@@ -17,11 +17,11 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function setSource(): void
+    protected function setShopSource(): void
     {
-        $this->source = new stdClass();
-        $this->source->type = $this->getType();
-        $this->source->id = $this->id;
+        $this->shopSource = new stdClass();
+        $this->shopSource->type = $this->getType();
+        $this->shopSource->id = $this->id;
     }
 
     /**
@@ -29,7 +29,7 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = (int) $this->source->id;
+        $this->id = (int) $this->shopSource->id;
     }
 
     /**
@@ -37,7 +37,7 @@ class Source extends BaseSource
      */
     public function getReference()
     {
-        return $this->source->id;
+        return $this->shopSource->id;
     }
 
     /**

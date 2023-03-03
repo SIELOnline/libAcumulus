@@ -308,7 +308,7 @@ class InvoiceStatusForm extends Form
         $type = $this->getSubmittedValue('acumulus_main_source_type');
         $id = (int) $this->getSubmittedValue('acumulus_main_source_id');
         $mainSource = $this->container->createSource($type, $id);
-        if ($mainSource->getSource()) {
+        if ($mainSource->getShopSource()) {
             $this->setSource($mainSource);
         }
 

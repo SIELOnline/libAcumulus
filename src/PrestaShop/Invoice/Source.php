@@ -21,8 +21,8 @@ use function strlen;
 /**
  * Wraps a PrestaShop order in an invoice source object.
  *
- * @property Order|OrderSlip $source;
- * @method Order|OrderSlip getSource()
+ * @property Order|OrderSlip $shopSource;
+ * @method Order|OrderSlip getShopSource()
  */
 class Source extends BaseSource
 {
@@ -31,12 +31,12 @@ class Source extends BaseSource
      *
      * @throws \PrestaShopException
      */
-    protected function setSource(): void
+    protected function setShopSource(): void
     {
         if ($this->getType() === Source::Order) {
-            $this->source = new Order($this->id);
+            $this->shopSource = new Order($this->id);
         } else {
-            $this->source = new OrderSlip($this->id);
+            $this->shopSource = new OrderSlip($this->id);
             $this->addProperties();
         }
     }
@@ -49,8 +49,8 @@ class Source extends BaseSource
     public function getReference()
     {
         return $this->getType() === Source::Order
-            ? $this->source->reference
-            : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf('%06d', $this->source->id);
+            ? $this->shopSource->reference
+            : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf('%06d', $this->shopSource->id);
     }
 
     /**
@@ -60,7 +60,7 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = $this->source->id;
+        $this->id = $this->shopSource->id;
         if ($this->getType() === Source::CreditNote) {
             $this->addProperties();
         }
@@ -71,7 +71,7 @@ class Source extends BaseSource
      */
     public function getDate(): string
     {
-        return substr($this->source->date_add, 0, strlen('2000-01-01'));
+        return substr($this->shopSource->date_add, 0, strlen('2000-01-01'));
     }
 
     /**
@@ -82,7 +82,7 @@ class Source extends BaseSource
      */
     protected function getStatusOrder(): int
     {
-        return (int) $this->source->current_state;
+        return (int) $this->shopSource->current_state;
     }
 
     /**
@@ -106,7 +106,7 @@ class Source extends BaseSource
     public function getPaymentMethod()
     {
         /** @var \Order $order */
-        $order = $this->getOrder()->source;
+        $order = $this->getShopOrder()->shopSource;
         return $order->module ?? parent::getPaymentMethod();
     }
 
@@ -116,7 +116,7 @@ class Source extends BaseSource
     public function getPaymentStatus(): int
     {
         // Assumption: credit slips are always in a paid status.
-        return ($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote
+        return ($this->getType() === Source::Order && $this->shopSource->hasBeenPaid()) || $this->getType() === Source::CreditNote
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -129,7 +129,7 @@ class Source extends BaseSource
         if ($this->getType() === Source::Order) {
             $paymentDate = null;
             /** @var \Order $order */
-            $order = $this->getOrder()->source;
+            $order = $this->getShopOrder()->shopSource;
             foreach ($order->getOrderPaymentCollection() as $payment) {
                 /** @var \OrderPayment $payment */
                 if ($payment->date_add && ($paymentDate === null || $payment->date_add > $paymentDate)) {
@@ -138,7 +138,7 @@ class Source extends BaseSource
             }
         } else {
             // Assumption: last modified date is date of actual reimbursement.
-            $paymentDate = $this->source->date_upd;
+            $paymentDate = $this->shopSource->date_upd;
         }
 
         return $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
@@ -149,7 +149,7 @@ class Source extends BaseSource
      */
     public function getCountryCode(): string
     {
-        $invoiceAddress = new Address($this->getOrder()->source->id_address_invoice);
+        $invoiceAddress = new Address($this->getShopOrder()->shopSource->id_address_invoice);
         return !empty($invoiceAddress->id_country) ? Country::getIsoById($invoiceAddress->id_country) : '';
     }
 
@@ -161,11 +161,11 @@ class Source extends BaseSource
      */
     public function getCurrency(): array
     {
-        $currency = Currency::getCurrencyInstance($this->getOrder()->source->id_currency);
+        $currency = Currency::getCurrencyInstance($this->getShopOrder()->shopSource->id_currency);
         /** @noinspection PhpCastIsUnnecessaryInspection */
         return [
             Meta::Currency => $currency->iso_code,
-            Meta::CurrencyRate => (float) $this->source->conversion_rate,
+            Meta::CurrencyRate => (float) $this->shopSource->conversion_rate,
             Meta::CurrencyDoConvert => true,
         ];
     }
@@ -180,22 +180,22 @@ class Source extends BaseSource
     {
         $sign = $this->getSign();
         if ($this->getType() === Source::Order) {
-            $amount = $this->source->getTotalProductsWithoutTaxes()
-                      + $this->source->total_shipping_tax_excl
-                      + $this->source->total_wrapping_tax_excl
-                      - $this->source->total_discounts_tax_excl;
-            $amountInc = $this->source->getTotalProductsWithTaxes()
-                         + $this->source->total_shipping_tax_incl
-                         + $this->source->total_wrapping_tax_incl
-                         - $this->source->total_discounts_tax_incl;
+            $amount = $this->shopSource->getTotalProductsWithoutTaxes()
+                      + $this->shopSource->total_shipping_tax_excl
+                      + $this->shopSource->total_wrapping_tax_excl
+                      - $this->shopSource->total_discounts_tax_excl;
+            $amountInc = $this->shopSource->getTotalProductsWithTaxes()
+                         + $this->shopSource->total_shipping_tax_incl
+                         + $this->shopSource->total_wrapping_tax_incl
+                         - $this->shopSource->total_discounts_tax_incl;
         } else {
             // On credit notes, the amount ex VAT will not have been corrected
             // for discounts that are subtracted from the refund. This will be
             // corrected later in getDiscountLinesCreditNote().
-            $amount = $this->source->total_products_tax_excl
-                      + $this->source->total_shipping_tax_excl;
-            $amountInc = $this->source->total_products_tax_incl
-                         + $this->source->total_shipping_tax_incl;
+            $amount = $this->shopSource->total_products_tax_excl
+                      + $this->shopSource->total_shipping_tax_excl;
+            $amountInc = $this->shopSource->total_products_tax_incl
+                         + $this->shopSource->total_shipping_tax_incl;
         }
 
         return [
@@ -212,8 +212,8 @@ class Source extends BaseSource
      */
     public function getInvoiceReferenceOrder(): ?string
     {
-        return !empty($this->source->invoice_number)
-            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getSource()->id_lang, null, $this->getSource()->id_shop) . sprintf('%06d', $this->getSource()->invoice_number)
+        return !empty($this->shopSource->invoice_number)
+            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getShopSource()->id_lang, null, $this->getShopSource()->id_shop) . sprintf('%06d', $this->getShopSource()->invoice_number)
             : null;
     }
 
@@ -225,8 +225,8 @@ class Source extends BaseSource
      */
     public function getInvoiceDateOrder(): ?string
     {
-        return !empty($this->getSource()->invoice_number)
-            ? substr($this->getSource()->invoice_date, 0, strlen('2000-01-01'))
+        return !empty($this->getShopSource()->invoice_number)
+            ? substr($this->getShopSource()->invoice_date, 0, strlen('2000-01-01'))
             : null;
     }
 
@@ -236,7 +236,7 @@ class Source extends BaseSource
     protected function getShopOrderOrId()
     {
         /** @var \OrderSlip $orderSlip */
-        $orderSlip = $this->source;
+        $orderSlip = $this->shopSource;
         return $orderSlip->id_order;
     }
 
@@ -246,7 +246,7 @@ class Source extends BaseSource
     protected function getShopCreditNotesOrIds()
     {
         /** @var \Order $order */
-        $order = $this->source;
+        $order = $this->shopSource;
         return $order->getOrderSlipsCollection();
     }
 
@@ -269,7 +269,7 @@ class Source extends BaseSource
             $row = reset($row);
             foreach ($row as $key => $value) {
                 /** @noinspection PhpVariableVariableInspection */
-                $this->source->$key ??= $value;
+                $this->shopSource->$key ??= $value;
             }
         }
     }

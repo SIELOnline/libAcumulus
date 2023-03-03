@@ -59,11 +59,11 @@ class Creator extends BaseCreator
         parent::setInvoiceSource($invoiceSource);
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->order = $this->invoiceSource->getSource();
+                $this->order = $this->invoiceSource->getShopSource();
                 $this->creditNote = null;
                 break;
             case Source::CreditNote:
-                $this->creditNote = $this->invoiceSource->getSource();
+                $this->creditNote = $this->invoiceSource->getShopSource();
                 $this->order = $this->creditNote->getOrder();
                 break;
         }
@@ -79,7 +79,7 @@ class Creator extends BaseCreator
         parent::setPropertySources();
 
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $source */
-        $source = $this->invoiceSource->getSource();
+        $source = $this->invoiceSource->getShopSource();
         if ($source->getBillingAddress() !== null) {
             $this->propertySources['billingAddress'] = $source->getBillingAddress();
         } else {
@@ -441,7 +441,7 @@ class Creator extends BaseCreator
     {
         $result = [];
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $magentoSource */
-        $magentoSource = $this->invoiceSource->getSource();
+        $magentoSource = $this->invoiceSource->getShopSource();
         // Only add a free shipping line on an order, not on a credit note:
         // free shipping is never refunded...
         if ($this->invoiceSource->getType() === Source::Order || !Number::isZero($magentoSource->getBaseShippingAmount())) {
@@ -524,7 +524,7 @@ class Creator extends BaseCreator
         $result = [];
 
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $source */
-        $source = $this->invoiceSource->getSource();
+        $source = $this->invoiceSource->getShopSource();
         if (!Number::isZero($source->getBaseDiscountAmount())) {
             $line = [
                 Tag::ItemNumber => '',

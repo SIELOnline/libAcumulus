@@ -22,7 +22,7 @@ use function strlen;
 /**
  * Wraps an OpenCart order in an invoice source object.
  *
- * @property array $source
+ * @property array $shopSource
  */
 abstract class Source extends BaseSource
 {
@@ -35,10 +35,10 @@ abstract class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function setSource(): void
+    protected function setShopSource(): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->source = $this->getRegistry()->getOrder($this->id);
+        $this->shopSource = $this->getRegistry()->getOrder($this->id);
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = $this->source['order_id'];
+        $this->id = $this->shopSource['order_id'];
     }
 
     /**
@@ -54,7 +54,7 @@ abstract class Source extends BaseSource
      */
     public function getDate(): string
     {
-        return substr($this->source['date_added'], 0, strlen('2000-01-01'));
+        return substr($this->shopSource['date_added'], 0, strlen('2000-01-01'));
     }
 
     /**
@@ -64,7 +64,7 @@ abstract class Source extends BaseSource
      */
     public function getStatus(): int
     {
-        return (int) $this->source['order_status_id'];
+        return (int) $this->shopSource['order_status_id'];
     }
 
     /**
@@ -72,10 +72,10 @@ abstract class Source extends BaseSource
      */
     public function getCountryCode(): string
     {
-        if (!empty($this->source['payment_iso_code_2'])) {
-            return $this->source['payment_iso_code_2'];
-        } elseif (!empty($this->source['shipping_iso_code_2'])) {
-            return $this->source['shipping_iso_code_2'];
+        if (!empty($this->shopSource['payment_iso_code_2'])) {
+            return $this->shopSource['payment_iso_code_2'];
+        } elseif (!empty($this->shopSource['shipping_iso_code_2'])) {
+            return $this->shopSource['shipping_iso_code_2'];
         } else {
             return '';
         }
@@ -88,7 +88,7 @@ abstract class Source extends BaseSource
      */
     public function getPaymentMethod(): ?string
     {
-        return $this->source['payment_code'] ?? parent::getPaymentMethod();
+        return $this->shopSource['payment_code'] ?? parent::getPaymentMethod();
     }
 
     /**
@@ -104,7 +104,7 @@ abstract class Source extends BaseSource
         // completed...
         $orderStatuses = (array) $this->getRegistry()->config->get('config_complete_status');
 
-        return (empty($orderStatuses) || in_array($this->source['order_status_id'], $orderStatuses, true))
+        return (empty($orderStatuses) || in_array($this->shopSource['order_status_id'], $orderStatuses, true))
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -130,8 +130,8 @@ abstract class Source extends BaseSource
     public function getCurrency(): array
     {
         return [
-            Meta::Currency => $this->source['currency_code'],
-            Meta::CurrencyRate => (float) $this->source['currency_value'],
+            Meta::Currency => $this->shopSource['currency_code'],
+            Meta::CurrencyRate => (float) $this->shopSource['currency_value'],
             Meta::CurrencyDoConvert => false,
         ];
     }
@@ -145,7 +145,7 @@ abstract class Source extends BaseSource
     protected function getAvailableTotals(): array
     {
         $result = [
-            Meta::InvoiceAmountInc => (float) $this->source['total'],
+            Meta::InvoiceAmountInc => (float) $this->shopSource['total'],
             Meta::InvoiceVatAmount => 0.0,
             Meta::InvoiceVatBreakdown => [],
         ];
@@ -178,8 +178,8 @@ abstract class Source extends BaseSource
     public function getInvoiceReference()
     {
         $result = null;
-        if (!empty($this->source['invoice_no'])) {
-            $result = $this->source['invoice_prefix'] . $this->source['invoice_no'];
+        if (!empty($this->shopSource['invoice_no'])) {
+            $result = $this->shopSource['invoice_prefix'] . $this->shopSource['invoice_no'];
         }
         return $result;
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
@@ -22,34 +23,41 @@ use function strlen;
  * 'shop_order' and 'shop_order_refund'. The base class for all these types of
  * orders is WC_Abstract_Order
  *
- * @property WC_Order|WC_Order_Refund $source
- * @method WC_Order|WC_Order_Refund getSource()
+ * @property WC_Order|WC_Order_Refund $shopSource
+ * @method WC_Order|WC_Order_Refund getShopSource()
  */
 class Source extends BaseSource
 {
     /**
      * Loads an Order or refund source for the set id.
+     *
+     * @throws  \RuntimeException
+     *   If $idOrSource is empty or not a valid source.
      */
-    protected function setSource(): void
+    protected function setShopSource(): void
     {
-        $this->source = WC()->order_factory::get_order($this->id);
-        if (!is_object($this->source)) {
-            $this->source = null;
-            $this->id = null;
+        $this->shopSource = WC()->order_factory::get_order($this->id);
+        if (!is_object($this->shopSource)) {
+            throw new RuntimeException("Not a valid source id ({$this->id})");
+//            $this->source = null;
+//            $this->id = null;
         }
     }
 
     /**
      * Sets the id based on the loaded Order or Order refund.
+     *
+     * @throws  \RuntimeException
+     *   If $idOrSource is empty or not a valid source.
      */
     protected function setId(): void
     {
-        if ($this->source instanceof WC_Abstract_Order) {
-            $this->id = $this->source->get_id();
-        } else {
-            $this->source = null;
-            $this->id = null;
+        if (!$this->shopSource instanceof WC_Abstract_Order) {
+            throw new RuntimeException('Not a WC_Abstract_Order');
+//            $this->source = null;
+//            $this->id = null;
         }
+        $this->id = $this->shopSource->get_id();
     }
 
     /**
@@ -63,7 +71,7 @@ class Source extends BaseSource
         // wc-sequential-order-numbers, and custom-order-numbers-for-woocommerce(-pro).
         if ($this->getType() === Source::Order) {
             /** @var \WC_Order $order */
-            $order = $this->source;
+            $order = $this->shopSource;
             return $order->get_order_number();
         }
         return parent::getReference();
@@ -75,7 +83,7 @@ class Source extends BaseSource
     public function getDate(): string
     {
         // get_date_created() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->source->get_date_created(), 0, strlen('2000-01-01'));
+        return substr((string) $this->shopSource->get_date_created(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -83,7 +91,7 @@ class Source extends BaseSource
      */
     public function getStatus(): string
     {
-        return $this->source->get_status();
+        return $this->shopSource->get_status();
     }
 
     /**
@@ -96,7 +104,7 @@ class Source extends BaseSource
         // Payment method is not stored for credit notes, so it is expected to
         // be the same as for its order.
         /** @var \WC_Order $order */
-        $order = $this->getOrder()->source;
+        $order = $this->getShopOrder()->shopSource;
         return $order->get_payment_method();
     }
 
@@ -111,7 +119,7 @@ class Source extends BaseSource
      */
     protected function getPaymentStatusOrder(): int
     {
-        return $this->source->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
+        return $this->shopSource->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     /**
@@ -141,7 +149,7 @@ class Source extends BaseSource
     protected function getPaymentDateOrder(): string
     {
         // get_date_paid() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->source->get_date_paid(), 0, strlen('2000-01-01'));
+        return substr((string) $this->shopSource->get_date_paid(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -156,7 +164,7 @@ class Source extends BaseSource
     protected function getPaymentDateCreditNote(): string
     {
         // get_date_modified() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->source->get_date_modified(), 0, strlen('2000-01-01'));
+        return substr((string) $this->shopSource->get_date_modified(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -167,7 +175,7 @@ class Source extends BaseSource
         // Billing information is not stored for credit notes, so it is expected
         // to be the same as for its order.
         /** @var \WC_Order $order */
-        $order = $this->getOrder()->source;
+        $order = $this->getShopOrder()->shopSource;
         $tax_based_on = get_option('woocommerce_tax_based_on');
         $result = '';
         if ($tax_based_on === 'shipping') {
@@ -211,8 +219,8 @@ class Source extends BaseSource
     protected function getAvailableTotals(): array
     {
         return [
-            Meta::InvoiceAmountInc => (float) $this->source->get_total(),
-            Meta::InvoiceVatAmount => (float) $this->source->get_total_tax(),
+            Meta::InvoiceAmountInc => (float) $this->shopSource->get_total(),
+            Meta::InvoiceVatAmount => (float) $this->shopSource->get_total_tax(),
         ];
     }
 
@@ -224,7 +232,7 @@ class Source extends BaseSource
     protected function getShopOrderOrId(): int
     {
         /** @var \WC_Order_Refund $refund */
-        $refund = $this->source;
+        $refund = $this->shopSource;
         return $refund->get_parent_id();
     }
 
@@ -236,7 +244,7 @@ class Source extends BaseSource
     protected function getShopCreditNotesOrIds(): array
     {
         /** @var \WC_Order $order */
-        $order = $this->source;
+        $order = $this->shopSource;
         return $order->get_refunds();
     }
 }

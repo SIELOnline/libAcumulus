@@ -198,21 +198,21 @@ abstract class Creator
         $this->propertySources['invoiceSourceType'] = ['label' => $this->t($this->propertySources['invoiceSource']->getType())];
 
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
-            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
+            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getShopOrder();
             $this->propertySources['originalInvoiceSourceType'] =
                 ['label' => $this->t($this->propertySources['originalInvoiceSource']->getType())];
         }
-        $this->propertySources['source'] = $this->invoiceSource->getSource();
+        $this->propertySources['source'] = $this->invoiceSource->getShopSource();
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
             if ($this->invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refund'] = $this->invoiceSource->getSource();
+                $this->propertySources['refund'] = $this->invoiceSource->getShopSource();
             }
-            $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
+            $this->propertySources['order'] = $this->invoiceSource->getShopOrder()->getShopSource();
             if ($this->invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getOrder();
+                $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getShopOrder();
                 $this->propertySources['refundedInvoiceSourceType'] =
                     ['label' => $this->t($this->propertySources['refundedInvoiceSource']->getType())];
-                $this->propertySources['refundedOrder'] = $this->invoiceSource->getOrder()->getSource();
+                $this->propertySources['refundedOrder'] = $this->invoiceSource->getShopOrder()->getShopSource();
             }
         }
     }

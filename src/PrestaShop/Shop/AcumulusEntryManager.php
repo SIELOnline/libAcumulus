@@ -73,8 +73,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         if ($invoiceSource->getType() === Source::Order) {
-            $shopId = $invoiceSource->getSource()->id_shop;
-            $shopGroupId = $invoiceSource->getSource()->id_shop_group;
+            $shopId = $invoiceSource->getShopSource()->id_shop;
+            $shopGroupId = $invoiceSource->getShopSource()->id_shop_group;
         } else {
             $shopId = 0;
             $shopGroupId = 0;

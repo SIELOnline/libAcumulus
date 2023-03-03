@@ -42,13 +42,13 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function setSource(): void
+    protected function setShopSource(): void
     {
         // @todo: set the source, given an id (and type).
         if ($this->getType() === Source::Order) {
-            $this->source = new Order($this->id);
+            $this->shopSource = new Order($this->id);
         } else {
-            $this->source = new CreditNote($this->id);
+            $this->shopSource = new CreditNote($this->id);
         }
     }
 
@@ -58,7 +58,7 @@ class Source extends BaseSource
     protected function setId(): void
     {
         // @todo: set the id, given a loaded source.
-        $this->id = (int) $this->source->id;
+        $this->id = (int) $this->shopSource->id;
     }
 
     /**
@@ -108,7 +108,7 @@ class Source extends BaseSource
     {
         // @todo: override or implement both getPaymentStatusOrder() and getPaymentStatusCreditNote()
         // Assumption: credit slips are always in a paid status.
-        if (($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
+        if (($this->getType() === Source::Order && $this->shopSource->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
             $result = Api::PaymentStatus_Paid;
         } else {
             $result = Api::PaymentStatus_Due;
@@ -142,8 +142,8 @@ class Source extends BaseSource
     {
         // @todo: provide implementation.
         $result = [
-            Meta::Currency => $this->source->currency_code,
-            Meta::CurrencyRate => (float) $this->source->conversion_rate,
+            Meta::Currency => $this->shopSource->currency_code,
+            Meta::CurrencyRate => (float) $this->shopSource->conversion_rate,
             Meta::CurrencyDoConvert => true,
         ];
         return $result;

@@ -50,11 +50,11 @@ class Creator extends BaseCreator
         parent::setInvoiceSource($invoiceSource);
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->order = $this->invoiceSource->getSource();
+                $this->order = $this->invoiceSource->getShopSource();
                 break;
             case Source::CreditNote:
-                $this->creditNote = $this->invoiceSource->getSource();
-                $this->order = $this->invoiceSource->getOrder()->getSource();
+                $this->creditNote = $this->invoiceSource->getShopSource();
+                $this->order = $this->invoiceSource->getShopOrder()->getShopSource();
                 break;
         }
     }
@@ -68,7 +68,7 @@ class Creator extends BaseCreator
         parent::setPropertySources();
         $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
         $this->propertySources['address_delivery'] = new Address($this->order->id_address_delivery);
-        $this->propertySources['customer'] = new Customer($this->invoiceSource->getSource()->id_customer);
+        $this->propertySources['customer'] = new Customer($this->invoiceSource->getShopSource()->id_customer);
     }
 
     /**
@@ -78,7 +78,7 @@ class Creator extends BaseCreator
     {
         // @todo: override or implement both addItemLinesOrder() and addItemLinesCreditNote()
         $result = [];
-        $lines = $this->invoiceSource->getSource()->getItemLines();
+        $lines = $this->invoiceSource->getShopSource()->getItemLines();
         foreach ($lines as $line) {
             $result[] = $this->getItemLine($line);
         }

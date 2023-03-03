@@ -24,14 +24,12 @@ abstract class Source
     public const Other = 'Other';
 
     protected string $type;
-    /**
-     * @todo: Make these an int resp. array|object, thus not null. This means, we
-     *   should probably throw when we cannot construct a valid instance
-     */
-    protected ?int $id;
-    /** @var array|object|null */
-    protected $source;
-    /** @var array|object|null */
+    protected int $id;
+    /** @var array|object */
+    protected $shopSource;
+    /** @var array|object */
+    protected $shopOrder;
+    /** @var array|object */
     protected $invoice;
 
     /**
@@ -40,19 +38,21 @@ abstract class Source
      * @param string $type
      * @param int|string|array|object $idOrSource
      *
-     * @todo: Throw an exception if we cannot find the source.
+     * @throws  \RuntimeException
+     *   If $idOrSource is empty or not a valid source.
      */
     public function __construct(string $type, $idOrSource)
     {
         $this->type = $type;
         if (empty($idOrSource)) {
-            $this->id = null;
-            $this->source = null;
+            throw new RuntimeException('Empty source');
+//            $this->id = null;
+//            $this->source = null;
         } elseif (is_scalar($idOrSource)) {
             $this->id = (int) $idOrSource;
-            $this->setSource();
+            $this->setShopSource();
         } else {
-            $this->source = $idOrSource;
+            $this->shopSource = $idOrSource;
             $this->setId();
         }
         $this->setInvoice();
@@ -60,8 +60,10 @@ abstract class Source
 
     /**
      * Sets the source based on type and id.
+     *
+     * @throws \RuntimeException
      */
-    protected function setSource(): void
+    protected function setShopSource(): void
     {
         $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -72,22 +74,6 @@ abstract class Source
     protected function setId(): void
     {
         $this->callTypeSpecificMethod(__FUNCTION__);
-    }
-
-    /**
-     * Returns whether the wrapped source is a valid source.
-     *
-     * This should mainly be used directly after creating a Source from
-     * non-trusted input.
-     *
-     * @return bool
-     *   True if the wrapped source is a valid source, false otherwise.
-     *
-     * @noinspection PhpUnused
-     */
-    public function isValid(): bool
-    {
-        return $this->id !== null && $this->source !== null;
     }
 
     /**
@@ -104,12 +90,20 @@ abstract class Source
     /**
      * Returns the web shop specific source for an invoice.
      *
-     * @return array|object|null
+     * @return array|object
      *   The web shop specific source for an invoice.
+     */
+    public function getShopSource()
+    {
+        return $this->shopSource;
+    }
+
+    /**
+     * @deprecated  Renamed to getShopSource().
      */
     public function getSource()
     {
-        return $this->source;
+        return $this->getShopSource();
     }
 
     /**
@@ -147,7 +141,7 @@ abstract class Source
      */
     public function getSign(): float
     {
-        return $this->getType() === static::CreditNote ? -1.0 : 1.0;
+        return $this->getType() === self::CreditNote ? -1.0 : 1.0;
     }
 
     /**
@@ -190,7 +184,7 @@ abstract class Source
      */
     public function getPaymentMethod()
     {
-        return $this->getOrder()->getPaymentMethod();
+        return $this->getShopOrder()->getPaymentMethod();
     }
 
     /**
@@ -403,12 +397,25 @@ abstract class Source
      *   If the invoice source is a credit note, its original order is returned,
      *   otherwise, the invoice source is an order itself and $this is returned.
      */
-    public function getOrder(): Source
+    public function getShopOrder(): Source
     {
-        return $this->getType() === static::CreditNote ? new static(static::Order, $this->getShopOrderOrId()) : $this;
+        if (!isset($this->shopOrder)) {
+            $this->shopOrder = $this->getType() === self::Order
+                ? $this
+                : new static(self::Order, $this->getShopOrderOrId());
+        }
+        return $this->shopOrder;
     }
 
-    /** @noinspection PhpDocSignatureInspection */
+    /**
+     * @deprecated  Renamed to getShopSource().
+     * @noinspection PhpUnused
+     */
+    public function getOrder(): Source
+    {
+        return $this->getShopOrder();
+    }
+
     /**
      * Returns the original order or order id for this credit note.
      *
@@ -432,19 +439,21 @@ abstract class Source
      *
      * Do not override this method but override getShopCreditNotes() instead.
      *
-     * @return Source[]|null
-     *   If the invoice source is an order, a, possibly empty, array of refunds
-     *   is returned, null otherwise.
+     * @return Source[]
+     *   If this invoice source is a(n):
+     *   - Order: a - possibly empty - array of credit notes of this order.
+     *   - Credit note: an array with this credit note as only element
      */
-    public function getCreditNotes(): ?array
+    public function getCreditNotes(): array
     {
-        $result = null;
-        if ($this->getType() === static::Order) {
+        if ($this->getType() === self::Order) {
             $result = [];
             $shopCreditNotes = $this->getShopCreditNotesOrIds();
             foreach ($shopCreditNotes as $shopCreditNote) {
-                $result[] = new static(static::CreditNote, $shopCreditNote);
+                $result[] = new static(self::CreditNote, $shopCreditNote);
             }
+        } else {
+            $result = [$this];
         }
         return $result;
     }
@@ -460,11 +469,37 @@ abstract class Source
      * available.
      *
      * @return array[]|object[]|int[]|\Traversable
-     *   The, possibly empty, set of refunds or refund-ids for this order.
+     *   The - possibly empty - set of refunds or refund-ids for this order.
      */
     protected function getShopCreditNotesOrIds()
     {
         return [];
+    }
+
+    /**
+     * Returns a shop credit note for this invoice source.
+     *
+     * @param int $index
+     *   The 0-based index of the credit note to return. Some shops allow for
+     *   more than 1 credit note to be created for any given order. By default,
+     *   the 1st (and often the only possible one) will be returned.
+     *
+     * @return array|object|null
+     *   If this invoice source is a(n):
+     *   - Order that has at least i+1 credit notes: the ith shop credit note
+     *     for this order.
+     *   - Credit note: the credit note itself, if $index = 0.
+     *   Null otherwise.
+     *
+     * @noinspection PhpUnused  Can be used in mappings.
+     */
+    public function getShopCreditNote(int $index = 0)
+    {
+        /**
+         * @noinspection ProperNullCoalescingOperatorUsageInspection
+         *   False positive.
+         */
+        return $this->getCreditNotes()[$index]->getShopSource() ?? null;
     }
 
     /**

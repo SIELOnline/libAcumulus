@@ -18,7 +18,7 @@ class Source extends BaseSource
     public function getOrderTotalLines(): array
     {
         if (!isset($this->orderTotalLines)) {
-            $this->orderTotalLines = $this->getOrderModel()->getOrderTotals($this->source['order_id']);
+            $this->orderTotalLines = $this->getOrderModel()->getOrderTotals($this->shopSource['order_id']);
         }
         return $this->orderTotalLines;
     }

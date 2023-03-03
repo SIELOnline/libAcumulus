@@ -23,8 +23,8 @@ use function strlen;
 /**
  * Wraps a Magento order or credit memo in an invoice source object.
  *
- * @property Order|Creditmemo $source
- * @method Order|Creditmemo getSource()
+ * @property Order|Creditmemo $shopSource
+ * @method Order|Creditmemo getShopSource()
  */
 class Source extends BaseSource
 {
@@ -33,29 +33,33 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = (int) $this->source->getId();
+        $this->id = (int) $this->shopSource->getId();
     }
 
     /**
      * Loads an Order source for the set id.
+     *
+     * @noinspection PhpUnused  Called via setShopSource().
      */
-    protected function setSourceOrder(): void
+    protected function setShopSourceOrder(): void
     {
-        $this->source = Registry::getInstance()->create(Order::class);
+        $this->shopSource = Registry::getInstance()->create(Order::class);
         /** @var \Magento\Sales\Model\ResourceModel\Order $loader */
         $loader = Registry::getInstance()->get(\Magento\Sales\Model\ResourceModel\Order::class);
-        $loader->load($this->source, $this->id);
+        $loader->load($this->shopSource, $this->id);
     }
 
     /**
      * Loads a Credit memo source for the set id.
+     *
+     * @noinspection PhpUnused  Called via setShopSource().
      */
-    protected function setSourceCreditNote(): void
+    protected function setShopSourceCreditNote(): void
     {
-        $this->source = Registry::getInstance()->create(Creditmemo::class);
+        $this->shopSource = Registry::getInstance()->create(Creditmemo::class);
         /** @var \Magento\Sales\Model\ResourceModel\Order $loader */
         $loader = Registry::getInstance()->get(\Magento\Sales\Model\ResourceModel\Order\Creditmemo::class);
-        $loader->load($this->source, $this->id);
+        $loader->load($this->shopSource, $this->id);
     }
 
     /**
@@ -71,7 +75,7 @@ class Source extends BaseSource
      */
     protected function getReferenceOrder(): string
     {
-        return $this->source->getIncrementId();
+        return $this->shopSource->getIncrementId();
     }
 
     /**
@@ -79,7 +83,7 @@ class Source extends BaseSource
      */
     protected function getReferenceCreditNote(): string
     {
-        return 'CM' . $this->source->getIncrementId();
+        return 'CM' . $this->shopSource->getIncrementId();
     }
 
     /**
@@ -88,7 +92,7 @@ class Source extends BaseSource
     public function getDate(): string
     {
         // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
-        return substr($this->source->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+        return substr($this->shopSource->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
 
     /**
@@ -96,7 +100,7 @@ class Source extends BaseSource
      */
     protected function getStatusOrder(): string
     {
-        return $this->source->getStatus();
+        return $this->shopSource->getStatus();
     }
 
     /**
@@ -110,7 +114,7 @@ class Source extends BaseSource
      */
     protected function getStatusCreditNote(): int
     {
-        return $this->source->getState();
+        return $this->shopSource->getState();
     }
 
     /**
@@ -124,7 +128,7 @@ class Source extends BaseSource
     public function getPaymentMethod()
     {
         try {
-            return $this->getOrder()->source->getPayment()->getMethod();
+            return $this->getShopOrder()->shopSource->getPayment()->getMethod();
         } catch (Throwable $e) {
             return parent::getPaymentMethod();
         }
@@ -139,7 +143,7 @@ class Source extends BaseSource
      */
     protected function getPaymentStatusOrder(): int
     {
-        return Number::isZero($this->source->getBaseTotalDue())
+        return Number::isZero($this->shopSource->getBaseTotalDue())
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -153,7 +157,7 @@ class Source extends BaseSource
      */
     protected function getPaymentStatusCreditNote(): int
     {
-        return $this->source->getState() === Creditmemo::STATE_REFUNDED
+        return $this->shopSource->getState() === Creditmemo::STATE_REFUNDED
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -180,7 +184,7 @@ class Source extends BaseSource
     {
         // Take date of last payment as payment date.
         $paymentDate = null;
-        foreach ($this->source->getStatusHistoryCollection() as $statusChange) {
+        foreach ($this->shopSource->getStatusHistoryCollection() as $statusChange) {
             /** @var \Magento\Sales\Model\Order\Status\History $statusChange */
             if (!$paymentDate || $this->isPaidStatus($statusChange->getStatus())) {
                 $createdAt = substr($statusChange->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
@@ -201,14 +205,14 @@ class Source extends BaseSource
      */
     protected function getPaymentDateCreditNote(): ?string
     {
-        return substr($this->source->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+        return substr($this->shopSource->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
 
     public function getCurrency(): array
     {
         return [
-            Meta::Currency => $this->source->getOrderCurrencyCode(),
-            Meta::CurrencyRate => (float) $this->source->getBaseToOrderRate(),
+            Meta::Currency => $this->shopSource->getOrderCurrencyCode(),
+            Meta::CurrencyRate => (float) $this->shopSource->getBaseToOrderRate(),
             Meta::CurrencyDoConvert => false,
         ];
 
@@ -224,8 +228,8 @@ class Source extends BaseSource
     {
         $sign = $this->getSign();
         return [
-            Meta::InvoiceAmountInc => $sign * $this->source->getBaseGrandTotal(),
-            Meta::InvoiceVatAmount => $sign * $this->source->getBaseTaxAmount(),
+            Meta::InvoiceAmountInc => $sign * $this->shopSource->getBaseGrandTotal(),
+            Meta::InvoiceVatAmount => $sign * $this->shopSource->getBaseTaxAmount(),
         ];
     }
 
@@ -236,7 +240,7 @@ class Source extends BaseSource
     {
         parent::setInvoice();
         if ($this->getType() === Source::Order) {
-            $shopInvoices = $this->source->getInvoiceCollection();
+            $shopInvoices = $this->shopSource->getInvoiceCollection();
             if (count($shopInvoices) > 0) {
                 $this->invoice = $shopInvoices->getFirstItem();
             }
@@ -266,7 +270,7 @@ class Source extends BaseSource
     protected function getShopOrderOrId()
     {
         /** @var \Magento\Sales\Model\Order\Creditmemo $creditmemo */
-        $creditmemo = $this->source;
+        $creditmemo = $this->shopSource;
         return $creditmemo->getOrderId();
     }
 
@@ -276,7 +280,7 @@ class Source extends BaseSource
     protected function getShopCreditNotesOrIds()
     {
         /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->source;
+        $order = $this->shopSource;
         return $order->getCreditmemosCollection();
     }
 
@@ -285,6 +289,6 @@ class Source extends BaseSource
      */
     public function getCountryCode(): string
     {
-        return $this->source->getBillingAddress()->getCountryId();
+        return $this->shopSource->getBillingAddress()->getCountryId();
     }
 }

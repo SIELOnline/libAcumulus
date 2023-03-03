@@ -213,17 +213,17 @@ abstract class InvoiceCollector extends Collector
         $this->propertySources = [];
         $this->propertySources['invoiceSource'] = $this->invoiceSource;
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
-            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
+            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getShopOrder();
         }
-        $this->propertySources['source'] = $this->invoiceSource->getSource();
+        $this->propertySources['source'] = $this->invoiceSource->getShopSource();
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
             if ($this->invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refund'] = $this->invoiceSource->getSource();
+                $this->propertySources['refund'] = $this->invoiceSource->getShopSource();
             }
-            $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
+            $this->propertySources['order'] = $this->invoiceSource->getShopOrder()->getShopSource();
             if ($this->invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getOrder();
-                $this->propertySources['refundedOrder'] = $this->invoiceSource->getOrder()->getSource();
+                $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getShopOrder();
+                $this->propertySources['refundedOrder'] = $this->invoiceSource->getShopOrder()->getShopSource();
             }
         }
         return $this;

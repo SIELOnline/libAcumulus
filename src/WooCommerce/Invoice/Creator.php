@@ -65,7 +65,7 @@ class Creator extends BaseCreator
     {
         $result = [];
         /** @var WC_Order_Item_Product[] $items */
-        $items = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        $items = $this->invoiceSource->getShopSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
             $product = $item->get_product();
             $line = $this->getItemLine($item, $product);
@@ -372,7 +372,7 @@ class Creator extends BaseCreator
         // So far, all amounts found on refunds are negative, so we probably
         // don't need to correct the sign on these lines either: but this has
         // not been tested yet!.
-        foreach ($this->invoiceSource->getSource()->get_fees() as $feeLine) {
+        foreach ($this->invoiceSource->getShopSource()->get_fees() as $feeLine) {
             $line = $this->getFeeLine($feeLine);
             $line = $this->addLineType($line, static::LineType_Other);
             $result[] = $line;
@@ -410,7 +410,7 @@ class Creator extends BaseCreator
         $result = [];
         // Get the shipping lines for this order.
         /** @var \WC_Order_Item_Shipping[] $shippingItems */
-        $shippingItems = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+        $shippingItems = $this->invoiceSource->getShopSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
         foreach ($shippingItems as $shippingItem) {
             $shippingLine = $this->getShippingLine($shippingItem);
             if ($shippingLine) {
@@ -544,7 +544,7 @@ class Creator extends BaseCreator
             $shippingTaxClass = get_option('woocommerce_shipping_tax_class');
             if (is_string($shippingTaxClass)) {
                 /** @var \WC_Order $order */
-                $order = $this->invoiceSource->getOrder()->getSource();
+                $order = $this->invoiceSource->getShopOrder()->getShopSource();
 
                 // Since WC3, the shipping tax class can be based on those from
                 // the product items in the cart (which should be the preferred
@@ -583,7 +583,7 @@ class Creator extends BaseCreator
             // Add a line for all coupons applied. Coupons are only stored on
             // the order, not on refunds, so use the order.
             /** @var \WC_Order $order */
-            $order = $this->invoiceSource->getOrder()->getSource();
+            $order = $this->invoiceSource->getShopOrder()->getShopSource();
             $usedCoupons = $order->get_coupon_codes();
             foreach ($usedCoupons as $code) {
                 $coupon = new WC_Coupon($code);

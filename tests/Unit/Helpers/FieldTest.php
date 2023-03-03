@@ -10,12 +10,12 @@ namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use Siel\Acumulus\Helpers\Container;
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Helpers\Field;
+use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\FormRenderer;
 use Siel\Acumulus\Tests\Unit\GetTestData;
 
 /**
- * Tests for the {@see Field} class.
+ * Tests for the {@see FieldExpander} class.
  */
 class FieldTest extends TestCase
 {
@@ -35,15 +35,15 @@ class FieldTest extends TestCase
     }
 
     /**
-     * @return \Siel\Acumulus\Helpers\Field
+     * @return \Siel\Acumulus\Helpers\FieldExpander
      */
-    public function getField(): Field
+    public function getField(): FieldExpander
     {
-        return $this->getContainer()->getField();
+        return $this->getContainer()->getFieldExpander();
     }
 
     /**
-     * Returns a few "objects" to test{@see  Field::expand()} with.
+     * Returns a few "objects" to test{@see  FieldExpander::expand()} with.
      */
     private function getObjects(): array
     {

@@ -19,6 +19,7 @@ use Siel\Acumulus\Api;
  * @property ?string $emailFrom
  * @property ?string $subject
  * @property ?string $message
+ * @property ?bool $confirmReading
  * @property ?bool $gfx
  *
  * @method bool setEmailTo(?string $value, int $mode = PropertySet::Always)
@@ -26,6 +27,7 @@ use Siel\Acumulus\Api;
  * @method bool setEmailFrom(?string $value, int $mode = PropertySet::Always)
  * @method bool setSubject(?string $value, int $mode = PropertySet::Always)
  * @method bool setMessage(?string $value, int $mode = PropertySet::Always)
+ * @method bool setConfirmReading(?bool $value, int $mode = PropertySet::Always)
  * @method bool setGfx(?bool $value, int $mode = PropertySet::Always)
  */
 class EmailAsPdf extends AcumulusObject
@@ -38,6 +40,7 @@ class EmailAsPdf extends AcumulusObject
             ['name' => 'emailFrom', 'type' => 'string'],
             ['name' => 'subject', 'type' => 'string'],
             ['name' => 'message', 'type' => 'string'],
+            ['name' => 'confirmReading', 'type' => 'bool', 'allowedValues' => [Api::ConfirmReading_No, Api::ConfirmReading_Yes]],
             ['name' => 'gfx', 'type' => 'bool', 'allowedValues' => [Api::ApplyGraphics_No, Api::ApplyGraphics_Yes]],
         ];
     }

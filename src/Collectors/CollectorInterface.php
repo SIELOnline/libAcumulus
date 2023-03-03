@@ -45,7 +45,7 @@ interface CollectorInterface
      *   The objects that serve as a source for property extraction. Note that
      *    the {@see \Siel\Acumulus\Helpers\Token} class can also call
      *    (parameterless) methods on the property sources.
-     * @param string[] $fieldDefinitions
+     * @param string[] $fieldSpecifications
      *   The patterns for the fields that can be collected via a simple mapping.
      *   A pattern can be a constant value or a pattern that contains references
      *   to properties or methods defined on one of the property sources.
@@ -55,5 +55,5 @@ interface CollectorInterface
      *   $propertySources, the $fieldDefinitions, and the logic of a class
      *   implementing this interface.
      */
-    public function collect(array $propertySources, array $fieldDefinitions): AcumulusObject;
+    public function collect(array $propertySources, array $fieldSpecifications): AcumulusObject;
 }

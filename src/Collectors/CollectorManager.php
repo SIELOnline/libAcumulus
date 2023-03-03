@@ -10,10 +10,10 @@ use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\EmailAsPdf;
-use Siel\Acumulus\Data\EmailAsPdfTarget;
+use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Field;
+use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 
@@ -35,16 +35,16 @@ use function array_key_exists;
  */
 class CollectorManager
 {
-    protected Field $field;
+    protected FieldExpander $fieldExpander;
     private ShopCapabilities $shopCapabilities;
     private Container $container;
     private Config $config;
     protected Log $log;
     protected array $propertySources;
 
-    public function __construct(Field $field, ShopCapabilities $shopCapabilities, Config $config, Container $container, Log $log)
+    public function __construct(FieldExpander $fieldExpander, ShopCapabilities $shopCapabilities, Config $config, Container $container, Log $log)
     {
-        $this->field = $field;
+        $this->fieldExpander = $fieldExpander;
         $this->shopCapabilities = $shopCapabilities;
         $this->container = $container;
         $this->config = $config;
@@ -136,7 +136,7 @@ class CollectorManager
         $invoice->setCustomer($this->collectCustomer());
         $emailAsPdfSettings = $this->getConfig()->getEmailAsPdfSettings();
         if ($emailAsPdfSettings['emailAsPdf']) {
-            $invoice->setEmailAsPdf($this->collectEmailAsPdf(EmailAsPdfTarget::Invoice));
+            $invoice->setEmailAsPdf($this->collectEmailAsPdf(EmailAsPdfType::Invoice));
         }
 
         // @todo: invoice lines.
@@ -148,6 +148,11 @@ class CollectorManager
     {
         $customerCollector = $this->getContainer()->getCollector('Customer');
         $customerMappings = $this->getConfig()->getCustomerSettings();
+        $customerMappings['type'] = $customerMappings['defaultCustomerType'];
+        unset($customerMappings['defaultCustomerType']);
+        $customerMappings['telephone2'] = $this->getConfig()->get('telephone2') ;
+        $customerMappings['disableDuplicates'] = $this->getConfig()->get('disableDuplicates') ;
+
         /** @var \Siel\Acumulus\Data\Customer $customer */
         $customer = $customerCollector->collect($this->getPropertySources(), $customerMappings);
 
@@ -170,14 +175,15 @@ class CollectorManager
         return $address;
     }
 
-    public function collectEmailAsPdf(string $target): EmailAsPdf
+    public function collectEmailAsPdf(string $type): EmailAsPdf
     {
         $emailAsPdfCollector = $this->getContainer()->getCollector('EmailAsPdf');
-        if ($target === EmailAsPdfTarget::Invoice) {
+        if ($type === EmailAsPdfType::Invoice) {
             $emailAsPdfMappings = $this->getConfig()->getInvoiceEmailAsPdfSettings();
         } else {
             $emailAsPdfMappings = $this->getConfig()->getPackingSlipEmailAsPdfSettings();
         }
+        $emailAsPdfMappings['emailAsPdfType'] = $type;
         /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */
         $emailAsPdf = $emailAsPdfCollector->collect($this->getPropertySources(), $emailAsPdfMappings);
         return $emailAsPdf;

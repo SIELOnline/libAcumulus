@@ -23,8 +23,11 @@ class EmailInvoiceAsPdf extends EmailAsPdf
 {
     protected function getPropertyDefinitions(): array
     {
-        return parent::getPropertyDefinitions() + [
-            ['name' => 'ubl', 'type' => 'bool', 'allowedValues' => [Api::UblInclude_No, Api::UblInclude_Yes]],
-        ];
+        return array_merge(
+            parent::getPropertyDefinitions(),
+            [
+                ['name' => 'ubl', 'type' => 'bool', 'allowedValues' => [Api::UblInclude_No, Api::UblInclude_Yes]],
+            ]
+        );
     }
 }

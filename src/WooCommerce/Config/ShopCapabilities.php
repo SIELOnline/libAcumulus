@@ -228,7 +228,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      *   http://docs.woothemes.com/document/eu-vat-number-2/.
      * - current WooCommerce EU VAT number: billing_vat_number
      */
-    public function getShopDefaults(): array
+    public function getDefaultShopConfig(): array
     {
         return [
             // Customer defaults.

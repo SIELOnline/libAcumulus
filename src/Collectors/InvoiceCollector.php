@@ -8,7 +8,7 @@ use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
-use Siel\Acumulus\Helpers\Field;
+use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
@@ -113,7 +113,6 @@ abstract class InvoiceCollector extends Collector
     protected Config $config;
     protected ShopCapabilities $shopCapabilities;
     protected Translator $translator;
-    protected Log $log;
     protected Countries $countries;
 
     protected Source $invoiceSource;
@@ -135,7 +134,7 @@ abstract class InvoiceCollector extends Collector
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\Field $field
+     * @param \Siel\Acumulus\Helpers\FieldExpander $fieldExpander
      * @param \Siel\Acumulus\Helpers\Countries $countries
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Helpers\Container $container
@@ -143,14 +142,13 @@ abstract class InvoiceCollector extends Collector
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Field $field, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config
+    public function __construct(FieldExpander $fieldExpander, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config
     $config, Translator $translator, Log $log)
     {
-        parent::__construct($field, $container);
+        parent::__construct($fieldExpander, $container, $log);
         $this->countries = $countries;
         $this->shopCapabilities = $shopCapabilities;
         $this->config = $config;
-        $this->log = $log;
         $this->translator = $translator;
         $invoiceHelperTranslations = new Translations();
         $this->translator->add($invoiceHelperTranslations);

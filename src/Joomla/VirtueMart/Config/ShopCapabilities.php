@@ -161,7 +161,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults(): array
+    public function getDefaultShopConfig(): array
     {
         return [
             'contactYourId' => '[virtuemart_user_id]', // Order BT

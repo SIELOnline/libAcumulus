@@ -154,7 +154,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults(): array
+    public function getDefaultShopConfig(): array
     {
         return [
             'contactYourId' => '[order_user_id]', // order

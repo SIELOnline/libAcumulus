@@ -13,6 +13,7 @@ use RuntimeException;
 use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\AcumulusProperty;
+use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
 /**

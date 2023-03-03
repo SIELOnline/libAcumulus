@@ -44,9 +44,6 @@ class ConfirmUninstallForm extends Form
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFieldDefinitions(): array
     {
         $fields = [];

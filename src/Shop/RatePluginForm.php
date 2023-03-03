@@ -96,9 +96,6 @@ class RatePluginForm extends Form
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFieldDefinitions(): array
     {
         switch ($this->action) {

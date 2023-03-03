@@ -43,9 +43,6 @@ class InvoiceManager extends BaseInvoiceManager
         // @todo: Define the connection between this library and MyWebShop's database (e.g. OpenCart, PrestaShop) or model architecture (e.g. Magento).
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByIdRange(
         string $invoiceSourceType,
         string $InvoiceSourceIdFrom,
@@ -55,9 +52,6 @@ class InvoiceManager extends BaseInvoiceManager
         // @todo: provide implementation.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByReferenceRange(
         string $invoiceSourceType,
         string $invoiceSourceReferenceFrom,
@@ -69,9 +63,6 @@ class InvoiceManager extends BaseInvoiceManager
         //   method.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         // @todo: provide implementation.

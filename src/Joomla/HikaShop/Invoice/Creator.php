@@ -57,9 +57,6 @@ class Creator extends BaseCreator
         $this->order = $this->invoiceSource->getShopSource();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setPropertySources(): void
     {
         parent::setPropertySources();
@@ -72,9 +69,6 @@ class Creator extends BaseCreator
         $this->propertySources['customer'] = $this->order->customer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getItemLines(): array
     {
         return array_map([$this, 'getItemLine'], $this->order->products);
@@ -410,17 +404,11 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingLine(): array
     {
         throw new RuntimeException(__METHOD__ . ' should never be called');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingMethodName(): string
     {
         $shipping_id = func_num_args() > 0 ? func_get_arg(0) : $this->order->order_shipping_id;
@@ -434,9 +422,6 @@ class Creator extends BaseCreator
         return parent::getShippingMethodName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDiscountLines(): array
     {
         $result = [];
@@ -468,9 +453,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getPaymentFeeLine(): array
     {
         // @todo: check (return on refund?)

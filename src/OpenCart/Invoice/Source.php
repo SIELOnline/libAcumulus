@@ -32,9 +32,6 @@ abstract class Source extends BaseSource
      */
     protected array $orderTotalLines;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setShopSource(): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -49,9 +46,6 @@ abstract class Source extends BaseSource
         $this->id = $this->shopSource['order_id'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDate(): string
     {
         return substr($this->shopSource['date_added'], 0, strlen('2000-01-01'));
@@ -67,9 +61,6 @@ abstract class Source extends BaseSource
         return (int) $this->shopSource['order_status_id'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCountryCode(): string
     {
         if (!empty($this->shopSource['payment_iso_code_2'])) {
@@ -91,9 +82,6 @@ abstract class Source extends BaseSource
         return $this->shopSource['payment_code'] ?? parent::getPaymentMethod();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentStatus(): int
     {
         // The 'config_complete_status' setting contains a set of statuses that,
@@ -109,9 +97,6 @@ abstract class Source extends BaseSource
             : Api::PaymentStatus_Due;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentDate(): ?string
     {
         // @todo Can we determine this based on history (and optionally
@@ -172,9 +157,6 @@ abstract class Source extends BaseSource
      */
     abstract public function getOrderTotalLines(): array;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceReference()
     {
         $result = null;

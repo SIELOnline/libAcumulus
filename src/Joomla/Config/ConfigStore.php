@@ -14,9 +14,6 @@ use Siel\Acumulus\Helpers\Util;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    /**
-     * {@inheritdoc}
-     */
     public function load(): array
     {
         /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
@@ -26,9 +23,6 @@ class ConfigStore extends BaSeConfigStore
         return !empty($values) ? json_decode($values, true) : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(array $values): bool
     {
         /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */

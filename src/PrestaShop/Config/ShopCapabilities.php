@@ -16,9 +16,6 @@ use TaxRulesGroup;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoSource(): array
     {
         $source = [
@@ -37,9 +34,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoRefund(): array
     {
         $refund = [
@@ -63,9 +57,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoOrder(): array
     {
         $order = [
@@ -108,9 +99,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoShopProperties(): array
     {
         return [
@@ -246,9 +234,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultShopConfig(): array
     {
         return [
@@ -270,9 +255,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShopOrderStatuses(): array
     {
         $statuses = OrderState::getOrderStates(Context::getContext()->language->id);
@@ -283,9 +265,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentMethods(): array
     {
         $paymentModules = PaymentModule::getInstalledPaymentModules();
@@ -298,9 +277,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getVatClasses(): array
     {
         $result = [];
@@ -312,9 +288,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLink(string $linkType): string
     {
         switch ($linkType) {

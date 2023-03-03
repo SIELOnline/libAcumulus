@@ -19,18 +19,12 @@ class ConfigStore extends BaSeConfigStore
 {
     protected string $configCode = 'acumulus_siel';
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(): array
     {
         $values = $this->getSettings()->getSetting($this->configCode);
         return $values[$this->configCode . '_' . $this->configKey] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(array $values): bool
     {
         $modelSettingSetting = $this->getSettings();

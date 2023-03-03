@@ -11,17 +11,11 @@ use Siel\Acumulus\OpenCart\Invoice\Creator as BaseCreator;
  */
 class Creator extends BaseCreator
 {
-    /**
-     * {@inheritDoc}
-     */
     protected function getOrderProductOptions(array $item): array
     {
         return $this->getOrderModel()->getOptions($item['order_id'], $item['order_product_id']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function getOrderProducts(): array
     {
         return $this->getOrderModel()->getProducts($this->invoiceSource->getId());

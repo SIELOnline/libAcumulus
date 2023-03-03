@@ -41,9 +41,6 @@ class Creator extends BaseCreator
     /** @var Refund */
     protected $creditNote;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
     {
         // @todo: add objects from your webshop as property source (for use in tokenized values)
@@ -59,9 +56,6 @@ class Creator extends BaseCreator
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setPropertySources(): void
     {
         // @todo: add objects from your webshop as property source (for use in tokenized values)
@@ -71,9 +65,6 @@ class Creator extends BaseCreator
         $this->propertySources['customer'] = new Customer($this->invoiceSource->getShopSource()->id_customer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getItemLines(): array
     {
         // @todo: override or implement both addItemLinesOrder() and addItemLinesCreditNote()
@@ -150,9 +141,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingLine(): array
     {
         $result = [];

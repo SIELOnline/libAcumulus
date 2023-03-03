@@ -21,9 +21,6 @@ use const Siel\Acumulus\Version;
  */
 class Environment extends EnvironmentBase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setShopEnvironment(): void
     {
         // Module has same version as library.

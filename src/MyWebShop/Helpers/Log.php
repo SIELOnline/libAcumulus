@@ -19,9 +19,6 @@ class Log extends BaseLog
 {
     protected AbstractLogger $logger;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function write(string $message, int $severity): void
     {
         // @todo: adapt to MyWebShop's way of logging.

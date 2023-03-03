@@ -39,9 +39,6 @@ class FormHelper extends BaseFormHelper
         'whatsNext' => 'icon-forward',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function isSubmitted(): bool
     {
         return Tools::isSubmit('submitAdd') || Tools::isSubmit('submit' . $this->moduleName) || Tools::getValue('ajax') !== false;

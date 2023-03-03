@@ -22,9 +22,6 @@ use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
  */
 class FormMapper extends BaseFormMapper
 {
-    /**
-     * {@inheritdoc}
-     */
     public function map(Form $form)
     {
         // @todo: adapt to the way MyWebShop wants you to create a form.

@@ -95,9 +95,6 @@ class BatchForm extends Form
         $this->submittedValues['date_to'] = trim($this->submittedValues['date_to']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function validate(): void
     {
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
@@ -211,9 +208,6 @@ class BatchForm extends Form
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFieldDefinitions(): array
     {
         $fields = [];

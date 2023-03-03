@@ -11,9 +11,6 @@ use function strlen;
  */
 class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
 {
-    /**
-     * {@inheritDoc}
-     */
     public function getRoute(string $method, string $extension = 'acumulus', string $extensionType = 'module'): string
     {
         if ($extension === '') {
@@ -28,17 +25,11 @@ class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
         return $route;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getLoadRoute(string $object = '', string $extension = 'acumulus', string $extensionType = 'module'): string
     {
         return "extension/$extension/$extensionType/$object";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getAcumulusTrigger(string $trigger, string $moment): string
     {
         $extension = 'acumulus';
@@ -49,17 +40,11 @@ class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
         return "system/extension/$extensionType/$extension/$trigger$moment";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getFileUrl(string $file = '', string $extension = 'acumulus'): string
     {
         return HTTP_CATALOG . substr(DIR_EXTENSION, strlen(DIR_OPENCART)) . $extension . '/' . strtolower(APPLICATION) . '/' . $file;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function inAdmin(): bool
     {
         return $this->config->get('application') === 'Admin';

@@ -87,9 +87,6 @@ class SplitLine extends CompletorStrategyBase
     protected array $maxVatRate;
     protected array $keyComponent;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function init(): void
     {
         $this->splitLines = [];
@@ -117,17 +114,11 @@ class SplitLine extends CompletorStrategyBase
         $this->keyComponent = $this->getVatBreakDownMaxAmount();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function checkPreconditions(): bool
     {
         return count($this->getVatBreakdown()) === 2 && count($this->splitLines) >= 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(): bool
     {
         if ($this->tryVatRate($this->maxVatRate[Tag::VatRate])) {

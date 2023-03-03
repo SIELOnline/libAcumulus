@@ -43,9 +43,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $this->tableName = DB_PREFIX . 'acumulus_entry';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByEntryId(?int $entryId)
     {
         $operator = $entryId === null ? 'is' : '=';
@@ -55,9 +52,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $this->convertDbResultToAcumulusEntries($result->rows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
         /** @var \stdClass $result  (documentation error in DB) */
@@ -70,9 +64,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $this->convertDbResultToAcumulusEntries($result->rows, $ignoreLock);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         if ($invoiceSource->getType() === Source::Order) {
@@ -93,9 +84,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         $record = $entry->getRecord();
@@ -109,9 +97,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(AcumulusEntry $entry): bool
     {
         $record = $entry->getRecord();
@@ -122,9 +107,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function sqlNow()
     {
         return date(Api::Format_TimeStamp);
@@ -173,9 +155,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function uninstall(): bool
     {
         return (bool) $this->getDb()->query("DROP TABLE `$this->tableName`");

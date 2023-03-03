@@ -21,9 +21,6 @@ class ConfigStore extends BaSeConfigStore
 {
     protected string $configPath = 'siel_acumulus/';
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(): array
     {
         $values = $this->getConfigInterface()->getValue($this->configPath . $this->configKey);
@@ -33,9 +30,6 @@ class ConfigStore extends BaSeConfigStore
         return is_array($values) ? $values : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(array $values): bool
     {
         // @todo: switch to json.

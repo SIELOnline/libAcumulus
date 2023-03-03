@@ -55,9 +55,6 @@ class Source extends BaseSource
         $this->id = $this->getShopSource()->get_id();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReference()
     {
         // Method get_order_number() is used for when other plugins are
@@ -162,9 +159,6 @@ class Source extends BaseSource
         return substr((string) $this->getShopSource()->get_date_modified(), 0, strlen('2000-01-01'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCountryCode(): string
     {
         // Billing information is not stored for credit notes, so it is expected

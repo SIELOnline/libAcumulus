@@ -24,17 +24,11 @@ class ConfigStore extends BaSeConfigStore
         $this->configFile = $this->configDir . '/config.json';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(): array
     {
         return is_readable($this->configFile) ? json_decode(file_get_contents($this->configFile), true) : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(array $values): bool
     {
         file_put_contents($this->configFile, json_encode($values, JSON_FORCE_OBJECT | Util::JsonFlags));

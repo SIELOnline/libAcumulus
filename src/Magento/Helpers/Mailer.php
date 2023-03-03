@@ -15,9 +15,6 @@ use Zend_Mail_Transport_Exception;
 class Mailer extends BaseMailer
 {
 
-    /**
-     * {@inheritdoc}
-     */
     public function sendMail(
         string $from,
         string $fromName,
@@ -49,17 +46,11 @@ class Mailer extends BaseMailer
         return Registry::getInstance()->get(MagentoAppConfigInterface::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFrom(): string
     {
         return $this->getConfig()->getValue('trans_email/ident_general/email');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFromName(): string
     {
         $result = $this->getConfig()->getValue('general/store_information/name');

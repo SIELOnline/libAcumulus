@@ -54,9 +54,6 @@ class ActivateSupportForm extends Form
         $this->translator->add($translations);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function validate(): void
     {
         $hostName = $this->environment->get()['hostName'];
@@ -85,9 +82,6 @@ class ActivateSupportForm extends Form
         return !$result->hasError();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFieldDefinitions(): array
     {
         $fields = [];

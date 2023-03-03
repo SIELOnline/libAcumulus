@@ -19,9 +19,6 @@ use function is_array;
  */
 class AdvancedConfigForm extends BaseConfigForm
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function validate(): void
     {
         $this->validateInvoiceFields();

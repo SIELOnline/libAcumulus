@@ -12,18 +12,12 @@ use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    /**
-     * {@inheritdoc}
-     */
     public function load(): array
     {
         $values = Configuration::get(strtoupper($this->configKey));
         return !empty($values) ? unserialize($values, ['allow_classes' => false]) : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(array $values): bool
     {
         $serializedValues = serialize($values);

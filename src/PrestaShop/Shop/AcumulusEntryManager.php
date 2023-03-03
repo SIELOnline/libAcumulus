@@ -40,9 +40,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $this->tableName = _DB_PREFIX_ . 'acumulus_entry';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByEntryId(?int $entryId)
     {
         $operator = $entryId === null ? 'is' : '=';
@@ -52,9 +49,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $this->convertDbResultToAcumulusEntries($result);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
     {
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -67,9 +61,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $this->convertDbResultToAcumulusEntries($result, $ignoreLock);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         if ($invoiceSource->getType() === Source::Order) {
@@ -92,9 +83,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         $record = $entry->getRecord();
@@ -108,9 +96,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(BaseAcumulusEntry $entry): bool
     {
         $record = $entry->getRecord();
@@ -122,9 +107,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function sqlNow()
     {
         return date(Api::Format_TimeStamp);
@@ -165,9 +147,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function uninstall(): bool
     {
         return $this->getDb()->execute("DROP TABLE `$this->tableName`");

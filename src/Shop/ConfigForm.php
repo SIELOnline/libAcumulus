@@ -33,9 +33,6 @@ class ConfigForm extends BaseConfigForm
      */
     protected array $accountNumberOptions;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function validate(): void
     {
         $this->validateAccountFields();

@@ -33,9 +33,6 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
     protected array $vatRates;
     protected int $countLines;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(): bool
     {
         $this->countLines = count($this->lines2Complete);

@@ -14,9 +14,6 @@ use Siel\Acumulus\OpenCart\Config\ShopCapabilities as ShopCapabilitiesBase;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultShopConfig(): array
     {
         return [
@@ -38,9 +35,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentMethods(): array
     {
         $registry = $this->getRegistry();

@@ -17,9 +17,6 @@ use function strlen;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoSource(): array
     {
         $source = [
@@ -47,9 +44,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoRefund(): array
     {
         $refund = [
@@ -66,9 +60,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoOrder(): array
     {
         $order = [
@@ -119,9 +110,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoShopProperties(): array
     {
         $meta = [
@@ -301,9 +289,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
         ];
     }
-    /**
-     * {@inheritdoc}
-     */
     public function getShopOrderStatuses(): array
     {
         $result = [];
@@ -345,9 +330,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentMethods(): array
     {
         $result = [];
@@ -372,9 +354,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return ['standard' => $this->t('Standaard')] + array_combine($keys, $labels);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLink(string $linkType): string
     {
         switch ($linkType) {

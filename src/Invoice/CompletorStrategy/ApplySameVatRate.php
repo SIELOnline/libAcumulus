@@ -38,9 +38,6 @@ class ApplySameVatRate extends CompletorStrategyBase
      */
     public static int $tryOrder = 30;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(): bool
     {
         // Try all possible vat rates.

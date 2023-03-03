@@ -12,9 +12,6 @@ use Siel\Acumulus\OpenCart\Invoice\Source as BaseSource;
  */
 class Source extends BaseSource
 {
-    /**
-     * {@inheritDoc}
-     */
     public function getOrderTotalLines(): array
     {
         if (!isset($this->orderTotalLines)) {

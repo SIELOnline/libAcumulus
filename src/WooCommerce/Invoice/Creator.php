@@ -58,9 +58,6 @@ class Creator extends BaseCreator
      */
     protected float $precision = 0.01;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getItemLines(): array
     {
         $result = [];
@@ -402,9 +399,6 @@ class Creator extends BaseCreator
             ] + self::getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingLines(): array
     {
         $result = [];
@@ -420,9 +414,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingLine(): array
     {
         /** @var \WC_Order_Item_Shipping $item */
@@ -568,9 +559,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDiscountLines(): array
     {
         $result = [];

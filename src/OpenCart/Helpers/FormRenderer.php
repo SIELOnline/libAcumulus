@@ -16,9 +16,6 @@ class FormRenderer extends BaseFormRenderer
         $this->requiredMarkup = '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function renderSimpleField(array $field): string
     {
         $oldElementWrapperClass = $this->elementWrapperClass;

@@ -14,9 +14,6 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  */
 class AcumulusEntry extends BaseAcumulusEntry
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function get(string $field)
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $entry */

@@ -40,9 +40,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return Registry::getInstance()->create(Collection::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByEntryId(?int $entryId)
     {
         /** @var \Siel\AcumulusMa2\Model\Entry[] $result */
@@ -52,9 +49,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $this->convertDbResultToAcumulusEntries($result);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $result */
@@ -130,9 +124,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     }
 
 
-    /**
-     * {@inheritdoc}
-     */
     protected function sqlNow(): int
     {
         return time();

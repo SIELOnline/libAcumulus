@@ -15,9 +15,6 @@ class Log extends BaseLog
 {
     protected string $category;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($libraryVersion)
     {
         parent::__construct($libraryVersion);

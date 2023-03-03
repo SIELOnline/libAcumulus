@@ -52,33 +52,21 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         //   Magento).
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByEntryId(?int $entryId)
     {
         // @todo: provide implementation.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
         // @todo: provide implementation.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         // @todo: insert a new entry (note that save() takes care of distinguishing between insert and update).
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         // @todo: update an existing entry (note that save() takes care of distinguishing between insert and update).
@@ -92,17 +80,11 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         // @todo: delete an existing entry.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function sqlNow()
     {
         return date(Api::Format_TimeStamp);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function install(): bool
     {
         // @todo: adapt to the way MyWebShop lets you define tables. Just return
@@ -124,9 +106,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         )");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function uninstall(): bool
     {
         // @todo: adapt to the way MyWebShop lets you delete tables. Just return true if this is done in a separate script.

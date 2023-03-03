@@ -15,9 +15,6 @@ class Environment extends EnvironmentBase
 {
     private string $configFile = __DIR__ . '/../../../../config/db.json';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setShopEnvironment(): void
     {
         $this->data['moduleVersion'] = Version;

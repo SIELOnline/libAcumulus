@@ -29,25 +29,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultShopConfig(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShopOrderStatuses(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentMethods(): array
     {
         return [];

@@ -15,9 +15,6 @@ use Siel\Acumulus\Helpers\Log as BaseLog;
  */
 class Log extends BaseLog
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function write(string $message, int $severity): void
     {
         $message = sprintf('%s Acumulus %s: %s - %s', date('Y-m-d H:i:s'), $this->getLibraryVersion(), $this->getSeverityString($severity), $message);

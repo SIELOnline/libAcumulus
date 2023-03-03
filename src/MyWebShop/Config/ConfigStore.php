@@ -12,9 +12,6 @@ use Siel\Acumulus\Helpers\Util;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    /**
-     * {@inheritdoc}
-     */
     public function load(): array
     {
         // @todo: Access your web shop's or CMS's config and get the Acumulus settings.
@@ -23,9 +20,6 @@ class ConfigStore extends BaSeConfigStore
         return json_decode($values);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(array $values): bool
     {
         // @todo: remove this line if your configuration sub system accepts arrays as value.

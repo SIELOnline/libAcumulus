@@ -14,9 +14,6 @@ use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
  */
 class SimpleTestCollector extends Collector
 {
-    /**
-     * {@inheritDoc}
-     */
     protected function getAcumulusObjectType(): string
     {
         return 'SimpleTestObject';

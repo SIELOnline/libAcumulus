@@ -38,9 +38,6 @@ class FormMapper extends BaseFormMapper
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function map(Form $form)
     {
         $this->isFirstElement = true;

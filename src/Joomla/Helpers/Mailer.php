@@ -46,18 +46,12 @@ class Mailer extends BaseMailer
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFrom(): string
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         return Factory::getApplication()->get('mailfrom');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTo(): string
     {
         $return = parent::getTo();

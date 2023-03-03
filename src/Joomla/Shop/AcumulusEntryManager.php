@@ -42,9 +42,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByEntryId(?int $entryId)
     {
         $table = $this->newTable();
@@ -52,9 +49,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $this->convertDbResultToAcumulusEntries($result);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
         $table = $this->newTable();
@@ -66,9 +60,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $result ? $this->convertDbResultToAcumulusEntries($table, $ignoreLock) : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         // Start with new table class to not overwrite any loaded record.
@@ -82,9 +73,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table->store(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         // Continue with existing table object with already loaded record.
@@ -103,9 +91,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table->delete();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function sqlNow()
     {
         /** @noinspection PhpUnhandledExceptionInspection */

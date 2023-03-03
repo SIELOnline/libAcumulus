@@ -45,17 +45,11 @@ class Source extends BaseSource
         $this->id = $this->getShopSource()['details']['BT']->virtuemart_order_id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReference()
     {
         return $this->getShopSource()['details']['BT']->order_number;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDate(): string
     {
         return date(Api::DateFormat_Iso, strtotime($this->getShopSource()['details']['BT']->created_on));
@@ -82,9 +76,6 @@ class Source extends BaseSource
         return $this->getShopSource()['details']['BT']->virtuemart_paymentmethod_id ?? parent::getPaymentMethod();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentStatus(): int
     {
         return in_array($this->getShopSource()['details']['BT']->order_status, $this->getPaidStatuses(), false)
@@ -92,9 +83,6 @@ class Source extends BaseSource
             : Api::PaymentStatus_Due;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentDate(): ?string
     {
         $date = null;
@@ -121,9 +109,6 @@ class Source extends BaseSource
         return ['C', 'S', 'R'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCountryCode(): string
     {
         if (!empty($this->getShopSource()['details']['BT']->virtuemart_country_id)) {

@@ -11,9 +11,6 @@ use Siel\Acumulus\Helpers\Mailer as BaseMailer;
  */
 class Mailer extends BaseMailer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function sendMail(
         string $from,
         string $fromName,
@@ -29,17 +26,11 @@ class Mailer extends BaseMailer
         return wp_mail($to, $subject, $bodyHtml, $headers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFrom(): string
     {
         return get_bloginfo('admin_email');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFromName(): string
     {
         return get_bloginfo('name');

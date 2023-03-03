@@ -65,9 +65,6 @@ class Source extends BaseSource
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDate(): string
     {
         return substr($this->getShopSource()->date_add, 0, strlen('2000-01-01'));
@@ -109,9 +106,6 @@ class Source extends BaseSource
         return $order->module ?? parent::getPaymentMethod();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentStatus(): int
     {
         // Assumption: credit slips are always in a paid status.
@@ -120,9 +114,6 @@ class Source extends BaseSource
             : Api::PaymentStatus_Due;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentDate(): ?string
     {
         if ($this->getType() === Source::Order) {
@@ -143,9 +134,6 @@ class Source extends BaseSource
         return $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCountryCode(): string
     {
         $invoiceAddress = new Address($this->getShopOrder()->shopSource->id_address_invoice);
@@ -229,9 +217,6 @@ class Source extends BaseSource
             : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShopOrderOrId()
     {
         /** @var \OrderSlip $orderSlip */
@@ -239,9 +224,6 @@ class Source extends BaseSource
         return $orderSlip->id_order;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShopCreditNotesOrIds()
     {
         /** @var \Order $order */

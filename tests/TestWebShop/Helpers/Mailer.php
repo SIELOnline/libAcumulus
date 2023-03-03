@@ -11,25 +11,16 @@ use Siel\Acumulus\Helpers\Mailer as BaseMailer;
  */
 class Mailer extends BaseMailer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFrom(): string
     {
         return 'unit.test@burorader.com';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFromName(): string
     {
         return 'Unit Test | Buro RaDer';

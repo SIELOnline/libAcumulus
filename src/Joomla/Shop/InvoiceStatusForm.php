@@ -11,9 +11,6 @@ use Siel\Acumulus\Shop\InvoiceStatusForm as BaseInvoiceStatusForm;
  */
 class InvoiceStatusForm extends BaseInvoiceStatusForm
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getFieldDefinitions(): array
     {
         $result = parent::getFieldDefinitions();

@@ -14,18 +14,12 @@ use function in_array;
  */
 class OcHelper extends BaseOcHelper
 {
-    /**
-     * {@inheritDoc}
-     */
     public function __construct($registry, Container $acumulusContainer)
     {
         $this->languageSettingKey = 'config_language_admin';
         parent::__construct($registry, $acumulusContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function addEvents(): void
     {
         // @todo: make them less specific to catch events from other plugins as well, see phpdoc on parent.
@@ -36,9 +30,6 @@ class OcHelper extends BaseOcHelper
         $this->addEvent('acumulus', 'admin/view/sale/order_info/before', 'eventViewSaleOrderInfo');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function addEvent(string $code, string $trigger, string $method, bool $status = true, int $sort_order = 1): void
     {
         /** @var \Opencart\Admin\Model\Setting\Event $model */

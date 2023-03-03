@@ -14,9 +14,6 @@ use Siel\Acumulus\Config\Config;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoSource(): array
     {
         $source = [
@@ -65,9 +62,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoShopProperties(): array
     {
         return [
@@ -151,9 +145,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultShopConfig(): array
     {
         return [
@@ -187,9 +178,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShopOrderStatuses(): array
     {
         /** @var \hikashopCategoryClass $class */
@@ -238,9 +226,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentMethods(): array
     {
         $result = [];

@@ -12,9 +12,6 @@ use Siel\Acumulus\OpenCart\Helpers\Mailer as BaseMailer;
  */
 class Mailer extends BaseMailer
 {
-    /**
-     * {@inheritDoc}
-     */
     protected function getMail(): Mail
     {
         return new Mail();

@@ -14,9 +14,6 @@ use stdClass;
  */
 class Source extends BaseSource
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setShopSource(): void
     {
         $this->shopSource = new stdClass();
@@ -24,65 +21,41 @@ class Source extends BaseSource
         $this->getShopSource()->id = $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setId(): void
     {
         $this->id = (int) $this->getShopSource()->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReference()
     {
         return $this->getShopSource()->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDate(): string
     {
         return '2023-02-01';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStatus()
     {
         return 'pending';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentMethod()
     {
         return 3;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentStatus(): int
     {
         return Api::PaymentStatus_Due;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentDate(): ?string
     {
         return '2023-02-03';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCountryCode(): string
     {
         return 'nl';
@@ -103,9 +76,6 @@ class Source extends BaseSource
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAvailableTotals(): array
     {
         return [
@@ -115,17 +85,11 @@ class Source extends BaseSource
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShopOrderOrId()
     {
         return 3;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShopCreditNotesOrIds(): array
     {
         return [];

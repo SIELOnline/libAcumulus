@@ -13,9 +13,6 @@ use WP_Debug_Data;
  */
 class Environment extends EnvironmentBase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setShopEnvironment(): void
     {
         /** @var \WooCommerce $woocommerce */
@@ -26,9 +23,6 @@ class Environment extends EnvironmentBase
         $this->data['cmsVersion'] = $wp_version;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDbVariables(): array
     {
         if ( ! class_exists( 'WP_Debug_Data' ) ) {

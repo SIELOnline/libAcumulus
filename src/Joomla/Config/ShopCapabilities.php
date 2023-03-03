@@ -13,9 +13,6 @@ use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
  */
 abstract class ShopCapabilities extends ShopCapabilitiesBase
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getLink(string $linkType): string
     {
         switch ($linkType) {

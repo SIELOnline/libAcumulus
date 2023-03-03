@@ -185,9 +185,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultShopConfig(): array
     {
         // @todo: fill in the appropriate property names, remove a line when no appropriate default exists.
@@ -225,9 +222,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShopOrderStatuses(): array
     {
         // @todo: adapt to MyWebShop's way of retrieving the list of order statuses.
@@ -239,9 +233,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentMethods(): array
     {
         // @todo: adapt to MyWebShop's way of retrieving the list of (active) payment methods.
@@ -266,10 +257,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLink($linkType): string
+    public function getLink(string $linkType): string
     {
         // @todo: adapt to MyWebShop's way of creating links.
         switch ($linkType) {

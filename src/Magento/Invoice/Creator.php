@@ -71,9 +71,6 @@ class Creator extends BaseCreator
         $this->shopInvoice = count($this->shopInvoices) > 0 ? $this->shopInvoices->getFirstItem() : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setPropertySources(): void
     {
         parent::setPropertySources();
@@ -434,9 +431,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingLine(): array
     {
         $result = [];
@@ -504,9 +498,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingMethodName(): string
     {
         $name = $this->order->getShippingDescription();
@@ -516,9 +507,6 @@ class Creator extends BaseCreator
         return parent::getShippingMethodName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDiscountLines(): array
     {
         $result = [];

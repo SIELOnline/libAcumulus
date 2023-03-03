@@ -216,9 +216,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         'extensionAttributes',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoSource(): array
     {
         return [
@@ -229,9 +226,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoRefund(): array
     {
         return [
@@ -242,9 +236,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoOrder(): array
     {
         return [
@@ -255,9 +246,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoShopProperties(): array
     {
         $orderItem = [
@@ -471,9 +459,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultShopConfig(): array
     {
         return [
@@ -497,9 +482,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShopOrderStatuses(): array
     {
         /** @var OrderStatusCollection $model */
@@ -512,9 +494,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTriggerInvoiceEventOptions(): array
     {
         $result = parent::getTriggerInvoiceEventOptions();
@@ -522,9 +501,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentMethods(): array
     {
         $result = [];
@@ -545,9 +521,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getVatClasses(): array
     {
         $result = [];
@@ -560,10 +533,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLink($linkType): string
+    public function getLink(string $linkType): string
     {
         $registry = Registry::getInstance();
         /** @var UrlInterface $urlInterface */

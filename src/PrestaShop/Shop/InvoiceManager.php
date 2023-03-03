@@ -39,9 +39,6 @@ class InvoiceManager extends BaseInvoiceManager
         $this->orderSlipTableName = _DB_PREFIX_ . OrderSlip::$definition['table'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
     {
         switch ($invoiceSourceType) {
@@ -73,9 +70,6 @@ class InvoiceManager extends BaseInvoiceManager
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
     {
         switch ($invoiceSourceType) {
@@ -97,9 +91,6 @@ class InvoiceManager extends BaseInvoiceManager
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         $dateFromStr = $dateFrom->format('c');

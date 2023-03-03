@@ -19,9 +19,6 @@ class Mailer extends BaseMailer
     protected string $templateDir;
     protected string $templateName;
 
-    /**
-     * {@inheritdoc}
-     */
     public function sendMail(
         string $from,
         string $fromName,
@@ -52,17 +49,11 @@ class Mailer extends BaseMailer
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFrom(): string
     {
         return Configuration::get('PS_SHOP_EMAIL');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFromName(): string
     {
         return Configuration::get('PS_SHOP_NAME');

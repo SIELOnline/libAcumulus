@@ -48,9 +48,6 @@ class InvoiceManager extends BaseInvoiceManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByIdRange(
         string $invoiceSourceType,
         string $InvoiceSourceIdFrom,
@@ -181,9 +178,6 @@ class InvoiceManager extends BaseInvoiceManager
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         $args = [

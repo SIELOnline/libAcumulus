@@ -63,9 +63,6 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     protected int $splitLineKey;
     protected int $splitLineCount;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function init(): void
     {
         $this->splitLineCount = 0;
@@ -96,9 +93,6 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function checkPreconditions(): bool
     {
         $result = false;
@@ -112,9 +106,6 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(): bool
     {
         $this->linesCompleted = [$this->splitLineKey];

@@ -25,9 +25,6 @@ use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
  */
 class InvoiceManager extends BaseInvoiceManager
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
     {
         if ($invoiceSourceType === Source::Order) {
@@ -64,9 +61,6 @@ class InvoiceManager extends BaseInvoiceManager
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         if ($invoiceSourceType === Source::Order) {

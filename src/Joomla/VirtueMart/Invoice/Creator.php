@@ -123,9 +123,6 @@ class Creator extends BaseCreator
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setPropertySources(): void
     {
         // As the source array does not contain scalar properties itself, only
@@ -238,9 +235,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingLine(): array
     {
         $result = [];
@@ -261,9 +255,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingMethodName(): string
     {
         /** @var \VirtueMartModelShipmentmethod $shipmentMethodsModel */

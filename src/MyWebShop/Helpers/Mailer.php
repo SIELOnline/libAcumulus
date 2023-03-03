@@ -11,9 +11,6 @@ use Siel\Acumulus\Helpers\Mailer as BaseMailer;
  */
 class Mailer extends BaseMailer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
         // @todo: adapt to MyWebShop's way of creating a mailer, a "mail object", and having the "mail object" sent by the mailer.
@@ -21,18 +18,12 @@ class Mailer extends BaseMailer
         return Mail::Send($this->translator->getLanguage(), $from, $fromName, $subject, $to, $bodyHtml);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFrom(): string
     {
         // @todo: adapt to MyWebShop's way of getting the from email address to use.
         return Configuration::get('SHOP_EMAIL');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFromName(): string
     {
         // @todo: adapt to MyWebShop's way of getting the webshop name.

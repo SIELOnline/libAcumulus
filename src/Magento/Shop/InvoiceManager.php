@@ -24,9 +24,6 @@ use Magento\Framework\Event\ManagerInterface;
  */
 class InvoiceManager extends BaseInvoiceManager
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
     {
         $field = 'entity_id';
@@ -37,9 +34,6 @@ class InvoiceManager extends BaseInvoiceManager
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
     {
         $field = 'increment_id';
@@ -50,9 +44,6 @@ class InvoiceManager extends BaseInvoiceManager
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         $field = 'updated_at';

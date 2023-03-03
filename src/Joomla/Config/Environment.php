@@ -13,9 +13,6 @@ use Siel\Acumulus\Config\Environment as EnvironmentBase;
  */
 class Environment extends EnvironmentBase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setShopEnvironment(): void
     {
         /** @var \Joomla\CMS\Table\Extension $extension */

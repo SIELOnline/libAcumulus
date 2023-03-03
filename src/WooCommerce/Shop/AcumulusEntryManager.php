@@ -48,9 +48,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByEntryId(?int $entryId)
     {
         $metaQuery = [
@@ -71,9 +68,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $this->convertDbResultToAcumulusEntries($result);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
     {
         $result = null;
@@ -102,9 +96,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         $now = $this->sqlNow();
@@ -117,9 +108,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $result1 !== false && $result2 !== false && $result3 !== false && $result4 !== false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         $postId = $entry->getSourceId();
@@ -148,9 +136,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function sqlNow()
     {
         return current_time('timestamp', true);

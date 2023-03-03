@@ -96,9 +96,6 @@ class Creator extends BaseCreator
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setPropertySources(): void
     {
         parent::setPropertySources();
@@ -107,9 +104,6 @@ class Creator extends BaseCreator
         $this->propertySources['customer'] = new Customer($this->invoiceSource->getShopSource()->id_customer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getItemLines(): array
     {
         $result = [];
@@ -216,9 +210,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShippingLine(): array
     {
         $sign = $this->invoiceSource->getSign();

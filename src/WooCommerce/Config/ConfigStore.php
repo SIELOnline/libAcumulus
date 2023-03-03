@@ -11,17 +11,11 @@ use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    /**
-     * {@inheritdoc}
-     */
     public function load(): array
     {
       return get_option($this->configKey, []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(array $values): bool
     {
         // WP: update_option() also returns false when there are no changes. We

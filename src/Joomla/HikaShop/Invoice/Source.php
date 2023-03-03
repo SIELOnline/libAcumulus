@@ -41,17 +41,11 @@ class Source extends BaseSource
         $this->id = $this->getShopSource()->order_id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReference()
     {
         return $this->getShopSource()->order_number;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDate(): string
     {
         return date(Api::DateFormat_Iso, $this->getShopSource()->order_created);
@@ -77,9 +71,6 @@ class Source extends BaseSource
         return $this->getShopSource()->order_payment_id ?? parent::getPaymentMethod();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentStatus(): int
     {
         /** @var \hikashopConfigClass $config */
@@ -90,9 +81,6 @@ class Source extends BaseSource
             : Api::PaymentStatus_Paid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaymentDate(): ?string
     {
         // Scan through the history and look for a non-empty
@@ -121,9 +109,6 @@ class Source extends BaseSource
         return $date ? date(Api::DateFormat_Iso, $date) : $date;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCountryCode(): string
     {
         return !empty($this->getShopSource()->billing_address->address_country_code_2) ? $this->getShopSource()->billing_address->address_country_code_2 : '';
@@ -176,17 +161,11 @@ class Source extends BaseSource
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceReference()
     {
         return !empty($this->getShopSource()->order_invoice_number) ? $this->getShopSource()->order_invoice_number : parent::getInvoiceReference();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceDate(): ?string
     {
         return !empty($this->getShopSource()->order_invoice_created) ? date(Api::DateFormat_Iso, $this->getShopSource()->order_invoice_created) : parent::getInvoiceDate();

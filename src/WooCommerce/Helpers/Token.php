@@ -17,9 +17,6 @@ use function is_array;
  */
 class Token extends BaseToken
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getObjectProperty(object $variable, string $property, array $args)
     {
         if ($variable instanceof WC_Data) {

@@ -61,17 +61,11 @@ class SplitNonMatchingLine extends CompletorStrategyBase
     protected array $minVatRate;
     protected array $maxVatRate;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function init(): void
     {
         $this->linesCompleted = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function checkPreconditions(): bool
     {
         $result = count($this->getVatBreakdown()) === 2;
@@ -92,9 +86,6 @@ class SplitNonMatchingLine extends CompletorStrategyBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(): bool
     {
         $this->minVatRate = $this->getVatBreakDownMinRate();

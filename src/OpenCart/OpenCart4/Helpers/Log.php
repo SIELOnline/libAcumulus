@@ -11,9 +11,6 @@ use Siel\Acumulus\OpenCart\Helpers\Log as BaseLog;
  */
 class Log extends BaseLog
 {
-    /**
-     * {@inheritDoc}
-     */
     protected function getLog(): \Opencart\System\Library\Log
     {
         return new \Opencart\System\Library\Log($this->filename);

@@ -27,9 +27,6 @@ use function strlen;
  */
 class Source extends BaseSource
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setId(): void
     {
         $this->id = (int) $this->getShopSource()->getId();
@@ -61,9 +58,6 @@ class Source extends BaseSource
         $loader->load($this->shopSource, $this->getId());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReference()
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
@@ -85,9 +79,6 @@ class Source extends BaseSource
         return 'CM' . $this->getShopSource()->getIncrementId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDate(): string
     {
         // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
@@ -232,9 +223,6 @@ class Source extends BaseSource
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setInvoice(): void
     {
         parent::setInvoice();
@@ -263,9 +251,6 @@ class Source extends BaseSource
         return $this->getInvoice() !== null ? substr($this->getInvoice()->getCreatedAt(), 0, strlen('2000-01-01')) : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShopOrderOrId()
     {
         /** @var \Magento\Sales\Model\Order\Creditmemo $creditmemo */
@@ -273,9 +258,6 @@ class Source extends BaseSource
         return $creditmemo->getOrderId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getShopCreditNotesOrIds()
     {
         /** @var \Magento\Sales\Model\Order $order */
@@ -283,9 +265,6 @@ class Source extends BaseSource
         return $order->getCreditmemosCollection();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCountryCode(): string
     {
         return $this->getShopSource()->getBillingAddress()->getCountryId();

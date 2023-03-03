@@ -27,9 +27,6 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         return Registry::getInstance();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoSource(): array
     {
         $catalogOrder = [
@@ -184,9 +181,6 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoShopProperties(): array
     {
         return [
@@ -261,9 +255,6 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShopOrderStatuses(): array
     {
         /** @var \Opencart\Admin\Model\Localisation\OrderStatus|\ModelLocalisationOrderStatus $model */
@@ -290,9 +281,6 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getVatClasses(): array
     {
         $result = [];
@@ -317,9 +305,6 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
      */
     abstract protected function paymentMethodToOptions(array $extensions): array;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLink(string $linkType): string
     {
         $registry = $this->getRegistry();

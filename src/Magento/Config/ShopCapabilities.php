@@ -14,6 +14,7 @@ use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Item;
 use Magento\Sales\Model\ResourceModel\Status\Collection as OrderStatusCollection;
 use Magento\Tax\Model\ResourceModel\TaxClass\Collection as TaxClassCollection;
+use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\Config;
@@ -461,6 +462,75 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     public function getDefaultShopConfig(): array
     {
+        return [
+            'contactYourId' => '[customer::incrementId|customer::entityId]', // \Mage\Customer\Model\Customer
+            'companyName1' => '[company]', // \Magento\Sales\Model\Order\Address
+            'fullName' => '[name]', // \Magento\Sales\Model\Order\Address
+            'address1' => '[streetLine(1)]', // \Magento\Sales\Model\Order\Address
+            'address2' => '[streetLine(2)]', // \Magento\Sales\Model\Order\Address
+            'postalCode' => '[postcode]', // \Magento\Sales\Model\Order\Address
+            'city' => '[city]', // \Magento\Sales\Model\Order\Address
+            // Magento has 2 VAT numbers:
+            // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
+            'vatNumber' => '[vatId|customerTaxvat]', // \Magento\Sales\Model\Order
+            'telephone' => '[telephone]', // \Magento\Sales\Model\Order\Address
+            'fax' => '[fax]', // \Magento\Sales\Model\Order\Address
+            'email' => '[email]', // \Magento\Sales\Model\Order\Address
+
+            // Invoice lines defaults.
+            'itemNumber' => '[sku]',
+            'productName' => '[name]',
+        ];
+    }
+
+    public function getDefaultShopMappings(): array
+    {
+        return [
+            Mappings::Customer => [
+                // Customer defaults.
+                //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
+                'contactYourId' => '[source::getShopOrder()::get_customer_id()]', // WC_Order
+                'vatNumber' => '[source::getShopOrder()::get_meta(billing_vat_number)'
+                    . '|source::getShopOrder()::get_meta(_vat_number)'
+                    . '|source::getShopOrder()::get_meta(vat_number)'
+                    . '|source::getShopOrder()::get_meta(Vat Number)]', // Post meta
+                'telephone' => '[source::getShopOrder()::get_billing_phone()]', // WC_Order
+                'telephone2' => '[source::getShopOrder()::get_shipping_phone()]', // WC_Order
+                'email' => '[source::getShopOrder()::get_billing_email()]', // WC_Order
+            ],
+            Mappings::InvoiceAddress => [
+                'companyName1' => '[source::getShopOrder()::get_billing_company]', // WC_Order
+                'fullName' => '[source::getShopOrder()::get_billing_first_name+source::getShopOrder()::get_billing_last_name]', // WC_Order
+                'address1' => '[source::getShopOrder()::get_billing_address_1]', // WC_Order
+                'address2' => '[source::getShopOrder()::get_billing_address_2]', // WC_Order
+                'postalCode' => '[source::getShopOrder()::get_billing_postcode]', // WC_Order
+                'city' => '[source::getShopOrder()::get_billing_city]', // WC_Order
+                'countryCode' => '[source::getShopOrder()::get_billing_country]', // WC_Order
+                //@todo? logic country = global $woocommerce->countries->get_countries()[countryCode];
+            ],
+            Mappings::ShippingAddress => [
+                'companyName1' => '[source::getShopOrder()::get_shipping_company()]', // WC_Order
+                'fullName' => '[source::getShopOrder()::get_shipping_first_name()+source::getShopOrder()::get_shipping_last_name()]', // WC_Order
+                'address1' => '[source::getShopOrder()::get_shipping_address_1()]', // WC_Order
+                'address2' => '[source::getShopOrder()::get_shipping_address_2()]', // WC_Order
+                'postalCode' => '[source::getShopOrder()::get_shipping_postcode()]', // WC_Order
+                'city' => '[source::getShopOrder()::get_shipping_city()]', // WC_Order
+                'countryCode' => '[source::getShopOrder()::get_shipping_country()]', // WC_Order
+                //@todo? logic country = global $woocommerce->countries->get_countries()[countryCode];
+            ],
+            Mappings::EmailInvoiceAsPdf => [
+                'emailTo' => '[source::getShopOrder()::get_billing_email()]', // WC_Order
+            ],
+            Mappings::Invoice => [
+                // @todo: fields that come from source, metadata
+            ],
+            Mappings::ItemLine => [
+                'itemNumber' => '[sku]',
+                'productName' => '[name]',
+                'costPrice' => '[cost_price]',
+                // @todo: others? (e.g. quantity, unit price, metadata)
+            ],
+        ];
         return [
             'contactYourId' => '[customer::incrementId|customer::entityId]', // \Mage\Customer\Model\Customer
             'companyName1' => '[company]', // \Magento\Sales\Model\Order\Address

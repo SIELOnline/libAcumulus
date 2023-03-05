@@ -242,6 +242,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     public function getDefaultShopMappings(): array
     {
+        // WooCommerce: The properties for both addresses are always filled.
         return [
             Mappings::Customer => [
                 // Customer defaults.
@@ -278,7 +279,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             Mappings::EmailInvoiceAsPdf => [
                 'emailTo' => '[source::getShopOrder()::get_billing_email()]', // WC_Order
             ],
-            mappings::Invoice => [
+            Mappings::Invoice => [
                 // @todo: fields that come from source, metadata
             ],
             Mappings::ItemLine => [
@@ -295,7 +296,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $orderStatuses = wc_get_order_statuses();
         foreach ($orderStatuses as $key => $label) {
             // PHP8: str_starts_with()
-            if (substr($key, 0, strlen('wc-')) === 'wc-') {
+            if (strncmp($key, 'wc-', 3) === 0) {
                 $key = substr($key, strlen('wc-'));
             }
             /** @noinspection OffsetOperationsInspection */

@@ -492,7 +492,9 @@ class FieldExpander
         $args = [];
         if (preg_match('/^(.+)\((.*)\)$/', $property, $matches)) {
             $property = $matches[1];
-            $args = explode(',', $matches[2]);
+            if ($matches[2] !== '') {
+                $args = explode(',', $matches[2]);
+            }
         }
         if (is_array($object)) {
             if (is_callable($object)) {

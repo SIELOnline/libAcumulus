@@ -109,9 +109,9 @@ class FormHelper
     /**
      * Adds the meta field to the form fields.
      *
-     * The meta field is added into the first fieldset or details set of fields
-     * to prevent problems with rendering and with PrestaShop that only allows
-     * fieldsets at the top.
+     * To prevent problems with rendering (css using + or ~ selector) or with
+     * PrestaShop that only allows fieldsets at the top, the meta field is added
+     * to the first fieldset or details element, or placed at the end.
      *
      * @param array[] $fields
      *

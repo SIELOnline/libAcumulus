@@ -18,6 +18,13 @@ Refactorings:
   getShopDefaults() of each shop to getDefaultShopMappings().
 
 
+7.6.6 (2023-03-05) (WC)
+-----------------------
+Bugs
+- WC: TypeError: substr() expects parameter 1 to be string, null given in
+  FormHelper.php:207.
+
+
 7.6.5 (2023-03-02) (JOO+PS+WC)
 ------------------------------
 Bugs:
@@ -30,8 +37,8 @@ Bugs:
   must be of the type string or null, bool returned.
 
 
-7.6.4 (2023-02-07) (MA+PS only)
--------------------------------
+7.6.4 (2023-02-07) (MA+PS)
+--------------------------
 Features:
 - PHP8.2 awareness: removed use of a dynamic property in class Log.
 - ALL: Fatal errors will now log stack trace (fallback for when mail does not work).
@@ -46,8 +53,8 @@ Refactorings:
 - MA: Added strict typing (PHP7.4 level).
 
 
-7.6.3 (2023-02-06) (JOO only)
------------------------------
+7.6.3 (2023-02-06) (JOO)
+------------------------
 Features:
 - PHP8.1 awareness: Added the #[ReturnTypeWillChange] attribute where necessary. Turned
   out to be needed in only 1 place, code that isn't yet functional.
@@ -74,8 +81,8 @@ Bugs:
   lines would not add up as no line would be created for the missing vat class.
 
 
-7.6.2 (2023-02-01) (OC+WC only)
--------------------------------
+7.6.2 (2023-02-01) (OC+WC)
+--------------------------
 Features:
 - OC: Support for OpenCart 4. Note that OpenCart 4 will only run on PHP 8 and seems to
   contain some errors regarding tax totals not including tax on shipping costs (and
@@ -91,8 +98,8 @@ Bugs:
   creating it, place the instance in a public static property.
 
 
-7.6.1 (2023-01-24) (PS only)
-----------------------------
+7.6.1 (2023-01-24) (PS)
+-----------------------
 Features:
 - ALL: The batch form now allows white space (at the start or end) in the
   from-to fields which will be removed. This allows for easier copy & paste from
@@ -113,8 +120,8 @@ Refactorings:
   createInvoiceAddResult().
 
 
-7.6.0 (2023-01-17) (WC only)
-----------------------------
+7.6.0 (2023-01-17) (WC)
+-----------------------
 Features:
 - ALL: A new setting "Do you charge EU VAT?" replaces the setting "Which tax
   classes define EU vat rates?" and this new setting is only used in case no
@@ -251,8 +258,8 @@ Bugs:
   valid mail addresses when no field references are used.
 
 
-7.4.2 (2022-10-25) (OC only)
-----------------------------
+7.4.2 (2022-10-25) (OC)
+-----------------------
 Features:
 - OC: Added mail (pdf document) buttons on Acumulus invoice status overview.
 - To improve showing the documents links and buttons on the invoice status
@@ -267,14 +274,14 @@ Bugs:
   solutions from 7.4.0.
 
 
-7.4.1 (2022-10-25) (WC only)
-----------------------------
+7.4.1 (2022-10-25) (WC)
+-----------------------
 Bugs:
 - Error in e-mail address validation on forms.
 
 
-7.4.0 (2022-10-24) (WC only)
-----------------------------
+7.4.0 (2022-10-24) (WC)
+-----------------------
 Features:
 - WC: Added buttons to the invoice status screen to mail the Acumulus invoice or
   packing slip.
@@ -359,8 +366,8 @@ Bugs:
 - MA: Form <details> rendering went wrong.
 
 
-7.2.3 (2022-06-01) (HS, WM only)
---------------------------------
+7.2.3 (2022-06-01) (HS, WM)
+---------------------------
 Features:
 - JOO: Changed Joomla specific parts to run on Joomla 4. Note: VirtueMart will
   NOT run on Joomla 4, even not VM4! HikaShop: yet to be tested.
@@ -379,8 +386,8 @@ Bugs:
   message instead of the details of the definitive invoice.
 
 
-7.2.2 (2022-05-13) (OC, PS only)
---------------------------------
+7.2.2 (2022-05-13) (OC, PS)
+---------------------------
 Features:
 - PS, OC: Added crash reporting (explained in the notes for 7.1.0).
 
@@ -391,8 +398,8 @@ Bugs:
     $logLevel = $logLevel ?? Severity::Exception;
 
 
-7.2.1 (2022-05-12) (MA, WC only)
---------------------------------
+7.2.1 (2022-05-12) (MA, WC)
+---------------------------
 Bugs:
 - MA: Magento coding standards: The use of function assert() is forbidden.
 - WC: PHP Fatal error: Uncaught Error: Class 'Siel\Acumulus\Invoice\Source' not
@@ -419,8 +426,8 @@ Bugs:
   InvoiceAddResult.php:294.
 
 
-7.1.1 (2022-05-03) (JOO only)
------------------------------
+7.1.1 (2022-05-03) (JOO)
+------------------------
 Bugs:
 - Error checking on forms was not yet adapted to new way of error reporting from
   the communication layer. Impossible to enter account details on the config
@@ -434,8 +441,8 @@ Refactorings:
 - Pulled method checkAccountSettings() from BaseConfigForm up to Form.
 
 
-7.1.0 (2022-05-02) (JOO only)
------------------------------
+7.1.0 (2022-05-02) (JOO)
+------------------------
 Features:
 - JOO: We now look for uncaught errors at the highest level of our operations,
   controller tasks or event handlers, and log and mail those errors. On Admin
@@ -463,14 +470,14 @@ Refactorings:
 - Code documentation: changed {@see ...} with external links to {@link ...}.
 
 
-7.0.3 (2022-04-20) (WC only)
-----------------------------
+7.0.3 (2022-04-20) (WC)
+-----------------------
 Bugs:
 - PHP Fatal error:  Uncaught TypeError: Return value of ConfigStore::load() must
   be of the type array, bool returned in WooCommerce/Config/ConfigStore.php:16.
 
-7.0.2 (2022-04-20) (WC only)
-----------------------------
+7.0.2 (2022-04-20) (WC)
+-----------------------
 Bugs:
 - WC: "Je site heeft een technisch probleem: Een fout van het type E_ERROR werd
   veroorzaakt op regelnummer 87 van het bestand .../Number.php. Foutmelding:
@@ -479,8 +486,8 @@ Bugs:
   line 487 and ..."
 
 
-7.0.1 (2022-04-19) (WC only)
-----------------------------
+7.0.1 (2022-04-19) (WC)
+-----------------------
 Bugs:
 - WC: "Je site heeft een technisch probleem: Een fout van het type E_ERROR werd
   veroorzaakt op regelnummer 76 van het bestand .../Number.php. Foutmelding:
@@ -489,8 +496,8 @@ Bugs:
   line 436 and ..."
 
 
-7.0.0 (2022-04-14) (WC only)
-----------------------------
+7.0.0 (2022-04-14) (WC)
+-----------------------
 Note: Due to the large number of changes, especially the PHP7 strict typing
 introduced in many places, this version has only been released for WooCommerce.
 Other web shops will follow soon.
@@ -567,8 +574,8 @@ Refactorings:
 - Added visibility to class constants.
 
 
-6.4.2 (2022-03-24) (JOO only, but retracted)
---------------------------------------------
+6.4.2 (2022-03-24) (JOO, but retracted)
+---------------------------------------
 Bugs:
 - HS: property order->order_shipping_params may be present but be an "empty"
   object (order->order_shipping_params->prices is an empty array).
@@ -577,8 +584,8 @@ Bugs:
   strict mode are enabled. Solved by requiring MySql 5.6+ so we can define
   multiple columns with default current_timestamp.
 
-6.4.1 (2022-02-23) (MA2 only)
------------------------------
+6.4.1 (2022-02-23) (MA2)
+------------------------
 Bugs:
 - MA24: Magento now requires a declarative data schema and does no longer allow
   Setup/InstallSchema.php, Setup/UpgradeSchema.php, and Setup/Uninstall.php.
@@ -680,8 +687,8 @@ Refactorings:
 - Documentation typos.
 - Tag <sourceuri> now points to GitHub instead of www.siel.nl.
 
-6.3.5 (2021-11-15) (WC only)
-----------------------------
+6.3.5 (2021-11-15) (WC)
+-----------------------
 Bugs:
 - WC: Ignore hidden metadata from the "WooCommerce TM Extra Product Options"
   plugin when adding child lines for variants/options.
@@ -843,8 +850,8 @@ Refactorings:
   named as in parent method.
 - HS: Use Creator::VatRateSource_Exact0 for 0 vat rates.
 
-6.1.1 (2020-12-22) (MA only)
-----------------------------
+6.1.1 (2020-12-22) (MA)
+-----------------------
 Bugs:
 - MA2: Renaming the registration form into the register form (done in 6.0.2) was
   not done in MA2 specific code.
@@ -1147,13 +1154,13 @@ Refactorings:
   boolean $recalculateUnitPrice.
 - WC: WooCommerce 3.7 renamed get_used_coupons() to get_coupon_codes().
 
-5.7.3 (2019-06-25) (MA2 only)
------------------------------
+5.7.3 (2019-06-25) (MA2)
+------------------------
 Features:
 - Added support for the Fooman surcharge payment module.
 
-5.7.2 (2019-05-15) (JOO only)
------------------------------
+5.7.2 (2019-05-15) (JOO)
+------------------------
 Bugs:
 - Errors in the installation process:
   * syntax error in <version> tag in xml files.
@@ -1163,8 +1170,8 @@ Refactorings:
 - JOO: Registration of our own autoloader now takes place in only 1 place: the
   Acumulus Joomla model.
 
-5.7.1 (2019-05-02) (WC only)
-----------------------------
+5.7.1 (2019-05-02) (WC)
+-----------------------
 Bugs:
 - WC: tweaked the precision settings again.
 - WC: Acumulus info box op bestellingspagina toont verkeerde status voor credit

@@ -141,7 +141,7 @@ class Number
      *   The number may be passed as a string, and in many cases probably will
      *   indeed be passed as a string as it comes from the database.
      * @param int $precision
-     *   The number of decimals to which it should have been rounded, if it is a
+     *   The number of decimals to which it should have been rounded if it is a
      *   rounded number. Should be a non-negative integer.
      *
      * @return bool

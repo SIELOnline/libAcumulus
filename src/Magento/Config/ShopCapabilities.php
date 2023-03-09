@@ -453,7 +453,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             'item' => [
                 'class' => [Order\Item::class, Item::class],
-                'file' => ['vendor/magento/module-sales/Model/Order/Item.php', 'vendor/magento/module-sales/Model/Order/Creditmemo/Item.php'],
+                'file' => [
+                    'vendor/magento/module-sales/Model/Order/Item.php',
+                    'vendor/magento/module-sales/Model/Order/Creditmemo/Item.php'
+                ],
                 'properties' => array_unique(array_merge($orderItem, $creditMemoItem)),
                 'properties-more' => true,
             ],
@@ -487,68 +490,48 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return [
             Mappings::Customer => [
-                // Customer defaults.
-                //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
-                'contactYourId' => '[source::getShopOrder()::get_customer_id()]', // WC_Order
-                'vatNumber' => '[source::getShopOrder()::get_meta(billing_vat_number)'
-                    . '|source::getShopOrder()::get_meta(_vat_number)'
-                    . '|source::getShopOrder()::get_meta(vat_number)'
-                    . '|source::getShopOrder()::get_meta(Vat Number)]', // Post meta
-                'telephone' => '[source::getShopOrder()::get_billing_phone()]', // WC_Order
-                'telephone2' => '[source::getShopOrder()::get_shipping_phone()]', // WC_Order
-                'email' => '[source::getShopOrder()::get_billing_email()]', // WC_Order
+                'contactYourId' => '[source::getShopOrder()::getCustomer()::getId()]', // Order, not Creditmemo
+                // Magento has 2 VAT numbers:
+                // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
+                // Magento\Customer\Model\Address also has a getVatId() method, but that is not the Address we have here.
+                'vatNumber' => '[source::getShopOrder()::getCustomerTaxvat())', // Order, not Creditmemo
+                'telephone' => '[source::getBillingAddress()::getTelephone()]', // Address
+                'telephone2' => '[source::getShippingAddress()::getTelephone()]', // Address
+                'fax' => '[source::getShippingAddress()::getFax()]', // Address
+                // Email field of Address seems to be a copy of the Customer email field.
+                'email' => '[source::getShippingAddress()::getEmail()]', // Address
             ],
+            // Both Order and Creditmemo have get(Billing|Shipping)Address() methods.
             Mappings::InvoiceAddress => [
-                'companyName1' => '[source::getShopOrder()::get_billing_company]', // WC_Order
-                'fullName' => '[source::getShopOrder()::get_billing_first_name+source::getShopOrder()::get_billing_last_name]', // WC_Order
-                'address1' => '[source::getShopOrder()::get_billing_address_1]', // WC_Order
-                'address2' => '[source::getShopOrder()::get_billing_address_2]', // WC_Order
-                'postalCode' => '[source::getShopOrder()::get_billing_postcode]', // WC_Order
-                'city' => '[source::getShopOrder()::get_billing_city]', // WC_Order
-                'countryCode' => '[source::getShopOrder()::get_billing_country]', // WC_Order
-                //@todo? logic country = global $woocommerce->countries->get_countries()[countryCode];
+                'companyName1' => '[source::getBillingAddress()::getCompany()]', // Address
+                'fullName' => '[source::getBillingAddress()::getName()]', // Address
+                'address1' => '[source::getBillingAddress()::getStreetLine(1)]', // Address
+                'address2' => '[source::getBillingAddress()::getStreetLine(1)]', // Address
+                'postalCode' => '[source::getBillingAddress()::getPostcode()]', // Address
+                'city' => '[source::getBillingAddress()::getCity()]', // Adress
+                'countryCode' => '[source::getBillingAddress()::getCountryId()]', // Address
             ],
             Mappings::ShippingAddress => [
-                'companyName1' => '[source::getShopOrder()::get_shipping_company()]', // WC_Order
-                'fullName' => '[source::getShopOrder()::get_shipping_first_name()+source::getShopOrder()::get_shipping_last_name()]', // WC_Order
-                'address1' => '[source::getShopOrder()::get_shipping_address_1()]', // WC_Order
-                'address2' => '[source::getShopOrder()::get_shipping_address_2()]', // WC_Order
-                'postalCode' => '[source::getShopOrder()::get_shipping_postcode()]', // WC_Order
-                'city' => '[source::getShopOrder()::get_shipping_city()]', // WC_Order
-                'countryCode' => '[source::getShopOrder()::get_shipping_country()]', // WC_Order
-                //@todo? logic country = global $woocommerce->countries->get_countries()[countryCode];
+                'companyName1' => '[source::getShippingAddress()::getCompany()]', // Address
+                'fullName' => '[source::getShippingAddress()::getName()]', // Address
+                'address1' => '[source::getShippingAddress()::getStreetLine(1)]', // Address
+                'address2' => '[source::getShippingAddress()::getStreetLine(1)]', // Address
+                'postalCode' => '[source::getShippingAddress()::getPostcode()]', // Address
+                'city' => '[source::getShippingAddress()::getCity()]', // Adress
+                'countryCode' => '[source::getShippingAddress()::getCountryId()]', // Address
             ],
             Mappings::EmailInvoiceAsPdf => [
-                'emailTo' => '[source::getShopOrder()::get_billing_email()]', // WC_Order
+                'emailTo' => '[source::getShippingAddress()::getEmail()]', // Address
             ],
             Mappings::Invoice => [
                 // @todo: fields that come from source, metadata
             ],
             Mappings::ItemLine => [
+                // @todo: on which object?
                 'itemNumber' => '[sku]',
                 'productName' => '[name]',
-                'costPrice' => '[cost_price]',
                 // @todo: others? (e.g. quantity, unit price, metadata)
             ],
-        ];
-        return [
-            'contactYourId' => '[customer::incrementId|customer::entityId]', // \Mage\Customer\Model\Customer
-            'companyName1' => '[company]', // \Magento\Sales\Model\Order\Address
-            'fullName' => '[name]', // \Magento\Sales\Model\Order\Address
-            'address1' => '[streetLine(1)]', // \Magento\Sales\Model\Order\Address
-            'address2' => '[streetLine(2)]', // \Magento\Sales\Model\Order\Address
-            'postalCode' => '[postcode]', // \Magento\Sales\Model\Order\Address
-            'city' => '[city]', // \Magento\Sales\Model\Order\Address
-            // Magento has 2 VAT numbers:
-            // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
-            'vatNumber' => '[vatId|customerTaxvat]', // \Magento\Sales\Model\Order
-            'telephone' => '[telephone]', // \Magento\Sales\Model\Order\Address
-            'fax' => '[fax]', // \Magento\Sales\Model\Order\Address
-            'email' => '[email]', // \Magento\Sales\Model\Order\Address
-
-            // Invoice lines defaults.
-            'itemNumber' => '[sku]',
-            'productName' => '[name]',
         ];
     }
 

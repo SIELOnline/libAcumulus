@@ -1,4 +1,7 @@
 # Ignore dependencies that are managed with Composer.
+# As we have only require-devs, we do not deliver /vendor/ to our users of the library,
+# so we do not commit it, so users will not see it.
 # Generally you should only ignore the root vendor directory. It's important
 # that any other vendor directories are not ignored unless you purposely do so.
+composer.lock
 /vendor/

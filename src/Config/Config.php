@@ -605,14 +605,19 @@ class Config
     }
 
     /**
-     * Returns all mappings (overridden via configuration)
+     * Returns mappings that are overridden via the configuration.
      *
-     * @return array
-     *   Description.
+     * @return string[][]
+     *   An array of mappings per {@see \Siel\Acumulus\Data\AcumulusObject}.
+     *   The keys are one of the {@see \Siel\Acumulus\Config\Mappings}
+     *   constants, its values an array of property mappings: the keys being
+     *   property names of the {@see \Siel\Acumulus\Data\AcumulusObject} (as
+     *   indicated by the outer key), the values a string that can be passed
+     *   to {@see \Siel\Acumulus\Helpers\FieldExpander::expand()}.
      */
     public function getMappings(): array
     {
-        return $this->get('mappings');
+        return $this->get('mappings') ?? [];
     }
 
     /**
@@ -1125,6 +1130,31 @@ class Config
                     'group' => 'other',
                     'type' => 'int',
                     'default' => 0,
+                ],
+                'mappings' => [
+                    'group' => 'mappings',
+                    'type' => 'array',
+                    'default' => [
+                        Mappings::Invoice => [
+                            'description' => '[source::getTypeLabel(2)+source::getReference()'
+                                . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
+                        ],
+                        Mappings::Customer => [
+                        ],
+                        Mappings::InvoiceAddress => [
+                        ],
+                        Mappings::ShippingAddress => [
+                        ],
+                        Mappings::EmailInvoiceAsPdf => [
+                            'subject' => 'Factuur voor [source::getTypeLabel(1)+source::getReference()'
+                                . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
+                        ],
+                        Mappings::EmailPackingSlipAsPdf => [
+                            'subject' => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
+                        ],
+                        Mappings::ItemLine => [
+                        ],
+                    ],
                 ],
             ];
         }

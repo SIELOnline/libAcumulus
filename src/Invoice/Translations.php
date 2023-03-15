@@ -26,7 +26,7 @@ class Translations extends TranslationCollection
         'plural_Other' => 'overige',
         'plural_Order_ref'  => 'bestellingreferenties',
         'plural_CreditNote_ref' => 'creditnota-referenties',
-        'plural_Order_id'  => 'bestellingnummers',
+        'plural_Order_id'  => 'bestelnummers',
         'plural_CreditNote_id' => 'creditnotanummers',
 
         'for' => 'voor',

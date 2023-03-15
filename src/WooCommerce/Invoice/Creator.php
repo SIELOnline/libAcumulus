@@ -62,7 +62,7 @@ class Creator extends BaseCreator
     {
         $result = [];
         /** @var WC_Order_Item_Product[] $items */
-        $items = $this->invoiceSource->getShopSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        $items = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
             $product = $item->get_product();
             $line = $this->getItemLine($item, $product);
@@ -369,7 +369,7 @@ class Creator extends BaseCreator
         // So far, all amounts found on refunds are negative, so we probably
         // don't need to correct the sign on these lines either: but this has
         // not been tested yet!.
-        foreach ($this->invoiceSource->getShopSource()->get_fees() as $feeLine) {
+        foreach ($this->invoiceSource->getSource()->get_fees() as $feeLine) {
             $line = $this->getFeeLine($feeLine);
             $line = $this->addLineType($line, static::LineType_Other);
             $result[] = $line;
@@ -404,7 +404,7 @@ class Creator extends BaseCreator
         $result = [];
         // Get the shipping lines for this order.
         /** @var \WC_Order_Item_Shipping[] $shippingItems */
-        $shippingItems = $this->invoiceSource->getShopSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+        $shippingItems = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
         foreach ($shippingItems as $shippingItem) {
             $shippingLine = $this->getShippingLine($shippingItem);
             if ($shippingLine) {

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit;
 
-use stdClass;
-
 /**
  * GetData provides test data to test Field and Collectors.
  */
@@ -19,11 +17,17 @@ class GetTestData
         $this->dataFile = $this->configDir . '/data.json';
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function load(): object
     {
-        return is_readable($this->dataFile) ? json_decode(file_get_contents($this->dataFile), false) : new stdClass();
+        return json_decode(file_get_contents($this->dataFile), false, 512, JSON_THROW_ON_ERROR);
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function get(): object
     {
         $data = $this->load();

@@ -87,10 +87,10 @@ class Creator extends BaseCreator
         parent::setInvoiceSource($invoiceSource);
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->order = $this->invoiceSource->getShopSource();
+                $this->order = $this->invoiceSource->getSource();
                 break;
             case Source::CreditNote:
-                $this->creditSlip = $this->invoiceSource->getShopSource();
+                $this->creditSlip = $this->invoiceSource->getSource();
                 $this->order = $this->invoiceSource->getShopOrder()->getShopSource();
                 break;
         }
@@ -101,7 +101,7 @@ class Creator extends BaseCreator
         parent::setPropertySources();
         $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
         $this->propertySources['address_delivery'] = new Address($this->order->id_address_delivery);
-        $this->propertySources['customer'] = new Customer($this->invoiceSource->getShopSource()->id_customer);
+        $this->propertySources['customer'] = new Customer($this->invoiceSource->getSource()->id_customer);
     }
 
     protected function getItemLines(): array
@@ -219,7 +219,7 @@ class Creator extends BaseCreator
         // amount entered is based on a nicely rounded amount incl tax). So we
         // recalculate this ourselves.
         $vatRate = $this->order->carrier_tax_rate;
-        $shippingInc = $sign * $this->invoiceSource->getShopSource()->total_shipping_tax_incl;
+        $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
         $shippingEx = $shippingInc / (100 + $vatRate) * 100;
         $shippingVat = $shippingInc - $shippingEx;
 
@@ -295,7 +295,7 @@ class Creator extends BaseCreator
     protected function getPaymentFeeLine(): array
     {
         /** @var Order|OrderSlip $source */
-        $source = $this->invoiceSource->getShopSource();
+        $source = $this->invoiceSource->getSource();
         /** @noinspection MissingIssetImplementationInspection */
         if (isset($source->payment_fee, $source->payment_fee_rate) && (float) $source->payment_fee !== 0.0) {
             $sign = $this->invoiceSource->getSign();

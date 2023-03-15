@@ -39,7 +39,7 @@ use Siel\Acumulus\Meta;
  */
 class Source extends BaseSource
 {
-    protected function setShopSource(): void
+    protected function setSource(): void
     {
         // @todo: set the source, given an id (and type).
         if ($this->getType() === Source::Order) {
@@ -52,7 +52,7 @@ class Source extends BaseSource
     protected function setId(): void
     {
         // @todo: set the id, given a loaded source.
-        $this->id = (int) $this->getShopSource()->id;
+        $this->id = (int) $this->getSource()->id;
     }
 
     public function getReference()
@@ -84,7 +84,7 @@ class Source extends BaseSource
     {
         // @todo: override or implement both getPaymentStatusOrder() and getPaymentStatusCreditNote()
         // Assumption: credit slips are always in a paid status.
-        if (($this->getType() === Source::Order && $this->getShopSource()->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
+        if (($this->getType() === Source::Order && $this->getSource()->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
             $result = Api::PaymentStatus_Paid;
         } else {
             $result = Api::PaymentStatus_Due;
@@ -112,8 +112,8 @@ class Source extends BaseSource
     {
         // @todo: provide implementation.
         $result = [
-            Meta::Currency => $this->getShopSource()->currency_code,
-            Meta::CurrencyRate => (float) $this->getShopSource()->conversion_rate,
+            Meta::Currency => $this->getSource()->currency_code,
+            Meta::CurrencyRate => (float) $this->getSource()->conversion_rate,
             Meta::CurrencyDoConvert => true,
         ];
         return $result;

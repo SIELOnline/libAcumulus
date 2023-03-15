@@ -202,10 +202,10 @@ abstract class Creator
             $this->propertySources['originalInvoiceSourceType'] =
                 ['label' => $this->t($this->propertySources['originalInvoiceSource']->getType())];
         }
-        $this->propertySources['source'] = $this->invoiceSource->getShopSource();
+        $this->propertySources['source'] = $this->invoiceSource->getSource();
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
             if ($this->invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refund'] = $this->invoiceSource->getShopSource();
+                $this->propertySources['refund'] = $this->invoiceSource->getSource();
             }
             $this->propertySources['order'] = $this->invoiceSource->getShopOrder()->getShopSource();
             if ($this->invoiceSource->getType() === Source::CreditNote) {

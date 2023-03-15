@@ -14,21 +14,16 @@ use stdClass;
  */
 class Source extends BaseSource
 {
-    protected function setShopSource(): void
+    protected function setSource(): void
     {
         $this->shopSource = new stdClass();
-        $this->getShopSource()->type = $this->getType();
-        $this->getShopSource()->id = $this->id;
+        $this->getSource()->type = $this->getType();
+        $this->getSource()->id = $this->id;
     }
 
     protected function setId(): void
     {
-        $this->id = (int) $this->getShopSource()->id;
-    }
-
-    public function getReference()
-    {
-        return $this->getShopSource()->id;
+        $this->id = (int) $this->getSource()->id;
     }
 
     public function getDate(): string
@@ -36,12 +31,12 @@ class Source extends BaseSource
         return '2023-02-01';
     }
 
-    public function getStatus()
+    public function getStatus(): string
     {
         return 'pending';
     }
 
-    public function getPaymentMethod()
+    public function getPaymentMethod(): int
     {
         return 3;
     }
@@ -85,7 +80,7 @@ class Source extends BaseSource
         ];
     }
 
-    protected function getShopOrderOrId()
+    protected function getShopOrderOrId(): int
     {
         return 3;
     }

@@ -47,6 +47,7 @@ class FieldExpanderTest extends TestCase
      */
     private function getObjects(): array
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return (array) (new GetTestData())->get();
     }
 
@@ -220,10 +221,10 @@ class FieldExpanderTest extends TestCase
             ['[container::language]', self::Language],
             ['[container::translator::language]', self::Language],
             ['[container::createAcumulusObject(address)::fullName]', null], //magic __get
-            ['[container::createSource(order,10)::id]', 10], //magic __get
-            ['[container::createSource(order,10)::date]', '2023-02-01'], //magic __get
-            ['[container::createSource(order,10)::getShopCreditNote()]', null], // () is not '' as a single argument
-            ['[container::createSource(order,10)::getShopCreditNote()::id]', null], // null in middle of chain
+            ['[container::createSource(Order,10)::id]', 10], //magic __get
+            ['[container::createSource(Order,10)::date]', '2023-02-01'], //magic __get
+            ['[container::createSource(Order,10)::getCreditNote()]', null], // () is not '' as a single argument
+            ['[container::createSource(Order,10)::getCreditNote()::id]', null], // null in middle of chain
         ];
     }
 

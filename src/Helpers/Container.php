@@ -25,6 +25,7 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ConfigStore;
 use Siel\Acumulus\Config\ConfigUpgrade;
 use Siel\Acumulus\Config\Environment;
+use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Invoice\Completor;
@@ -488,7 +489,7 @@ class Container
         $arguments = [
             $this->getFieldExpander(),
             $this->getShopCapabilities(),
-            $this->getConfig(),
+            $this->getMappings(),
             $this,
             $this->getLog(),
         ];
@@ -571,6 +572,11 @@ class Container
     public function getShopCapabilities(): ShopCapabilities
     {
         return $this->getInstance('ShopCapabilities', 'Config', [$this->shopNamespace, $this->getTranslator()]);
+    }
+
+    public function getMappings(): Mappings
+    {
+        return $this->getInstance('Mappings', 'Config', [$this->getConfig(), $this->getShopCapabilities()]);
     }
 
     public function getInvoiceManager(): InvoiceManager

@@ -101,7 +101,7 @@ class Creator extends BaseCreator
     protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
     {
         parent::setInvoiceSource($invoiceSource);
-        $this->order = $this->invoiceSource->getShopSource();
+        $this->order = $this->invoiceSource->getSource();
         $this->orderModel = VmModel::getModel('orders');
         /** @var \TableInvoices $invoicesTable */
         $invoicesTable = $this->orderModel->getTable('invoices');

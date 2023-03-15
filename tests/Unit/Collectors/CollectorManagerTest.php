@@ -8,10 +8,10 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Unit\Collectors;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Tests\Unit\GetTestData;
 
 /**
@@ -20,12 +20,29 @@ use Siel\Acumulus\Tests\Unit\GetTestData;
  */
 class CollectorManagerTest extends TestCase
 {
-    protected Container $container;
+    private Container $container;
+
+    private function getInvoiceSource(): Source
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $objects = (new GetTestData())->get();
+        $order = $objects->order;
+        return $this->getContainer()->createSource(Source::Order, $order);
+    }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $this->container = new Container('Tests\TestWebShop', 'nl');
+        $this->container->addTranslations('Translations', 'Invoice');
+    }
+
+    /**
+     * @return \Siel\Acumulus\Helpers\Container
+     */
+    private function getContainer(): Container
+    {
+        return $this->container;
     }
 
     public function testCollectInvoice(): void
@@ -36,27 +53,25 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectCustomer(): void
     {
-        $manager = $this->container->getCollectorManager();
-        $objects = (new GetTestData())->get();
-        $manager->addPropertySource('customer', $objects->order->customer);
+        $manager = $this->getContainer()->getCollectorManager();
+        $customer = $manager->collectCustomer($this->getInvoiceSource());
 
-        $customer = $manager->collectCustomer();
         $this->assertNull($customer->contactId);
-        $this->assertSame(Api::CustomerType_Debtor, $customer->type);
+        $this->assertNull($customer->type);
         $this->assertNull($customer->vatTypeId);
         $this->assertSame('2', $customer->contactYourId);
-        $this->assertTrue($customer->contactStatus);
+        $this->assertNull($customer->contactStatus);
 
         $this->assertNull($customer->website);
-        $this->assertSame('', $customer->vatNumber);
+        $this->assertNull($customer->vatNumber);
         $this->assertSame('0123456789', $customer->telephone);
         $this->assertSame('0612345978', $customer->telephone2);
-        $this->assertSame('', $customer->fax);
-        $this->assertSame('customer@burorader.com', $customer->email);
-        $this->assertTrue($customer->overwriteIfExists);
+        $this->assertNull($customer->fax);
+        $this->assertSame('customer@example.com', $customer->email);
+        $this->assertNull($customer->overwriteIfExists);
         $this->assertNull($customer->bankAccountNumber);
-        $this->assertSame('', $customer->mark);
-        $this->assertTrue($customer->disableDuplicates);
+        $this->assertNull($customer->mark);
+        $this->assertNull($customer->disableDuplicates);
 
         // Test that the child objects are there and have correct values.
         $this->assertSame('Lindelaan 4', $customer->getInvoiceAddress()->address1);
@@ -65,13 +80,11 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectAddress(): void
     {
-        $manager = $this->container->getCollectorManager();
-        $objects = (new GetTestData())->get();
-        $manager->addPropertySource('customer', $objects->order->customer);
+        $manager = $this->getContainer()->getCollectorManager();
+        $invoiceAddress = $manager->collectAddress($this->getInvoiceSource(), AddressType::Invoice);
 
-        $invoiceAddress = $manager->collectAddress(AddressType::Invoice);
         $this->assertSame('Buro RaDer', $invoiceAddress->companyName1);
-        $this->assertSame('', $invoiceAddress->companyName2);
+        $this->assertNull($invoiceAddress->companyName2);
         $this->assertSame('Erwin Derksen', $invoiceAddress->fullName);
         $this->assertSame('Beste Erwin', $invoiceAddress->salutation);
         $this->assertSame('Lindelaan 4', $invoiceAddress->address1);
@@ -83,9 +96,9 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($invoiceAddress->countryAutoName);
         $this->assertNull($invoiceAddress->countryAutoNameLang);
 
-        $shippingAddress = $manager->collectAddress(AddressType::Shipping);
+        $shippingAddress = $manager->collectAddress($this->getInvoiceSource(), AddressType::Shipping);
         $this->assertSame('Buro RaDer', $shippingAddress->companyName1);
-        $this->assertSame('', $shippingAddress->companyName2);
+        $this->assertNull($shippingAddress->companyName2);
         $this->assertSame('Erwin Derksen', $shippingAddress->fullName);
         $this->assertSame('Beste Erwin', $shippingAddress->salutation);
         $this->assertSame('Lindelaan 5', $shippingAddress->address1);
@@ -98,27 +111,24 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectEmailAsPdf(): void
     {
-        $manager = $this->container->getCollectorManager();
-        $objects = (new GetTestData())->get();
-        $manager->addPropertySource('customer', $objects->order->customer);
-        $manager->addPropertySource('order', $objects->order);
-
+        $manager = $this->getContainer()->getCollectorManager();
         /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $invoiceEmailAsPdf */
-        $invoiceEmailAsPdf = $manager->collectEmailAsPdf(EmailAsPdfType::Invoice);
-        $this->assertSame('info@burorader.com', $invoiceEmailAsPdf->emailFrom);
-        $this->assertSame('', $invoiceEmailAsPdf->emailTo);
-        $this->assertSame('erwin@burorader.com', $invoiceEmailAsPdf->emailBcc);
+        $invoiceEmailAsPdf = $manager->collectEmailAsPdf($this->getInvoiceSource(), EmailAsPdfType::Invoice);
+
+        $this->assertNull($invoiceEmailAsPdf->emailFrom);
+        $this->assertSame('customer@example.com', $invoiceEmailAsPdf->emailTo);
+        $this->assertSame('dev@example.com', $invoiceEmailAsPdf->emailBcc);
         $this->assertSame('Factuur voor bestelling 3', $invoiceEmailAsPdf->subject);
         $this->assertNull($invoiceEmailAsPdf->message);
         $this->assertNull($invoiceEmailAsPdf->gfx);
         $this->assertNull($invoiceEmailAsPdf->ubl);
 
-
         /** @var \Siel\Acumulus\Data\EmailPackingSlipAsPdf $packingSlipEmailAsPdf */
-        $packingSlipEmailAsPdf = $manager->collectEmailAsPdf(EmailAsPdfType::PackingSlip);
-        $this->assertSame('info@burorader.com', $packingSlipEmailAsPdf->emailFrom);
-        $this->assertSame('erwin@burorader.com', $packingSlipEmailAsPdf->emailTo);
-        $this->assertSame('', $packingSlipEmailAsPdf->emailBcc);
+        $packingSlipEmailAsPdf = $manager->collectEmailAsPdf($this->getInvoiceSource(), EmailAsPdfType::PackingSlip);
+
+        $this->assertNull($packingSlipEmailAsPdf->emailFrom);
+        $this->assertSame('customer@example.com', $packingSlipEmailAsPdf->emailTo);
+        $this->assertSame('dev@example.com', $packingSlipEmailAsPdf->emailBcc);
         $this->assertSame('Pakbon voor bestelling 3', $packingSlipEmailAsPdf->subject);
         $this->assertNull($packingSlipEmailAsPdf->message);
         $this->assertNull($packingSlipEmailAsPdf->gfx);

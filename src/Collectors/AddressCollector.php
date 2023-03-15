@@ -50,7 +50,7 @@ class AddressCollector extends Collector
     {
         if ($acumulusObject->countryCode === null) {
             /** @var \Siel\Acumulus\Invoice\Source $invoiceSource */
-            $invoiceSource = $this->propertySources['invoiceSource'];
+            $invoiceSource = $this->propertySources['source'];
             // Set 'nl' as default country code, but overwrite with the real country
             // code, if not empty.
             $acumulusObject->setCountryCode('nl');

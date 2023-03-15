@@ -60,7 +60,7 @@ abstract class Creator extends BaseCreator
 
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->order = $this->invoiceSource->getShopSource();
+                $this->order = $this->invoiceSource->getSource();
                 break;
             case Source::CreditNote:
                 break;

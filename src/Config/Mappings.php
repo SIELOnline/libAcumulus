@@ -73,7 +73,7 @@ class Mappings
      */
     protected function getAll(): array
     {
-        return array_merge(
+        return array_merge_recursive(
             $this->getDefaultShopMappings(),
             $this->getConfiguredMappings(),
         );

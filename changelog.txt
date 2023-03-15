@@ -9,9 +9,9 @@ Refactorings:
 - Class Source:
   - Throws on construction based on an invalid source, making isValid() superfluous.
     Therefore, isValid() has been removed.
-  - Renamed setSource()/getSource to setShopSource()/getShopSource().
-  - Renamed getOrder to getShopOrder().
-  - Added getShopCreditNote().
+  - Added getTypeLabel(int $case) to get the translated source type.
+  - Added some methods to traverse from credit note to order and to find out if a given
+    Source is an order or a credit note. Useful in mapping definitions.
   - getCreditNotes() does no longer return null but this for a credit note.
 - Renamed ShopCapabilities::getShopDefaults() to ShopCapabilities::getDefaultShopConfig()
   and added ShopCapabilities::getDefaultShopMappings(). Moved all mappings in the

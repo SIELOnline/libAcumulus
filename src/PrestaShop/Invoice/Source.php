@@ -21,7 +21,7 @@ use function strlen;
 /**
  * Wraps a PrestaShop order in an invoice source object.
  *
- * @method Order|OrderSlip getShopSource()
+ * @method Order|OrderSlip getSource()
  */
 class Source extends BaseSource
 {
@@ -30,7 +30,7 @@ class Source extends BaseSource
      *
      * @throws \PrestaShopException
      */
-    protected function setShopSource(): void
+    protected function setSource(): void
     {
         if ($this->getType() === Source::Order) {
             $this->shopSource = new Order($this->getId());
@@ -48,8 +48,8 @@ class Source extends BaseSource
     public function getReference()
     {
         return $this->getType() === Source::Order
-            ? $this->getShopSource()->reference
-            : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf('%06d', $this->getShopSource()->id);
+            ? $this->getSource()->reference
+            : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf('%06d', $this->getSource()->id);
     }
 
     /**
@@ -59,7 +59,7 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = $this->getShopSource()->id;
+        $this->id = $this->getSource()->id;
         if ($this->getType() === Source::CreditNote) {
             $this->addProperties();
         }
@@ -67,7 +67,7 @@ class Source extends BaseSource
 
     public function getDate(): string
     {
-        return substr($this->getShopSource()->date_add, 0, strlen('2000-01-01'));
+        return substr($this->getSource()->date_add, 0, strlen('2000-01-01'));
     }
 
     /**
@@ -78,7 +78,7 @@ class Source extends BaseSource
      */
     protected function getStatusOrder(): int
     {
-        return (int) $this->getShopSource()->current_state;
+        return (int) $this->getSource()->current_state;
     }
 
     /**
@@ -109,7 +109,7 @@ class Source extends BaseSource
     public function getPaymentStatus(): int
     {
         // Assumption: credit slips are always in a paid status.
-        return ($this->getType() === Source::Order && $this->getShopSource()->hasBeenPaid()) || $this->getType() === Source::CreditNote
+        return ($this->getType() === Source::Order && $this->getSource()->hasBeenPaid()) || $this->getType() === Source::CreditNote
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -128,7 +128,7 @@ class Source extends BaseSource
             }
         } else {
             // Assumption: last modified date is date of actual reimbursement.
-            $paymentDate = $this->getShopSource()->date_upd;
+            $paymentDate = $this->getSource()->date_upd;
         }
 
         return $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
@@ -152,7 +152,7 @@ class Source extends BaseSource
         /** @noinspection PhpCastIsUnnecessaryInspection */
         return [
             Meta::Currency => $currency->iso_code,
-            Meta::CurrencyRate => (float) $this->getShopSource()->conversion_rate,
+            Meta::CurrencyRate => (float) $this->getSource()->conversion_rate,
             Meta::CurrencyDoConvert => true,
         ];
     }
@@ -167,22 +167,22 @@ class Source extends BaseSource
     {
         $sign = $this->getSign();
         if ($this->getType() === Source::Order) {
-            $amount = $this->getShopSource()->getTotalProductsWithoutTaxes()
-                      + $this->getShopSource()->total_shipping_tax_excl
-                      + $this->getShopSource()->total_wrapping_tax_excl
-                      - $this->getShopSource()->total_discounts_tax_excl;
-            $amountInc = $this->getShopSource()->getTotalProductsWithTaxes()
-                         + $this->getShopSource()->total_shipping_tax_incl
-                         + $this->getShopSource()->total_wrapping_tax_incl
-                         - $this->getShopSource()->total_discounts_tax_incl;
+            $amount = $this->getSource()->getTotalProductsWithoutTaxes()
+                      + $this->getSource()->total_shipping_tax_excl
+                      + $this->getSource()->total_wrapping_tax_excl
+                      - $this->getSource()->total_discounts_tax_excl;
+            $amountInc = $this->getSource()->getTotalProductsWithTaxes()
+                         + $this->getSource()->total_shipping_tax_incl
+                         + $this->getSource()->total_wrapping_tax_incl
+                         - $this->getSource()->total_discounts_tax_incl;
         } else {
             // On credit notes, the amount ex VAT will not have been corrected
             // for discounts that are subtracted from the refund. This will be
             // corrected later in getDiscountLinesCreditNote().
-            $amount = $this->getShopSource()->total_products_tax_excl
-                      + $this->getShopSource()->total_shipping_tax_excl;
-            $amountInc = $this->getShopSource()->total_products_tax_incl
-                         + $this->getShopSource()->total_shipping_tax_incl;
+            $amount = $this->getSource()->total_products_tax_excl
+                      + $this->getSource()->total_shipping_tax_excl;
+            $amountInc = $this->getSource()->total_products_tax_incl
+                         + $this->getSource()->total_shipping_tax_incl;
         }
 
         return [
@@ -199,8 +199,8 @@ class Source extends BaseSource
      */
     public function getInvoiceReferenceOrder(): ?string
     {
-        return !empty($this->getShopSource()->invoice_number)
-            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getShopSource()->id_lang, null, $this->getShopSource()->id_shop) . sprintf('%06d', $this->getShopSource()->invoice_number)
+        return !empty($this->getSource()->invoice_number)
+            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getSource()->id_lang, null, $this->getSource()->id_shop) . sprintf('%06d', $this->getSource()->invoice_number)
             : null;
     }
 
@@ -212,8 +212,8 @@ class Source extends BaseSource
      */
     public function getInvoiceDateOrder(): ?string
     {
-        return !empty($this->getShopSource()->invoice_number)
-            ? substr($this->getShopSource()->invoice_date, 0, strlen('2000-01-01'))
+        return !empty($this->getSource()->invoice_number)
+            ? substr($this->getSource()->invoice_date, 0, strlen('2000-01-01'))
             : null;
     }
 
@@ -250,7 +250,7 @@ class Source extends BaseSource
             $row = reset($row);
             foreach ($row as $key => $value) {
                 /** @noinspection PhpVariableVariableInspection */
-                $this->getShopSource()->$key ??= $value;
+                $this->getSource()->$key ??= $value;
             }
         }
     }

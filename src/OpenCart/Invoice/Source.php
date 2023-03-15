@@ -32,7 +32,7 @@ abstract class Source extends BaseSource
      */
     protected array $orderTotalLines;
 
-    protected function setShopSource(): void
+    protected function setSource(): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->shopSource = $this->getRegistry()->getOrder($this->getId());

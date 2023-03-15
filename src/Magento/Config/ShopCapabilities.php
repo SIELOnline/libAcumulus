@@ -490,38 +490,38 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return [
             Mappings::Customer => [
-                'contactYourId' => '[source::getShopOrder()::getCustomer()::getId()]', // Order, not Creditmemo
+                'contactYourId' => '[source::getOrder()::getSource()::getCustomer()::getId()]', // Order, not Creditmemo
                 // Magento has 2 VAT numbers:
                 // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
                 // Magento\Customer\Model\Address also has a getVatId() method, but that is not the Address we have here.
-                'vatNumber' => '[source::getShopOrder()::getCustomerTaxvat())', // Order, not Creditmemo
-                'telephone' => '[source::getBillingAddress()::getTelephone()]', // Address
-                'telephone2' => '[source::getShippingAddress()::getTelephone()]', // Address
-                'fax' => '[source::getShippingAddress()::getFax()]', // Address
+                'vatNumber' => '[source::getOrder()::getSource()::getCustomerTaxvat())', // Order, not Creditmemo
+                'telephone' => '[source::getSource()::getBillingAddress()::getTelephone()]', // Address
+                'telephone2' => '[source::getSource()::getShippingAddress()::getTelephone()]', // Address
+                'fax' => '[source::getSource()::getShippingAddress()::getFax()]', // Address
                 // Email field of Address seems to be a copy of the Customer email field.
-                'email' => '[source::getShippingAddress()::getEmail()]', // Address
+                'email' => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
             // Both Order and Creditmemo have get(Billing|Shipping)Address() methods.
             Mappings::InvoiceAddress => [
-                'companyName1' => '[source::getBillingAddress()::getCompany()]', // Address
-                'fullName' => '[source::getBillingAddress()::getName()]', // Address
-                'address1' => '[source::getBillingAddress()::getStreetLine(1)]', // Address
-                'address2' => '[source::getBillingAddress()::getStreetLine(1)]', // Address
-                'postalCode' => '[source::getBillingAddress()::getPostcode()]', // Address
-                'city' => '[source::getBillingAddress()::getCity()]', // Adress
-                'countryCode' => '[source::getBillingAddress()::getCountryId()]', // Address
+                'companyName1' => '[source::getSource()::getBillingAddress()::getCompany()]', // Address
+                'fullName' => '[source::getSource()::getBillingAddress()::getName()]', // Address
+                'address1' => '[source::getSource()::getBillingAddress()::getStreetLine(1)]', // Address
+                'address2' => '[source::getSource()::getBillingAddress()::getStreetLine(1)]', // Address
+                'postalCode' => '[source::getSource()::getBillingAddress()::getPostcode()]', // Address
+                'city' => '[source::getSource()::getBillingAddress()::getCity()]', // Adress
+                'countryCode' => '[source::getSource()::getBillingAddress()::getCountryId()]', // Address
             ],
             Mappings::ShippingAddress => [
-                'companyName1' => '[source::getShippingAddress()::getCompany()]', // Address
-                'fullName' => '[source::getShippingAddress()::getName()]', // Address
-                'address1' => '[source::getShippingAddress()::getStreetLine(1)]', // Address
-                'address2' => '[source::getShippingAddress()::getStreetLine(1)]', // Address
-                'postalCode' => '[source::getShippingAddress()::getPostcode()]', // Address
-                'city' => '[source::getShippingAddress()::getCity()]', // Adress
-                'countryCode' => '[source::getShippingAddress()::getCountryId()]', // Address
+                'companyName1' => '[source::getSource()::getShippingAddress()::getCompany()]', // Address
+                'fullName' => '[source::getSource()::getShippingAddress()::getName()]', // Address
+                'address1' => '[source::getSource()::getShippingAddress()::getStreetLine(1)]', // Address
+                'address2' => '[source::getSource()::getShippingAddress()::getStreetLine(1)]', // Address
+                'postalCode' => '[source::getSource()::getShippingAddress()::getPostcode()]', // Address
+                'city' => '[source::getSource()::getShippingAddress()::getCity()]', // Adress
+                'countryCode' => '[source::getSource()::getShippingAddress()::getCountryId()]', // Address
             ],
             Mappings::EmailInvoiceAsPdf => [
-                'emailTo' => '[source::getShippingAddress()::getEmail()]', // Address
+                'emailTo' => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
             Mappings::Invoice => [
                 // @todo: fields that come from source, metadata

@@ -70,8 +70,8 @@ use function strlen;
  * - expansion-specification = property-alternative('|'property-alternative)*
  * - property-alternative = space-concatenated-property('+'space-concatenated-property)*
  * - space-concatenated-property = single-property('&'single-property)*
- * - single-property = property-in-object|property-name|literal-text|constant
- * - property-in-object = (object-name'::')+property-name
+ * - single-property = property-in-named-object|property-name|literal-text|constant
+ * - property-in-named-object = (object-name'::')+property-name
  * - object-name = text
  * - property-name = text
  * - literal-text = "text"
@@ -81,6 +81,10 @@ use function strlen;
  * - This syntax is quite simple. The following features are not possible:
  *     - Grouping, e.g. by using brackets, to override operator precedence.
  *     - Translation of literal strings.
+ *       @todo: can we add translations, e.g. via a ::_t_ at the end or
+ *         something like that. But if we go that way, maybe we should switch to
+ *         twig (which has a sandbox and works with Symphony translations, and
+ *         then use Symphony for logging, http, config, etc, as well).
  *     - Lookup based on a value of a property.
  * - The parsing is quite simple: the special symbols - ], |, &, and " - cannot
  *   appear otherwise:
@@ -342,15 +346,15 @@ class FieldExpander
     /**
      * Expands a single property.
      *
-     * - single-property = property-in-object|property-name|literal-text
-     * - property-in-object = (object-name::)+property-name
+     * - single-property = property-in-named-object|property-name|literal-text
+     * - property-in-named-object = (object-name::)+property-name
      * - object-name = text
      * - property-name = text
      * - literal-text = "text"
      *
      * @return array
      *   Returns an array with 2 keys:
-     *   - 'type' = self:: TypeLiteral or self::TypeProperty
+     *   - 'type' = self::TypeLiteral or self::TypeProperty
      *   - 'value': the value of a single-property.
      *     The type of this value is that of the single property.
      */
@@ -409,9 +413,9 @@ class FieldExpander
     }
 
     /**
-     * Expands a property-in-object.
+     * Expands a property-in-named-object.
      *
-     * - property-in-object = (object-name::)+property-name
+     * - property-in-named-object = (object-name::)+property-name
      * - object-name = text
      * - property-name = text
      *
@@ -438,7 +442,7 @@ class FieldExpander
     /**
      * Expands a property.
      *
-     * - single-property = property-in-object|property-name|literal-text
+     * - single-property = property-in-named-object|property-name|literal-text
      * - object-name = text
      * - property-name = text
      *

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Invoice;
 
 use RuntimeException;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
 
+use function count;
+use function function_exists;
 use function get_class;
 
 /**
@@ -23,12 +26,17 @@ abstract class Source
     public const CreditNote = 'CreditNote';
     public const Other = 'Other';
 
+    public const Case_Lower = 1;
+    public const Case_Upper = 2;
+    private const Case_First = 4;
+    public const Case_UpperFirst = self::Case_Upper | self::Case_First;
+    public const Case_LowerFirst = self::Case_Lower | self::Case_First;
+
     protected string $type;
     protected int $id;
     /** @var array|object */
     protected $shopSource;
-    /** @var array|object */
-    protected $shopOrder;
+    protected Source $orderSource;
     /** @var array|object */
     protected $invoice;
 
@@ -48,30 +56,12 @@ abstract class Source
             throw new RuntimeException('Empty source');
         } elseif (is_scalar($idOrSource)) {
             $this->id = (int) $idOrSource;
-            $this->setShopSource();
+            $this->setSource();
         } else {
             $this->shopSource = $idOrSource;
             $this->setId();
         }
         $this->setInvoice();
-    }
-
-    /**
-     * Sets the source based on type and id.
-     *
-     * @throws \RuntimeException
-     */
-    protected function setShopSource(): void
-    {
-        $this->callTypeSpecificMethod(__FUNCTION__);
-    }
-
-    /**
-     * Sets the id based on type and source.
-     */
-    protected function setId(): void
-    {
-        $this->callTypeSpecificMethod(__FUNCTION__);
     }
 
     /**
@@ -86,23 +76,38 @@ abstract class Source
     }
 
     /**
-     * Returns the web shop specific source for an invoice.
+     * Returns the translated type of the wrapped source.
      *
-     * @return array|object
-     *   The web shop specific source for an invoice.
+     * @param int $case
+     *   - MB_CASE_LOWER (1): convert to all lower case
+     *   - MB_CASE_UPPER (0): convert to all upper case
+     *   - MB_CASE_TITLE (2): convert first character to upper case
+     *   any other value or not passed: return as is, do not convert
+     *
+     * @return string
+     *   One of the constants Source::Order or Source::CreditNote.
      */
-    public function getShopSource()
+    public function getTypeLabel(int $case = -1): string
     {
-        return $this->shopSource;
-    }
-
-    /**
-     * @deprecated  Renamed to getShopSource().
-     * @noinspection PhpUnused
-     */
-    public function getSource()
-    {
-        return $this->getShopSource();
+        $label = Container::getContainer()->getTranslator()->get($this->getType());
+        if ($case !== -1) {
+            if (function_exists('mb_convert_case')) {
+                $label = mb_convert_case($label, $case);
+            } else {
+                switch ($case) {
+                    case MB_CASE_LOWER:
+                        $label = strtolower($label);
+                        break;
+                    case MB_CASE_UPPER:
+                        $label = strtoupper($label);
+                        break;
+                    case MB_CASE_TITLE:
+                        $label = ucfirst($label);
+                        break;
+                }
+            }
+        }
+        return $label;
     }
 
     /**
@@ -114,6 +119,38 @@ abstract class Source
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * Sets the id based on type and source.
+     */
+    protected function setId(): void
+    {
+        $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * Returns the web shop specific source for an invoice.
+     *
+     * @return array|object
+     *   The web shop specific source for an invoice.
+     */
+    public function getSource()
+    {
+        return $this->shopSource;
+    }
+
+    /**
+     * Sets the web shop specific source based on type and id.
+     *
+     * Only called by the constructor as this wrapper object should be
+     * "immutable": it should only represent one source over its lifetime.
+     *
+     * @throws \RuntimeException
+     */
+    protected function setSource(): void
+    {
+        $this->callTypeSpecificMethod(__FUNCTION__);
     }
 
     /**
@@ -157,7 +194,7 @@ abstract class Source
     /**
      * Returns the status for this invoice source.
      *
-     * The Acumulus plugin does not define its own statuses, so 1 of the
+     * The Acumulus plugin does not define its own statuses, so one of the
      * web shop's order or credit note statuses should be returned.
      *
      * Should either be overridden or both getStatusOrder() and
@@ -180,10 +217,14 @@ abstract class Source
      *
      * @return int|string|null
      *   A value identifying the payment method or null if unknown.
+     *
+     * @todo: this implementation does not add anything: change to call
+     *   callTypeSpecificMethod() adn move this implementation to
+     *   getPaymentMethodCreditNote().
      */
     public function getPaymentMethod()
     {
-        return $this->getShopOrder()->getPaymentMethod();
+        return $this->getOrder()->getPaymentMethod();
     }
 
     /**
@@ -391,31 +432,64 @@ abstract class Source
     }
 
     /**
-     * Returns the order source for a credit note source.
+     * Returns a {@see Source} for the order of a credit note.
      *
      * Do not override this method but override getShopOrderOrId() instead.
      *
      * @return Source
      *   If the invoice source is a credit note, its original order is returned,
-     *   otherwise, the invoice source is an order itself and $this is returned.
-     */
-    public function getShopOrder(): Source
-    {
-        if (!isset($this->shopOrder)) {
-            $this->shopOrder = $this->getType() === self::Order
-                ? $this
-                : new static(self::Order, $this->getShopOrderOrId());
-        }
-        return $this->shopOrder;
-    }
-
-    /**
-     * @deprecated  Renamed to getShopSource().
-     * @noinspection PhpUnused
+     *   otherwise, the invoice source is an order itself. $this is returned.
      */
     public function getOrder(): Source
     {
-        return $this->getShopOrder();
+        if (!isset($this->orderSource)) {
+            $this->orderSource = $this->getType() === self::Order
+                ? $this
+                : new static(self::Order, $this->getShopOrderOrId());
+        }
+        return $this->orderSource;
+    }
+
+    /**
+     * Returns the parent {@see Source} for a credit note.
+     *
+     * This is typically used in mappings, that do not allow condition testing
+     * other than canceling the property/method traversal when null is returned.
+     *
+     * Do not override this method but override getShopOrderOrId() instead.
+     *
+     * @return Source|null
+     *   If the invoice source is a credit note, its original order is returned,
+     *   otherwise, null.
+     */
+    public function getParent(): ?Source
+    {
+        return $this->getType() !== self::Order ? $this->getOrder() : null;
+    }
+
+    /**
+     * Returns $this if the current object is of the given type.
+     *
+     * @param string $type
+     *   One of the Source constants used to define the type of the source
+     *   (Order, CreditNote, Invoice (future)).
+     *
+     * @return \Siel\Acumulus\Invoice\Source|null
+     *   $this if the current object is of the given type, null otherwise.
+     */
+    protected function isType(string $type): ?Source
+    {
+        return $this->getType() === $type ? $this : null;
+    }
+
+    public function isOrder(): ?Source
+    {
+        return $this->isType(Source::Order);
+    }
+
+    public function isCreditNote(): ?Source
+    {
+        return $this->isType(Source::CreditNote);
     }
 
     /**
@@ -466,7 +540,7 @@ abstract class Source
      * This method will only be called when $this represents an order.
      *
      * The base implementation returns an empty array for those web shops that
-     * do not support credit notes. Override if the web shop does support credit
+     * do not support credit notes. Override if the web shop supports credit
      * notes. Do not do any object loading here if only the ids are readily
      * available.
      *
@@ -479,7 +553,7 @@ abstract class Source
     }
 
     /**
-     * Returns a shop credit note for this invoice source.
+     * Returns a credit note for this invoice source.
      *
      * @param int $index
      *   The 0-based index of the credit note to return. Some shops allow for
@@ -488,40 +562,36 @@ abstract class Source
      *
      * @return array|object|null
      *   If this invoice source is a(n):
-     *   - Order that has at least i+1 credit notes: the ith shop credit note
+     *   - Order that has at least $index+1 credit notes: the ith credit note
      *     for this order.
-     *   - Credit note: the credit note itself, if $index = 0.
-     *   Null otherwise.
+     *   - Credit note: if $index = 0, the credit note itself, otherwise null.
      *
      * @noinspection PhpUnused  Can be used in mappings.
      */
-    public function getShopCreditNote(int $index = 0)
+    public function getCreditNote(int $index = 0)
     {
-        /**
-         * @noinspection ProperNullCoalescingOperatorUsageInspection
-         *   False positive.
-         */
-        return $this->getCreditNotes()[$index]->getShopSource() ?? null;
+        $creditNotes = $this->getCreditNotes();
+        return $index < count($creditNotes) ? $creditNotes[$index]->getSource() : null;
     }
 
     /**
-     * Calls a "sub" method whose logic depends on the type of invoice source.
+     * Calls a type specific implementation of $method.
+     *
      * This allows to separate logic for different source types into different
-     * methods.
-     * The method name is expected to be the original method name suffixed with
-     * the source type (Order or CreditNote).
+     * methods. The method name is expected to be the original method name
+     * suffixed with the source type (Order or CreditNote).
      *
      * @param string $method
      *   The name of the base method for which to call the Source type specific
      *   variant.
-     * @param array $args
+     * @param mixed $args
      *   The arguments to pass to the method to call.
      *
      * @return mixed
      *   The return value of that method call, or null if the method does not
      *   exist.
      */
-    protected function callTypeSpecificMethod(string $method, array $args = [])
+    protected function callTypeSpecificMethod(string $method, ...$args)
     {
         $method .= $this->getType();
         if (method_exists($this, $method)) {

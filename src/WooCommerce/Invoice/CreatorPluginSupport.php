@@ -158,7 +158,7 @@ class CreatorPluginSupport
     protected function supportBundleProducts(?array $invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ InvoiceAddResult $localResult): ?array
     {
         /** @var \WC_Abstract_Order $shopSource */
-        $shopSource = $invoiceSource->getShopSource();
+        $shopSource = $invoiceSource->getSource();
         /** @var WC_Order_Item_Product[] $items */
         $items = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
@@ -288,7 +288,7 @@ class CreatorPluginSupport
         InvoiceAddResult $localResult
     ): ?array {
         /** @var \WC_Abstract_Order $shopSource */
-        $shopSource = $invoiceSource->getShopSource();
+        $shopSource = $invoiceSource->getSource();
         /** @var WC_Order_Item_Product[] $items */
         $items = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {

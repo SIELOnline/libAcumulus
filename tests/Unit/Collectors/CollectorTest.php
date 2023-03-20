@@ -25,6 +25,11 @@ class CollectorTest extends TestCase
         'nature' => '[field_nature]',
         'unitPrice' => '[field_unit_price]',
     ];
+    protected array $nullfieldMappings = [
+        'itemNumber' => '["null"]',
+        'nature' => '[null]',
+        'unitPrice' => '[""]',
+    ];
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
@@ -64,6 +69,28 @@ class CollectorTest extends TestCase
         $this->assertSame((string) $itemNumber, $simpleTestObject->getItemNumber());
         $this->assertSame($nature, $simpleTestObject->getNature());
         $this->assertSame((float) $unitPrice, $simpleTestObject->getUnitPrice());
+    }
+
+    public function testCollectNullMappingsOnly(): void
+    {
+        $itemNumber = 3;
+        $nature = Api::Nature_Product;
+        $unitPrice = '4.99';
+
+        $propertySources = [
+            'line' => [
+                'field_item_number' => $itemNumber,
+                'field_nature' => $nature,
+                'field_unit_price' => $unitPrice,
+            ],
+        ];
+
+        $collector = $this->container->getCollector('SimpleTest');
+        $simpleTestObject = $collector->collect($propertySources, $this->nullfieldMappings);
+        $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
+        $this->assertNull($simpleTestObject->getItemNumber());
+        $this->assertNull($simpleTestObject->getNature());
+        $this->assertNull($simpleTestObject->getUnitPrice());
     }
 
     public function testCollectWithLogic(): void

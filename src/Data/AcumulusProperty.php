@@ -143,7 +143,7 @@ class AcumulusProperty
      */
     public function setValue($value, int $mode = PropertySet::Always): bool
     {
-        if ($value === null || $value === 'null') {
+        if (in_array($value, [null, 'null', ''], true)) {
             $value = null;
         } else {
             switch ($this->type) {
@@ -156,7 +156,7 @@ class AcumulusProperty
                         throw new DomainException("$this->name: not a valid $this->type: " . var_export($value, true));
                     }
                     $iResult = (int) round($value);
-                    if (($this->type === 'id' && $iResult <= 0) || !Number::floatsAreEqual($iResult, (float) $value, 0.0002)) {
+                    if (($this->type === 'id' && $iResult <= 0) || !Number::floatsAreEqual($iResult, (float) $value, 0.0001)) {
                         throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
                     $value = $iResult;

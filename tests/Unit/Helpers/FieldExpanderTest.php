@@ -116,6 +116,9 @@ class FieldExpanderTest extends TestCase
         return [
             ['[street|street2]', 'Stationsstraat 3'],
             ['[street2|street]', 'Stationsstraat 3'],
+            ['[non_existing1|non_existing2]', null],
+            ['[non_existing1|returned]', null],
+            ['[returned|non_existing2]', null],
             ['[invoiceSource::customer::invoice_address::street|invoiceSource::customer::invoice_address::street2]', 'Lindelaan 4'],
             ['[invoiceSource::customer::invoice_address::street2|invoiceSource::customer::invoice_address::street]', 'Achter de Linden'],
         ];
@@ -240,9 +243,9 @@ class FieldExpanderTest extends TestCase
     }
 
     /**
-     * Tests parameter passing (without type strictness).
+     * Tests parameter passing without type strictness.
      */
-    public function testObjects2(): void
+    public function testParameterPassing(): void
     {
         $objects = ['container' => $this->getContainer()];
         $field = $this->getFieldExpander();

@@ -26,39 +26,39 @@ use Siel\Acumulus\Api;
  *
  * Metadata can be added via the {@see MetadataCollection} methods.
  *
- *  @property ?string $contactId
- *  @property ?int $type
- *  @property ?int $vatTypeId
- *  @property ?string $contactYourId
- *  @property ?bool $contactStatus
+ * @property ?string $contactId
+ * @property ?int $type
+ * @property ?int $vatTypeId
+ * @property ?string $contactYourId
+ * @property ?bool $contactStatus
+ * @property ?string $website
+ * @property ?string $vatNumber
+ * @property ?string $telephone
+ * @property ?string $telephone2
+ * @property ?string $fax
+ * @property ?string $email
+ * @property ?bool $overwriteIfExists
+ * @property ?string $bankAccountNumber
+ * @property ?string $mark
+ * @property ?bool $disableDuplicates
  *
- *  @property ?string $website
- *  @property ?string $vatNumber
- *  @property ?string $telephone
- *  @property ?string $telephone2
- *  @property ?string $fax
- *  @property ?string $email
- *  @property ?bool $overwriteIfExists
- *  @property ?string $bankAccountNumber
- *  @property ?string $mark
- *  @property ?bool $disableDuplicates
+ * @method bool setContactId(?string $value, int $mode = PropertySet::Always)
+ * @method bool setType(?int $value, int $mode = PropertySet::Always)
+ * @method bool setVatTypeId(?int $value, int $mode = PropertySet::Always)
+ * @method bool setContactYourId(?string $value, int $mode = PropertySet::Always)
+ * @method bool setContactStatus(?bool $value, int $mode = PropertySet::Always)
+ * @method bool setWebsite(?string $value, int $mode = PropertySet::Always)
+ * @method bool setVatNumber(?string $value, int $mode = PropertySet::Always)
+ * @method bool setTelephone(?string $value, int $mode = PropertySet::Always)
+ * @method bool setTelephone2(?string $value, int $mode = PropertySet::Always)
+ * @method bool setFax(?string $value, int $mode = PropertySet::Always)
+ * @method bool setEmail(?string $value, int $mode = PropertySet::Always)
+ * @method bool setOverwriteIfExists(?bool $value, int $mode = PropertySet::Always)
+ * @method bool setBankAccountNumber(?string $value, int $mode = PropertySet::Always)
+ * @method bool setMark(?string $value, int $mode = PropertySet::Always)
+ * @method bool setDisableDuplicates(?bool $value, int $mode = PropertySet::Always)
  *
- *  @method bool setContactId(?string $value, int $mode = PropertySet::Always)
- *  @method bool setType(?int $value, int $mode = PropertySet::Always)
- *  @method bool setVatTypeId(?int $value, int $mode = PropertySet::Always)
- *  @method bool setContactYourId(?string $value, int $mode = PropertySet::Always)
- *  @method bool setContactStatus(?bool $value, int $mode = PropertySet::Always)
- *
- *  @method bool setWebsite(?string $value, int $mode = PropertySet::Always)
- *  @method bool setVatNumber(?string $value, int $mode = PropertySet::Always)
- *  @method bool setTelephone(?string $value, int $mode = PropertySet::Always)
- *  @method bool setTelephone2(?string $value, int $mode = PropertySet::Always)
- *  @method bool setFax(?string $value, int $mode = PropertySet::Always)
- *  @method bool setEmail(?string $value, int $mode = PropertySet::Always)
- *  @method bool setOverwriteIfExists(?bool $value, int $mode = PropertySet::Always)
- *  @method bool setBankAccountNumber(?string $value, int $mode = PropertySet::Always)
- *  @method bool setMark(?string $value, int $mode = PropertySet::Always)
- *  @method bool setDisableDuplicates(?bool $value, int $mode = PropertySet::Always)
+ * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
  */
 class Customer extends AcumulusObject
 {
@@ -69,7 +69,7 @@ class Customer extends AcumulusObject
             [
                 'name' => 'type',
                 'type' => 'int',
-                'allowedValues' => [Api::CustomerType_Debtor, Api::CustomerType_Creditor, Api::CustomerType_Both]
+                'allowedValues' => [Api::CustomerType_Debtor, Api::CustomerType_Creditor, Api::CustomerType_Both],
             ],
             ['name' => 'vatTypeId', 'type' => 'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],
             ['name' => 'contactYourId', 'type' => 'string'],

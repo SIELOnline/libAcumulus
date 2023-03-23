@@ -20,49 +20,55 @@ use Siel\Acumulus\Api;
  *
  * Metadata can be added via the {@see MetadataCollection} methods.
  *
- *  @property ?string $companyName1
- *  @property ?string $companyName2
- *  @property ?string $fullName
- *  @property ?string $salutation
- *  @property ?string $address1
- *  @property ?string $address2
- *  @property ?string $postalCode
- *  @property ?string $city
- *  @property ?string $country
- *  @property ?string $countryCode
- *  @property ?int $countryAutoName
- *  @property ?string $countryAutoNameLang
+ * @property ?string $companyName1
+ * @property ?string $companyName2
+ * @property ?string $fullName
+ * @property ?string $salutation
+ * @property ?string $address1
+ * @property ?string $address2
+ * @property ?string $postalCode
+ * @property ?string $city
+ * @property ?string $country
+ * @property ?string $countryCode
+ * @property ?int $countryAutoName
+ * @property ?string $countryAutoNameLang
  *
- *  @method bool setCompanyName1(?string $value, int $mode = PropertySet::Always)
- *  @method bool setCompanyName2(?string $value, int $mode = PropertySet::Always)
- *  @method bool setFullName(?string $value, int $mode = PropertySet::Always)
- *  @method bool setSalutation(?string $value, int $mode = PropertySet::Always)
- *  @method bool setAddress1(?string $value, int $mode = PropertySet::Always)
- *  @method bool setAddress2(?string $value, int $mode = PropertySet::Always)
- *  @method bool setPostalCode(?string $value, int $mode = PropertySet::Always)
- *  @method bool setCity(?string $value, int $mode = PropertySet::Always)
- *  @method bool setCountry(?string $value, int $mode = PropertySet::Always)
- *  @method bool setCountryCode(?string $value, int $mode = PropertySet::Always)
- *  @method bool setCountryAutoName(?int $value, int $mode = PropertySet::Always)
- *  @method bool setCountryAutoNameLang(?string $value, int $mode = PropertySet::Always)
+ * @method bool setCompanyName1(?string $value, int $mode = PropertySet::Always)
+ * @method bool setCompanyName2(?string $value, int $mode = PropertySet::Always)
+ * @method bool setFullName(?string $value, int $mode = PropertySet::Always)
+ * @method bool setSalutation(?string $value, int $mode = PropertySet::Always)
+ * @method bool setAddress1(?string $value, int $mode = PropertySet::Always)
+ * @method bool setAddress2(?string $value, int $mode = PropertySet::Always)
+ * @method bool setPostalCode(?string $value, int $mode = PropertySet::Always)
+ * @method bool setCity(?string $value, int $mode = PropertySet::Always)
+ * @method bool setCountry(?string $value, int $mode = PropertySet::Always)
+ * @method bool setCountryCode(?string $value, int $mode = PropertySet::Always)
+ * @method bool setCountryAutoName(?int $value, int $mode = PropertySet::Always)
+ * @method bool setCountryAutoNameLang(?string $value, int $mode = PropertySet::Always)
+ *
+ * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
  */
 class Address extends AcumulusObject
 {
     protected function getPropertyDefinitions(): array
     {
         return [
-            ['name' => 'companyName1', 'type' =>'string'],
-            ['name' => 'companyName2', 'type' =>'string'],
-            ['name' => 'fullName', 'type' =>'string'],
-            ['name' => 'salutation', 'type' =>'string'],
-            ['name' => 'address1', 'type' =>'string'],
-            ['name' => 'address2', 'type' =>'string'],
-            ['name' => 'postalCode', 'type' =>'string'],
-            ['name' => 'city', 'type' =>'string'],
-            ['name' => 'country', 'type' =>'string'],
-            ['name' => 'countryCode', 'type' =>'string'],
-            ['name' => 'countryAutoName', 'type' =>'int', 'allowedValues' => [Api::AutoName_No, Api::AutoName_OnlyForeign, Api::AutoName_Yes]],
-            ['name' => 'countryAutoNameLang', 'type' =>'string'],
+            ['name' => 'companyName1', 'type' => 'string'],
+            ['name' => 'companyName2', 'type' => 'string'],
+            ['name' => 'fullName', 'type' => 'string'],
+            ['name' => 'salutation', 'type' => 'string'],
+            ['name' => 'address1', 'type' => 'string'],
+            ['name' => 'address2', 'type' => 'string'],
+            ['name' => 'postalCode', 'type' => 'string'],
+            ['name' => 'city', 'type' => 'string'],
+            ['name' => 'country', 'type' => 'string'],
+            ['name' => 'countryCode', 'type' => 'string'],
+            [
+                'name' => 'countryAutoName',
+                'type' => 'int',
+                'allowedValues' => [Api::AutoName_No, Api::AutoName_OnlyForeign, Api::AutoName_Yes],
+            ],
+            ['name' => 'countryAutoNameLang', 'type' => 'string'],
         ];
     }
 }

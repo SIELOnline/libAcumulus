@@ -12,13 +12,8 @@ use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
  * Collets values for a
  * {@See \Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject}.
  */
-class SimpleTestCollector extends Collector
+class SimpleTestObjectCollector extends Collector
 {
-    protected function getAcumulusObjectType(): string
-    {
-        return 'SimpleTestObject';
-    }
-
     /**
      * @param SimpleTestObject $acumulusObject
      */

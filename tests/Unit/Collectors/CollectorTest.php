@@ -11,6 +11,7 @@ namespace Siel\Acumulus\Tests\Unit\Collectors;
 
 use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\Collectors\CollectorInterface;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
@@ -31,6 +32,17 @@ class CollectorTest extends TestCase
         'unitPrice' => '[""]',
     ];
 
+    /**
+     * Description.
+     *
+     * @return \Siel\Acumulus\Collectors\CollectorInterface
+     *   Description.
+     */
+    public function getCollector(): CollectorInterface
+    {
+        return $this->container->getCollector('SimpleTestObject');
+    }
+
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
@@ -39,7 +51,7 @@ class CollectorTest extends TestCase
 
     public function testCollectAllEmpty(): void
     {
-        $collector = $this->container->getCollector('SimpleTest');
+        $collector = $this->getCollector();
         $propertySources = [];
         $fieldMappings = [];
         $simpleTestObject = $collector->collect($propertySources, $fieldMappings);
@@ -63,7 +75,7 @@ class CollectorTest extends TestCase
             ],
         ];
 
-        $collector = $this->container->getCollector('SimpleTest');
+        $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->fieldMappings);
         $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
         $this->assertSame((string) $itemNumber, $simpleTestObject->getItemNumber());
@@ -85,7 +97,7 @@ class CollectorTest extends TestCase
             ],
         ];
 
-        $collector = $this->container->getCollector('SimpleTest');
+        $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->nullfieldMappings);
         $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
         $this->assertNull($simpleTestObject->getItemNumber());
@@ -110,7 +122,7 @@ class CollectorTest extends TestCase
             ]
         ];
 
-        $collector = $this->container->getCollector('SimpleTest');
+        $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->fieldMappings);
         $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
         $this->assertSame((string) $itemNumber, $simpleTestObject->getItemNumber());

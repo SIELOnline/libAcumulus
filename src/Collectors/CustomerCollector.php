@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
-use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\Customer;
-
 /**
  * Collects customer data from the shop.
  *
@@ -40,8 +37,4 @@ use Siel\Acumulus\Data\Customer;
  */
 class CustomerCollector extends Collector
 {
-    protected function getAcumulusObjectType(): string
-    {
-        return 'Customer';
-    }
 }

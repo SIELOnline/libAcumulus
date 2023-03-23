@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\EmailAsPdfType;
 
 /**

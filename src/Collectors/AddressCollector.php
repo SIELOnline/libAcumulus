@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\PropertySet;
-use Siel\Acumulus\Fld;
 
 /**
  * Collects address data from the shop.
@@ -38,11 +35,6 @@ use Siel\Acumulus\Fld;
  */
 class AddressCollector extends Collector
 {
-    protected function getAcumulusObjectType(): string
-    {
-        return 'Address';
-    }
-
     /**
      * @param \Siel\Acumulus\Data\Address $acumulusObject
      */

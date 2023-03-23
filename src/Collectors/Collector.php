@@ -13,6 +13,7 @@ use Siel\Acumulus\Helpers\Log;
 
 use function get_class;
 use function is_string;
+use function strlen;
 
 /**
  * Collector is the abstract base class for a collector.
@@ -52,7 +53,12 @@ abstract class Collector implements CollectorInterface
      *   The non-qualified name of the child classes of {@see AcumulusObject:
      *   'Invoice', 'Customer', 'Address', 'Line', or 'EmailAsPdf'.
      */
-    abstract protected function getAcumulusObjectType(): string;
+    protected function getAcumulusObjectType(): string
+    {
+        $fqClassName = static::class;
+        $shortClass = substr($fqClassName, strrpos($fqClassName, '\\') + 1);
+        return substr($shortClass, 0, -strlen('Collector'));
+    }
 
     protected function getContainer(): Container
     {

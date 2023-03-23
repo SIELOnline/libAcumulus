@@ -17,8 +17,6 @@ use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 
-use function array_key_exists;
-
 /**
  * CollectorManager manages the collector phase.
  *
@@ -89,21 +87,7 @@ class CollectorManager
     protected function setPropertySources(Source $invoiceSource): void
     {
         $this->propertySources = [];
-        $this->propertySources['invoiceSource'] = $invoiceSource;
-        if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
-            $this->propertySources['originalInvoiceSource'] = $invoiceSource->getShopOrder();
-        }
         $this->propertySources['source'] = $invoiceSource->getSource();
-        if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
-            if ($invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refund'] = $invoiceSource->getSource();
-            }
-            $this->propertySources['order'] = $invoiceSource->getShopOrder()->getShopSource();
-            if ($invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refundedInvoiceSource'] = $invoiceSource->getShopOrder();
-                $this->propertySources['refundedOrder'] = $invoiceSource->getShopOrder()->getShopSource();
-            }
-        }
     }
 
     /**

@@ -181,7 +181,7 @@ abstract class Source
     }
 
     /**
-     * Returns the web shop's invoice source date.
+     * Returns the web shop's order or refund date.
      *
      * @return string
      *   The order (or credit memo) date: yyyy-mm-dd.

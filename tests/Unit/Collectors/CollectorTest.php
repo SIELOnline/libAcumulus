@@ -26,7 +26,7 @@ class CollectorTest extends TestCase
         'nature' => '[field_nature]',
         'unitPrice' => '[field_unit_price]',
     ];
-    protected array $nullfieldMappings = [
+    protected array $nullFieldMappings = [
         'itemNumber' => '["null"]',
         'nature' => '[null]',
         'unitPrice' => '[""]',
@@ -98,7 +98,7 @@ class CollectorTest extends TestCase
         ];
 
         $collector = $this->getCollector();
-        $simpleTestObject = $collector->collect($propertySources, $this->nullfieldMappings);
+        $simpleTestObject = $collector->collect($propertySources, $this->nullFieldMappings);
         $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
         $this->assertNull($simpleTestObject->getItemNumber());
         $this->assertNull($simpleTestObject->getNature());

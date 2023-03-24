@@ -38,8 +38,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDefaultShopMappings(): array
     {
         return [
+            Mappings::Invoice => [
+            ],
             Mappings::Customer => [
-                // Customer defaults.
                 'contactYourId' => '[source::getOrder()::getSource()::customer::id]',
                 'telephone' => '[source::getOrder()::getSource()::customer::telephone]',
                 'telephone2' => '[source::getOrder()::getSource()::customer::mobile]',
@@ -72,9 +73,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             Mappings::EmailPackingSlipAsPdf => [
                 'emailTo' => '[source::getOrder()::getSource()::customer::email]',
                 'emailBcc' => 'dev@example.com',
-            ],
-            Mappings::Invoice => [
-                // @todo: fields that come from source, metadata
             ],
             Mappings::ItemLine => [
                 'itemNumber' => '[sku]',

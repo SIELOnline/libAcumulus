@@ -99,7 +99,7 @@ abstract class Collector implements CollectorInterface
     /**
      * Collects the fields that can be extracted using simple field mappings.
      *
-     * @param string[] $fieldSpecifications
+     * @param (null|string|string[])[] $fieldSpecifications
      *   A set of field mapping specifications to fill properties of the
      *   $acumulusObject with.
      */
@@ -109,6 +109,13 @@ abstract class Collector implements CollectorInterface
             if ($acumulusObject->isProperty($field)) {
                 if ($pattern !== null) {
                     $this->expandAndSet($acumulusObject, $field, $pattern);
+                }
+            } elseif ($field === 'meta') {
+                // Meta is an array of mappings for metadata.
+                foreach ($pattern as $metaField => $metaPattern) {
+                    if ($metaPattern !== null) {
+                        $this->expandAndSetMeta($acumulusObject, $metaField, $metaPattern);
+                    }
                 }
             } else {
                 $this->log->notice('%s: %s does not have a property %s', __METHOD__, get_class($acumulusObject), $field);
@@ -129,52 +136,64 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * Expands and sets a possibly dynamic value to an Acumulus object.
-     *
-     * This method will:
-     * - Overwrite already set properties.
-     * - If the non-expanded value equals 'null', the property will not be set,
-     *   but also not be unset.
-     * - If the expanded value is empty the property will be set (with that
-     *   empty value).
+     * Sets a property of an Acumulus object to an expanded value.
      *
      * @param \Siel\Acumulus\Data\AcumulusObject $object
      *   An object to set the property on.
      * @param string $property
      *   The name of the property to set.
      * @param mixed $value
-     *   The value to set the property to, or a pattern that may contain
-     *   property or method names that are to be extracted from the
-     *   {@see $propertySources}.
+     *   The value to set the property to, or a pattern to expand and set the
+     *   resulting value to the property.
+     * @param int $mode
+     *   The mode to use when setting the property. One of the
+     *   {@see PropertySet} constants.
      *
      * @return bool
      *   Whether the value was set.
      */
     protected function expandAndSet(AcumulusObject $object, string $property, $value, int $mode = PropertySet::Always): bool
     {
-        if ($value !== null && $value !== 'null') {
-            if (is_string($value)) {
-                $value = $this->expand($value);
-            }
-            // The set() method will take care of casting the value to the
-            // correct type.
-            return $object->set($property, $value, $mode);
+        return $object->set($property, $this->getValue($value), $mode);
+    }
+
+    /**
+     * Adds an expanded metadata value to an Acumulus object.
+     *
+     * @param mixed $value
+     */
+    protected function expandAndSetMeta(AcumulusObject $object, string $meta, $value): void
+    {
+        $object->getMetadata()->add($meta, $this->getValue($value));
+    }
+
+    /**
+     * Returns the expanded value.
+     *
+     * @param mixed $value
+     *   The value to expand and return.
+     *
+     * @return mixed
+     *   The expanded value, or the value itself it was not a field
+     *   specification.
+     */
+    protected function getValue($value)
+    {
+        if (is_string($value)) {
+            $value = $this->expand($value);
         }
-        return false;
+        return $value;
     }
 
     /**
      * Wrapper method around {@see FieldExpander::expand()}.
-     *
-     * The values of variables in $pattern are taken from one of the property
-     * sources known to this collector.
      *
      * @param string $fieldSpecification
      *  A field specification that may contain field mappings.
      *
      * @return mixed
      *   The expanded field specification, which may be empty if the properties
-     *   referred to do not exist or are empty themselves.
+     *   referred to, do not exist or are empty themselves.
      */
     protected function expand(string $fieldSpecification)
     {

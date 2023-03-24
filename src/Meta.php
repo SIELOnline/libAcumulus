@@ -45,6 +45,8 @@ interface Meta
      * - Order line (Creator->Event: WooCommerce and Magento only).
      */
     public const Id = 'meta-id';
+    public const Reference = 'meta-reference';
+    public const Status = 'meta-status';
     /**
      * A warning can be placed at any level and is placed at the level it
      * applies to (order, order line, ...). It tells that the code discovered a
@@ -52,10 +54,63 @@ interface Meta
      * should result in true but didn't).
      */
     public const Warning = 'meta-warning';
+
+    // Invoice
+    public const Type = 'meta-type';
+    public const Date = 'meta-date';
     /**
-     * Creator->Event: the internal product id of the order item line product
-     * (Magento only).
+     * Support: the payment method used for this order or refund.
      */
+    public const PaymentMethod = 'meta-payment-method';
+
+    // Invoice: Currency related meta tags.
+    /**
+     * Creator->Completor: Currency code the mounts are expressed in: ISO4217,
+     * ISO 3166-1
+     */
+    public const Currency = 'meta-currency';
+    /**
+     * Creator->Completor: Conversion rate from the used currency to the shop's
+     * default currency:
+     *   amount in shop currency = CurrencyRate * amount in other currency
+     */
+    public const CurrencyRate = 'meta-currency-rate';
+    /**
+     * Creator->Completor: true if we should use the above meta info to convert
+     * amounts, false if the amounts are already in the shop's default currency
+     * (which should be euro) and this info is thus purely informational.
+     */
+    public const CurrencyDoConvert = 'meta-currency-do-convert';
+    /**
+     * Completor: Whether the currency rate
+     *   should be inverted (shop default is not EUR, but order is in EUR).
+     *   AND has been inverted (we invert of course only once).
+     */
+    public const CurrencyRateInverted = 'meta-currency-rate-inverted';
+
+    // Invoice: Source totals meta tags.
+    public const Totals = 'meta-totals';
+    /**
+     * Creator -> Completor: the total amount ex vat of the invoice.
+     */
+    public const InvoiceAmount = 'meta-total-amount';
+    /**
+     * Creator -> Completor: the total amount inc vat of the invoice.
+     */
+    public const InvoiceAmountInc = 'meta--total-amountinc';
+    /**
+     * Creator -> Completor: the total vat amount of the invoice.
+     */
+    public const InvoiceVatAmount = 'meta-total-vatamount';
+    /**
+     * Support: Used by OC to specify the tax distribution.
+     */
+    public const InvoiceVatBreakdown = 'meta-vat-breakdown';
+    /**
+     * Support: which of the above fields were computed (as opposed to fetched
+     * from the webshop).
+     */
+    public const InvoiceCalculated = 'meta-totals-calculated';
 
     // Line: Price and vat related meta tags.
     /**
@@ -183,29 +238,6 @@ interface Meta
      */
     public const PrecisionVatAmount = 'meta-vatamount-precision';
 
-    // Invoice: Invoice totals meta tags.
-    /**
-     * Creator -> Completor: the total amount ex vat of the invoice.
-     */
-    public const InvoiceAmount = 'meta-invoice-amount';
-    /**
-     * Creator -> Completor: the total amount inc vat of the invoice.
-     */
-    public const InvoiceAmountInc = 'meta-invoice-amountinc';
-    /**
-     * Creator -> Completor: the total vat amount of the invoice.
-     */
-    public const InvoiceVatAmount = 'meta-invoice-vatamount';
-    /**
-     * Support: Used by OC to specify the tax distribution.
-     */
-    public const InvoiceVatBreakdown = 'meta-invoice-vat-breakdown';
-    /**
-     * Support: which of the above fields were computed (as opposed to fetched
-     * from the webshop).
-     */
-    public const InvoiceCalculated = 'meta-invoice-calculated';
-
     // Invoice: Lines totals meta tags.
     /** Completor: the total amount ex vat of the invoice lines. */
     public const LinesAmount = 'meta-lines-amount';
@@ -244,31 +276,6 @@ interface Meta
      * Completor: Where was the choice for the vat type made?
      */
     public const VatTypeSource = 'meta-vattype-source';
-
-    // Invoice: Currency related meta tags.
-    /**
-     * Creator->Completor: Currency code the mounts are expressed in: ISO4217,
-     * ISO 3166-1
-     */
-    public const Currency = 'meta-currency';
-    /**
-     * Creator->Completor: Conversion rate from the used currency to the shop's
-     * default currency:
-     *   amount in shop currency = CurrencyRate * amount in other currency
-     */
-    public const CurrencyRate = 'meta-currency-rate';
-    /**
-     * Creator->Completor: true if we should use the above meta info to convert
-     * amounts, false if the amounts are already in the shop's default currency
-     * (which should be euro) and this info is thus purely informational.
-     */
-    public const CurrencyDoConvert = 'meta-currency-do-convert';
-    /**
-     * Completor: Whether the currency rate
-     *   should be inverted (shop default is not EUR, but order is in EUR).
-     *   AND has been inverted (we invert of course only once).
-     */
-    public const CurrencyRateInverted = 'meta-currency-rate-inverted';
 
     // Line: Parent - Children related meta tags.
     /**
@@ -350,8 +357,4 @@ interface Meta
      * preconditions failed.
      */
     public const CompletorStrategyPreconditionFailed = 'meta-completor-strategy-precondition-failed';
-    /**
-     * Support: the payment method used for this order or refund.
-     */
-    public const paymentMethod = 'meta-payment-method';
 }

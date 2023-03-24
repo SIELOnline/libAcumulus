@@ -131,10 +131,7 @@ class CollectorManager
         $invoice = $invoiceCollector->collect(['source' => $source], $invoiceMappings);
 
         $invoice->setCustomer($this->collectCustomer($source));
-        $emailAsPdfSettings = $this->getMappings()->get(Mappings::EmailInvoiceAsPdf);
-        if ($emailAsPdfSettings['emailAsPdf']) {
-            $invoice->setEmailAsPdf($this->collectEmailAsPdf($source, EmailAsPdfType::Invoice));
-        }
+        $invoice->setEmailAsPdf($this->collectEmailAsPdf($source, EmailAsPdfType::Invoice));
 
         // @todo: invoice lines.
 

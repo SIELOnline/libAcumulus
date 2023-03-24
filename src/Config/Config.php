@@ -16,6 +16,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 use function array_key_exists;
@@ -1136,8 +1137,20 @@ class Config
                     'type' => 'array',
                     'default' => [
                         Mappings::Invoice => [
+                            'paymentStatus' => '[source::getPaymentStatus()]',
+                            'paymentDate' => '[source::getPaymentDate()]',
                             'description' => '[source::getTypeLabel(2)+source::getReference()'
                                 . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
+                            'meta' => [
+                                Meta::Type => '[source::getType()]',
+                                Meta::Id => '[source::getId()]',
+                                Meta::Reference => '[source::getReference()]',
+                                Meta::Date => '[source::getDate()]',
+                                Meta::Status => '[source::getStatus()]',
+                                Meta::PaymentMethod => '[source::getPaymentMethod()]',
+                                Meta::Currency => '[source::getCurrency()]',
+                                Meta::Totals => '[source::getTotals()]',
+                            ],
                         ],
                         Mappings::Customer => [
                         ],

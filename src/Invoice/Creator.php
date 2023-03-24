@@ -12,6 +12,8 @@
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode  During the transition to Collectors duplicate
+ *   code will exist.
  */
 
 namespace Siel\Acumulus\Invoice;
@@ -198,7 +200,7 @@ abstract class Creator
         $this->propertySources['invoiceSourceType'] = ['label' => $this->t($this->propertySources['invoiceSource']->getType())];
 
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
-            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getShopOrder();
+            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder()->getSource();
             $this->propertySources['originalInvoiceSourceType'] =
                 ['label' => $this->t($this->propertySources['originalInvoiceSource']->getType())];
         }
@@ -207,12 +209,12 @@ abstract class Creator
             if ($this->invoiceSource->getType() === Source::CreditNote) {
                 $this->propertySources['refund'] = $this->invoiceSource->getSource();
             }
-            $this->propertySources['order'] = $this->invoiceSource->getShopOrder()->getShopSource();
+            $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
             if ($this->invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getShopOrder();
+                $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getOrder()->getSource();
                 $this->propertySources['refundedInvoiceSourceType'] =
                     ['label' => $this->t($this->propertySources['refundedInvoiceSource']->getType())];
-                $this->propertySources['refundedOrder'] = $this->invoiceSource->getShopOrder()->getShopSource();
+                $this->propertySources['refundedOrder'] = $this->invoiceSource->getOrder()->getSource();
             }
         }
     }
@@ -498,7 +500,7 @@ abstract class Creator
 
         // Meta data.
         $invoice += $this->invoiceSource->getCurrency();
-        $this->addIfNotEmpty($invoice, Meta::paymentMethod, $paymentMethod);
+        $this->addIfNotEmpty($invoice, Meta::PaymentMethod, $paymentMethod);
         $invoice += $this->invoiceSource->getTotals();
 
         return $invoice;

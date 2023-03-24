@@ -8,6 +8,8 @@ use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
 
+use stdClass;
+
 use function count;
 use function function_exists;
 use function get_class;
@@ -290,7 +292,39 @@ abstract class Source
      * @return array
      *   An array with the currency meta tags.
      */
-    abstract public function getCurrency(): array;
+    abstract public function getCurrencyMeta(): array;
+
+    /**
+     * Returns info about the used currency for this order/refund.
+     *
+     * Only called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     *
+     * @todo: when Creator has been phased out:
+     *   - remove getCurrencyMeta().
+     *   - rename getCurrencyMeta() to getCurrency(), ...
+     *   - and let it directly return an object like here.
+     *   - remove this getCurrency();
+     *   - (make it a class that can do the conversion and that has a __toString())
+     */
+    public function getCurrency(): stdClass
+    {
+        $currency = $this->getCurrency();
+        $result = new stdClass();
+
+        if (isset($currency[Meta::Currency])) {
+            $result->currency = $currency[Meta::Currency];
+        }
+        if (isset($currency[Meta::CurrencyRate])) {
+            $result->rate = $currency[Meta::CurrencyRate];
+        }
+        if (isset($currency[Meta::CurrencyDoConvert])) {
+            $result->doConvert = $currency[Meta::CurrencyDoConvert];
+        }
+        if (isset($currency[Meta::CurrencyRateInverted])) {
+            $result->rateIsInverted = $currency[Meta::CurrencyRateInverted];
+        }
+        return $result;
+    }
 
     /**
      * Returns an array with the totals fields.
@@ -307,9 +341,42 @@ abstract class Source
      *   purely for reasons of support:
      *   - 'meta-invoice-vat-breakdown': a vat breakdown per vat rate.
      */
-    public function getTotals(): array
+    public function getAmounts(): array
     {
         return $this->completeTotals($this->getAvailableTotals());
+    }
+
+    /**
+     * Returns the invoice amounts.
+     *
+     * Only called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     *
+     * @todo: when Creator has been phased out:
+     *   - remove getAmounts().
+     *   - move completeTotals() to Completor phase
+     *   - rename getAvailableTotals() to getTotals(), ...
+     *   - and let it directly return an object like here.
+     *   - remove this getTotals();
+     *   - (make it a class whose getters replace completeTotals() and that has a __toString())
+     */
+    public function getTotals(): stdClass
+    {
+        $totals = $this->getAvailableTotals();
+        $result = new stdClass();
+
+        if (isset($totals[Meta::InvoiceAmount])) {
+            $result->amount = $totals[Meta::InvoiceAmount];
+        }
+        if (isset($totals[Meta::InvoiceAmountInc])) {
+            $result->amountInc = $totals[Meta::InvoiceAmountInc];
+        }
+        if (isset($totals[Meta::InvoiceVatAmount])) {
+            $result->vatAmount = $totals[Meta::InvoiceVatAmount];
+        }
+        if (isset($totals[Meta::InvoiceVatBreakdown])) {
+            $result->vatBreakDown = $totals[Meta::InvoiceVatBreakdown];
+        }
+        return $result;
     }
 
     /**

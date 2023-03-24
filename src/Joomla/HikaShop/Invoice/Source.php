@@ -124,7 +124,7 @@ class Source extends BaseSource
      * amounts are stored as if the order was placed in the default currency,
      * thus we can no longer find out so at this point.
      */
-    public function getCurrency(): array
+    public function getCurrencyMeta(): array
     {
         $result = [];
         if (!empty($this->getSource()->order_currency_info)) {

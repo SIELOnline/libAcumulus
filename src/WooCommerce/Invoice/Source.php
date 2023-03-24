@@ -185,7 +185,7 @@ class Source extends BaseSource
      * (probably) still be in euro's. So, we will not have to convert the
      * amounts and this meta info is thus purely informative.
      */
-    public function getCurrency(): array
+    public function getCurrencyMeta(): array
     {
         return [
             Meta::Currency => 'EUR',

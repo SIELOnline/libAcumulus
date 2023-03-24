@@ -406,13 +406,13 @@ abstract class Creator
      *
      * Metadata (not recognised by the API but used later on by the Creator or
      * Completor, or for support and debugging purposes):
-     * - See {@see Source::getCurrency()}:
+     * - See {@see Source::getCurrencyMeta()}:
      *     - 'currency'
      *     - 'currency-rate'
      *     - 'currency-do-convert'
      * - See {@see Source::getPaymentMethod()}:
      *     - 'meta-payment-method': an id of the payment method used.
-     * - See {@see Source::getTotals()}:
+     * - See {@see Source::getAmounts()}:
      *     - 'meta-invoice-amount': the total invoice amount excluding VAT.
      *     - 'meta-invoice-amountinc': the total invoice amount including VAT.
      *     - 'meta-invoice-vatamount': the total vat amount for the invoice.
@@ -499,9 +499,9 @@ abstract class Creator
         }
 
         // Meta data.
-        $invoice += $this->invoiceSource->getCurrency();
+        $invoice += $this->invoiceSource->getCurrencyMeta();
         $this->addIfNotEmpty($invoice, Meta::PaymentMethod, $paymentMethod);
-        $invoice += $this->invoiceSource->getTotals();
+        $invoice += $this->invoiceSource->getAmounts();
 
         return $invoice;
     }

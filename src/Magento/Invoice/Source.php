@@ -198,7 +198,7 @@ class Source extends BaseSource
         return substr($this->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
 
-    public function getCurrency(): array
+    public function getCurrencyMeta(): array
     {
         return [
             Meta::Currency => $this->getSource()->getOrderCurrencyCode(),

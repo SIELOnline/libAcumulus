@@ -112,7 +112,7 @@ abstract class Source extends BaseSource
      * another currency was presented to the customer, so we will not have to
      * convert the amounts and this meta info is thus purely informative.
      */
-    public function getCurrency(): array
+    public function getCurrencyMeta(): array
     {
         return [
             Meta::Currency => $this->shopSource['currency_code'],
@@ -138,7 +138,7 @@ abstract class Source extends BaseSource
         $orderTotals = $this->getOrderTotalLines();
         foreach ($orderTotals as $totalLine) {
             if ($totalLine['code'] === 'tax') {
-                $result[Meta::InvoiceVatBreakdown][] = $totalLine['title'] . ': ' . $totalLine['value'];
+                $result[Meta::InvoiceVatBreakdown][$totalLine['title']] = $totalLine['value'];
                 $result[Meta::InvoiceVatAmount] += $totalLine['value'];
             }
         }

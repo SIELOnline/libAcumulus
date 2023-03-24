@@ -131,7 +131,7 @@ class Source extends BaseSource
      * another currency was presented to the customer, so we will not have to
      * convert the amounts and this meta info is thus purely informative.
      */
-    public function getCurrency(): array
+    public function getCurrencyMeta(): array
     {
         // Load the currency.
         /** @var \VirtueMartModelCurrency $currency_model */

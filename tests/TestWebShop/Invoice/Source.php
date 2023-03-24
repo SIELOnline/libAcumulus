@@ -62,7 +62,7 @@ class Source extends BaseSource
      * MyWebShop stores the internal currency id, so look up the currency
      * object first then extract the ISO code for it.
      */
-    public function getCurrency(): array
+    public function getCurrencyMeta(): array
     {
         return [
             Meta::Currency => 'EUR',

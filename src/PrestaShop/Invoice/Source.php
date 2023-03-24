@@ -146,7 +146,7 @@ class Source extends BaseSource
      * PrestaShop stores the internal currency id, so look up the currency
      * object first then extract the ISO code for it.
      */
-    public function getCurrency(): array
+    public function getCurrencyMeta(): array
     {
         $currency = Currency::getCurrencyInstance($this->getShopOrder()->shopSource->id_currency);
         /** @noinspection PhpCastIsUnnecessaryInspection */

@@ -13,6 +13,7 @@ Refactorings:
   - Added some methods to traverse from credit note to order and to find out if a given
     Source is an order or a credit note. Useful in mapping definitions.
   - getCreditNotes() does no longer return null but this for a credit note.
+  - Renamed and "duplicated" (for the new metadata) getCurrency() and getTotals().
 - Renamed ShopCapabilities::getShopDefaults() to ShopCapabilities::getDefaultShopConfig()
   and added ShopCapabilities::getDefaultShopMappings(). Moved all mappings in the
   getShopDefaults() of each shop to getDefaultShopMappings().

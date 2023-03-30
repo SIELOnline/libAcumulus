@@ -33,6 +33,7 @@ use function count;
 use function in_array;
 use function is_array;
 use function is_float;
+use function is_object;
 
 /**
  * The invoice completor class provides functionality to correct and complete
@@ -601,13 +602,17 @@ class Completor
      */
     protected function convertToEuro(): void
     {
-        if ($this->shouldConvertCurrency($this->invoice)) {
-            // Convert all amounts at the invoice level.
-            $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
-            $conversionRate = $invoice[Meta::CurrencyRate];
-            $this->convertAmount($invoice, Meta::InvoiceAmount, $conversionRate);
-            $this->convertAmount($invoice, Meta::InvoiceAmountInc, $conversionRate);
-            $this->convertAmount($invoice, Meta::InvoiceVatAmount, $conversionRate);
+        $invoice = $this->invoice[Tag::Customer][Tag::Invoice];
+        if (isset($invoice[Meta::Currency])) {
+            /** @var \Siel\Acumulus\Invoice\Currency $currency */
+            $currency = $invoice[Meta::Currency];
+            if ($currency->shouldConvert()) {
+                /** @var \Siel\Acumulus\Invoice\Totals $totals */
+                $totals = $invoice[Meta::Totals];
+                $totals->amountEx = $currency->convertAmount($totals->amountEx);
+                $totals->amountVat = $currency->convertAmount($totals->amountVat);
+                $totals->amountInc = $currency->convertAmount($totals->amountInc);
+            }
         }
     }
 
@@ -627,6 +632,8 @@ class Completor
     /**
      * Calculates the total amount and vat amount for the invoice lines and adds
      * these to the fields 'meta-lines-amount' and 'meta-lines-vatamount'.
+     *
+     * @todo: use Totals class? but what about incomplete
      */
     protected function completeLineTotals(): void
     {
@@ -691,25 +698,27 @@ class Completor
     protected function areTotalsEqual(): ?bool
     {
         $invoice = $this->invoice[Tag::Customer][Tag::Invoice];
+        /** @var \Siel\Acumulus\Invoice\Totals $totals */
+        $totals = $invoice[Meta::Totals];
         if (!in_array(Meta::LinesAmount, $this->lineTotalsStates['incomplete'], true)) {
-            if (Number::floatsAreEqual($invoice[Meta::InvoiceAmount], $invoice[Meta::LinesAmount], 0.05)) {
+            if (Number::floatsAreEqual($totals->amountEx, $invoice[Meta::LinesAmount], 0.05)) {
                 $this->lineTotalsStates['equal'][Meta::LinesAmount] = Meta::InvoiceAmount;
             } else {
-                $this->lineTotalsStates['differ'][Meta::LinesAmount] = $invoice[Meta::InvoiceAmount] - $invoice[Meta::LinesAmount];
+                $this->lineTotalsStates['differ'][Meta::LinesAmount] = $totals->amountEx - $invoice[Meta::LinesAmount];
             }
         }
         if (!in_array(Meta::LinesAmountInc, $this->lineTotalsStates['incomplete'], true)) {
-            if (Number::floatsAreEqual($invoice[Meta::InvoiceAmountInc], $invoice[Meta::LinesAmountInc], 0.05)) {
+            if (Number::floatsAreEqual($totals->amountInc, $invoice[Meta::LinesAmountInc], 0.05)) {
                 $this->lineTotalsStates['equal'][Meta::LinesAmountInc] = Meta::InvoiceAmountInc;
             } else {
-                $this->lineTotalsStates['differ'][Meta::LinesAmountInc] = $invoice[Meta::InvoiceAmountInc] - $invoice[Meta::LinesAmountInc];
+                $this->lineTotalsStates['differ'][Meta::LinesAmountInc] = $totals->amountInc - $invoice[Meta::LinesAmountInc];
             }
         }
         if (!in_array(Meta::LinesVatAmount, $this->lineTotalsStates['incomplete'], true)) {
-            if (Number::floatsAreEqual($invoice[Meta::InvoiceVatAmount], $invoice[Meta::LinesVatAmount], 0.05)) {
+            if (Number::floatsAreEqual($totals->amountVat, $invoice[Meta::LinesVatAmount], 0.05)) {
                 $this->lineTotalsStates['equal'][Meta::LinesVatAmount] = Meta::InvoiceVatAmount;
             } else {
-                $this->lineTotalsStates['differ'][Meta::LinesVatAmount] = $invoice[Meta::InvoiceVatAmount] - $invoice[Meta::LinesVatAmount];
+                $this->lineTotalsStates['differ'][Meta::LinesVatAmount] = $totals->amountVat - $invoice[Meta::LinesVatAmount];
             }
         }
 
@@ -1507,9 +1516,12 @@ class Completor
     protected function processMetaData(array $object): array
     {
         foreach ($object as $key => &$value) {
-            if (is_array($value)) {
+            if (is_array($value) || is_object($value)) {
                 if (strncmp($key, 'meta-', 5) === 0) {
-                    $value = str_replace('"', "'", json_encode(array_unique($value, SORT_REGULAR), Meta::JsonFlags));
+                    if (is_array($value)) {
+                        $value = array_unique($value, SORT_REGULAR);
+                    }
+                    $value = str_replace('"', "'", json_encode($value, Meta::JsonFlags));
                 } else {
                     $value = $this->processMetaData($value);
                 }
@@ -2090,7 +2102,7 @@ class Completor
                     $reports[$year] = Completor::EuSales_Passed;
                 } else {
                     $warningPercentage = $this->config->getInvoiceSettings()['euCommerceThresholdPercentage'];
-                    $invoiceAmount = $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmount];
+                    $invoiceAmount = $this->invoice[Tag::Customer][Tag::Invoice][Meta::Totals]->amountEx;
                     $percentage = ((float) $euSales['nltaxed'] + (float) $invoiceAmount) / ((float) $euSales['threshold']) * 100.0;
                     if ($percentage > 100.0) {
                         $reports[$year] = Completor::EuSales_WillReach;

@@ -1,43 +1,50 @@
 <?php
 /**
- * Although we would like to use strict equality, i.e. including type equality,
- * unconditionally changing each comparison in this file will lead to problems
- * - API responses return each value as string, even if it is an int or float.
- * - The shop environment may be lax in its typing by, e.g. using strings for
- *   each value coming from the database.
- * - Our own config object is type aware, but, e.g, uses string for a vat class
- *   regardless the type for vat class ids as used by the shop itself.
- * So for now, we will ignore the warnings about non strictly typed comparisons
- * in this code, and we won't use strict_types=1.
- * @noinspection TypeUnsafeComparisonInspection
- * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode  During the transition to Collectors duplicate
  *   code will exist.
  */
 
-namespace Siel\Acumulus\Invoice;
+declare(strict_types=1);
+
+namespace Siel\Acumulus\Collectors\Creator;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Collectors\Collector;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
+use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Invoice\Translations;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
-use function array_key_exists;
 use function func_get_args;
-use function in_array;
 use function is_array;
 use function is_int;
 use function is_string;
 
 /**
+ * Creates an Acumulus invoice.
+ *
+ * This class is based on the former Siel\Acumulus\Invoice\Creator class which
+ * eventually will be replaced by code in this Collectors namespace.
+ * - Customer, address and emailAsPdf data gathering will be fully converted to
+ *   (split into) collecting and completing with the first release where any of
+ *   this code is really used.
+ * - Invoice and invoice lines gathering is much more difficult to split over
+ *   these 2 phases so the old Creator code remains to exist for a while. But to
+ *   be able to move, change or delete parts of the Creator class, while keeping
+ *   code for webshops that are not yet converted running, that class was copied
+ *   to here, so we don't hve to touch the original file.
+ *
+ *
+ * Original documentation form the 'Create' class:
+ *
  * Creates a raw version of the Acumulus invoice from a {@see Source}.
  *
  * Introduction
@@ -101,17 +108,11 @@ use function is_string;
  * Hierarchical lines are "corrected" in the Completor phase, see
  * {@see FlattenerInvoiceLines}
  */
-abstract class Creator
+abstract class Creator extends Collector
 {
-    public const VatRateSource_Exact = 'exact';
     public const VatRateSource_Exact0 = 'exact-0';
     public const VatRateSource_Calculated = 'calculated';
     public const VatRateSource_Completor = 'completor';
-    public const VatRateSource_Strategy = 'strategy';
-    public const VatRateSource_Parent = 'parent';
-    public const VatRateSource_Child = 'child';
-    public const VatRateSource_Creator_Lookup = 'creator-lookup';
-    public const VatRateSource_Creator_Missing_Amount = 'creator-missing-amount';
 
     public const LineType_OrderItem = 'order-item';
     public const LineType_Shipping = 'shipping';
@@ -119,48 +120,45 @@ abstract class Creator
     public const LineType_GiftWrapping = 'gift';
     public const LineType_Manual = 'manual';
     public const LineType_Discount = 'discount';
-    public const LineType_Voucher = 'voucher';
-    public const LineType_Other = 'other';
-    public const LineType_Corrector = 'missing-amount-corrector';
+//    public const LineType_Voucher = 'voucher';
+//    public const LineType_Other = 'other';
+//    public const LineType_Corrector = 'missing-amount-corrector';
 
     protected Config $config;
     protected ShopCapabilities $shopCapabilities;
-    protected Token $token;
     protected Translator $translator;
-    protected Log $log;
     protected Countries $countries;
-    protected Container $container;
-    /**
-     * @var array
-     *   Resulting Acumulus invoice.
-     *
-     * @todo: This really should become an object that can be passed around like
-     *   Source. We could add a lot of simple query methods to this object. And
-     *   if we are going to extract groups of methods into separate "knowledge"
-     *   classes, it will be easier to pass it around. To keep current code
-     *   compatible, it should be of a type that extends \ArrayAccess. The other
-     *   array like interfaces (Countable, Iterator, Traversable) are probably
-     *   not needed.
-     */
-    protected array $invoice = [];
-    protected Source $invoiceSource;
-    /**
-     * The list of sources to search for properties.
-     */
-    protected array $propertySources;
 
-    public function __construct(Token $token, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config $config, Translator $translator, Log $log)
+    protected Source $invoiceSource;
+
+    /**
+     * Constructor.
+     *
+     * @param \Siel\Acumulus\Helpers\FieldExpander $fieldExpander
+     * @param \Siel\Acumulus\Helpers\Countries $countries
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
+     * @param \Siel\Acumulus\Helpers\Container $container
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
+     */
+    public function __construct(FieldExpander $fieldExpander, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config
+    $config, Translator $translator, Log $log)
     {
-        $this->token = $token;
+        parent::__construct($fieldExpander, $container, $log);
         $this->countries = $countries;
-        $this->container = $container;
         $this->shopCapabilities = $shopCapabilities;
         $this->config = $config;
-        $this->log = $log;
         $this->translator = $translator;
         $invoiceHelperTranslations = new Translations();
         $this->translator->add($invoiceHelperTranslations);
     }
+
+    protected function getAcumulusObjectType(): string
+    {
+        return 'Invoice';
+    }
+
 
     /**
      * Helper method to translate strings.
@@ -178,254 +176,7 @@ abstract class Creator
     }
 
     /**
-     * Sets the source to create the invoice for.
-     *
-     * @param Source $invoiceSource
-     */
-    protected function setInvoiceSource(Source $invoiceSource): void
-    {
-        $this->invoiceSource = $invoiceSource;
-        if (!in_array($invoiceSource->getType(), [Source::Order, Source::CreditNote], true)) {
-            $this->log->error('Creator::setSource(): unknown source type %s', $this->invoiceSource->getType());
-        }
-    }
-
-    /**
-     * Sets the list of sources to search for a property when expanding tokens.
-     */
-    protected function setPropertySources(): void
-    {
-        $this->propertySources = [];
-        $this->propertySources['invoiceSource'] = $this->invoiceSource;
-        $this->propertySources['invoiceSourceType'] = ['label' => $this->t($this->propertySources['invoiceSource']->getType())];
-
-        if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
-            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
-            $this->propertySources['originalInvoiceSourceType'] =
-                ['label' => $this->t($this->propertySources['originalInvoiceSource']->getType())];
-        }
-        $this->propertySources['source'] = $this->invoiceSource->getSource();
-        if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
-            if ($this->invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refund'] = $this->invoiceSource->getSource();
-            }
-            $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
-            if ($this->invoiceSource->getType() === Source::CreditNote) {
-                $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getOrder();
-                $this->propertySources['refundedInvoiceSourceType'] =
-                    ['label' => $this->t($this->propertySources['refundedInvoiceSource']->getType())];
-                $this->propertySources['refundedOrder'] = $this->invoiceSource->getOrder()->getSource();
-            }
-        }
-    }
-
-    /**
-     * Adds an object as property source.
-     *
-     * The object is added to the start of the array. So, upon token expansion,
-     * it will be searched before other (already added) property sources.
-     *
-     * @param string $name
-     *   The name to use for the source
-     * @param object|array $property
-     *   The source object to add.
-     */
-    public function addPropertySource(string $name, $property): void
-    {
-        $this->propertySources = [$name => $property] + $this->propertySources;
-    }
-
-    /**
-     * Removes an object as property source.
-     *
-     * @param string $name
-     *   The name of the source to remove.
-     */
-    public function removePropertySource(string $name): void
-    {
-        unset($this->propertySources[$name]);
-    }
-
-    /**
-     * Creates an Acumulus invoice from an order or credit note.
-     *
-     * @param Source $source
-     *  The web shop order.
-     *
-     * @return array
-     *   The acumulus invoice for this order.
-     */
-    public function create(Source $source): array
-    {
-        $this->setInvoiceSource($source);
-        $this->setPropertySources();
-        $this->invoice = [];
-        $this->invoice[Tag::Customer] = $this->getCustomer();
-        $this->invoice[Tag::Customer][Tag::Invoice] = $this->getInvoice();
-        $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->getInvoiceLines();
-        $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
-        if ($emailAsPdfSettings['emailAsPdf']) {
-            $emailTo = !empty($this->invoice[Tag::Customer][Tag::Email]) ? $this->invoice[Tag::Customer][Tag::Email] : '';
-            $emailAsPdf = $this->getEmailAsPdf($emailTo);
-        }
-        if (!empty($emailAsPdf)) {
-            $this->invoice[Tag::Customer][Tag::Invoice][Tag::EmailAsPdf] = $emailAsPdf;
-        }
-        return $this->invoice;
-    }
-
-    /**
-     * Creates an Acumulus emailAsPdf structure from an order or credit note.
-     *
-     * NOTE: This is a temporary function, added in 7.4.0, to allow the new
-     * mail invoice buttons (on the order list or detail page) to also use token
-     * expansion. For 8.0, we are already working on new "Collectors" that will
-     * replace this Creator and are more fine-grained, so we wil have a ready to
-     * use separate emailAsPdf Collector.
-     *
-     * @param Source $source
-     *  The web shop order.
-     * @param bool $forInvoice
-     *   True if we want the emailAsPdf section for mailing an invoice, false if
-     *   we want to email the packing slip.
-     *
-     * @return array
-     *   The acumulus emailAsPdf structure for this order.
-     */
-    public function createEmailAsPdf(Source $source, bool $forInvoice = true): array
-    {
-        $this->setInvoiceSource($source);
-        $this->setPropertySources();
-        $emailTo = '';
-        if ($forInvoice) {
-            $customerSettings = $this->config->getCustomerSettings();
-            if (!empty($customerSettings['email'])) {
-                $value = $this->getTokenizedValue($customerSettings['email']);
-                if (!empty($value)) {
-                    $emailTo = $value;
-                }
-            }
-        }
-        return $this->getEmailAsPdf($emailTo, $forInvoice);
-    }
-
-    /**
-     * Returns the 'customer' part of the invoice add structure.
-     *
-     * The following keys are allowed/expected by the API:
-     * - 'type'
-     * - 'contactid': will not be set. Acumulus id for this customer, in the
-     *   absence of this value, the API uses the email address as identifying
-     *   value.
-     * - 'contactyourid': web shop customer id.
-     * - 'contactstatus'
-     * - 'companyname1'
-     * - 'companyname2'
-     * - 'vatnumber'
-     * - 'fullname'
-     * - 'salutation'
-     * - 'address1'
-     * - 'address2'
-     * - 'postalcode'
-     * - 'city'
-     * - 'countrycode'
-     * - 'country'
-     * - 'telephone'
-     * - 'fax'
-     * - 'email': used to identify clients.
-     * - 'overwriteifexists'
-     * - 'bankaccountnumber': will not be set: no web shop software provides
-     *    this.
-     * - 'mark'
-     * - 'disableduplicates': not (yet) supported.
-     *
-     * At the customer level no meta tags are defined.
-     *
-     * Extending classes should normally not have to override this method as all
-     * values are fetched via configurable settings that may contain tokens
-     * (Dutch: veldverwijzingen) that refer to properties of objects in the web
-     * shop (property sources). The exception is the (ISO) country code which
-     * may not be easy to fetch via a property source as this might include a
-     * database lookup to a "Countries" table. This is fetched via
-     * Source::getCountryCode().
-     *
-     * @return array
-     *   A keyed array with the customer data.
-     */
-    protected function getCustomer(): array
-    {
-        $customer = [];
-        $customerSettings = $this->config->getCustomerSettings();
-        $this->addDefault($customer, Tag::Type, $customerSettings['defaultCustomerType']);
-        // Add an empty value to have it rendered high up in the xml message.
-        // I know, I am neurotic...
-        $customer[Tag::VatTypeId] = '';
-        $this->addTokenDefault($customer, Tag::ContactYourId, $customerSettings['contactYourId']);
-        $this->addDefaultEmpty($customer, Tag::ContactStatus, $customerSettings['contactStatus']);
-        $this->addTokenDefault($customer, Tag::CompanyName1, $customerSettings['companyName1']);
-        $this->addTokenDefault($customer, Tag::CompanyName2, $customerSettings['companyName2']);
-        $this->addTokenDefault($customer, Tag::VatNumber, $customerSettings['vatNumber']);
-        $this->addTokenDefault($customer, Tag::FullName, $customerSettings['fullName']);
-        $this->addTokenDefault($customer, Tag::Salutation, $customerSettings['salutation']);
-        $this->addTokenDefault($customer, Tag::Address1, $customerSettings['address1']);
-        $this->addTokenDefault($customer, Tag::Address2, $customerSettings['address2']);
-        $this->addTokenDefault($customer, Tag::PostalCode, $customerSettings['postalCode']);
-        $this->addTokenDefault($customer, Tag::City, $customerSettings['city']);
-        $customer[Tag::CountryCode] = $this->countries->convertEuCountryCode($this->invoiceSource->getCountryCode());
-        // Add 'nl' as default country code. As other methods in the creator may
-        // depend on this value being filled, e.g. looking up product vat rates,
-        // we cannot wait until the completion phase, so we add it here.
-        $this->addDefault($customer, Tag::CountryCode, 'nl');
-        $this->addDefault($customer, Tag::Country, $this->countries->getCountryName($customer[Tag::CountryCode]));
-        $this->addTokenDefault($customer, Tag::Telephone, $customerSettings['telephone']);
-        $this->addTokenDefault($customer, Tag::Fax, $customerSettings['fax']);
-        $this->addTokenDefault($customer, Tag::Email, $customerSettings['email']);
-        $this->addDefaultEmpty($customer, Tag::OverwriteIfExists, $customerSettings['overwriteIfExists'] ? Api::OverwriteIfExists_Yes : Api::OverwriteIfExists_No);
-        $this->addTokenDefault($customer, Tag::Mark, $customerSettings['mark']);
-        return $customer;
-    }
-
-    /**
      * Returns the 'invoice' part of the invoice add structure.
-     *
-     * The following keys are allowed/expected by the API:
-     * - 'concept': in case of errors or warnings this may be overridden by the
-     *   Completor to make it a concept.
-     * - 'concepttype' : not (yet) used.
-     * - 'number'
-     * - 'vattype': will be filled by the Completor.
-     * - 'issuedate'
-     * - 'costcenter'
-     * - 'accountnumber'
-     * - 'paymentstatus'
-     * - 'paymentdate'
-     * - 'description'
-     * - 'descriptiontext'
-     * - 'template'
-     * - 'invoicenotes'
-     *
-     * Metadata (not recognised by the API but used later on by the Creator or
-     * Completor, or for support and debugging purposes):
-     * - See {@see Source::getCurrency()}:
-     *     - 'currency'
-     *     - 'rate'
-     *     - 'doConvert'
-     * - See {@see Source::getPaymentMethod()}:
-     *     - 'meta-payment-method': an id of the payment method used.
-     * - See {@see Source::getTotals()}:
-     *     - 'amountEx': the total invoice amount excluding VAT.
-     *     - 'vatAmount': the total vat amount for the invoice.
-     *     - 'amountInc': the total invoice amount including VAT.
-     * - These will be added in the completor phase by
-     *   {@see Completor::completeLineTotals()}:
-     *     - 'meta-lines-amount'
-     *     - 'meta-lines-amountinc'
-     *     - 'meta-lines-vatamount'
-     *
-     * Extending classes should normally not have to override this method, but
-     * should instead implement {@see getInvoiceNumber()},
-     * {@see getInvoiceDate()}, {@see getPaymentStatus()},
-     * {@see getPaymentDate()}, and, optionally, {@see getDescription()}.
      *
      * @return array
      *   A keyed array with the invoice data (without the invoice lines and the
@@ -438,7 +189,7 @@ abstract class Creator
         $shopSettings = $this->config->getShopSettings();
         $invoiceSettings = $this->config->getInvoiceSettings();
 
-        // Invoice type.
+        // Data type.
         $concept = $invoiceSettings['concept'];
         if ($concept === Config::Concept_Plugin) {
             $concept = Api::Concept_No;
@@ -448,7 +199,7 @@ abstract class Creator
         // Meta info: internal order/refund id
         $invoice[Meta::Id] = $this->invoiceSource->getId();
 
-        // Invoice number and date.
+        // Data number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];
         if ($sourceToUse !== Config::InvoiceNrSource_Acumulus) {
             $invoice[Tag::Number] = $this->getInvoiceNumber($sourceToUse);
@@ -491,17 +242,12 @@ abstract class Creator
         // be assumed to be correct.
         $invoice[Tag::Template] = '';
 
-        // Invoice notes.
+        // Data notes.
         $this->addTokenDefault($invoice, Tag::InvoiceNotes, $invoiceSettings['invoiceNotes']);
         // Change newlines to the literal \n and tabs to \t.
         if (!empty($invoice[Tag::InvoiceNotes])) {
             $invoice[Tag::InvoiceNotes] = str_replace(["\r\n", "\r", "\n", "\t"], ['\n', '\n', '\n', '\t'], $invoice[Tag::InvoiceNotes]);
         }
-
-        // Meta data.
-        $invoice[Meta::Currency] = $this->invoiceSource->getCurrency();
-        $this->addIfNotEmpty($invoice, Meta::PaymentMethod, $paymentMethod);
-        $invoice[Meta::Totals] = $this->invoiceSource->getTotals();
 
         return $invoice;
     }
@@ -527,7 +273,7 @@ abstract class Creator
         if (is_string($result)) {
             // Filter to an int. Just casting to an int would result in 0 with
             // any invoice number that has a prefix.
-            $result = preg_replace('/\D/', '', $result);
+            $result = preg_replace('/[^0-9]/', '', $result);
         }
         return $result;
     }
@@ -609,7 +355,7 @@ abstract class Creator
      * - 'meta-vatrate-source' to be filled
      * - If 'meta-vatrate-source' = exact: no other keys expected.
      * - If 'meta-vatrate-source' = calculated: 'meta-vatrate-min' and
-     *   'meta-vatrate-ma'x are expected to be filled. These values should come
+     *   'meta-vatrate-max are expected to be filled. These values should come
      *   from calling the helper method getVatRangeTags() with the values used
      *   to calculate the vat rate and their precision.
      * - If 'meta-vatrate-source' = completor: vat rate should be null and
@@ -697,7 +443,7 @@ abstract class Creator
      *
      * The nature can come from the:
      * - Shop settings: the nature_shop setting.
-     * - Invoice settings: The nature field reference.
+     * - Data settings: The nature field reference.
      *
      * It will be left undefined when no value can be given to it based on these
      * settings.
@@ -881,38 +627,22 @@ abstract class Creator
      *
      * @param string $fallbackEmailTo
      *   An email address to use as fallback when the emailTo setting is empty.
-     * @param bool $forInvoice
-     *   True if we want the emailAsPdf section for mailing an invoice, false if
-     *   we want to email the packing slip.
      *
      * @return array
      *   The emailAsPdf section, possibly empty.
      */
-    protected function getEmailAsPdf(string $fallbackEmailTo, bool $forInvoice = true): array
+    protected function getEmailAsPdf(string $fallbackEmailTo): array
     {
         $emailAsPdf = [];
         $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
-        if ($forInvoice) {
-            $emailTo = !empty($emailAsPdfSettings['emailTo'])
-                ? $this->getTokenizedValue($emailAsPdfSettings['emailTo'])
-                : $fallbackEmailTo;
-        } else {
-            $emailTo = $this->getTokenizedValue($emailAsPdfSettings['packingSlipEmailTo']);
-        }
-        if (!empty($emailTo)) {
-            $emailAsPdf[Tag::EmailTo] = $emailTo;
-            if ($forInvoice) {
+        if ($emailAsPdfSettings['emailAsPdf']) {
+            $emailTo = !empty($emailAsPdfSettings['emailTo']) ? $this->getTokenizedValue($emailAsPdfSettings['emailTo']) : $fallbackEmailTo;
+            if (!empty($emailTo)) {
+                $emailAsPdf[Tag::EmailTo] = $emailTo;
                 $this->addTokenDefault($emailAsPdf, Tag::EmailBcc, $emailAsPdfSettings['emailBcc']);
                 $this->addTokenDefault($emailAsPdf, Tag::EmailFrom, $emailAsPdfSettings['emailFrom']);
                 $this->addTokenDefault($emailAsPdf, Tag::Subject, $emailAsPdfSettings['subject']);
                 $emailAsPdf[Tag::ConfirmReading] = $emailAsPdfSettings['confirmReading'] ? Api::ConfirmReading_Yes : Api::ConfirmReading_No;
-            } else {
-                $this->addTokenDefault($emailAsPdf, Tag::EmailBcc, $emailAsPdfSettings['packingSlipEmailBcc']);
-                $this->addTokenDefault($emailAsPdf, Tag::EmailFrom, $emailAsPdfSettings['packingSlipEmailFrom']);
-                $this->addTokenDefault($emailAsPdf, Tag::Subject, $emailAsPdfSettings['packingSlipSubject']);
-                $emailAsPdf[Tag::ConfirmReading] = $emailAsPdfSettings['packingSlipConfirmReading']
-                    ? Api::ConfirmReading_Yes
-                    : Api::ConfirmReading_No;
             }
         }
         return $emailAsPdf;
@@ -923,7 +653,7 @@ abstract class Creator
      *
      * @return bool
      *
-     * @todo: Remove margin scheme handling from (plugin specific) creators and
+     * @todo: remove margin scheme handling from (plugin specific) creators and
      *   move it to the completor phase. This will aid in simplifying the
      *   creators towards raw data collectors.
      */
@@ -967,7 +697,8 @@ abstract class Creator
      */
     protected function getTokenizedValue(string $pattern): string
     {
-        return $this->token->expand($pattern, $this->propertySources);
+//        return $this->field->expand($pattern, $this->propertySources);
+        return '';
     }
 
     /**
@@ -1117,7 +848,7 @@ abstract class Creator
      *   - 'meta-vatrate-max'
      *   - 'meta-vatamount-precision'
      *   - 'meta-vatrate-source'
-     * @todo: Can we move this from the (plugin specific) creators to the
+     * @todo: can we move this from the (plugin specific) creators to the
      *   completor phase? This would aid in simplifying the creators towards raw
      *   data collectors.
      */

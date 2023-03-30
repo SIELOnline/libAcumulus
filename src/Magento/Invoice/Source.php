@@ -11,7 +11,9 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Meta;
 
@@ -118,7 +120,7 @@ class Source extends BaseSource
     public function getPaymentMethod()
     {
         try {
-            return $this->getShopOrder()->shopSource->getPayment()->getMethod();
+            return $this->getOrder()->shopSource->getPayment()->getMethod();
         } catch (Throwable $e) {
             return parent::getPaymentMethod();
         }
@@ -198,14 +200,9 @@ class Source extends BaseSource
         return substr($this->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
 
-    public function getCurrencyMeta(): array
+    public function getCurrency(): Currency
     {
-        return [
-            Meta::Currency => $this->getSource()->getOrderCurrencyCode(),
-            Meta::CurrencyRate => (float) $this->getSource()->getBaseToOrderRate(),
-            Meta::CurrencyDoConvert => false,
-        ];
-
+        return new Currency($this->getSource()->getOrderCurrencyCode(), (float) $this->getSource()->getBaseToOrderRate());
     }
 
     /**
@@ -214,13 +211,10 @@ class Source extends BaseSource
      * This override provides the values 'meta-invoice-amountinc' and
      * 'meta-invoice-vatamount'.
      */
-    protected function getAvailableTotals(): array
+    public function getTotals(): Totals
     {
         $sign = $this->getSign();
-        return [
-            Meta::InvoiceAmountInc => $sign * $this->getSource()->getBaseGrandTotal(),
-            Meta::InvoiceVatAmount => $sign * $this->getSource()->getBaseTaxAmount(),
-        ];
+        return new Totals($sign * $this->getSource()->getBaseGrandTotal(), $sign * $this->getSource()->getBaseTaxAmount());
     }
 
     protected function setInvoice(): void

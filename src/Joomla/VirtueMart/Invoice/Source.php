@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\Meta;
 use VmModel;
 
@@ -131,18 +133,14 @@ class Source extends BaseSource
      * another currency was presented to the customer, so we will not have to
      * convert the amounts and this meta info is thus purely informative.
      */
-    public function getCurrencyMeta(): array
+    public function getCurrency(): Currency
     {
         // Load the currency.
         /** @var \VirtueMartModelCurrency $currency_model */
         $currency_model = VmModel::getModel('currency');
         /** @var \TableCurrencies $currency */
         $currency = $currency_model->getCurrency($this->getSource()['details']['BT']->user_currency_id);
-        return [
-            Meta::Currency => $currency->currency_code_3,
-            Meta::CurrencyRate => (float) $this->getSource()['details']['BT']->user_currency_rate,
-            Meta::CurrencyDoConvert => false,
-        ];
+        return new Currency($currency->currency_code_3, (float) $this->getSource()['details']['BT']->user_currency_rate);
     }
 
     /**
@@ -151,12 +149,12 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount as they may be needed by the Completor.
      */
-    protected function getAvailableTotals(): array
+    public function getTotals(): Totals
     {
-        return [
-            Meta::InvoiceAmountInc => (float) $this->getSource()['details']['BT']->order_total,
-            Meta::InvoiceVatAmount => (float) $this->getSource()['details']['BT']->order_billTaxAmount,
-        ];
+        return new Totals(
+            (float) $this->getSource()['details']['BT']->order_total,
+            (float) $this->getSource()['details']['BT']->order_billTaxAmount,
+        );
     }
 
     /**

@@ -6,7 +6,9 @@ namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
 use hikashopOrderClass;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\Meta;
 use stdClass;
 
@@ -124,16 +126,13 @@ class Source extends BaseSource
      * amounts are stored as if the order was placed in the default currency,
      * thus we can no longer find out so at this point.
      */
-    public function getCurrencyMeta(): array
+    public function getCurrency(): Currency
     {
-        $result = [];
         if (!empty($this->getSource()->order_currency_info)) {
             $currency = unserialize($this->getSource()->order_currency_info, ['allowed_classes' => [stdClass::class]]);
-            $result = [
-                Meta::Currency => $currency->currency_code,
-                Meta::CurrencyRate => (float) $currency->currency_rate,
-                Meta::CurrencyDoConvert => true,
-            ];
+            $result = new Currency($currency->currency_code, (float) $currency->currency_rate, true);
+        } else {
+            $result = new Currency();
         }
         return $result;
     }
@@ -144,21 +143,20 @@ class Source extends BaseSource
      * This override provides the values 'meta-invoice-amountinc' and
      * 'meta-invoice-vatamount'.
      */
-    protected function getAvailableTotals(): array
+    public function getTotals(): Totals
     {
         // No order_tax_info => no tax (?) => vat amount = 0.
         $vatAmount = 0.0;
+        $vatBreakdown = [];
         if (!empty($this->getSource()->order_tax_info)) {
             foreach ($this->getSource()->order_tax_info as $taxInfo) {
                 if (!empty($taxInfo->tax_amount)) {
                     $vatAmount += $taxInfo->tax_amount;
+                    $vatBreakdown[$taxInfo->tax_namekey] = $taxInfo->tax_amount;
                 }
             }
         }
-        return [
-            Meta::InvoiceAmountInc => (float) $this->getSource()->order_full_price,
-            Meta::InvoiceVatAmount => $vatAmount,
-        ];
+        return new Totals((float) $this->getSource()->order_full_price, $vatAmount, null, $vatBreakdown);
     }
 
     public function getInvoiceReference()

@@ -2,7 +2,9 @@
 namespace Siel\Acumulus\MyWebShop\Invoice;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\Meta;
 
 /**
@@ -108,18 +110,13 @@ class Source extends BaseSource
      * MyWebShop stores the internal currency id, so look up the currency
      * object first then extract the ISO code for it.
      */
-    public function getCurrencyMeta(): array
+    public function getCurrency(): Currency
     {
         // @todo: provide implementation.
-        $result = [
-            Meta::Currency => $this->getSource()->currency_code,
-            Meta::CurrencyRate => (float) $this->getSource()->conversion_rate,
-            Meta::CurrencyDoConvert => true,
-        ];
-        return $result;
+        return new Currency($this->getSource()->currency_code, (float) $this->getSource()->conversion_rate, true);
     }
 
-    protected function getAvailableTotals(): array
+    public function getTotals(): Totals
     {
         // @todo: provide implementation.
     }

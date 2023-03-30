@@ -116,6 +116,6 @@ use Siel\Acumulus\Invoice\Source;
  * {@see FlattenerInvoiceLines}
  *
  */
-abstract class InvoiceCollector extends Collector
+class InvoiceCollector extends Collector
 {
 }

@@ -65,7 +65,7 @@ interface Meta
 
     // Invoice: Currency related meta tags.
     /**
-     * Creator->Completor: Currency code the mounts are expressed in: ISO4217,
+     * Creator->Completor: Currency code the amounts are expressed in: ISO4217,
      * ISO 3166-1
      */
     public const Currency = 'meta-currency';
@@ -88,7 +88,9 @@ interface Meta
      */
     public const CurrencyRateInverted = 'meta-currency-rate-inverted';
 
-    // Invoice: Source totals meta tags.
+    /**
+     * Invoice: Source totals meta tags.
+     */
     public const Totals = 'meta-totals';
     /**
      * Creator -> Completor: the total amount ex vat of the invoice.
@@ -102,15 +104,6 @@ interface Meta
      * Creator -> Completor: the total vat amount of the invoice.
      */
     public const InvoiceVatAmount = 'meta-total-vatamount';
-    /**
-     * Support: Used by OC to specify the tax distribution.
-     */
-    public const InvoiceVatBreakdown = 'meta-vat-breakdown';
-    /**
-     * Support: which of the above fields were computed (as opposed to fetched
-     * from the webshop).
-     */
-    public const InvoiceCalculated = 'meta-totals-calculated';
 
     // Line: Price and vat related meta tags.
     /**

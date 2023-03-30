@@ -7,11 +7,14 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Collectors;
 
+use DateTime;
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tests\Unit\GetTestData;
 
 /**
@@ -47,8 +50,45 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectInvoice(): void
     {
-        $this->assertTrue(true, '@todo: write tests for invoice collector');
-        // @todo
+        $manager = $this->getContainer()->getCollectorManager();
+        $invoice = $manager->collectInvoice($this->getInvoiceSource());
+
+        $this->assertNull($invoice->concept);
+        $this->assertNull($invoice->conceptType);
+        $this->assertNull($invoice->number);
+        $this->assertNull($invoice->vatType);
+        $this->assertNull($invoice->issueDate);
+        $this->assertNull($invoice->costCenter);
+        $this->assertNull($invoice->accountNumber);
+        $this->assertNull($invoice->template);
+        $this->assertSame(Api::PaymentStatus_Paid, $invoice->paymentStatus);
+        $this->assertEquals(new DateTime('2022-12-02'), $invoice->paymentDate);
+        $this->assertSame('Bestelling 3', $invoice->description);
+        $this->assertNull($invoice->descriptionText);
+        $this->assertNull($invoice->invoiceNotes);
+
+        $meta = $invoice->getMetadata();
+        $this->assertSame(Source::Order, $meta->getValue('meta-type'));
+        $this->assertSame(3, $meta->getValue('meta-id'));
+        $this->assertSame(3, $meta->getValue('meta-reference'));
+        $this->assertEquals('2022-12-01', $meta->getValue('meta-date'));
+        $this->assertSame('pending', $meta->getValue('meta-status'));
+        $this->assertSame('paypal', $meta->getValue('meta-payment-method'));
+
+        /** @var \Siel\Acumulus\Invoice\Currency $currency */
+        $currency = $meta->getValue(Meta::Currency);
+        $this->assertSame('EUR', $currency->currency);
+        $this->assertEqualsWithDelta(1.0, $currency->rate, 0.000001);
+        $this->assertFalse($currency->doConvert);
+
+        /** @var \Siel\Acumulus\Invoice\Totals $totals */
+        $totals = $meta->getValue(Meta::Totals);
+        $this->assertEqualsWithDelta(50.4, $totals->amountInc, 0.001);
+        $this->assertEqualsWithDelta(8.75, $totals->amountVat, 0.001);
+        $this->assertEqualsWithDelta(41.65, $totals->amountEx, 0.001);
+
+        $this->assertNotNull($invoice->getCustomer());
+        $this->assertCount(0, $invoice->getLines());
     }
 
     public function testCollectCustomer(): void

@@ -9,11 +9,12 @@ namespace Siel\Acumulus\Tests\Unit;
  */
 class GetTestData
 {
-    private string $configDir = __DIR__ . '/../../../config';
+    private string $configDir;
     private string $dataFile;
 
     public function __construct()
     {
+        $this->configDir = __DIR__ . '/../../../config';
         $this->dataFile = $this->configDir . '/data.json';
     }
 

@@ -7,11 +7,11 @@ namespace Siel\Acumulus\WooCommerce\Invoice;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
-use Siel\Acumulus\Meta;
+use Siel\Acumulus\Invoice\Totals;
 use WC_Abstract_Order;
-use WC_Order;
-use WC_Order_Refund;
 
+use function get_class;
+use function gettype;
 use function is_object;
 use function strlen;
 
@@ -23,7 +23,7 @@ use function strlen;
  * 'shop_order' and 'shop_order_refund'. The base class for all these types of
  * orders is WC_Abstract_Order
  *
- * @method WC_Order|WC_Order_Refund getSource()
+ * @method \WC_Order|\WC_Order_Refund getSource()
  */
 class Source extends BaseSource
 {
@@ -37,20 +37,25 @@ class Source extends BaseSource
     {
         $this->shopSource = WC()->order_factory::get_order($this->getId());
         if (!is_object($this->shopSource)) {
-            throw new RuntimeException("Not a valid source id ({$this->id})");
+            throw new RuntimeException("Not a valid source id ($this->id)");
         }
     }
 
     /**
      * Sets the id based on the loaded Order or Order refund.
      *
-     * @throws  \RuntimeException
+     * @throws \RuntimeException
      *   If $idOrSource is empty or not a valid source.
      */
     protected function setId(): void
     {
         if (!$this->shopSource instanceof WC_Abstract_Order) {
-            throw new RuntimeException('Not a WC_Abstract_Order (' . get_debug_type($this->shopSource) . ')');
+            // @todo: PHP8.0: get_debug_type().
+            $type = gettype($this->shopSource);
+            if ($type === 'object') {
+                $type = get_class($this->shopSource);
+            }
+            throw new RuntimeException("$type is not a WC_Abstract_Order");
         }
         $this->id = $this->getSource()->get_id();
     }
@@ -96,7 +101,7 @@ class Source extends BaseSource
         // Payment method is not stored for credit notes, so it is expected to
         // be the same as for its order.
         /** @var \WC_Order $order */
-        $order = $this->getShopOrder()->shopSource;
+        $order = $this->getOrder()->shopSource;
         return $order->get_payment_method();
     }
 
@@ -164,7 +169,7 @@ class Source extends BaseSource
         // Billing information is not stored for credit notes, so it is expected
         // to be the same as for its order.
         /** @var \WC_Order $order */
-        $order = $this->getShopOrder()->shopSource;
+        $order = $this->getOrder()->shopSource;
         $tax_based_on = get_option('woocommerce_tax_based_on');
         $result = '';
         if ($tax_based_on === 'shipping') {
@@ -179,24 +184,6 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * WooCommerce does not support multiple currencies, so the amounts are
-     * always in the shop's default currency. Even if another plugin is used to
-     * present another currency to the customer, the amounts stored will
-     * (probably) still be in euro's. So, we will not have to convert the
-     * amounts and this meta info is thus purely informative.
-     */
-    public function getCurrencyMeta(): array
-    {
-        return [
-            Meta::Currency => 'EUR',
-            Meta::CurrencyRate => 1.0,
-            Meta::CurrencyDoConvert => false,
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     *
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
      *
@@ -205,12 +192,9 @@ class Source extends BaseSource
      *   types. So many return values advertised as float, will be strings
      *   representing a float.
      */
-    protected function getAvailableTotals(): array
+    public function getTotals(): Totals
     {
-        return [
-            Meta::InvoiceAmountInc => (float) $this->getSource()->get_total(),
-            Meta::InvoiceVatAmount => (float) $this->getSource()->get_total_tax(),
-        ];
+        return new Totals((float) $this->getSource()->get_total(), (float) $this->getSource()->get_total_tax());
     }
 
     /**

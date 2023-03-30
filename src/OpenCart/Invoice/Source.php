@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Siel\Acumulus\OpenCart\Invoice;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
@@ -112,13 +114,9 @@ abstract class Source extends BaseSource
      * another currency was presented to the customer, so we will not have to
      * convert the amounts and this meta info is thus purely informative.
      */
-    public function getCurrencyMeta(): array
+    public function getCurrency(): Currency
     {
-        return [
-            Meta::Currency => $this->shopSource['currency_code'],
-            Meta::CurrencyRate => (float) $this->shopSource['currency_value'],
-            Meta::CurrencyDoConvert => false,
-        ];
+        return new Currency($this->shopSource['currency_code'], (float) $this->shopSource['currency_value']);
     }
 
     /**
@@ -127,22 +125,18 @@ abstract class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc,
      * meta-invoice-vatamount and a vat breakdown in meta-invoice-vat.
      */
-    protected function getAvailableTotals(): array
+    public function getTotals(): Totals
     {
-        $result = [
-            Meta::InvoiceAmountInc => (float) $this->shopSource['total'],
-            Meta::InvoiceVatAmount => 0.0,
-            Meta::InvoiceVatBreakdown => [],
-        ];
-
+        $vatAmount = 0.0;
+        $vatBreakdown = [];
         $orderTotals = $this->getOrderTotalLines();
         foreach ($orderTotals as $totalLine) {
             if ($totalLine['code'] === 'tax') {
-                $result[Meta::InvoiceVatBreakdown][$totalLine['title']] = $totalLine['value'];
-                $result[Meta::InvoiceVatAmount] += $totalLine['value'];
+                $vatAmount += $totalLine['value'];
+                $vatBreakdown[$totalLine['title']] = $totalLine['value'];
             }
         }
-        return $result;
+        return new Totals((float) $this->shopSource['total'], $vatAmount, null, $vatBreakdown);
     }
 
     /**

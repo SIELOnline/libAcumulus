@@ -679,7 +679,7 @@ abstract class InvoiceManager
      */
     protected function isEmptyInvoice(array $invoice): bool
     {
-        return Number::isZero($invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmountInc]);
+        return Number::isZero($invoice[Tag::Customer][Tag::Invoice][Meta::Totals]->amountInc);
     }
 
     /**

@@ -91,7 +91,7 @@ class Creator extends BaseCreator
                 break;
             case Source::CreditNote:
                 $this->creditSlip = $this->invoiceSource->getSource();
-                $this->order = $this->invoiceSource->getShopOrder()->getShopSource();
+                $this->order = $this->invoiceSource->getOrder()->getSource();
                 break;
         }
     }
@@ -126,22 +126,37 @@ class Creator extends BaseCreator
      * Merges the product and tax details arrays.
      *
      * @param array $productLines
+     *   An array with order line information, the fields being about the
+     *   product of this order line.
      * @param array $taxLines
+     *   An array with line tax information, the fields being about the tax on
+     *   this order line.
      *
      * @return array
+     *   An array with the product and tax lines merged based on the field
+     *   'id_order_detail', the unique identifier for an order line.
      */
     public function mergeProductLines(array $productLines, array $taxLines): array
     {
-        $result = [];
         // Key the product lines on id_order_detail, so we can easily add the
         // tax lines in the 2nd loop.
-        foreach ($productLines as $productLine) {
-            $result[$productLine['id_order_detail']] = $productLine;
-        }
+        $result = array_column($productLines, null, 'id_order_detail');
+
         // Add the tax lines without overwriting existing entries (though in a
         // consistent db the same keys should contain the same values).
         foreach ($taxLines as $taxLine) {
-            $result[$taxLine['id_order_detail']] += $taxLine;
+            if (isset($result[$taxLine['id_order_detail']])) {
+                $result[$taxLine['id_order_detail']] += $taxLine;
+            } else {
+                // We have a tax line for a non product line ([SIEL #200452]).
+                $this->log->notice(sprintf(
+                    '%s: Tax detail found for order line %d (of order %d) without product info',
+                    __METHOD__,
+                    $taxLine['id_order_detail'],
+                    $this->order->id
+                ));
+                $result[$taxLine['id_order_detail']] = $taxLine;
+            }
         }
         return $result;
     }
@@ -315,11 +330,13 @@ class Creator extends BaseCreator
             ];
 
             /**
-             * Add these amounts to the invoice totals.
-             *{@see \Siel\Acumulus\Invoice\Source::getTotals()}
+             * @var \Siel\Acumulus\Invoice\Totals $totals
+             *   Add these amounts to the invoice totals.
+             *  {@see \Siel\Acumulus\Invoice\Source::getTotals()}
              */
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmountInc] += $paymentInc;
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmount] += $paymentEx;
+            $totals = $this->invoice[Tag::Customer][Tag::Invoice][Meta::Totals];
+            $totals->amountEx += $paymentEx;
+            $totals->amountInc += $paymentInc;
             return $result;
         }
         return parent::getPaymentFeeLine();
@@ -441,7 +458,7 @@ class Creator extends BaseCreator
                     $sum += $item[Tag::Quantity] * $item[Tag::UnitPrice];
                     return $sum;
                 }, 0.0);
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmount] += $totalOrderDiscountEx;
+                $this->invoice[Tag::Customer][Tag::Invoice][Meta::Totals]->amountEx += $totalOrderDiscountEx;
             } //else {
                 // We could not match a discount with the difference between the
                 // total amount credited and the sum of the products returned. A

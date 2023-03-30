@@ -189,8 +189,10 @@ abstract class CompletorStrategyBase
     protected function initAmounts(): void
     {
         $invoicePart = &$this->invoice[Tag::Customer][Tag::Invoice];
-        $this->vatAmount = $invoicePart[Meta::InvoiceVatAmount] ?? $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceAmount];
-        $this->invoiceAmount = $invoicePart[Meta::InvoiceAmount] ?? $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceVatAmount];
+        /** @var \Siel\Acumulus\Invoice\Totals $totals */
+        $totals = $invoicePart[Meta::Totals];
+        $this->vatAmount = $totals->amountVat;
+        $this->invoiceAmount = $totals->amountEx;
 
         // The vat amount to divide over the non completed lines is the total vat
         // amount of the invoice minus all known vat amounts per line.

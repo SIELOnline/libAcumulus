@@ -39,6 +39,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return [
             Mappings::Invoice => [
+
             ],
             Mappings::Customer => [
                 'contactYourId' => '[source::getOrder()::getSource()::customer::id]',

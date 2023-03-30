@@ -1039,7 +1039,8 @@ class InvoiceStatusForm extends Form
             }
 
             // Get local amounts.
-            $localTotals = $source->getAmounts();
+            // @todo: use Totals class?
+            $localTotals = $source->getTotals();
 
             // Compare.
             $amountExStatus = $this->getAmountStatus($amountExAcumulus, $localTotals[Meta::InvoiceAmount]);

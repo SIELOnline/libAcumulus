@@ -6,6 +6,8 @@ This file contains a historical overview of changes in our own code.
 8.0.0 (2023-03-??)
 ------------------
 Refactorings:
+- Introduced classes Currency and Totals that contain the meta information and can act on
+  it, convert amounts resp. complete totals.
 - Class Source:
   - Throws on construction based on an invalid source, making isValid() superfluous.
     Therefore, isValid() has been removed.
@@ -13,10 +15,17 @@ Refactorings:
   - Added some methods to traverse from credit note to order and to find out if a given
     Source is an order or a credit note. Useful in mapping definitions.
   - getCreditNotes() does no longer return null but this for a credit note.
-  - Renamed and "duplicated" (for the new metadata) getCurrency() and getTotals().
+  - getCurrency() and getTotals() to use the new Currency and Totals classes.
 - Renamed ShopCapabilities::getShopDefaults() to ShopCapabilities::getDefaultShopConfig()
   and added ShopCapabilities::getDefaultShopMappings(). Moved all mappings in the
   getShopDefaults() of each shop to getDefaultShopMappings().
+
+7.6.7 (2023-03-30) (PS)
+-----------------------
+Bugs:
+- PS: Error: Unsupported operand types in ..PrestaShop\Invoice\Creator->mergeProductLines.
+  Actually this looks like a corrupt database, but maybe there is indeed just no product
+  detail info for a given order line.
 
 
 7.6.6 (2023-03-05) (WC)

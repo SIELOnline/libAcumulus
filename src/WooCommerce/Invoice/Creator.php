@@ -535,7 +535,7 @@ class Creator extends BaseCreator
             $shippingTaxClass = get_option('woocommerce_shipping_tax_class');
             if (is_string($shippingTaxClass)) {
                 /** @var \WC_Order $order */
-                $order = $this->invoiceSource->getShopOrder()->getShopSource();
+                $order = $this->invoiceSource->getOrder()->getSource();
 
                 // Since WC3, the shipping tax class can be based on those from
                 // the product items in the cart (which should be the preferred
@@ -571,7 +571,7 @@ class Creator extends BaseCreator
             // Add a line for all coupons applied. Coupons are only stored on
             // the order, not on refunds, so use the order.
             /** @var \WC_Order $order */
-            $order = $this->invoiceSource->getShopOrder()->getShopSource();
+            $order = $this->invoiceSource->getOrder()->getSource();
             $usedCoupons = $order->get_coupon_codes();
             foreach ($usedCoupons as $code) {
                 $coupon = new WC_Coupon($code);

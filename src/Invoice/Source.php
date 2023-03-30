@@ -6,9 +6,6 @@ namespace Siel\Acumulus\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Meta;
-
-use stdClass;
 
 use function count;
 use function function_exists;
@@ -27,12 +24,6 @@ abstract class Source
     public const Order = 'Order';
     public const CreditNote = 'CreditNote';
     public const Other = 'Other';
-
-    public const Case_Lower = 1;
-    public const Case_Upper = 2;
-    private const Case_First = 4;
-    public const Case_UpperFirst = self::Case_Upper | self::Case_First;
-    public const Case_LowerFirst = self::Case_Lower | self::Case_First;
 
     protected string $type;
     protected int $id;
@@ -88,6 +79,9 @@ abstract class Source
      *
      * @return string
      *   One of the constants Source::Order or Source::CreditNote.
+     *
+     * @noinspection PhpUnused   May be called via the
+     *   {@see \Siel\Acumulus\Helpers\FieldExpander}.
      */
     public function getTypeLabel(int $case = -1): string
     {
@@ -187,6 +181,8 @@ abstract class Source
      *
      * @return string
      *   The order (or credit memo) date: yyyy-mm-dd.
+     *
+     * @todo: convert to type DateTime
      */
     public function getDate(): string
     {
@@ -213,6 +209,20 @@ abstract class Source
     /**
      * Returns the payment method used.
      *
+     * Should either be overridden or both getPaymentMethodOrder() and
+     * getPaymentMethodNote() should be implemented.
+     *
+     * @return int|string|null
+     *   A value identifying the payment method or null if unknown.
+     */
+    public function getPaymentMethod()
+    {
+        return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * Returns the payment method used for this credit note.
+     *
      * This default implementation returns the payment method for the order as
      * several web shops do not store a payment method with credit notes but
      * instead assume it is the same as for its original order.
@@ -220,11 +230,9 @@ abstract class Source
      * @return int|string|null
      *   A value identifying the payment method or null if unknown.
      *
-     * @todo: this implementation does not add anything: change to call
-     *   callTypeSpecificMethod() adn move this implementation to
-     *   getPaymentMethodCreditNote().
+     * @noinspection PhpUnused  Called via callTypeSpecificMethod().
      */
-    public function getPaymentMethod()
+    public function getPaymentMethodCreditNote()
     {
         return $this->getOrder()->getPaymentMethod();
     }
@@ -264,6 +272,8 @@ abstract class Source
      * @return string|null
      *   The payment date (yyyy-mm-dd) or null if the order has not been (fully)
      *   paid yet.
+     *
+     * @todo: convert to type DateTime
      */
     public function getPaymentDate(): ?string
     {
@@ -280,154 +290,33 @@ abstract class Source
     abstract public function getCountryCode(): string;
 
     /**
-     * Returns metadata about the used currency on the invoice.
+     * Returns info about the used currency on this order/refund.
      *
-     * The currency related meta tags are:
+     * The currency related info:
      * - currency: the code of the currency used for this order/refund
-     * - currency-rate: the rate from the used currency to the shop's default
+     * - rate: the rate from the used currency to the shop's default
      *   currency.
-     * - currency-do-convert: if the amounts are in the used currency or in the
+     * - doConvert: if the amounts are in the used currency or in the
      *   default currency (MA, OC, WC).
      *
-     * @return array
-     *   An array with the currency meta tags.
+     * This default implementation is for shops that do not support multiple
+     * currencies. This means that the amounts are always in the shop's default
+     * currency (which should be EUR). Even if another plugin is used to present
+     * another currency to the customer, the amounts stored should still be in
+     * EUR. So, we will not have to convert amounts and this meta info is thus
+     * purely informative.
      */
-    abstract public function getCurrencyMeta(): array;
-
-    /**
-     * Returns info about the used currency for this order/refund.
-     *
-     * Only called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
-     *
-     * @todo: when Creator has been phased out:
-     *   - remove getCurrencyMeta().
-     *   - rename getCurrencyMeta() to getCurrency(), ...
-     *   - and let it directly return an object like here.
-     *   - remove this getCurrency();
-     *   - (make it a class that can do the conversion and that has a __toString())
-     */
-    public function getCurrency(): stdClass
+    public function getCurrency(): Currency
     {
-        $currency = $this->getCurrency();
-        $result = new stdClass();
-
-        if (isset($currency[Meta::Currency])) {
-            $result->currency = $currency[Meta::Currency];
-        }
-        if (isset($currency[Meta::CurrencyRate])) {
-            $result->rate = $currency[Meta::CurrencyRate];
-        }
-        if (isset($currency[Meta::CurrencyDoConvert])) {
-            $result->doConvert = $currency[Meta::CurrencyDoConvert];
-        }
-        if (isset($currency[Meta::CurrencyRateInverted])) {
-            $result->rateIsInverted = $currency[Meta::CurrencyRateInverted];
-        }
-        return $result;
+        // Constructor defaults are geared for the case that no conversion has
+        // to be done.
+        return new Currency();
     }
 
     /**
-     * Returns an array with the totals fields.
-     *
-     * Do not override this method but implement getAvailableTotals() instead.
-     *
-     * @return array
-     *   An array with the following possible keys:
-     *   - 'meta-invoice-amount': the total invoice amount excluding VAT.
-     *   - 'meta-invoice-amountinc': the total invoice amount including VAT.
-     *   - 'meta-invoice-vatamount': the total vat amount for the invoice.
-     *
-     *   This one is really optional: so far only filled by OpenCart and
-     *   purely for reasons of support:
-     *   - 'meta-invoice-vat-breakdown': a vat breakdown per vat rate.
+     * Returns a {@see Totals} object with the invoice totals.
      */
-    public function getAmounts(): array
-    {
-        return $this->completeTotals($this->getAvailableTotals());
-    }
-
-    /**
-     * Returns the invoice amounts.
-     *
-     * Only called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
-     *
-     * @todo: when Creator has been phased out:
-     *   - remove getAmounts().
-     *   - move completeTotals() to Completor phase
-     *   - rename getAvailableTotals() to getTotals(), ...
-     *   - and let it directly return an object like here.
-     *   - remove this getTotals();
-     *   - (make it a class whose getters replace completeTotals() and that has a __toString())
-     */
-    public function getTotals(): stdClass
-    {
-        $totals = $this->getAvailableTotals();
-        $result = new stdClass();
-
-        if (isset($totals[Meta::InvoiceAmount])) {
-            $result->amount = $totals[Meta::InvoiceAmount];
-        }
-        if (isset($totals[Meta::InvoiceAmountInc])) {
-            $result->amountInc = $totals[Meta::InvoiceAmountInc];
-        }
-        if (isset($totals[Meta::InvoiceVatAmount])) {
-            $result->vatAmount = $totals[Meta::InvoiceVatAmount];
-        }
-        if (isset($totals[Meta::InvoiceVatBreakdown])) {
-            $result->vatBreakDown = $totals[Meta::InvoiceVatBreakdown];
-        }
-        return $result;
-    }
-
-    /**
-     * Returns an array with the available totals fields.
-     *
-     * Most web shops provide only 2 of the 3 totals, so only return those that
-     * are provided. Source::getTotals() will complete missing fields by calling
-     * Source::completeTotals();
-     *
-     * @return array
-     *   An array with the following possible keys:
-     *   - 'meta-invoice-amount': the total invoice amount excluding VAT.
-     *   - 'meta-invoice-amountinc': the total invoice amount including VAT.
-     *   - 'meta-invoice-vatamount': the total vat amount for the invoice.
-     *
-     *   This one is really optional: so far only filled by OpenCart and
-     *   purely for reasons of support:
-     *   - 'meta-invoice-vat-breakdown': a vat breakdown per vat rate.
-     */
-    abstract protected function getAvailableTotals(): array;
-
-    /**
-     * Completes the set of invoice totals as set by getInvoiceTotals.
-     *
-     * Most shops only provide 2 out of these 3 in their data, so we calculate
-     * the 3rd.
-     *
-     * Do not override this method, just implement getAvailableTotals().
-     *
-     * @param array $totals
-     *   The invoice totals to complete with missing total fields.
-     *
-     * @return array
-     *   The invoice totals with all invoice total fields.
-     */
-    protected function completeTotals(array $totals): array
-    {
-        if (!isset($totals[Meta::InvoiceAmount])) {
-            $totals[Meta::InvoiceAmount] = $totals[Meta::InvoiceAmountInc] - $totals[Meta::InvoiceVatAmount];
-            $totals[Meta::InvoiceCalculated ] = Meta::InvoiceAmount;
-        }
-        if (!isset($totals[Meta::InvoiceAmountInc])) {
-            $totals[Meta::InvoiceAmountInc] = $totals[Meta::InvoiceAmount] + $totals[Meta::InvoiceVatAmount];
-            $totals[Meta::InvoiceCalculated ] = Meta::InvoiceAmountInc;
-        }
-        if (!isset($totals[Meta::InvoiceVatAmount])) {
-            $totals[Meta::InvoiceVatAmount] = $totals[Meta::InvoiceAmountInc] - $totals[Meta::InvoiceAmount];
-            $totals[Meta::InvoiceCalculated ] = Meta::InvoiceVatAmount;
-        }
-        return $totals;
-    }
+    abstract public function getTotals(): Totals;
 
     /**
      * Loads and sets the web shop invoice linked to this source.
@@ -467,7 +356,7 @@ abstract class Source
     /**
      * See {@see getInvoiceReference}
      *
-     * @noinspection PhpUnused
+     * @noinspection PhpUnused  Called via callTypeSpecificMethod().
      */
     public function getInvoiceReferenceCreditNote()
     {
@@ -490,7 +379,9 @@ abstract class Source
     /**
      * See {@see getInvoiceDate}
      *
-     * @noinspection PhpUnused
+     * @noinspection PhpUnused  Called via callTypeSpecificMethod().
+     *
+     * @todo: convert to type DateTime
      */
     public function getInvoiceDateCreditNote(): ?string
     {
@@ -549,11 +440,17 @@ abstract class Source
         return $this->getType() === $type ? $this : null;
     }
 
+    /**
+     * @noinspection PhpUnused  May be called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     */
     public function isOrder(): ?Source
     {
         return $this->isType(Source::Order);
     }
 
+    /**
+     * @noinspection PhpUnused  May be called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     */
     public function isCreditNote(): ?Source
     {
         return $this->isType(Source::CreditNote);

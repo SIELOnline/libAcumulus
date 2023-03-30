@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\TestWebShop\Invoice;
 
+use DateTime;
+use Exception;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\Meta;
 use stdClass;
 
@@ -28,7 +31,7 @@ class Source extends BaseSource
 
     public function getDate(): string
     {
-        return '2023-02-01';
+        return $this->getSource()->date;
     }
 
     public function getStatus(): string
@@ -36,19 +39,26 @@ class Source extends BaseSource
         return 'pending';
     }
 
-    public function getPaymentMethod(): int
+    public function getPaymentMethod(): ?string
     {
-        return 3;
+        return $this->getSource()->payment->provider;
     }
 
     public function getPaymentStatus(): int
     {
-        return Api::PaymentStatus_Due;
+        return $this->getSource()->paid ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     public function getPaymentDate(): ?string
     {
-        return '2023-02-03';
+        try {
+            $timestamp = $this->getSource()->payment->timestamp;
+            $date = new DateTime($timestamp);
+            $result = $date->format('Y-m-d');
+        } catch (Exception $e) {
+            $result = null;
+        }
+        return $result;
     }
 
     public function getCountryCode(): string
@@ -56,33 +66,14 @@ class Source extends BaseSource
         return 'nl';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * MyWebShop stores the internal currency id, so look up the currency
-     * object first then extract the ISO code for it.
-     */
-    public function getCurrencyMeta(): array
+    public function getTotals(): Totals
     {
-        return [
-            Meta::Currency => 'EUR',
-            Meta::CurrencyRate => 1.0,
-            Meta::CurrencyDoConvert => false,
-        ];
-    }
-
-    protected function getAvailableTotals(): array
-    {
-        return [
-            'meta-invoice-amount' => 10.0,
-            'meta-invoice-amountinc' => 12.10,
-            'meta-invoice-vatamount' => 2.10,
-        ];
+        return new Totals($this->getSource()->amount, $this->getSource()->amount_vat);
     }
 
     protected function getShopOrderOrId(): int
     {
-        return 3;
+        return $this->getSource()->id;
     }
 
     protected function getShopCreditNotesOrIds(): array

@@ -3,6 +3,14 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+7.6.7 (2023-03-30) (PS)
+-----------------------
+Bugs:
+- PS: Error: Unsupported operand types in ..PrestaShop\Invoice\Creator->mergeProductLines.
+  Actually this looks like a corrupt database, but maybe there is indeed just no product
+  detail info for a given order line.
+
+
 7.6.6 (2023-03-05) (WC)
 -----------------------
 Bugs

@@ -10,8 +10,8 @@ Bugs:
   is nu op 1 cent gezet.
 
 Refactoring:
-- ALL: Use distinct messages for the cases where an invice is not sent because a lock
-  esists versus a lock could not be obtained.
+- ALL: Use distinct messages for the cases where an invoice is not sent because a lock
+  exists versus a lock could not be obtained.
 - PS: Use Appkernel::VERSION as version not the indirect _PS_VERSION_.
 
 

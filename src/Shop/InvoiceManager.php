@@ -395,7 +395,7 @@ abstract class InvoiceManager
         } elseif ($acumulusEntry->hasLockExpired()) {
             $result->setSendStatus(InvoiceAddResult::Send_LockExpired);
         } elseif ($acumulusEntry->isSendLock()) {
-            return $result->setSendStatus(InvoiceAddResult::NotSent_LockedForSending);
+            return $result->setSendStatus(InvoiceAddResult::NotSent_AlreadyLocked);
         } else {
             return $result->setSendStatus(InvoiceAddResult::NotSent_AlreadySent);
         }
@@ -479,7 +479,7 @@ abstract class InvoiceManager
             // Acquire lock.
             if (!$this->getAcumulusEntryManager()->lockForSending($invoiceSource)) {
                 // Bail out: Lock not acquired.
-                return $result->setSendStatus(InvoiceAddResult::NotSent_LockedForSending);
+                return $result->setSendStatus(InvoiceAddResult::NotSent_LockNotAcquired);
             }
         }
 

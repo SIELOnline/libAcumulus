@@ -52,8 +52,8 @@ abstract class AcumulusEntryManager
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source object for which the invoice was created.
      * @param bool $ignoreLock
-     *   Whether to return an entry that serves as a send-lock (false) or ignore
-     *   it (true)
+     *   Whether also to return the entry if it serves as a send-lock (false),
+     *   or to ignore it (true, default).
      *
      * @return AcumulusEntry|null
      *   Acumulus entry record for the given invoice source or null if no
@@ -125,7 +125,12 @@ abstract class AcumulusEntryManager
      *
      * @return int
      *   One of the AcumulusEntry::Lock_... constants describing the status of
-     *   the lock.
+     *   the lock:
+     *   - AcumulusEntry::Lock_Deleted: success
+     *   - AcumulusEntry::Lock_BecameRealEntry: (probably) the process that held
+     *     the lock was successful after all
+     *   - AcumulusEntry::Lock_NoLongerExists: another process deleted it or the
+     *     process that created the lock finished unsuccessful after all.
      */
     public function deleteLock(Source $invoiceSource): int
     {

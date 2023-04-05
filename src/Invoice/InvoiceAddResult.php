@@ -38,8 +38,9 @@ class InvoiceAddResult extends MessageCollection
     public const NotSent_LocalErrors = 0x8;
     public const NotSent_DryRun = 0x9;
     public const NotSent_TriggerCreditNoteEventNotEnabled = 0xa;
-    public const NotSent_LockedForSending = 0xb;
-    public const NotSent_NoInvoiceLines = 0xc;
+    public const NotSent_AlreadyLocked = 0xb;
+    public const NotSent_LockNotAcquired = 0xc;
+    public const NotSent_NoInvoiceLines = 0xd;
     public const NotSent_Mask = 0xf;
     // Reasons for sending
     public const Send_New = 0x10;
@@ -187,8 +188,11 @@ class InvoiceAddResult extends MessageCollection
             case self::NotSent_AlreadySent:
                 $message = 'reason_not_sent_alreadySent';
                 break;
-            case self::NotSent_LockedForSending:
+            case self::NotSent_AlreadyLocked:
                 $message = 'reason_not_sent_alreadySending';
+                break;
+            case self::NotSent_LockNotAcquired:
+                $message = 'reason_not_sent_lockNotAcquired';
                 break;
             case self::NotSent_EventInvoiceCreated:
                 $message = 'reason_not_sent_prevented_invoiceCreated';

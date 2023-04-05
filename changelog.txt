@@ -3,6 +3,18 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+7.6.8 (2023-04-??)
+-----------------------
+Bugs:
+- PS: Nauwkeurigheid van bedragen bij creditfacturen is slechter dan aangenomen, precisie
+  is nu op 1 cent gezet.
+
+Refactoring:
+- ALL: Use distinct messages for the cases where an invice is not sent because a lock
+  esists versus a lock could not be obtained.
+- PS: Use Appkernel::VERSION as version not the indirect _PS_VERSION_.
+
+
 7.6.7 (2023-03-30) (PS)
 -----------------------
 Bugs:

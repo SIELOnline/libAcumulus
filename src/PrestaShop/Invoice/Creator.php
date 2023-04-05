@@ -71,10 +71,10 @@ class Creator extends BaseCreator
      *
      * However, we have had a support call where the precision, for a credit
      * note, turned out to be only 0.002. This was, apparently, with a price
-     * entered excl. vat: excl: 34,22; incl: 41,40378; (computed) vat: 7,18378.
+     * entered excl. vat: 34,22; incl: 41,40378; (computed) vat: 7,18378.
      * The max-vat rate was just below 21%, so no match was made.
      */
-    protected float $precision = 0.005;
+    protected float $precision = 0.01;
 
     /**
      * {@inheritdoc}

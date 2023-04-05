@@ -19,7 +19,7 @@ class Environment extends EnvironmentBase
     protected function setShopEnvironment(): void
     {
         $this->data['moduleVersion'] = Module::getInstanceByName('acumulus')->version;
-        $this->data['shopVersion'] = _PS_VERSION_;
+        $this->data['shopVersion'] = AppKernel::VERSION;
     }
 
     /**

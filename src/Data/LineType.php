@@ -11,8 +11,8 @@ namespace Siel\Acumulus\Data;
  */
 interface LineType
 {
-    public const OrderItem = 'order-item';
-    public const Shipping = 'shipping';
+    public const Item = 'order-item';
+    public const Shipping = 'shipping-line';
     public const PaymentFee = 'payment';
     public const GiftWrapping = 'gift';
     public const Manual = 'manual';

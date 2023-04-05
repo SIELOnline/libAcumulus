@@ -95,7 +95,7 @@ class FieldExpanderTest extends TestCase
             ['[invoiceSource::customer::id]', 2],
             ['[invoiceSource::customer::invoice_address::id]', 4],
             ['[date]', '2022-12-01'],
-            ['[amount]', 19.95],
+            ['[amount]', 50.40],
             ['[paid]', true],
             ['[returned]', null],
         ];
@@ -225,7 +225,6 @@ class FieldExpanderTest extends TestCase
             ['[container::translator::language]', self::Language],
             ['[container::createAcumulusObject(address)::fullName]', null], //magic __get
             ['[container::createSource(Order,10)::id]', 10], //magic __get
-            ['[container::createSource(Order,10)::date]', '2023-02-01'], //magic __get
             ['[container::createSource(Order,10)::getCreditNote()]', null], // () is not '' as a single argument
             ['[container::createSource(Order,10)::getCreditNote()::id]', null], // null in middle of chain
         ];

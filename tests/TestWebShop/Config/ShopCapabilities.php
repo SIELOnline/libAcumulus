@@ -6,6 +6,10 @@ namespace Siel\Acumulus\Tests\TestWebShop\Config;
 
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
+use Siel\Acumulus\Data\LineType;
 
 /**
  * Defines the TestWebShop specific capabilities.
@@ -35,19 +39,19 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [];
     }
 
-    public function getDefaultShopMappings(): array
+    public function getDefaultPropertyMappings(): array
     {
         return [
-            Mappings::Invoice => [
+            DataType::Invoice => [
 
             ],
-            Mappings::Customer => [
+            DataType::Customer => [
                 'contactYourId' => '[source::getOrder()::getSource()::customer::id]',
                 'telephone' => '[source::getOrder()::getSource()::customer::telephone]',
                 'telephone2' => '[source::getOrder()::getSource()::customer::mobile]',
                 'email' => '[source::getOrder()::getSource()::customer::email]',
             ],
-            Mappings::InvoiceAddress => [
+            AddressType::Invoice => [
                 'companyName1' => '[source::getOrder()::getSource()::customer::company_name]',
                 'salutation' => '["Beste"+source::getOrder()::getSource()::customer::first_name]',
                 'fullName' => '[source::getOrder()::getSource()::customer::first_name+source::getOrder()::getSource()::customer::last_name]',
@@ -57,7 +61,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'city' => '[source::getOrder()::getSource()::customer::invoice_address::city]',
                 'countryCode' => '[source::getOrder()::getSource()::customer::invoice_address::country_code]',
             ],
-            Mappings::ShippingAddress => [
+            AddressType::Shipping => [
                 'companyName1' => '[source::getOrder()::getSource()::customer::company_name]',
                 'salutation' => '["Beste"+source::getOrder()::getSource()::customer::first_name]',
                 'fullName' => '[source::getOrder()::getSource()::customer::first_name+source::getOrder()::getSource()::customer::last_name]',
@@ -67,15 +71,15 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'city' => '[source::getOrder()::getSource()::customer::shipping_address::city]',
                 'countryCode' => '[source::getOrder()::getSource()::customer::shipping_address::country_code]',
             ],
-            Mappings::EmailInvoiceAsPdf => [
+            EmailAsPdfType::Invoice => [
                 'emailTo' => '[source::getOrder()::getSource()::customer::email]',
                 'emailBcc' => 'dev@example.com',
             ],
-            Mappings::EmailPackingSlipAsPdf => [
+            EmailAsPdfType::PackingSlip => [
                 'emailTo' => '[source::getOrder()::getSource()::customer::email]',
                 'emailBcc' => 'dev@example.com',
             ],
-            Mappings::ItemLine => [
+            LineType::Item => [
                 'itemNumber' => '[sku]',
                 'productName' => '[name]',
                 'costPrice' => '[cost_price]',

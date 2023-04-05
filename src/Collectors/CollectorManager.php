@@ -9,6 +9,7 @@ use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Customer;
+use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdf;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\Invoice;
@@ -42,7 +43,6 @@ use Siel\Acumulus\Invoice\Source;
 class CollectorManager
 {
     protected FieldExpander $fieldExpander;
-    private ShopCapabilities $shopCapabilities;
     private Container $container;
     private Mappings $mappings;
     protected Log $log;
@@ -50,11 +50,9 @@ class CollectorManager
     /** deprecated  Only Source remains with multi-level FieldExpander? */
     protected array $propertySources;
 
-    public function __construct(FieldExpander $fieldExpander, ShopCapabilities $shopCapabilities, Mappings $mappings, Container $container,
-        Log $log)
+    public function __construct(FieldExpander $fieldExpander, Mappings $mappings, Container $container, Log $log)
     {
         $this->fieldExpander = $fieldExpander;
-        $this->shopCapabilities = $shopCapabilities;
         $this->container = $container;
         $this->mappings = $mappings;
         $this->log = $log;
@@ -126,7 +124,7 @@ class CollectorManager
     public function collectInvoice(Source $source): Invoice
     {
         $invoiceCollector = $this->getContainer()->getCollector('Invoice');
-        $invoiceMappings = $this->getMappings()->get(Mappings::Invoice);
+        $invoiceMappings = $this->getMappings()->getPropertyMappings(DataType::Invoice);
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
         $invoice = $invoiceCollector->collect(['source' => $source], $invoiceMappings);
 
@@ -141,7 +139,7 @@ class CollectorManager
     public function collectCustomer(Source $source): Customer
     {
         $customerCollector = $this->getContainer()->getCollector('Customer');
-        $customerMappings = $this->getMappings()->get(Mappings::Customer);
+        $customerMappings = $this->getMappings()->getPropertyMappings(DataType::Customer);
 
         /** @var \Siel\Acumulus\Data\Customer $customer */
         $customer = $customerCollector->collect(['source' => $source], $customerMappings);
@@ -152,14 +150,10 @@ class CollectorManager
         return $customer;
     }
 
-    public function collectAddress(Source $source, string $addressType): Address
+    public function collectAddress(Source $source, string $type): Address
     {
-        if ($addressType === AddressType::Invoice) {
-            $addressMappings = $this->getMappings()->get(Mappings::InvoiceAddress);
-        } else {
-            $addressMappings = $this->getMappings()->get(Mappings::ShippingAddress);
-        }
         $addressCollector = $this->getContainer()->getCollector('Address');
+        $addressMappings = $this->getMappings()->getPropertyMappings($type);
         /** @var \Siel\Acumulus\Data\Address $address */
         $address = $addressCollector->collect(['source' => $source], $addressMappings);
         return $address;
@@ -168,11 +162,7 @@ class CollectorManager
     public function collectEmailAsPdf(Source $source, string $type): EmailAsPdf
     {
         $emailAsPdfCollector = $this->getContainer()->getCollector('EmailAsPdf');
-        if ($type === EmailAsPdfType::Invoice) {
-            $emailAsPdfMappings = $this->getMappings()->get(Mappings::EmailInvoiceAsPdf);
-        } else {
-            $emailAsPdfMappings = $this->getMappings()->get(Mappings::EmailPackingSlipAsPdf);
-        }
+        $emailAsPdfMappings = $this->getMappings()->getPropertyMappings($type);
         $emailAsPdfMappings['emailAsPdfType'] = $type;
         /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */
         $emailAsPdf = $emailAsPdfCollector->collect(['source' => $source], $emailAsPdfMappings);

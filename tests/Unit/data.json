@@ -1,0 +1,74 @@
+{
+    "order": {
+        "id": 3,
+        "date": "2022-12-01",
+        "amount": 50.40,
+        "amount_vat": 8.75,
+        "paid": true,
+        "returned": null,
+        "lines": [
+            {
+                "sku": "SKU1",
+                "product": "Buro",
+                "qty": 1,
+                "price": 19.95,
+                "vat_rate": 21
+            },
+            {
+                "sku": "SKU2",
+                "product": "RaDer",
+                "qty": 2,
+                "price": 24.95,
+                "vat_rate": 21
+            }
+        ],
+        "shipping": {
+            "carrier": "myparcel",
+            "price": 5.5,
+            "vat_rate": 21
+        },
+        "payment": {
+            "provider": "paypal",
+            "paid": 50.40,
+            "timestamp": "2022-12-02T15:40:05+02:00"
+        }
+    },
+    "customer": {
+        "id": 2,
+        "company_name": "Buro RaDer",
+        "first_name": "Erwin",
+        "middle_name": "",
+        "last_name": "Derksen",
+        "email": "customer@example.com",
+        "telephone": "0123456789",
+        "mobile": "0612345978"
+    },
+    "invoice_address": {
+        "id": 4,
+        "street": "Lindelaan 4",
+        "street2": "Achter de Linden",
+        "postal_code": "1234 AB",
+        "city": "Utrecht",
+        "country_code": "NL"
+    },
+    "shipping_address": {
+        "id": 5,
+        "street": "Lindelaan 5",
+        "street2": "Achter den Linden",
+        "postal_code": "1234 AB",
+        "city": "Utrecht",
+        "country_code": "NL"
+    },
+    "address": {
+        "id": 5,
+        "street": "Stationsstraat 3",
+        "street2": null,
+        "postal_code": "4321 BA",
+        "city": "Amsterdam",
+        "country_code": "NL"
+    },
+    "keyed_array": {
+        "p1": "v1",
+        "p2": "v2"
+    }
+}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection DuplicatedCode  During the transition to Collectors duplicate
+ * @noinspection DuplicatedCode  During the transition to Collectors, duplicate
  *   code will exist.
  */
 
@@ -42,8 +42,8 @@ use function is_string;
  *   code for webshops that are not yet converted running, that class was copied
  *   to here, so we don't hve to touch the original file.
  *
- *
  * Original documentation form the 'Create' class:
+ * ===============================================
  *
  * Creates a raw version of the Acumulus invoice from a {@see Source}.
  *
@@ -100,7 +100,7 @@ use function is_string;
  * is no maximum depth on child lines.
  *
  * Price info may be on the child lines, but may also be on the parent line,
- * especially so, if the bundle is cheaper that its separate parts. The child
+ * especially so, if the bundle is cheaper than its separate parts. The child
  * lines may have their own vat rates, so depending on your situation fetch the
  * vat info from the child line objects itself or copy it from the parent. When
  * left empty, it is copied from the parent in the Completor phase.

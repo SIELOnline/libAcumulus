@@ -16,6 +16,10 @@ use Magento\Sales\Model\ResourceModel\Status\Collection as OrderStatusCollection
 use Magento\Tax\Model\ResourceModel\TaxClass\Collection as TaxClassCollection;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\Config;
 
@@ -486,10 +490,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getDefaultShopMappings(): array
+    public function getDefaultPropertyMappings(): array
     {
         return [
-            Mappings::Customer => [
+            DataType::Customer => [
                 'contactYourId' => '[source::getOrder()::getSource()::getCustomer()::getId()]', // Order, not Creditmemo
                 // Magento has 2 VAT numbers:
                 // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
@@ -502,7 +506,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'email' => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
             // Both Order and Creditmemo have get(Billing|Shipping)Address() methods.
-            Mappings::InvoiceAddress => [
+            AddressType::Invoice => [
                 'companyName1' => '[source::getSource()::getBillingAddress()::getCompany()]', // Address
                 'fullName' => '[source::getSource()::getBillingAddress()::getName()]', // Address
                 'address1' => '[source::getSource()::getBillingAddress()::getStreetLine(1)]', // Address
@@ -511,7 +515,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'city' => '[source::getSource()::getBillingAddress()::getCity()]', // Adress
                 'countryCode' => '[source::getSource()::getBillingAddress()::getCountryId()]', // Address
             ],
-            Mappings::ShippingAddress => [
+            AddressType::Shipping => [
                 'companyName1' => '[source::getSource()::getShippingAddress()::getCompany()]', // Address
                 'fullName' => '[source::getSource()::getShippingAddress()::getName()]', // Address
                 'address1' => '[source::getSource()::getShippingAddress()::getStreetLine(1)]', // Address
@@ -520,13 +524,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'city' => '[source::getSource()::getShippingAddress()::getCity()]', // Adress
                 'countryCode' => '[source::getSource()::getShippingAddress()::getCountryId()]', // Address
             ],
-            Mappings::EmailInvoiceAsPdf => [
+            EmailAsPdfType::Invoice => [
                 'emailTo' => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
-            Mappings::Invoice => [
+            DataType::Invoice => [
                 // @todo: fields that come from source, metadata
             ],
-            Mappings::ItemLine => [
+            LineType::Item => [
                 // @todo: on which object?
                 'itemNumber' => '[sku]',
                 'productName' => '[name]',

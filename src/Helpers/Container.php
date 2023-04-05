@@ -488,7 +488,6 @@ class Container
     {
         $arguments = [
             $this->getFieldExpander(),
-            $this->getShopCapabilities(),
             $this->getMappings(),
             $this,
             $this->getLog(),

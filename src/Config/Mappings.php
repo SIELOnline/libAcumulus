@@ -10,19 +10,17 @@ namespace Siel\Acumulus\Config;
  */
 class Mappings
 {
-    public const Invoice = 'invoice';
-    public const ItemLine = 'itemLine';
-    public const ShippingLine = 'shippingLine';
-    public const PaymentLine = 'paymentLine';
-    public const FeeLine = 'feeLine';
-    public const Customer = 'customer';
-    public const EmailInvoiceAsPdf = 'emailInvoiceAsPdf';
-    public const EmailPackingSlipAsPdf = 'emailPackingSlipAsPdf';
-    public const ShippingAddress = 'shippingAddress';
-    public const InvoiceAddress = 'invoiceAddress';
+    public const Properties = Config::PropertyMappings;
+    public const Metadata = Config::MetadataMappings;
 
     private Config $config;
     private ShopCapabilities $shopCapabilities;
+
+    /**
+     * @var string[][][]
+     *   See {@see getAllMappings()}
+     */
+    private array $allMappings;
 
     public function __construct(Config $config, ShopCapabilities $shopCapabilities)
     {
@@ -41,50 +39,92 @@ class Mappings
     }
 
     /**
-     * Returns the mappings for a given object type.
+     * Returns the property mappings for a given object type.
      *
      * The {@see \Siel\Acumulus\Collectors\CollectorManager} will retrieve these
-     * mapping and pass them to the {@see \Siel\Acumulus\Collectors\Collector}
+     * mappings and pass them to the {@see \Siel\Acumulus\Collectors\Collector}
      * that can create the {@see \Siel\Acumulus\Data\AcumulusObject} of the
      * right type.
      *
-     * @param string $for
+     * @param string $forType
      *   One of the Mappings::... constants, indicating for which object type
-     *   the settings should be returned.
+     *   the mappings should be returned.
      *
      * @return array
-     *   An array with as keys the property names and as values the mappings to
-     *   be used to extract the value for the property.
+     *   An array with as keys the property names and as values mappings for the
+     *   specified property. These are typically strings that may contain a
+     *   field expansion specification, see
+     *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may
+     *   contain a value of another scalar type.
      */
-    public function get(string $for): array
+    public function getPropertyMappings(string $forType): array
     {
-        $mappings = $this->getAll();
-        return $mappings[$for] ?? [];
+        $mappings = $this->getAllMappings();
+        return $mappings[Mappings::Properties][$forType] ?? [];
+    }
+
+    /**
+     * Returns the metadata mappings for a given object type.
+     *
+     * The {@see \Siel\Acumulus\Collectors\CollectorManager} will retrieve these
+     * mappings and pass them to the {@see \Siel\Acumulus\Collectors\Collector}
+     * that can create the {@see \Siel\Acumulus\Data\AcumulusObject} of the
+     * right type.
+     *
+     * @param string $forType
+     *   One of the Data\...Type::... constants, indicating for which object
+     *   type the mappings should be returned.
+     *
+     * @return array
+     *   An array with as keys the metadata names and as values mappings for the
+     *   specified metadata field. These are typically strings that may contain
+     *   a field expansion specification, see
+     *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may
+     *   contain a value of another scalar type.
+     */
+    public function getMetadataMappings(string $forType): array
+    {
+        $mappings = $this->getAllMappings();
+        return $mappings[Mappings::Metadata][$forType] ?? [];
     }
 
     /**
      * Returns all mappings for all objects.
      *
-     * If a given property has no mapping, no array entry will be set for that
-     * property. This implies that all array entries are non-null.
-     *
-     * @return array[]
-     *   All mappings for all objects.
+     * @return string[][][]
+     *   The mappings that are stored in the config.
+     *     - 1st dimension: 2 keys: Mappings::Properties and Mappings::Metadata.
+     *     - 2nd dimension: keys being one of the Data\...Type::... constants.
+     *     - 3rd dimension: keys being property names or metadata keys.
+     *   Values are mappings for the specified property or metadata field. These
+     *   are typically strings that may contain a field expansion specification,
+     *   see {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it
+     *   may contain a value of another scalar type.
      */
-    protected function getAll(): array
+    protected function getAllMappings(): array
     {
-        return array_merge_recursive(
-            $this->getDefaultShopMappings(),
-            $this->getConfiguredMappings(),
-        );
+        if (!isset($this->allMappings)) {
+            $configuredMappings = $this->getConfiguredMappings();
+            $this->allMappings = [
+                Mappings::Properties => array_merge_recursive(
+                $this->getDefaultShopPropertyMappings(),
+                    $configuredMappings[Mappings::Properties],
+            ),
+                Mappings::Metadata => array_merge_recursive(
+                $this->getDefaultShopMetadataMappings(),
+                    $configuredMappings[Mappings::Metadata],
+            ),
+            ];
+        }
+        return $this->allMappings;
 
     }
 
     /**
-     * Returns all  mappings that are stored in the configuration object.
+     * Returns all mappings that are stored in the configuration object.
      *
-     * @return array[]
-     *   The mappings that are overridden by the user.
+     * @return string[][][]
+     *   See {@see getAllMappings()}.
      */
     protected function getConfiguredMappings(): array
     {
@@ -92,13 +132,24 @@ class Mappings
     }
 
     /**
-     * Returns the default mappings for the current shop.
+     * Returns the default property mappings for the current shop.
      *
      * @return array[]
-     *   The default mappings for the current shop.
+     *   The default property mappings for the current shop.
      */
-    protected function getDefaultShopMappings(): array
+    protected function getDefaultShopPropertyMappings(): array
     {
-        return $this->getShopCapabilities()->getDefaultShopMappings();
+        return $this->getShopCapabilities()->getDefaultPropertyMappings();
+    }
+
+    /**
+     * Returns the default metadata mappings for the current shop.
+     *
+     * @return array[]
+     *   The default metadata mappings for the current shop.
+     */
+    protected function getDefaultShopMetadataMappings(): array
+    {
+        return $this->getShopCapabilities()->getDefaultMetadataMappings();
     }
 }

@@ -7,6 +7,10 @@ namespace Siel\Acumulus\WooCommerce\Config;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
+use Siel\Acumulus\Data\LineType;
 use WC_Tax;
 
 use function function_exists;
@@ -240,49 +244,51 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getDefaultShopMappings(): array
+    public function getDefaultPropertyMappings(): array
     {
         // WooCommerce: The properties for both addresses are always filled.
         return [
-            Mappings::Customer => [
+            DataType::Customer => [
                 // Customer defaults.
                 //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
-                'contactYourId' => '[source::getOrder()::getSource()::get_customer_id()]', // WC_Order
+                'contactYourId' => '[source::getOrder()::getSource()::get_customer_id()]',
                 'vatNumber' => '[source::getOrder()::get_meta(billing_vat_number)'
                     . '|source::getOrder()::getSource()::get_meta(_vat_number)'
                     . '|source::getOrder()::getSource()::get_meta(vat_number)'
                     . '|source::getOrder()::getSource()::get_meta(Vat Number)]', // Post meta
-                'telephone' => '[source::getOrder()::getSource()::get_billing_phone()]', // WC_Order
-                'telephone2' => '[source::getOrder()::getSource()::get_shipping_phone()]', // WC_Order
-                'email' => '[source::getOrder()::getSource()::get_billing_email()]', // WC_Order
+                'telephone' => '[source::getOrder()::getSource()::get_billing_phone()]',
+                'telephone2' => '[source::getOrder()::getSource()::get_shipping_phone()]',
+                'email' => '[source::getOrder()::getSource()::get_billing_email()]',
             ],
-            Mappings::InvoiceAddress => [
-                'companyName1' => '[source::getOrder()::getSource()::get_billing_company]', // WC_Order
-                'fullName' => '[source::getOrder()::getSource()::get_billing_first_name+source::getOrder()::getSource()::get_billing_last_name]', // WC_Order
-                'address1' => '[source::getOrder()::getSource()::get_billing_address_1]', // WC_Order
-                'address2' => '[source::getOrder()::getSource()::get_billing_address_2]', // WC_Order
-                'postalCode' => '[source::getOrder()::getSource()::get_billing_postcode]', // WC_Order
-                'city' => '[source::getOrder()::getSource()::get_billing_city]', // WC_Order
-                'countryCode' => '[source::getOrder()::getSource()::get_billing_country]', // WC_Order
+            AddressType::Invoice => [
+                'companyName1' => '[source::getOrder()::getSource()::get_billing_company]',
+                'fullName' =>
+                    '[source::getOrder()::getSource()::get_billing_first_name+source::getOrder()::getSource()::get_billing_last_name]',
+                'address1' => '[source::getOrder()::getSource()::get_billing_address_1]',
+                'address2' => '[source::getOrder()::getSource()::get_billing_address_2]',
+                'postalCode' => '[source::getOrder()::getSource()::get_billing_postcode]',
+                'city' => '[source::getOrder()::getSource()::get_billing_city]',
+                'countryCode' => '[source::getOrder()::getSource()::get_billing_country]',
                 //@todo? logic country = global $woocommerce->countries->get_countries()[countryCode];
             ],
-            Mappings::ShippingAddress => [
-                'companyName1' => '[source::getOrder()::getSource()::get_shipping_company()]', // WC_Order
-                'fullName' => '[source::getOrder()::getSource()::get_shipping_first_name()+source::getOrder()::getSource()::get_shipping_last_name()]', // WC_Order
-                'address1' => '[source::getOrder()::getSource()::get_shipping_address_1()]', // WC_Order
-                'address2' => '[source::getOrder()::getSource()::get_shipping_address_2()]', // WC_Order
-                'postalCode' => '[source::getOrder()::getSource()::get_shipping_postcode()]', // WC_Order
-                'city' => '[source::getOrder()::getSource()::get_shipping_city()]', // WC_Order
-                'countryCode' => '[source::getOrder()::getSource()::get_shipping_country()]', // WC_Order
+            AddressType::Shipping => [
+                'companyName1' => '[source::getOrder()::getSource()::get_shipping_company()]',
+                'fullName' =>
+                    '[source::getOrder()::getSource()::get_shipping_first_name()+source::getOrder()::getSource()::get_shipping_last_name()]',
+                'address1' => '[source::getOrder()::getSource()::get_shipping_address_1()]',
+                'address2' => '[source::getOrder()::getSource()::get_shipping_address_2()]',
+                'postalCode' => '[source::getOrder()::getSource()::get_shipping_postcode()]',
+                'city' => '[source::getOrder()::getSource()::get_shipping_city()]',
+                'countryCode' => '[source::getOrder()::getSource()::get_shipping_country()]',
                 //@todo? logic country = global $woocommerce->countries->get_countries()[countryCode];
             ],
-            Mappings::EmailInvoiceAsPdf => [
-                'emailTo' => '[source::getOrder()::getSource()::get_billing_email()]', // WC_Order
+            EmailAsPdfType::Invoice => [
+                'emailTo' => '[source::getOrder()::getSource()::get_billing_email()]',
             ],
-            Mappings::Invoice => [
+            DataType::Invoice => [
                 // @todo: fields that come from source, metadata
             ],
-            Mappings::ItemLine => [
+            LineType::Item => [
                 'itemNumber' => '[sku]',
                 'productName' => '[name]',
                 'costPrice' => '[cost_price]',

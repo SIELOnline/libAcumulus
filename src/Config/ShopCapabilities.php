@@ -67,19 +67,15 @@ abstract class ShopCapabilities
     abstract public function getDefaultShopConfig(): array;
 
     /**
-     * Returns an array with shop specific mapping defaults.
-     *
-     * Any key defined in {@see getKeyInfo()} that can be
-     * given a more logical value given that the library is running in a given
-     * web shop software, should be returned here.
+     * Returns an array with shop specific property mapping defaults.
      *
      * This base method is abstract, because mappings are almost per definition
      * shop dependent.
-     * - See the {@see \Siel\Acumulus\Data\_Documentation Data namespace} to get
-     *   all the possible {@see \Siel\Acumulus\Data\AcumulusObject} types and
-     *   their {@see \Siel\Acumulus\Data\AcumulusProperty} properties.
+     * See the {@see \Siel\Acumulus\Data\_Documentation Data namespace} to get
+     * all the possible {@see \Siel\Acumulus\Data\AcumulusObject} types and
+     * their {@see \Siel\Acumulus\Data\AcumulusProperty} properties.
      *
-     * @return string[]
+     * @return string[][]
      *   A keyed array of keyed arrays. At the 1st level the keys are the
      *   {@see \Siel\Acumulus\Config\Mappings}::... constants and the values are
      *   the mappings for that object type. A mapping being a keyed array, with
@@ -88,7 +84,27 @@ abstract class ShopCapabilities
      *
      * @todo: make abstract when implemented for all shops.
      */
-    public function getDefaultShopMappings(): array
+    public function getDefaultPropertyMappings(): array
+    {
+        return [];
+    }
+
+    /**
+     * Returns an array with shop specific metadata mapping defaults.
+     *
+     * This base method is abstract, because mappings are almost per definition
+     * shop dependent.
+     *
+     * @return string[][]
+     *   A keyed array of keyed arrays. At the 1st level the keys are the
+     *   {@see \Siel\Acumulus\Config\Mappings}::... constants and the values are
+     *   the mappings for that object type. A mapping being a keyed array, with
+     *   as keys the metadata names and as values a so-called field expansion
+     *   specification, see {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     *
+     * @todo: make abstract when implemented for all shops.
+     */
+    public function getDefaultMetadataMappings(): array
     {
         return [];
     }

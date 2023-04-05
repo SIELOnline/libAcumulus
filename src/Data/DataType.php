@@ -9,8 +9,8 @@ namespace Siel\Acumulus\Data;
  *
  * PHP8.1: enumeration.
  */
-interface AddressType
+interface DataType
 {
-    public const Shipping = 'shippingAddress';
-    public const Invoice = 'invoiceAddress';
+    public const Invoice = 'invoice';
+    public const Customer = 'customer';
 }

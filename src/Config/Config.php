@@ -13,6 +13,10 @@ namespace Siel\Acumulus\Config;
 
 use SensitiveParameter;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
@@ -85,6 +89,9 @@ class Config
 
     public const TriggerCreditNoteEvent_None = 0;
     public const TriggerCreditNoteEvent_Create = 1;
+
+    public const PropertyMappings = 'propertyMappings';
+    public const MetadataMappings = 'metadataMappings';
 
     private ConfigStore $configStore;
     private ShopCapabilities $shopCapabilities;
@@ -618,7 +625,7 @@ class Config
      */
     public function getMappings(): array
     {
-        return $this->get('mappings') ?? [];
+        return $this->getSettingsByGroup('mappings');
     }
 
     /**
@@ -1132,11 +1139,11 @@ class Config
                     'type' => 'int',
                     'default' => 0,
                 ],
-                'mappings' => [
+                'propertyMappings' => [
                     'group' => 'mappings',
                     'type' => 'array',
                     'default' => [
-                        Mappings::Invoice => [
+                        DataType::Invoice => [
                             'paymentStatus' => '[source::getPaymentStatus()]',
                             'paymentDate' => '[source::getPaymentDate()]',
                             'description' => '[source::getTypeLabel(2)+source::getReference()'
@@ -1152,20 +1159,36 @@ class Config
                                 Meta::Totals => '[source::getTotals()]',
                             ],
                         ],
-                        Mappings::Customer => [
+                        DataType::Customer => [
                         ],
-                        Mappings::InvoiceAddress => [
+                        AddressType::Invoice => [
                         ],
-                        Mappings::ShippingAddress => [
+                        AddressType::Shipping => [
                         ],
-                        Mappings::EmailInvoiceAsPdf => [
+                        EmailAsPdfType::Invoice => [
                             'subject' => 'Factuur voor [source::getTypeLabel(1)+source::getReference()'
                                 . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
                         ],
-                        Mappings::EmailPackingSlipAsPdf => [
+                        EmailAsPdfType::PackingSlip => [
                             'subject' => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
                         ],
-                        Mappings::ItemLine => [
+                        LineType::Item => [
+                        ],
+                    ],
+                ],
+                'metadataMappings' => [
+                    'group' => 'mappings',
+                    'type' => 'array',
+                    'default' => [
+                        DataType::Invoice => [
+                            Meta::Type => '[source::getType()]',
+                            Meta::Id => '[source::getId()]',
+                            Meta::Reference => '[source::getReference()]',
+                            Meta::Date => '[source::getDate()]',
+                            Meta::Status => '[source::getStatus()]',
+                            Meta::PaymentMethod => '[source::getPaymentMethod()]',
+                            Meta::Currency => '[source::getCurrency()]',
+                            Meta::Totals => '[source::getTotals()]',
                         ],
                     ],
                 ],

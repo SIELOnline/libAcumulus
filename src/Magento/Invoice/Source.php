@@ -19,6 +19,7 @@ use Siel\Acumulus\Meta;
 
 use Throwable;
 
+use function count;
 use function in_array;
 use function strlen;
 
@@ -226,6 +227,14 @@ class Source extends BaseSource
                 $this->invoice = $shopInvoices->getFirstItem();
             }
         }
+    }
+
+    /**
+     * {@see Source::getInvoiceId()}
+     */
+    public function getInvoiceIdOrder()
+    {
+        return $this->getInvoice() !== null ? $this->getInvoice()->getId() : null;
     }
 
     /**

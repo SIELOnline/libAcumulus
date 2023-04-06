@@ -47,8 +47,8 @@ class Mappings
      * right type.
      *
      * @param string $forType
-     *   One of the Mappings::... constants, indicating for which object type
-     *   the mappings should be returned.
+     *   One of the Data\...Type::... constants, indicating for which object
+     *   type the mappings should be returned.
      *
      * @return array
      *   An array with as keys the property names and as values mappings for the
@@ -107,13 +107,13 @@ class Mappings
             $configuredMappings = $this->getConfiguredMappings();
             $this->allMappings = [
                 Mappings::Properties => array_merge_recursive(
-                $this->getDefaultShopPropertyMappings(),
+                    $this->getDefaultShopPropertyMappings(),
                     $configuredMappings[Mappings::Properties],
-            ),
+                ),
                 Mappings::Metadata => array_merge_recursive(
-                $this->getDefaultShopMetadataMappings(),
+                    $this->getDefaultShopMetadataMappings(),
                     $configuredMappings[Mappings::Metadata],
-            ),
+                ),
             ];
         }
         return $this->allMappings;
@@ -134,7 +134,7 @@ class Mappings
     /**
      * Returns the default property mappings for the current shop.
      *
-     * @return array[]
+     * @return string[][]
      *   The default property mappings for the current shop.
      */
     protected function getDefaultShopPropertyMappings(): array
@@ -145,7 +145,7 @@ class Mappings
     /**
      * Returns the default metadata mappings for the current shop.
      *
-     * @return array[]
+     * @return string[][]
      *   The default metadata mappings for the current shop.
      */
     protected function getDefaultShopMetadataMappings(): array

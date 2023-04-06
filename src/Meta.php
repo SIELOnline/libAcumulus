@@ -58,6 +58,11 @@ interface Meta
     // Invoice
     public const Type = 'meta-type';
     public const Date = 'meta-date';
+
+    // Shop invoice linked to this source.
+    public const ShopInvoiceId = 'meta-shop-invoice-id';
+    public const ShopInvoiceReference = 'meta-shop-invoice-reference';
+    public const ShopInvoiceDate = 'meta-shop-invoice-date';
     /**
      * Support: the payment method used for this order or refund.
      */

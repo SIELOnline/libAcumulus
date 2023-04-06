@@ -615,13 +615,8 @@ class Config
     /**
      * Returns mappings that are overridden via the configuration.
      *
-     * @return string[][]
-     *   An array of mappings per {@see \Siel\Acumulus\Data\AcumulusObject}.
-     *   The keys are one of the {@see \Siel\Acumulus\Config\Mappings}
-     *   constants, its values an array of property mappings: the keys being
-     *   property names of the {@see \Siel\Acumulus\Data\AcumulusObject} (as
-     *   indicated by the outer key), the values a string that can be passed
-     *   to {@see \Siel\Acumulus\Helpers\FieldExpander::expand()}.
+     * @return string[][][]
+     *   See {@see Mappings::getAllMappings()}.
      */
     public function getMappings(): array
     {
@@ -1154,6 +1149,9 @@ class Config
                                 Meta::Reference => '[source::getReference()]',
                                 Meta::Date => '[source::getDate()]',
                                 Meta::Status => '[source::getStatus()]',
+                                Meta::ShopInvoiceId => '[source::getShopInvoiceId()]',
+                                Meta::ShopInvoiceReference => '[source::getShopInvoiceReference()]',
+                                Meta::ShopInvoiceDate => '[source::getShopInvoiceDate()]',
                                 Meta::PaymentMethod => '[source::getPaymentMethod()]',
                                 Meta::Currency => '[source::getCurrency()]',
                                 Meta::Totals => '[source::getTotals()]',

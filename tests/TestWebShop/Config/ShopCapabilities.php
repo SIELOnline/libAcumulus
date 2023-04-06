@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\TestWebShop\Config;
 
-use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;

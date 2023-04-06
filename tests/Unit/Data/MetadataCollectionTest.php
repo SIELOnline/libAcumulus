@@ -29,16 +29,16 @@ class MetadataCollectionTest extends TestCase
         $mdc = new MetadataCollection();
         $this->assertFalse($mdc->exists($name1));
         $this->assertFalse($mdc->exists($no_name));
+        $this->assertNull($mdc->getMetadataValue($name1));
         $this->assertNull($mdc->get($name1));
-        $this->assertNull($mdc->getValue($name1));
         $this->assertSame([], $mdc->getKeys());
 
         // Test set that creates.
         $mdc->set($name1, $value1);
         $this->assertTrue($mdc->exists($name1));
         $this->assertFalse($mdc->exists($no_name));
-        $this->assertInstanceOf(MetadataValue::class, $mdc->get($name1));
-        $this->assertSame($value1, $mdc->getValue($name1));
+        $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name1));
+        $this->assertSame($value1, $mdc->get($name1));
         $this->assertSame([$name1], $mdc->getKeys());
 
         // Test add that creates.
@@ -46,35 +46,35 @@ class MetadataCollectionTest extends TestCase
         $this->assertTrue($mdc->exists($name1));
         $this->assertTrue($mdc->exists($name2));
         $this->assertFalse($mdc->exists($no_name));
-        $this->assertInstanceOf(MetadataValue::class, $mdc->get($name2));
-        $this->assertSame($value2, $mdc->getValue($name2));
+        $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name2));
+        $this->assertSame($value2, $mdc->get($name2));
         $this->assertSame([$name1, $name2], $mdc->getKeys());
 
         // Test set that overwrites.
         $mdc->set($name1, $value2);
         $this->assertTrue($mdc->exists($name1));
         $this->assertTrue($mdc->exists($name2));
-        $mdv1 = $mdc->get($name1);
+        $mdv1 = $mdc->getMetadataValue($name1);
         $this->assertInstanceOf(MetadataValue::class, $mdv1);
         $this->assertSame(1, $mdv1->count());
-        $this->assertSame($value2, $mdc->getValue($name1));
+        $this->assertSame($value2, $mdc->get($name1));
 
         // Test add that adds.
         $mdc->add($name1, $value1);
         $this->assertTrue($mdc->exists($name1));
         $this->assertTrue($mdc->exists($name2));
-        $mdv1 = $mdc->get($name1);
+        $mdv1 = $mdc->getMetadataValue($name1);
         $this->assertInstanceOf(MetadataValue::class, $mdv1);
         $this->assertSame(2, $mdv1->count());
-        $this->assertSame([$value2, $value1], $mdc->getValue($name1));
+        $this->assertSame([$value2, $value1], $mdc->get($name1));
 
         // Test remove.
         $mdc->remove($name2);
         $this->assertTrue($mdc->exists($name1));
         $this->assertFalse($mdc->exists($name2));
+        $this->assertNull($mdc->getMetadataValue($name2));
         $this->assertNull($mdc->get($name2));
-        $this->assertNull($mdc->getValue($name2));
-        $mdv1 = $mdc->get($name1);
+        $mdv1 = $mdc->getMetadataValue($name1);
         $this->assertInstanceOf(MetadataValue::class, $mdv1);
     }
     public function testMetadataCollectionWithNull(): void
@@ -86,44 +86,44 @@ class MetadataCollectionTest extends TestCase
         $mdc = new MetadataCollection();
         $mdc->set($name1, $value1);
         $this->assertTrue($mdc->exists($name1));
-        $this->assertInstanceOf(MetadataValue::class, $mdc->get($name1));
-        $this->assertNull($mdc->getValue($name1));
+        $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name1));
+        $this->assertNull($mdc->get($name1));
         $this->assertSame([$name1], $mdc->getKeys());
 
         // Test add that creates.
         $name2 = 'my_metadata2';
         $mdc->add($name2, $value1);
         $this->assertTrue($mdc->exists($name2));
-        $this->assertInstanceOf(MetadataValue::class, $mdc->get($name2));
-        $this->assertNull($mdc->getValue($name2));
+        $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name2));
+        $this->assertNull($mdc->get($name2));
         $this->assertSame([$name1, $name2], $mdc->getKeys());
 
         // Test set that overwrites.
         $value2 = 2;
         $mdc->set($name1, $value2);
         $this->assertTrue($mdc->exists($name1));
-        $mdv1 = $mdc->get($name1);
+        $mdv1 = $mdc->getMetadataValue($name1);
         $this->assertInstanceOf(MetadataValue::class, $mdv1);
         $this->assertSame(1, $mdv1->count());
-        $this->assertSame($value2, $mdc->getValue($name1));
+        $this->assertSame($value2, $mdc->get($name1));
 
         // Test add that adds.
         $mdc->add($name1, $value1);
         $this->assertTrue($mdc->exists($name1));
-        $mdv1 = $mdc->get($name1);
+        $mdv1 = $mdc->getMetadataValue($name1);
         $this->assertInstanceOf(MetadataValue::class, $mdv1);
         $this->assertSame(2, $mdv1->count());
-        $this->assertSame([$value2, $value1], $mdc->getValue($name1));
+        $this->assertSame([$value2, $value1], $mdc->get($name1));
 
         // Test remove.
         $mdc->remove($name1);
         $this->assertFalse($mdc->exists($name1));
+        $this->assertNull($mdc->getMetadataValue($name1));
         $this->assertNull($mdc->get($name1));
-        $this->assertNull($mdc->getValue($name1));
 
         $mdc->remove($name2);
         $this->assertFalse($mdc->exists($name2));
+        $this->assertNull($mdc->getMetadataValue($name2));
         $this->assertNull($mdc->get($name2));
-        $this->assertNull($mdc->getValue($name2));
     }
 }

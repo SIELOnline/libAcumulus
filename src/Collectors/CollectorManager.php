@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Config\Mappings;
-use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Customer;
@@ -33,8 +32,7 @@ use Siel\Acumulus\Invoice\Source;
  *
  * Enter the CollectorManager that, like a controller:
  * - Creates the required {@see Collector Collectors}.
- * - Gets the mappings from {@see Mappings}, that in turn gets them from
- *   {@see Mapping} and shop defaults (via {@see ShopCapabilities}.
+ * - Gets the mappings from {@see Mappings}.
  * - Populates the propertySources parameter.
  * - Executes the Collectors.
  * - Assembles the results (merge child objects into their parent).

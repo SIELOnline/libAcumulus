@@ -68,21 +68,21 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($invoice->invoiceNotes);
 
         $meta = $invoice->getMetadata();
-        $this->assertSame(Source::Order, $meta->getValue('meta-type'));
-        $this->assertSame(3, $meta->getValue('meta-id'));
-        $this->assertSame(3, $meta->getValue('meta-reference'));
-        $this->assertEquals('2022-12-01', $meta->getValue('meta-date'));
-        $this->assertSame('pending', $meta->getValue('meta-status'));
-        $this->assertSame('paypal', $meta->getValue('meta-payment-method'));
+        $this->assertSame(Source::Order, $meta->get('meta-type'));
+        $this->assertSame(3, $meta->get('meta-id'));
+        $this->assertSame(3, $meta->get('meta-reference'));
+        $this->assertEquals('2022-12-01', $meta->get('meta-date'));
+        $this->assertSame('pending', $meta->get('meta-status'));
+        $this->assertSame('paypal', $meta->get('meta-payment-method'));
 
         /** @var \Siel\Acumulus\Invoice\Currency $currency */
-        $currency = $meta->getValue(Meta::Currency);
+        $currency = $meta->get(Meta::Currency);
         $this->assertSame('EUR', $currency->currency);
         $this->assertEqualsWithDelta(1.0, $currency->rate, 0.000001);
         $this->assertFalse($currency->doConvert);
 
         /** @var \Siel\Acumulus\Invoice\Totals $totals */
-        $totals = $meta->getValue(Meta::Totals);
+        $totals = $meta->get(Meta::Totals);
         $this->assertEqualsWithDelta(50.4, $totals->amountInc, 0.001);
         $this->assertEqualsWithDelta(8.75, $totals->amountVat, 0.001);
         $this->assertEqualsWithDelta(41.65, $totals->amountEx, 0.001);

@@ -94,7 +94,7 @@ trait AcumulusObjectArrayAccessTrait
             $result = $this->$offset;
         } else {
             // Metadata.
-            $result = $this->metadata->getValue($offset);
+            $result = $this->metadata->get($offset);
         }
         return $result;
     }

@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Meta;
 
+use function count;
 use function is_string;
 
 /**
@@ -36,7 +37,6 @@ use function is_string;
 class MetadataValue
 {
     private array $value = [];
-    private int $count = 0;
 
     /**
      * @param mixed ...$values
@@ -50,16 +50,27 @@ class MetadataValue
 
     public function count(): int
     {
-        return $this->count;
+        return count($this->value);
     }
 
     /**
      * Returns the value of this property.
      *
-     * Note: this will often be a scalar value, but this may also be a (keyed)
-     * array or a stdClass/object with all public properties.
+     * Note: this will often be a scalar value, but this may also be a more
+     * complex type, though to be useful, it should be "stringable" or "json
+     * encodable" in that case.
      *
-     * @return mixed|null
+     * param int|null $index
+     *   @todo: behavior for all these cases. Add a constructor parameter $isMulti?
+     *
+     * @return array|mixed|null
+     *   If
+     *   - $index = null: all values for thisMetadataValue, or  null if it has
+     *     no values (note: thus not an empty array, as null is more logical
+     *     when
+     *
+     * @todo: add a parameter ?int $index = null ? in that case also add it to
+     *   {@see \Siel\Acumulus\Data\MetadataCollection::get()}
      */
     public function get()
     {
@@ -82,7 +93,6 @@ class MetadataValue
     public function add($value): void
     {
         $this->value[] = $value;
-        $this->count++;
     }
 
     public function __toString(): string

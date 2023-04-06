@@ -77,10 +77,10 @@ abstract class ShopCapabilities
      *
      * @return string[][]
      *   A keyed array of keyed arrays. At the 1st level the keys are the
-     *   {@see \Siel\Acumulus\Config\Mappings}::... constants and the values are
-     *   the mappings for that object type. A mapping being a keyed array, with
-     *   as keys the property names and as values a so-called field expansion
-     *   specification, see {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     *   Data\...Type::... constants and the values are the mappings for that
+     *   object type. A mapping being a keyed array, with as keys the property
+     *   names and as values a so-called field expansion specification, see
+     *   {@see \Siel\Acumulus\Helpers\FieldExpander}.
      *
      * @todo: make abstract when implemented for all shops.
      */
@@ -96,11 +96,11 @@ abstract class ShopCapabilities
      * shop dependent.
      *
      * @return string[][]
-     *   A keyed array of keyed arrays. At the 1st level the keys are the
-     *   {@see \Siel\Acumulus\Config\Mappings}::... constants and the values are
-     *   the mappings for that object type. A mapping being a keyed array, with
-     *   as keys the metadata names and as values a so-called field expansion
-     *   specification, see {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     *   A keyed array of keyed arrays. At the 1st level the keys are
+     *   Data\...Type::... constants and the values are the mappings for that
+     *   object type. A mapping being a keyed array, with as keys the metadata
+     *   names and as values a so-called field expansion specification, see
+     *   {@see \Siel\Acumulus\Helpers\FieldExpander}.
      *
      * @todo: make abstract when implemented for all shops.
      */

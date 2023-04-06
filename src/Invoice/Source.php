@@ -54,6 +54,7 @@ abstract class Source
             $this->shopSource = $idOrSource;
             $this->setId();
         }
+        // @todo: lazy loading in getter.
         $this->setInvoice();
     }
 
@@ -342,6 +343,22 @@ abstract class Source
     }
 
     /**
+     * Returns the id of the web shop invoice linked to this source.
+     *
+     * This base implementation will return null, invoices not supported. So,
+     * override if a shop supports invoices as proper objects on their own,
+     * stored under their own id.
+     *
+     * @return int|string|null
+     *   The reference of the (web shop) invoice linked to this source, or null
+     *   if no invoice is linked to this source.
+     */
+    public function getInvoiceId()
+    {
+        return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
      * Returns the reference of the web shop invoice linked to this source.
      *
      * @return int|string|null
@@ -396,7 +413,7 @@ abstract class Source
      *
      * @return Source
      *   If the invoice source is a credit note, its original order is returned,
-     *   otherwise, the invoice source is an order itself. $this is returned.
+     *   otherwise, the invoice source is an order itself and $this is returned.
      */
     public function getOrder(): Source
     {
@@ -554,6 +571,8 @@ abstract class Source
      * @return mixed
      *   The return value of that method call, or null if the method does not
      *   exist.
+     *
+     * @todo: all methods called via this method can be made protected/private.
      */
     protected function callTypeSpecificMethod(string $method, ...$args)
     {

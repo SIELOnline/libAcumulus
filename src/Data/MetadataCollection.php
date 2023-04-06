@@ -22,7 +22,7 @@ class MetadataCollection
     /**
      * Returns the {@see MetadataValue} object for $name, or null if not set.
      */
-    public function get(string $name): ?MetadataValue
+    public function getMetadataValue(string $name): ?MetadataValue
     {
         return $this->metadata[$name] ?? null;
     }
@@ -35,13 +35,13 @@ class MetadataCollection
      * distinguish these 2 situations. For these cases, use
      * {@see MetadataValue::count()}.
      *
-     * @return mixed|null
+     * @return array|mixed|null
      *   The value for the given metadata name, or null if not set.
      */
-    public function getValue(string $name)
+    public function get(string $name)
     {
         /** @noinspection NullPointerExceptionInspection */
-        return $this->exists($name) ? $this->get($name)->get() : null;
+        return $this->exists($name) ? $this->getMetadataValue($name)->get() : null;
     }
 
     /**

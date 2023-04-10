@@ -248,6 +248,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // WooCommerce: The properties for both addresses are always filled.
         return [
+            DataType::Invoice => [
+                // @todo: fields that come from the Order, metadata (if it comes
+                //   from Source, it should probably be in config (for now).
+            ],
             DataType::Customer => [
                 // Customer defaults.
                 //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
@@ -284,9 +288,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             EmailAsPdfType::Invoice => [
                 'emailTo' => '[source::getOrder()::getSource()::get_billing_email()]',
-            ],
-            DataType::Invoice => [
-                // @todo: fields that come from source, metadata
             ],
             LineType::Item => [
                 'itemNumber' => '[sku]',
@@ -333,7 +334,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDateToUseOptions(): array
     {
         $result = parent::getDateToUseOptions();
-        unset($result[Config::InvoiceDate_InvoiceCreate]);
+        unset($result[Config::IssueDateSource_InvoiceCreate]);
         return $result;
     }
 

@@ -367,7 +367,7 @@ abstract class ShopCapabilities
      *
      * Overrides should typically return a subset of the constants defined in
      * this base implementation, but including at least
-     * {@see Config::InvoiceDate_Transfer}.
+     * {@see Config::IssueDateSource_Transfer}.
      *
      * @return string[]
      *   An array keyed by the option values and having translated descriptions
@@ -376,9 +376,9 @@ abstract class ShopCapabilities
     public function getDateToUseOptions(): array
     {
         return [
-            Config::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
-            Config::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
-            Config::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
+            Config::IssueDateSource_InvoiceCreate => $this->t('option_dateToUse_1'),
+            Config::IssueDateSource_OrderCreate => $this->t('option_dateToUse_2'),
+            Config::IssueDateSource_Transfer => $this->t('option_dateToUse_3'),
         ];
     }
 

@@ -42,7 +42,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return [
             DataType::Invoice => [
-
+                // @todo: fields that come from the Order, metadata (if it comes
+                //   from Source, it should probably be in config (for now).
             ],
             DataType::Customer => [
                 'contactYourId' => '[source::getOrder()::getSource()::customer::id]',

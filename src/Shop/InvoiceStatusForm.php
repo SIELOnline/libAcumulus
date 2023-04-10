@@ -925,9 +925,9 @@ class InvoiceStatusForm extends Form
             if ($localPaymentStatus === Api::PaymentStatus_Paid) {
                 $shopSettings = $this->acumulusConfig->getShopSettings();
                 $dateToUse = $shopSettings['dateToUse'];
-                if ($dateToUse !== Config::InvoiceDate_Transfer) {
+                if ($dateToUse !== Config::IssueDateSource_Transfer) {
                     $defaultPaymentDate = $source->getInvoiceDate();
-                    if ($dateToUse !== Config::InvoiceDate_InvoiceCreate || empty($defaultPaymentDate)) {
+                    if ($dateToUse !== Config::IssueDateSource_InvoiceCreate || empty($defaultPaymentDate)) {
                         $defaultPaymentDate = $source->getDate();
                     }
                 }

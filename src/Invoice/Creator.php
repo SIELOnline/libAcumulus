@@ -454,7 +454,7 @@ abstract class Creator
             $invoice[Tag::Number] = $this->getInvoiceNumber($sourceToUse);
         }
         $dateToUse = $shopSettings['dateToUse'];
-        if ($dateToUse !== Config::InvoiceDate_Transfer) {
+        if ($dateToUse !== Config::IssueDateSource_Transfer) {
             $invoice[Tag::IssueDate] = $this->getInvoiceDate($dateToUse);
         }
 
@@ -546,7 +546,7 @@ abstract class Creator
     {
         $result = $this->invoiceSource->getInvoiceDate();
         /** @noinspection TypeUnsafeComparisonInspection */
-        if ($dateToUse != Config::InvoiceDate_InvoiceCreate || empty($result)) {
+        if ($dateToUse != Config::IssueDateSource_InvoiceCreate || empty($result)) {
             $result = $this->invoiceSource->getDate();
         }
         return $result;

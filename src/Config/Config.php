@@ -60,9 +60,9 @@ class Config
     public const InvoiceNrSource_ShopOrder = 2;
     public const InvoiceNrSource_Acumulus = 3;
 
-    public const InvoiceDate_InvoiceCreate = 1;
-    public const InvoiceDate_OrderCreate = 2;
-    public const InvoiceDate_Transfer = 3;
+    public const IssueDateSource_InvoiceCreate = 1;
+    public const IssueDateSource_OrderCreate = 2;
+    public const IssueDateSource_Transfer = 3;
 
     public const Nature_Unknown = 0;
     public const Nature_Services = 1;
@@ -1001,7 +1001,7 @@ class Config
                 'dateToUse' => [
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => Config::InvoiceDate_InvoiceCreate,
+                    'default' => Config::IssueDateSource_InvoiceCreate,
                 ],
                 'triggerOrderStatus' => [
                     'group' => 'event',
@@ -1134,7 +1134,7 @@ class Config
                     'type' => 'int',
                     'default' => 0,
                 ],
-                'propertyMappings' => [
+                Config::PropertyMappings => [
                     'group' => 'mappings',
                     'type' => 'array',
                     'default' => [
@@ -1143,19 +1143,6 @@ class Config
                             'paymentDate' => '[source::getPaymentDate()]',
                             'description' => '[source::getTypeLabel(2)+source::getReference()'
                                 . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
-                            'meta' => [
-                                Meta::Type => '[source::getType()]',
-                                Meta::Id => '[source::getId()]',
-                                Meta::Reference => '[source::getReference()]',
-                                Meta::Date => '[source::getDate()]',
-                                Meta::Status => '[source::getStatus()]',
-                                Meta::ShopInvoiceId => '[source::getShopInvoiceId()]',
-                                Meta::ShopInvoiceReference => '[source::getShopInvoiceReference()]',
-                                Meta::ShopInvoiceDate => '[source::getShopInvoiceDate()]',
-                                Meta::PaymentMethod => '[source::getPaymentMethod()]',
-                                Meta::Currency => '[source::getCurrency()]',
-                                Meta::Totals => '[source::getTotals()]',
-                            ],
                         ],
                         DataType::Customer => [
                         ],
@@ -1174,7 +1161,7 @@ class Config
                         ],
                     ],
                 ],
-                'metadataMappings' => [
+                Config::MetadataMappings => [
                     'group' => 'mappings',
                     'type' => 'array',
                     'default' => [
@@ -1185,6 +1172,9 @@ class Config
                             Meta::Date => '[source::getDate()]',
                             Meta::Status => '[source::getStatus()]',
                             Meta::PaymentMethod => '[source::getPaymentMethod()]',
+                            Meta::ShopInvoiceId => '[source::getShopInvoiceId()]',
+                            Meta::ShopInvoiceReference => '[source::getShopInvoiceReference()]',
+                            Meta::ShopInvoiceDate => '[source::getShopInvoiceDate()]',
                             Meta::Currency => '[source::getCurrency()]',
                             Meta::Totals => '[source::getTotals()]',
                         ],

@@ -50,8 +50,9 @@ abstract class Collector implements CollectorInterface
      * collected.
      *
      * @return string
-     *   The non-qualified name of the child classes of {@see AcumulusObject:
-     *   'Invoice', 'Customer', 'Address', 'Line', or 'EmailAsPdf'.
+     *   The class name of the child clas of {@see AcumulusObject} this
+     *   Collector is meant or operate on: 'Invoice', 'Customer', 'Address',
+     *   'Line', or 'EmailAsPdf'.
      */
     protected function getAcumulusObjectType(): string
     {
@@ -106,19 +107,8 @@ abstract class Collector implements CollectorInterface
     protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldSpecifications): void
     {
         foreach ($fieldSpecifications as $field => $pattern) {
-            if ($acumulusObject->isProperty($field)) {
-                if ($pattern !== null) {
-                    $this->expandAndSet($acumulusObject, $field, $pattern);
-                }
-            } elseif ($field === 'meta') {
-                // Meta is an array of mappings for metadata.
-                foreach ($pattern as $metaField => $metaPattern) {
-                    if ($metaPattern !== null) {
-                        $this->expandAndSetMeta($acumulusObject, $metaField, $metaPattern);
-                    }
-                }
-            } else {
-                $this->log->notice('%s: %s does not have a property %s', __METHOD__, get_class($acumulusObject), $field);
+            if ($pattern !== null) {
+                $this->expandAndSet($acumulusObject, $field, $pattern);
             }
         }
     }
@@ -138,10 +128,10 @@ abstract class Collector implements CollectorInterface
     /**
      * Sets a property of an Acumulus object to an expanded value.
      *
-     * @param \Siel\Acumulus\Data\AcumulusObject $object
+     * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      *   An object to set the property on.
-     * @param string $property
-     *   The name of the property to set.
+     * @param string $field
+     *   The name of the property or metadata key to set.
      * @param mixed $value
      *   The value to set the property to, or a pattern to expand and set the
      *   resulting value to the property.
@@ -152,19 +142,22 @@ abstract class Collector implements CollectorInterface
      * @return bool
      *   Whether the value was set.
      */
-    protected function expandAndSet(AcumulusObject $object, string $property, $value, int $mode = PropertySet::Always): bool
+    protected function expandAndSet(AcumulusObject $acumulusObject, string $field, $value, int $mode = PropertySet::Always): bool
     {
-        return $object->set($property, $this->getValue($value), $mode);
-    }
-
-    /**
-     * Adds an expanded metadata value to an Acumulus object.
-     *
-     * @param mixed $value
-     */
-    protected function expandAndSetMeta(AcumulusObject $object, string $meta, $value): void
-    {
-        $object->getMetadata()->add($meta, $this->getValue($value));
+        if ($acumulusObject->isProperty($field)) {
+            return $acumulusObject->set($field, $this->expandValue($value), $mode);
+        } elseif (strncmp($field, 'meta', strlen('meta')) === 0) {
+            $acumulusObject->metadataAdd($field, $this->expandValue($value));
+            return true;
+        } else {
+            $this->log->notice(
+                '%s: %s does not have a property %s, nor is it considered metadata',
+                __METHOD__,
+                get_class($acumulusObject),
+                $field
+            );
+            return false;
+        }
     }
 
     /**
@@ -177,7 +170,7 @@ abstract class Collector implements CollectorInterface
      *   The expanded value, or the value itself it was not a field
      *   specification.
      */
-    protected function getValue($value)
+    protected function expandValue($value)
     {
         if (is_string($value)) {
             $value = $this->expand($value);

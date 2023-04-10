@@ -122,7 +122,7 @@ class CollectorManager
     public function collectInvoice(Source $source): Invoice
     {
         $invoiceCollector = $this->getContainer()->getCollector('Invoice');
-        $invoiceMappings = $this->getMappings()->getPropertyMappings(DataType::Invoice);
+        $invoiceMappings = $this->getMappings()->getFor(DataType::Invoice);
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
         $invoice = $invoiceCollector->collect(['source' => $source], $invoiceMappings);
 
@@ -137,7 +137,7 @@ class CollectorManager
     public function collectCustomer(Source $source): Customer
     {
         $customerCollector = $this->getContainer()->getCollector('Customer');
-        $customerMappings = $this->getMappings()->getPropertyMappings(DataType::Customer);
+        $customerMappings = $this->getMappings()->getFor(DataType::Customer);
 
         /** @var \Siel\Acumulus\Data\Customer $customer */
         $customer = $customerCollector->collect(['source' => $source], $customerMappings);
@@ -151,7 +151,7 @@ class CollectorManager
     public function collectAddress(Source $source, string $type): Address
     {
         $addressCollector = $this->getContainer()->getCollector('Address');
-        $addressMappings = $this->getMappings()->getPropertyMappings($type);
+        $addressMappings = $this->getMappings()->getFor($type);
         /** @var \Siel\Acumulus\Data\Address $address */
         $address = $addressCollector->collect(['source' => $source], $addressMappings);
         return $address;
@@ -160,7 +160,7 @@ class CollectorManager
     public function collectEmailAsPdf(Source $source, string $type): EmailAsPdf
     {
         $emailAsPdfCollector = $this->getContainer()->getCollector('EmailAsPdf');
-        $emailAsPdfMappings = $this->getMappings()->getPropertyMappings($type);
+        $emailAsPdfMappings = $this->getMappings()->getFor($type);
         $emailAsPdfMappings['emailAsPdfType'] = $type;
         /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */
         $emailAsPdf = $emailAsPdfCollector->collect(['source' => $source], $emailAsPdfMappings);

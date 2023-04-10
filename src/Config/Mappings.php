@@ -57,35 +57,10 @@ class Mappings
      *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may
      *   contain a value of another scalar type.
      */
-    public function getPropertyMappings(string $forType): array
+    public function getFor(string $forType): array
     {
         $mappings = $this->getAllMappings();
-        return $mappings[Mappings::Properties][$forType] ?? [];
-    }
-
-    /**
-     * Returns the metadata mappings for a given object type.
-     *
-     * The {@see \Siel\Acumulus\Collectors\CollectorManager} will retrieve these
-     * mappings and pass them to the {@see \Siel\Acumulus\Collectors\Collector}
-     * that can create the {@see \Siel\Acumulus\Data\AcumulusObject} of the
-     * right type.
-     *
-     * @param string $forType
-     *   One of the Data\...Type::... constants, indicating for which object
-     *   type the mappings should be returned.
-     *
-     * @return array
-     *   An array with as keys the metadata names and as values mappings for the
-     *   specified metadata field. These are typically strings that may contain
-     *   a field expansion specification, see
-     *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may
-     *   contain a value of another scalar type.
-     */
-    public function getMetadataMappings(string $forType): array
-    {
-        $mappings = $this->getAllMappings();
-        return $mappings[Mappings::Metadata][$forType] ?? [];
+        return ($mappings[Mappings::Properties][$forType] ?? []) + ($mappings[Mappings::Metadata][$forType] ?? []);
     }
 
     /**

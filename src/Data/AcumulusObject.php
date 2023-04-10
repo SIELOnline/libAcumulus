@@ -53,6 +53,7 @@ use function strlen;
 abstract class AcumulusObject implements ArrayAccess
 {
     use AcumulusObjectArrayAccessTrait;
+    use AcumulusObjectMetadataTrait;
 
     /**
      * @var array[]
@@ -64,7 +65,6 @@ abstract class AcumulusObject implements ArrayAccess
 
     /** @var \Siel\Acumulus\Data\AcumulusProperty[] */
     private array $data = [];
-    private MetadataCollection $metadata;
 
     public function __construct()
     {
@@ -72,7 +72,6 @@ abstract class AcumulusObject implements ArrayAccess
             $property = new AcumulusProperty($propertyDefinition);
             $this->data[$property->getName()] = $property;
         }
-        $this->metadata = new MetadataCollection();
     }
 
     /**
@@ -82,12 +81,6 @@ abstract class AcumulusObject implements ArrayAccess
      *   'allowedValues' (optional).
      */
     abstract protected function getPropertyDefinitions(): array;
-
-    // PHP 8.1: a read-only property suffices here.
-    public function getMetadata(): MetadataCollection
-    {
-        return $this->metadata;
-    }
 
     /**
      * Implements direct property get access for the

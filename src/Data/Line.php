@@ -60,4 +60,18 @@ class Line extends AcumulusObject
     {
         $this->children[] = $child;
     }
+
+    public function hasWarning(): bool
+    {
+        $hasWarning = parent::hasWarning();
+        if (!$hasWarning) {
+            foreach ($this->getChildren() as $line) {
+                if ($line->hasWarning()) {
+                    $hasWarning  = true;
+                    break;
+                }
+            }
+        }
+        return $hasWarning;
+    }
 }

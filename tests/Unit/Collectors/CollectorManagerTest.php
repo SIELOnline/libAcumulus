@@ -68,12 +68,15 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($invoice->invoiceNotes);
 
         $meta = $invoice->getMetadata();
-        $this->assertSame(Source::Order, $meta->get('meta-type'));
-        $this->assertSame(3, $meta->get('meta-id'));
-        $this->assertSame(3, $meta->get('meta-reference'));
-        $this->assertEquals('2022-12-01', $meta->get('meta-date'));
-        $this->assertSame('pending', $meta->get('meta-status'));
-        $this->assertSame('paypal', $meta->get('meta-payment-method'));
+        $this->assertSame(Source::Order, $meta->get(Meta::Type));
+        $this->assertSame(3, $meta->get(Meta::Id));
+        $this->assertSame(3, $meta->get(Meta::Reference));
+        $this->assertEquals('2022-12-01', $meta->get(Meta::Date));
+        $this->assertSame('pending', $meta->get(Meta::Status));
+        $this->assertSame('paypal', $meta->get(Meta::PaymentMethod));
+        $this->assertNull($meta->get(Meta::ShopInvoiceId));
+        $this->assertNull($meta->get(Meta::ShopInvoiceReference));
+        $this->assertNull($meta->get(Meta::ShopInvoiceDate));
 
         /** @var \Siel\Acumulus\Invoice\Currency $currency */
         $currency = $meta->get(Meta::Currency);

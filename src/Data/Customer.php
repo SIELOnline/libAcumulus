@@ -46,17 +46,17 @@ use Siel\Acumulus\Api;
  * @method bool setType(?int $value, int $mode = PropertySet::Always)
  * @method bool setVatTypeId(?int $value, int $mode = PropertySet::Always)
  * @method bool setContactYourId(?string $value, int $mode = PropertySet::Always)
- * @method bool setContactStatus(?bool $value, int $mode = PropertySet::Always)
+ * @method bool setContactStatus(bool|int|null $value, int $mode = PropertySet::Always)
  * @method bool setWebsite(?string $value, int $mode = PropertySet::Always)
  * @method bool setVatNumber(?string $value, int $mode = PropertySet::Always)
  * @method bool setTelephone(?string $value, int $mode = PropertySet::Always)
  * @method bool setTelephone2(?string $value, int $mode = PropertySet::Always)
  * @method bool setFax(?string $value, int $mode = PropertySet::Always)
  * @method bool setEmail(?string $value, int $mode = PropertySet::Always)
- * @method bool setOverwriteIfExists(?bool $value, int $mode = PropertySet::Always)
+ * @method bool setOverwriteIfExists(bool|int|null $value, int $mode = PropertySet::Always)
  * @method bool setBankAccountNumber(?string $value, int $mode = PropertySet::Always)
  * @method bool setMark(?string $value, int $mode = PropertySet::Always)
- * @method bool setDisableDuplicates(?bool $value, int $mode = PropertySet::Always)
+ * @method bool setDisableDuplicates(bool|int|null $value, int $mode = PropertySet::Always)
  *
  * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
  */
@@ -109,5 +109,17 @@ class Customer extends AcumulusObject
     public function setShippingAddress(?Address $shippingAddress): void
     {
         $this->shippingAddress = $shippingAddress;
+    }
+
+    public function hasWarning(): bool
+    {
+        $hasWarning = parent::hasWarning();
+        if (!$hasWarning && $this->getShippingAddress() !== null) {
+            $hasWarning = $this->getShippingAddress()->hasWarning();
+        }
+        if (!$hasWarning && $this->getInvoiceAddress() !== null) {
+            $hasWarning = $this->getInvoiceAddress()->hasWarning();
+        }
+        return $hasWarning;
     }
 }

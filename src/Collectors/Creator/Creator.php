@@ -9,13 +9,9 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Collectors\Creator;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Collectors\Collector;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
-use Siel\Acumulus\Helpers\FieldExpander;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
@@ -26,7 +22,6 @@ use Siel\Acumulus\Tag;
 use function func_get_args;
 use function is_array;
 use function is_int;
-use function is_string;
 
 /**
  * Creates an Acumulus invoice.
@@ -108,7 +103,7 @@ use function is_string;
  * Hierarchical lines are "corrected" in the Completor phase, see
  * {@see FlattenerInvoiceLines}
  */
-abstract class Creator extends Collector
+abstract class Creator
 {
     public const VatRateSource_Exact0 = 'exact-0';
     public const VatRateSource_Calculated = 'calculated';
@@ -134,18 +129,13 @@ abstract class Creator extends Collector
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\FieldExpander $fieldExpander
      * @param \Siel\Acumulus\Helpers\Countries $countries
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
-     * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(FieldExpander $fieldExpander, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config
-    $config, Translator $translator, Log $log)
+    public function __construct(Countries $countries, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
     {
-        parent::__construct($fieldExpander, $container, $log);
         $this->countries = $countries;
         $this->shopCapabilities = $shopCapabilities;
         $this->config = $config;
@@ -153,12 +143,6 @@ abstract class Creator extends Collector
         $invoiceHelperTranslations = new Translations();
         $this->translator->add($invoiceHelperTranslations);
     }
-
-    protected function getAcumulusObjectType(): string
-    {
-        return 'Invoice';
-    }
-
 
     /**
      * Helper method to translate strings.
@@ -184,118 +168,7 @@ abstract class Creator extends Collector
      */
     protected function getInvoice(): array
     {
-        $invoice = [];
-
-        $shopSettings = $this->config->getShopSettings();
-        $invoiceSettings = $this->config->getInvoiceSettings();
-
-        // Data type.
-        $concept = $invoiceSettings['concept'];
-        if ($concept === Config::Concept_Plugin) {
-            $concept = Api::Concept_No;
-        }
-        $this->addDefaultEmpty($invoice, Tag::Concept, $concept);
-
-        // Meta info: internal order/refund id
-        $invoice[Meta::Id] = $this->invoiceSource->getId();
-
-        // Data number and date.
-        $sourceToUse = $shopSettings['invoiceNrSource'];
-        if ($sourceToUse !== Config::InvoiceNrSource_Acumulus) {
-            $invoice[Tag::Number] = $this->getInvoiceNumber($sourceToUse);
-        }
-        $dateToUse = $shopSettings['dateToUse'];
-        if ($dateToUse !== Config::InvoiceDate_Transfer) {
-            $invoice[Tag::IssueDate] = $this->getInvoiceDate($dateToUse);
-        }
-
-        // Bookkeeping (account number, cost center).
-        $paymentMethod = $this->invoiceSource->getPaymentMethod();
-        if (!empty($paymentMethod)) {
-            if (!empty($invoiceSettings['paymentMethodCostCenter'][$paymentMethod])) {
-                $invoice[Tag::CostCenter] = $invoiceSettings['paymentMethodCostCenter'][$paymentMethod];
-            }
-            if (!empty($invoiceSettings['paymentMethodAccountNumber'][$paymentMethod])) {
-                $invoice[Tag::AccountNumber] = $invoiceSettings['paymentMethodAccountNumber'][$paymentMethod];
-            }
-        }
-        $this->addDefault($invoice, Tag::CostCenter, $invoiceSettings['defaultCostCenter']);
-        $this->addDefault($invoice, Tag::AccountNumber, $invoiceSettings['defaultAccountNumber']);
-
-        // Payment info.
-        $invoice[Tag::PaymentStatus] = $this->invoiceSource->getPaymentStatus();
-        if ($invoice[Tag::PaymentStatus] === Api::PaymentStatus_Paid) {
-            $this->addIfNotEmpty($invoice, Tag::PaymentDate, $this->invoiceSource->getPaymentDate());
-        }
-
-        // Additional descriptive info.
-        $this->addTokenDefault($invoice, Tag::Description, $invoiceSettings['description']);
-        $this->addTokenDefault($invoice, Tag::DescriptionText, $invoiceSettings['descriptionText']);
-        // Change newlines to the literal \n, tabs are not supported.
-        if (!empty($invoice[Tag::DescriptionText])) {
-            $invoice[Tag::DescriptionText] = str_replace(["\r\n", "\r", "\n"], '\n', $invoice[Tag::DescriptionText]);
-        }
-
-        // Acumulus invoice template to use: this depends on the payment status
-        // which in some shops is notoriously hard to get right. So, we postpone
-        // this to after the invoice_created event when the payment status may
-        // be assumed to be correct.
-        $invoice[Tag::Template] = '';
-
-        // Data notes.
-        $this->addTokenDefault($invoice, Tag::InvoiceNotes, $invoiceSettings['invoiceNotes']);
-        // Change newlines to the literal \n and tabs to \t.
-        if (!empty($invoice[Tag::InvoiceNotes])) {
-            $invoice[Tag::InvoiceNotes] = str_replace(["\r\n", "\r", "\n", "\t"], ['\n', '\n', '\n', '\t'], $invoice[Tag::InvoiceNotes]);
-        }
-
-        return $invoice;
-    }
-
-    /**
-     * Returns the number to use as invoice number.
-     *
-     * @param int $invoiceNumberSource
-     *   \Siel\Acumulus\PluginConfig::InvoiceNrSource_ShopInvoice or
-     *   \Siel\Acumulus\PluginConfig::InvoiceNrSource_ShopOrder.
-     *
-     * @return int|null
-     *   The number to use as invoice "number" on the Acumulus invoice. Note
-     *   that Acumulus expects a number and does not accept string prefixes or
-     *   such.
-     */
-    protected function getInvoiceNumber(int $invoiceNumberSource): ?int
-    {
-        $result = $invoiceNumberSource === Config::InvoiceNrSource_ShopInvoice ? $this->invoiceSource->getInvoiceReference() : null;
-        if (empty($result)) {
-            $result = $this->invoiceSource->getReference();
-        }
-        if (is_string($result)) {
-            // Filter to an int. Just casting to an int would result in 0 with
-            // any invoice number that has a prefix.
-            $result = preg_replace('/[^0-9]/', '', $result);
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the date to use as invoice date.
-     *
-     * @param int $dateToUse
-     *   \Siel\Acumulus\PluginConfig::InvoiceDate_InvoiceCreate or
-     *   \Siel\Acumulus\PluginConfig::InvoiceDate_OrderCreate
-     *
-     * @return string
-     *   Date to use as invoice date on the Acumulus invoice: yyyy-mm-dd.
-     */
-    protected function getInvoiceDate(int $dateToUse): string
-    {
-        $result = $this->invoiceSource->getInvoiceDate();
-        /** @noinspection TypeUnsafeComparisonInspection */
-        if ($dateToUse != Config::InvoiceDate_InvoiceCreate || empty($result)) {
-            $result = $this->invoiceSource->getDate();
-        }
-        return $result;
+        return [];
     }
 
     /**

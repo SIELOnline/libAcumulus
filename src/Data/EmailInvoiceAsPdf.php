@@ -17,7 +17,7 @@ use Siel\Acumulus\Api;
  *
  * @property ?bool $ubl
  *
- * @method bool setUbl(?bool $value, int $mode = PropertySet::Always)
+ * @method bool setUbl(bool|int|null $value, int $mode = PropertySet::Always)
  */
 class EmailInvoiceAsPdf extends EmailAsPdf
 {

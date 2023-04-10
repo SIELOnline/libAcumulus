@@ -27,10 +27,10 @@ use Siel\Acumulus\Api;
  * @method bool setEmailFrom(?string $value, int $mode = PropertySet::Always)
  * @method bool setSubject(?string $value, int $mode = PropertySet::Always)
  * @method bool setMessage(?string $value, int $mode = PropertySet::Always)
- * @method bool setConfirmReading(?bool $value, int $mode = PropertySet::Always)
- * @method bool setGfx(?bool $value, int $mode = PropertySet::Always)
+ * @method bool setConfirmReading(bool|int|null $value, int $mode = PropertySet::Always)
+ * @method bool setGfx(bool|int|null $value, int $mode = PropertySet::Always)
  */
-class EmailAsPdf extends AcumulusObject
+abstract class EmailAsPdf extends AcumulusObject
 {
     protected function getPropertyDefinitions(): array
     {

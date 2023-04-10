@@ -20,6 +20,8 @@ Refactorings:
   and added ShopCapabilities::getDefaultShopMappings(). Moved all mappings in the
   getShopDefaults() of each shop to getDefaultShopMappings().
 - Renamed Config::InvoiceDate_... constants to Config::IssueDateSource_...
+- Class Creator and Completor: extracted single task completors into the new Completors
+  namespace.
 
 
 7.6.8 (2023-04-??)

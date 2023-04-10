@@ -27,7 +27,7 @@ use Siel\Acumulus\Api;
  *
  * Metadata can be added via the {@see MetadataCollection} methods.
  *
- * @property ?int $concept
+ * @property ?bool $concept
  * @property ?string $conceptType
  * @property ?int $number
  * @property ?int $vatType
@@ -41,7 +41,7 @@ use Siel\Acumulus\Api;
  * @property ?int $template
  * @property ?string $invoiceNotes
  *
- * @method bool setConcept(?int $value, int $mode = PropertySet::Always)
+ * @method bool setConcept(bool|int|null $value, int $mode = PropertySet::Always)
  * @method bool setConceptType(?string $value, int $mode = PropertySet::Always)
  * @method bool setNumber(?int $value, int $mode = PropertySet::Always)
  * @method bool setVatType(?int $value, int $mode = PropertySet::Always)
@@ -133,5 +133,25 @@ class Invoice extends AcumulusObject
     public function setEmailAsPdf(?EmailAsPdf $emailAsPdf): void
     {
         $this->emailAsPdf = $emailAsPdf;
+    }
+
+    public function hasWarning(): bool
+    {
+        $hasWarning = parent::hasWarning();
+        if (!$hasWarning && $this->getCustomer() !== null) {
+            $hasWarning = $this->getCustomer()->hasWarning();
+        }
+        if (!$hasWarning && $this->getEmailAsPdf() !== null) {
+            $hasWarning = $this->getEmailAsPdf()->hasWarning();
+        }
+        if (!$hasWarning) {
+            foreach ($this->getLines() as $line) {
+                if ($line->hasWarning()) {
+                    $hasWarning  = true;
+                    break;
+                }
+            }
+        }
+        return $hasWarning;
     }
 }

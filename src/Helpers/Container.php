@@ -21,6 +21,7 @@ use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Collectors\CollectorInterface;
 use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Completors\CompletorInterface;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ConfigStore;
 use Siel\Acumulus\Config\ConfigUpgrade;
@@ -515,12 +516,27 @@ class Container
     }
 
     /**
+     * Returns a {@see \Siel\Acumulus\Collectors\Collector} instance of the
+     * given type.
+     *
+     * @param string $type
+     *   The child type of the {@see \Siel\Acumulus\Collectors\Collector}
+     *   requested. The class name only, without namespace and without Collector
+     *   at the end.
+     */
+    public function getInvoiceCompletor(string $type): CompletorInterface
+    {
+        $arguments = [];
+        return $this->getInstance("Complete$type", 'Completors', $arguments);
+    }
+
+    /**
      * Returns a {@see \Siel\Acumulus\Data\AcumulusObject} instance of the
      * given type.
      *
      * @param string $type
      *   The child type of the {@see \Siel\Acumulus\Data\AcumulusObject}
-     *   requested.  The class name only, without namespace.
+     *   requested. The class name only, without namespace.
      */
     public function createAcumulusObject(string $type): AcumulusObject
     {

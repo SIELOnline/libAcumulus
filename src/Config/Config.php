@@ -996,7 +996,7 @@ class Config
                 'invoiceNrSource' => [
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => Config::InvoiceNrSource_ShopInvoice,
+                    'default' => Config::InvoiceNrSource_Acumulus,
                 ],
                 'dateToUse' => [
                     'group' => 'shop',

@@ -261,7 +261,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_invoiceNrSource' => 'Factuurnummer',
         'option_invoiceNrSource_1' => 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een bestelling gekoppeld is, zal het bestelnummer gebruikt worden!',
         'option_invoiceNrSource_2' => 'Gebruik het bestelnummer van uw webwinkel.',
-        'option_invoiceNrSource_3' => 'Laat Acumulus het factuurnummer bepalen.',
+        'option_invoiceNrSource_3' => 'Laat Acumulus het factuurnummer bepalen (aangeraden).',
         'desc_invoiceNrSource' => 'U kunt hier kiezen welk nummer Acumulus als factuurnummer moet gebruiken.',
 
         'field_dateToUse' => 'Factuurdatum',
@@ -671,7 +671,7 @@ If you unchecked the first option, the second option only applies to business cl
         'field_invoiceNrSource' => 'Invoice number',
         'option_invoiceNrSource_1' => 'Use the web shop invoice number. Note: if no invoice has been created for the order yet, the order number will be used!',
         'option_invoiceNrSource_2' => 'Use the web shop order number as invoice number.',
-        'option_invoiceNrSource_3' => 'Have Acumulus create an invoice number.',
+        'option_invoiceNrSource_3' => 'Have Acumulus create the invoice number (recommended).',
         'desc_invoiceNrSource' => 'Select which number to use for the invoice in Acumulus.',
 
         'field_dateToUse' => 'Invoice date',

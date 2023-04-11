@@ -22,6 +22,8 @@ Refactorings:
 - Renamed Config::InvoiceDate_... constants to Config::IssueDateSource_...
 - Class Creator and Completor: extracted single task completors into the new Completors
   namespace.
+- Default source for the invoice number changed to the (recommended) "Let Acumulus create
+  the invoice number". 
 
 
 7.6.8 (2023-04-??)

@@ -146,7 +146,7 @@ abstract class Collector implements CollectorInterface
     {
         if ($acumulusObject->isProperty($field)) {
             return $acumulusObject->set($field, $this->expandValue($value), $mode);
-        } elseif (strncmp($field, 'meta', strlen('meta')) === 0) {
+        } elseif ($this->isMetadata($field)) {
             $acumulusObject->metadataAdd($field, $this->expandValue($value));
             return true;
         } else {
@@ -191,5 +191,19 @@ abstract class Collector implements CollectorInterface
     protected function expand(string $fieldSpecification)
     {
         return $this->getFieldExpander()->expand($fieldSpecification, $this->propertySources);
+    }
+
+    /**
+     * Returns whether $field indicates a metadata name.
+     *
+     * @param string $field
+     *
+     * @return bool
+     *   True if $field indicates a metadata name, false otherwise.
+     */
+    public function isMetadata(string $field): bool
+    {
+        // @todo: add exceptions to the rule (amountinc, vatamount, ...?).
+        return strncmp($field, 'meta', strlen('meta')) === 0;
     }
 }

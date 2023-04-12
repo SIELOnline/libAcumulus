@@ -1,15 +1,17 @@
 <?php
+/**
+ * @noinspection PhpPrivateFieldCanBeLocalVariableInspection  In the future,
+ *   $invoice may be made a local variable, but probably we will need it as a
+ *   property.
+ */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\Completors;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Tag;
 
 /**
  * InvoiceCompletor completes an {@see \Siel\Acumulus\Data\Invoice}.
@@ -49,26 +51,32 @@ class InvoiceCompletor
         return $this->config->get($key);
     }
 
+    /**
+     * Completes an {@see \Siel\Acumulus\Data\Invoice}.
+     *
+     * This phase is executed after the collecting phase.
+     */
     public function complete(Invoice $invoice): void
     {
         $this->invoice = $invoice;
 
-        $this->container->getInvoiceCompletor('InvoiceNumber')->complete($this->invoice, $this->configGet('invoiceNrSource'));
-        $this->container->getInvoiceCompletor('IssueDate')->complete($this->invoice, $this->configGet('dateToUse'));
-        $this->container->getInvoiceCompletor('AccountingInfo')->complete($this->invoice,
-            $this->configGet('defaultCostCenter'),
-            $this->configGet('paymentMethodCostCenter'),
-            $this->configGet('defaultAccountNumber'),
-            $this->configGet('paymentMethodAccountNumber'),
-        );
+        $this->completeCustomer();
+        $this->container->getCompletorTask('Invoice', 'InvoiceNumber')->complete($this->invoice);
+        $this->container->getCompletorTask('Invoice', 'IssueDate')->complete($this->invoice);
+        $this->container->getCompletorTask('Invoice', 'AccountingInfo')->complete($this->invoice);
+        $this->container->getCompletorTask('Invoice', 'MultiLineProperties')->complete($this->invoice);
+        $this->container->getCompletorTask('Invoice', 'Template')->complete($this->invoice);
 
         // As last!
-        $this->container->getInvoiceCompletor('Concept')->complete($this->invoice, $this->configGet('concept'));
+        $this->container->getCompletorTask('Invoice', 'Concept')->complete($this->invoice);
     }
 
-    private function completeAccountingInfo(): void
+    /**
+     * Completes the {@see \Siel\Acumulus\Data\Customer} part of the
+     * {@see \Siel\Acumulus\Data\Invoice}.
+     */
+    protected function completeCustomer(): void
     {
-
+        $this->container->getCompletorTask('Customer', 'Anonymise')->complete($this->invoice->getCustomer());
     }
-
 }

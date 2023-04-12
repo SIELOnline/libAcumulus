@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\Unit\Completors;
+namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
@@ -16,7 +16,7 @@ use Siel\Acumulus\Meta;
 
 /**
  * CompleteInvoiceNumberTest tests the
- * {@see \Siel\Acumulus\Completors\CompleteInvoiceNumber} class.
+ * {@see \Siel\Acumulus\Completors\Invoice\CompleteInvoiceNumber} class.
  */
 class CompleteInvoiceNumberTest extends TestCase
 {
@@ -68,7 +68,9 @@ class CompleteInvoiceNumberTest extends TestCase
      */
     public function testComplete(int $sourceToUse, $orderReference, $invoiceReference, ?int $expected): void
     {
-        $completor = $this->getContainer()->getInvoiceCompletor('InvoiceNumber');
+        $config = $this->getContainer()->getConfig();
+        $config->set('invoiceNrSource', $sourceToUse);
+        $completor = $this->getContainer()->getCompletorTask('Invoice','InvoiceNumber');
         $invoice = $this->getInvoice();
         $invoice->metadataAdd(Meta::Reference, $orderReference);
         $invoice->metadataAdd(Meta::ShopInvoiceReference, $invoiceReference);

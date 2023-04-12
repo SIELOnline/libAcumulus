@@ -5,19 +5,18 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\Unit\Completors;
+namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Meta;
 
 /**
  * CompleteMultiLineInfoTest tests the
- * {@see \Siel\Acumulus\Completors\CompleteMultiLine} class.
+ * {@see \Siel\Acumulus\Completors\Invoice\CompleteMultiLineProperties} class.
  */
-class CompleteMultiLineTest extends TestCase
+class CompleteMultiLinePropertiesTest extends TestCase
 {
     private Container $container;
 
@@ -45,7 +44,7 @@ class CompleteMultiLineTest extends TestCase
 
     public function testComplete(): void
     {
-        $completor = $this->getContainer()->getInvoiceCompletor('MultiLine');
+        $completor = $this->getContainer()->getCompletorTask('Invoice','MultiLineProperties');
         $invoice = $this->getInvoice();
 
         $invoice->descriptionText = ' ';
@@ -57,16 +56,16 @@ class CompleteMultiLineTest extends TestCase
         $this->assertSame('a', $invoice->invoiceNotes);
         $this->assertSame(' ', $invoice->descriptionText);
 
-        $invoice->descriptionText = '1\r\n2\r\n3\r\n';
-        $invoice->invoiceNotes = "\r\n1\r\n2\r\n3\r\n";
+        $invoice->descriptionText = '1\r\n2\t2\r\n3\r\n';
+        $invoice->invoiceNotes = "\r\n1\r\n2\t2\r\n3\r\n";
         $completor->complete($invoice);
-        $this->assertSame('1\r\n2\r\n3\r\n', $invoice->descriptionText);
-        $this->assertSame('\n1\n2\n3\n', $invoice->invoiceNotes);
+        $this->assertSame('1\r\n2\t2\r\n3\r\n', $invoice->descriptionText);
+        $this->assertSame('\n1\n2\t2\n3\n', $invoice->invoiceNotes);
 
         $invoice->descriptionText = "1\r\n2\r3\n";
-        $invoice->invoiceNotes = "\r\n\n\r1\n\r2\r\n\r\n3";
+        $invoice->invoiceNotes = "\r\n\n\r1\n\r2\t\t2\t2\r\n\r\n3";
         $completor->complete($invoice);
         $this->assertSame('1\n2\n3\n', $invoice->descriptionText);
-        $this->assertSame('\n\n\n1\n\n2\n\n3', $invoice->invoiceNotes);
+        $this->assertSame('\n\n\n1\n\n2\t\t2\t2\n\n3', $invoice->invoiceNotes);
     }
 }

@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\Unit\Completors;
+namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
@@ -15,7 +15,7 @@ use Siel\Acumulus\Helpers\Container;
 
 /**
  * CompleteTemplateTest tests the
- * {@see \Siel\Acumulus\Completors\CompleteTemplate} class.
+ * {@see \Siel\Acumulus\Completors\Invoice\CompleteTemplate} class.
  */
 class CompleteTemplateTest extends TestCase
 {
@@ -63,7 +63,10 @@ class CompleteTemplateTest extends TestCase
      */
     public function testComplete(int $paymentStatus, int $defaultInvoiceTemplate, int $defaultInvoicePaidTemplate, int $expected): void
     {
-        $completor = $this->getContainer()->getInvoiceCompletor('Template');
+        $config = $this->getContainer()->getConfig();
+        $config->set('defaultInvoiceTemplate', $defaultInvoiceTemplate);
+        $config->set('defaultInvoicePaidTemplate', $defaultInvoicePaidTemplate);
+        $completor = $this->getContainer()->getCompletorTask('Invoice','Template');
         $invoice = $this->getInvoice();
         $invoice->paymentStatus = $paymentStatus;
         $completor->complete($invoice, $defaultInvoiceTemplate, $defaultInvoicePaidTemplate);

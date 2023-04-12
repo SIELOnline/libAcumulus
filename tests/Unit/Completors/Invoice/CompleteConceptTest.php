@@ -5,10 +5,11 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\Unit\Completors;
+namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Completors\Invoice\CompleteConcept;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
@@ -46,47 +47,55 @@ class CompleteConceptTest extends TestCase
 
     public function testComplete(): void
     {
-        $completor = $this->getContainer()->getInvoiceCompletor('Concept');
+        $config = $this->getContainer()->getConfig();
+        $completor = $this->getContainer()->getCompletorTask('Invoice','Concept');
 
         // Plugin, no warning = false
+        $config->set('concept', Config::Concept_Plugin);
         $invoice = $this->getInvoice();
-        $completor->complete($invoice, Config::Concept_Plugin);
+        $completor->complete($invoice);
         $this->assertFalse($invoice->concept);
 
         // No, no warning = false
+        $config->set('concept', Api::Concept_No);
         $invoice = $this->getInvoice();
-        $completor->complete($invoice, Api::Concept_No);
+        $completor->complete($invoice);
         $this->assertFalse($invoice->concept);
 
         // Yes, no warning = true
+        $config->set('concept', Api::Concept_Yes);
         $invoice = $this->getInvoice();
-        $completor->complete($invoice, Api::Concept_Yes);
+        $completor->complete($invoice);
         $this->assertTrue($invoice->concept);
 
         // Test not overwrite.
-        $completor->complete($invoice, Api::Concept_No);
+        $config->set('concept', Api::Concept_No);
+        $completor->complete($invoice);
         $this->assertTrue($invoice->concept);
 
+        /** @var \Siel\Acumulus\Data\Line $line */
         $line = $this->getContainer()->createAcumulusObject(DataType::Line);
         $line->metadataAdd(Meta::Warning, 'warning');
 
         // Plugin, warning = true
-        /** @var \Siel\Acumulus\Data\Line $line */
+        $config->set('concept', Config::Concept_Plugin);
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
-        $completor->complete($invoice, Config::Concept_Plugin);
+        $completor->complete($invoice);
         $this->assertTrue($invoice->concept);
 
         // No, warning = false
+        $config->set('concept', Api::Concept_No);
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
-        $completor->complete($invoice, Api::Concept_No);
+        $completor->complete($invoice);
         $this->assertFalse($invoice->concept);
 
         // Yes, warning = true
+        $config->set('concept', Api::Concept_Yes);
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
-        $completor->complete($invoice, Api::Concept_Yes);
+        $completor->complete($invoice);
         $this->assertTrue($invoice->concept);
     }
 }

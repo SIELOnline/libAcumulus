@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\Unit\Completors;
+namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\DataType;
@@ -15,7 +15,7 @@ use Siel\Acumulus\Meta;
 
 /**
  * CompleteAccountingInfoTest tests
- * {@see \Siel\Acumulus\Completors\CompleteAccountingInfo}.
+ * {@see \Siel\Acumulus\Completors\Invoice\CompleteAccountingInfo}.
  */
 class CompleteAccountingInfoTest extends TestCase
 {
@@ -77,16 +77,15 @@ class CompleteAccountingInfoTest extends TestCase
         ?int $expectedAccountNumber
     ): void
     {
-        $completor = $this->getContainer()->getInvoiceCompletor('AccountingInfo');
+        $config = $this->getContainer()->getConfig();
+        $config->set('defaultCostCenter', $defaultCostCenter);
+        $config->set('defaultAccountNumber', $defaultAccountNumber);
+        $config->set('paymentMethodCostCenter', $costCenterPerPaymentMethod);
+        $config->set('paymentMethodAccountNumber', $accountNumberPerPaymentMethod);
+        $completor = $this->getContainer()->getCompletorTask('Invoice','AccountingInfo');
         $invoice = $this->getInvoice();
         $invoice->metadataAdd(Meta::PaymentMethod, $paymentMethod);
-        $completor->complete(
-            $invoice,
-            $defaultCostCenter,
-            $costCenterPerPaymentMethod,
-            $defaultAccountNumber,
-            $accountNumberPerPaymentMethod
-        );
+        $completor->complete($invoice);
         $this->assertSame($expectedCostCenter, $invoice->costCenter);
         $this->assertSame($expectedAccountNumber, $invoice->accountNumber);
     }

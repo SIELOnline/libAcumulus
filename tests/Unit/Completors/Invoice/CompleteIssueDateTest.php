@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\Unit\Completors;
+namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 
 use DateTime;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ use Siel\Acumulus\Meta;
 
 /**
  * CompleteInvoiceNumberTest tests the
- * {@see \Siel\Acumulus\Completors\CompleteIssueDate} class.
+ * {@see \Siel\Acumulus\Completors\Invoice\CompleteIssueDate} class.
  */
 class CompleteIssueDateTest extends TestCase
 {
@@ -71,7 +71,9 @@ class CompleteIssueDateTest extends TestCase
      */
     public function testComplete(int $issueDateSource, ?string $orderDate, ?string $invoiceDate, ?DateTime $expected): void
     {
-        $completor = $this->getContainer()->getInvoiceCompletor('IssueDate');
+        $config = $this->getContainer()->getConfig();
+        $config->set('dateToUse', $issueDateSource);
+        $completor = $this->getContainer()->getCompletorTask('Invoice','IssueDate');
         $invoice = $this->getInvoice();
         $invoice->metadataAdd(Meta::Date, $orderDate);
         $invoice->metadataAdd(Meta::ShopInvoiceDate, $invoiceDate);

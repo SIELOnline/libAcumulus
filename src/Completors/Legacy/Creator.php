@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Collectors\Creator;
+namespace Siel\Acumulus\Completors\Legacy;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
@@ -157,18 +157,6 @@ abstract class Creator
     protected function t(string $key): string
     {
         return $this->translator->get($key);
-    }
-
-    /**
-     * Returns the 'invoice' part of the invoice add structure.
-     *
-     * @return array
-     *   A keyed array with the invoice data (without the invoice lines and the
-     *   'emailaspdf' tag).
-     */
-    protected function getInvoice(): array
-    {
-        return [];
     }
 
     /**

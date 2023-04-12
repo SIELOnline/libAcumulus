@@ -6,6 +6,9 @@ namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
 
+use function assert;
+use function in_array;
+
 /**
  * Represents an Acumulus API customer object.
  *
@@ -62,6 +65,16 @@ use Siel\Acumulus\Api;
  */
 class Customer extends AcumulusObject
 {
+    protected ?Address $invoiceAddress = null;
+    protected ?Address $shippingAddress = null;
+    /**
+     * The address to use for tax calculations.
+     *
+     * Should be one of the {@see AddressType} constants, or null if the shop
+     * address is used for tax calculations (or if not yet set).
+     */
+    protected ?string $taxBasedOn = null;
+
     protected function getPropertyDefinitions(): array
     {
         return [
@@ -69,12 +82,11 @@ class Customer extends AcumulusObject
             [
                 'name' => 'type',
                 'type' => 'int',
-                'allowedValues' => [Api::CustomerType_Debtor, Api::CustomerType_Creditor, Api::CustomerType_Both],
+                'allowedValues' => [Api::CustomerType_Debtor, Api::CustomerType_Creditor, Api::CustomerType_Relation],
             ],
             ['name' => 'vatTypeId', 'type' => 'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],
             ['name' => 'contactYourId', 'type' => 'string'],
             ['name' => 'contactStatus', 'type' => 'bool', 'allowedValues' => [Api::ContactStatus_Disabled, Api::ContactStatus_Active]],
-
             ['name' => 'website', 'type' => 'string'],
             ['name' => 'vatNumber', 'type' => 'string'],
             ['name' => 'telephone', 'type' => 'string'],
@@ -87,9 +99,6 @@ class Customer extends AcumulusObject
             ['name' => 'disableDuplicates', 'type' => 'bool', 'allowedValues' => [Api::DisableDuplicates_No, Api::DisableDuplicates_Yes]],
         ];
     }
-
-    protected ?Address $invoiceAddress = null;
-    protected ?Address $shippingAddress = null;
 
     public function getInvoiceAddress(): ?Address
     {
@@ -111,6 +120,39 @@ class Customer extends AcumulusObject
         $this->shippingAddress = $shippingAddress;
     }
 
+    /**
+     * Returns which address is used for tax calculations.
+     *
+     * @return string|null
+     *   Either AddressType::Invoice, AddressType::Shipping, or null.
+     */
+    public function getTaxBasedOn(): ?string
+    {
+        return $this->taxBasedOn;
+    }
+
+    /**
+     * @param string|null $taxBasedOn
+     *   Either AddressType::Invoice, AddressType::Shipping, or null.
+     */
+    public function setTaxBasedOn(?string $taxBasedOn): void
+    {
+        assert(in_array($taxBasedOn, [AddressType::Invoice, AddressType::Shipping, null], true));
+        $this->taxBasedOn = $taxBasedOn;
+    }
+
+    /**
+     * Returns the address used for tax calculations.
+     *
+     * @return Address|null
+     *   Returns either the {@see getInvoiceAddress()} (default if
+     *   {@see getTaxBasedOn()} = null), or the {@see getShippingAddress()}.
+     */
+    public function getFiscalAddress(): ?Address
+    {
+        return $this->getTaxBasedOn() === AddressType::Shipping ? $this->getShippingAddress() : $this->getInvoiceAddress();
+    }
+
     public function hasWarning(): bool
     {
         $hasWarning = parent::hasWarning();
@@ -121,5 +163,40 @@ class Customer extends AcumulusObject
             $hasWarning = $this->getInvoiceAddress()->hasWarning();
         }
         return $hasWarning;
+    }
+
+    /**
+     * Returns whether to treat this Customer as a company.
+     *
+     * The return value is based on whether the company name of the fiscal
+     * address is not empty.
+     *
+     * Note that this method does not imply vat liability, as not all companies
+     * are vat liable.
+     */
+    public function isCompany(): bool
+    {
+        $address = $this->getFiscalAddress();
+        return $address !== null && !empty($address->companyName1);
+    }
+
+    /**
+     * Returns whether this Customer (probably) is vat liable.
+     *
+     * When available, the return value is based on the {@see vatTypeId}
+     * property, otherwise it is based on the {@see Address::$companyName1}
+     * property of the {@see getfiscalAddress()} and the {@see vatNumber}
+     * property both not being empty.
+     *
+     * Note that in the absence of vat number checking against external web
+     * services (VIES) this method does not return a certainty but a
+     * possibility. (Which is fine, as we mostly use it to check if reversed vat
+     * is possible, we do not decide to use it or not.)
+     */
+    public function isVatLiable(): bool
+    {
+        return !empty($this->vatTypeId)
+            ? $this->vatTypeId === Api::VatTypeId_Business
+            : $this->isCompany() && !empty($this->vatNumber);
     }
 }

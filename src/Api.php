@@ -57,7 +57,7 @@ interface Api
 
     public const CustomerType_Debtor = 1;
     public const CustomerType_Creditor = 2;
-    public const CustomerType_Both = 3;
+    public const CustomerType_Relation = 3;
 
     public const VatTypeId_Private = 1; // or vat exempt business.
     public const VatTypeId_Business = 2;

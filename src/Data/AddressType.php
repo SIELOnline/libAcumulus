@@ -11,6 +11,6 @@ namespace Siel\Acumulus\Data;
  */
 interface AddressType
 {
-    public const Shipping = 'ShippingAddress';
-    public const Invoice = 'InvoiceAddress';
+    public const Shipping = 'shippingAddress';
+    public const Invoice = 'invoiceAddress';
 }

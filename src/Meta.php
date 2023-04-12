@@ -40,9 +40,11 @@ interface Meta
     // Tags that may be used on multiple levels.
     /**
      * The internal id of the level it is part of:
-     * - Customer (not yet implemented)
+     * - Addresses (if available separately)
      * - Order (debug only)
      * - Order line (Creator->Event: WooCommerce and Magento only).
+     *
+     * - Customer (available via contactYourId)
      */
     public const Id = 'meta-id';
     public const Reference = 'meta-reference';
@@ -54,6 +56,9 @@ interface Meta
      * should result in true but didn't).
      */
     public const Warning = 'meta-warning';
+
+    // Customer:
+    public const TaxBasedOn = 'meta-tax-based-on';
 
     // Invoice
     public const Type = 'meta-type';

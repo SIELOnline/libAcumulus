@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Meta;
+
+use function assert;
+use function is_string;
 
 /**
  * Wraps the {@see \Siel\Acumulus\Data\MetadataCollection} methods in methods
@@ -61,7 +65,22 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
+     * Adds a warning to the object (in its metadata).
+     *
+     * @param string|\Siel\Acumulus\Helpers\Message $message
+     */
+    public function addWarning($message): void
+    {
+        assert(is_string($message) || $message instanceof Message);
+        $this->metadataAdd(Meta::Warning, $message);
+    }
+
+    /**
      * Returns whether the object contains a warning (in its metadata).
+     *
+     * As this method is intended to indicate the existence of a warning at any
+     * level, this method should be overridden for those data objects that have
+     * child data objects.
      *
      * @return bool
      *   True if the object, or one of its children, contains a warning in its

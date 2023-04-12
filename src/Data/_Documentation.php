@@ -34,6 +34,9 @@ namespace Siel\Acumulus\Data;
  * - Complex values represented by another data definition.
  * - A {@see MetadataCollection} containing {@see MetadataValue}s.
  *
+ * Additionally, child classes may contain:
+ * - "Convenience" methods, e.g. isCompany() on Customer or isNl() on Address.
+ *
  * ### Note to developers
  * When implementing a new extension you should not have to override any of the
  * classes in this namespace.

@@ -32,9 +32,7 @@ class CompleteMultiLineProperties extends BaseCompletorTask
     public function complete(AcumulusObject $acumulusObject, ...$args): void
     {
         assert($acumulusObject instanceof Invoice);
-        $acumulusObject->descriptionText = str_replace(["\r\n", "\r", "\n"], '\n', $acumulusObject->descriptionText);
-        $acumulusObject->descriptionText = str_replace("\t", '\t', $acumulusObject->descriptionText);
-        $acumulusObject->invoiceNotes = str_replace(["\r\n", "\r", "\n"], '\n', $acumulusObject->invoiceNotes);
-        $acumulusObject->invoiceNotes = str_replace("\t", '\t', $acumulusObject->invoiceNotes);
+        $acumulusObject->descriptionText = str_replace(["\r\n", "\r", "\n", "\t"], ['\n', '\n', '\n', '\t'], $acumulusObject->descriptionText);
+        $acumulusObject->invoiceNotes = str_replace(["\r\n", "\r", "\n", "\t"], ['\n', '\n', '\n', '\t'], $acumulusObject->invoiceNotes);
     }
 }

@@ -6,6 +6,10 @@ namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
 
+use Siel\Acumulus\Fld;
+
+use Siel\Acumulus\Meta;
+
 use function assert;
 use function in_array;
 
@@ -67,36 +71,29 @@ class Customer extends AcumulusObject
 {
     protected ?Address $invoiceAddress = null;
     protected ?Address $shippingAddress = null;
-    /**
-     * The address to use for tax calculations.
-     *
-     * Should be one of the {@see AddressType} constants, or null if the shop
-     * address is used for tax calculations (or if not yet set).
-     */
-    protected ?string $taxBasedOn = null;
 
     protected function getPropertyDefinitions(): array
     {
         return [
-            ['name' => 'contactId', 'type' => 'string'],
+            ['name' => Fld::ContactId, 'type' => 'string'],
             [
-                'name' => 'type',
+                'name' => Fld::Type,
                 'type' => 'int',
                 'allowedValues' => [Api::CustomerType_Debtor, Api::CustomerType_Creditor, Api::CustomerType_Relation],
             ],
-            ['name' => 'vatTypeId', 'type' => 'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],
-            ['name' => 'contactYourId', 'type' => 'string'],
-            ['name' => 'contactStatus', 'type' => 'bool', 'allowedValues' => [Api::ContactStatus_Disabled, Api::ContactStatus_Active]],
-            ['name' => 'website', 'type' => 'string'],
-            ['name' => 'vatNumber', 'type' => 'string'],
-            ['name' => 'telephone', 'type' => 'string'],
-            ['name' => 'telephone2', 'type' => 'string'],
-            ['name' => 'fax', 'type' => 'string'],
-            ['name' => 'email', 'type' => 'string'],
-            ['name' => 'overwriteIfExists', 'type' => 'bool', 'allowedValues' => [Api::OverwriteIfExists_No, Api::OverwriteIfExists_Yes]],
-            ['name' => 'bankAccountNumber', 'type' => 'string'],
-            ['name' => 'mark', 'type' => 'string'],
-            ['name' => 'disableDuplicates', 'type' => 'bool', 'allowedValues' => [Api::DisableDuplicates_No, Api::DisableDuplicates_Yes]],
+            ['name' => Fld::VatTypeId, 'type' => 'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],
+            ['name' => Fld::ContactYourId, 'type' => 'string'],
+            ['name' => Fld::ContactStatus, 'type' => 'bool', 'allowedValues' => [Api::ContactStatus_Disabled, Api::ContactStatus_Active]],
+            ['name' => Fld::Website, 'type' => 'string'],
+            ['name' => Fld::VatNumber, 'type' => 'string'],
+            ['name' => Fld::Telephone, 'type' => 'string'],
+            ['name' => Fld::Telephone2, 'type' => 'string'],
+            ['name' => Fld::Fax, 'type' => 'string'],
+            ['name' => Fld::Email, 'type' => 'string'],
+            ['name' => Fld::OverwriteIfExists, 'type' => 'bool', 'allowedValues' => [Api::OverwriteIfExists_No, Api::OverwriteIfExists_Yes]],
+            ['name' => Fld::BankAccountNumber, 'type' => 'string'],
+            ['name' => Fld::Mark, 'type' => 'string'],
+            ['name' => Fld::DisableDuplicates, 'type' => 'bool', 'allowedValues' => [Api::DisableDuplicates_No, Api::DisableDuplicates_Yes]],
         ];
     }
 
@@ -121,24 +118,13 @@ class Customer extends AcumulusObject
     }
 
     /**
-     * Returns which address is used for tax calculations.
-     *
-     * @return string|null
+     * @param string|null $vatAddress
      *   Either AddressType::Invoice, AddressType::Shipping, or null.
      */
-    public function getTaxBasedOn(): ?string
+    public function setVatAddress(?string $vatAddress): void
     {
-        return $this->taxBasedOn;
-    }
-
-    /**
-     * @param string|null $taxBasedOn
-     *   Either AddressType::Invoice, AddressType::Shipping, or null.
-     */
-    public function setTaxBasedOn(?string $taxBasedOn): void
-    {
-        assert(in_array($taxBasedOn, [AddressType::Invoice, AddressType::Shipping, null], true));
-        $this->taxBasedOn = $taxBasedOn;
+        assert(in_array($vatAddress, [AddressType::Invoice, AddressType::Shipping, null], true));
+        $this->metadataSet(Meta::VatAddress, $vatAddress);
     }
 
     /**
@@ -146,11 +132,13 @@ class Customer extends AcumulusObject
      *
      * @return Address|null
      *   Returns either the {@see getInvoiceAddress()} (default if
-     *   {@see getTaxBasedOn()} = null), or the {@see getShippingAddress()}.
+     *   {@see Meta::VatAddress} is not set), or the {@see getShippingAddress()}.
      */
     public function getFiscalAddress(): ?Address
     {
-        return $this->getTaxBasedOn() === AddressType::Shipping ? $this->getShippingAddress() : $this->getInvoiceAddress();
+        return $this->metadataGet(Meta::VatAddress) === AddressType::Shipping
+            ? $this->getShippingAddress()
+            : $this->getInvoiceAddress();
     }
 
     public function hasWarning(): bool

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Fld;
 
 /**
  * Represents an invoice line object of an Acumulus API invoice object.
@@ -35,13 +36,13 @@ class Line extends AcumulusObject
     protected function getPropertyDefinitions(): array
     {
         return [
-            ['name' => 'itemNumber', 'type' => 'string'],
-            ['name' => 'product', 'type' => 'string'],
-            ['name' => 'nature', 'type' => 'string', 'allowedValues' => [Api::Nature_Product, Api::Nature_Service]],
-            ['name' => 'unitPrice', 'type' => 'float', 'required' => true],
-            ['name' => 'vatRate', 'type' => 'float', 'required' => true],
-            ['name' => 'quantity', 'type' => 'float', 'required' => true],
-            ['name' => 'costPrice', 'type' => 'float'],
+            ['name' => Fld::ItemNumber, 'type' => 'string'],
+            ['name' => Fld::Product, 'type' => 'string'],
+            ['name' => Fld::Nature, 'type' => 'string', 'allowedValues' => [Api::Nature_Product, Api::Nature_Service]],
+            ['name' => Fld::UnitPrice, 'type' => 'float', 'required' => true],
+            ['name' => Fld::VatRate, 'type' => 'float', 'required' => true],
+            ['name' => Fld::Quantity, 'type' => 'float', 'required' => true],
+            ['name' => Fld::CostPrice, 'type' => 'float'],
         ];
     }
 

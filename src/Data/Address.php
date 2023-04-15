@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Fld;
 
 /**
  * Represents a set of address fields of an Acumulus API Customer object.
@@ -53,22 +54,22 @@ class Address extends AcumulusObject
     protected function getPropertyDefinitions(): array
     {
         return [
-            ['name' => 'companyName1', 'type' => 'string'],
-            ['name' => 'companyName2', 'type' => 'string'],
-            ['name' => 'fullName', 'type' => 'string'],
-            ['name' => 'salutation', 'type' => 'string'],
-            ['name' => 'address1', 'type' => 'string'],
-            ['name' => 'address2', 'type' => 'string'],
-            ['name' => 'postalCode', 'type' => 'string'],
-            ['name' => 'city', 'type' => 'string'],
-            ['name' => 'country', 'type' => 'string'],
-            ['name' => 'countryCode', 'type' => 'string'],
+            ['name' => Fld::CompanyName1, 'type' => 'string'],
+            ['name' => Fld::CompanyName2, 'type' => 'string'],
+            ['name' => Fld::FullName, 'type' => 'string'],
+            ['name' => Fld::Salutation, 'type' => 'string'],
+            ['name' => Fld::Address1, 'type' => 'string'],
+            ['name' => Fld::Address2, 'type' => 'string'],
+            ['name' => Fld::PostalCode, 'type' => 'string'],
+            ['name' => Fld::City, 'type' => 'string'],
+            ['name' => Fld::Country, 'type' => 'string'],
+            ['name' => Fld::CountryCode, 'type' => 'string'],
             [
-                'name' => 'countryAutoName',
+                'name' => Fld::CountryAutoName,
                 'type' => 'int',
-                'allowedValues' => [Api::AutoName_No, Api::AutoName_OnlyForeign, Api::AutoName_Yes],
+                'allowedValues' => [Api::CountryAutoName_No, Api::CountryAutoName_OnlyForeign, Api::CountryAutoName_Yes],
             ],
-            ['name' => 'countryAutoNameLang', 'type' => 'string'],
+            ['name' => Fld::CountryAutoNameLang, 'type' => 'string'],
         ];
     }
 }

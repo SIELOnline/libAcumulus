@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Fld;
 
 /**
  * Represents an emailAsPdf part of an Acumulus API invoice object.
@@ -35,13 +36,13 @@ abstract class EmailAsPdf extends AcumulusObject
     protected function getPropertyDefinitions(): array
     {
         return [
-            ['name' => 'emailTo', 'type' => 'string', 'required' => true],
-            ['name' => 'emailBcc', 'type' => 'string'],
-            ['name' => 'emailFrom', 'type' => 'string'],
-            ['name' => 'subject', 'type' => 'string'],
-            ['name' => 'message', 'type' => 'string'],
-            ['name' => 'confirmReading', 'type' => 'bool', 'allowedValues' => [Api::ConfirmReading_No, Api::ConfirmReading_Yes]],
-            ['name' => 'gfx', 'type' => 'bool', 'allowedValues' => [Api::ApplyGraphics_No, Api::ApplyGraphics_Yes]],
+            ['name' => Fld::EmailTo, 'type' => 'string', 'required' => true],
+            ['name' => Fld::EmailBcc, 'type' => 'string'],
+            ['name' => Fld::EmailFrom, 'type' => 'string'],
+            ['name' => Fld::Subject, 'type' => 'string'],
+            ['name' => Fld::Message, 'type' => 'string'],
+            ['name' => Fld::ConfirmReading, 'type' => 'bool', 'allowedValues' => [Api::ConfirmReading_No, Api::ConfirmReading_Yes]],
+            ['name' => Fld::Gfx, 'type' => 'bool', 'allowedValues' => [Api::ApplyGraphics_No, Api::ApplyGraphics_Yes]],
         ];
     }
 }

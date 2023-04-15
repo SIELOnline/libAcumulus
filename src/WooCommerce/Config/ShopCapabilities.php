@@ -11,6 +11,7 @@ use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 use WC_Tax;
 
 use function function_exists;
@@ -250,49 +251,47 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [
             DataType::Invoice => [
                 // @todo: fields that come from the Order, metadata (if it comes
-                //   from Source, it should probably be in config (for now).
+                //   from Source, it should probably be in Config (for now).
             ],
             DataType::Customer => [
                 // Customer defaults.
                 //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
-                'contactYourId' => '[source::getOrder()::getSource()::get_customer_id()]',
-                'vatNumber' => '[source::getOrder()::get_meta(billing_vat_number)'
+                Fld::ContactYourId => '[source::getOrder()::getSource()::get_customer_id()]',
+                Fld::VatNumber => '[source::getOrder()::get_meta(billing_vat_number)'
                     . '|source::getOrder()::getSource()::get_meta(_vat_number)'
                     . '|source::getOrder()::getSource()::get_meta(vat_number)'
                     . '|source::getOrder()::getSource()::get_meta(Vat Number)]', // Post meta
-                'telephone' => '[source::getOrder()::getSource()::get_billing_phone()]',
-                'telephone2' => '[source::getOrder()::getSource()::get_shipping_phone()]',
-                'email' => '[source::getOrder()::getSource()::get_billing_email()]',
+                Fld::Telephone => '[source::getOrder()::getSource()::get_billing_phone()]',
+                Fld::Telephone2 => '[source::getOrder()::getSource()::get_shipping_phone()]',
+                Fld::Email => '[source::getOrder()::getSource()::get_billing_email()]',
             ],
             AddressType::Invoice => [
-                'companyName1' => '[source::getOrder()::getSource()::get_billing_company]',
-                'fullName' =>
+                Fld::CompanyName1 => '[source::getOrder()::getSource()::get_billing_company]',
+                Fld::FullName =>
                     '[source::getOrder()::getSource()::get_billing_first_name+source::getOrder()::getSource()::get_billing_last_name]',
-                'address1' => '[source::getOrder()::getSource()::get_billing_address_1]',
-                'address2' => '[source::getOrder()::getSource()::get_billing_address_2]',
-                'postalCode' => '[source::getOrder()::getSource()::get_billing_postcode]',
-                'city' => '[source::getOrder()::getSource()::get_billing_city]',
-                'countryCode' => '[source::getOrder()::getSource()::get_billing_country]',
-                //@todo? logic country = global $woocommerce->countries->get_countries()[countryCode];
+                Fld::Address1 => '[source::getOrder()::getSource()::get_billing_address_1]',
+                Fld::Address2 => '[source::getOrder()::getSource()::get_billing_address_2]',
+                Fld::PostalCode => '[source::getOrder()::getSource()::get_billing_postcode]',
+                Fld::City => '[source::getOrder()::getSource()::get_billing_city]',
+                Fld::CountryCode => '[source::getOrder()::getSource()::get_billing_country]',
             ],
             AddressType::Shipping => [
-                'companyName1' => '[source::getOrder()::getSource()::get_shipping_company()]',
-                'fullName' =>
+                Fld::CompanyName1 => '[source::getOrder()::getSource()::get_shipping_company()]',
+                Fld::FullName =>
                     '[source::getOrder()::getSource()::get_shipping_first_name()+source::getOrder()::getSource()::get_shipping_last_name()]',
-                'address1' => '[source::getOrder()::getSource()::get_shipping_address_1()]',
-                'address2' => '[source::getOrder()::getSource()::get_shipping_address_2()]',
-                'postalCode' => '[source::getOrder()::getSource()::get_shipping_postcode()]',
-                'city' => '[source::getOrder()::getSource()::get_shipping_city()]',
-                'countryCode' => '[source::getOrder()::getSource()::get_shipping_country()]',
-                //@todo? logic country = global $woocommerce->countries->get_countries()[countryCode];
+                Fld::Address1 => '[source::getOrder()::getSource()::get_shipping_address_1()]',
+                Fld::Address2 => '[source::getOrder()::getSource()::get_shipping_address_2()]',
+                Fld::PostalCode => '[source::getOrder()::getSource()::get_shipping_postcode()]',
+                Fld::City => '[source::getOrder()::getSource()::get_shipping_city()]',
+                Fld::CountryCode => '[source::getOrder()::getSource()::get_shipping_country()]',
             ],
             EmailAsPdfType::Invoice => [
-                'emailTo' => '[source::getOrder()::getSource()::get_billing_email()]',
+                Fld::EmailTo => '[source::getOrder()::getSource()::get_billing_email()]',
             ],
             LineType::Item => [
-                'itemNumber' => '[sku]',
-                'productName' => '[name]',
-                'costPrice' => '[cost_price]',
+                Fld::ItemNumber => '[sku]',
+                Fld::Product => '[name]',
+                Fld::CostPrice => '[cost_price]',
                 // @todo: others? (e.g. quantity, unit price, metadata)
             ],
         ];

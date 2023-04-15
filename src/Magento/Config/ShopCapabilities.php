@@ -14,12 +14,12 @@ use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Item;
 use Magento\Sales\Model\ResourceModel\Status\Collection as OrderStatusCollection;
 use Magento\Tax\Model\ResourceModel\TaxClass\Collection as TaxClassCollection;
-use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\Config;
 
@@ -494,46 +494,46 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return [
             DataType::Customer => [
-                'contactYourId' => '[source::getOrder()::getSource()::getCustomer()::getId()]', // Order, not Creditmemo
+                Fld::ContactYourId => '[source::getOrder()::getSource()::getCustomer()::getId()]', // Order, not Creditmemo
                 // Magento has 2 VAT numbers:
                 // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
                 // Magento\Customer\Model\Address also has a getVatId() method, but that is not the Address we have here.
-                'vatNumber' => '[source::getOrder()::getSource()::getCustomerTaxvat())', // Order, not Creditmemo
-                'telephone' => '[source::getSource()::getBillingAddress()::getTelephone()]', // Address
-                'telephone2' => '[source::getSource()::getShippingAddress()::getTelephone()]', // Address
-                'fax' => '[source::getSource()::getShippingAddress()::getFax()]', // Address
+                Fld::VatNumber => '[source::getOrder()::getSource()::getCustomerTaxvat())', // Order, not Creditmemo
+                Fld::Telephone => '[source::getSource()::getBillingAddress()::getTelephone()]', // Address
+                Fld::Telephone2 => '[source::getSource()::getShippingAddress()::getTelephone()]', // Address
+                Fld::Fax => '[source::getSource()::getShippingAddress()::getFax()]', // Address
                 // Email field of Address seems to be a copy of the Customer email field.
-                'email' => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
+                Fld::Email => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
             // Both Order and Creditmemo have get(Billing|Shipping)Address() methods.
             AddressType::Invoice => [
-                'companyName1' => '[source::getSource()::getBillingAddress()::getCompany()]', // Address
-                'fullName' => '[source::getSource()::getBillingAddress()::getName()]', // Address
-                'address1' => '[source::getSource()::getBillingAddress()::getStreetLine(1)]', // Address
-                'address2' => '[source::getSource()::getBillingAddress()::getStreetLine(1)]', // Address
-                'postalCode' => '[source::getSource()::getBillingAddress()::getPostcode()]', // Address
-                'city' => '[source::getSource()::getBillingAddress()::getCity()]', // Adress
-                'countryCode' => '[source::getSource()::getBillingAddress()::getCountryId()]', // Address
+                Fld::CompanyName1 => '[source::getSource()::getBillingAddress()::getCompany()]', // Address
+                Fld::FullName => '[source::getSource()::getBillingAddress()::getName()]', // Address
+                Fld::Address1 => '[source::getSource()::getBillingAddress()::getStreetLine(1)]', // Address
+                Fld::Address2 => '[source::getSource()::getBillingAddress()::getStreetLine(1)]', // Address
+                Fld::PostalCode => '[source::getSource()::getBillingAddress()::getPostcode()]', // Address
+                Fld::City => '[source::getSource()::getBillingAddress()::getCity()]', // Adress
+                Fld::CountryCode => '[source::getSource()::getBillingAddress()::getCountryId()]', // Address
             ],
             AddressType::Shipping => [
-                'companyName1' => '[source::getSource()::getShippingAddress()::getCompany()]', // Address
-                'fullName' => '[source::getSource()::getShippingAddress()::getName()]', // Address
-                'address1' => '[source::getSource()::getShippingAddress()::getStreetLine(1)]', // Address
-                'address2' => '[source::getSource()::getShippingAddress()::getStreetLine(1)]', // Address
-                'postalCode' => '[source::getSource()::getShippingAddress()::getPostcode()]', // Address
-                'city' => '[source::getSource()::getShippingAddress()::getCity()]', // Adress
-                'countryCode' => '[source::getSource()::getShippingAddress()::getCountryId()]', // Address
+                Fld::CompanyName1 => '[source::getSource()::getShippingAddress()::getCompany()]', // Address
+                Fld::FullName => '[source::getSource()::getShippingAddress()::getName()]', // Address
+                Fld::Address1 => '[source::getSource()::getShippingAddress()::getStreetLine(1)]', // Address
+                Fld::Address2 => '[source::getSource()::getShippingAddress()::getStreetLine(1)]', // Address
+                Fld::PostalCode => '[source::getSource()::getShippingAddress()::getPostcode()]', // Address
+                Fld::City => '[source::getSource()::getShippingAddress()::getCity()]', // Adress
+                Fld::CountryCode => '[source::getSource()::getShippingAddress()::getCountryId()]', // Address
             ],
             EmailAsPdfType::Invoice => [
-                'emailTo' => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
+                Fld::EmailTo => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
             DataType::Invoice => [
                 // @todo: fields that come from source, metadata
             ],
             LineType::Item => [
                 // @todo: on which object?
-                'itemNumber' => '[sku]',
-                'productName' => '[name]',
+                Fld::ItemNumber => '[sku]',
+                Fld::Product => '[name]',
                 // @todo: others? (e.g. quantity, unit price, metadata)
             ],
         ];

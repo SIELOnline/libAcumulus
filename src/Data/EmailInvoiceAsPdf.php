@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Fld;
 
 /**
  * Represents an emailAsPdf part of an Acumulus API invoice object or direct
@@ -26,7 +27,7 @@ class EmailInvoiceAsPdf extends EmailAsPdf
         return array_merge(
             parent::getPropertyDefinitions(),
             [
-                ['name' => 'ubl', 'type' => 'bool', 'allowedValues' => [Api::UblInclude_No, Api::UblInclude_Yes]],
+                ['name' => Fld::Ubl, 'type' => 'bool', 'allowedValues' => [Api::UblInclude_No, Api::UblInclude_Yes]],
             ]
         );
     }

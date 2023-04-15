@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Data;
 
 use DateTime;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Fld;
 
 /**
  * Represents an Acumulus API Invoice object.
@@ -62,11 +63,11 @@ class Invoice extends AcumulusObject
     protected function getPropertyDefinitions(): array
     {
         return [
-            ['name' => 'concept', 'type' => 'bool', 'required' => true, 'allowedValues' => [Api::Concept_No, Api::Concept_Yes]],
-            ['name' => 'conceptType', 'type' => 'string'],
-            ['name' => 'number', 'type' => 'int'],
+            ['name' => Fld::Concept, 'type' => 'bool', 'required' => true, 'allowedValues' => [Api::Concept_No, Api::Concept_Yes]],
+            ['name' => Fld::ConceptType, 'type' => 'string'],
+            ['name' => Fld::Number, 'type' => 'int'],
             [
-                'name' => 'vatType',
+                'name' => Fld::VatType,
                 'type' => 'int',
                 'allowedValues' => [
                     Api::VatType_National,
@@ -78,20 +79,20 @@ class Invoice extends AcumulusObject
                     Api::VatType_OtherForeignVat,
                 ],
             ],
-            ['name' => 'issueDate', 'type' => 'date'],
-            ['name' => 'costCenter', 'type' => 'int'],
-            ['name' => 'accountNumber', 'type' => 'int'],
+            ['name' => Fld::IssueDate, 'type' => 'date'],
+            ['name' => Fld::CostCenter, 'type' => 'int'],
+            ['name' => Fld::AccountNumber, 'type' => 'int'],
             [
-                'name' => 'paymentStatus',
+                'name' => Fld::PaymentStatus,
                 'type' => 'int',
                 'required' => true,
                 'allowedValues' => [Api::PaymentStatus_Due, Api::PaymentStatus_Paid]
             ],
-            ['name' => 'paymentDate', 'type' => 'date'],
-            ['name' => 'description', 'type' => 'string'],
-            ['name' => 'descriptionText', 'type' => 'string'],
-            ['name' => 'template', 'type' => 'int'],
-            ['name' => 'invoiceNotes', 'type' => 'string'],
+            ['name' => Fld::PaymentDate, 'type' => 'date'],
+            ['name' => Fld::Description, 'type' => 'string'],
+            ['name' => Fld::DescriptionText, 'type' => 'string'],
+            ['name' => Fld::Template, 'type' => 'int'],
+            ['name' => Fld::InvoiceNotes, 'type' => 'string'],
         ];
     }
 

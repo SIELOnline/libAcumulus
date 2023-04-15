@@ -9,6 +9,7 @@ use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 
 /**
  * Defines the TestWebShop specific capabilities.
@@ -46,43 +47,43 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 //   from Source, it should probably be in config (for now).
             ],
             DataType::Customer => [
-                'contactYourId' => '[source::getOrder()::getSource()::customer::id]',
-                'telephone' => '[source::getOrder()::getSource()::customer::telephone]',
-                'telephone2' => '[source::getOrder()::getSource()::customer::mobile]',
-                'email' => '[source::getOrder()::getSource()::customer::email]',
+                Fld::ContactYourId => '[source::getOrder()::getSource()::customer::id]',
+                Fld::Telephone => '[source::getOrder()::getSource()::customer::telephone]',
+                Fld::Telephone2 => '[source::getOrder()::getSource()::customer::mobile]',
+                Fld::Email => '[source::getOrder()::getSource()::customer::email]',
             ],
             AddressType::Invoice => [
-                'companyName1' => '[source::getOrder()::getSource()::customer::company_name]',
-                'salutation' => '["Beste"+source::getOrder()::getSource()::customer::first_name]',
-                'fullName' => '[source::getOrder()::getSource()::customer::first_name+source::getOrder()::getSource()::customer::last_name]',
-                'address1' => '[source::getOrder()::getSource()::customer::invoice_address::street]',
-                'address2' => '[source::getOrder()::getSource()::customer::invoice_address::street2]',
-                'postalCode' => '[source::getOrder()::getSource()::customer::invoice_address::postal_code]',
-                'city' => '[source::getOrder()::getSource()::customer::invoice_address::city]',
-                'countryCode' => '[source::getOrder()::getSource()::customer::invoice_address::country_code]',
+                Fld::CompanyName1 => '[source::getOrder()::getSource()::customer::company_name]',
+                Fld::Salutation => '["Beste"+source::getOrder()::getSource()::customer::first_name]',
+                Fld::FullName => '[source::getOrder()::getSource()::customer::first_name+source::getOrder()::getSource()::customer::last_name]',
+                Fld::Address1 => '[source::getOrder()::getSource()::customer::invoice_address::street]',
+                Fld::Address2 => '[source::getOrder()::getSource()::customer::invoice_address::street2]',
+                Fld::PostalCode => '[source::getOrder()::getSource()::customer::invoice_address::postal_code]',
+                Fld::City => '[source::getOrder()::getSource()::customer::invoice_address::city]',
+                Fld::CountryCode => '[source::getOrder()::getSource()::customer::invoice_address::country_code]',
             ],
             AddressType::Shipping => [
-                'companyName1' => '[source::getOrder()::getSource()::customer::company_name]',
-                'salutation' => '["Beste"+source::getOrder()::getSource()::customer::first_name]',
-                'fullName' => '[source::getOrder()::getSource()::customer::first_name+source::getOrder()::getSource()::customer::last_name]',
-                'address1' => '[source::getOrder()::getSource()::customer::shipping_address::street]',
-                'address2' => '[source::getOrder()::getSource()::customer::shipping_address::street2]',
-                'postalCode' => '[source::getOrder()::getSource()::customer::shipping_address::postal_code]',
-                'city' => '[source::getOrder()::getSource()::customer::shipping_address::city]',
-                'countryCode' => '[source::getOrder()::getSource()::customer::shipping_address::country_code]',
+                Fld::CompanyName1 => '[source::getOrder()::getSource()::customer::company_name]',
+                Fld::Salutation => '["Beste"+source::getOrder()::getSource()::customer::first_name]',
+                Fld::FullName => '[source::getOrder()::getSource()::customer::first_name+source::getOrder()::getSource()::customer::last_name]',
+                Fld::Address1 => '[source::getOrder()::getSource()::customer::shipping_address::street]',
+                Fld::Address2 => '[source::getOrder()::getSource()::customer::shipping_address::street2]',
+                Fld::PostalCode => '[source::getOrder()::getSource()::customer::shipping_address::postal_code]',
+                Fld::City => '[source::getOrder()::getSource()::customer::shipping_address::city]',
+                Fld::CountryCode => '[source::getOrder()::getSource()::customer::shipping_address::country_code]',
             ],
             EmailAsPdfType::Invoice => [
-                'emailTo' => '[source::getOrder()::getSource()::customer::email]',
-                'emailBcc' => 'dev@example.com',
+                Fld::EmailTo => '[source::getOrder()::getSource()::customer::email]',
+                Fld::EmailBcc => 'dev@example.com',
             ],
             EmailAsPdfType::PackingSlip => [
-                'emailTo' => '[source::getOrder()::getSource()::customer::email]',
-                'emailBcc' => 'dev@example.com',
+                Fld::EmailTo => '[source::getOrder()::getSource()::customer::email]',
+                Fld::EmailBcc => 'dev@example.com',
             ],
             LineType::Item => [
-                'itemNumber' => '[sku]',
-                'productName' => '[name]',
-                'costPrice' => '[cost_price]',
+                Fld::ItemNumber => '[sku]',
+                Fld::Product => '[name]',
+                Fld::CostPrice => '[cost_price]',
                 // @todo: others? (e.g. quantity, unit price, metadata)
             ],
         ];

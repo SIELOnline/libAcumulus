@@ -144,7 +144,6 @@ class Creator extends BaseCreator
         }
         $result[Tag::Quantity] = $item->getQtyOrdered();
 
-
         // Get vat and discount information
         // - Tax percent = VAT % as specified in product settings, for the
         //   parent of bundled products this may be 0 and incorrect.
@@ -463,10 +462,10 @@ class Creator extends BaseCreator
                 $shippingEx = $sign * $magentoSource->getBaseShippingAmount();
                 $shippingVat = $shippingInc - $shippingEx;
                 $result += [
-                               Tag::UnitPrice => $shippingEx,
-                               Meta::UnitPriceInc => $shippingInc,
-                               Meta::RecalculatePrice => $this->shippingPriceIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
-                           ] + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPriceIncludeTax() ? 0.02 : 0.01);
+                        Tag::UnitPrice => $shippingEx,
+                        Meta::UnitPriceInc => $shippingInc,
+                        Meta::RecalculatePrice => $this->shippingPriceIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
+                    ] + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02, $this->shippingPriceIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
                 // Add vat class meta data.
@@ -477,7 +476,7 @@ class Creator extends BaseCreator
                     $tag = $this->discountIncludesTax() ? Meta::LineDiscountAmountInc : Meta::LineDiscountAmount;
                     $result[$tag] = -$sign * $magentoSource->getBaseShippingDiscountAmount();
                 } elseif ($this->invoiceSource->getType() === Source::CreditNote
-                          && !Number::floatsAreEqual($shippingVat, $magentoSource->getBaseShippingTaxAmount(), 0.02)) {
+                    && !Number::floatsAreEqual($shippingVat, $magentoSource->getBaseShippingTaxAmount(), 0.02)) {
                     // On credit notes, the shipping discount amount is not
                     // stored but can be deduced via the shipping discount tax
                     // amount and the shipping vat rate. To get a more precise

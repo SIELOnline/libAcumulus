@@ -38,8 +38,8 @@ class ConfigStore extends BaSeConfigStore
 
         // Force a cache clear.
         /** @var \Magento\Framework\App\Config $config */
-	    $config = ObjectManager::getInstance()->get(MagentoAppConfig::class);
-	    $config->clean();
+        $config = ObjectManager::getInstance()->get(MagentoAppConfig::class);
+        $config->clean();
         return true;
     }
 

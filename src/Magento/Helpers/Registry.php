@@ -14,8 +14,8 @@ use Magento\Framework\Module\ResourceInterface;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * Registry is a wrapper around the Magento2 ObjectManager to get objects of all
- * sorts.
+ * Registry is a wrapper around the Magento2 ObjectManager to get objects that
+ * in Magento code would be injected via the constructor.
  */
 class Registry
 {

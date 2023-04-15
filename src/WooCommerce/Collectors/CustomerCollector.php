@@ -19,13 +19,13 @@ class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
         $taxBasedOn = get_option('woocommerce_tax_based_on');
+        $acumulusObject->metadataSet(Meta::VatBasedOnShop, $taxBasedOn);
         $taxBasedOnMapping = [
             'shipping' => AddressType::Shipping,
             'billing' => AddressType::Invoice,
             'base' => null,
         ];
-        $acumulusObject->metadataSet(Meta::TaxBasedOn, $taxBasedOn);
-        $acumulusObject->setTaxBasedOn($taxBasedOnMapping[$taxBasedOn] ?? null);
+        $acumulusObject->setVatAddress($taxBasedOnMapping[$taxBasedOn] ?? null);
     }
 
 }

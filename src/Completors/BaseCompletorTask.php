@@ -14,7 +14,7 @@ use Siel\Acumulus\Helpers\Translator;
  *
  * Via the constructor it gets access to the Configuration and Container.
  */
-abstract class BaseCompletorTask implements CompletorInterface
+abstract class BaseCompletorTask implements CompletorTaskInterface
 {
     private Container $container;
     private Config $config;

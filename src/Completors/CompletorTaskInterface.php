@@ -19,7 +19,7 @@ use Siel\Acumulus\Data\AcumulusObject;
  * execution may be important to meet the preconditions (availability of other
  * information).
  */
-interface CompletorInterface
+interface CompletorTaskInterface
 {
     /**
      * Performs the completion task.

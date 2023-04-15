@@ -57,14 +57,28 @@ interface Meta
      */
     public const Warning = 'meta-warning';
 
-    // Customer:
-    public const TaxBasedOn = 'meta-tax-based-on';
+    // Shop settings
+    // @todo: why is this added to Customer, looks like shop settings (like this
+    //   one and "prices include vat") should be on Invoice.
+    public const VatBasedOnShop = 'meta-vat-based-on-shop';
+    public const VatAddress = 'meta-vat-address';
+
+    // Customer + addresses:
+    public const ShopCountryName = 'meta-shop-country-name';
+    /**
+     * An {@see \Siel\Acumulus\Data\Address} object itself does not know which
+     * type of address it represents.
+     */
+    public const AddressType = 'meta-address-type';
 
     // Invoice
-    public const Type = 'meta-type';
-    public const Date = 'meta-date';
+    public const ShopSourceType = 'meta-shop-source-type';
+    public const ShopSourceDate = 'meta-shop-source-date';
+    public const PricesIncludeVat = 'meta-prices-include-vat';
+    public const PrecisionPrice = 'meta-precision-price';
+    public const PrecisionVat = 'meta-precision-vat';
 
-    // Shop invoice linked to this source.
+    // Shop invoice linked to this source (if existing).
     public const ShopInvoiceId = 'meta-shop-invoice-id';
     public const ShopInvoiceReference = 'meta-shop-invoice-reference';
     public const ShopInvoiceDate = 'meta-shop-invoice-date';

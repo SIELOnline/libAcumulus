@@ -21,7 +21,7 @@ use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Collectors\CollectorInterface;
 use Siel\Acumulus\Collectors\CollectorManager;
-use Siel\Acumulus\Completors\CompletorInterface;
+use Siel\Acumulus\Completors\CompletorTaskInterface;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ConfigStore;
 use Siel\Acumulus\Config\ConfigUpgrade;
@@ -516,7 +516,7 @@ class Container
     }
 
     /**
-     * Returns a {@see \Siel\Acumulus\Completors\CompletorInterface} instance
+     * Returns a {@see \Siel\Acumulus\Completors\CompletorTaskInterface} instance
      * that performs the given task.
      *
      * @param string $dataType
@@ -526,10 +526,11 @@ class Container
      * @param string $task
      *   The task to be executed. This is used to construct the class name of a
      *   class that performs the given task and implements
-     *   @see \Siel\Acumulus\CompletorInterface\}. So, only the task name should
-     *   be provided, not the namespace and not the 'Complete' at the beginning.
+     *   @see \Siel\Acumulus\Completor\CompletorTaskInterface}. Only the task
+     *   name should be provided, not the namespace, nor the 'Complete' at the
+     *   beginning.
      */
-    public function getCompletorTask(string $dataType, string $task): CompletorInterface
+    public function getCompletorTask(string $dataType, string $task): CompletorTaskInterface
     {
         $arguments = [$this, $this->getConfig(), $this->getTranslator()];
         return $this->getInstance("Complete$task", "Completors\\$dataType", $arguments);

@@ -51,8 +51,8 @@ abstract class Collector implements CollectorInterface
      *
      * @return string
      *   The class name of the child clas of {@see AcumulusObject} this
-     *   Collector is meant or operate on: 'Invoice', 'Customer', 'Address',
-     *   'Line', or 'EmailAsPdf'.
+     *   Collector is meant to operate on: a {@see \Siel\Acumulus\Data\DataType}
+     *   constant.
      */
     protected function getAcumulusObjectType(): string
     {

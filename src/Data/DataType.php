@@ -14,6 +14,7 @@ interface DataType
     public const Invoice = 'Invoice';
     public const Customer = 'Customer';
     public const Address = 'Address';
+    public const EmailAsPdf = 'EmailAsPdf';
     public const EmailInvoiceAsPdf = 'EmailInvoiceAsPdf';
     public const EmailPackingSlipAsPdf = 'EmailPackingSlipAsPdf';
     public const Line = 'Line';

@@ -9,7 +9,6 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 
 use function count;
-use function in_array;
 
 /**
  * Provides basic config form handling.

@@ -79,31 +79,47 @@ class Mappings
     protected function getAllMappings(): array
     {
         if (!isset($this->allMappings)) {
-            $configuredMappings = $this->getConfiguredMappings();
+            $defaultShopPropertyMappings = $this->getDefaultShopPropertyMappings();
+            $defaultShopMetadataMappings = $this->getDefaultShopMetadataMappings();
+            $configuredPropertyMappings = $this->getConfiguredPropertyMappings();
+            $configuredMetaMappings = $this->getConfiguredMetaMappings();
             $this->allMappings = [
-                Mappings::Properties => array_merge_recursive(
-                    $this->getDefaultShopPropertyMappings(),
-                    $configuredMappings[Mappings::Properties],
-                ),
-                Mappings::Metadata => array_merge_recursive(
-                    $this->getDefaultShopMetadataMappings(),
-                    $configuredMappings[Mappings::Metadata],
-                ),
+                Mappings::Properties => $defaultShopPropertyMappings,
+                Mappings::Metadata => $defaultShopMetadataMappings,
             ];
+            foreach ($configuredPropertyMappings as $dataType => $configuredMapping) {
+                $this->allMappings[Mappings::Properties][$dataType] ??= [];
+                $this->allMappings[Mappings::Properties][$dataType] += $configuredMapping;
+            }
+            foreach ($configuredMetaMappings as $dataType => $configuredMapping) {
+                $this->allMappings[Mappings::Metadata][$dataType] ??= [];
+                $this->allMappings[Mappings::Metadata][$dataType] += $configuredMapping;
+            }
         }
         return $this->allMappings;
 
     }
 
     /**
-     * Returns all mappings that are stored in the configuration object.
+     * Returns all property mappings that are stored in config.
      *
-     * @return string[][][]
-     *   See {@see getAllMappings()}.
+     * @return string[][]
+     *   The default property mappings as stored in config.
      */
-    protected function getConfiguredMappings(): array
+    protected function getConfiguredPropertyMappings(): array
     {
-        return $this->getConfig()->getMappings();
+        return $this->getConfig()->get(Config::PropertyMappings);
+    }
+
+    /**
+     * Returns all metadata mappings that are stored in config.
+     *
+     * @return string[][]
+     *   The default metadata mappings as stored in config.
+     */
+    protected function getConfiguredMetaMappings(): array
+    {
+        return $this->getConfig()->get(Config::MetadataMappings);
     }
 
     /**

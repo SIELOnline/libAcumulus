@@ -75,7 +75,7 @@ class CompleteIssueDateTest extends TestCase
         $config->set('dateToUse', $issueDateSource);
         $completor = $this->getContainer()->getCompletorTask('Invoice','IssueDate');
         $invoice = $this->getInvoice();
-        $invoice->metadataAdd(Meta::Date, $orderDate);
+        $invoice->metadataAdd(Meta::ShopSourceDate, $orderDate);
         $invoice->metadataAdd(Meta::ShopInvoiceDate, $invoiceDate);
         $completor->complete($invoice, $issueDateSource);
         $this->assertEquals($expected, $invoice->issueDate);

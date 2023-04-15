@@ -39,10 +39,10 @@ class CompleteIssueDate extends BaseCompletorTask
         $dateToUse = $this->configGet('dateToUse');
         switch ($dateToUse) {
             case Config::IssueDateSource_InvoiceCreate:
-                $date = $acumulusObject->metadataGet(Meta::ShopInvoiceDate) ?? $acumulusObject->metadataGet(Meta::Date);
+                $date = $acumulusObject->metadataGet(Meta::ShopInvoiceDate) ?? $acumulusObject->metadataGet(Meta::ShopSourceDate);
                 break;
             case Config::IssueDateSource_OrderCreate:
-                $date = $acumulusObject->metadataGet(Meta::Date);
+                $date = $acumulusObject->metadataGet(Meta::ShopSourceDate);
                 break;
             case Config::IssueDateSource_Transfer:
                 $date = null;

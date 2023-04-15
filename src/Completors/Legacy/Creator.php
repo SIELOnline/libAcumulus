@@ -10,8 +10,6 @@ namespace Siel\Acumulus\Completors\Legacy;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Config\ShopCapabilities;
-use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
@@ -27,7 +25,9 @@ use function is_int;
  * Creates an Acumulus invoice.
  *
  * This class is based on the former Siel\Acumulus\Invoice\Creator class which
- * eventually will be replaced by code in this Collectors namespace.
+ * eventually will be replaced by code in this Collectors namespace. It contains
+ * those pieces of code that have not yet been refactored to a Collector or
+ * Completor.
  * - Customer, address and emailAsPdf data gathering will be fully converted to
  *   (split into) collecting and completing with the first release where any of
  *   this code is really used.
@@ -35,73 +35,7 @@ use function is_int;
  *   these 2 phases so the old Creator code remains to exist for a while. But to
  *   be able to move, change or delete parts of the Creator class, while keeping
  *   code for webshops that are not yet converted running, that class was copied
- *   to here, so we don't hve to touch the original file.
- *
- * Original documentation form the 'Create' class:
- * ===============================================
- *
- * Creates a raw version of the Acumulus invoice from a {@see Source}.
- *
- * Introduction
- * ------------
- * The Acumulus invoice structure is specified on:
- * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ }
- *
- * In addition to the scheme as defined over there, additional metadata tags
- * are expected to be added. Some of these are required for the completor phase,
- * while others are optional and are merely used for support (deducing where
- * some values came from, or what path was taken to get a value).
- *
- * In some cases,the tags may get a PHP null value, indicating the absence of a
- * value that should be there but could not be (easily) retrieved from the
- * invoice source. These will be replaced with actual values in the completor
- * stage.
- *
- * This base class:
- * - Implements the basic break down into smaller actions that web shops should
- *   subsequently implement.
- * - Provides helper methods for some recurring functionality.
- * - Documents the expectations of each method to be implemented by a web shop's
- *   Creator class.
- * - Documents the meta tags expected or suggested.
- *
- * A raw invoice:
- * - Contains all customer tags (as far as they should or can be set), even if
- *   the use configured to not send customer data to Acumulus.
- * - Contains most invoice tags (as far as they should or can be set), except
- *   'vattype' and 'concept'.
- * - Contains all invoice lines (based on order data), but:
- *     - Possibly hierarchically structured.
- *     - Does not have to be complete or correct.
- *     - In the used currency, not necessarily Euro.
- *
- * Hierarchically structured invoice lines
- * ---------------------------------------
- * If your shop supports:
- * 1 options or variants, like size, color, etc.
- * 2 bundles or composed products
- * Then you should create hierarchical lines for these product types.
- *
- * ad 1)
- * For each option or variant you add a child line. Set the meta tag
- * 'meta-vatrate-source' to Creator::VatRateSource_Parent. Copy the quantity
- * from the parent to the child. Price info is probably on the parent line only,
- * unless your shop administers additional or reduced costs for a given option
- * on the child lines.
- *
- * ad 2)
- * For each product that is part of the bundle add a child line. As this may be
- * a bundle/composed product on its own, you may create multiple levels, there
- * is no maximum depth on child lines.
- *
- * Price info may be on the child lines, but may also be on the parent line,
- * especially so, if the bundle is cheaper than its separate parts. The child
- * lines may have their own vat rates, so depending on your situation fetch the
- * vat info from the child line objects itself or copy it from the parent. When
- * left empty, it is copied from the parent in the Completor phase.
- *
- * Hierarchical lines are "corrected" in the Completor phase, see
- * {@see FlattenerInvoiceLines}
+ *   to here, so we don't have to touch the original file.
  */
 abstract class Creator
 {
@@ -120,24 +54,18 @@ abstract class Creator
 //    public const LineType_Corrector = 'missing-amount-corrector';
 
     protected Config $config;
-    protected ShopCapabilities $shopCapabilities;
     protected Translator $translator;
-    protected Countries $countries;
 
     protected Source $invoiceSource;
 
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\Countries $countries
-     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(Countries $countries, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
+    public function __construct(Config $config, Translator $translator)
     {
-        $this->countries = $countries;
-        $this->shopCapabilities = $shopCapabilities;
         $this->config = $config;
         $this->translator = $translator;
         $invoiceHelperTranslations = new Translations();
@@ -161,80 +89,6 @@ abstract class Creator
 
     /**
      * Returns the 'invoice''line' parts of the invoice add structure.
-     *
-     * Each invoice line is a keyed array.
-     * The following keys are allowed or even required (*) by the API:
-     * - 'itemnumber'
-     * - 'product'
-     * - 'nature'
-     * - 'unitprice' (*)
-     * - 'vatrate' (*)
-     * - 'quantity' (*)
-     * - 'costprice': optional, this triggers margin invoices.
-     *
-     * Metadata (not recognised by the API but used later on by the Creator or
-     * {@see Completor}, or for support and debugging purposes), see
-     * {@see \Siel\Acumulus\Meta}:
-     * - Complementary to 'amount' and 'vatrate':
-     *     - 'unitpriceinc'
-     *     - 'vatamount'
-     * - 'meta-line-type': type of line: 1 of the LineType_... constants.
-     * - vat rate related:
-     *     * 'meta-vatrate-source', 1 of the VatRateSource_... constants:
-     *         - exact: should exactly equal an existing VAT rate.
-     *         - exact-0: should exactly equal the 0 VAT rate.
-     *         - calculated: based on dividing vat amount and unit price which
-     *           both may have a limited precision and therefore probably will
-     *           not exactly match an existing vat rate.
-     *         - completor: to be filled in by the completor.
-     *         - strategy: to be completed in by a tax divide strategy. This may
-     *           lead to this line being split into multiple lines.
-     *         - parent: copied from the parent.
-     *     * 'meta-vatrate-min': required if 'meta-vatrate-source' is
-     *       calculated. The minimum value for the vat rate, based on the
-     *       precision of the 'vatamount' and 'unitprice'.
-     *     * 'meta-vatrate-max': required if 'meta-vatrate-source' is
-     *       calculated. The maximum value for the vat rate, based on the
-     *       precision of the 'vatamount' and 'unitprice'.
-     * - 'meta-strategy-split': true or false (absent = false)
-     * - Totals per line:
-     *     - 'meta-line-price'
-     *     - 'meta-line-priceinc'
-     *     - 'meta-line-vatamount'
-     * - Parent - children line metadata:
-     *     - 'meta-children'
-     *     - 'meta-children-count'
-     *     - 'meta-parent-index'
-     *     - 'meta-children-merged'
-     *     - 'meta-children-not-shown'
-     *     - 'meta-parent'
-     * -
-     * These keys can be used to complete missing values or to assist in
-     * correcting rounding errors in the values that are present.
-     *
-     * The base CompletorInvoiceLines expects:
-     * - 'meta-vatrate-source' to be filled
-     * - If 'meta-vatrate-source' = exact: no other keys expected.
-     * - If 'meta-vatrate-source' = calculated: 'meta-vatrate-min' and
-     *   'meta-vatrate-max are expected to be filled. These values should come
-     *   from calling the helper method getVatRangeTags() with the values used
-     *   to calculate the vat rate and their precision.
-     * - If 'meta-vatrate-source' = completor: vat rate should be null and
-     *   unit price should be 0. The completor will typically fill vat rate with
-     *   the highest or most appearing vat rate, looking at the exact and
-     *   calculated (after correcting them for rounding errors) vat rates.
-     * - If 'meta-vatrate-source' = strategy: vat rate should be null and either
-     *   unit price or unit price inc should be filled wit a non-0 amount
-     *   (typically a negative amount as this is mostly used for spreading
-     *   discounts over tax rates). Moreover, on the invoice level,
-     *   'meta-invoice-amount' and 'meta-invoice-vatamount' should be filled in.
-     *   The completor will use a tax divide strategy to arrive at valid values
-     *   for the missing fields.
-     *
-     * Extending classes should normally not have to override this method, but
-     * should instead implement {@see getItemLines()}, {@see getShippingLine()},
-     * {@see getPaymentFeeLine()}, {@see getGiftWrappingLine()},
-     * {@see getDiscountLines()}, and {@see getManualLines()}.
      *
      * @return array[]
      *   A non keyed array with all invoice lines.

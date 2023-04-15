@@ -121,7 +121,7 @@ class CollectorManager
 
     public function collectInvoice(Source $source): Invoice
     {
-        $invoiceCollector = $this->getContainer()->getCollector('Invoice');
+        $invoiceCollector = $this->getContainer()->getCollector(DataType::Invoice);
         $invoiceMappings = $this->getMappings()->getFor(DataType::Invoice);
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
         $invoice = $invoiceCollector->collect(['source' => $source], $invoiceMappings);
@@ -136,7 +136,7 @@ class CollectorManager
 
     public function collectCustomer(Source $source): Customer
     {
-        $customerCollector = $this->getContainer()->getCollector('Customer');
+        $customerCollector = $this->getContainer()->getCollector(DataType::Customer);
         $customerMappings = $this->getMappings()->getFor(DataType::Customer);
 
         /** @var \Siel\Acumulus\Data\Customer $customer */
@@ -150,7 +150,7 @@ class CollectorManager
 
     public function collectAddress(Source $source, string $type): Address
     {
-        $addressCollector = $this->getContainer()->getCollector('Address');
+        $addressCollector = $this->getContainer()->getCollector(DataType::Address);
         $addressMappings = $this->getMappings()->getFor($type);
         /** @var \Siel\Acumulus\Data\Address $address */
         $address = $addressCollector->collect(['source' => $source], $addressMappings);
@@ -159,7 +159,7 @@ class CollectorManager
 
     public function collectEmailAsPdf(Source $source, string $type): EmailAsPdf
     {
-        $emailAsPdfCollector = $this->getContainer()->getCollector('EmailAsPdf');
+        $emailAsPdfCollector = $this->getContainer()->getCollector(DataType::EmailAsPdf);
         $emailAsPdfMappings = $this->getMappings()->getFor($type);
         $emailAsPdfMappings['emailAsPdfType'] = $type;
         /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */

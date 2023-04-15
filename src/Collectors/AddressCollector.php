@@ -40,6 +40,7 @@ class AddressCollector extends Collector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
+        // Not needed for: MA, WC; Needed for: -
         if ($acumulusObject->countryCode === null) {
             /** @var \Siel\Acumulus\Invoice\Source $invoiceSource */
             $invoiceSource = $this->propertySources['source'];

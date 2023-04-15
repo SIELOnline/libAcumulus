@@ -17,6 +17,7 @@ use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
@@ -39,6 +40,20 @@ use const Siel\Acumulus\Version;
  *
  * Configuration is stored in the host environment bridged via the ConfigStore
  * class.
+ *
+ * @todo: New settings/mappings
+ *   - Alle mappings uit de settings formulieren, naar mappings.
+ *   - Overrulen settings een mapping van een gebruiker: nee zou ik zeggen: alle
+ *     completors moeten dus {@see PropertySet::NotOverwrite} gebruiken!
+ *   - Customer - address/alt address:  which address is used to base tax on:
+ *     follow shop, invoice, shipping.
+ *   - Customer - mark? naar mappings
+ *   - Customer: overige velden waar de shops standaard geen mapping voor hebben
+ *     (bank account number, website, mark, fax, ???)
+ *   - Address - Country: Vermelden: nooit, altijd, buitenland
+ *   - Address - Country: Naam: uit winkel (taal hangt af van bezoeker/admin), Acumulus (nl)
+ *   - EmailAsPdf: ubl, gfx
+ *   - Invoice: concept type???
  *
  * @noinspection PhpLackOfCohesionInspection
  */
@@ -613,17 +628,6 @@ class Config
     }
 
     /**
-     * Returns mappings that are overridden via the configuration.
-     *
-     * @return string[][][]
-     *   See {@see Mappings::getAllMappings()}.
-     */
-    public function getMappings(): array
-    {
-        return $this->getSettingsByGroup('mappings');
-    }
-
-    /**
      * Get all settings belonging to the same group.
      *
      * @param string $group
@@ -1139,23 +1143,25 @@ class Config
                     'type' => 'array',
                     'default' => [
                         DataType::Invoice => [
-                            'paymentStatus' => '[source::getPaymentStatus()]',
-                            'paymentDate' => '[source::getPaymentDate()]',
-                            'description' => '[source::getTypeLabel(2)+source::getReference()'
+                            Fld::PaymentStatus => '[source::getPaymentStatus()]',
+                            Fld::PaymentDate => '[source::getPaymentDate()]',
+                            Fld::Description => '[source::getTypeLabel(2)+source::getReference()'
                                 . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
                         ],
                         DataType::Customer => [
                         ],
                         AddressType::Invoice => [
+                            Fld::CountryCode => '[source::getCountryCode()]',
                         ],
                         AddressType::Shipping => [
+                            Fld::CountryCode => '[source::getCountryCode()]',
                         ],
                         EmailAsPdfType::Invoice => [
-                            'subject' => 'Factuur voor [source::getTypeLabel(1)+source::getReference()'
+                            Fld::Subject => 'Factuur voor [source::getTypeLabel(1)+source::getReference()'
                                 . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
                         ],
                         EmailAsPdfType::PackingSlip => [
-                            'subject' => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
+                            Fld::Subject => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
                         ],
                         LineType::Item => [
                         ],
@@ -1166,10 +1172,10 @@ class Config
                     'type' => 'array',
                     'default' => [
                         DataType::Invoice => [
-                            Meta::Type => '[source::getType()]',
+                            Meta::ShopSourceType => '[source::getType()]',
                             Meta::Id => '[source::getId()]',
                             Meta::Reference => '[source::getReference()]',
-                            Meta::Date => '[source::getDate()]',
+                            Meta::ShopSourceDate => '[source::getDate()]',
                             Meta::Status => '[source::getStatus()]',
                             Meta::PaymentMethod => '[source::getPaymentMethod()]',
                             Meta::ShopInvoiceId => '[source::getShopInvoiceId()]',
@@ -1177,6 +1183,12 @@ class Config
                             Meta::ShopInvoiceDate => '[source::getShopInvoiceDate()]',
                             Meta::Currency => '[source::getCurrency()]',
                             Meta::Totals => '[source::getTotals()]',
+                        ],
+                        AddressType::Invoice => [
+                            Meta::AddressType => AddressType::Invoice,
+                        ],
+                        AddressType::Shipping => [
+                            Meta::AddressType => AddressType::Shipping,
                         ],
                     ],
                 ],

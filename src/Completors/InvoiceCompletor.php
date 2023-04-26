@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Completors;
 
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 
@@ -23,52 +24,30 @@ use Siel\Acumulus\Helpers\Container;
  *   and payment method and status.
  * - Deriving the vat type.
  */
-class InvoiceCompletor
+class InvoiceCompletor extends BaseCompletor
 {
-    private Container $container;
-    private Config $config;
     private Invoice $invoice;
-
-    /**
-     * @param \Siel\Acumulus\Helpers\Container $container
-     * @param \Siel\Acumulus\Config\Config $config
-     */
-    public function __construct(Container $container, Config $config)
-    {
-        $this->container = $container;
-        $this->config = $config;
-    }
-
-    /**
-     * Returns the configured value for this setting.
-     *
-     * @return mixed|null
-     *   The configured value for this setting, or null if not set and no
-     *   default is available.
-     */
-    protected function configGet(string $key)
-    {
-        return $this->config->get($key);
-    }
 
     /**
      * Completes an {@see \Siel\Acumulus\Data\Invoice}.
      *
      * This phase is executed after the collecting phase.
+     *
+     * @param \Siel\Acumulus\Data\Invoice $acumulusObject
      */
-    public function complete(Invoice $invoice): void
+    public function complete(AcumulusObject $acumulusObject): void
     {
-        $this->invoice = $invoice;
+        $this->invoice = $acumulusObject;
 
         $this->completeCustomer();
-        $this->container->getCompletorTask('Invoice', 'InvoiceNumber')->complete($this->invoice);
-        $this->container->getCompletorTask('Invoice', 'IssueDate')->complete($this->invoice);
-        $this->container->getCompletorTask('Invoice', 'AccountingInfo')->complete($this->invoice);
-        $this->container->getCompletorTask('Invoice', 'MultiLineProperties')->complete($this->invoice);
-        $this->container->getCompletorTask('Invoice', 'Template')->complete($this->invoice);
+        $this->getCompletorTask('Invoice', 'InvoiceNumber')->complete($this->invoice);
+        $this->getCompletorTask('Invoice', 'IssueDate')->complete($this->invoice);
+        $this->getCompletorTask('Invoice', 'AccountingInfo')->complete($this->invoice);
+        $this->getCompletorTask('Invoice', 'MultiLineProperties')->complete($this->invoice);
+        $this->getCompletorTask('Invoice', 'Template')->complete($this->invoice);
 
         // As last!
-        $this->container->getCompletorTask('Invoice', 'Concept')->complete($this->invoice);
+        $this->getCompletorTask('Invoice', 'Concept')->complete($this->invoice);
     }
 
     /**
@@ -77,6 +56,6 @@ class InvoiceCompletor
      */
     protected function completeCustomer(): void
     {
-        $this->container->getCompletorTask('Customer', 'Anonymise')->complete($this->invoice->getCustomer());
+        $this->getContainer()->getCompletor('Customer')->complete($this->invoice->getCustomer());
     }
 }

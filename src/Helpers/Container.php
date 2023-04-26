@@ -427,17 +427,37 @@ class Container
         );
     }
 
-    public function getCompletor(): Completor
+    /**
+     * Returns an instance of a {@see \Siel\Acumulus\Invoice\Completor} or {@see \Siel\Acumulus\Completors\BaseCompletor}
+     *
+     * @param string $dataType
+     *   The data type to get the
+     *   {@see \Siel\Acumulus\Completors\BaseCompletor Completor} for, or empty
+     *   or not passed to get a "legacy" {@see \Siel\Acumulus\Invoice\Completor}.
+     *
+     * @return \Siel\Acumulus\Invoice\Completor|\Siel\Acumulus\Completors\BaseCompletor
+     */
+    public function getCompletor(string $dataType = '')
     {
-        return $this->getInstance('Completor', 'Invoice', [
-            $this->getCompletorInvoiceLines(),
-            $this->getCompletorStrategyLines(),
-            $this->getCountries(),
-            $this->getAcumulusApiClient(),
-            $this->getConfig(),
-            $this->getTranslator(),
-            $this->getLog(),
-        ], true);
+        if ($dataType !== '') {
+            $arguments = [$this, $this->getConfig(), $this->getTranslator()];
+            return $this->getInstance("{$dataType}Completor", 'Completors', $arguments);
+        } else {
+            return $this->getInstance(
+                'Completor',
+                'Invoice',
+                [
+                    $this->getCompletorInvoiceLines(),
+                    $this->getCompletorStrategyLines(),
+                    $this->getCountries(),
+                    $this->getAcumulusApiClient(),
+                    $this->getConfig(),
+                    $this->getTranslator(),
+                    $this->getLog(),
+                ],
+                true
+            );
+        }
     }
 
     public function getCompletorInvoiceLines(): CompletorInvoiceLines

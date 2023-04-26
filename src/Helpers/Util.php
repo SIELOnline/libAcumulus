@@ -246,6 +246,10 @@ class Util
      */
     public function convertHtmlToPlainText(string $body): string
     {
+        // DOMDocument::loadHtml() does not accept an empty string as document.
+        if ($body === '') {
+            return $body;
+        }
         libxml_use_internal_errors(true);
         $doc = new DOMDocument('1.0', 'utf-8');
         if ($doc->loadHTML($body, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_HTML_NOIMPLIED)) {

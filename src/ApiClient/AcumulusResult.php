@@ -325,7 +325,7 @@ class AcumulusResult extends MessageCollection
      *   before parsing the 'format' tag, e.g. invalid xml.
      * - 'html': If the response came from another system, e.g. the load
      *   balancer (429) or http daemon (404)
-     * - '': Absent ot incorrect Content-Type header or plain text
+     * - '': Absent or incorrect Content-Type header or plain text
      */
     protected function getContentFormat(): string
     {
@@ -397,7 +397,10 @@ class AcumulusResult extends MessageCollection
             && (!in_array($code, $this->possiblyValidHttpStatusCodes, true)
                 || $this->getContentFormat() !== $this->getRequestedFormat())
         ) {
-            if ($this->getContentFormat() === 'html') {
+
+            if ($body === '') {
+                $body = '[Empty response body]';
+            } elseif ($this->getContentFormat() === 'html') {
                 $body = $this->util->convertHtmlToPlainText($body);
             } else {
                 $body = $this->util->maskXmlOrJsonString($body);

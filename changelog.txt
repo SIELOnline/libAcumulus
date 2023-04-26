@@ -3,8 +3,12 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.0.0 (2023-03-??)
+8.0.0 (2023-05-??)
 ------------------
+Bugs:
+- ValueError: DOMDocument::loadHTML(): Argument #1 ($source) must not be empty
+  in siel/acumulus/src/Helpers/Util.php:251.
+ 
 Refactorings:
 - Introduced classes Currency and Totals that contain the meta information and can act on
   it, convert amounts resp. complete totals.

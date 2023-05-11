@@ -222,4 +222,36 @@ abstract class AcumulusObject implements ArrayAccess
         $this->checkIsProperty($name);
         return $this->data[$name]->setValue($value, $mode);
     }
+
+    /**
+     * Returns the AcumulusObject as a keyed array.
+     *
+     * @return string[]
+     *   The properties and metadata of this object as a keyed array. The keys
+     *   are the (lower cased) property names or metadata keys, the values will
+     *   be strings or a(n) (recursive)  array of strings.
+     *
+     * @throws \RuntimeException
+     *   When a required property is not set.
+     *
+     * @noinspection PhpVariableVariableInspection
+     */
+    public function toArray(): array
+    {
+        $result = [];
+
+        // Add properties.
+        foreach ($this->data as $name => $property) {
+            if (isset($this->$name)) {
+                $result[strtolower($name)] = (string) $this->$name;
+            } elseif ($this->data[$name]->isRequired()) {
+                throw new RuntimeException("Required property $name is not set");
+            }
+        }
+
+        // Add metadata.
+        $result += $this->getMetadata()->toArray();
+
+        return $result;
+    }
 }

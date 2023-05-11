@@ -209,4 +209,38 @@ class AcumulusProperty
         $this->value = $value;
         return true;
     }
+
+    /**
+     * Returns the string representation of the property.
+     *
+     * @return string
+     *   The string representation of the property. A bool is converted to one
+     *   of its allowed values. A date is converted to its ISO representation
+     *   (yyyy-mm-dd).
+     */
+    public function __toString(): string
+    {
+        $result = '';
+        if ($this->value !== null) {
+            switch ($this->type) {
+                case 'string':
+                case 'int':
+                case 'id':
+                case 'float':
+                    $result = $this->value;
+                    break;
+                case 'date':
+                    /** @var DateTime $date */
+                    $date = $this->value;
+                    $result = $date->format(Api::DateFormat_Iso);
+                    break;
+                case 'bool':
+                    $result = $this->value ? $this->allowedValues[1] : $this->allowedValues[0];
+                    break;
+                default:
+                    throw new UnexpectedValueException("$this->name: not a valid type: $this->type");
+            }
+        }
+        return (string) $result;
+    }
 }

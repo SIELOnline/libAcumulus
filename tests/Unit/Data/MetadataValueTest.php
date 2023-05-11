@@ -8,8 +8,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Data;
 
+use DateTime;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataValue;
+
+use function is_array;
 
 /**
  * Tests for the {@see MetadataValue} class.
@@ -80,5 +83,36 @@ class MetadataValueTest extends TestCase
         $this->assertSame([$value1, $value2], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode
         $this->assertJsonStringEqualsJsonString('["value1",2]', (string) $mdv);
+    }
+
+    public function toStringDataProvider(): array
+    {
+        return [
+            [2, '2'],
+            [null, 'null'],
+            [true, 'true'],
+            [1.23, '1.23'],
+            ['2', '2'],
+            ['test', 'test'],
+            [['test1', 'test2'], '["test1","test2"]'],
+            [new DateTime('2023-05-04'), '2023-05-04'],
+            [new DateTime('2023-05-04 13:14:15'), '2023-05-04 13:14:15'],
+        ];
+    }
+
+    /**
+     * @dataProvider toStringDataProvider
+     */
+    public function testToString($value, string $expected): void
+    {
+        $mdv = new MetadataValue();
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                $mdv->add($item);
+            }
+        } else {
+            $mdv->add($value);
+        }
+        $this->assertSame($expected, (string) $mdv);
     }
 }

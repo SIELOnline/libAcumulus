@@ -126,4 +126,24 @@ class MetadataCollectionTest extends TestCase
         $this->assertNull($mdc->getMetadataValue($name2));
         $this->assertNull($mdc->get($name2));
     }
+
+    public function testToArray(): void
+    {
+        $name1 = 'my_metadata1';
+        $value1 = 2;
+        $name2 = 'my_metadata2';
+        $value2 = 'test';
+
+        // Test set that creates.
+        $mdc = new MetadataCollection();
+        $mdc->set($name1, $value1);
+        $mdc->set($name2, $value2);
+
+        $array = $mdc->toArray();
+        $expected = [
+            $name1 => '2',
+            $name2 => 'test',
+        ];
+        $this->assertSame($expected, $array);
+    }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use DateTime;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Meta;
 
 use function count;
@@ -58,7 +60,7 @@ class MetadataValue
      *
      * Note: this will often be a scalar value, but this may also be a more
      * complex type, though to be useful, it should be "stringable" or "json
-     * encodable" in that case.
+     * serializable" in that case.
      *
      * param int|null $index
      *   @todo: behavior for all these cases. Add a constructor parameter $isMulti?
@@ -98,6 +100,18 @@ class MetadataValue
     public function __toString(): string
     {
         $value = $this->get();
-        return is_string($value) ? $value : json_encode($value, Meta::JsonFlags);
+
+        if (is_string($value)) {
+            $result = $value;
+        } elseif ($value instanceof DateTime) {
+            if ($value->format('H:i:s') === '00:00:00') {
+                $result = $value->format(Api::DateFormat_Iso);
+            } else {
+                $result = $value->format('Y-m-d H:i:s');
+            }
+        } else {
+            $result = json_encode($value, Meta::JsonFlags);
+        }
+        return $result;
     }
 }

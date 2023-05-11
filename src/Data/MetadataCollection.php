@@ -93,4 +93,14 @@ class MetadataCollection
     {
         return array_keys($this->metadata);
     }
+
+    public function toArray(): array
+    {
+        $result = [];
+        foreach ($this->metadata as $key => $value) {
+            $result[$key] = (string) $value;
+        }
+        return $result;
+
+    }
 }

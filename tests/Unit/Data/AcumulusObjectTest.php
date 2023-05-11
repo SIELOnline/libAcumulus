@@ -12,7 +12,6 @@ use LogicException;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Data\AcumulusProperty;
 use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
@@ -71,6 +70,7 @@ class AcumulusObjectTest extends TestCase
         $this->assertTrue(isset($ao->itemNumber));
 
         unset($ao->itemNumber);
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
         $this->assertFalse(isset($ao->itemNumber));
         $this->assertNull($ao->itemNumber);
     }
@@ -141,5 +141,32 @@ class AcumulusObjectTest extends TestCase
         /** @noinspection PhpUnusedLocalVariableInspection */
         /** @noinspection PhpMethodParametersCountMismatchInspection */
         $v = $ao->setUnitPrice(19.99, PropertySet::Always, true);
+    }
+
+    public function testToArray(): void
+    {
+        $ao = new SimpleTestObject();
+        $ao->metadataAdd('My_Metadata', 'meta');
+        $value1 = 'PRD0001';
+        $ao->itemNumber = $value1;
+        $value3 = 19.99;
+        $ao->unitPrice = $value3;
+        $expected = [
+            'itemnumber' => 'PRD0001',
+            'unitprice' => '19.99',
+            'My_Metadata' => 'meta',
+        ];
+        $this->assertSame($expected, $ao->toArray());
+
+        $value2 = Api::Nature_Product;
+        $ao->nature = $value2;
+        $expected = [
+            'itemnumber' => 'PRD0001',
+            'nature' => Api::Nature_Product,
+            'unitprice' => '19.99',
+            'My_Metadata' => 'meta',
+        ];
+        $this->assertSame($expected, $ao->toArray());
+
     }
 }

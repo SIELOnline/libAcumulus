@@ -405,16 +405,16 @@ abstract class InvoiceManager
         $this->triggerInvoiceCreated($invoice, $invoiceSource, $result);
         // If the invoice is set to null, we do not send it.
         if ($invoice === null) {
-            return $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceCreated);
+            return $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceCreateAfter);
         }
 
-        // @todo: handle verification errors here. Currently they
+        // @todo: handle verification errors here. Currently, they
         //   get severity Error, should perhaps become Exception.
         $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $result);
         $this->triggerInvoiceSendBefore($invoice, $invoiceSource, $result);
         // If the invoice is set to null, we do not send it.
         if ($invoice === null) {
-            return $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceCompleted);
+            return $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceSendBefore);
         }
 
         // Some last checks that can prevent sending:

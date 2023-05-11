@@ -69,7 +69,7 @@ class CompleteTemplateTest extends TestCase
         $completor = $this->getContainer()->getCompletorTask('Invoice','Template');
         $invoice = $this->getInvoice();
         $invoice->paymentStatus = $paymentStatus;
-        $completor->complete($invoice, $defaultInvoiceTemplate, $defaultInvoicePaidTemplate);
+        $completor->complete($invoice);
         $this->assertEquals($expected, $invoice->template);
     }
 }

@@ -12,6 +12,7 @@ namespace Siel\Acumulus\Completors;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Translator;
 
 /**
@@ -90,6 +91,11 @@ abstract class BaseCompletor
      * Completes an {@see \Siel\Acumulus\Data\Customer}.
      *
      * This phase is executed after the collecting phase.
+     *
+     * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
+     *   The object to complete.
+     * @param \Siel\Acumulus\Helpers\MessageCollection|null $result
+     *   A message collection where any message can be added to.
      */
-    abstract public function complete(AcumulusObject $acumulusObject): void;
+    abstract public function complete(AcumulusObject $acumulusObject, ?MessageCollection $result = null): void;
 }

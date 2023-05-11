@@ -295,6 +295,11 @@ class Container
         return $this->getInstance('Requirements', 'Helpers');
     }
 
+    public function getEvent(): Event
+    {
+        return $this->getInstance('Event', 'Helpers');
+    }
+
     public function getUtil(): Util
     {
         return $this->getInstance('Util', 'Helpers');
@@ -443,6 +448,7 @@ class Container
             $arguments = [$this, $this->getConfig(), $this->getTranslator()];
             return $this->getInstance("{$dataType}Completor", 'Completors', $arguments);
         } else {
+            // @todo: deprecated: legacy completor.
             return $this->getInstance(
                 'Completor',
                 'Invoice',
@@ -523,7 +529,7 @@ class Container
      * @param string $type
      *   The child type of the {@see \Siel\Acumulus\Collectors\Collector}
      *   requested. The class name only, without namespace and without Collector
-     *   at the end.
+     *   at the end. Typically a {@see \Siel\Acumulus\Data\DataType} constant.
      */
     public function getCollector(string $type): CollectorInterface
     {

@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Completors;
 
-use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\MessageCollection;
 
 /**
  * InvoiceCompletor completes an {@see \Siel\Acumulus\Data\Invoice}.
@@ -34,17 +33,19 @@ class InvoiceCompletor extends BaseCompletor
      * This phase is executed after the collecting phase.
      *
      * @param \Siel\Acumulus\Data\Invoice $acumulusObject
+     * @param \Siel\Acumulus\Helpers\MessageCollection|null $result
      */
-    public function complete(AcumulusObject $acumulusObject): void
+    public function complete(AcumulusObject $acumulusObject, ?MessageCollection $result = null): void
     {
         $this->invoice = $acumulusObject;
 
-        $this->completeCustomer();
+        $this->completeCustomer($result);
         $this->getCompletorTask('Invoice', 'InvoiceNumber')->complete($this->invoice);
         $this->getCompletorTask('Invoice', 'IssueDate')->complete($this->invoice);
         $this->getCompletorTask('Invoice', 'AccountingInfo')->complete($this->invoice);
         $this->getCompletorTask('Invoice', 'MultiLineProperties')->complete($this->invoice);
         $this->getCompletorTask('Invoice', 'Template')->complete($this->invoice);
+        $this->getCompletorTask('Invoice', 'AddEmailAsPdfSection')->complete($this->invoice);
 
         // As last!
         $this->getCompletorTask('Invoice', 'Concept')->complete($this->invoice);
@@ -54,8 +55,8 @@ class InvoiceCompletor extends BaseCompletor
      * Completes the {@see \Siel\Acumulus\Data\Customer} part of the
      * {@see \Siel\Acumulus\Data\Invoice}.
      */
-    protected function completeCustomer(): void
+    protected function completeCustomer(?MessageCollection $result = null): void
     {
-        $this->getContainer()->getCompletor('Customer')->complete($this->invoice->getCustomer());
+        $this->getContainer()->getCompletor('Customer')->complete($this->invoice->getCustomer(), $result);
     }
 }

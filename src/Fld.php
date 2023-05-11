@@ -31,10 +31,12 @@ interface Fld
     public const ContactId = 'contactId';
     public const ContactYourId = 'contactYourId';
     public const ContactStatus = 'contactStatus';
+    public const CompanyName = 'companyName';
     public const CompanyName1 = 'companyName1';
     public const CompanyName2 = 'companyName2';
     public const FullName = 'fullName';
     public const Salutation = 'salutation';
+    public const Address = 'address';
     public const Address1 = 'address1';
     public const Address2 = 'address2';
     public const PostalCode = 'postalCode';

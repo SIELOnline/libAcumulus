@@ -57,11 +57,11 @@ interface Meta
      */
     public const Warning = 'meta-warning';
 
-    // Shop settings
+    // Shop settings.
     // @todo: why is this added to Customer, looks like shop settings (like this
     //   one and "prices include vat") should be on Invoice.
     public const VatBasedOnShop = 'meta-vat-based-on-shop';
-    public const VatAddress = 'meta-vat-address';
+    public const MainAddress = 'meta-main-address';
 
     // Customer + addresses:
     public const ShopCountryName = 'meta-shop-country-name';
@@ -123,11 +123,14 @@ interface Meta
     /**
      * Creator -> Completor: the total amount inc vat of the invoice.
      */
-    public const InvoiceAmountInc = 'meta--total-amountinc';
+    public const InvoiceAmountInc = 'meta-total-amountinc';
     /**
      * Creator -> Completor: the total vat amount of the invoice.
      */
     public const InvoiceVatAmount = 'meta-total-vatamount';
+
+    // Settings:
+    public const AddEmailAsPdfSection = 'meta-add-email-as-pdf-section';
 
     // Line: Price and vat related meta tags.
     /**
@@ -146,12 +149,12 @@ interface Meta
      */
     public const VatRateSource = 'meta-vatrate-source';
     /**
-     * The minimum vatrate in case we have to compute it using 2 non-exact
+     * The minimum vat rate in case we have to compute it using 2 non-exact
      * amounts.
      */
     public const VatRateMin = 'meta-vatrate-min';
     /**
-     * The maximum vatrate in case we have to compute it using 2 non-exact
+     * The maximum vat rate in case we have to compute it using 2 non-exact
      * amounts.
      */
     public const VatRateMax = 'meta-vatrate-max';

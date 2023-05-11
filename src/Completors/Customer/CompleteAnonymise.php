@@ -37,7 +37,7 @@ class CompleteAnonymise extends BaseCompletorTask
         assert($acumulusObject instanceof Customer);
         $sendCustomer = $this->configGet('sendCustomer');
         if (!$sendCustomer && !$acumulusObject->isCompany()) {
-            // Create address with only the county code set,
+            // Create address with only the country code set,
             $countryCode = $acumulusObject->getFiscalAddress()->countryCode;
             /** @var \Siel\Acumulus\Data\Address $anonymousAdress */
             $anonymousAdress = $this->getContainer()->createAcumulusObject(DataType::Address);

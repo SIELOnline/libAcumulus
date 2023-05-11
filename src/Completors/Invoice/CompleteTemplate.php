@@ -24,9 +24,6 @@ class CompleteTemplate extends BaseCompletorTask
      * @param \Siel\Acumulus\Data\Invoice $acumulusObject
      * @param int ...$args
      *   Additional parameters: none.
-     *     - 0: int|null: default template for invoices (comes from a setting).
-     *     - 1: int: default template for paid invoices: 0 => use default
-     *       template (comes from a setting).
      */
     public function complete(AcumulusObject $acumulusObject, ...$args): void
     {

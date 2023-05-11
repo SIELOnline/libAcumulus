@@ -70,6 +70,8 @@ class MessageCollection
      *   A code to better identify the source of the message.
      *
      * @return $this
+     *
+     * @noinspection ParameterDefaultValueIsNotNullInspection
      */
     public function createAndAddMessage(string $message, int $severity, $code = 0): self
     {

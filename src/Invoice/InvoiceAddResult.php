@@ -28,19 +28,20 @@ class InvoiceAddResult extends MessageCollection
     // Invoice send handling related constants.
     public const SendStatus_Unknown = 0;
     // Reasons for not sending.
-    public const NotSent_EventInvoiceCreated = 0x1;
-    public const NotSent_EventInvoiceCompleted = 0x2;
-    public const NotSent_AlreadySent = 0x3;
-    public const NotSent_WrongStatus = 0x4;
-    public const NotSent_EmptyInvoice = 0x5;
-    public const NotSent_TriggerInvoiceCreateNotEnabled = 0x6;
-    public const NotSent_TriggerInvoiceSentNotEnabled = 0x7;
-    public const NotSent_LocalErrors = 0x8;
-    public const NotSent_DryRun = 0x9;
-    public const NotSent_TriggerCreditNoteEventNotEnabled = 0xa;
-    public const NotSent_AlreadyLocked = 0xb;
-    public const NotSent_LockNotAcquired = 0xc;
-    public const NotSent_NoInvoiceLines = 0xd;
+    public const NotSent_AlreadySent = 0x1;
+    public const NotSent_WrongStatus = 0x2;
+    public const NotSent_EmptyInvoice = 0x3;
+    public const NotSent_TriggerInvoiceCreateNotEnabled = 0x4;
+    public const NotSent_TriggerInvoiceSentNotEnabled = 0x5;
+    public const NotSent_LocalErrors = 0x6;
+    public const NotSent_DryRun = 0x7;
+    public const NotSent_TriggerCreditNoteEventNotEnabled = 0x8;
+    public const NotSent_AlreadyLocked = 0x9;
+    public const NotSent_LockNotAcquired = 0xa;
+    public const NotSent_NoInvoiceLines = 0xb;
+    public const NotSent_EventInvoiceCreateBefore = 0xc;
+    public const NotSent_EventInvoiceCreateAfter = 0xd;
+    public const NotSent_EventInvoiceSendBefore = 0xe;
     public const NotSent_Mask = 0xf;
     // Reasons for sending
     public const Send_New = 0x10;
@@ -194,10 +195,10 @@ class InvoiceAddResult extends MessageCollection
             case self::NotSent_LockNotAcquired:
                 $message = 'reason_not_sent_lockNotAcquired';
                 break;
-            case self::NotSent_EventInvoiceCreated:
+            case self::NotSent_EventInvoiceCreateAfter:
                 $message = 'reason_not_sent_prevented_invoiceCreated';
                 break;
-            case self::NotSent_EventInvoiceCompleted:
+            case self::NotSent_EventInvoiceSendBefore:
                 $message = 'reason_not_sent_prevented_invoiceCompleted';
                 break;
             case self::NotSent_EmptyInvoice:

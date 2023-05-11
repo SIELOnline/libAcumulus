@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Data;
 
 use DateTime;
+use Error;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
+use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Meta;
 
 /**
  * Represents an Acumulus API Invoice object.
@@ -154,5 +157,41 @@ class Invoice extends AcumulusObject
             }
         }
         return $hasWarning;
+    }
+
+    /**
+     * @throws Error
+     *   customer or emailAsPdf not (yet) set.
+     * @noinspection NullPointerExceptionInspection
+     */
+    public function toArray(): array
+    {
+        $invoice = parent::toArray();
+        $lines = [];
+        foreach ($this->getLines() as $line) {
+            $lines[] = $line->toArray();
+        }
+        $invoice[Fld::Line] = $lines;
+
+        if ($this->metadataGet(Meta::AddEmailAsPdfSection)) {
+            $invoice[Fld::EmailAsPdf] = $this->getEmailAsPdf()->toArray();
+        }
+
+        $customer = $this->getCustomer()->toArray();
+        $customer[Fld::Invoice] = $invoice;
+        return [Fld::Customer => $customer];
+    }
+
+    /**
+     * Returns whether the invoice is empty (free products only).
+     *
+     * @return bool
+     *   True if the invoice amount (inc. VAT) is €0,-.
+     */
+    public function isZeroAmount(): bool
+    {
+        /** @var \Siel\Acumulus\Invoice\Totals|null $totals */
+        $totals = $this->metadataGet(Meta::Totals);
+        return $totals !== null && Number::isZero($totals->amountInc);
     }
 }

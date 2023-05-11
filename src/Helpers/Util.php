@@ -45,8 +45,9 @@ class Util
      * Converts a keyed, optionally multi-level, array to XML.
      *
      * Acumulus specific:
-     * Each key is converted to a tag, no attributes are used. Numeric
-     * sub-arrays are repeated using the same key (not their numeric index).
+     * Each key is converted to a tag (the tag name being the key in lowercase),
+     * no attributes are used. Numeric sub-arrays are repeated using the same
+     * tag (not a numeric index).
      *
      * @param array $values
      *   The array to convert to XML.
@@ -117,7 +118,7 @@ class Util
                         $element->parentNode->appendChild($node);
                     }
                 } else {
-                    $node = $document->createElement($key);
+                    $node = $document->createElement(strtolower($key));
                     $element->appendChild($node);
                 }
                 $this->convertToDom($value, $node);

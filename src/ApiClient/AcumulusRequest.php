@@ -8,11 +8,14 @@ use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
+use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Util;
 
 use function assert;
+use function is_array;
 
 /**
  * AcumulusRequest turns a call to {@see Acumulus} into an {@see HttpRequest}.
@@ -100,7 +103,7 @@ class AcumulusRequest
      *
      * @param string $uri
      *   The uri of the API resource to invoke.
-     * @param array $submit
+     * @param \Siel\Acumulus\Data\AcumulusObject|array $submit
      *   The main submit part to send to the Acumulus web API.
      * @param bool $needContract
      *   Indicates whether this api function needs the contract details. Most
@@ -125,9 +128,10 @@ class AcumulusRequest
      *   Note that errors at the application level will not be thrown as an
      *   exception, but will have to be handled by the calling code.
      */
-    public function execute(string $uri, array $submit, bool $needContract): AcumulusResult
+    public function execute(string $uri, $submit, bool $needContract): AcumulusResult
     {
         assert($this->uri === null);
+        assert(is_array($submit) || $submit instanceof Invoice);
 
         $this->uri = $uri;
         $this->submit = $this->constructFullSubmit($submit, $needContract);
@@ -165,7 +169,7 @@ class AcumulusRequest
     protected function executeWithPostXmlStringApproach(): HttpResponse
     {
         // - Convert message to XML. XML requires 1 top level tag, so add one.
-        //   The top tag name is ignored by the Acumulus API, we use <acumulus>.
+        //   This top tag name is ignored by the API, we use <acumulus>.
         // - 'xmlstring' is the post field that Acumulus expects.
         $options = $this->getCurlOptions();
         $body = ['xmlstring' => trim($this->util->convertArrayToXml(['acumulus' => $this->submit]))];
@@ -210,7 +214,7 @@ class AcumulusRequest
      *   part containing a.o. tags like <contract>, <testmode>, and <connector>.
      * - An endpoint specific part, the actual data to be sent.
      *
-     * @param array $submit
+     * @param \Siel\Acumulus\Data\AcumulusObject|array $submit
      *   The endpoint specific part to be sent.
      * @param bool $needContract
      *   Whether this endpoint needs the <contract> part to authorize and
@@ -218,10 +222,16 @@ class AcumulusRequest
      *
      * @return array
      *   The post fields to send to Acumulus.
+     *
+     * @todo: convert submit to (Acumulus)Object? (though not all messages are
+     *   AcumulusObjects yet, in fact only 1 is).
      */
-    protected function constructFullSubmit(array $submit, bool $needContract): array
+    protected function constructFullSubmit($submit, bool $needContract): array
     {
         $basicSubmit = $this->getBasicSubmit($needContract);
+        if ($submit instanceof AcumulusObject) {
+            $submit = $submit->toArray();
+        }
         return array_merge($basicSubmit, $submit);
     }
 
@@ -254,6 +264,8 @@ class AcumulusRequest
      *
      * @return array
      *   The basic submit part of an API message.
+     *
+     * @todo: convert basic submit to (Acumulus)Object.
      */
     protected function getBasicSubmit(bool $needContract): array
     {

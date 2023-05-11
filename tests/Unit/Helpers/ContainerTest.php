@@ -1,6 +1,6 @@
-<?php /** @noinspection EfferentObjectCouplingInspection */
-
+<?php
 /**
+ * @noinspection EfferentObjectCouplingInspection
  * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode

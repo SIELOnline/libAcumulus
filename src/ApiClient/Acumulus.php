@@ -9,6 +9,7 @@ namespace Siel\Acumulus\ApiClient;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Environment;
+use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
@@ -379,7 +380,7 @@ class Acumulus
      *
      * See {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/}
      *
-     * @param array $invoice
+     * @param \Siel\Acumulus\Data\Invoice|array $invoice
      *   The invoice to send.
      *
      * @return AcumulusResult
@@ -394,7 +395,7 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function invoiceAdd(array $invoice): AcumulusResult
+    public function invoiceAdd($invoice): AcumulusResult
     {
         return $this->callApiFunction('invoices/invoice_add', $invoice)->setMainAcumulusResponseKey('invoice');
     }
@@ -922,9 +923,11 @@ class Acumulus
      * Wrapper around
      * {@see \Siel\Acumulus\ApiClient\AcumulusRequest::execute()}.
      *
+     * For error handling see: {@see AcumulusResult}.
+     *
      * @param string $apiFunction
      *   The API function to invoke.
-     * @param array $message
+     * @param \Siel\Acumulus\Data\AcumulusObject|array $message
      *   The values to submit.
      * @param bool $needContract
      *   Indicates whether this api function needs the contract details. Most
@@ -936,13 +939,13 @@ class Acumulus
      *   An AcumulusResult object containing the results.
      *
      * @throws AcumulusException|AcumulusResponseException
-     *   A communication level error occurred.
+     *   A communication level error occurred:
      *   - {@see AcumulusRequest} will be set;
      *   - {@see HttpRequest} will probably also be set;
      *   - {@see HttpResponse} might be set or not;
      *   - {@see AcumulusResult} will not be set.
      */
-    protected function callApiFunction(string $apiFunction, array $message, bool $needContract = true): AcumulusResult
+    protected function callApiFunction(string $apiFunction, $message, bool $needContract = true): AcumulusResult
     {
         $acumulusRequest = $this->createAcumulusRequest();
         $uri = $this->constructUri($apiFunction);

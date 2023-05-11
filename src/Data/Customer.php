@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use Error;
 use Siel\Acumulus\Api;
 
 use Siel\Acumulus\Fld;
@@ -118,13 +119,24 @@ class Customer extends AcumulusObject
     }
 
     /**
+     * Returns the type of the address used as main address.
+     *
+     * @return string
+     *   Either AddressType::Invoice or AddressType::Shipping.
+     */
+    protected function getMainAddressType(): string
+    {
+        return $this->metadataGet(Meta::MainAddress) ?? AddressType::Invoice;
+    }
+
+    /**
      * @param string|null $vatAddress
      *   Either AddressType::Invoice, AddressType::Shipping, or null.
      */
     public function setVatAddress(?string $vatAddress): void
     {
         assert(in_array($vatAddress, [AddressType::Invoice, AddressType::Shipping, null], true));
-        $this->metadataSet(Meta::VatAddress, $vatAddress);
+        $this->metadataSet(Meta::MainAddress, $vatAddress);
     }
 
     /**
@@ -132,11 +144,11 @@ class Customer extends AcumulusObject
      *
      * @return Address|null
      *   Returns either the {@see getInvoiceAddress()} (default if
-     *   {@see Meta::VatAddress} is not set), or the {@see getShippingAddress()}.
+     *   {@see Meta::MainAddress} is not set), or the {@see getShippingAddress()}.
      */
     public function getFiscalAddress(): ?Address
     {
-        return $this->metadataGet(Meta::VatAddress) === AddressType::Shipping
+        return $this->getMainAddressType() === AddressType::Shipping
             ? $this->getShippingAddress()
             : $this->getInvoiceAddress();
     }
@@ -151,6 +163,31 @@ class Customer extends AcumulusObject
             $hasWarning = $this->getInvoiceAddress()->hasWarning();
         }
         return $hasWarning;
+    }
+
+    /**
+     * @throws Error
+     *   No address is set.
+     * @noinspection NullPointerExceptionInspection
+     */
+    public function toArray(): array
+    {
+        if ($this->getMainAddressType() === AddressType::Invoice) {
+            $address = $this->getInvoiceAddress() ?? $this->getShippingAddress();
+            $altAddress = $this->getShippingAddress() ?? $this->getInvoiceAddress();
+        } else {
+            $altAddress = $this->getInvoiceAddress() ?? $this->getShippingAddress();
+            $address = $this->getShippingAddress() ?? $this->getInvoiceAddress();
+        }
+        $address = $address->toArray();
+        $altAddress = $altAddress->toArray();
+        $altAddressKeys = array_keys($altAddress);
+        array_walk($altAddressKeys, static function (&$value) {
+            $value = "alt$value";
+        });
+        $altAddress = array_combine($altAddressKeys, $altAddress);
+
+        return [Fld::Customer => parent::toArray() + $address + $altAddress];
     }
 
     /**

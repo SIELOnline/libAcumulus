@@ -243,7 +243,7 @@ abstract class AcumulusObject implements ArrayAccess
         // Add properties.
         foreach ($this->data as $name => $property) {
             if (isset($this->$name)) {
-                $result[strtolower($name)] = (string) $this->$name;
+                $result[$name] = (string) $this->$name;
             } elseif ($this->data[$name]->isRequired()) {
                 throw new RuntimeException("Required property $name is not set");
             }

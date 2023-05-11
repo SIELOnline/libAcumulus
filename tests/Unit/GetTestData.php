@@ -19,7 +19,7 @@ class GetTestData
     /**
      * @throws \JsonException
      */
-    public function load(): object
+    private function load(): object
     {
         return json_decode(file_get_contents($this->dataFile), false, 512, JSON_THROW_ON_ERROR);
     }

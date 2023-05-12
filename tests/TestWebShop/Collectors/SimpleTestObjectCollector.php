@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\Collectors;
+namespace Siel\Acumulus\TestWebShop\Collectors;
 
 use Siel\Acumulus\Collectors\Collector;
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
+use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
 
 /**
  * Collets values for a
- * {@See \Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject}.
+ * {@See \Siel\Acumulus\TestWebShop\Data\SimpleTestObject}.
  */
 class SimpleTestObjectCollector extends Collector
 {

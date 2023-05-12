@@ -40,7 +40,7 @@ class AcumulusResultTest extends TestCase
     protected function setUp(): void
     {
         $language = 'nl';
-        $this->container = new Container('Tests\TestWebShop\TestDoubles', $language);
+        $this->container = new Container('TestWebShop\TestDoubles', $language);
         $this->translator = $this->container->getTranslator();
         $this->translator->add(new SeverityTranslations());
         $this->translator->add(new ResultTranslations());

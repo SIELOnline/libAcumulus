@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient\HttpRequest;
+use Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\HttpRequest;
 
 /**
  * Tests for the {@see \Siel\Acumulus\ApiClient\HttpRequest} class.

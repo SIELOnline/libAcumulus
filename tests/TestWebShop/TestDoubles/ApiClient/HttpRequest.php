@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient;
+namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\ApiClient\HttpRequest as BaseHttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;

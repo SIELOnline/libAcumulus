@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\Helpers;
+namespace Siel\Acumulus\TestWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\Form;
 
@@ -15,7 +15,7 @@ class FormMapper extends \Siel\Acumulus\Helpers\FormMapper
     /**
      * @inheritDoc
      */
-    public function map(Form $form)
+    public function map(Form $form): void
     {
     }
 }

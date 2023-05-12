@@ -80,7 +80,7 @@ namespace Siel\Acumulus;
  * - {@see \Siel\Acumulus\WooCommerce}
  * - {@see \Siel\Acumulus\MyWebShop}: example and template code to implement the
  *   Acumulus plugin for your own webshop.
- * - {@see \Siel\Acumulus\Tests\TestWebShop\_Documentation \Siel\Acumulus\Tests\TestWebShop}
+ * - {@see \Siel\Acumulus\TestWebShop\_Documentation \Siel\Acumulus\TestWebShop}
  *   A minimalist implementation to allow the tests to run in a "functional"
  *   shop environment.
  *

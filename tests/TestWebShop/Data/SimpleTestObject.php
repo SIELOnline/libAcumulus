@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\Data;
+namespace Siel\Acumulus\TestWebShop\Data;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AcumulusObject;

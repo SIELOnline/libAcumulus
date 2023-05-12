@@ -19,6 +19,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Siel\\Acumulus\\TestWebShop\\": "tests/TestWebShop",
             "Siel\\Acumulus\\Tests\\": "tests/"
         }
     },

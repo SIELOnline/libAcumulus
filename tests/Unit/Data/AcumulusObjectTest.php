@@ -13,7 +13,7 @@ use RuntimeException;
 use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\PropertySet;
-use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
+use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
 
 /**
  * Tests for the basic operations of the {@see \Siel\Acumulus\Data\AcumulusObject} class.
@@ -152,8 +152,8 @@ class AcumulusObjectTest extends TestCase
         $value3 = 19.99;
         $ao->unitPrice = $value3;
         $expected = [
-            'itemnumber' => 'PRD0001',
-            'unitprice' => '19.99',
+            'itemNumber' => 'PRD0001',
+            'unitPrice' => '19.99',
             'My_Metadata' => 'meta',
         ];
         $this->assertSame($expected, $ao->toArray());
@@ -161,9 +161,9 @@ class AcumulusObjectTest extends TestCase
         $value2 = Api::Nature_Product;
         $ao->nature = $value2;
         $expected = [
-            'itemnumber' => 'PRD0001',
+            'itemNumber' => 'PRD0001',
             'nature' => Api::Nature_Product,
-            'unitprice' => '19.99',
+            'unitPrice' => '19.99',
             'My_Metadata' => 'meta',
         ];
         $this->assertSame($expected, $ao->toArray());

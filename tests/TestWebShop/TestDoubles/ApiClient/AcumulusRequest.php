@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient;
+namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
 use Siel\Acumulus\Config\Config;

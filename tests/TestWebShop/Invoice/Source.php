@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\Invoice;
+namespace Siel\Acumulus\TestWebShop\Invoice;
 
 use DateTime;
 use Exception;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
-use Siel\Acumulus\Meta;
 use stdClass;
 
 /**

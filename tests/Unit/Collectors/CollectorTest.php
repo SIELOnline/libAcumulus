@@ -13,7 +13,7 @@ use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Collectors\CollectorInterface;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
+use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
 
 /**
  * Tests for the {@see \Siel\Acumulus\Collectors\Collector} class.
@@ -46,7 +46,7 @@ class CollectorTest extends TestCase
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        $this->container = new Container('Tests\TestWebShop', 'nl');
+        $this->container = new Container('TestWebShop', 'nl');
     }
 
     public function testCollectAllEmpty(): void

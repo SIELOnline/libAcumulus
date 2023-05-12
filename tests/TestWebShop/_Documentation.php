@@ -5,7 +5,7 @@
  * @noinspection PhpUndefinedNamespaceInspection
  */
 
-namespace Siel\Acumulus\Tests\TestWebShop;
+namespace Siel\Acumulus\TestWebShop;
 
 /**
  * The TestWebShop namespace contains code for a Test web shop used with the unit
@@ -18,18 +18,18 @@ namespace Siel\Acumulus\Tests\TestWebShop;
  * do when adding support for a new web shop.
  *
  * Things to do when developing an extension for another web shop:
- * - Complete {@see \Siel\Acumulus\Tests\TestWebShop\Helpers\Log}.
- * - Complete {@see \Siel\Acumulus\Tests\TestWebShop\Helpers\Mailer}.
- * - Complete {@see \Siel\Acumulus\Tests\TestWebShop\Config\ConfigStore}.
- * - Complete {@see \Siel\Acumulus\Tests\TestWebShop\Config\ShopCapabilities}
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Helpers\Log}.
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Helpers\Mailer}.
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Config\ConfigStore}.
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Config\ShopCapabilities}
  *   (getTokenInfo() may be deferred until later).
  *
  * You should now continue with the invoice handling and sending parts:
- * - Complete {@see \Siel\Acumulus\Tests\TestWebShop\Shop\AcumulusEntry}.
- * - Complete {@see \Siel\Acumulus\Tests\TestWebShop\Shop\AcumulusEntryManager}.
- * - Complete {@see \Siel\Acumulus\Tests\TestWebShop\Shop\InvoiceManager}.
- * - Complete {@see \Siel\Acumulus\Tests\TestWebShop\Invoice\Source}.
- * - Complete {@see \Siel\Acumulus\Tests\TestWebShop\Invoice\Creator}.
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Shop\AcumulusEntry}.
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Shop\AcumulusEntryManager}.
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Shop\InvoiceManager}.
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Invoice\Source}.
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Invoice\Creator}.
  * - You will now know what objects should be documented in
  *   ShopCapabilities::getTokenInfo(), so correct that method now as well.
  */

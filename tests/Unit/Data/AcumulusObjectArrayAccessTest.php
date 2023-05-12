@@ -10,7 +10,7 @@ namespace Siel\Acumulus\Tests\Unit\Data;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
+use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
 
 /**
  * Tests for the array access interface part of the

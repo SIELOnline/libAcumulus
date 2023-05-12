@@ -10,7 +10,7 @@ namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Tests\TestWebShop\TestDoubles\Helpers\FieldExpander;
+use Siel\Acumulus\TestWebShop\TestDoubles\Helpers\FieldExpander;
 
 /**
  * FieldParsingTest tests the - internal - parsing mechanisms of the

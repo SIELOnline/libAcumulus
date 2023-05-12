@@ -1,9 +1,14 @@
 <?php
 
-namespace Siel\Acumulus\Tests\TestWebShop\ApiClient;
+declare(strict_types=1);
+
+namespace Siel\Acumulus\TestWebShop\ApiClient;
 
 use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
 
+/**
+ * AcumulusRequest extends the real AcumulusRequest with testing functionality.
+ */
 class AcumulusRequest extends BaseAcumulusRequest
 {
     protected function getBasicSubmit(bool $needContract): array
@@ -11,8 +16,7 @@ class AcumulusRequest extends BaseAcumulusRequest
         $result = parent::getBasicSubmit($needContract);
         if (strpos($this->uri, 'entry/noemailonerror') !== false) {
             $this->uri = str_replace('entry/noemailonerror', 'entry/entry_info', $this->uri);
-            unset($result['contract']['emailonerror']);
-            unset($result['contract']['emailonwarning']);
+            unset($result['contract']['emailonerror'], $result['contract']['emailonwarning']);
         }
         if (strpos($this->uri, 'entry/noemailonwarning') !== false) {
             $this->uri = str_replace('entry/noemailonwarning', 'entry/entry_info', $this->uri);

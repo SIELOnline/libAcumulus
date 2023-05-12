@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\Config;
+namespace Siel\Acumulus\TestWebShop\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 use Siel\Acumulus\Helpers\Util;

@@ -25,7 +25,7 @@ class CompleteInvoiceNumberTest extends TestCase
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        $this->container = new Container('Tests\TestWebShop', 'nl');
+        $this->container = new Container('TestWebShop', 'nl');
         $this->container->addTranslations('Translations', 'Invoice');
     }
 

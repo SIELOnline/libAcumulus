@@ -33,7 +33,7 @@ class AcumulusRequestTest extends TestCase
     protected function setUp(): void
     {
         $language = 'nl';
-        $this->container = new Container('Tests\TestWebShop\TestDoubles', $language);
+        $this->container = new Container('TestWebShop\TestDoubles', $language);
         $this->examples = new ApiRequestResponseExamples();
     }
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\Config;
+namespace Siel\Acumulus\TestWebShop\Config;
 
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Data\AddressType;

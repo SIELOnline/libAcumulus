@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient\ConnectionHandler;
+use Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\ConnectionHandler;
 
 /**
  * Test curl handle creation and reuse based on scheme + host.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\Helpers;
+namespace Siel\Acumulus\TestWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
@@ -11,7 +11,7 @@ use Siel\Acumulus\Helpers\Mailer as BaseMailer;
  */
 class Mailer extends BaseMailer
 {
-    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
+    public function sendMail(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): bool
     {
         return true;
     }

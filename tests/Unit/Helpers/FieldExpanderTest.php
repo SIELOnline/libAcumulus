@@ -29,7 +29,7 @@ class FieldExpanderTest extends TestCase
     public function getContainer(): Container
     {
         if (!isset(self::$container)) {
-            self::$container = new Container('Tests\TestWebShop', self::Language);
+            self::$container = new Container('TestWebShop', self::Language);
         }
         return self::$container;
     }

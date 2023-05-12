@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\Config;
+namespace Siel\Acumulus\TestWebShop\Config;
 
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 
@@ -13,8 +13,6 @@ use const Siel\Acumulus\Version;
  */
 class Environment extends EnvironmentBase
 {
-    private string $configFile = __DIR__ . '/../../../../config/db.json';
-
     protected function setShopEnvironment(): void
     {
         $this->data['moduleVersion'] = Version;

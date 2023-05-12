@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\Helpers;
+namespace Siel\Acumulus\TestWebShop\TestDoubles\Helpers;
 
 use Siel\Acumulus\Helpers\FieldExpander as BaseFieldExpander;
 use Siel\Acumulus\Helpers\Log;

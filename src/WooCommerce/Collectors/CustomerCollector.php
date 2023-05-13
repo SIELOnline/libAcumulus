@@ -25,7 +25,7 @@ class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
             'billing' => AddressType::Invoice,
             'base' => null,
         ];
-        $acumulusObject->setVatAddress($taxBasedOnMapping[$taxBasedOn] ?? null);
+        $acumulusObject->setMainAddress($taxBasedOnMapping[$taxBasedOn] ?? null);
     }
 
 }

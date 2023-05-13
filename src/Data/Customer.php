@@ -124,7 +124,7 @@ class Customer extends AcumulusObject
      * @return string
      *   Either AddressType::Invoice or AddressType::Shipping.
      */
-    protected function getMainAddressType(): string
+    protected function getMainAddress(): string
     {
         return $this->metadataGet(Meta::MainAddress) ?? AddressType::Invoice;
     }
@@ -133,7 +133,7 @@ class Customer extends AcumulusObject
      * @param string|null $vatAddress
      *   Either AddressType::Invoice, AddressType::Shipping, or null.
      */
-    public function setVatAddress(?string $vatAddress): void
+    public function setMainAddress(?string $vatAddress): void
     {
         assert(in_array($vatAddress, [AddressType::Invoice, AddressType::Shipping, null], true));
         $this->metadataSet(Meta::MainAddress, $vatAddress);
@@ -148,7 +148,7 @@ class Customer extends AcumulusObject
      */
     public function getFiscalAddress(): ?Address
     {
-        return $this->getMainAddressType() === AddressType::Shipping
+        return $this->getMainAddress() === AddressType::Shipping
             ? $this->getShippingAddress()
             : $this->getInvoiceAddress();
     }
@@ -172,7 +172,7 @@ class Customer extends AcumulusObject
      */
     public function toArray(): array
     {
-        if ($this->getMainAddressType() === AddressType::Invoice) {
+        if ($this->getMainAddress() === AddressType::Invoice) {
             $address = $this->getInvoiceAddress() ?? $this->getShippingAddress();
             $altAddress = $this->getShippingAddress() ?? $this->getInvoiceAddress();
         } else {
@@ -183,11 +183,11 @@ class Customer extends AcumulusObject
         $altAddress = $altAddress->toArray();
         $altAddressKeys = array_keys($altAddress);
         array_walk($altAddressKeys, static function (&$value) {
-            $value = "alt$value";
+            $value = 'alt' . ucfirst($value);
         });
         $altAddress = array_combine($altAddressKeys, $altAddress);
 
-        return [Fld::Customer => parent::toArray() + $address + $altAddress];
+        return $this->propertiesToArray() + $address + $altAddress + $this->metadataToArray();
     }
 
     /**

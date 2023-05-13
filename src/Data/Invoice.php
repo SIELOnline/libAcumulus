@@ -66,7 +66,7 @@ class Invoice extends AcumulusObject
     protected function getPropertyDefinitions(): array
     {
         return [
-            ['name' => Fld::Concept, 'type' => 'bool', 'required' => true, 'allowedValues' => [Api::Concept_No, Api::Concept_Yes]],
+            ['name' => Fld::Concept, 'type' => 'bool', 'allowedValues' => [Api::Concept_No, Api::Concept_Yes]],
             ['name' => Fld::ConceptType, 'type' => 'string'],
             ['name' => Fld::Number, 'type' => 'int'],
             [
@@ -88,7 +88,6 @@ class Invoice extends AcumulusObject
             [
                 'name' => Fld::PaymentStatus,
                 'type' => 'int',
-                'required' => true,
                 'allowedValues' => [Api::PaymentStatus_Due, Api::PaymentStatus_Paid]
             ],
             ['name' => Fld::PaymentDate, 'type' => 'date'],
@@ -166,7 +165,7 @@ class Invoice extends AcumulusObject
      */
     public function toArray(): array
     {
-        $invoice = parent::toArray();
+        $invoice = $this->propertiesToArray();
         $lines = [];
         foreach ($this->getLines() as $line) {
             $lines[] = $line->toArray();
@@ -176,6 +175,7 @@ class Invoice extends AcumulusObject
         if ($this->metadataGet(Meta::AddEmailAsPdfSection)) {
             $invoice[Fld::EmailAsPdf] = $this->getEmailAsPdf()->toArray();
         }
+        $invoice += $this->metadataToArray();
 
         $customer = $this->getCustomer()->toArray();
         $customer[Fld::Invoice] = $invoice;

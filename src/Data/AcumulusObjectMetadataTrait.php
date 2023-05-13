@@ -65,6 +65,17 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
+     * Returns the metadata as a keyed array.
+     *
+     * @return string[]
+     *   The metadata as a keyed array.
+     */
+    public function metadataToArray(): array
+    {
+        return $this->getMetadata()->toArray();
+    }
+
+    /**
      * Adds a warning to the object (in its metadata).
      *
      * @param string|\Siel\Acumulus\Helpers\Message $message

@@ -70,7 +70,7 @@ trait AcumulusObjectMetadataTrait
      * @return string[]
      *   The metadata as a keyed array.
      */
-    public function metadataToArray(): array
+    protected function metadataToArray(): array
     {
         return $this->getMetadata()->toArray();
     }

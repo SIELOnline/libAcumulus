@@ -249,7 +249,7 @@ abstract class AcumulusObject implements ArrayAccess
      *   Required property is not set.
      * @noinspection PhpVariableVariableInspection
      */
-    public function propertiesToArray(): array
+    protected function propertiesToArray(): array
     {
         $result = [];
         foreach ($this->data as $name => $property) {

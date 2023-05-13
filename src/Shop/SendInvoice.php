@@ -32,9 +32,21 @@ class SendInvoice
 {
     private Container $container;
 
+    private bool $dryRun;
+
     public function __construct(Container $container)
     {
         $this->container = $container;
+    }
+
+    protected function isDryRun(): bool
+    {
+        return $this->dryRun;
+    }
+
+    protected function setDryRun(bool $dryRun): void
+    {
+        $this->dryRun = $dryRun;
     }
 
     /**
@@ -123,9 +135,10 @@ class SendInvoice
         bool $forceSend = false,
         bool $dryRun = false
     ): InvoiceAddResult {
+        $this->setDryRun($dryRun);
         $invoice = $this->create($invoiceSource, $result, $forceSend);
         if ($invoice !== null && !$result->isSendingPrevented()) {
-            $this->send($invoice, $invoiceSource, $result, $dryRun);
+            $this->send($invoice, $invoiceSource, $result);
         }
         return $result;
     }
@@ -136,6 +149,7 @@ class SendInvoice
         $this->getEvent()->triggerInvoiceCreateBefore($invoiceSource, $result);
         if (!$result->isSendingPrevented()) {
             $invoice = $this->getCollectorManager()->collectInvoice($invoiceSource);
+            $result->setInvoice($invoice);
             $this->getEvent()->triggerInvoiceCreateAfter($invoice, $invoiceSource, $result);
             /** @noinspection PhpConditionAlreadyCheckedInspection */
             if (!$result->isSendingPrevented()) {
@@ -155,13 +169,13 @@ class SendInvoice
     {
         $acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource, false);
         if ($this->isTestMode()) {
-            $result->setSendStatus(InvoiceAddResult::Send_TestMode);
+            $result->setSendStatus(InvoiceAddResult::Sent_TestMode);
         } elseif ($acumulusEntry === null) {
-            $result->setSendStatus(InvoiceAddResult::Send_New);
+            $result->setSendStatus(InvoiceAddResult::Sent_New);
         } elseif ($forceSend) {
-            $result->setSendStatus(InvoiceAddResult::Send_Forced);
+            $result->setSendStatus(InvoiceAddResult::Sent_Forced);
         } elseif ($acumulusEntry->hasLockExpired()) {
-            $result->setSendStatus(InvoiceAddResult::Send_LockExpired);
+            $result->setSendStatus(InvoiceAddResult::Sent_LockExpired);
         } elseif ($acumulusEntry->isSendLock()) {
             $result->setSendStatus(InvoiceAddResult::NotSent_AlreadyLocked);
         } else {
@@ -169,12 +183,12 @@ class SendInvoice
         }
     }
 
-    protected function send(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result, bool $dryRun): void
+    protected function send(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         $this->getEvent()->triggerInvoiceSendBefore($invoice, $result);
         if (!$result->isSendingPrevented()) {
             // Some last checks that can also still prevent sending.
-            $this->checkBeforeSending($invoice, $result, $dryRun);
+            $this->checkBeforeSending($invoice, $result);
             /** @noinspection PhpConditionAlreadyCheckedInspection */
             if (!$result->isSendingPrevented()) {
                 $this->lockAndSend($invoice, $invoiceSource, $result);
@@ -204,7 +218,12 @@ class SendInvoice
     {
         $didLock = $this->lock($invoiceSource, $result);
         if (!$result->isSendingPrevented()) {
-            $this->doSend($invoice, $invoiceSource, $result);
+            if (!$this->isDryRun()) {
+                $this->doSend($invoice, $invoiceSource, $result);
+            } else {
+                $result->setSendStatus(InvoiceAddResult::NotSent_DryRun);
+                // @todo: add $invoice to result.
+            }
         }
 
         // When everything went well, the lock will have been replaced by a real
@@ -243,11 +262,12 @@ class SendInvoice
      */
     protected function lock(Source $invoiceSource, InvoiceAddResult $result): bool
     {
-        $doLock = !$this->isTestMode()
-            && in_array($result->getSendStatus(), [InvoiceAddResult::Send_New, InvoiceAddResult::Send_LockExpired], true);
+        $doLock = !$this->isDryRun()
+            && !$this->isTestMode()
+            && in_array($result->getSendStatus(), [InvoiceAddResult::Sent_New, InvoiceAddResult::Sent_LockExpired], true);
         if ($doLock) {
             // Check if we may expect an expired lock and, if so, remove it.
-            if ($result->getSendStatus() === InvoiceAddResult::Send_LockExpired) {
+            if ($result->getSendStatus() === InvoiceAddResult::Sent_LockExpired) {
                 $lockStatus = $this->getAcumulusEntryManager()->deleteLock($invoiceSource);
                 if ($lockStatus === AcumulusEntry::Lock_BecameRealEntry) {
                     // Bail out: invoice already sent after all.
@@ -334,8 +354,7 @@ class SendInvoice
                 } else {
                     // Could not delete the old entry: already moved to the waste bin.
                     $invoiceAddResult->createAndAddMessage(
-                        sprintf($this->t('message_warning_old_entry_already_deleted'), $this->t($invoiceSource->getType()),
-                            $entryId),
+                        sprintf($this->t('message_warning_old_entry_already_deleted'), $this->t($invoiceSource->getType()), $entryId),
                         Severity::Warning,
                         902
                     );
@@ -359,18 +378,13 @@ class SendInvoice
      * Checks for a number of conditions that can prevent sending the invoice.
      *
      * The conditions that are checked:
-     * - Dry run: do not actually send.
      * - Errors were encountered during the creation of the invoice.
      * - Edge case: no invoice lines: will fail on the API.
      * - If the invoice has a 0 total amount, and the user does not want to send
      *   those.
      */
-    protected function checkBeforeSending(Invoice $invoice, InvoiceAddResult $result, bool $dryRun): void
+    protected function checkBeforeSending(Invoice $invoice, InvoiceAddResult $result): void
     {
-        // - Dry run: do not actually send:
-        if ($dryRun) {
-            $result->setSendStatus(InvoiceAddResult::NotSent_DryRun);
-        }
         // - We encountered errors during the creation of the invoice.
         if ($result->hasError()) {
             $result->setSendStatus(InvoiceAddResult::NotSent_LocalErrors);

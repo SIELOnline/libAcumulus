@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\ApiClient\AcumulusResult;
+use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Severity;
@@ -43,11 +44,11 @@ class InvoiceAddResult extends MessageCollection
     public const NotSent_EventInvoiceCreateAfter = 0xd;
     public const NotSent_EventInvoiceSendBefore = 0xe;
     public const NotSent_Mask = 0xf;
-    // Reasons for sending
-    public const Send_New = 0x10;
-    public const Send_Forced = 0x20;
-    public const Send_TestMode = 0x30;
-    public const Send_LockExpired = 0x40;
+    // Reasons for sending.
+    public const Sent_New = 0x10;
+    public const Sent_Forced = 0x20;
+    public const Sent_TestMode = 0x30;
+    public const Sent_LockExpired = 0x40;
     public const Send_Mask = 0xf0;
 
     /**
@@ -65,6 +66,17 @@ class InvoiceAddResult extends MessageCollection
      * A list of parameters to use when getting the send-status as text.
      */
     protected array $sendStatusArguments;
+    /**
+     * @var \Siel\Acumulus\Data\Invoice|null
+     *   The invoice that is (attempted to) being sent to Acumulus, or null if not yet
+     *   set.
+     */
+    protected ?Invoice $invoice = null;
+    /**
+     * @var \Siel\Acumulus\ApiClient\AcumulusResult|null
+     *   The API result of sending the invoice to Acumulus, null if not yet sent or if
+     *   sending is prevented
+     */
     protected ?AcumulusResult $acumulusResult = null;
 
     /**
@@ -180,69 +192,63 @@ class InvoiceAddResult extends MessageCollection
      */
     protected function getSendStatusText(): string
     {
-        switch ($this->sendStatus) {
-            case self::NotSent_WrongStatus:
-                $message = count($this->sendStatusArguments) === 0
-                    ? 'reason_not_sent_triggerCreditNoteEvent_None'
-                    : 'reason_not_sent_wrongStatus';
-                break;
-            case self::NotSent_AlreadySent:
-                $message = 'reason_not_sent_alreadySent';
-                break;
-            case self::NotSent_AlreadyLocked:
-                $message = 'reason_not_sent_alreadySending';
-                break;
-            case self::NotSent_LockNotAcquired:
-                $message = 'reason_not_sent_lockNotAcquired';
-                break;
-            case self::NotSent_EventInvoiceCreateAfter:
-                $message = 'reason_not_sent_prevented_invoiceCreated';
-                break;
-            case self::NotSent_EventInvoiceSendBefore:
-                $message = 'reason_not_sent_prevented_invoiceCompleted';
-                break;
-            case self::NotSent_EmptyInvoice:
-                $message = 'reason_not_sent_empty_invoice';
-                break;
-            case self::NotSent_NoInvoiceLines:
-                $message = 'reason_not_sent_no_invoice_lines';
-                break;
-            case self::NotSent_TriggerInvoiceCreateNotEnabled:
-                $message = 'reason_not_sent_not_enabled_triggerInvoiceCreate';
-                break;
-            case self::NotSent_TriggerInvoiceSentNotEnabled:
-                $message = 'reason_not_sent_not_enabled_triggerInvoiceSent';
-                break;
-            case self::NotSent_LocalErrors:
-                $message = 'reason_not_sent_local_errors';
-                break;
-            case self::NotSent_DryRun:
-                $message = 'reason_not_sent_dry_run';
-                break;
-            case self::Send_TestMode:
-                $message = 'reason_sent_testMode';
-                break;
-            case self::Send_New:
-                $message = count($this->sendStatusArguments) === 0
-                    ? 'reason_sent_new'
-                    : 'reason_sent_new_status_change';
-                break;
-            case self::Send_LockExpired:
-                $message = 'reason_sent_lock_expired';
-                break;
-            case self::Send_Forced:
-                $message = 'reason_sent_forced';
-                break;
-            default:
-                $message = 'reason_unknown';
-                $this->sendStatusArguments = [($this->sendStatus)];
-                break;
+        $messages = [
+            self::NotSent_AlreadySent => 'reason_not_sent_alreadySent',
+            self::NotSent_AlreadyLocked => 'reason_not_sent_alreadySending',
+            self::NotSent_LockNotAcquired => 'reason_not_sent_lockNotAcquired',
+            self::NotSent_EventInvoiceCreateAfter => 'reason_not_sent_prevented_invoiceCreated',
+            self::NotSent_EventInvoiceSendBefore => 'reason_not_sent_prevented_invoiceCompleted',
+            self::NotSent_EmptyInvoice => 'reason_not_sent_empty_invoice',
+            self::NotSent_NoInvoiceLines => 'reason_not_sent_no_invoice_lines',
+            self::NotSent_TriggerInvoiceCreateNotEnabled => 'reason_not_sent_not_enabled_triggerInvoiceCreate',
+            self::NotSent_TriggerInvoiceSentNotEnabled => 'reason_not_sent_not_enabled_triggerInvoiceSent',
+            self::NotSent_LocalErrors => 'reason_not_sent_local_errors',
+            self::NotSent_DryRun => 'reason_not_sent_dry_run',
+            self::Sent_TestMode => 'reason_sent_testMode',
+            self::Sent_LockExpired => 'reason_sent_lock_expired',
+            self::Sent_Forced => 'reason_sent_forced',
+        ];
+        if (isset($messages[$this->sendStatus])) {
+            $message = $messages[$this->sendStatus];
+        } else {
+            // Send statuses that can have different messages depending on whether there
+            // are send status arguments.
+            switch ($this->sendStatus) {
+                case self::NotSent_WrongStatus:
+                    $message = count($this->sendStatusArguments) === 0
+                        ? 'reason_not_sent_triggerCreditNoteEvent_None'
+                        : 'reason_not_sent_wrongStatus';
+                    break;
+                case self::Sent_New:
+                    $message = count($this->sendStatusArguments) === 0
+                        ? 'reason_sent_new'
+                        : 'reason_sent_new_status_change';
+                    break;
+                default:
+                    $message = 'reason_unknown';
+                    $this->sendStatusArguments = [($this->sendStatus)];
+                    break;
+            }
         }
         $message = $this->t($message);
         if (count($this->sendStatusArguments) !== 0) {
             $message = vsprintf($message, $this->sendStatusArguments);
         }
         return $message;
+    }
+
+    /**
+     * Returns the invoice that is (attempted to) being sent to Acumulus, or null if not
+     * yet set.
+     */
+    public function getInvoice(): ?Invoice
+    {
+        return $this->invoice;
+    }
+
+    public function setInvoice(Invoice $invoice): void
+    {
+        $this->invoice = $invoice;
     }
 
     public function getMainApiResponse(): ?array

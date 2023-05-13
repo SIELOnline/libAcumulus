@@ -387,13 +387,13 @@ abstract class InvoiceManager
     ): InvoiceAddResult {
         // Get the basic reason for sending or not sending.
         if ($this->isTestMode()) {
-            $result->setSendStatus(InvoiceAddResult::Send_TestMode);
+            $result->setSendStatus(InvoiceAddResult::Sent_TestMode);
         } elseif (($acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource, false)) === null) {
-            $result->setSendStatus(InvoiceAddResult::Send_New);
+            $result->setSendStatus(InvoiceAddResult::Sent_New);
         } elseif ($forceSend) {
-            $result->setSendStatus(InvoiceAddResult::Send_Forced);
+            $result->setSendStatus(InvoiceAddResult::Sent_Forced);
         } elseif ($acumulusEntry->hasLockExpired()) {
-            $result->setSendStatus(InvoiceAddResult::Send_LockExpired);
+            $result->setSendStatus(InvoiceAddResult::Sent_LockExpired);
         } elseif ($acumulusEntry->isSendLock()) {
             return $result->setSendStatus(InvoiceAddResult::NotSent_AlreadyLocked);
         } else {
@@ -462,13 +462,13 @@ abstract class InvoiceManager
     {
         $doLock = !$this->isTestMode() && in_array(
                 $result->getSendStatus(),
-                [InvoiceAddResult::Send_New, InvoiceAddResult::Send_LockExpired],
+                [InvoiceAddResult::Sent_New, InvoiceAddResult::Sent_LockExpired],
                 true
             );
 
         if ($doLock) {
             // Check if we may expect an expired lock and, if so, remove it.
-            if ($result->getSendStatus() === InvoiceAddResult::Send_LockExpired) {
+            if ($result->getSendStatus() === InvoiceAddResult::Sent_LockExpired) {
                 $lockStatus = $this->getAcumulusEntryManager()->deleteLock($invoiceSource);
                 if ($lockStatus === AcumulusEntry::Lock_BecameRealEntry) {
                     // Bail out: invoice already sent after all.

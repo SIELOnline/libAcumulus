@@ -3,11 +3,13 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-7.6.8 (2023-04-??)
+7.6.8 (2023-05-??)
 -----------------------
 Bugs:
 - PS: Nauwkeurigheid van bedragen bij creditfacturen is slechter dan aangenomen, precisie
   is nu op 1 cent gezet.
+- WC: TypeError: DateTime::createFromFormat() expects parameter 2 to be string, null given
+  in wp-content/plugins/acumulus/lib/siel/acumulus/src/Shop/AcumulusEntry.php:230.
 
 Refactoring:
 - ALL: Use distinct messages for the cases where an invoice is not sent because a lock

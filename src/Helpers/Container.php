@@ -444,11 +444,8 @@ class Container
      */
     public function getCompletor(string $dataType = '')
     {
-        if ($dataType !== '') {
-            $arguments = [$this, $this->getConfig(), $this->getTranslator()];
-            return $this->getInstance("{$dataType}Completor", 'Completors', $arguments);
-        } else {
-            // @todo: deprecated: legacy completor.
+        if ($dataType === '') {
+            // @legacy
             return $this->getInstance(
                 'Completor',
                 'Invoice',
@@ -463,6 +460,25 @@ class Container
                 ],
                 true
             );
+        } elseif ($dataType === 'legacy') {
+            // @legacy
+            return $this->getInstance(
+                'Completor',
+                'Completors\Legacy',
+                [
+                    $this->getCompletorInvoiceLines(),
+                    $this->getCompletorStrategyLines(),
+                    $this->getCountries(),
+                    $this->getAcumulusApiClient(),
+                    $this->getConfig(),
+                    $this->getTranslator(),
+                    $this->getLog(),
+                ],
+                true
+            );
+        } else {
+            $arguments = [$this, $this->getConfig(), $this->getTranslator()];
+            return $this->getInstance("{$dataType}Completor", 'Completors', $arguments);
         }
     }
 
@@ -485,21 +501,38 @@ class Container
         return $this->getInstance('CompletorStrategyLines', 'Invoice', [$this->getConfig(), $this->getTranslator()]);
     }
 
-    public function getCreator(): Creator
+    /**
+     * @return \Siel\Acumulus\Invoice\Creator|\Siel\Acumulus\Completors\Legacy\Creator
+     */
+    public function getCreator(bool $legacy = false)
     {
-        return $this->getInstance(
-            'Creator',
-            'Invoice',
-            [
-                $this->getToken(),
-                $this->getCountries(),
-                $this->getShopCapabilities(),
-                $this,
-                $this->getConfig(),
-                $this->getTranslator(),
-                $this->getLog(),
-            ]
-        );
+        // @legacy
+        return $legacy
+            ? $this->getInstance(
+                'Creator',
+                'Completors\Legacy',
+                [
+                    $this->getFieldExpander(),
+                    $this->getShopCapabilities(),
+                    $this,
+                    $this->getConfig(),
+                    $this->getTranslator(),
+                    $this->getLog(),
+                ]
+            )
+            : $this->getInstance(
+                'Creator',
+                'Invoice',
+                [
+                    $this->getToken(),
+                    $this->getCountries(),
+                    $this->getShopCapabilities(),
+                    $this,
+                    $this->getConfig(),
+                    $this->getTranslator(),
+                    $this->getLog(),
+                ]
+            );
     }
 
     /**

@@ -55,7 +55,8 @@ class CompletorInvoiceLines
      */
     protected array $possibleVatRates;
     protected Config $config;
-    protected Completor $completor;
+    /** @var \Siel\Acumulus\Invoice\Completor|\Siel\Acumulus\Completors\Legacy\Completor  */
+    protected $completor;
     protected FlattenerInvoiceLines $invoiceLineFlattener;
 
     public function __construct(FlattenerInvoiceLines $invoiceLinesFlattener, Config $config)
@@ -67,7 +68,7 @@ class CompletorInvoiceLines
     /**
      * Sets the completor (just so we can call some convenience methods).
      */
-    public function setCompletor(Completor $completor): void
+    public function setCompletor($completor): void
     {
         $this->completor = $completor;
     }

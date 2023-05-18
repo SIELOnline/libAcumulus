@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Completors\Legacy\Creator as LegacyCreator;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
@@ -30,7 +31,6 @@ class CreatorPluginSupport
     /**
      * Called at the beginning of Creator::getItemLine().
      *
-     * @param \Siel\Acumulus\WooCommerce\Invoice\Creator $creator
      * @param WC_Order_Item_Product $item
      *   An array representing an order item line, meta values are already
      *   available under their own names and as an array under key 'item_meta'.
@@ -41,7 +41,7 @@ class CreatorPluginSupport
      *
      * @noinspection PhpUnused
      */
-    public function getItemLineBefore(Creator $creator, WC_Order_Item_Product $item, $product): void
+    public function getItemLineBefore(LegacyCreator $creator, WC_Order_Item_Product $item, $product): void
     {
         $this->getItemLineBeforeBookings($creator, $item, $product);
     }
@@ -49,7 +49,6 @@ class CreatorPluginSupport
     /**
      * Called at the end of Creator::getItemLine().
      *
-     * @param \Siel\Acumulus\WooCommerce\Invoice\Creator $creator
      * @param WC_Order_Item_Product $item
      *   An array representing an order item line, meta values are already
      *   available under their own names and as an array under key 'item_meta'.
@@ -61,7 +60,7 @@ class CreatorPluginSupport
      * @noinspection PhpUnused
      */
     public function getItemLineAfter(
-        Creator $creator,
+        LegacyCreator $creator,
         /** @noinspection PhpUnusedParameterInspection */ WC_Order_Item_Product $item,
         /** @noinspection PhpUnusedParameterInspection */$product
     ): void {
@@ -74,11 +73,9 @@ class CreatorPluginSupport
      * Bookings are stored in a separate entity, we add that as a separate
      * property source, so its properties can be used.
      *
-     * @param \Siel\Acumulus\WooCommerce\Invoice\Creator $creator
-     * @param WC_Order_Item_Product $item
      * @param WC_Product|bool|null $product
      */
-    public function getItemLineBeforeBookings(Creator $creator, WC_Order_Item_Product $item, $product): void
+    public function getItemLineBeforeBookings(LegacyCreator $creator, WC_Order_Item_Product $item, $product): void
     {
         if (($product instanceof WC_Product)
             && function_exists('is_wc_booking_product')
@@ -103,10 +100,8 @@ class CreatorPluginSupport
      * Supports the "WooCommerce Bookings" plugin.
      *
      * Removes the property source.
-     *
-     * @param \Siel\Acumulus\WooCommerce\Invoice\Creator $creator
      */
-    public function getItemLineAfterBookings(Creator $creator): void
+    public function getItemLineAfterBookings(LegacyCreator $creator): void
     {
         $creator->removePropertySource('resource');
         $creator->removePropertySource('booking');
@@ -114,12 +109,6 @@ class CreatorPluginSupport
 
     /**
      * Filter that reacts to the acumulus_invoice_created event.
-     *
-     * @param array|null $invoice
-     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
-     *
-     * @return array|null
      */
     public function acumulusInvoiceCreated(?array $invoice, BaseSource $invoiceSource, InvoiceAddResult $localResult): ?array
     {
@@ -148,12 +137,6 @@ class CreatorPluginSupport
      *    represents a bundle or bundled item.
      * 2) In a 2nd pass, we group the bundled items as children into the parent
      *    line.
-     *
-     * @param array|null $invoice
-     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
-     *
-     * @return array|null
      */
     protected function supportBundleProducts(?array $invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ InvoiceAddResult $localResult): ?array
     {
@@ -274,12 +257,6 @@ class CreatorPluginSupport
      * tmcartepo. We need the tncartepo_data value as that contains the
      * options.
      * This method adds the option data as children to the invoice line.
-     *
-     * @param array|null $invoice
-     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
-     *
-     * @return array|null
      */
     protected function supportTMExtraProductOptions(
         ?array $invoice,

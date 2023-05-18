@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
@@ -106,7 +107,10 @@ class SplitNonMatchingLine extends CompletorStrategyBase
         return $result;
     }
 
-    protected function splitNonMatchingLine(array $line): bool
+    /**
+     * @param array|Line $line
+     */
+    protected function splitNonMatchingLine($line): bool
     {
         [$lowAmount, $highAmount] = $this->splitAmountOver2VatRates($line[Meta::LineAmount],
             $line[Meta::LineAmountInc] - $line[Meta::LineAmount],

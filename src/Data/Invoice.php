@@ -111,6 +111,8 @@ class Invoice extends AcumulusObject
     public function setCustomer(Customer $customer): void
     {
         $this->customer = $customer;
+        // @legacy: needed to support ArrayAccess.
+        $this->customer->setInvoice($this);
     }
 
     /**

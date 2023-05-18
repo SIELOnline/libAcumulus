@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
@@ -58,8 +59,8 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     protected float $knownDiscountVatAmount;
     /** @var float[] */
     protected array $discountsPerVatRate;
-    /** @var array[] */
-    protected array $splitLine;
+    /** @var array|Line */
+    protected $splitLine;
     protected int $splitLineKey;
     protected int $splitLineCount;
 

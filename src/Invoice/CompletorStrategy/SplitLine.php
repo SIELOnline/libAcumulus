@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Meta;
@@ -76,10 +77,10 @@ class SplitLine extends CompletorStrategyBase
      * chances of returning a wrong true result.
      */
     public static int $tryOrder = 40;
-    /** @var array[] */
+    /** @var array[]|Line[] */
     protected array $splitLines;
     protected float $splitLinesAmount;
-    /** @var array[] */
+    /** @var array[]|Line[] */
     protected array $otherLines;
     protected float $otherLinesAmount;
     protected float $nonStrategyAmount;

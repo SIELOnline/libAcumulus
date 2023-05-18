@@ -62,6 +62,11 @@ class Line extends AcumulusObject
         $this->children[] = $child;
     }
 
+    public function removeChildren(): void
+    {
+        $this->children = [];
+    }
+
     public function hasWarning(): bool
     {
         $hasWarning = parent::hasWarning();

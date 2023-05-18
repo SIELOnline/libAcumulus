@@ -31,9 +31,9 @@ class CustomerCompletor extends BaseCompletor
      * This phase is executed after the collecting phase.
      *
      * @param \Siel\Acumulus\Data\Customer $acumulusObject
-     * @param \Siel\Acumulus\Helpers\MessageCollection|null $result
+     * @param \Siel\Acumulus\Helpers\MessageCollection $result
      */
-    public function complete(AcumulusObject $acumulusObject, ?MessageCollection $result = null): void
+    public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
         $this->customer = $acumulusObject;
         $this->getContainer()->getCompletorTask('Customer', 'ByConfig')->complete($this->customer, $this->configGet('sendCustomer'));

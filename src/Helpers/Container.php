@@ -466,7 +466,7 @@ class Container
                 'Completor',
                 'Completors\Legacy',
                 [
-                    $this->getCompletorInvoiceLines(),
+                    $this->getCompletorInvoiceLines(true),
                     $this->getCompletorStrategyLines(),
                     $this->getCountries(),
                     $this->getAcumulusApiClient(),
@@ -482,18 +482,26 @@ class Container
         }
     }
 
-    public function getCompletorInvoiceLines(): CompletorInvoiceLines
+    /**
+     * @return \Siel\Acumulus\Invoice\CompletorInvoiceLines|\Siel\Acumulus\Completors\Legacy\CompletorInvoiceLines
+     */
+    public function getCompletorInvoiceLines(bool $legacy = false)
     {
+        $subNamespace = $legacy ? 'Completors\Legacy' : 'Invoice';
         return $this->getInstance(
             'CompletorInvoiceLines',
-            'Invoice',
-            [$this->getFlattenerInvoiceLines(), $this->getConfig()]
+            $subNamespace,
+            [$this->getFlattenerInvoiceLines($legacy), $this->getConfig()]
         );
     }
 
-    public function getFlattenerInvoiceLines(): FlattenerInvoiceLines
+    /**
+     * @return \Siel\Acumulus\Invoice\FlattenerInvoiceLines|\Siel\Acumulus\Completors\Legacy\FlattenerInvoiceLines
+     */
+    public function getFlattenerInvoiceLines(bool $legacy = false)
     {
-        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', [$this->getConfig()]);
+        $subNamespace = $legacy ? 'Completors\Legacy' : 'Invoice';
+        return $this->getInstance('FlattenerInvoiceLines', $subNamespace, [$this->getConfig()]);
     }
 
     public function getCompletorStrategyLines(): CompletorStrategyLines

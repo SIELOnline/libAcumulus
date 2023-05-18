@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpDeprecationInspection
+ */
 
 declare(strict_types=1);
 
@@ -45,7 +48,7 @@ class CollectorManager
     private Mappings $mappings;
     protected Log $log;
 
-    /** deprecated  Only Source remains with multi-level FieldExpander? */
+    /** deprecated?  Only Source remains with multi-level FieldExpander? */
     protected array $propertySources;
 
     public function __construct(FieldExpander $fieldExpander, Mappings $mappings, Container $container, Log $log)
@@ -68,7 +71,7 @@ class CollectorManager
     }
 
     /**
-     * @deprecated  Only Source remains with multi-level FieldExpander?
+     * @deprecated?  Only Source remains with multi-level FieldExpander?
      */
     protected function getPropertySources(): array
     {
@@ -78,7 +81,7 @@ class CollectorManager
     /**
      * Sets the list of sources to search for a property when expanding fields.
      *
-     * @deprecated  Only Source remains with multi-level FieldExpander?
+     * @deprecated?  Only Source remains with multi-level FieldExpander?
      */
     protected function setPropertySources(Source $invoiceSource): void
     {
@@ -99,7 +102,7 @@ class CollectorManager
      * @param object|array $property
      *   The source object to add.
      *
-     * @deprecated  Only Source remains with multi-level FieldExpander?
+     * @deprecated?  Only Source remains with multi-level FieldExpander?
      */
     public function addPropertySource(string $name, $property): void
     {
@@ -112,7 +115,7 @@ class CollectorManager
      * @param string $name
      *   The name of the source to remove.
      *
-     * @deprecated  Only Source remains with multi-level FieldExpander?
+     * @deprecated?  Only Source remains with multi-level FieldExpander?
      */
     protected function removePropertySource(string $name): void
     {
@@ -129,7 +132,13 @@ class CollectorManager
         $invoice->setCustomer($this->collectCustomer($source));
         $invoice->setEmailAsPdf($this->collectEmailAsPdf($source, EmailAsPdfType::Invoice));
 
-        // @todo: invoice lines.
+        // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
+        //   version in the Legacy sub namespace that is stripped down to these features
+        //   that has not yet been converted.
+        /** @var \Siel\Acumulus\Completors\Legacy\Creator $creator */
+        $creator = $this->getContainer()->getCreator(true);
+        $creator->create($source, $invoice);
+        // @legacy end
 
         return $invoice;
     }

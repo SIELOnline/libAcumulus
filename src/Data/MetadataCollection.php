@@ -21,10 +21,13 @@ class MetadataCollection
 
     /**
      * Returns the {@see MetadataValue} object for $name, or null if not set.
+     *
+     * @legacy: the return by reference is to make the ArrayAccess working.
      */
-    public function getMetadataValue(string $name): ?MetadataValue
+    public function &getMetadataValue(string $name): ?MetadataValue
     {
-        return $this->metadata[$name] ?? null;
+        $result = $this->metadata[$name] ?? null;
+        return $result;
     }
 
     /**
@@ -37,11 +40,14 @@ class MetadataCollection
      *
      * @return array|mixed|null
      *   The value for the given metadata name, or null if not set.
+     *
+     * @legacy: the return by reference is to make the ArrayAccess working.
      */
-    public function get(string $name)
+    public function &get(string $name)
     {
         /** @noinspection NullPointerExceptionInspection */
-        return $this->exists($name) ? $this->getMetadataValue($name)->get() : null;
+        $result = $this->exists($name) ? $this->getMetadataValue($name)->get() : null;
+        return $result;
     }
 
     /**

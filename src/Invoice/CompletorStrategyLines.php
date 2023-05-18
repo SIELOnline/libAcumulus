@@ -17,6 +17,8 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -35,9 +37,9 @@ class CompletorStrategyLines
 {
     protected Config $config;
     protected Translator $translator;
-    /** @var array[] */
-    protected array $invoice;
-    /** @var array[] */
+    /** @var array[]|Invoice */
+    protected $invoice;
+    /** @var array[]|Line[] */
     protected array $invoiceLines;
     protected Source $source;
     /**
@@ -60,17 +62,17 @@ class CompletorStrategyLines
      * Completes the invoice with default settings that do not depend on shop
      * specific data.
      *
-     * @param array $invoice
+     * @param array|Invoice $invoice
      *   The invoice to complete.
      * @param Source $source
      *   The source object for which this invoice was created.
      * @param int[] $possibleVatTypes
      * @param array[] $possibleVatRates
      *
-     * @return array
+     * @return array|Invoice
      *   The completed invoice.
      */
-    public function complete(array $invoice, Source $source, array $possibleVatTypes, array $possibleVatRates): array
+    public function complete($invoice, Source $source, array $possibleVatTypes, array $possibleVatRates)
     {
         $this->invoice = $invoice;
         $this->invoiceLines = &$this->invoice[Tag::Customer][Tag::Invoice][Tag::Line];
@@ -163,7 +165,7 @@ class CompletorStrategyLines
      * Replaces all completed strategy lines with the given completed lines.
      *
      * @param int[] $linesCompleted
-     * @param array[] $completedLines
+     * @param array[]|Line[] $completedLines
      *   An array of completed invoice lines to replace the strategy lines with.
      */
     protected function replaceLinesCompleted(array $linesCompleted, array $completedLines, string $strategyName): void

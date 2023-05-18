@@ -1,7 +1,6 @@
 <?php
 /**
- * @noinspection DuplicatedCode  During the transition to Collectors, duplicate
- *   code will exist.
+ * @noinspection DuplicatedCode  During the transition to Collectors, duplicate code will exist.
  */
 
 declare(strict_types=1);
@@ -10,6 +9,11 @@ namespace Siel\Acumulus\Completors\Legacy;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\FieldExpander;
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
@@ -17,7 +21,10 @@ use Siel\Acumulus\Invoice\Translations;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
+use function array_key_exists;
+use function count;
 use function func_get_args;
+use function in_array;
 use function is_array;
 use function is_int;
 
@@ -42,6 +49,8 @@ abstract class Creator
     public const VatRateSource_Exact0 = 'exact-0';
     public const VatRateSource_Calculated = 'calculated';
     public const VatRateSource_Completor = 'completor';
+    public const VatRateSource_Parent = 'parent';
+    public const VatRateSource_Strategy = 'strategy';
 
     public const LineType_OrderItem = 'order-item';
     public const LineType_Shipping = 'shipping';
@@ -49,23 +58,40 @@ abstract class Creator
     public const LineType_GiftWrapping = 'gift';
     public const LineType_Manual = 'manual';
     public const LineType_Discount = 'discount';
-//    public const LineType_Voucher = 'voucher';
-//    public const LineType_Other = 'other';
-//    public const LineType_Corrector = 'missing-amount-corrector';
+    public const LineType_Voucher = 'voucher';
+    public const LineType_Other = 'other';
+    public const LineType_Corrector = 'missing-amount-corrector';
 
+    private Container $container;
     protected Config $config;
     protected Translator $translator;
-
     protected Source $invoiceSource;
 
+    private FieldExpander $field;
+    protected ShopCapabilities $shopCapabilities;
+    protected Log $log;
     /**
-     * Constructor.
-     *
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @var Invoice
+     *   Resulting Acumulus invoice.
      */
-    public function __construct(Config $config, Translator $translator)
-    {
+    protected Invoice $invoice;
+    /**
+     * The list of sources to search for properties.
+     */
+    protected array $propertySources;
+
+    public function __construct(
+        FieldExpander $field,
+        ShopCapabilities $shopCapabilities,
+        Container $container,
+        Config $config,
+        Translator $translator,
+        Log $log
+    ) {
+        $this->log = $log;
+        $this->field = $field;
+        $this->shopCapabilities = $shopCapabilities;
+        $this->container = $container;
         $this->config = $config;
         $this->translator = $translator;
         $invoiceHelperTranslations = new Translations();
@@ -87,8 +113,98 @@ abstract class Creator
         return $this->translator->get($key);
     }
 
+    protected function getContainer(): Container
+    {
+        return $this->container;
+    }
+
+    protected function getField(): FieldExpander
+    {
+        return $this->field;
+    }
+
     /**
-     * Returns the 'invoice''line' parts of the invoice add structure.
+     * Sets the source to create the invoice for.
+     *
+     * @param Source $invoiceSource
+     */
+    protected function setInvoiceSource(Source $invoiceSource): void
+    {
+        $this->invoiceSource = $invoiceSource;
+        if (!in_array($invoiceSource->getType(), [Source::Order, Source::CreditNote], true)) {
+            $this->log->error('Creator::setSource(): unknown source type %s', $this->invoiceSource->getType());
+        }
+    }
+
+    /**
+     * Sets the list of sources to search for a property when expanding tokens.
+     */
+    protected function setPropertySources(): void
+    {
+        $this->propertySources = [];
+        $this->propertySources['invoiceSource'] = $this->invoiceSource;
+        $this->propertySources['invoiceSourceType'] = ['label' => $this->t($this->propertySources['invoiceSource']->getType())];
+
+        if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
+            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
+            $this->propertySources['originalInvoiceSourceType'] =
+                ['label' => $this->t($this->propertySources['originalInvoiceSource']->getType())];
+        }
+        $this->propertySources['source'] = $this->invoiceSource->getSource();
+        if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
+            if ($this->invoiceSource->getType() === Source::CreditNote) {
+                $this->propertySources['refund'] = $this->invoiceSource->getSource();
+            }
+            $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
+            if ($this->invoiceSource->getType() === Source::CreditNote) {
+                $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getOrder();
+                $this->propertySources['refundedInvoiceSourceType'] =
+                    ['label' => $this->t($this->propertySources['refundedInvoiceSource']->getType())];
+                $this->propertySources['refundedOrder'] = $this->invoiceSource->getOrder()->getSource();
+            }
+        }
+    }
+
+    /**
+     * Adds an object as property source.
+     *
+     * The object is added to the start of the array. So, upon token expansion,
+     * it will be searched before other (already added) property sources.
+     *
+     * @param string $name
+     *   The name to use for the source
+     * @param object|array $property
+     *   The source object to add.
+     */
+    public function addPropertySource(string $name, $property): void
+    {
+        $this->propertySources = [$name => $property] + $this->propertySources;
+    }
+
+    /**
+     * Removes an object as property source.
+     *
+     * @param string $name
+     *   The name of the source to remove.
+     */
+    public function removePropertySource(string $name): void
+    {
+        unset($this->propertySources[$name]);
+    }
+
+    /**
+     * Creates an Acumulus invoice from an order or credit note.
+     */
+    public function create(Source $source, Invoice $invoice): void
+    {
+        $this->invoice = $invoice;
+        $this->setInvoiceSource($source);
+        $this->setPropertySources();
+        Converter::getInvoiceLinesFromArray($this->getInvoiceLines(), $this->invoice);
+    }
+
+    /**
+     * Returns the 'invoice' 'line' parts of the invoice add structure.
      *
      * @return array[]
      *   A non keyed array with all invoice lines.
@@ -338,32 +454,6 @@ abstract class Creator
     }
 
     /**
-     * Constructs and returns the 'emailaspdf' section (if enabled).
-     *
-     * @param string $fallbackEmailTo
-     *   An email address to use as fallback when the emailTo setting is empty.
-     *
-     * @return array
-     *   The emailAsPdf section, possibly empty.
-     */
-    protected function getEmailAsPdf(string $fallbackEmailTo): array
-    {
-        $emailAsPdf = [];
-        $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
-        if ($emailAsPdfSettings['emailAsPdf']) {
-            $emailTo = !empty($emailAsPdfSettings['emailTo']) ? $this->getTokenizedValue($emailAsPdfSettings['emailTo']) : $fallbackEmailTo;
-            if (!empty($emailTo)) {
-                $emailAsPdf[Tag::EmailTo] = $emailTo;
-                $this->addTokenDefault($emailAsPdf, Tag::EmailBcc, $emailAsPdfSettings['emailBcc']);
-                $this->addTokenDefault($emailAsPdf, Tag::EmailFrom, $emailAsPdfSettings['emailFrom']);
-                $this->addTokenDefault($emailAsPdf, Tag::Subject, $emailAsPdfSettings['subject']);
-                $emailAsPdf[Tag::ConfirmReading] = $emailAsPdfSettings['confirmReading'] ? Api::ConfirmReading_Yes : Api::ConfirmReading_No;
-            }
-        }
-        return $emailAsPdf;
-    }
-
-    /**
      * Returns whether the margin scheme may be used.
      *
      * @return bool
@@ -412,28 +502,7 @@ abstract class Creator
      */
     protected function getTokenizedValue(string $pattern): string
     {
-//        return $this->field->expand($pattern, $this->propertySources);
-        return '';
-    }
-
-    /**
-     * Helper method to add a non-empty value to an array.
-     *
-     * @param array $array
-     * @param string $key
-     * @param mixed $value
-     *
-     * @return bool
-     *   True if the value was not empty and thus has been added, false
-     *   otherwise.
-     */
-    protected function addIfNotEmpty(array &$array, string $key, $value): bool
-    {
-        if (!empty($value)) {
-            $array[$key] = $value;
-            return true;
-        }
-        return false;
+        return $this->getField()->expand($pattern, $this->propertySources);
     }
 
     /**
@@ -450,26 +519,6 @@ abstract class Creator
     protected function addDefault(array &$array, string $key, $value): bool
     {
         if (empty($array[$key]) && !empty($value)) {
-            $array[$key] = $value;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Helper method to add a possibly empty default value to an array.
-     * This method will not overwrite existing values.
-     *
-     * @param array $array
-     * @param string $key
-     * @param mixed $value
-     *
-     * @return bool
-     *   Whether the default was added.
-     */
-    protected function addDefaultEmpty(array &$array, string $key, $value): bool
-    {
-        if (!isset($array[$key])) {
             $array[$key] = $value;
             return true;
         }
@@ -510,7 +559,7 @@ abstract class Creator
      */
     protected function addLineType(array $lines, string $lineType): array
     {
-        if (!empty($lines)) {
+        if (count($lines) !== 0) {
             // reset(), so key() does not return null if the array is not empty.
             reset($lines);
             if (is_int(key($lines))) {

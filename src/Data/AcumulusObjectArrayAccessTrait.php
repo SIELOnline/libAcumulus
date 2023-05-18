@@ -10,6 +10,9 @@ namespace Siel\Acumulus\Data;
 use ReturnTypeWillChange;
 use RuntimeException;
 
+use function array_key_exists;
+use function count;
+
 /**
  * Allows access to AcumulusObjects with array bracket syntax.
  *
@@ -27,19 +30,64 @@ use RuntimeException;
 trait AcumulusObjectArrayAccessTrait
 {
     /**
-     * @inheritdoc
+     * @var string[]
+     *   Mappings from (legacy) lower case keys to their new camel case replacement.
+     */
+    private array $propertyMappings = [];
+
+    private function getPropertyMappings(): array
+    {
+        if (count($this->propertyMappings) === 0) {
+            foreach ($this->getPropertyDefinitions() as $propertyDefinition) {
+                $this->propertyMappings[strtolower($propertyDefinition['name'])] = $propertyDefinition['name'];
+            }
+        }
+        return $this->propertyMappings;
+    }
+
+    /**
+     * Returns the name of the property $offset refers to.
+     *
+     * @param string $offset
+     *    The name to look for. This may be the lowercase version of a property name.
+     *
+     * @return string|null
+     *   The name of the property if the offset refers to a property, null otherwise.
+     */
+    private function getAcumulusProperty(string $offset): ?string
+    {
+        if ($this->isProperty($offset)) {
+            return $offset;
+        } else {
+            $propertyMappings = $this->getPropertyMappings();
+            if (array_key_exists($offset, $propertyMappings)) {
+                return $propertyMappings[$offset];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the value of the storage place inferred by $offset.
+     *
+     * $offset can refer to:
+     * - An {@see AcumulusProperty}. $offset can be an exact match or the lowercase
+     *   version of a property.
+     * - A "normal" object property (if one exists).
+     * - A metadata key (all other cases).
      */
     public function offsetSet($offset, $value): void
     {
         $this->checkOffset($offset);
-        if ($this->isProperty($offset)) {
-            $this->set($offset, $value);
+        $propertyName = $this->getAcumulusProperty($offset);
+        if ($propertyName !== null) {
+            $this->set($propertyName, $value);
         } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
             $this->$offset = $value;
         } else {
             // Metadata.
-            $this->metadata->set($offset, $value);
+            $this->getMetadata()->set($offset, $value);
         }
     }
 
@@ -49,14 +97,15 @@ trait AcumulusObjectArrayAccessTrait
     public function offsetExists($offset): bool
     {
         $this->checkOffset($offset);
-        if ($this->isProperty($offset)) {
-            $result = $this->__isset($offset);
+        $propertyName = $this->getAcumulusProperty($offset);
+        if ($propertyName !== null) {
+            $result = $this->__isset($propertyName);
         } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
             $result = isset($this->$offset);
         } else {
             // Metadata.
-            $result = $this->metadata->exists($offset);
+            $result = $this->getMetadata()->exists($offset);
         }
         return $result;
     }
@@ -67,14 +116,15 @@ trait AcumulusObjectArrayAccessTrait
     public function offsetUnset($offset): void
     {
         $this->checkOffset($offset);
-        if ($this->isProperty($offset)) {
-            $this->__unset($offset);
+        $propertyName = $this->getAcumulusProperty($offset);
+        if ($propertyName !== null) {
+            $this->__unset($propertyName);
         } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
             unset($this->$offset);
         } else {
             // Metadata.
-            $this->metadata->remove($offset);
+            $this->getMetadata()->remove($offset);
         }
     }
 
@@ -84,17 +134,18 @@ trait AcumulusObjectArrayAccessTrait
      * @noinspection PhpLanguageLevelInspection
      */
     #[ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function &offsetGet($offset)
     {
         $this->checkOffset($offset);
-        if ($this->isProperty($offset)) {
-            $result = $this->__get($offset);
+        $propertyName = $this->getAcumulusProperty($offset);
+        if ($propertyName !== null) {
+            $result = &$this->__get($propertyName);
         } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
-            $result = $this->$offset;
+            $result = &$this->$offset;
         } else {
             // Metadata.
-            $result = $this->metadata->get($offset);
+            $result = &$this->getMetadata()->get($offset);
         }
         return $result;
     }

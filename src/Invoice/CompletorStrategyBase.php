@@ -18,6 +18,8 @@ namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
@@ -39,10 +41,10 @@ abstract class CompletorStrategyBase
      */
     public static int $tryOrder;
     /**
-     * @var array[]
+     * @var array[]|Invoice
      *   The invoice according to the Acumulus API definition.
      */
-    protected array $invoice;
+    protected $invoice;
     /** @var array[] */
     protected array $possibleVatTypes;
     /** @var array[] */
@@ -54,12 +56,12 @@ abstract class CompletorStrategyBase
      */
     protected array $linesCompleted;
     /**
-     * @var array[]
+     * @var array[]|Line[]
      *   The lines that are to be completed by the strategy.
      */
     protected array $lines2Complete;
     /**
-     * @var array[]
+     * @var array[]|Line[]
      *   The lines that replace (some of) the $lines2Complete.
      *
      *   $linesCompleted indicates which lines in $lines2Complete are completed
@@ -85,10 +87,13 @@ abstract class CompletorStrategyBase
     private array $vatBreakdown;
     protected Source $source;
 
+    /**
+     * @param array[]|Invoice $invoice
+     */
     public function __construct(
         Config $config,
         Translator $translator,
-        array $invoice,
+        $invoice,
         array $possibleVatTypes,
         array $possibleVatRates,
         Source $source
@@ -172,7 +177,7 @@ abstract class CompletorStrategyBase
      *
      * Should only be called after success.
      *
-     * @return array[]
+     * @return array[]|Line[]
      */
     public function getReplacingLines(): array
     {
@@ -392,7 +397,7 @@ abstract class CompletorStrategyBase
      * Completes a line by filling in the given vat rate and calculating other
      * possibly missing fields ('vatamount', 'unitprice').
      *
-     * @param array $line2Complete
+     * @param array|Line $line2Complete
      *   The invoice line to complete. After it has been completed it is added
      *   to {@see $replacingLines}
      * @param float $vatRate
@@ -401,7 +406,7 @@ abstract class CompletorStrategyBase
      * @return float
      *   The vat amount for the completed line.
      */
-    protected function completeLine(array $line2Complete, float $vatRate): float
+    protected function completeLine($line2Complete, float $vatRate): float
     {
         if (!isset($line2Complete[Tag::Quantity])) {
             $line2Complete[Tag::Quantity] = 1;

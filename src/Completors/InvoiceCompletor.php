@@ -12,6 +12,7 @@ namespace Siel\Acumulus\Completors;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\MessageCollection;
+use Siel\Acumulus\Invoice\Source;
 
 /**
  * InvoiceCompletor completes an {@see \Siel\Acumulus\Data\Invoice}.
@@ -26,6 +27,27 @@ use Siel\Acumulus\Helpers\MessageCollection;
 class InvoiceCompletor extends BaseCompletor
 {
     private Invoice $invoice;
+    /**
+     * @var \Siel\Acumulus\Invoice\Source
+     *
+     * @legacy: The part that still uses the old Completor parts need the Source.
+     */
+    private Source $source;
+
+    public function getSource(): Source
+    {
+        return $this->source;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setSource(Source $source): InvoiceCompletor
+    {
+        $this->source = $source;
+        return $this;
+    }
+
 
     /**
      * Completes an {@see \Siel\Acumulus\Data\Invoice}.
@@ -33,9 +55,9 @@ class InvoiceCompletor extends BaseCompletor
      * This phase is executed after the collecting phase.
      *
      * @param \Siel\Acumulus\Data\Invoice $acumulusObject
-     * @param \Siel\Acumulus\Helpers\MessageCollection|null $result
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      */
-    public function complete(AcumulusObject $acumulusObject, ?MessageCollection $result = null): void
+    public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
         $this->invoice = $acumulusObject;
 
@@ -47,6 +69,12 @@ class InvoiceCompletor extends BaseCompletor
         $this->getCompletorTask('Invoice', 'Template')->complete($this->invoice);
         $this->getCompletorTask('Invoice', 'AddEmailAsPdfSection')->complete($this->invoice);
 
+        // @legacy: Not all Completing tasks are already converted, certainly not those that complete Lines.
+        /** @var \Siel\Acumulus\Completors\Legacy\Completor $legacyCompletor */
+        $legacyCompletor = $this->getContainer()->getCompletor('legacy');
+        $legacyCompletor->complete($this->invoice, $this->getSource(), $result);
+        // end of @legacy: Not all Completing tasks are already converted, certainly not those that complete Lines.
+
         // As last!
         $this->getCompletorTask('Invoice', 'Concept')->complete($this->invoice);
     }
@@ -55,7 +83,7 @@ class InvoiceCompletor extends BaseCompletor
      * Completes the {@see \Siel\Acumulus\Data\Customer} part of the
      * {@see \Siel\Acumulus\Data\Invoice}.
      */
-    protected function completeCustomer(?MessageCollection $result = null): void
+    protected function completeCustomer(MessageCollection $result): void
     {
         $this->getContainer()->getCompletor('Customer')->complete($this->invoice->getCustomer(), $result);
     }

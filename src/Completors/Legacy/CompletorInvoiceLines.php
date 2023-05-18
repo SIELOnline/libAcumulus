@@ -12,13 +12,15 @@
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode  During the transition to Collectors, duplicate code will exist.
  */
 
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Completors\Legacy;
 
-use ArrayAccess;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -78,15 +80,15 @@ class CompletorInvoiceLines
      * Completes the invoice with default settings that do not depend on shop
      * specific data.
      *
-     * @param array|ArrayAccess $invoice
+     * @param Invoice $invoice
      *   The invoice to complete.
      * @param int[] $possibleVatTypes
      * @param array[] $possibleVatRates
      *
-     * @return array|ArrayAccess
+     * @return Invoice
      *   The completed invoice.
      */
-    public function complete($invoice, array $possibleVatTypes, array $possibleVatRates)
+    public function complete(Invoice $invoice, array $possibleVatTypes, array $possibleVatRates): Invoice
     {
         $this->possibleVatTypes = $possibleVatTypes;
         $this->possibleVatRates = $possibleVatRates;
@@ -108,13 +110,13 @@ class CompletorInvoiceLines
      * The actions that can be done this way are those who operate on a line in
      * isolation and thus do not need totals, maximums or things like that.
      *
-     * @param array|ArrayAccess $invoice
+     * @param Invoice $invoice
      *   The invoice with the lines to complete recursively.
      *
-     * @return array|ArrayAccess
+     * @return Invoice
      *   The invoice with the completed invoice lines.
      */
-    protected function completeInvoiceLinesRecursive($invoice)
+    protected function completeInvoiceLinesRecursive(Invoice $invoice): Invoice
     {
         $lines = $invoice[Tag::Customer][Tag::Invoice][Tag::Line];
 
@@ -153,7 +155,7 @@ class CompletorInvoiceLines
     /**
      * Completes the invoice lines after they have been flattened.
      *
-     * @param array[] $lines
+     * @param Line[] $lines
      *   The invoice lines to complete.
      *
      * @return array[]
@@ -538,9 +540,9 @@ class CompletorInvoiceLines
      * service. However, for accompanying services like shipping or payment
      * fees, the nature should follow the major part of the "real" order items.
      *
-     * @param array[] $lines
+     * @param Line[] $lines
      *
-     * @return array[]
+     * @return Line[]
      *   The lines with the nature field completed for non-item lines.
      */
     protected function addNatureToNonItemLines(array $lines): array
@@ -568,7 +570,7 @@ class CompletorInvoiceLines
      *   part). However, we do not know for which lines it was meant, so we
      *   treat them like the other extra lines.
      *
-     * @param array[] $lines
+     * @param Line[] $lines
      *   The invoice lines to search.
      *
      * @return string
@@ -598,10 +600,10 @@ class CompletorInvoiceLines
      * method, but either no lookup vat data is available or the looked up vat
      * rate is not a possible vat rate.
      *
-     * @param array[] $lines
+     * @param Line[] $lines
      *   The invoice lines to correct by adding a vat rate to 0 amounts.
      *
-     * @return array[]
+     * @return Line[]
      *   The corrected invoice lines.
      */
     protected function addVatRateTo0PriceLines(array $lines): array
@@ -628,7 +630,7 @@ class CompletorInvoiceLines
     /**
      * Returns the maximum vat rate that appears in the given set of lines.
      *
-     * @param array[] $lines
+     * @param Line[] $lines
      *   The invoice lines to search.
      * @param ?int $index
      *   If passed, the index of the max vat rate is returned via this parameter.
@@ -764,10 +766,10 @@ class CompletorInvoiceLines
      *   this plugin is known to have a precision worse than 0.0001.
      * - Unit price is available.
      *
-     * @param array[] $lines
+     * @param Line[] $lines
      *   The invoice lines to recalculate.
      *
-     * @return array[]
+     * @return Line[]
      *   The recalculated invoice lines.
      */
     protected function recalculateLineData(array $lines): array
@@ -813,10 +815,10 @@ class CompletorInvoiceLines
      * - 'meta-line-price'
      * - 'meta-line-priceinc'
      *
-     * @param array[] $lines
+     * @param Line[] $lines
      *   The invoice lines to complete with metadata.
      *
-     * @return array[]
+     * @return Line[]
      *   The completed invoice lines.
      */
     protected function completeLineMetaData(array $lines): array

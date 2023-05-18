@@ -20,10 +20,6 @@ abstract class BaseCompletorTask implements CompletorTaskInterface
     private Config $config;
     private Translator $translator;
 
-    /**
-     * @param \Siel\Acumulus\Helpers\Container $container
-     * @param \Siel\Acumulus\Config\Config $config
-     */
     public function __construct(Container $container, Config $config, Translator $translator)
     {
         $this->container = $container;

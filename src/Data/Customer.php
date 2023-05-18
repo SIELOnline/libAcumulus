@@ -72,6 +72,8 @@ class Customer extends AcumulusObject
 {
     protected ?Address $invoiceAddress = null;
     protected ?Address $shippingAddress = null;
+    // @legacy: needed to support fluent ArrayAccess.
+    protected ?Invoice $invoice = null;
 
     protected function getPropertyDefinitions(): array
     {
@@ -96,6 +98,18 @@ class Customer extends AcumulusObject
             ['name' => Fld::Mark, 'type' => 'string'],
             ['name' => Fld::DisableDuplicates, 'type' => 'bool', 'allowedValues' => [Api::DisableDuplicates_No, Api::DisableDuplicates_Yes]],
         ];
+    }
+
+    // @legacy: needed to support ArrayAccess.
+    public function getInvoice(): ?Invoice
+    {
+        return $this->invoice;
+    }
+
+    // @legacy: needed to support ArrayAccess.
+    public function setInvoice(?Invoice $invoice): void
+    {
+        $this->invoice = $invoice;
     }
 
     public function getInvoiceAddress(): ?Address

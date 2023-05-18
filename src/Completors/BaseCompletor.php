@@ -88,14 +88,14 @@ abstract class BaseCompletor
     }
 
     /**
-     * Completes an {@see \Siel\Acumulus\Data\Customer}.
+     * Completes an {@see \Siel\Acumulus\Data\AcumulusObject}.
      *
      * This phase is executed after the collecting phase.
      *
      * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      *   The object to complete.
-     * @param \Siel\Acumulus\Helpers\MessageCollection|null $result
+     * @param \Siel\Acumulus\Helpers\MessageCollection $result
      *   A message collection where any message can be added to.
      */
-    abstract public function complete(AcumulusObject $acumulusObject, ?MessageCollection $result = null): void;
+    abstract public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void;
 }

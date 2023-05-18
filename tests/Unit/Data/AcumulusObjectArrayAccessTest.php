@@ -10,6 +10,7 @@ namespace Siel\Acumulus\Tests\Unit\Data;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\TestWebShop\Data\ComplexTestObject;
 use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
 
 /**
@@ -59,5 +60,31 @@ class AcumulusObjectArrayAccessTest extends TestCase
 
         unset($ao->nature);
         $this->assertNull($ao[self::nature]);
+    }
+
+    /**
+     * @noinspection UnsupportedStringOffsetOperationsInspection
+     */
+    public function testComplex(): void
+    {
+        $value1 = 'PRD0001';
+        $value2 = Api::Nature_Product;
+        $value3 = 19.99;
+        $value4 = 'meta';
+        $ao = new ComplexTestObject();
+
+        $ao[self::itemNumber] = $value1;
+        $this->assertSame($value1, $ao[self::itemNumber]);
+
+        $ao['simple'] = new SimpleTestObject();
+        $ao['simple'][self::nature] = $value2;
+        $this->assertSame($value2, $ao['simple'][self::nature]);
+
+        $ao['list'][] = new SimpleTestObject();
+        $ao['list'][0][self::unitPrice] = $value3;
+        $this->assertSame($value3, $ao['list'][0][self::unitPrice]);
+
+        $ao['meta'] = $value4;
+        $this->assertSame($value4, $ao['meta']);
     }
 }

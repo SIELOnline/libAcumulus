@@ -90,8 +90,10 @@ abstract class AcumulusObject implements ArrayAccess
      *
      * @throws \RuntimeException
      *   $name is not an existing name of an {@see AcumulusProperty}.
+     *
+     * @legacy: the return by reference is to make the ArrayAccess working.
      */
-    public function __get(string $name)
+    public function &__get(string $name)
     {
         $this->checkIsProperty($name);
         return $this->data[$name]->getValue();
@@ -240,7 +242,7 @@ abstract class AcumulusObject implements ArrayAccess
     }
 
     /**
-     *  Returns the AcumulusObject properties as a keyed array.
+     *  Returns the AcumulusObject properties as a keyed array of strings.
      *
      * @return string[]
      *   The properties as a keyed array of strings.
@@ -254,7 +256,8 @@ abstract class AcumulusObject implements ArrayAccess
         $result = [];
         foreach ($this->data as $name => $property) {
             if (isset($this->$name)) {
-                $result[$name] = (string) $this->$name;
+                // Invokes AcumulusProperty::_toString().
+                $result[$name] = (string) $property;
             } elseif ($this->data[$name]->isRequired()) {
                 throw new RuntimeException("Required property $name is not set");
             }

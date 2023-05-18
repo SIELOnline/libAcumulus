@@ -227,6 +227,10 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(\Siel\Acumulus\Completors\Legacy\Creator::class, $object);
         $object = $container->getCompletor('legacy');
         $this->assertInstanceOf(\Siel\Acumulus\Completors\Legacy\Completor::class, $object);
+        $object = $container->getCompletorInvoiceLines(true);
+        $this->assertInstanceOf(\Siel\Acumulus\Completors\Legacy\CompletorInvoiceLines::class, $object);
+        $object = $container->getFlattenerInvoiceLines(true);
+        $this->assertInstanceOf(\Siel\Acumulus\Completors\Legacy\FlattenerInvoiceLines::class, $object);
     }
 
 //    public function testGetInstance()

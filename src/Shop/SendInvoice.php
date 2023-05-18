@@ -155,7 +155,7 @@ class SendInvoice
             if (!$result->isSendingPrevented()) {
                 // @todo: handle verification errors here. Currently, they
                 //   get severity Error, should perhaps become Exception.
-                $this->getInvoiceCompletor()->complete($invoice, $result);
+                $this->getInvoiceCompletor()->setSource($invoiceSource)->complete($invoice, $result);
             }
         }
         return $invoice ?? null;

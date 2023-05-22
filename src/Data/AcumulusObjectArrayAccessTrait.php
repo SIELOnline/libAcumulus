@@ -11,10 +11,11 @@ use ReturnTypeWillChange;
 use RuntimeException;
 
 use function array_key_exists;
-use function count;
+use function is_array;
 
 /**
- * Allows access to AcumulusObjects with array bracket syntax.
+ * Allows access to AcumulusObjects with array bracket syntax and Acumulus tags (all lower
+ * case).
  *
  * This trait allows to access an {@see AcumulusObject} as if it is
  * an array. The preferred way of accessing object properties is by using the
@@ -33,38 +34,76 @@ trait AcumulusObjectArrayAccessTrait
      * @var string[]
      *   Mappings from (legacy) lower case keys to their new camel case replacement.
      */
-    private array $propertyMappings = [];
+    private array $offsetMappings;
 
-    private function getPropertyMappings(): array
+    /**
+     * @return string[]
+     */
+    protected function getOffsetMappings(): array
     {
-        if (count($this->propertyMappings) === 0) {
+        if (!isset($this->offsetMappings)) {
+            $this->offsetMappings = [];
             foreach ($this->getPropertyDefinitions() as $propertyDefinition) {
-                $this->propertyMappings[strtolower($propertyDefinition['name'])] = $propertyDefinition['name'];
+                if (strtolower($propertyDefinition['name']) !== $propertyDefinition['name']) {
+                    $this->offsetMappings[strtolower($propertyDefinition['name'])] = $propertyDefinition['name'];
+                }
             }
         }
-        return $this->propertyMappings;
+        return $this->offsetMappings;
     }
 
     /**
      * Returns the name of the property $offset refers to.
      *
      * @param string $offset
-     *    The name to look for. This may be the lowercase version of a property name.
+     *    The name to look for. This may be:
+     *    - The correct name of an existing property ($invoice['customer']['email']).
+     *    - The lowercase version of a property name ($invoice['customer']['vatnumber']).
+     *    - The (lowercase) name of an address field but called on Customer
+     *      ($invoice['customer']['companyname']).
+     *    - The singular version of lines ($invoice['customer']['invoice']['line']).
+     *    - The name of a sub AcumulusObject ($invoice['customer']['invoice']).
+     *    - All other offsets are seen as metadata keys
      *
-     * @return string|null
-     *   The name of the property if the offset refers to a property, null otherwise.
+     * @return string|array
+     *   The mapped name of $offset if it refers to a property under a (slightly) other
+     *   name, $offset self otherwise. An array will be returned if the offset can be
+     *   found in another object: the first element being the object, the 2nd being the
+     *   name of the property in that object.
      */
-    private function getAcumulusProperty(string $offset): ?string
+    private function mapOffset(string $offset)
     {
-        if ($this->isProperty($offset)) {
-            return $offset;
-        } else {
-            $propertyMappings = $this->getPropertyMappings();
+        if (!$this->isProperty($offset) && !property_exists($this, $offset)) {
+            $propertyMappings = $this->getOffsetMappings();
             if (array_key_exists($offset, $propertyMappings)) {
-                return $propertyMappings[$offset];
+                $offset = $propertyMappings[$offset];
             }
         }
-        return null;
+        return $offset;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @noinspection PhpLanguageLevelInspection
+     */
+    #[ReturnTypeWillChange]
+    public function &offsetGet($offset)
+    {
+        $this->checkOffset($offset);
+        $offset = $this->mapOffset($offset);
+        if (is_array($offset)) {
+            $result = &$offset[0]->{$offset[1]};
+        } elseif ($this->isProperty($offset)) {
+            $result = &$this->__get($offset);
+        } elseif (property_exists($this, $offset)) {
+            /** @noinspection PhpVariableVariableInspection */
+            $result = &$this->$offset;
+        } else {
+            // Metadata.
+            $result = &$this->getMetadata()->get($offset);
+        }
+        return $result;
     }
 
     /**
@@ -79,9 +118,11 @@ trait AcumulusObjectArrayAccessTrait
     public function offsetSet($offset, $value): void
     {
         $this->checkOffset($offset);
-        $propertyName = $this->getAcumulusProperty($offset);
-        if ($propertyName !== null) {
-            $this->set($propertyName, $value);
+        $offset = $this->mapOffset($offset);
+        if (is_array($offset)) {
+            $offset[0]->{$offset[1]} = $value;
+        } elseif ($this->isProperty($offset)) {
+            $this->set($offset, $value);
         } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
             $this->$offset = $value;
@@ -97,8 +138,10 @@ trait AcumulusObjectArrayAccessTrait
     public function offsetExists($offset): bool
     {
         $this->checkOffset($offset);
-        $propertyName = $this->getAcumulusProperty($offset);
-        if ($propertyName !== null) {
+        $propertyName = $this->mapOffset($offset);
+        if (is_array($offset)) {
+            $result = isset($offset[0]->{$offset[1]});
+        } elseif ($this->isProperty($offset)) {
             $result = $this->__isset($propertyName);
         } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
@@ -116,8 +159,10 @@ trait AcumulusObjectArrayAccessTrait
     public function offsetUnset($offset): void
     {
         $this->checkOffset($offset);
-        $propertyName = $this->getAcumulusProperty($offset);
-        if ($propertyName !== null) {
+        $propertyName = $this->mapOffset($offset);
+        if (is_array($offset)) {
+            unset($offset[0]->{$offset[1]});
+        } elseif ($this->isProperty($offset)) {
             $this->__unset($propertyName);
         } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
@@ -126,28 +171,6 @@ trait AcumulusObjectArrayAccessTrait
             // Metadata.
             $this->getMetadata()->remove($offset);
         }
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @noinspection PhpLanguageLevelInspection
-     */
-    #[ReturnTypeWillChange]
-    public function &offsetGet($offset)
-    {
-        $this->checkOffset($offset);
-        $propertyName = $this->getAcumulusProperty($offset);
-        if ($propertyName !== null) {
-            $result = &$this->__get($propertyName);
-        } elseif (property_exists($this, $offset)) {
-            /** @noinspection PhpVariableVariableInspection */
-            $result = &$this->$offset;
-        } else {
-            // Metadata.
-            $result = &$this->getMetadata()->get($offset);
-        }
-        return $result;
     }
 
     /**

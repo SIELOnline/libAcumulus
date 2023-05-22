@@ -63,6 +63,8 @@ use Siel\Acumulus\Meta;
  */
 class Invoice extends AcumulusObject
 {
+    use InvoiceArrayAccessTrait;
+
     protected function getPropertyDefinitions(): array
     {
         return [

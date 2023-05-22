@@ -1617,7 +1617,7 @@ class Completor
      * @return bool
      *   True if the invoice uses another currency, false otherwise.
      */
-    protected function shouldConvertCurrency(&$invoice): bool
+    public function shouldConvertCurrency(&$invoice): bool
     {
         $invoicePart = &$invoice[Tag::Customer][Tag::Invoice];
         $currencyMetaAvailable = isset(
@@ -1831,9 +1831,9 @@ class Completor
                 // Look at the lines to determine the possible nature(s).
                 // Degenerate case: no lines: return "both" anyway instead of
                 // "unknown".
-                $result = count(
-                    $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line]
-                ) === 0 ? Config::Nature_Both : Config::Nature_Unknown;
+                $result = count($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line]) === 0
+                    ? Config::Nature_Both
+                    : Config::Nature_Unknown;
                 foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
                     if (!empty($line[Tag::Nature])) {
                         if ($line[Tag::Nature] === Api::Nature_Product) {

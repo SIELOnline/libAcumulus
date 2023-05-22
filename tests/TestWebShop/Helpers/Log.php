@@ -6,8 +6,6 @@ namespace Siel\Acumulus\TestWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\Log as BaseLog;
 
-$i = 3;
-
 /**
  * Extends the base log class to log any library logging to the TestWebShop log.
  *

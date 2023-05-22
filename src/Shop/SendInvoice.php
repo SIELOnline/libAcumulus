@@ -6,7 +6,6 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Collectors\CollectorManager;
 use Siel\Acumulus\Completors\InvoiceCompletor;
 use Siel\Acumulus\Config\Config;
@@ -31,7 +30,6 @@ use function in_array;
 class SendInvoice
 {
     private Container $container;
-
     private bool $dryRun;
 
     public function __construct(Container $container)
@@ -64,10 +62,7 @@ class SendInvoice
         return $this->getTranslator()->get($key);
     }
 
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    public function getContainer(): Container
+    protected function getContainer(): Container
     {
         return $this->container;
     }
@@ -119,15 +114,35 @@ class SendInvoice
     }
 
     /**
-     * Description.
+     * Creates and sends an invoice.
+     *
+     * Roughly the following steps are executed:
+     * - Determine whether to send the invoice or not.
+     * - Trigger event: InvoiceCreateBefore.
+     * - Create the invoice:
+     *     - Collect the invoice.
+     *     - Trigger event: InvoiceCreateAfter.
+     *     - Complete the invoice.
+     * - Trigger event: InvoiceSendBefore.
+     * - Send the invoice.
+     * - Locally store information about the invoice created in Acumulus.
+     * - Trigger event: InvoiceSendAfter.
+     * - Mail the results.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+     *   The source to create and send the invoice for.
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
+     *   The result to store the send result, messages, and the source.
      * @param bool $forceSend
+     *   Whether to force sending the invoice, even if it already has been sent before.
      * @param bool $dryRun
+     *   Whether to prevent the actual sending and storing the result, but execute all
+     *   other steps. Mainly used for debug/test/support reasons, but also to discover
+     *   what invoices would be sent from the batch screen given the provided selection
+     *   criteria.
      *
      * @return \Siel\Acumulus\Invoice\InvoiceAddResult
-     *   Description.
+     *   The result.
      */
     public function createAndSend(
         Source $invoiceSource,
@@ -143,6 +158,15 @@ class SendInvoice
         return $result;
     }
 
+    /**
+     * Creates the invoice, i.e. Collect and Complete it.
+     *
+     * Note that if we encounter local errors, we do not set the
+     * {@see InvoiceAddResult::getSendStatus()} to
+     * {@see InvoiceAddResult::NotSent_LocalErrors}. We will trigger the InvoiceSendBefore
+     * event to allow custom code to solve it and only then will we change the send status
+     * to that status.
+     */
     protected function create(Source $invoiceSource, InvoiceAddResult $result, bool $forceSend): ?Invoice
     {
         $this->setBasicSendStatus($invoiceSource, $result, $forceSend);
@@ -153,8 +177,6 @@ class SendInvoice
             $this->getEvent()->triggerInvoiceCreateAfter($invoice, $invoiceSource, $result);
             /** @noinspection PhpConditionAlreadyCheckedInspection */
             if (!$result->isSendingPrevented()) {
-                // @todo: handle verification errors here. Currently, they
-                //   get severity Error, should perhaps become Exception.
                 $this->getInvoiceCompletor()->setSource($invoiceSource)->complete($invoice, $result);
             }
         }
@@ -209,12 +231,8 @@ class SendInvoice
      * After sending the invoice:
      * - The invoice sent event gets triggered.
      * - A mail with the results may be sent.
-     *
-     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
-     *   The result structure of the invoice add API call merged with any local
-     *   messages.
      */
-    protected function lockAndSend(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): InvoiceAddResult
+    protected function lockAndSend(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         $didLock = $this->lock($invoiceSource, $result);
         if (!$result->isSendingPrevented()) {
@@ -222,7 +240,6 @@ class SendInvoice
                 $this->doSend($invoice, $invoiceSource, $result);
             } else {
                 $result->setSendStatus(InvoiceAddResult::NotSent_DryRun);
-                // @todo: add $invoice to result.
             }
         }
 
@@ -250,8 +267,6 @@ class SendInvoice
 
         // Send a mail if there are messages.
         $this->mailInvoiceAddResult($result, $invoiceSource);
-
-        return $result;
     }
 
     /**
@@ -298,7 +313,7 @@ class SendInvoice
         // Save Acumulus entry if we were not sending in test mode and there
         // were no errors.
         if (!$this->isTestMode() && !$apiResult->hasError()) {
-            $this->saveAcumulusEntry($invoiceSource, $apiResult, $invoiceAddResult);
+            $this->saveAcumulusEntry($invoiceSource, $invoiceAddResult);
         }
     }
 
@@ -309,18 +324,19 @@ class SendInvoice
      * - A successful result gets saved to the acumulus entries table.
      * - If an older submission exists, it will be deleted from Acumulus.
      */
-    protected function saveAcumulusEntry(Source $invoiceSource, AcumulusResult $apiResult, InvoiceAddResult $invoiceAddResult): void
+    protected function saveAcumulusEntry(Source $invoiceSource, InvoiceAddResult $invoiceAddResult): void
     {
         // Save Acumulus entry:
         // - If the invoice was sent as a concept, the entry id and token will
         //   be empty, but we will receive a concept id and store that instead.
         // If we are going to overwrite an existing entry, we want to delete
         // that from Acumulus.
-        /** @noinspection DuplicatedCode */
         $acumulusEntryManager = $this->getAcumulusEntryManager();
         $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource);
 
-        $invoiceInfo = $apiResult->getMainAcumulusResponse();
+        /** @noinspection NullPointerExceptionInspection  will be set when we arrive here. */
+        $invoiceInfo = $invoiceAddResult->getAcumulusResult()->getMainAcumulusResponse();
+        /** @noinspection DuplicatedCode */
         if (!empty($invoiceInfo['token']) && !empty('entryid')) {
             // A real entry.
             $token = $invoiceInfo['token'];

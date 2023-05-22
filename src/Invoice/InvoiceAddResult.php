@@ -84,7 +84,7 @@ class InvoiceAddResult extends MessageCollection
      *
      * @param string $trigger
      *   A string indicating the function that triggered the sending, e.g.
-     *   InvoiceManager::sourceStatusChange().
+     *   'InvoiceManager::sourceStatusChange()'.
      */
     public function __construct($trigger, Translator $translator)
     {

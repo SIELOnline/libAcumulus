@@ -70,6 +70,8 @@ use function in_array;
  */
 class Customer extends AcumulusObject
 {
+    use CustomerArrayAccessTrait;
+
     protected ?Address $invoiceAddress = null;
     protected ?Address $shippingAddress = null;
     // @legacy: needed to support fluent ArrayAccess.

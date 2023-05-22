@@ -30,24 +30,28 @@ class InvoiceCompletor extends BaseCompletor
     /**
      * @var \Siel\Acumulus\Invoice\Source
      *
-     * @legacy: The part that still uses the old Completor parts need the Source.
+     * @legacy: The old Completor parts still need the Source.
      */
     private Source $source;
 
-    public function getSource(): Source
+    /**
+     * @legacy: The old Completor parts still need the Source.
+     */
+    protected function getSource(): Source
     {
         return $this->source;
     }
 
     /**
      * @return $this
+     *
+     * @legacy: The old Completor parts still need the Source.
      */
     public function setSource(Source $source): InvoiceCompletor
     {
         $this->source = $source;
         return $this;
     }
-
 
     /**
      * Completes an {@see \Siel\Acumulus\Data\Invoice}.

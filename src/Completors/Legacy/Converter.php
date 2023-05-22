@@ -9,6 +9,7 @@ use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 use function array_key_exists;
@@ -33,7 +34,14 @@ class Converter
         /** @var \Siel\Acumulus\Data\Line $line */
         $line = Container::getContainer()->createAcumulusObject(DataType::Line);
         foreach ($lineArray as $key => $value) {
-            $line[static::getProperty($key)] = $value;
+            $propertyName = static::getProperty($key);
+            if ($propertyName === Meta::ChildrenLines) {
+                foreach ($value as $child) {
+                    $line->addChild(static::getLineFromArray($child));
+                }
+            } else {
+                $line[$propertyName] = $value;
+            }
         }
         return $line;
     }

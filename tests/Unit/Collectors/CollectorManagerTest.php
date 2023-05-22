@@ -40,9 +40,6 @@ class CollectorManagerTest extends TestCase
         $this->container->addTranslations('Translations', 'Invoice');
     }
 
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
     private function getContainer(): Container
     {
         return $this->container;

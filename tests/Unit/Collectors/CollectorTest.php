@@ -32,12 +32,6 @@ class CollectorTest extends TestCase
         'unitPrice' => '[""]',
     ];
 
-    /**
-     * Description.
-     *
-     * @return \Siel\Acumulus\Collectors\CollectorInterface
-     *   Description.
-     */
     public function getCollector(): CollectorInterface
     {
         return $this->container->getCollector('SimpleTestObject');

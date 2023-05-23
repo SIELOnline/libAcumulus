@@ -9,6 +9,7 @@ use Siel\Acumulus\Api;
 
 use function array_key_exists;
 use function call_user_func;
+use function count;
 use function is_array;
 use function is_object;
 
@@ -205,7 +206,12 @@ class AcumulusEntry
     public function getUpdated(bool $raw = false)
     {
         $result = $this->get(static::$keyUpdated);
-        if (!$raw) {
+        // [SIEL #207319]: TypeError: DateTime::createFromFormat() expects parameter 2 to
+        // be string, null given in src/Shop/AcumulusEntry.php:230. No idea how or why
+        // this can occur, but let's just take the created value for the updated value.
+        if (empty($result)) {
+            $result =  $this->getCreated($raw);
+        } elseif (!$raw) {
             $result = $this->toDateTime($result);
         }
         return $result;
@@ -271,7 +277,7 @@ class AcumulusEntry
             // It's an object: try to get the property.
             // Safest way is via the get_object_vars() function.
             $properties = get_object_vars($this->record);
-            if (!empty($properties) && array_key_exists($field, $properties)) {
+            if (array_key_exists($field, $properties)) {
                 $value = $properties[$field];
             } elseif (method_exists($this->record, $field)) {
                 $value = call_user_func([$this->record, $field]);

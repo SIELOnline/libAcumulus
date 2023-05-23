@@ -26,7 +26,6 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 use function count;
-use function is_array;
 
 /**
  * The invoice lines completor class provides functionality to correct and
@@ -354,7 +353,7 @@ class CompletorInvoiceLines
                     if ($this->getUniqueVatRate($line[Meta::VatRateLookupMatches])) {
                         // Only a single vat rate remains: take that one.
                         $vatRateInfo = reset($line[Meta::VatRateLookupMatches]);
-                        $line[Tag::VatRate] = is_array($vatRateInfo) ? $vatRateInfo[Tag::VatRate] : $vatRateInfo;
+                        $line[Tag::VatRate] = !is_scalar($vatRateInfo) ? $vatRateInfo[Tag::VatRate] : $vatRateInfo;
                         $line[Meta::VatRateSource] = $vatRateSource;
                     }
                 }
@@ -671,7 +670,7 @@ class CompletorInvoiceLines
 
         $result = [];
         foreach ($vatRateInfos as $vatRateInfo) {
-            $vatRate = is_array($vatRateInfo) ? $vatRateInfo[Tag::VatRate] : $vatRateInfo;
+            $vatRate = !is_scalar($vatRateInfo) ? $vatRateInfo[Tag::VatRate] : $vatRateInfo;
             if ($min <= $vatRate && $vatRate <= $max) {
                 $result[] = $vatRateInfo;
             }
@@ -704,40 +703,10 @@ class CompletorInvoiceLines
         foreach ($vatRateInfos as $vatRateInfo) {
             $vatRate = $vatRateInfo[Tag::VatRate];
             foreach ($vatRates as $vatRateInfo2) {
-                $vatRate2 = is_array($vatRateInfo2) ? $vatRateInfo2[Tag::VatRate] : $vatRateInfo2;
+                $vatRate2 = !is_scalar($vatRateInfo2) ? $vatRateInfo2[Tag::VatRate] : $vatRateInfo2;
                 if (Number::floatsAreEqual($vatRate, $vatRate2)) {
                     $result[] = $vatRateInfo;
                 }
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the subset of the vat rate infos that (do not) indicate a foreign
-     * vat type.
-     *
-     * @param bool $isEuVatType
-     *   True to filter on vat type = Api::VatType_EuVat, false to filter
-     *   on vat type != Api::VatType_EuVat.
-     * @param array|null $vatRateInfos
-     *   The set of vat rate infos to filter. If not given, the property
-     *   $this->possibleVatRates is used.
-     *
-     * @return array[]
-     *   The, possibly empty, set of vat rate infos that indicate (or not) an
-     *   EU vat type.
-     */
-    protected function filterVatRateInfosByEuVat(bool $isEuVatType, ?array $vatRateInfos = null): array
-    {
-        if ($vatRateInfos === null) {
-            $vatRateInfos = $this->possibleVatRates;
-        }
-
-        $result = [];
-        foreach ($vatRateInfos as $vatRateInfo) {
-            if (($vatRateInfo[Tag::VatType] === Api::VatType_EuVat) === $isEuVatType) {
-                $result[] = $vatRateInfo;
             }
         }
         return $result;

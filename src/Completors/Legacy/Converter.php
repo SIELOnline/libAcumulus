@@ -21,9 +21,9 @@ use function array_key_exists;
  */
 class Converter
 {
-    public static function getInvoiceLinesFromArray(array $invoiceArray, Invoice $invoice): Invoice
+    public static function getInvoiceLinesFromArray(array $linesArray, Invoice $invoice): Invoice
     {
-        foreach ($invoiceArray[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
+        foreach ($linesArray as $line) {
             $invoice->addLine(static::getLineFromArray($line));
         }
         return $invoice;

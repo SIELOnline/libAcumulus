@@ -446,11 +446,11 @@ class Creator extends BaseCreator
         $option = get_option($optionName);
 
         if (!empty($option['cost'])) {
-            // Note that "Cost" may contain a formula or use commas: 'Vul een
-            // bedrag(excl. btw) in of een berekening zoals 10.00 * [qty].
-            // Gebruik [qty] voor het aantal artikelen, [cost] voor de totale
-            // prijs van alle artikelen, en [fee percent="10" min_fee="20"
-            // max_fee=""] voor prijzen gebaseerd op percentage.'
+        // Note that "Cost" may contain a formula or use commas: 'Vul een bedrag(excl.
+        // btw) in of een berekening zoals 10.00 * [qty]. Gebruik [qty] voor het
+        // aantal artikelen, [cost] voor de totale prijs van alle artikelen, en
+        // [fee percent="10" min_fee="20" max_fee=""] voor prijzen gebaseerd op
+        // percentage.'
             $cost = str_replace(',', '.', $option['cost']);
             if (is_numeric($cost)) {
                 $cost = (float) $cost;
@@ -460,7 +460,6 @@ class Creator extends BaseCreator
                 }
             }
         }
-
         $quantity = $item->get_quantity();
         $shippingEx /= $quantity;
         $shippingVat = $item->get_total_tax() / $quantity;

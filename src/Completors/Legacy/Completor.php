@@ -1697,7 +1697,7 @@ class Completor
      */
     protected function isVatFreeClass($lineOrVatClassId): bool
     {
-        $vatClassId = is_array($lineOrVatClassId)
+        $vatClassId = !is_scalar($lineOrVatClassId)
             ? $lineOrVatClassId[Meta::VatClassId] ?? null
             : $lineOrVatClassId;
         $shopSettings = $this->config->getShopSettings();
@@ -1718,7 +1718,7 @@ class Completor
      */
     protected function is0VatClass($lineOrVatClassId): bool
     {
-        $vatClassId = is_array($lineOrVatClassId)
+        $vatClassId = !is_scalar($lineOrVatClassId)
             ? $lineOrVatClassId[Meta::VatClassId] ?? null
             : $lineOrVatClassId;
         $shopSettings = $this->config->getShopSettings();
@@ -1736,7 +1736,7 @@ class Completor
      * @return bool
      *   True if $vatRate is the 0% or the vat free vat rate, false otherwise.
      */
-    protected function isNoVat($vatRate): bool
+    public function isNoVat($vatRate): bool
     {
         return $this->is0VatRate($vatRate) || $this->isFreeVatRate($vatRate);
     }
@@ -1753,7 +1753,7 @@ class Completor
      */
     protected function is0VatRate($lineOrVatRate): bool
     {
-        $vatRate = is_array($lineOrVatRate)
+        $vatRate = !is_scalar($lineOrVatRate)
             ? $lineOrVatRate[Tag::VatRate] ?? null
             : $lineOrVatRate;
         return isset($vatRate) && Number::isZero($vatRate);
@@ -1771,7 +1771,7 @@ class Completor
      */
     protected function isFreeVatRate($lineOrVatRate): bool
     {
-        $vatRate = is_array($lineOrVatRate)
+        $vatRate = !is_scalar($lineOrVatRate)
             ? $lineOrVatRate[Tag::VatRate] ?? null
             : $lineOrVatRate;
         return isset($vatRate) && Number::floatsAreEqual($vatRate, Api::VatFree);
@@ -1858,7 +1858,7 @@ class Completor
      * @return bool
      *   True if this invoice may get a 0-vat vat type, false otherwise.
      */
-    protected function is0VatVatTypePossible(): bool
+    public function is0VatVatTypePossible(): bool
     {
         return count(array_intersect($this->possibleVatTypes, static::$zeroVatVatTypes)) !== 0;
     }
@@ -1920,24 +1920,6 @@ class Completor
             /** @noinspection NullPointerExceptionInspection */
             $this->addWarning($array, $this->result->getByCode($code)->format(Message::Format_Plain));
         }
-    }
-
-    /**
-     * Helper method to add a default non-empty value to an array.
-     * This method will not overwrite existing values.
-     *
-     * @param array|ArrayAccess $array
-     *
-     * @return bool
-     *   Whether the default was added.
-     */
-    protected function addDefault(&$array, string $key, $value): bool
-    {
-        if (empty($array[$key]) && !empty($value)) {
-            $array[$key] = $value;
-            return true;
-        }
-        return false;
     }
 
     /**

@@ -230,7 +230,7 @@ class FlattenerInvoiceLines
      */
     protected function correctInfoBetweenParentAndChildren(Line $parent, array &$children): void
     {
-        if (!empty($children)) {
+        if (count($children) !== 0) {
             $parent[Meta::Parent] = $this->parentIndex;
             $parent[Meta::NumberOfChildren] = count($children);
             foreach ($children as &$child) {

@@ -13,6 +13,7 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 use function array_key_exists;
+use function is_array;
 
 /**
  * Converter converts between the new AcumulusObject and the old array storage.
@@ -21,12 +22,20 @@ use function array_key_exists;
  */
 class Converter
 {
-    public static function getInvoiceLinesFromArray(array $linesArray, Invoice $invoice): Invoice
+    /**
+     * Converts the lines in $linesArray to {@see Line}s and adds them to $invoice.
+     *
+     * @param array $linesArray
+     *   The elements being either a {@see Line} or an array representing a line.
+     */
+    public static function getInvoiceLinesFromArray(array $linesArray, Invoice $invoice): void
     {
         foreach ($linesArray as $line) {
-            $invoice->addLine(static::getLineFromArray($line));
+            if (is_array($line)) {
+                $line = static::getLineFromArray($line);
+            }
+            $invoice->addLine($line);
         }
-        return $invoice;
     }
 
     public static function getLineFromArray(array $lineArray): Line

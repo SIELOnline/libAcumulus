@@ -132,6 +132,11 @@ class Invoice extends AcumulusObject
         }
     }
 
+    public function removeLines(): void
+    {
+        $this->lines = [];
+    }
+
     public function getEmailAsPdf(): ?EmailAsPdf
     {
         return $this->emailAsPdf;
@@ -164,6 +169,7 @@ class Invoice extends AcumulusObject
 
     /**
      * @throws Error
+     * @todo: remove/exclude polyfills
      *   customer or emailAsPdf not (yet) set.
      * @noinspection NullPointerExceptionInspection
      */

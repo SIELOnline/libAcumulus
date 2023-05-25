@@ -301,7 +301,7 @@ interface Meta
     /**
      * Creator->Completor: the children lines.
      */
-    public const ChildrenLines = 'meta-children';
+    public const ChildrenLines = 'children';
     /**
      * Support: the index of the parent line this child belonged to before
      * flattening.

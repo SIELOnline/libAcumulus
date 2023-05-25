@@ -113,8 +113,8 @@ class Creator extends BaseCreator
 
         // Support for some often used plugins that extend WooCommerce,
         // especially in the area of products (bundles, bookings, ...).
-        /** @var \Siel\Acumulus\WooCommerce\Invoice\CreatorPluginSupport $creatorPluginSupport */
-        $creatorPluginSupport = $this->getContainer()->getInstance('CreatorPluginSupport', 'Invoice');
+        /** @var \Siel\Acumulus\WooCommerce\Completors\Legacy\CreatorPluginSupport $creatorPluginSupport */
+        $creatorPluginSupport = $this->getContainer()->getInstance('CreatorPluginSupport', 'Completors\Legacy');
         $creatorPluginSupport->getItemLineBefore($this, $item, $product);
 
         // $product can be null if the product has been deleted.

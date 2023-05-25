@@ -43,6 +43,8 @@ use function is_int;
  *   be able to move, change or delete parts of the Creator class, while keeping
  *   code for webshops that are not yet converted running, that class was copied
  *   to here, so we don't have to touch the original file.
+ *
+ * @noinspection EfferentObjectCouplingInspection
  */
 abstract class Creator
 {

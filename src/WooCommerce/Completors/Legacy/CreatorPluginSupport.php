@@ -1,11 +1,11 @@
 <?php
 /**
- * @noinspection DuplicatedCode  We have a copy of this class in Completors\Legacy.
+ * @noinspection DuplicatedCode  Yes, this is a duplicate of WooCommerce\Invoice\Creator.
  */
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\WooCommerce\Invoice;
+namespace Siel\Acumulus\WooCommerce\Completors\Legacy;
 
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source as BaseSource;

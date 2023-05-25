@@ -228,10 +228,10 @@ class FieldExpander
      *   properties referred to do not exist or are empty themselves.
      *
      *   The type of the return value is either:
-     *   - The type of the property requested if $fieldSpecification contains
-     *     exactly 1 variable field specification, i.e. it begins with a '[' and
-     *     the first and only ']' is at the end.
-     *   - string otherwise.
+     *     - The type of the property requested if $fieldSpecification contains
+     *       exactly 1 variable field specification, i.e. it begins with a '[' and
+     *       the first and only ']' is at the end.
+     *     - string otherwise.
      */
     public function expand(string $fieldSpecification, array $objects)
     {
@@ -520,7 +520,7 @@ class FieldExpander
             // try to get it the more difficult way.
             if ($value === null) {
                 // Try some other ways.
-                $value = $this->getPropertyFromObject($object, $property, $args);
+                $value = $this->getPropertyFromObjectByGetterMethod($object, $property, $args);
             }
         }
 
@@ -528,7 +528,8 @@ class FieldExpander
     }
 
     /**
-     * Looks up a property in a web shop specific object.
+     * Looks up a property in a web shop specific object by calling a (getter) method.
+     *
      * This part is extracted into a separate method, so it can be overridden
      * with web shop specific ways to access properties. The base implementation
      * will probably get the property anyway, so override mainly to prevent
@@ -544,12 +545,14 @@ class FieldExpander
      * @return mixed
      *   The value for the property of the given name, or null or the empty
      *   string if not available (or the property really equals null or the
-     *   empty string). The return value may be a scalar (numeric type) that can
-     *   be converted to a string.
+     *   empty string). The return value may be:
+     *     - A string (for direct use in field expansion).
+     *     - A scalar (numeric) type that can be converted to a string (for use in field expansion).
+     *     - An object or array for further traversing.
      *
      * @noinspection PhpUsageOfSilenceOperatorInspection
      */
-    protected function getPropertyFromObject(object $variable, string $property, array $args)
+    protected function getPropertyFromObjectByGetterMethod(object $variable, string $property, array $args)
     {
         $value = null;
         $method1 = $property;
@@ -566,24 +569,18 @@ class FieldExpander
             @$value = $variable->$property;
         } elseif (method_exists($variable, '__call')) {
             try {
-                $value = @call_user_func_array([$variable, $property], $args);
+                $value = @call_user_func_array([$variable, $method1], $args);
             } catch (Exception $e) {
             }
             if ($value === null || $value === '') {
                 try {
-                    $value = call_user_func_array([$variable, $method1], $args);
+                    $value = @call_user_func_array([$variable, $method2], $args);
                 } catch (Exception $e) {
                 }
             }
             if ($value === null || $value === '') {
                 try {
-                    $value = call_user_func_array([$variable, $method2], $args);
-                } catch (Exception $e) {
-                }
-            }
-            if ($value === null || $value === '') {
-                try {
-                    $value = call_user_func_array([$variable, $method3], $args);
+                    $value = @call_user_func_array([$variable, $method3], $args);
                 } catch (Exception $e) {
                 }
             }

@@ -499,10 +499,13 @@ abstract class Creator
      *
      * @param string $pattern
      *
-     * @return string
-     *   The pattern with tokens expanded with their actual value.
+     * @return mixed
+     *   The pattern with fields expanded with their actual value. If the $pattern
+     *   contains exactly 1 variable field specification, i.e. it begins with a '[' and
+     *   the first and only ']' is at the end, the type of the returned value is that of
+     *   the property referred to, otherwise it is a string or null if not found.
      */
-    protected function getTokenizedValue(string $pattern): string
+    protected function getTokenizedValue(string $pattern)
     {
         return $this->getField()->expand($pattern, $this->propertySources);
     }

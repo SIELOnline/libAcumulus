@@ -12,6 +12,7 @@
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode  This is indeed a copy of the original Invoice\Creator.
  */
 
 namespace Siel\Acumulus\WooCommerce\Invoice;

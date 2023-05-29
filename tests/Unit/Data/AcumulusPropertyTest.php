@@ -174,29 +174,29 @@ class AcumulusPropertyTest extends TestCase
         $p->setValue($value);
     }
 
-    public function toStringDataProvider(): array
+    public function apiValueDataProvider(): array
     {
         return [
-            [['type' => 'int'], -2, '-2'],
-            [['type' => 'id'], 2, '2'],
-            [['type' => 'float'], 1.99, '1.99'],
+            [['type' => 'int'], -2, -2],
+            [['type' => 'id'], 2, 2],
+            [['type' => 'float'], 1.99, 1.99],
             [['type' => 'string'], 'value', 'value'],
             [['type' => 'date'], '2022-09-01', '2022-09-01'],
             [['type' => 'bool', 'allowedValues' => ['no', 'yes']], true, 'yes'],
             [['type' => 'bool', 'allowedValues' => ['no', 'yes']], false, 'no'],
-            [['type' => 'bool', 'allowedValues' => [0, 1]], 1, '1'],
+            [['type' => 'bool', 'allowedValues' => [0, 1]], 1, 1],
             [['type' => 'int'], null, ''],
         ];
     }
 
     /**
-     * @dataProvider toStringDataProvider
+     * @dataProvider apiValueDataProvider
      */
-    public function testToString(array $propertyDefinition, $value, $expected): void
+    public function testApiValue(array $propertyDefinition, $value, $expected): void
     {
         $pd = ['name' => 'property'] + $propertyDefinition;
         $p = new AcumulusProperty($pd);
         $p->setValue($value);
-        $this->assertSame($expected, (string) $p);
+        $this->assertSame($expected, $p->getApiValue());
     }
 }

@@ -153,7 +153,7 @@ class AcumulusObjectTest extends TestCase
         $ao->unitPrice = $value3;
         $expected = [
             'itemNumber' => 'PRD0001',
-            'unitPrice' => '19.99',
+            'unitPrice' => 19.99,
             'My_Metadata' => 'meta',
         ];
         $this->assertSame($expected, $ao->toArray());
@@ -163,7 +163,7 @@ class AcumulusObjectTest extends TestCase
         $expected = [
             'itemNumber' => 'PRD0001',
             'nature' => Api::Nature_Product,
-            'unitPrice' => '19.99',
+            'unitPrice' => 19.99,
             'My_Metadata' => 'meta',
         ];
         $this->assertSame($expected, $ao->toArray());

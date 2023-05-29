@@ -92,12 +92,12 @@ class InvoiceTest extends TestCase
                 'altAddress1' => 'Street 2',
                 'meta-main-address' => 'invoiceAddress',
                 'invoice' => [
-                    'concept' => '1',
+                    'concept' => 1,
                     'line' => [],
                     'emailAsPdf' => [
                         'emailTo' => 'client@example.com',
                     ],
-                    'meta-add-email-as-pdf-section' => 'true',
+                    'meta-add-email-as-pdf-section' => true,
                 ]
             ],
         ];

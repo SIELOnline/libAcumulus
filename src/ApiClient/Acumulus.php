@@ -7,9 +7,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\ApiClient;
 
+use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Environment;
-use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
@@ -317,8 +317,9 @@ class Acumulus
      *
      * @param string $countryCode
      *   Country code of the country to retrieve the VAT info for.
-     * @param string $date
-     *   ISO date string (yyyy-mm-dd) for the date to retrieve the VAT info for.
+     * @param string|\DateTime|null $date
+     *   DateTime object or ISO date string (yyyy-mm-dd) for the date to retrieve the VAT
+     *   info for.
      *
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -332,9 +333,11 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function getVatInfo(string $countryCode, string $date = ''): AcumulusResult
+    public function getVatInfo(string $countryCode, $date = null): AcumulusResult
     {
-        if (empty($date)) {
+        if ($date instanceof DateTime) {
+            $date = $date->format(Api::DateFormat_Iso);
+        } elseif (empty($date)) {
             $date = date(Api::DateFormat_Iso);
         }
         $message = [
@@ -480,7 +483,7 @@ class Acumulus
     }
 
     /**
-     * Moves the entry into or out of the trash bin.
+     * Moves the entry into or out of the recycle bin.
      *
      * See {@link https://siel.nl/acumulus/API/Entry/Set_Delete_Status/}
      *

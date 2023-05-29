@@ -104,9 +104,8 @@ class MetadataCollection
     {
         $result = [];
         foreach ($this->metadata as $key => $value) {
-            $result[$key] = (string) $value;
+            $result[$key] = $value->getApiValue();
         }
         return $result;
-
     }
 }

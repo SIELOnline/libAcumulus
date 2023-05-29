@@ -535,19 +535,16 @@ abstract class Creator
      * Warnings are placed in the $array under the key Meta::Warning. If no
      * warning is set, $warning is added as a string, otherwise it becomes an
      * array of warnings to which this $warning is added.
-     *
-     * @param array $array
-     * @param string $warning
      */
-    protected function addWarning(array &$array, string $warning): void
+    protected function addWarning(array &$array, string $warning, string $severity = Meta::Warning): void
     {
-        if (!isset($array[Meta::Warning])) {
-            $array[Meta::Warning] = $warning;
+        if (!isset($array[$severity])) {
+            $array[$severity] = $warning;
         } else {
-            if (!is_array($array[Meta::Warning])) {
-                $array[Meta::Warning] = (array) $array[Meta::Warning];
+            if (!is_array($array[$severity])) {
+                $array[$severity] = (array) $array[$severity];
             }
-            $array[Meta::Warning][] = $warning;
+            $array[$severity][] = $warning;
         }
     }
 

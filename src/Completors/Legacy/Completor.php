@@ -21,6 +21,7 @@
 namespace Siel\Acumulus\Completors\Legacy;
 
 use ArrayAccess;
+use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
@@ -877,7 +878,7 @@ class Completor
                         } elseif ($euVat === Config::EuVat_Yes) {
                             $vatType = Api::VatType_EuVat;
                         } elseif ($euVat === Config::EuVat_SwitchOnLimit) {
-                            $year = (int) substr($this->getInvoiceDate(), 0, 4);
+                            $year = (int) $this->getInvoiceDate()->format('Y');
                             $currentYear = (int) date('Y');
                             if ($year < $currentYear) {
                                 // Older year: we can only be sure if we did
@@ -894,7 +895,7 @@ class Completor
                                         $this->t('field_euVat')
                                     );
                                     $this->result->createAndAddMessage($notice, Severity::Notice, 814);
-                                    $this->addWarning($invoice, $notice);
+                                    $this->addWarning($invoice, $notice, Meta::Notice);
                                 }
                             } else {
                                 // Current year: we can assume to be sure when
@@ -920,7 +921,7 @@ class Completor
                                             $this->t('field_euVat')
                                         );
                                         $this->result->createAndAddMessage($notice, Severity::Notice, 813);
-                                        $this->addWarning($invoice, $notice);
+                                        $this->addWarning($invoice, $notice, Meta::Notice);
                                         break;
                                 }
                             }
@@ -1389,7 +1390,7 @@ class Completor
             && isset($invoice[Tag::VatType])
             && $invoice[Tag::VatType] === Api::VatType_National
         ) {
-            $year = (int) substr($this->getInvoiceDate(), 0, 4);
+            $year = (int) $this->getInvoiceDate()->format('Y');
             switch ($this->getEuSalesReport($year)) {
                 case Completor::EuSales_Passed:
                     $this->changeInvoiceToConcept($invoice, 'eu_commerce_threshold_passed', 830);
@@ -1488,7 +1489,8 @@ class Completor
     {
         $countryCode = strtoupper($countryCode);
         $date = $this->getInvoiceDate();
-        $cacheKey = "$countryCode&$date";
+        $date_iso = $date->format(Api::DateFormat_Iso);
+        $cacheKey = "$countryCode&$date_iso";
         if (!isset($this->vatRatesCache[$cacheKey])) {
             $result = $this->acumulusApiClient->getVatInfo($countryCode, $date);
             if ($result->hasRealMessages() && $countryCode === 'XI') {
@@ -1512,16 +1514,13 @@ class Completor
     }
 
     /**
-     * Returns the invoice date in the iso yyyy-mm-dd format.
-     *
-     * @return string
-     *   The invoice date in the iso yyyy-mm-dd format.
+     * Returns the invoice date.
      */
-    protected function getInvoiceDate(): string
+    protected function getInvoiceDate(): DateTime
     {
         return !empty($this->invoice[Tag::IssueDate])
             ? $this->invoice[Tag::IssueDate]
-            : date(Api::DateFormat_Iso);
+            : new DateTime();
     }
 
     /**
@@ -1929,18 +1928,18 @@ class Completor
      *
      * @param array|ArrayAccess $array
      */
-    protected function addWarning(&$array, string $warning): void
+    protected function addWarning(&$array, string $warning, string $severity = Meta::Warning): void
     {
-        if (!isset($array[Meta::Warning])) {
-            $array[Meta::Warning] = $warning;
+        if (!isset($array[$severity])) {
+            $array[$severity] = $warning;
         } else {
-            if (!is_array($array[Meta::Warning])) {
-                $array[Meta::Warning] = (array) $array[Meta::Warning];
+            if (!is_array($array[$severity])) {
+                $array[$severity] = (array) $array[$severity];
             }
             // @todo: find out why a warning could be added multiple times and
             //   try to prevent it in the first place.
-            if (in_array($warning, $array[Meta::Warning], true)) {
-                $array[Meta::Warning][] = $warning;
+            if (in_array($warning, $array[$severity], true)) {
+                $array[$severity][] = $warning;
             }
         }
     }

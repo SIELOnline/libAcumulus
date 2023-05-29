@@ -50,12 +50,15 @@ interface Meta
     public const Reference = 'meta-reference';
     public const Status = 'meta-status';
     /**
-     * A warning can be placed at any level and is placed at the level it
-     * applies to (order, order line, ...). It tells that the code discovered a
-     * problem. This is often the result of a failing sanity check (a check that
+     * Messages can be added at any level and are placed at the level it applies to
+     * (order, order line, ...). It tells that the code discovered a problem (warning) or
+     * just gives some more info on what it did or how it obtained some value (info or
+     * notice). Warnings are often the result of a failing sanity check (a check that
      * should result in true but didn't).
      */
     public const Warning = 'meta-warning';
+    public const Notice = 'meta-notice';
+    public const Info = 'meta-info';
 
     // Shop settings.
     // @todo: why is this added to Customer, looks like shop settings (like this

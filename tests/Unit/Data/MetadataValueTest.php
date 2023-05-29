@@ -24,7 +24,7 @@ class MetadataValueTest extends TestCase
         $mdv = new MetadataValue();
         $this->assertSame(0, $mdv->count());
         $this->assertNull($mdv->get());
-        $this->assertSame('null', (string) $mdv);
+        $this->assertSame('null', $mdv->getApiValue());
     }
 
     public function test1Value(): void
@@ -35,11 +35,11 @@ class MetadataValueTest extends TestCase
         $mdv = new MetadataValue($value1);
         $this->assertSame(1, $mdv->count());
         $this->assertSame($value1, $mdv->get());
-        $this->assertSame($value1, (string) $mdv);
+        $this->assertSame($value1, $mdv->getApiValue());
 
         $mdv = new MetadataValue($value2);
         $this->assertSame($value2, $mdv->get());
-        $this->assertSame((string) $value2, (string) $mdv);
+        $this->assertSame($value2, $mdv->getApiValue());
     }
 
     public function testNullValue(): void
@@ -49,7 +49,7 @@ class MetadataValueTest extends TestCase
         $mdv = new MetadataValue($value1);
         $this->assertSame(1, $mdv->count());
         $this->assertNull($mdv->get());
-        $this->assertSame('null', (string) $mdv);
+        $this->assertSame('null', $mdv->getApiValue());
     }
 
     public function testMultipleValues(): void
@@ -61,7 +61,7 @@ class MetadataValueTest extends TestCase
         $this->assertSame(2, $mdv->count());
         $this->assertSame([$value1, $value2], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode
-        $this->assertJsonStringEqualsJsonString('["value1",2]', (string) $mdv);
+        $this->assertSame("['value1',2]", $mdv->getApiValue());
     }
 
     public function testAdd(): void
@@ -74,7 +74,7 @@ class MetadataValueTest extends TestCase
         $this->assertSame(2, $mdv->count());
         $this->assertSame([$value1, $value2], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode
-        $this->assertJsonStringEqualsJsonString('["value1",2]', (string) $mdv);
+        $this->assertSame("['value1',2]", $mdv->getApiValue());
 
         $mdv = new MetadataValue();
         $mdv->add($value1);
@@ -82,28 +82,28 @@ class MetadataValueTest extends TestCase
         $this->assertSame(2, $mdv->count());
         $this->assertSame([$value1, $value2], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode
-        $this->assertJsonStringEqualsJsonString('["value1",2]', (string) $mdv);
+        $this->assertSame("['value1',2]", $mdv->getApiValue());
     }
 
-    public function toStringDataProvider(): array
+    public function getApiValueDataProvider(): array
     {
         return [
-            [2, '2'],
+            [2, 2],
             [null, 'null'],
-            [true, 'true'],
-            [1.23, '1.23'],
+            [true, true],
+            [1.23, 1.23],
             ['2', '2'],
             ['test', 'test'],
-            [['test1', 'test2'], '["test1","test2"]'],
+            [['test1', 'test2'], "['test1','test2']"],
             [new DateTime('2023-05-04'), '2023-05-04'],
             [new DateTime('2023-05-04 13:14:15'), '2023-05-04 13:14:15'],
         ];
     }
 
     /**
-     * @dataProvider toStringDataProvider
+     * @dataProvider getApiValueDataProvider
      */
-    public function testToString($value, string $expected): void
+    public function testGetApiValue($value, $expected): void
     {
         $mdv = new MetadataValue();
         if (is_array($value)) {
@@ -113,6 +113,6 @@ class MetadataValueTest extends TestCase
         } else {
             $mdv->add($value);
         }
-        $this->assertSame($expected, (string) $mdv);
+        $this->assertSame($expected, $mdv->getApiValue());
     }
 }

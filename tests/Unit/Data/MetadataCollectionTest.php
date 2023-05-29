@@ -141,7 +141,7 @@ class MetadataCollectionTest extends TestCase
 
         $array = $mdc->toArray();
         $expected = [
-            $name1 => '2',
+            $name1 => 2,
             $name2 => 'test',
         ];
         $this->assertSame($expected, $array);

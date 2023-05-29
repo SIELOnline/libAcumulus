@@ -169,8 +169,8 @@ class Invoice extends AcumulusObject
 
     /**
      * @throws Error
-     * @todo: remove/exclude polyfills
      *   customer or emailAsPdf not (yet) set.
+     * @todo: remove/exclude polyfills
      * @noinspection NullPointerExceptionInspection
      */
     public function toArray(): array

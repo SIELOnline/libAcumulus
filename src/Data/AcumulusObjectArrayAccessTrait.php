@@ -138,11 +138,11 @@ trait AcumulusObjectArrayAccessTrait
     public function offsetExists($offset): bool
     {
         $this->checkOffset($offset);
-        $propertyName = $this->mapOffset($offset);
+        $offset = $this->mapOffset($offset);
         if (is_array($offset)) {
             $result = isset($offset[0]->{$offset[1]});
         } elseif ($this->isProperty($offset)) {
-            $result = $this->__isset($propertyName);
+            $result = $this->__isset($offset);
         } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
             $result = isset($this->$offset);
@@ -159,11 +159,11 @@ trait AcumulusObjectArrayAccessTrait
     public function offsetUnset($offset): void
     {
         $this->checkOffset($offset);
-        $propertyName = $this->mapOffset($offset);
+        $offset = $this->mapOffset($offset);
         if (is_array($offset)) {
             unset($offset[0]->{$offset[1]});
         } elseif ($this->isProperty($offset)) {
-            $this->__unset($propertyName);
+            $this->__unset($offset);
         } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
             unset($this->$offset);

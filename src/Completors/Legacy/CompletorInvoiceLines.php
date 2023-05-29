@@ -378,11 +378,12 @@ class CompletorInvoiceLines
     protected function completeLineRequiredData(array &$lines, ?Line $parent = null): void
     {
         foreach ($lines as &$line) {
+            $fieldsCalculated = [];
             // Easy gains first. Known usages: Magento.
             if (!isset($line[Meta::VatAmount]) && isset($line[Meta::LineVatAmount])) {
                 // Known usages: Magento.
                 $line[Meta::VatAmount] = $line[Meta::LineVatAmount] / $line[Tag::Quantity];
-                $line[Meta::FieldsCalculated][] = Meta::VatAmount . ' (from ' . Meta::LineVatAmount . ')';
+                $fieldsCalculated[] = Meta::VatAmount . ' (from ' . Meta::LineVatAmount . ')';
             }
             if (!isset($line[Meta::LineType]) && $parent !== null) {
                 // Known usages: WooCommerce TM Extra Product Options that adds
@@ -410,7 +411,7 @@ class CompletorInvoiceLines
                         // We cannot fill in unit price reliably, so better to
                         // leave it empty and fail clearly.
                     // }
-                    $line[Meta::FieldsCalculated][] = Tag::UnitPrice;
+                    $fieldsCalculated[] = Tag::UnitPrice;
                 }
             }
 
@@ -434,7 +435,7 @@ class CompletorInvoiceLines
                         // We cannot fill in unit price inc reliably, so we
                         // leave it empty as it is metadata after all.
                     // }
-                    $line[Meta::FieldsCalculated][] = Meta::UnitPriceInc;
+                    $fieldsCalculated[] = Meta::UnitPriceInc;
                 }
             }
 
@@ -464,8 +465,12 @@ class CompletorInvoiceLines
                         $line[$key] = $value;
                     }
 
-                    $line[Meta::FieldsCalculated][] = Tag::VatRate;
+                    $fieldsCalculated[] = Tag::VatRate;
                 }
+            }
+
+            if (count($fieldsCalculated) > 0) {
+                $line[Meta::FieldsCalculated] = $fieldsCalculated;
             }
 
             // Recursively complete the required data.
@@ -751,29 +756,30 @@ class CompletorInvoiceLines
     protected function completeLineMetaData(array &$lines): void
     {
         foreach ($lines as &$line) {
+            $fieldsCalculated = [];
             if (Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
                 if (!isset($line[Meta::UnitPriceInc])) {
                     $line[Meta::UnitPriceInc] = $this->completor->isNoVat($line[Tag::VatRate])
                         ? $line[Tag::UnitPrice]
                         : $line[Tag::UnitPrice] * (100.0 + $line[Tag::VatRate]) / 100.0;
-                    $line[Meta::FieldsCalculated][] = Meta::UnitPriceInc;
+                    $fieldsCalculated[] = Meta::UnitPriceInc;
                 }
                 if (!isset($line[Meta::VatAmount])) {
                     $line[Meta::VatAmount] = $this->completor->isNoVat($line[Tag::VatRate])
                         ? 0.0
                         : $line[Tag::VatRate] / 100.0 * $line[Tag::UnitPrice];
-                    $line[Meta::FieldsCalculated][] = Meta::VatAmount. ' (from ' . Tag::VatRate . ')';
+                    $fieldsCalculated[] = Meta::VatAmount . ' (from ' . Tag::VatRate . ')';
                 }
                 if (isset($line[Meta::LineDiscountAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
                     $line[Meta::LineDiscountAmountInc] = $this->completor->isNoVat($line[Tag::VatRate])
                         ? $line[Meta::LineDiscountAmount]
                         : $line[Meta::LineDiscountAmount] * (100.0 + $line[Tag::VatRate]) / 100.0;
-                    $line[Meta::FieldsCalculated][] = Meta::LineDiscountAmountInc;
+                    $fieldsCalculated[] = Meta::LineDiscountAmountInc;
                 }
                 elseif (isset($line[Meta::LineDiscountVatAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
                     $line[Meta::LineDiscountAmountInc] = $line[Meta::LineDiscountVatAmount]
                         / $line[Tag::VatRate] * (100 + $line[Tag::VatRate]);
-                    $line[Meta::FieldsCalculated][] = Meta::LineDiscountAmountInc;
+                    $fieldsCalculated[] = Meta::LineDiscountAmountInc;
                 }
             } elseif ($line[Meta::VatRateSource] == Creator::VatRateSource_Strategy && !empty($line[Meta::StrategySplit])) {
                 if (isset($line[Tag::UnitPrice], $line[Meta::UnitPriceInc])) {
@@ -784,6 +790,9 @@ class CompletorInvoiceLines
                         $line[Meta::LineAmountInc] = $line[Meta::UnitPriceInc] * $line[Tag::Quantity];
                     }
                 }
+            }
+            if (count($fieldsCalculated) > 0) {
+                $line[Meta::FieldsCalculated] = $fieldsCalculated;
             }
         }
     }

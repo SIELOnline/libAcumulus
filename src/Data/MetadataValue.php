@@ -9,7 +9,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Meta;
 
 use function count;
-use function is_string;
+use function is_bool;
 
 /**
  * MetadataValue represents a metadata value.
@@ -97,11 +97,18 @@ class MetadataValue
         $this->value[] = $value;
     }
 
-    public function __toString(): string
+    /**
+     * Converts the metadata value to a representation that fits in an API message.
+     *
+     * Scalars are not converted, except boolean values. Boolean and other types are json
+     * encoded. However, to get a "prettier print" in the final message double quotes are
+     * replaced by single quotes to prevent that these quotes would get escaped when the
+     * whole message gets json encoded.
+     */
+    public function getApiValue()
     {
         $value = $this->get();
-
-        if (is_string($value)) {
+        if (is_scalar($value)) {
             $result = $value;
         } elseif ($value instanceof DateTime) {
             if ($value->format('H:i:s') === '00:00:00') {
@@ -111,6 +118,7 @@ class MetadataValue
             }
         } else {
             $result = json_encode($value, Meta::JsonFlags);
+            $result = str_replace('"', "'", $result);
         }
         return $result;
     }

@@ -55,14 +55,6 @@ abstract class AcumulusObject implements ArrayAccess
     use AcumulusObjectArrayAccessTrait;
     use AcumulusObjectMetadataTrait;
 
-    /**
-     * @var array[]
-     *   an array of property definitions, a property definition being a keyed
-     *   array with keys 'name', 'type', 'required' (optional), and
-     *   'allowedValues' (optional).
-     */
-    protected static array $propertyDefinitions = [];
-
     /** @var \Siel\Acumulus\Data\AcumulusProperty[] */
     private array $data = [];
 
@@ -256,8 +248,7 @@ abstract class AcumulusObject implements ArrayAccess
         $result = [];
         foreach ($this->data as $name => $property) {
             if (isset($this->$name)) {
-                // Invokes AcumulusProperty::_toString().
-                $result[$name] = (string) $property;
+                $result[$name] = $property->getApiValue();
             } elseif ($this->data[$name]->isRequired()) {
                 throw new RuntimeException("Required property $name is not set");
             }

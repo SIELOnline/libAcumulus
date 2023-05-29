@@ -155,7 +155,7 @@ class Creator extends BaseCreator
             $precisionEx = $this->precision;
             $reason = $this->isPriceIncRealistic($productPriceInc, $taxes, $product);
             if ($reason !== '') {
-                $this->addWarning($result, "Price inc is realistic: $reason");
+                $this->addWarning($result, "Price inc is realistic: $reason", Meta::Info);
                 $precisionInc = 0.001;
                 $recalculatePrice = Tag::UnitPrice;
             } else {

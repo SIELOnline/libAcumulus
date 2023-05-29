@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Completors\Invoice;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Completors\BaseCompletorTask;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;

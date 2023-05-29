@@ -80,11 +80,8 @@ use function strlen;
  * Notes:
  * - This syntax is quite simple. The following features are not possible:
  *     - Grouping, e.g. by using brackets, to override operator precedence.
- *     - Translation of literal strings.
- *       @todo: can we add translations, e.g. via a ::_t_ at the end or
- *         something like that. But if we go that way, maybe we should switch to
- *         twig (which has a sandbox and works with Symphony translations, and
- *         then use Symphony for logging, http, config, etc, as well).
+ *     - Translation of literal strings. Use methods like {@see Source::getTypeLabel()}
+ *       to allow to get translated texts.
  *     - Lookup based on a value of a property.
  * - The parsing is quite simple: the special symbols - ], |, &, and " - cannot
  *   appear otherwise:
@@ -696,7 +693,7 @@ class FieldExpander
                 }
                 $value = $result !== '' ? $result : null;
             } elseif (!is_object($value) || method_exists($value, '__toString')) {
-                // object with a _toString() method, null, or a resorce.
+                // object with a _toString() method, null, or a resource.
                 $value = (string) $value;
             } else {
                 // object without a _toString().

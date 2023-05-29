@@ -31,6 +31,8 @@ class Totals
      *
      * @todo: separate from this Totals class as we want to use this class in
      *   more places to compare 3 amounts that make up an amount with tax.
+     * @todo: at least, a __toString() method should be defined that does not
+     *   render empty properties.
      */
     public ?array $vatBreakdown;
     /**

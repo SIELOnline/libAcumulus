@@ -115,6 +115,11 @@ class AcumulusProperty
         return $this->required;
     }
 
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
     /**
      * @return mixed
      *   The value of this property, or null if not set.
@@ -213,14 +218,14 @@ class AcumulusProperty
     }
 
     /**
-     * Returns the string representation of the property.
+     * Returns the representation of the property as it will be in the API message.
      *
-     * @return string
-     *   The string representation of the property. A bool is converted to one
+     * @return string|int|float
+     *   The  representation of the property in a message. A bool is converted to one
      *   of its allowed values. A date is converted to its ISO representation
-     *   (yyyy-mm-dd).
+     *   (yyyy-mm-dd). Any other type is returned as is.
      */
-    public function __toString(): string
+    public function getApiValue()
     {
         $result = '';
         if ($this->value !== null) {
@@ -243,6 +248,6 @@ class AcumulusProperty
                     throw new UnexpectedValueException("$this->name: not a valid type: $this->type");
             }
         }
-        return (string) $result;
+        return $result;
     }
 }

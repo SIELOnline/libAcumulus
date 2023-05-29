@@ -120,7 +120,7 @@ class AcumulusTest extends TestCase
                     ['vattype' => 'reduced', 'vatrate' => '-1.0000', 'countryregion' => '2'],
                 ],
             ],
-            'eu' => [['be', '2015-12-01'],
+            'eu' => [['be', \DateTime::createFromFormat(Api::DateFormat_Iso, '2015-12-01')],
                 [
                     ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '2'],
                     ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => '2'],

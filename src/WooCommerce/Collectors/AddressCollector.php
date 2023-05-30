@@ -18,11 +18,10 @@ class AddressCollector extends \Siel\Acumulus\Collectors\AddressCollector
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
         if (!empty($acumulusObject->countryCode)) {
+            /** @var \WooCommerce $woocommerce */
             global $woocommerce;
-            $acumulusObject->metadataSet(
-                Meta::ShopCountryName,
-                $woocommerce->countries->get_countries()[$acumulusObject->countryCode] ?? null
-            );
+            $countries = $woocommerce->countries->get_countries();
+            $acumulusObject->metadataSet(Meta::ShopCountryName, $countries[$acumulusObject->countryCode] ?? null);
         }
     }
 }

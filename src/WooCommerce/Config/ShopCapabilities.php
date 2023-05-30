@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Config;
 
-use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AddressType;
@@ -234,7 +233,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'address2' => '[billing_address_2]', // WC_Abstract_order
             'postalCode' => '[billing_postcode]', // WC_Abstract_order
             'city' => '[billing_city]', // WC_Abstract_order
-            'vatNumber' => '[billing_vat_number|_vat_number|vat_number|VAT Number]', // Post meta
+            'vatNumber' => '[billing_eu_vat_number|billing_vat_number|_vat_number|vat_number|VAT Number]', // Post meta
             'telephone' => '[billing_phone]', // WC_Abstract_order
             'email' => '[billing_email]', // WC_Abstract_order
 
@@ -257,10 +256,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 // Customer defaults.
                 //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
                 Fld::ContactYourId => '[source::getOrder()::getSource()::get_customer_id()]',
-                Fld::VatNumber => '[source::getOrder()::get_meta(billing_vat_number)'
-                    . '|source::getOrder()::getSource()::get_meta(_vat_number)'
-                    . '|source::getOrder()::getSource()::get_meta(vat_number)'
-                    . '|source::getOrder()::getSource()::get_meta(Vat Number)]', // Post meta
+                Fld::VatNumber => '[source::getOrder()::getSource()::get_meta(_billing_eu_vat_number)' // eu-vat-for-woocommerce
+                    . '|source::getOrder()::getSource()::get_meta(_billing_vat_number)' // @todo: which plugin?
+                    . '|source::getOrder()::getSource()::get_meta(_vat_number)' // @todo: which plugin?
+                    . '|source::getOrder()::getSource()::get_meta(vat_number)' // @todo: which plugin?
+                    . '|source::getOrder()::getSource()::get_meta(Vat Number)]',  // @todo: which plugin?
                 Fld::Telephone => '[source::getOrder()::getSource()::get_billing_phone()]',
                 Fld::Telephone2 => '[source::getOrder()::getSource()::get_shipping_phone()]',
                 Fld::Email => '[source::getOrder()::getSource()::get_billing_email()]',

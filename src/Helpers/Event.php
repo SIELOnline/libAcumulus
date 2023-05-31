@@ -11,7 +11,7 @@ use Siel\Acumulus\Invoice\Source;
 /**
  * Event does foo.
  */
-abstract class Event
+interface Event
 {
     /**
      * Triggers an event that an invoice for Acumulus is to be created and sent.
@@ -29,7 +29,7 @@ abstract class Event
      *   Contains any earlier generated messages and the initial send status.
      *   You can add your own messages and/or change the send status.
      */
-    abstract public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void;
+    public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void;
 
     /**
      * Triggers an event that an invoice for Acumulus has been "collected" and
@@ -53,7 +53,7 @@ abstract class Event
      *   Contains any earlier generated messages and the initial send status.
      *   You can add your own messages and/or change the send status.
      */
-    abstract public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void;
+    public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void;
 
     /**
      * Triggers an event that an invoice for Acumulus is ready to be sent.
@@ -74,7 +74,7 @@ abstract class Event
      *   Contains any earlier generated messages and the initial send status.
      *   You can add your own messages and/or change the send status.
      */
-    abstract public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void;
+    public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void;
 
     /**
      * Triggers an event after an invoice for Acumulus has been sent.
@@ -90,5 +90,5 @@ abstract class Event
      *   The result, response, status, and any messages, as sent back by
      *   Acumulus (or set earlier locally).
      */
-    abstract public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void;
+    public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void;
 }

@@ -12,6 +12,7 @@ use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusResult;
+use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Mailer;
@@ -79,6 +80,11 @@ abstract class InvoiceManager
         return $this->container->getConfig();
     }
 
+    protected function getShopCapabilities(): ShopCapabilities
+    {
+        return $this->container->getShopCapabilities();
+    }
+
     protected function getAcumulusEntryManager(): AcumulusEntryManager
     {
         return $this->container->getAcumulusEntryManager();
@@ -112,6 +118,16 @@ abstract class InvoiceManager
     protected function getCompletor(): Completor
     {
         return $this->container->getCompletor();
+    }
+
+    protected function getInvoiceCreate(): InvoiceCreate
+    {
+       return $this->container->getInvoiceCreate();
+    }
+
+    protected function getInvoiceSend(): InvoiceSend
+    {
+        return $this->container->getInvoiceSend();
     }
 
     /**
@@ -362,6 +378,33 @@ abstract class InvoiceManager
         return $result;
     }
 
+    protected function createAndSend(
+        Source $invoiceSource,
+        InvoiceAddResult $result,
+        bool $forceSend = false,
+        bool $dryRun = false
+    ): InvoiceAddResult
+    {
+        if ($this->getShopCapabilities()->usesLegacyCreatorAndCompletor()) {
+            return $this->createAndSendLegacy($invoiceSource, $result, $forceSend, $dryRun);
+        } else {
+            $this->createAndSendNew($invoiceSource, $result, $forceSend, $dryRun);
+            return $result;
+        }
+    }
+    protected function createAndSendNew(
+        Source $invoiceSource,
+        InvoiceAddResult $result,
+        bool $forceSend = false,
+        bool $dryRun = false
+    ): void {
+        $this->getInvoiceSend()->setBasicSendStatus($invoiceSource, $result, $forceSend);
+        $invoice = $this->getInvoiceCreate()->create($invoiceSource, $result);
+        if ($invoice !== null && !$result->isSendingPrevented()) {
+            $this->getInvoiceSend()->send($invoice, $invoiceSource, $result, $dryRun);
+        }
+    }
+
     /**
      * Creates and sends an invoice to Acumulus for an order.
      *
@@ -378,8 +421,10 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result of sending (or not sending) the invoice.
+     *
+     * @legacy: old way of creating and sending invoices.
      */
-    protected function createAndSend(
+    protected function createAndSendLegacy(
         Source $invoiceSource,
         InvoiceAddResult $result,
         bool $forceSend = false,
@@ -457,6 +502,8 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result structure of the invoice add API call merged with any local
      *   messages.
+     *
+     * @legacy: old way of creating and sending invoices.
      */
     protected function lockAndSend(array $invoice, Source $invoiceSource, InvoiceAddResult $result): InvoiceAddResult
     {
@@ -523,6 +570,8 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result structure of the invoice add API call merged with any local
      *   messages.
+     *
+     * @legacy: old way of creating and sending invoices.
      */
     protected function doSend(array $invoice, Source $invoiceSource, InvoiceAddResult $invoiceAddResult): InvoiceAddResult
     {
@@ -605,6 +654,8 @@ abstract class InvoiceManager
      *
      * @return bool
      *   Success.
+     *
+     * @legacy: old way of creating and sending invoices.
      */
     protected function mailInvoiceAddResult(InvoiceAddResult $result, Source $invoiceSource): bool
     {
@@ -702,6 +753,8 @@ abstract class InvoiceManager
      *   The source object (order, credit note) for which the invoice was created.
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *   Any locally generated messages.
+     *
+     * @legacy: old way of event handling.
      */
     abstract protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void;
 
@@ -718,6 +771,8 @@ abstract class InvoiceManager
      *   The source object (order, credit note) for which the invoice was created.
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *   Any locally generated messages.
+     *
+     * @legacy: old way of event handling.
      */
     abstract protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void;
 
@@ -732,6 +787,8 @@ abstract class InvoiceManager
      *   The source object (order, credit note) for which the invoice was sent.
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      *   The result as sent back by Acumulus.
+     *
+     * @legacy: old way of event handling.
      */
     abstract protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void;
 

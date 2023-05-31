@@ -38,10 +38,10 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AboutForm;
 use Siel\Acumulus\Shop\AcumulusEntry;
-
 use Siel\Acumulus\Shop\AcumulusEntryManager;
-
+use Siel\Acumulus\Shop\InvoiceCreate;
 use Siel\Acumulus\Shop\InvoiceManager;
+use Siel\Acumulus\Shop\InvoiceSend;
 
 use function count;
 
@@ -670,6 +670,16 @@ class Container
     public function getInvoiceManager(): InvoiceManager
     {
         return $this->getInstance('InvoiceManager', 'Shop', [$this]);
+    }
+
+    public function getInvoiceCreate(): InvoiceCreate
+    {
+        return $this->getInstance('InvoiceCreate', 'Shop', [$this]);
+    }
+
+    public function getInvoiceSend(): InvoiceSend
+    {
+        return $this->getInstance('InvoiceSend', 'Shop', [$this]);
     }
 
     public function getAcumulusEntryManager(): AcumulusEntryManager

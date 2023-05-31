@@ -6,28 +6,22 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\Collectors\CollectorManager;
-use Siel\Acumulus\Completors\InvoiceCompletor;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Event;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Mailer;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Tag;
 
 use function count;
 use function in_array;
 
 /**
- * SendInvoice handles the task of creating and sending an invoice to Acumulus.
+ * SendInvoice handles the task of sending a created invoice to Acumulus.
  */
-class SendInvoice
+class InvoiceSend
 {
     private Container $container;
     private bool $dryRun;
@@ -59,22 +53,12 @@ class SendInvoice
      */
     protected function t(string $key): string
     {
-        return $this->getTranslator()->get($key);
+        return $this->getContainer()->getTranslator()->get($key);
     }
 
     protected function getContainer(): Container
     {
         return $this->container;
-    }
-
-    protected function getTranslator(): Translator
-    {
-        return $this->getContainer()->getTranslator();
-    }
-
-    protected function getLog(): Log
-    {
-        return $this->getContainer()->getLog();
     }
 
     protected function getConfig(): Config
@@ -102,92 +86,11 @@ class SendInvoice
         return $this->getContainer()->getMailer();
     }
 
-    protected function getCollectorManager(): CollectorManager
-    {
-        return $this->getContainer()->getCollectorManager();
-    }
-
-    protected function getInvoiceCompletor(): InvoiceCompletor
-    {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getContainer()->getCompletor(DataType::Invoice);
-    }
-
-    /**
-     * Creates and sends an invoice.
-     *
-     * Roughly the following steps are executed:
-     * - Determine whether to send the invoice or not.
-     * - Trigger event: InvoiceCreateBefore.
-     * - Create the invoice:
-     *     - Collect the invoice.
-     *     - Trigger event: InvoiceCreateAfter.
-     *     - Complete the invoice.
-     * - Trigger event: InvoiceSendBefore.
-     * - Send the invoice.
-     * - Locally store information about the invoice created in Acumulus.
-     * - Trigger event: InvoiceSendAfter.
-     * - Mail the results.
-     *
-     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     *   The source to create and send the invoice for.
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
-     *   The result to store the send result, messages, and the source.
-     * @param bool $forceSend
-     *   Whether to force sending the invoice, even if it already has been sent before.
-     * @param bool $dryRun
-     *   Whether to prevent the actual sending and storing the result, but execute all
-     *   other steps. Mainly used for debug/test/support reasons, but also to discover
-     *   what invoices would be sent from the batch screen given the provided selection
-     *   criteria.
-     *
-     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
-     *   The result.
-     */
-    public function createAndSend(
-        Source $invoiceSource,
-        InvoiceAddResult $result,
-        bool $forceSend = false,
-        bool $dryRun = false
-    ): InvoiceAddResult {
-        $this->setDryRun($dryRun);
-        $invoice = $this->create($invoiceSource, $result, $forceSend);
-        if ($invoice !== null && !$result->isSendingPrevented()) {
-            $this->send($invoice, $invoiceSource, $result);
-        }
-        return $result;
-    }
-
-    /**
-     * Creates the invoice, i.e. Collect and Complete it.
-     *
-     * Note that if we encounter local errors, we do not set the
-     * {@see InvoiceAddResult::getSendStatus()} to
-     * {@see InvoiceAddResult::NotSent_LocalErrors}. We will trigger the InvoiceSendBefore
-     * event to allow custom code to solve it and only then will we change the send status
-     * to that status.
-     */
-    protected function create(Source $invoiceSource, InvoiceAddResult $result, bool $forceSend): ?Invoice
-    {
-        $this->setBasicSendStatus($invoiceSource, $result, $forceSend);
-        $this->getEvent()->triggerInvoiceCreateBefore($invoiceSource, $result);
-        if (!$result->isSendingPrevented()) {
-            $invoice = $this->getCollectorManager()->collectInvoice($invoiceSource);
-            $result->setInvoice($invoice);
-            $this->getEvent()->triggerInvoiceCreateAfter($invoice, $invoiceSource, $result);
-            /** @noinspection PhpConditionAlreadyCheckedInspection */
-            if (!$result->isSendingPrevented()) {
-                $this->getInvoiceCompletor()->setSource($invoiceSource)->complete($invoice, $result);
-            }
-        }
-        return $invoice ?? null;
-    }
-
     /**
      * Sets the (basic)
      * {@see \Siel\Acumulus\Invoice\InvoiceAddResult::getSendStatus()}.
      */
-    protected function setBasicSendStatus(Source $invoiceSource, InvoiceAddResult $result, bool $forceSend): void
+    public function setBasicSendStatus(Source $invoiceSource, InvoiceAddResult $result, bool $forceSend): void
     {
         $acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource, false);
         if ($this->isTestMode()) {
@@ -205,8 +108,29 @@ class SendInvoice
         }
     }
 
-    protected function send(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
+    /**
+     * Sends an invoice.
+     *
+     * Roughly the following steps are executed:
+     * - Trigger event: InvoiceSendBefore.
+     * - Send the invoice.
+     * - Locally store information about the invoice created in Acumulus.
+     * - Trigger event: InvoiceSendAfter.
+     * - Mail the results.
+     *
+     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+     *   The source to create and send the invoice for.
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
+     *   The result to store the send result, messages, and the source.
+     * @param bool $dryRun
+     *   Whether to prevent the actual sending and storing the result, but execute all
+     *   other steps. Mainly used for debug/test/support reasons, but also to discover
+     *   what invoices would be sent from the batch screen given the provided selection
+     *   criteria.
+     */
+    public function send(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result, bool $dryRun = false): void
     {
+        $this->setDryRun($dryRun);
         $this->getEvent()->triggerInvoiceSendBefore($invoice, $result);
         if (!$result->isSendingPrevented()) {
             // Some last checks that can also still prevent sending.
@@ -406,7 +330,7 @@ class SendInvoice
             $result->setSendStatus(InvoiceAddResult::NotSent_LocalErrors);
         }
         // - Edge case: no invoice lines: will fail on the API.
-        if (count($invoice[Tag::Customer][Tag::Invoice][Tag::Line]) <= 0) {
+        if (count($invoice->getLines()) <= 0) {
             $result->setSendStatus(InvoiceAddResult::NotSent_NoInvoiceLines);
         }
         // - If the invoice has a 0 total amount, and the user does not want to

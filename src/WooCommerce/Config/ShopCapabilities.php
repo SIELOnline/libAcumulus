@@ -244,7 +244,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getDefaultPropertyMappings(): array
+    public function getDefaultShopMappings(): array
     {
         // WooCommerce: The properties for both addresses are always filled.
         return [

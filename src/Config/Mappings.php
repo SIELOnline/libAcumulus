@@ -10,8 +10,7 @@ namespace Siel\Acumulus\Config;
  */
 class Mappings
 {
-    public const Properties = Config::PropertyMappings;
-    public const Metadata = Config::MetadataMappings;
+    public const Mappings = Config::Mappings;
 
     private Config $config;
     private ShopCapabilities $shopCapabilities;
@@ -39,7 +38,7 @@ class Mappings
     }
 
     /**
-     * Returns the property mappings for a given object type.
+     * Returns the mappings for a given object type.
      *
      * The {@see \Siel\Acumulus\Collectors\CollectorManager} will retrieve these
      * mappings and pass them to the {@see \Siel\Acumulus\Collectors\Collector}
@@ -51,49 +50,37 @@ class Mappings
      *   type the mappings should be returned.
      *
      * @return array
-     *   An array with as keys the property names and as values mappings for the
-     *   specified property. These are typically strings that may contain a
-     *   field expansion specification, see
-     *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may
-     *   contain a value of another scalar type.
+     *   An array with as keys property names or metadata keys, and as values mappings for
+     *   the specified property or metadata value. These are typically strings that may
+     *   contain a field expansion specification, see
+     *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may contain a
+     *   value of another scalar type or even complex data when it is metadata.
      */
     public function getFor(string $forType): array
     {
         $mappings = $this->getAllMappings();
-        return ($mappings[Mappings::Properties][$forType] ?? []) + ($mappings[Mappings::Metadata][$forType] ?? []);
+        return ($mappings[$forType] ?? []);
     }
 
     /**
      * Returns all mappings for all objects.
      *
-     * @return string[][][]
+     * @return string[][]
      *   The mappings that are stored in the config.
-     *     - 1st dimension: 2 keys: Mappings::Properties and Mappings::Metadata.
-     *     - 2nd dimension: keys being one of the Data\...Type::... constants.
-     *     - 3rd dimension: keys being property names or metadata keys.
-     *   Values are mappings for the specified property or metadata field. These
-     *   are typically strings that may contain a field expansion specification,
-     *   see {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it
-     *   may contain a value of another scalar type.
+     *     - 1st dimension: keys being one of the Data\...Type::... constants.
+     *     - 2nd dimension: keys being property names or metadata keys.
+     *   Values are mappings for the specified property or metadata field. These are
+     *   typically strings that may contain a field expansion specification, see
+     *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may contain a
+     *   value of another scalar type or even complex data when it is metadata.
      */
     protected function getAllMappings(): array
     {
         if (!isset($this->allMappings)) {
-            $defaultShopPropertyMappings = $this->getDefaultShopPropertyMappings();
-            $defaultShopMetadataMappings = $this->getDefaultShopMetadataMappings();
-            $configuredPropertyMappings = $this->getConfiguredPropertyMappings();
-            $configuredMetaMappings = $this->getConfiguredMetaMappings();
-            $this->allMappings = [
-                Mappings::Properties => $defaultShopPropertyMappings,
-                Mappings::Metadata => $defaultShopMetadataMappings,
-            ];
-            foreach ($configuredPropertyMappings as $dataType => $configuredMapping) {
-                $this->allMappings[Mappings::Properties][$dataType] ??= [];
-                $this->allMappings[Mappings::Properties][$dataType] += $configuredMapping;
-            }
-            foreach ($configuredMetaMappings as $dataType => $configuredMapping) {
-                $this->allMappings[Mappings::Metadata][$dataType] ??= [];
-                $this->allMappings[Mappings::Metadata][$dataType] += $configuredMapping;
+            $this->allMappings = $this->getDefaultShopMappings();
+            foreach ($this->getConfiguredMappings() as $dataType => $defaultMapping) {
+                $this->allMappings[$dataType] ??= [];
+                $this->allMappings[$dataType] += $defaultMapping;
             }
         }
         return $this->allMappings;
@@ -101,46 +88,27 @@ class Mappings
     }
 
     /**
-     * Returns all property mappings that are stored in config.
+     * Returns the default mappings (that are hard coded in config).
      *
      * @return string[][]
-     *   The default property mappings as stored in config.
+     *   The default mappings as are hard coded in config.
      */
-    protected function getConfiguredPropertyMappings(): array
+    protected function getConfiguredMappings(): array
     {
-        return $this->getConfig()->get(Config::PropertyMappings);
+        return $this->getConfig()->get(Config::Mappings);
     }
 
     /**
-     * Returns all metadata mappings that are stored in config.
+     * Returns the default mappings for the current shop
+     *
+     * These are hard coded in the shop's {@see \Siel\Acumulus\Config\ShopCapabilities}
+     * class.
      *
      * @return string[][]
-     *   The default metadata mappings as stored in config.
+     *   The default mappings for the current shop.
      */
-    protected function getConfiguredMetaMappings(): array
+    protected function getDefaultShopMappings(): array
     {
-        return $this->getConfig()->get(Config::MetadataMappings);
-    }
-
-    /**
-     * Returns the default property mappings for the current shop.
-     *
-     * @return string[][]
-     *   The default property mappings for the current shop.
-     */
-    protected function getDefaultShopPropertyMappings(): array
-    {
-        return $this->getShopCapabilities()->getDefaultPropertyMappings();
-    }
-
-    /**
-     * Returns the default metadata mappings for the current shop.
-     *
-     * @return string[][]
-     *   The default metadata mappings for the current shop.
-     */
-    protected function getDefaultShopMetadataMappings(): array
-    {
-        return $this->getShopCapabilities()->getDefaultMetadataMappings();
+        return $this->getShopCapabilities()->getDefaultShopMappings();
     }
 }

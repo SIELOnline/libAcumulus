@@ -43,9 +43,9 @@ use const Siel\Acumulus\Version;
  *
  * @todo: New settings/mappings
  *   - Alle mappings uit de settings formulieren, naar mappings.
- *   - Overrulen settings een mapping van een gebruiker: nee zou ik zeggen: alle
+ *   - Overrulen settings een mapping van een gebruiker: ik zou zeggen van niet: alle
  *     completors moeten dus {@see PropertySet::NotOverwrite} gebruiken!
- *   - Customer - address/alt address:  which address is used to base tax on:
+ *   - Customer - address/alt address: which address is used to base tax on:
  *     follow shop, invoice, shipping.
  *   - Customer - mark? naar mappings
  *   - Customer: overige velden waar de shops standaard geen mapping voor hebben
@@ -105,8 +105,7 @@ class Config
     public const TriggerCreditNoteEvent_None = 0;
     public const TriggerCreditNoteEvent_Create = 1;
 
-    public const PropertyMappings = 'propertyMappings';
-    public const MetadataMappings = 'metadataMappings';
+    public const Mappings = 'mappings';
 
     private ConfigStore $configStore;
     private ShopCapabilities $shopCapabilities;
@@ -801,6 +800,8 @@ class Config
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @todo: the address fields below should be duplicated and renamed (when
+                //   we would use config keys for mappings). For now this is legacy code.
                 'companyName2' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
@@ -1138,7 +1139,7 @@ class Config
                     'type' => 'int',
                     'default' => 0,
                 ],
-                Config::PropertyMappings => [
+                Config::Mappings => [
                     'group' => 'mappings',
                     'type' => 'array',
                     'default' => [
@@ -1147,31 +1148,6 @@ class Config
                             Fld::PaymentDate => '[source::getPaymentDate()]',
                             Fld::Description => '[source::getTypeLabel(2)+source::getReference()'
                                 . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
-                        ],
-                        DataType::Customer => [
-                        ],
-                        AddressType::Invoice => [
-                            Fld::CountryCode => '[source::getCountryCode()]',
-                        ],
-                        AddressType::Shipping => [
-                            Fld::CountryCode => '[source::getCountryCode()]',
-                        ],
-                        EmailAsPdfType::Invoice => [
-                            Fld::Subject => 'Factuur voor [source::getTypeLabel(1)+source::getReference()'
-                                . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
-                        ],
-                        EmailAsPdfType::PackingSlip => [
-                            Fld::Subject => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
-                        ],
-                        LineType::Item => [
-                        ],
-                    ],
-                ],
-                Config::MetadataMappings => [
-                    'group' => 'mappings',
-                    'type' => 'array',
-                    'default' => [
-                        DataType::Invoice => [
                             Meta::ShopSourceType => '[source::getType()]',
                             Meta::Id => '[source::getId()]',
                             Meta::Reference => '[source::getReference()]',
@@ -1184,11 +1160,24 @@ class Config
                             Meta::Currency => '[source::getCurrency()]',
                             Meta::Totals => '[source::getTotals()]',
                         ],
+                        DataType::Customer => [
+                        ],
                         AddressType::Invoice => [
+                            Fld::CountryCode => '[source::getCountryCode()]',
                             Meta::AddressType => AddressType::Invoice,
                         ],
                         AddressType::Shipping => [
+                            Fld::CountryCode => '[source::getCountryCode()]',
                             Meta::AddressType => AddressType::Shipping,
+                        ],
+                        EmailAsPdfType::Invoice => [
+                            Fld::Subject => 'Factuur voor [source::getTypeLabel(1)+source::getReference()'
+                                . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
+                        ],
+                        EmailAsPdfType::PackingSlip => [
+                            Fld::Subject => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
+                        ],
+                        LineType::Item => [
                         ],
                     ],
                 ],

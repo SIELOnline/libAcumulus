@@ -39,7 +39,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [];
     }
 
-    public function getDefaultPropertyMappings(): array
+    public function getDefaultShopMappings(): array
     {
         return [
             DataType::Invoice => [

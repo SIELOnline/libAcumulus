@@ -490,7 +490,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getDefaultPropertyMappings(): array
+    public function getDefaultShopMappings(): array
     {
         return [
             DataType::Customer => [

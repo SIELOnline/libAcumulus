@@ -84,27 +84,7 @@ abstract class ShopCapabilities
      *
      * @todo: make abstract when implemented for all shops.
      */
-    public function getDefaultPropertyMappings(): array
-    {
-        return [];
-    }
-
-    /**
-     * Returns an array with shop specific metadata mapping defaults.
-     *
-     * This base method is abstract, because mappings are almost per definition
-     * shop dependent.
-     *
-     * @return string[][]
-     *   A keyed array of keyed arrays. At the 1st level the keys are
-     *   Data\...Type::... constants and the values are the mappings for that
-     *   object type. A mapping being a keyed array, with as keys the metadata
-     *   names and as values a so-called field expansion specification, see
-     *   {@see \Siel\Acumulus\Helpers\FieldExpander}.
-     *
-     * @todo: make abstract when implemented for all shops.
-     */
-    public function getDefaultMetadataMappings(): array
+    public function getDefaultShopMappings(): array
     {
         return [];
     }
@@ -444,6 +424,18 @@ abstract class ShopCapabilities
     public function hasOrderList(): bool
     {
         return false;
+    }
+
+    /**
+     * Returns the address type that the shop uses for fiscal calculations.
+     *
+     * @return string|null
+     *   One of the {@see \Siel\Acumulus\Data\AddressType} constants or null if the shop
+     *   does not allow to choose the address.
+     */
+    public function getFiscalAddressSetting(): ?string
+    {
+        return null;
     }
 
     /**

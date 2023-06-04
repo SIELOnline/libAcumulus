@@ -389,12 +389,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * WooCommerce switched to the new creation process!
      *
-     * Note: in case of severe errors during the creation process: return true to revert
+     * Note: in case of severe errors during the creation process: return false to revert
      * to the old "tried and tested" code.
      */
-    public function usesLegacyCreatorAndCompletor(): bool
+    public function usesNewCode(): bool
     {
-        // return true; // Emergency revert: remove the // at the beginning of this line!
-        return false;
+        // return false; // Emergency revert: remove the // at the beginning of this line!
+        return true;
     }
 }

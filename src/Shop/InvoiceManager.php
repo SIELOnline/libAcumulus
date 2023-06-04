@@ -385,7 +385,7 @@ abstract class InvoiceManager
         bool $dryRun = false
     ): InvoiceAddResult
     {
-        if ($this->getShopCapabilities()->usesLegacyCreatorAndCompletor()) {
+        if ($this->getShopCapabilities()->usesNewCode()) {
             return $this->createAndSendLegacy($invoiceSource, $result, $forceSend, $dryRun);
         } else {
             $this->createAndSendNew($invoiceSource, $result, $forceSend, $dryRun);

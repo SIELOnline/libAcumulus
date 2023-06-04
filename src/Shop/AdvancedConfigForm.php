@@ -305,7 +305,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getRelationFields(): array
     {
-        return [
+        $fields = [
             'clientData' => [
                 'type' => 'checkbox',
                 'label' => $this->t('field_clientData'),
@@ -437,6 +437,28 @@ class AdvancedConfigForm extends BaseConfigForm
                 ],
             ],
         ];
+        if ($this->shopCapabilities->usesNewCode()) {
+            $fieldsToHide = [
+                'contactYourId',
+                'companyName1',
+                'companyName2',
+                'vatNumber',
+                'fullName',
+                'salutation',
+                'address1',
+                'address2',
+                'postalCode',
+                'city',
+                'telephone',
+                'fax',
+                'email',
+                'mark',
+            ];
+            foreach ($fieldsToHide as $field) {
+                $fields[$field]['type'] = 'hidden';
+            }
+        }
+        return $fields;
     }
 
     /**
@@ -457,7 +479,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getInvoiceFields(): array
     {
-        return [
+        $fields = [
             'concept' => [
                 'type' => 'radio',
                 'label' => $this->t('field_concept'),
@@ -527,6 +549,17 @@ class AdvancedConfigForm extends BaseConfigForm
                 ],
             ],
         ];
+        if ($this->shopCapabilities->usesNewCode()) {
+            $fieldsToHide = [
+                'description',
+                'descriptionText',
+                'invoiceNotes',
+            ];
+            foreach ($fieldsToHide as $field) {
+                $fields[$field]['type'] = 'hidden';
+            }
+        }
+        return $fields;
     }
 
     /**
@@ -543,7 +576,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getInvoiceLinesFields(): array
     {
-        return [
+        $fields = [
             'itemNumber' => [
                 'type' => 'text',
                 'label' => $this->t('field_itemNumber'),
@@ -577,6 +610,21 @@ class AdvancedConfigForm extends BaseConfigForm
                 ],
             ],
         ];
+        if ($this->shopCapabilities->usesNewCode()) {
+            $fieldsToHide = [
+                /* @todo  List the fields that are mapped when item lines gets collected.
+                'itemName',
+                'productName',
+                'quantity',
+                'nature',
+                'costPrice',
+                 */
+            ];
+            foreach ($fieldsToHide as $field) {
+                $fields[$field]['type'] = 'hidden';
+            }
+        }
+        return $fields;
     }
 
     /**

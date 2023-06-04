@@ -439,19 +439,20 @@ abstract class ShopCapabilities
     }
 
     /**
-     * Returns whether the old Creator and Completor are used,
+     * Returns whether the new code is used.
      *
-     * The default return here is that the old structures are still used (true), so
-     * override for webshops that do implement the new way.
+     * The default return here is that the old code is used, so override for webshops that
+     * do use the new code (the override gives an emergency switch back tot the old code).
      *
      * @return bool
-     *   True if the old {@see Creator} and {@see \Siel\Acumulus\Invoice\Completor are
-     *   used, false if the new {@see \Siel\Acumulus\Data\_Documentation data objects} and
-     *   its {@see \Siel\Acumulus\Collectors\_Documentation collectors} and
-     *   {@see \Siel\Acumulus\Completors\_Documentation completors} are used.
+     *   True if the new {@see \Siel\Acumulus\Data\_Documentation data objects},
+     *   its {@see \Siel\Acumulus\Collectors\_Documentation collectors},
+     *   {@see \Siel\Acumulus\Config\Mappings},
+     *   and {@see \Siel\Acumulus\Completors\_Documentation completors} are used,
+     *   false otherwise.
      */
-    public function usesLegacyCreatorAndCompletor(): bool
+    public function usesNewCode(): bool
     {
-        return true;
+        return false;
     }
 }

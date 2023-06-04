@@ -13,15 +13,8 @@ namespace Siel\Acumulus\Config;
 
 use SensitiveParameter;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Data\AddressType;
-use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Data\EmailAsPdfType;
-use Siel\Acumulus\Data\LineType;
-use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 use function array_key_exists;
@@ -42,16 +35,13 @@ use const Siel\Acumulus\Version;
  * class.
  *
  * @todo: New settings/mappings
- *   - Alle mappings uit de settings formulieren, naar mappings.
- *   - Overrulen settings een mapping van een gebruiker: ik zou zeggen van niet: alle
- *     completors moeten dus {@see PropertySet::NotOverwrite} gebruiken!
+ *   - Alle mappings uit de settings formulieren en naar mappings.
+ *   - UI voor mappings die de gebruiker waarschijnlijk/mogelijk wil aanpassen?
+ *     (description, salutation, email: subjects, from, to, bcc)
+ *   - Juist geen UI meer voor mappings die de gebruiker waarschijnlijk niet wil aanpassen
  *   - Customer - address/alt address: which address is used to base tax on:
  *     follow shop, invoice, shipping.
- *   - Customer - mark? naar mappings
- *   - Customer: overige velden waar de shops standaard geen mapping voor hebben
- *     (bank account number, website, mark, fax, ???)
  *   - Address - Country: Vermelden: nooit, altijd, buitenland
- *   - Address - Country: Naam: uit winkel (taal hangt af van bezoeker/admin), Acumulus (nl)
  *   - EmailAsPdf: ubl, gfx
  *   - Invoice: concept type???
  *
@@ -112,7 +102,6 @@ class Config
     /** @var callable */
     private $getConfigUpgradeInstance;
     private Environment $environment;
-    protected Translator $translator;
     protected Log $log;
     protected array $keyInfo;
     protected bool $isConfigurationLoaded;
@@ -785,6 +774,7 @@ class Config
                     'type' => 'string',
                     'default' => "$hostName@nul.sielsystems.nl",
                 ],
+                // @legacy  Is now a mapping.
                 'contactYourId' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
@@ -795,6 +785,7 @@ class Config
                     'type' => 'int',
                     'default' => Api::ContactStatus_Active,
                 ],
+                // @legacy  Is now a mapping.
                 'companyName1' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
@@ -802,56 +793,67 @@ class Config
                 ],
                 // @todo: the address fields below should be duplicated and renamed (when
                 //   we would use config keys for mappings). For now this is legacy code.
+                // @legacy  Is now a mapping.
                 'companyName2' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'fullName' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'salutation' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'address1' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'address2' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'postalCode' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'city' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'vatNumber' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'telephone' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'fax' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'email' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
@@ -862,6 +864,7 @@ class Config
                     'type' => 'bool',
                     'default' => true,
                 ],
+                // @legacy  Is now a mapping.
                 'mark' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
@@ -937,37 +940,44 @@ class Config
                     'type' => 'int',
                     'default' => 80,
                 ],
+                // @legacy  Is now a mapping.
                 'description' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '[invoiceSourceType::label+invoiceSource::reference'
                         . '+"-"+refundedInvoiceSourceType::label+refundedInvoiceSource::reference]',
                 ],
+                // @legacy  Is now a mapping.
                 'descriptionText' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'invoiceNotes' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'itemNumber' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'productName' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'nature' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'costPrice' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
@@ -1078,21 +1088,28 @@ class Config
                     'type' => 'bool',
                     'default' => false,
                 ],
+                // @legacy  Is now a mapping.
+                // @todo  Should this be a UI editable setting?
                 'emailFrom' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
                 'emailTo' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
+                // @todo  Should this be a UI editable setting?
                 'emailBcc' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
+                // @todo  Should this be a UI editable setting?
                 'subject' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
@@ -1100,28 +1117,37 @@ class Config
                 ],
                 // For now, we do not make the invoice message configurable...
                 // For now, we don't present the confirmReading option in the UI.
+                // @legacy  Can now be handled via a mapping.
                 'confirmReading' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
                 ],
                 // For now, we don't present the packingSlipEmailFrom option in the UI.
+                // @legacy  Can now be handled via a mapping.
+                // @todo  Should this be a UI editable setting?
                 'packingSlipEmailFrom' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
+                // @todo  Should this be a UI editable setting?
                 'packingSlipEmailTo' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
                 ],
+                // @legacy  Is now a mapping.
+                // @todo  Should this be a UI editable setting?
                 'packingSlipEmailBcc' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
                 ],
                 // For now, we don't present the packingSlipSubject option in the UI.
+                // @legacy  Can now be handled via a mapping.
+                // @todo  Should this be a UI editable setting?
                 'packingSlipSubject' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
@@ -1129,6 +1155,7 @@ class Config
                 ],
                 // For now, we do not make packing slip mail message configurable...
                 // For now, we don't present the packingSlipConfirmReading option in the UI.
+                // @legacy  Can now be handled via a mapping.
                 'packingSlipConfirmReading' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
@@ -1139,47 +1166,12 @@ class Config
                     'type' => 'int',
                     'default' => 0,
                 ],
+                // @todo: find out how to let the user define this and only store the
+                //   differences!
                 Config::Mappings => [
-                    'group' => 'mappings',
+                    'group' => 'other',
                     'type' => 'array',
-                    'default' => [
-                        DataType::Invoice => [
-                            Fld::PaymentStatus => '[source::getPaymentStatus()]',
-                            Fld::PaymentDate => '[source::getPaymentDate()]',
-                            Fld::Description => '[source::getTypeLabel(2)+source::getReference()'
-                                . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
-                            Meta::ShopSourceType => '[source::getType()]',
-                            Meta::Id => '[source::getId()]',
-                            Meta::Reference => '[source::getReference()]',
-                            Meta::ShopSourceDate => '[source::getDate()]',
-                            Meta::Status => '[source::getStatus()]',
-                            Meta::PaymentMethod => '[source::getPaymentMethod()]',
-                            Meta::ShopInvoiceId => '[source::getShopInvoiceId()]',
-                            Meta::ShopInvoiceReference => '[source::getShopInvoiceReference()]',
-                            Meta::ShopInvoiceDate => '[source::getShopInvoiceDate()]',
-                            Meta::Currency => '[source::getCurrency()]',
-                            Meta::Totals => '[source::getTotals()]',
-                        ],
-                        DataType::Customer => [
-                        ],
-                        AddressType::Invoice => [
-                            Fld::CountryCode => '[source::getCountryCode()]',
-                            Meta::AddressType => AddressType::Invoice,
-                        ],
-                        AddressType::Shipping => [
-                            Fld::CountryCode => '[source::getCountryCode()]',
-                            Meta::AddressType => AddressType::Shipping,
-                        ],
-                        EmailAsPdfType::Invoice => [
-                            Fld::Subject => 'Factuur voor [source::getTypeLabel(1)+source::getReference()'
-                                . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
-                        ],
-                        EmailAsPdfType::PackingSlip => [
-                            Fld::Subject => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
-                        ],
-                        LineType::Item => [
-                        ],
-                    ],
+                    'default' => [],
                 ],
             ];
         }

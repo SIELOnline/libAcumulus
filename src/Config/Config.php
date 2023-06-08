@@ -13,6 +13,7 @@ namespace Siel\Acumulus\Config;
 
 use SensitiveParameter;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Tag;
@@ -35,10 +36,7 @@ use const Siel\Acumulus\Version;
  * class.
  *
  * @todo: New settings/mappings
- *   - Alle mappings uit de settings formulieren en naar mappings.
- *   - UI voor mappings die de gebruiker waarschijnlijk/mogelijk wil aanpassen?
- *     (description, salutation, email: subjects, from, to, bcc)
- *   - Juist geen UI meer voor mappings die de gebruiker waarschijnlijk niet wil aanpassen
+ *   - Alle mappings uit de settings formulieren en naar een mappings formulier.
  *   - Customer - address/alt address: which address is used to base tax on:
  *     follow shop, invoice, shipping.
  *   - Address - Country: Vermelden: nooit, altijd, buitenland
@@ -56,6 +54,10 @@ class Config
     public const Send_SendAndMailOnError = 1;
     public const Send_SendAndMail = 2;
     public const Send_TestMode = 3;
+
+    public const MainAddress_FollowShop = 'follow_shop';
+    public const MainAddress_Invoice = AddressType::Invoice;
+    public const MainAddress_Shipping = AddressType::Shipping;
 
     public const MissingAmount_Ignore = 1;
     public const MissingAmount_Warn = 2;
@@ -357,7 +359,7 @@ class Config
     }
 
     /**
-     * Returns the contract credentials to authenticate with the Acumulus API.
+     * Returns the contract fields to authenticate with the Acumulus API.
      *
      * @return array
      *   A keyed array with the keys:
@@ -369,7 +371,7 @@ class Config
      */
     public function getCredentials(): array
     {
-        $result = $this->getSettingsByGroup('credentials');
+        $result = $this->getSettingsByGroup(Tag::Contract);
         // No separate key for now.
         $result[Tag::EmailOnWarning] = $result[Tag::EmailOnError];
         return $result;
@@ -735,22 +737,22 @@ class Config
                     'default' => Api::outputFormat,
                 ],
                 Tag::ContractCode => [
-                    'group' => 'credentials',
+                    'group' => Tag::Contract,
                     'type' => 'string',
                     'default' => '',
                 ],
                 Tag::UserName => [
-                    'group' => 'credentials',
+                    'group' => Tag::Contract,
                     'type' => 'string',
                     'default' => '',
                 ],
                 Tag::Password => [
-                    'group' => 'credentials',
+                    'group' => Tag::Contract,
                     'type' => 'string',
                     'default' => '',
                 ],
                 Tag::EmailOnError => [
-                    'group' => 'credentials',
+                    'group' => Tag::Contract,
                     'type' => 'string',
                     'default' => '',
                 ],
@@ -773,6 +775,11 @@ class Config
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => "$hostName@nul.sielsystems.nl",
+                ],
+                'mainAddress' => [
+                    'group' => Tag::Customer,
+                    'type' => 'string',
+                    'default' => '',
                 ],
                 // @legacy  Is now a mapping.
                 'contactYourId' => [

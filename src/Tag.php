@@ -16,6 +16,7 @@ namespace Siel\Acumulus;
  */
 interface Tag
 {
+    public const Contract = 'contract';
     public const Customer = 'customer';
     public const Invoice = 'invoice';
     public const Line = 'line';

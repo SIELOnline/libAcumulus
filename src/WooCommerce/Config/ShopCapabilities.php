@@ -225,6 +225,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return [
             // Customer defaults.
+            'mainAddress' => Config::MainAddress_FollowShop, // Option 'woocommerce_tax_based_on'
             //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
             'contactYourId' => '[customer_id]', // WC_Abstract_order
             'companyName1' => '[billing_company]', // WC_Abstract_order
@@ -266,14 +267,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::Email => '[source::getOrder()::getSource()::get_billing_email()]',
             ],
             AddressType::Invoice => [
-                Fld::CompanyName1 => '[source::getOrder()::getSource()::get_billing_company]',
+                Fld::CompanyName1 => '[source::getOrder()::getSource()::get_billing_company()]',
                 Fld::FullName =>
-                    '[source::getOrder()::getSource()::get_billing_first_name+source::getOrder()::getSource()::get_billing_last_name]',
-                Fld::Address1 => '[source::getOrder()::getSource()::get_billing_address_1]',
-                Fld::Address2 => '[source::getOrder()::getSource()::get_billing_address_2]',
-                Fld::PostalCode => '[source::getOrder()::getSource()::get_billing_postcode]',
-                Fld::City => '[source::getOrder()::getSource()::get_billing_city]',
-                Fld::CountryCode => '[source::getOrder()::getSource()::get_billing_country]',
+                    '[source::getOrder()::getSource()::get_billing_first_name()+source::getOrder()::getSource()::get_billing_last_name()]',
+                Fld::Address1 => '[source::getOrder()::getSource()::get_billing_address_1()]',
+                Fld::Address2 => '[source::getOrder()::getSource()::get_billing_address_2()]',
+                Fld::PostalCode => '[source::getOrder()::getSource()::get_billing_postcode()]',
+                Fld::City => '[source::getOrder()::getSource()::get_billing_city()]',
+                Fld::CountryCode => '[source::getOrder()::getSource()::get_billing_country()]',
             ],
             AddressType::Shipping => [
                 Fld::CompanyName1 => '[source::getOrder()::getSource()::get_shipping_company()]',
@@ -289,10 +290,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::EmailTo => '[source::getOrder()::getSource()::get_billing_email()]',
             ],
             LineType::Item => [
+                // @todo: check syntax (move to method calls).
                 Fld::ItemNumber => '[sku]',
                 Fld::Product => '[name]',
                 Fld::CostPrice => '[cost_price]',
-                // @todo: others? (e.g. quantity, unit price, metadata)
+                // @todo: others? (e.g. quantity, unit price, metadata).
             ],
         ];
     }
@@ -371,6 +373,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'config':
             case 'advanced':
                 return admin_url("options-general.php?page=acumulus_$linkType");
+            case 'fiscal-address-setting':
+                return admin_url("admin.php?page=wc-settings&tab=tax");
             case 'logo':
                 return home_url('wp-content/plugins/acumulus/siel-logo.svg');
             case 'pro-support-image':
@@ -386,6 +390,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return true;
     }
 
+    public function getFiscalAddressSetting(): string
+    {
+        return 'woocommerce_tax_based_on';
+    }
+
     /**
      * WooCommerce switched to the new creation process!
      *
@@ -394,7 +403,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function usesNewCode(): bool
     {
-        // return false; // Emergency revert: remove the // at the beginning of this line!
+        return false; // Emergency revert: remove the // at the beginning of this line!
         return true;
     }
 }

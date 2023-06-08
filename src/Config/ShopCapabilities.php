@@ -400,6 +400,9 @@ abstract class ShopCapabilities
      */
     public function getLink(string $linkType): string
     {
+        if ($linkType === 'fiscal_address-setting') {
+            return '#';
+        }
         throw new InvalidArgumentException(__METHOD__ . "('$linkType'): unknown link type");
     }
 
@@ -429,20 +432,20 @@ abstract class ShopCapabilities
     /**
      * Returns the address type that the shop uses for fiscal calculations.
      *
-     * @return string|null
-     *   One of the {@see \Siel\Acumulus\Data\AddressType} constants or null if the shop
-     *   does not allow to choose the address.
+     * @return string
+     *   One of the {@see \Siel\Acumulus\Data\AddressType} constants if the shop
+     *   does not allow to choose the address, or the name of the setting
      */
-    public function getFiscalAddressSetting(): ?string
+    public function getFiscalAddressSetting(): string
     {
-        return null;
+        throw new \RuntimeException(__METHOD__ . ' is not implemented');
     }
 
     /**
      * Returns whether the new code is used.
      *
      * The default return here is that the old code is used, so override for webshops that
-     * do use the new code (the override gives an emergency switch back tot the old code).
+     * do use the new code (the override gives an emergency switch back to the old code).
      *
      * @return bool
      *   True if the new {@see \Siel\Acumulus\Data\_Documentation data objects},

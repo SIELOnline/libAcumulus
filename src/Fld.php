@@ -16,6 +16,7 @@ namespace Siel\Acumulus;
  */
 interface Fld
 {
+    public const Contract = 'contract';
     public const Customer = 'customer';
     public const Invoice = 'invoice';
     public const Line = 'line';

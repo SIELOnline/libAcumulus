@@ -23,9 +23,6 @@ class FieldExpanderTest extends TestCase
 
     private static Container $container;
 
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
     public function getContainer(): Container
     {
         if (!isset(self::$container)) {
@@ -34,9 +31,6 @@ class FieldExpanderTest extends TestCase
         return self::$container;
     }
 
-    /**
-     * @return \Siel\Acumulus\Helpers\FieldExpander
-     */
     public function getFieldExpander(): FieldExpander
     {
         return $this->getContainer()->getFieldExpander();

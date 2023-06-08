@@ -94,7 +94,7 @@ abstract class BaseConfigForm extends Form
     protected function translateAccountMessage(string $message): string
     {
         if (!empty($message)) {
-            $formType = $this->isAdvancedConfigForm() ? 'advanced' : 'config';
+            $formType = $this->getType();
             $message = sprintf($this->t($message), $this->t("message_error_arg1_$formType"), $this->t("message_error_arg2_$formType"));
         }
         return $message;
@@ -185,16 +185,5 @@ abstract class BaseConfigForm extends Form
         $result += $this->shopCapabilities->getShopOrderStatuses();
 
         return $result;
-    }
-
-    /**
-     * Returns whether this form instance is an advanced config form.
-     *
-     * @return bool
-     *   True if this form instance is an advanced config form.
-     */
-    protected function isAdvancedConfigForm(): bool
-    {
-        return $this instanceof AdvancedConfigForm;
     }
 }

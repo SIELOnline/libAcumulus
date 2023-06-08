@@ -372,6 +372,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return admin_url("admin.php?page=acumulus_$linkType");
             case 'config':
             case 'advanced':
+            case 'settings':
+            case 'mappings':
                 return admin_url("options-general.php?page=acumulus_$linkType");
             case 'fiscal-address-setting':
                 return admin_url("admin.php?page=wc-settings&tab=tax");
@@ -403,7 +405,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function usesNewCode(): bool
     {
-        return false; // Emergency revert: remove the // at the beginning of this line!
+        //return false; // Emergency revert: remove the // at the beginning of this line!
         return true;
     }
 }

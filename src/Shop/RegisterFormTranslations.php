@@ -24,7 +24,7 @@ class RegisterFormTranslations extends TranslationCollection
         'introHeader' => 'Een Acumulus proefaccount aanmaken',
         'register_form_intro' => '<p>Door dit formulier in te vullen kunt u een gratis en vrijblijvend proefaccount aanmaken bij Acumulus.</p>
             <p>Het gratis proefaccount is 30 dagen geldig en volledig functioneel (met een maximum van 50 boekingen).
-            Zodra u het proefaccount omzet in een abonnement is het aantal boekingen onbeperkt en de reeds gedane instellingen en boekingen blijven behouden.
+            Zodra u het proefaccount omzet in een abonnement is het aantal boekingen onbeperkt en de al gedane instellingen en boekingen blijven behouden.
             Het proefaccount wordt NIET automatisch omgezet in een abonnement! U ontvangt een e-mail vlak voordat het proefaccount verloopt.</p>',
 
         'personSettingsHeader' => 'Over u, contactpersoon',

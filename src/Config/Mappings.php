@@ -11,12 +11,26 @@ use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
 
+use function in_array;
+use function is_array;
+use function is_string;
+
 /**
  * Mappings returns sets of mappings for the different
  * {@see \Siel\Acumulus\Data\_Documentation data} objects.
  */
 class Mappings
 {
+    public const validDataTypes = [
+        DataType::Invoice,
+        DataType::Customer,
+        AddressType::Invoice,
+        AddressType::Shipping,
+        LineType::Item,
+        EmailAsPdfType::Invoice,
+        EmailAsPdfType::PackingSlip,
+    ];
+
     private Config $config;
     private ShopCapabilities $shopCapabilities;
 
@@ -25,6 +39,7 @@ class Mappings
      *   See {@see getAllMappings()}
      */
     private array $allMappings;
+    private array $defaultMappings;
 
     public function __construct(Config $config, ShopCapabilities $shopCapabilities)
     {
@@ -75,6 +90,28 @@ class Mappings
     }
 
     /**
+     * Saves the mappings in the config.
+     *
+     * @param array $mappings
+     *   A keyed 2-dimensional array that contains the mappings to store, this may be a
+     *   subset of the possible keys. Keys that are not present will not be changed.
+     *   Keys that do not differ from its default will not be stored.
+     *
+     * @return bool
+     *   Success.
+     */
+    public function save(array $mappings): bool
+    {
+        $mappings = array_filter($mappings, static function (string $key) {
+            return in_array($key, Mappings::validDataTypes, true);
+        }, ARRAY_FILTER_USE_KEY);
+        $existingMappings = $this->getAllMappings();
+        $mappings = array_merge($existingMappings, $mappings);
+        $mappings = $this->getOverriddenValues($mappings, $this->getDefaultMappings());
+        return $this->getConfig()->save(['mappings' => $mappings]);
+    }
+
+    /**
      * Returns all mappings for all objects.
      *
      * @return string[][]
@@ -90,13 +127,33 @@ class Mappings
     {
         if (!isset($this->allMappings)) {
             $this->allMappings = $this->getUserDefinedMappings();
-            foreach ($this->getDefaultShopMappings() as $dataType => $defaultMapping) {
-                $this->allMappings[$dataType] ??= [];
-                $this->allMappings[$dataType] += $defaultMapping;
-            }
             foreach ($this->getDefaultMappings() as $dataType => $defaultMapping) {
                 $this->allMappings[$dataType] ??= [];
                 $this->allMappings[$dataType] += $defaultMapping;
+            }
+        }
+        return $this->allMappings;
+    }
+
+    /**
+     * Returns the default mappings for all objects, shop specific and shop independent.
+     *
+     * @return string[][]
+     *   The default mappings:
+     *     - 1st dimension: keys being one of the Data\...Type::... constants.
+     *     - 2nd dimension: keys being property names or metadata keys.
+     *   Values are mappings for the specified property or metadata field. These are
+     *   typically strings that may contain a field expansion specification, see
+     *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may contain a
+     *   value of another scalar type or even complex data when it is metadata.
+     */
+    protected function getDefaultMappings(): array
+    {
+        if (!isset($this->defaultMappings)) {
+            $this->defaultMappings = $this->getDefaultShopMappings();
+            foreach ($this->getDefaultShopIndependentMappings() as $dataType => $defaultMapping) {
+                $this->defaultMappings[$dataType] ??= [];
+                $this->defaultMappings[$dataType] += $defaultMapping;
             }
         }
         return $this->allMappings;
@@ -131,14 +188,14 @@ class Mappings
     }
 
     /**
-     * Returns the default mappings
+     * Returns the default mappings that are shop independent.
      *
-     * These are hard coded in the {@see \Siel\Acumulus\Config\Config} class.
+     * These are hard coded here in the {@see \Siel\Acumulus\Config\Mappings} class.
      *
      * @return string[][]
-     *   The default mappings.
+     *   The shop independent default mappings.
      */
-    protected function getDefaultMappings(): array
+    protected function getDefaultShopIndependentMappings(): array
     {
         return [
             DataType::Invoice => [
@@ -178,5 +235,27 @@ class Mappings
             LineType::Item => [
             ],
         ];
+    }
+
+    /**
+     * Returns the values that do differ from the defaults.
+     */
+    protected function getOverriddenValues(array $mappings, array $existingMappings): array
+    {
+        $result = [];
+        foreach ($mappings as $key => $value) {
+            $existingValue = $existingMappings[$key] ?? '';
+            if (is_array($value)) {
+                $result[$key] = $this->getOverriddenValues($value, $existingValue);
+            } else {
+                if (!is_string($existingValue)) {
+                    $existingValue = json_encode($existingValue, Meta::JsonFlags);
+                }
+                if ($value !== $existingValue) {
+                    $result[$key] = $value;
+                }
+            }
+        }
+        return $result;
     }
 }

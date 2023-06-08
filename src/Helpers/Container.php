@@ -714,7 +714,8 @@ class Container
      *
      * @param string $type
      *   The type of form requested. Allowed values are: 'register', 'config',
-     *   'advanced', activate', batch', 'invoice', 'rate', 'uninstall'.
+     *   'advanced', 'settings', 'mappings', 'activate', batch', 'invoice', 'rate',
+     *   'uninstall'.
      */
     public function getForm(string $type): Form
     {
@@ -732,6 +733,17 @@ class Container
                 break;
             case 'advanced':
                 $class = 'AdvancedConfig';
+                $arguments[] = $this->getAboutBlockForm();
+                $arguments[] = $this->getAcumulusApiClient();
+                break;
+            case 'settings':
+                $class = 'Settings';
+                $arguments[] = $this->getAboutBlockForm();
+                $arguments[] = $this->getAcumulusApiClient();
+                break;
+            case 'mappings':
+                $class = 'Mappings';
+                $arguments[] = $this->getMappings();
                 $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;

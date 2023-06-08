@@ -83,8 +83,8 @@ abstract class Form extends MessageCollection
      * @var string
      *   The type of this form, the class could also be used to determine so,
      *   but as a simple type string is already used on creation, that is used.
-     *   Should be one of: register, config, advanced, activate, batch, invoice,
-     *   rate.
+     *   Should be one of: register, config, advanced, settings, mappings, activate,
+     *   batch, invoice, rate.
      */
     protected string $type;
     protected Log $log;
@@ -99,9 +99,9 @@ abstract class Form extends MessageCollection
     protected bool $formValuesSet;
     /**
      * @var (string|int|float|bool|array|null)[]
-     *   The values to be placed on the configuration form. The values that come
-     *   from the submitted values are cast to their expected types. Thus, in
-     *   contrast with $submittedValues, these are not only strings.
+     *   The values to be placed on the form. The values that come from the submitted
+     *   values are cast to their expected types. Thus, in contrast with $submittedValues,
+     *   these are not only strings.
      */
     protected array $formValues;
     /**
@@ -230,7 +230,6 @@ abstract class Form extends MessageCollection
                 } elseif (is_array($defaultFormValue)) {
                     // Distribute keyed arrays over separate values if existing.
                     foreach ($defaultFormValue as $arrayKey => $arrayValue) {
-                        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection : https://youtrack.jetbrains.com/issue/WI-60044 */
                         $fullKey = "{$key}[$arrayKey]";
                         if (array_key_exists($fullKey, $this->formValues)) {
                             $this->formValues[$fullKey] = $arrayValue;
@@ -445,7 +444,7 @@ abstract class Form extends MessageCollection
     }
 
     /**
-     * Performs config form validation.
+     * Performs form validation.
      *
      * Any errors are stored as a user readable message in the $errorMessages
      * property and will be keyed by the field name.
@@ -799,6 +798,8 @@ abstract class Form extends MessageCollection
                 break;
             case 'config':
             case 'advanced':
+            case 'settings':
+            case 'mappings':
                 $wrapperType = in_array($accountStatus, [null, false], true) ? 'details' : 'fieldset';
                 break;
             default:

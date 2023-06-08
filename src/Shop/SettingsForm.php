@@ -1,25 +1,28 @@
 <?php
 /**
- * @noinspection DuplicatedCode  SettingsForm started as a duplicate of ConfigForm.
+ * @noinspection DuplicatedCode  This is indeed largely a duplicate of ConfigForm.
  */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Api;
+use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 
 use function count;
+use function in_array;
 
 /**
- * Provides basic config form handling.
+ * Provides the settings form handling.
  *
  * Shop specific may optionally (have to) override:
  * - setSubmittedValues()
  */
-class ConfigForm extends BaseConfigForm
+class SettingsForm extends BaseConfigForm
 {
     /**
      * @var array
@@ -39,7 +42,6 @@ class ConfigForm extends BaseConfigForm
     {
         $this->validateAccountFields();
         $this->validateShopFields();
-        $this->validateEmailAsPdfFields();
         $this->validateDocumentsFields();
     }
 
@@ -155,41 +157,6 @@ class ConfigForm extends BaseConfigForm
     }
 
     /**
-     * Validates fields in the "Email as pdf" settings fieldset.
-     */
-    protected function validateEmailAsPdfFields(): void
-    {
-        // Check if this fieldset was rendered.
-        if (!$this->isKey('emailTo')) {
-            return;
-        }
-
-        // Check for valid email address if no token syntax is used.
-        if (!empty($this->submittedValues['emailTo'])
-            && strpos($this->submittedValues['emailTo'], '[') === false
-            && !$this->isEmailAddress($this->submittedValues['emailTo'], true)
-        ) {
-            $this->addFormMessage($this->t('message_validate_email_5'), Severity::Error, 'emailTo');
-        }
-
-        // Check for valid email addresses if no token syntax is used.
-        if (!empty($this->submittedValues['emailBcc'])
-            && strpos($this->submittedValues['emailBcc'], '[') === false
-            && !$this->isEmailAddress($this->submittedValues['emailBcc'], true)
-        ) {
-            $this->addFormMessage($this->t('message_validate_email_3'), Severity::Error, 'emailBcc');
-        }
-
-        // Check for valid email address if no token syntax is used.
-        if (!empty($this->submittedValues['emailFrom'])
-            && strpos($this->submittedValues['emailFrom'], '[') === false
-            && !$this->isEmailAddress($this->submittedValues['emailFrom'])
-        ) {
-            $this->addFormMessage($this->t('message_validate_email_4'), Severity::Error, 'emailFrom');
-        }
-    }
-
-    /**
      * Validates fields in the "Acumulus documents" fieldset.
      */
     protected function validateDocumentsFields(): void
@@ -270,6 +237,12 @@ class ConfigForm extends BaseConfigForm
                     'description' => sprintf($this->t('desc_triggerSettings'), $this->shopCapabilities->getLink('batch')),
                     'fields' => $this->getTriggerFields(),
                 ],
+                'relationSettingsHeader' => [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('relationSettingsHeader'),
+                    'description' => $this->t('desc_relationSettingsHeader'),
+                    'fields' => $this->getRelationFields(),
+                ],
                 'invoiceSettings' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('invoiceSettingsHeader'),
@@ -294,6 +267,12 @@ class ConfigForm extends BaseConfigForm
             }
 
             $fields += [
+                'optionsSettingsHeader' => [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('optionsSettingsHeader'),
+                    'description' => $this->t('desc_optionsSettingsHeader'),
+                    'fields' => $this->getOptionsFields(),
+                ],
                 'invoiceStatusScreenSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('invoiceStatusScreenSettingsHeader'),
@@ -321,8 +300,8 @@ class ConfigForm extends BaseConfigForm
             $fields += [
                 'advancedConfig' => [
                     'type' => 'details',
-                    'summary' => $this->t('advanced_form_header'),
-                    'fields' => $this->getAdvancedConfigLinkFields(),
+                    'summary' => $this->t('mappings_form_header'),
+                    'fields' => $this->getMappingsLinkFields(),
                 ],
             ];
         }
@@ -534,11 +513,14 @@ class ConfigForm extends BaseConfigForm
      * - 'dateToUse'
      * - 'defaultCustomerType'
      * - 'salutation'
-     * - 'clientData'
      * - 'defaultAccountNumber'
      * - 'defaultCostCenter'
      * - 'defaultInvoiceTemplate'
      * - 'defaultInvoicePaidTemplate'
+     * - 'concept'
+     * - 'euCommerceThreshold'
+     * - 'sendEmptyInvoice'
+     * - 'sendEmptyShipping'
      *
      * @return array[]
      *   The set of invoice related fields.
@@ -558,21 +540,64 @@ class ConfigForm extends BaseConfigForm
             0,
             $this->t('option_empty')
         );
+        $fiscalAddressSetting = $this->shopCapabilities->getFiscalAddressSetting();
+        if (in_array($fiscalAddressSetting, [AddressType::Invoice, AddressType::Shipping], true)) {
+            $descMainAdressAdditional = sprintf($this->t('desc_mainAddress_shopUses'), $this->t($fiscalAddressSetting));
+        } else {
+            $descMainAdressAdditional = sprintf($this->t('desc_mainAddress_shopSetting'),
+                $this->t($fiscalAddressSetting),
+                $this->shopCapabilities->getLink('fiscal-address-setting')
+            );
+        }
 
         return [
+            'mainAddress' => [
+                'type' => 'radio',
+                'label' => $this->t('field_mainAdress'),
+                'description' => $this->t('desc_mainAddress') . ' ' . $descMainAdressAdditional,
+                'options' => $this->getMainAddressOptions(),
+            ],
             'invoiceNrSource' => $this->getOptionsOrHiddenField('invoiceNrSource', 'radio'),
             'dateToUse' => $this->getOptionsOrHiddenField('dateToUse', 'radio'),
-            'defaultAccountNumber' => [
-                'type' => 'select',
-                'label' => $this->t('field_defaultAccountNumber'),
-                'description' => $this->t('desc_defaultAccountNumber'),
-                'options' => $this->accountNumberOptions,
+            'concept' => [
+                'type' => 'radio',
+                'label' => $this->t('field_concept'),
+                'description' => $this->t('desc_concept'),
+                'options' => [
+                    Config::Concept_Plugin => $this->t('option_concept_2'),
+                    Api::Concept_No => $this->t('option_concept_0'),
+                    Api::Concept_Yes => $this->t('option_concept_1'),
+                ],
+                'attributes' => [
+                    'required' => true,
+                ],
             ],
-            'defaultCostCenter' => [
-                'type' => 'select',
-                'label' => $this->t('field_defaultCostCenter'),
-                'description' => $this->t('desc_defaultCostCenter'),
-                'options' => $this->costCenterOptions,
+            'euCommerceThresholdPercentage' => [
+                'type' => 'text',
+                'label' => $this->t('field_eu_commerce_threshold_percentage'),
+                'description' => sprintf($this->t('desc_eu_commerce_threshold_percentage'), $this->t('module')),
+                'attributes' => [
+                    'size' => 10,
+                ],
+            ],
+            'missingAmount' => [
+                'type' => 'radio',
+                'label' => $this->t('field_missing_amount'),
+                'description' => $this->t('desc_missing_amount'),
+                'options' => [
+                    Config::MissingAmount_Warn => $this->t('option_missing_amount_2'),
+                    Config::MissingAmount_AddLine => $this->t('option_missing_amount_3'),
+                    Config::MissingAmount_Ignore => $this->t('option_missing_amount_1'),
+                ],
+            ],
+            'sendWhat' => [
+                'type' => 'checkbox',
+                'label' => $this->t('field_sendWhat'),
+                'description' => $this->t('desc_sendWhat'),
+                'options' => [
+                    'sendEmptyInvoice' => $this->t('option_sendEmptyInvoice'),
+                    'sendEmptyShipping' => $this->t('option_sendEmptyShipping'),
+                ],
             ],
             'defaultInvoiceTemplate' => [
                 'type' => 'select',
@@ -588,6 +613,107 @@ class ConfigForm extends BaseConfigForm
                 'label' => $this->t('field_defaultInvoicePaidTemplate'),
                 'description' => $this->t('desc_defaultInvoiceTemplate'),
                 'options' => $this->picklistToOptions($invoiceTemplates, 0, $this->t('option_same_template')),
+            ],
+            'defaultAccountNumber' => [
+                'type' => 'select',
+                'label' => $this->t('field_defaultAccountNumber'),
+                'description' => $this->t('desc_defaultAccountNumber'),
+                'options' => $this->accountNumberOptions,
+            ],
+            'defaultCostCenter' => [
+                'type' => 'select',
+                'label' => $this->t('field_defaultCostCenter'),
+                'description' => $this->t('desc_defaultCostCenter'),
+                'options' => $this->costCenterOptions,
+            ],
+        ];
+    }
+
+    /**
+     * Returns the set of relation management fields.
+     *
+     * The fields returned:
+     * - 'clientData': 'sendCustomer' and 'overwriteIfExists'
+     * - 'defaultCustomerType'
+     * - 'contactStatus'
+     *
+     * @return array[]
+     *   The set of relation management fields.
+     */
+    protected function getRelationFields(): array
+    {
+        return [
+            'clientData' => [
+                'type' => 'checkbox',
+                'label' => $this->t('field_clientData'),
+                'description' => $this->t('desc_clientData'),
+                'options' => [
+                    'sendCustomer' => $this->t('option_sendCustomer'),
+                    'overwriteIfExists' => $this->t('option_overwriteIfExists'),
+                ],
+            ],
+            'defaultCustomerType' => [
+                'type' => 'select',
+                'label' => $this->t('field_defaultCustomerType'),
+                'options' => $this->picklistToOptions($this->acumulusApiClient->getPicklistContactTypes(), 0, $this->t('option_empty')),
+            ],
+            'contactStatus' => [
+                'type' => 'radio',
+                'label' => $this->t('field_contactStatus'),
+                'description' => $this->t('desc_contactStatus'),
+                'options' => $this->getContactStatusOptions(),
+            ],
+        ];
+    }
+
+    /**
+     * Returns the set of options related fields.
+     *
+     * The fields returned:
+     * - 'optionsAllOn1Line'
+     * - 'optionsAllOnOwnLine'
+     * - 'optionsMaxLength'
+     *
+     * @return array[]
+     *   The set of options related fields.
+     *
+     * @todo: deze velden samenvoegen met "verzend gratis vezending regels" in een
+     *   fieldset Factuurregels?
+     */
+    protected function getOptionsFields(): array
+    {
+        return [
+            'showOptions' => [
+                'type' => 'checkbox',
+                'label' => $this->t('field_showOptions'),
+                'description' => $this->t('desc_showOptions'),
+                'options' => [
+                    'optionsShow' => $this->t('option_optionsShow'),
+                ],
+            ],
+            'optionsAllOn1Line' => [
+                'type' => 'select',
+                'label' => $this->t('field_optionsAllOn1Line'),
+                'options' => [
+                        0 => $this->t('option_do_not_use'),
+                        PHP_INT_MAX => $this->t('option_always'),
+                    ] + array_combine(range(1, 10), range(1, 10)),
+            ],
+            'optionsAllOnOwnLine' => [
+                'type' => 'select',
+                'label' => $this->t('field_optionsAllOnOwnLine'),
+                'options' => [
+                        PHP_INT_MAX => $this->t('option_do_not_use'),
+                        1 => $this->t('option_always'),
+                    ] + array_combine(range(2, 10), range(2, 10)),
+            ],
+            'optionsMaxLength' => [
+                'type' => 'number',
+                'label' => $this->t('field_optionsMaxLength'),
+                'description' => $this->t('desc_optionsMaxLength'),
+                'attributes' => [
+                    'min' => 1,
+                ],
             ],
         ];
     }
@@ -620,6 +746,14 @@ class ConfigForm extends BaseConfigForm
             'type' => 'markup',
             'value' => '<h3>' . ucfirst($this->t('document_invoice')) . '</h3>',
         ];
+        $fields['emailAsPdf_cb'] = [
+            'type' => 'checkbox',
+            'label' => $this->t('field_emailAsPdf'),
+            'description' => $this->t('desc_emailAsPdf'),
+            'options' => [
+                'emailAsPdf' => $this->t('option_emailAsPdf'),
+            ],
+        ];
         $fields['detailInvoice'] = [
             'type' => 'checkbox',
             'label' => $this->t('field_detailPage'),
@@ -634,7 +768,6 @@ class ConfigForm extends BaseConfigForm
                 'options' => $this->getDocumentsOptions('List', 'invoice'),
             ];
         }
-        $fields += $this->getEmailAsPdfFields();
         return $fields;
     }
 
@@ -658,95 +791,6 @@ class ConfigForm extends BaseConfigForm
                 'description' => $this->t('desc_listPage'),
                 'options' => $this->getDocumentsOptions('List', 'packing_slip'),
             ];
-        }
-        $fields['packingSlipEmailTo'] = [
-            'type' => 'text',
-            'label' => $this->t('field_packingSlipEmailTo'),
-            'description' => $this->t('desc_packingSlipEmailTo') . ' ' . $this->t('msg_token'),
-            'attributes' => [
-                'size' => 60,
-            ],
-        ];
-        $fields['packingSlipEmailBcc'] = [
-            'type' => 'text',
-            'label' => $this->t('field_packingSlipEmailBcc'),
-            'description' => $this->t('desc_packingSlipEmailBcc') . ' ' . $this->t('msg_token'),
-            'attributes' => [
-                'size' => 60,
-            ],
-        ];
-        return $fields;
-    }
-
-    /**
-     * Returns the set of "email invoice as PDF" related fields.
-     *
-     * The fields returned:
-     * - 'emailAsPdf'
-     * - 'emailTo'
-     * - 'emailBcc'
-     * - 'emailFrom'
-     * - 'subject'
-     *
-     * @return array[]
-     *   The set of "email invoice as PDF" related fields.
-     */
-    protected function getEmailAsPdfFields(): array
-    {
-        $fields = [
-            'emailAsPdf_cb' => [
-                'type' => 'checkbox',
-                'label' => $this->t('field_emailAsPdf'),
-                'description' => $this->t('desc_emailAsPdf'),
-                'options' => [
-                    'emailAsPdf' => $this->t('option_emailAsPdf'),
-                ],
-            ],
-            'emailTo' => [
-                'type' => 'text',
-                'label' => $this->t('field_emailTo'),
-                'description' => $this->t('desc_emailTo') . ' ' . $this->t('msg_token'),
-                'attributes' => [
-                    'size' => 60,
-                ],
-            ],
-            'emailBcc' => [
-                'type' => 'text',
-                'label' => $this->t('field_emailBcc'),
-                'description' => $this->t('desc_emailBcc') . ' ' . $this->t('msg_token'),
-                'attributes' => [
-                    'multiple' => true,
-                    'size' => 60,
-                ],
-            ],
-            'emailFrom' => [
-                'type' => 'text',
-                'label' => $this->t('field_emailFrom'),
-                'description' => $this->t('desc_emailFrom') . ' ' . $this->t('msg_token'),
-                'attributes' => [
-                    'size' => 60,
-                ],
-            ],
-            'subject' => [
-                'type' => 'text',
-                'label' => $this->t('field_subject'),
-                'description' => $this->t('desc_subject') . ' ' . $this->t('msg_token'),
-                'attributes' => [
-                    'size' => 60,
-                ],
-            ],
-        ];
-        if ($this->shopCapabilities->usesNewCode()) {
-            $fieldsToHide = [
-                'itemName',
-                'emailTo',
-                'emailBcc',
-                'emailFrom',
-                'subject',
-            ];
-            foreach ($fieldsToHide as $field) {
-                $fields[$field]['type'] = 'hidden';
-            }
         }
         return $fields;
     }
@@ -796,32 +840,32 @@ class ConfigForm extends BaseConfigForm
     }
 
     /**
-     * Returns the set of fields introducing the advanced config forms.
+     * Returns the set of fields introducing the mappings form.
      *
      * The fields returned:
-     * - 'tellAboutAdvancedSettings'
-     * - 'advancedSettingsLink'
+     * - 'tellAboutMappings'
+     * - 'mappingsLink'
      *
      * @return array[]
-     *   The set of fields introducing the advanced config form.
+     *   The set of fields introducing the mappings form.
      */
-    protected function getAdvancedConfigLinkFields(): array
+    protected function getMappingsLinkFields(): array
     {
         return [
-            'tellAboutAdvancedSettings' => [
+            'tellAboutMappings' => [
                 'type' => 'markup',
                 'value' => sprintf(
-                    $this->t('desc_advancedSettings'),
-                    $this->t('advanced_form_link_text'),
-                    $this->t('menu_advancedSettings')
+                    $this->t('desc_mappings'),
+                    $this->t('mappings_form_link_text'),
+                    $this->t('menu_mappings')
                 ),
             ],
-            'advancedSettingsLink' => [
+            'mappingsLink' => [
                 'type' => 'markup',
                 'value' => sprintf(
                     $this->t('button_link'),
-                    $this->t('advanced_form_link_text'),
-                    $this->shopCapabilities->getLink('advanced')
+                    $this->t('mappings_form_link_text'),
+                    $this->shopCapabilities->getLink('mappings')
                 ),
             ],
         ];
@@ -906,6 +950,31 @@ class ConfigForm extends BaseConfigForm
             Config::EuVat_Yes => $this->t('option_euVat_1'),
             Config::EuVat_SwitchOnLimit => $this->t('option_euVat_2'),
             Config::EuVat_No => $this->t('option_euVat_3'),
+        ];
+    }
+
+    protected function getMainAddressOptions(): array
+    {
+        return [
+            Config::MainAddress_FollowShop => $this->t('option_mainAddress_shop'),
+            Config::MainAddress_Invoice => ucfirst($this->t(AddressType::Invoice)),
+            Config::MainAddress_Shipping => ucfirst($this->t(AddressType::Shipping)),
+        ];
+    }
+
+    /**
+     * Returns the list of possible values for the contact status field.
+     *
+     * @return array
+     *   The list of possible values for the contact status field keyed by the
+     *   value to use in the API and translated labels as the values.
+     *
+     */
+    protected function getContactStatusOptions(): array
+    {
+        return [
+            Api::ContactStatus_Active => $this->t('option_contactStatus_Active'),
+            Api::ContactStatus_Disabled => $this->t('option_contactStatus_Disabled'),
         ];
     }
 

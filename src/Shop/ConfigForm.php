@@ -693,7 +693,7 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getEmailAsPdfFields(): array
     {
-        $fields = [
+        return [
             'emailAsPdf_cb' => [
                 'type' => 'checkbox',
                 'label' => $this->t('field_emailAsPdf'),
@@ -736,19 +736,6 @@ class ConfigForm extends BaseConfigForm
                 ],
             ],
         ];
-        if ($this->shopCapabilities->usesNewCode()) {
-            $fieldsToHide = [
-                'itemName',
-                'emailTo',
-                'emailBcc',
-                'emailFrom',
-                'subject',
-            ];
-            foreach ($fieldsToHide as $field) {
-                $fields[$field]['type'] = 'hidden';
-            }
-        }
-        return $fields;
     }
 
     /**

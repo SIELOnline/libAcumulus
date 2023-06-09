@@ -1174,8 +1174,6 @@ class Config
                     'type' => 'int',
                     'default' => 0,
                 ],
-                // @todo: find out how to let the user define this and only store the
-                //   differences!
                 Config::Mappings => [
                     'group' => 'other',
                     'type' => 'array',

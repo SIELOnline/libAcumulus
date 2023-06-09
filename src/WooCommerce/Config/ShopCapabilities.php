@@ -376,7 +376,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'mappings':
                 return admin_url("options-general.php?page=acumulus_$linkType");
             case 'fiscal-address-setting':
-                return admin_url("admin.php?page=wc-settings&tab=tax");
+                return admin_url('admin.php?page=wc-settings&tab=tax');
             case 'logo':
                 return home_url('wp-content/plugins/acumulus/siel-logo.svg');
             case 'pro-support-image':

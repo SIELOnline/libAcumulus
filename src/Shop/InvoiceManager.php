@@ -386,12 +386,13 @@ abstract class InvoiceManager
     ): InvoiceAddResult
     {
         if ($this->getShopCapabilities()->usesNewCode()) {
-            return $this->createAndSendLegacy($invoiceSource, $result, $forceSend, $dryRun);
-        } else {
             $this->createAndSendNew($invoiceSource, $result, $forceSend, $dryRun);
             return $result;
+        } else {
+            return $this->createAndSendLegacy($invoiceSource, $result, $forceSend, $dryRun);
         }
     }
+
     protected function createAndSendNew(
         Source $invoiceSource,
         InvoiceAddResult $result,

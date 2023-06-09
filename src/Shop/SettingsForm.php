@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection DuplicatedCode  This is indeed largely a duplicate of ConfigForm.
+ * @noinspection DuplicatedCode  This started as a duplicate of ConfigForm.
  */
 
 declare(strict_types=1);
@@ -21,6 +21,8 @@ use function in_array;
  *
  * Shop specific may optionally (have to) override:
  * - setSubmittedValues()
+ *
+ * @noinspection PhpUnused
  */
 class SettingsForm extends BaseConfigForm
 {
@@ -42,7 +44,6 @@ class SettingsForm extends BaseConfigForm
     {
         $this->validateAccountFields();
         $this->validateShopFields();
-        $this->validateDocumentsFields();
     }
 
     /**
@@ -157,39 +158,6 @@ class SettingsForm extends BaseConfigForm
     }
 
     /**
-     * Validates fields in the "Acumulus documents" fieldset.
-     */
-    protected function validateDocumentsFields(): void
-    {
-        // Check if this fieldset was rendered.
-        if (!$this->isKey('showInvoiceDetail')) {
-            return;
-        }
-
-        // Check that a mail address has been filled in when the packing slip option has been set to a mail link.
-        if (!empty($this->submittedValues['mailPackingSlipDetail']) || !empty($this->submittedValues['mailPackingSlipList'])) {
-            if (empty($this->submittedValues['packingSlipEmailTo'])) {
-                $this->addFormMessage($this->t('message_validate_packing_slip_email_0'), Severity::Error, 'packingSlipEmailTo');
-            }
-        }
-        // Check that a valid mail address has been filled in.
-        if (!empty($this->submittedValues['packingSlipEmailTo'])
-            && strpos($this->submittedValues['packingSlipEmailTo'], '[') === false
-            && !$this->isEmailAddress($this->submittedValues['packingSlipEmailTo'], true)
-        ) {
-                $this->addFormMessage($this->t('message_validate_packing_slip_email_1'), Severity::Error, 'packingSlipEmailTo');
-        }
-
-        // Check that valid bcc mail addresses have been filled in.
-        if (!empty($this->submittedValues['packingSlipEmailBcc'])
-            && strpos($this->submittedValues['packingSlipEmailBcc'], '[') === false
-            && !$this->isEmailAddress($this->submittedValues['packingSlipEmailBcc'], true)
-        ) {
-                $this->addFormMessage($this->t('message_validate_packing_slip_email_2'), Severity::Error, 'packingSlipEmailBcc');
-        }
-    }
-
-    /**
      * {@inheritdoc}
      *
      * This override returns the config form. At the minimum, this includes the
@@ -288,23 +256,19 @@ class SettingsForm extends BaseConfigForm
             ];
         }
 
-        $fields += [
-            'pluginSettings' => [
-                'type' => 'fieldset',
-                'legend' => $this->t('pluginSettingsHeader'),
-                'fields' => $this->getPluginFields(),
-            ],
-            'versionInformation' => $this->getAboutBlock($accountStatus),
+        $fields['pluginSettings'] = [
+            'type' => 'fieldset',
+            'legend' => $this->t('pluginSettingsHeader'),
+            'fields' => $this->getPluginFields(),
         ];
         if ($accountStatus) {
-            $fields += [
-                'advancedConfig' => [
-                    'type' => 'details',
-                    'summary' => $this->t('mappings_form_header'),
-                    'fields' => $this->getMappingsLinkFields(),
-                ],
+            $fields['advancedConfig'] = [
+                'type' => 'details',
+                'summary' => $this->t('mappings_form_header'),
+                'fields' => $this->getMappingsLinkFields(),
             ];
         }
+        $fields['versionInformation'] = $this->getAboutBlock($accountStatus);
 
         return $fields;
     }
@@ -718,6 +682,11 @@ class SettingsForm extends BaseConfigForm
         ];
     }
 
+    /**
+     * Returns the fields related to the invoice status screen.
+     *
+     * @return array[]
+     */
     protected function getInvoiceStatusScreenFields(): array
     {
         $fields = [];
@@ -734,11 +703,21 @@ class SettingsForm extends BaseConfigForm
         return $fields;
     }
 
+    /**
+     * Returns the fields related to the documents, invoice and packing slip, options.
+     *
+     * @return array[]
+     */
     protected function getDocumentsFields(): array
     {
         return $this->getInvoiceDocumentFields() + $this->getPackingSlipDocumentFields();
     }
 
+    /**
+     * Returns the fields related to the invoice document.
+     *
+     * @return array[]
+     */
     protected function getInvoiceDocumentFields(): array
     {
         $fields = [];
@@ -771,6 +750,11 @@ class SettingsForm extends BaseConfigForm
         return $fields;
     }
 
+    /**
+     * Returns the fields related to the packing slip document.
+     *
+     * @return array[]
+     */
     protected function getPackingSlipDocumentFields(): array
     {
         $fields = [];
@@ -801,11 +785,8 @@ class SettingsForm extends BaseConfigForm
      * The fields returned:
      * - 'debug'
      * - 'logLevel'
-     * - 'versionInformation'
-     * - 'versionInformationDesc'
      *
      * @return array[]
-     *   The set of plugin related fields.
      */
     protected function getPluginFields(): array
     {

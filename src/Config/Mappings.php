@@ -36,7 +36,7 @@ class Mappings
 
     /**
      * @var string[][][]
-     *   See {@see getAllMappings()}
+     *   See {@see getAll()}
      */
     private array $allMappings;
     private array $defaultMappings;
@@ -85,7 +85,7 @@ class Mappings
      */
     public function getFor(string $forType): array
     {
-        $mappings = $this->getAllMappings();
+        $mappings = $this->getAll();
         return ($mappings[$forType] ?? []);
     }
 
@@ -105,10 +105,13 @@ class Mappings
         $mappings = array_filter($mappings, static function (string $key) {
             return in_array($key, Mappings::validDataTypes, true);
         }, ARRAY_FILTER_USE_KEY);
-        $existingMappings = $this->getAllMappings();
-        $mappings = array_merge($existingMappings, $mappings);
-        $mappings = $this->getOverriddenValues($mappings, $this->getDefaultMappings());
-        return $this->getConfig()->save(['mappings' => $mappings]);
+        $existingMappings = $this->getAll();
+        $mappings = array_replace_recursive($existingMappings, $mappings);
+        $mappings = $this->getOverriddenValues($mappings, $this->getDefaults());
+        $result = $this->getConfig()->save(['mappings' => $mappings]);
+        // Clear internal cache.
+        unset($this->allMappings);
+        return $result;
     }
 
     /**
@@ -123,14 +126,13 @@ class Mappings
      *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may contain a
      *   value of another scalar type or even complex data when it is metadata.
      */
-    protected function getAllMappings(): array
+    public function getAll(): array
     {
         if (!isset($this->allMappings)) {
-            $this->allMappings = $this->getUserDefinedMappings();
-            foreach ($this->getDefaultMappings() as $dataType => $defaultMapping) {
-                $this->allMappings[$dataType] ??= [];
-                $this->allMappings[$dataType] += $defaultMapping;
-            }
+            $this->allMappings = array_replace_recursive(
+                $this->getDefaults(),
+                $this->getUserDefined()
+            );
         }
         return $this->allMappings;
     }
@@ -147,16 +149,15 @@ class Mappings
      *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may contain a
      *   value of another scalar type or even complex data when it is metadata.
      */
-    protected function getDefaultMappings(): array
+    protected function getDefaults(): array
     {
         if (!isset($this->defaultMappings)) {
-            $this->defaultMappings = $this->getDefaultShopMappings();
-            foreach ($this->getDefaultShopIndependentMappings() as $dataType => $defaultMapping) {
-                $this->defaultMappings[$dataType] ??= [];
-                $this->defaultMappings[$dataType] += $defaultMapping;
-            }
+            $this->defaultMappings = array_replace_recursive(
+                $this->getShopIndependentDefaults(),
+                $this->getShopDefaults()
+            );
         }
-        return $this->allMappings;
+        return $this->defaultMappings;
     }
 
     /**
@@ -168,7 +169,7 @@ class Mappings
      * @return string[][]
      *   The mappings that are overridden by the user.
      */
-    protected function getUserDefinedMappings(): array
+    protected function getUserDefined(): array
     {
         return $this->getConfig()->get(Config::Mappings);
     }
@@ -177,12 +178,12 @@ class Mappings
      * Returns the default mappings for the current shop
      *
      * These are hard coded in the shop's {@see \Siel\Acumulus\Config\ShopCapabilities}
-     * class and override the defaults from {@see getDefaultMappings()}.
+     * class and override the defaults from {@see getDefaults()}.
      *
      * @return string[][]
      *   The default mappings for the current shop.
      */
-    protected function getDefaultShopMappings(): array
+    protected function getShopDefaults(): array
     {
         return $this->getShopCapabilities()->getDefaultShopMappings();
     }
@@ -195,7 +196,7 @@ class Mappings
      * @return string[][]
      *   The shop independent default mappings.
      */
-    protected function getDefaultShopIndependentMappings(): array
+    protected function getShopIndependentDefaults(): array
     {
         return [
             DataType::Invoice => [
@@ -238,7 +239,7 @@ class Mappings
     }
 
     /**
-     * Returns the values that do differ from the defaults.
+     * Returns only the values that do differ from the defaults.
      */
     protected function getOverriddenValues(array $mappings, array $existingMappings): array
     {

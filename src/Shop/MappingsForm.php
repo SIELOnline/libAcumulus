@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection DuplicatedCode Yes, there is duplication from the former
+ * @noinspection DuplicatedCode This form started as a duplicate of
  *   {@see \Siel\Acumulus\Shop\AdvancedConfigForm}.
  */
 
@@ -32,9 +32,15 @@ use function is_array;
  *
  * Shop specific may optionally (have to) override:
  * - setSubmittedValues()
+ *
+ * @noinspection EfferentObjectCouplingInspection
+ * @noinspection PhpUnused
  */
 class MappingsForm extends Form
 {
+    protected const Size = 70;
+    protected const SizeLong = 150;
+
     protected Mappings $mappings;
 
     public function __construct(
@@ -57,6 +63,16 @@ class MappingsForm extends Form
     /**
      * {@inheritdoc}
      *
+     * This is the set of values as are stored in the config.
+     */
+    protected function getDefaultFormValues(): array
+    {
+        return $this->mappings->getAll();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * Saves the submitted and validated form values in the mappings store.
      */
     protected function execute(): bool
@@ -68,6 +84,7 @@ class MappingsForm extends Form
     protected function validate(): void
     {
         $this->validateEmailInvoiceFields();
+        $this->validateEmailPackingSlipFields();
     }
 
     /**
@@ -139,11 +156,14 @@ class MappingsForm extends Form
      */
     protected function getFieldDefinitions(): array
     {
-        $fields = [
+        $message = $this->checkAccountSettings();
+        $accountStatus = $this->emptyCredentials() ? null : empty($message);
+
+        return [
             'configHeader' => [
                 'type' => 'details',
                 'summary' => $this->t('config_form_header'),
-                'fields' => $this->getConfigLinkFields(),
+                'fields' => $this->getSettingsLinkFields(),
             ],
             'tokenHelpHeader' => [
                 'type' => 'details',
@@ -153,50 +173,44 @@ class MappingsForm extends Form
             ],
             'relationMappingsHeader' => [
                 'type' => 'fieldset',
-                'legend' => $this->t('relationSettingsHeader'),
-                'description' => $this->t('desc_relationSettingsHeader'),
-                'fields' => $this->addNames($this->getRelationFields(), DataType::Customer),
+                'legend' => $this->t('relationMappingsHeader'),
+                'description' => $this->t('desc_relationMappingsHeader'),
+                'fields' => $this->makeArrayFields($this->getRelationFields(), DataType::Customer),
             ],
             'invoiceAddressMappingsHeader' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('invoiceAddressMappingsHeader'),
                 'description' => $this->t('desc_invoiceAddressMappingsHeader'),
-                'fields' => $this->addNames($this->getAddressFields(), AddressType::Invoice),
+                'fields' => $this->makeArrayFields($this->getAddressFields(), AddressType::Invoice),
             ],
             'shippingAddressMappingsHeader' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('shippingAddressMappingsHeader'),
                 'description' => $this->t('desc_shippingAddressMappingsHeader'),
-                'fields' => $this->addNames($this->getAddressFields(), AddressType::Shipping),
+                'fields' => $this->makeArrayFields($this->getAddressFields(), AddressType::Shipping),
             ],
             'invoiceMappings' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('invoiceMappingsHeader'),
-                'fields' => $this->addNames($this->getInvoiceFields(), DataType::Invoice),
+                'fields' => $this->makeArrayFields($this->getInvoiceFields(), DataType::Invoice),
             ],
             'invoiceLinesMappingsHeader' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('invoiceLinesMappingsHeader'),
-                'fields' => $this->addNames($this->getInvoiceLinesFields(), LineType::Item),
+                'fields' => $this->makeArrayFields($this->getInvoiceLinesFields(), LineType::Item),
             ],
             'emailInvoicePdfMappingsHeader' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('emailInvoicePdfMappingsHeader'),
-                'fields' => $this->addNames($this->getEmailInvoiceFields(), EmailAsPdfType::Invoice),
+                'fields' => $this->makeArrayFields($this->getEmailInvoiceFields(), EmailAsPdfType::Invoice),
             ],
             'emailPackingSlipPdfMappingsHeader' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('emailPackingSlipPdfMappingsHeader'),
-                'fields' => $this->addNames($this->getEmailPackingSlipFields(), EmailAsPdfType::PackingSlip),
+                'fields' => $this->makeArrayFields($this->getEmailPackingSlipFields(), EmailAsPdfType::PackingSlip),
             ],
+            'versionInformation' => $this->getAboutBlock($accountStatus),
         ];
-
-        // Last fieldset: More Acumulus.
-        $message = $this->checkAccountSettings();
-        $accountStatus = $this->emptyCredentials() ? null : empty($message);
-        $fields['versionInformation'] = $this->getAboutBlock($accountStatus);
-
-        return $fields;
     }
 
     /**
@@ -353,7 +367,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_contactYourId'),
                 'description' => $this->t('desc_contactYourId'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'vatNumber' => [
@@ -361,37 +375,37 @@ class MappingsForm extends Form
                 'label' => $this->t('field_vatNumber'),
                 'description' => $this->t('desc_vatNumber'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::SizeLong,
                 ],
             ],
             'telephone' => [
                 'type' => 'text',
-                'label' => $this->t('field_telephone'),
+                'label' => $this->t('field_telephone1'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'telephone2' => [
                 'type' => 'text',
                 'label' => $this->t('field_telephone2'),
-                'description' => $this->t('desc_telephone'),
+                'description' => $this->t('desc_telephone12'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'fax' => [
                 'type' => 'text',
                 'label' => $this->t('field_fax'),
-                'description' => $this->t('desc_fax'),
+                'description' => $this->t('desc_fax1'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'email' => [
                 'type' => 'text',
                 'label' => $this->t('field_email'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'mark' => [
@@ -399,7 +413,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_mark'),
                 'description' => $this->t('desc_mark'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
         ];
@@ -415,14 +429,14 @@ class MappingsForm extends Form
                 'type' => 'text',
                 'label' => $this->t('field_companyName1'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'companyName2' => [
                 'type' => 'text',
                 'label' => $this->t('field_companyName2'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'fullName' => [
@@ -430,7 +444,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_fullName'),
                 'description' => $this->t('desc_fullName'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::SizeLong,
                 ],
             ],
             'salutation' => [
@@ -438,14 +452,14 @@ class MappingsForm extends Form
                 'label' => $this->t('field_salutation'),
                 'description' => $this->t('desc_salutation'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::SizeLong,
                 ],
             ],
             'address1' => [
                 'type' => 'text',
                 'label' => $this->t('field_address1'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'address2' => [
@@ -453,21 +467,21 @@ class MappingsForm extends Form
                 'label' => $this->t('field_address2'),
                 'description' => $this->t('desc_address'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'postalCode' => [
                 'type' => 'text',
                 'label' => $this->t('field_postalCode'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'city' => [
                 'type' => 'text',
                 'label' => $this->t('field_city'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'countryCode' => [
@@ -475,7 +489,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_countryCode'),
                 'description' => $this->t('desc_countryCode'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
         ];
@@ -492,7 +506,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_description'),
                 'description' => $this->t('desc_description'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::SizeLong,
                 ],
             ],
             'descriptionText' => [
@@ -500,7 +514,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_descriptionText'),
                 'description' => $this->t('desc_descriptionText'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::SizeLong,
                     'rows' => 6,
                     'style' => 'box-sizing: border-box; width: 83%; min-width: 24em;',
                 ],
@@ -510,7 +524,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_invoiceNotes'),
                 'description' => $this->t('desc_invoiceNotes'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::SizeLong,
                     'rows' => 6,
                     'style' => 'box-sizing: border-box; width: 83%; min-width: 24em;',
                 ],
@@ -529,7 +543,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_itemNumber'),
                 'description' => $this->t('desc_itemNumber'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'productName' => [
@@ -537,7 +551,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_productName'),
                 'description' => $this->t('desc_productName'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'nature' => [
@@ -553,7 +567,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_costPrice'),
                 'description' => $this->t('desc_costPrice'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
         ];
@@ -567,7 +581,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_emailTo'),
                 'description' => $this->t('desc_emailTo'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'emailBcc' => [
@@ -576,7 +590,7 @@ class MappingsForm extends Form
                 'description' => $this->t('desc_emailBcc'),
                 'attributes' => [
                     'multiple' => true,
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'emailFrom' => [
@@ -584,7 +598,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_emailFrom'),
                 'description' => $this->t('desc_emailFrom'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'subject' => [
@@ -592,7 +606,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_subject'),
                 'description' => $this->t('desc_subject'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::SizeLong,
                 ],
             ],
         ];
@@ -606,7 +620,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_packingSlipEmailTo'),
                 'description' => $this->t('desc_packingSlipEmailTo') . ' ' . $this->t('msg_token'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
             'packingSlipEmailBcc' => [
@@ -614,7 +628,7 @@ class MappingsForm extends Form
                 'label' => $this->t('field_packingSlipEmailBcc'),
                 'description' => $this->t('desc_packingSlipEmailBcc') . ' ' . $this->t('msg_token'),
                 'attributes' => [
-                    'size' => 60,
+                    'size' => self::Size,
                 ],
             ],
         ];
@@ -630,23 +644,24 @@ class MappingsForm extends Form
      * @return array[]
      *   The set of fields introducing the advanced config form.
      */
-    protected function getConfigLinkFields(): array
+    protected function getSettingsLinkFields(): array
     {
         return [
-            'tellAboutBasicSettings' => [
+            'tellAboutSettings' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('desc_basicSettings'), $this->t('config_form_link_text'), $this->t('menu_basicSettings')),
+                'value' => sprintf($this->t('desc_settings'), $this->t('settings_form_link_text'), $this->t('menu_settings')),
             ],
             'basicSettingsLink' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('button_link'), $this->t('config_form_link_text'), $this->shopCapabilities->getLink('config')),
+                'value' => sprintf($this->t('button_link'), $this->t('settings_form_link_text'), $this->shopCapabilities->getLink('settings')),
             ],
         ];
     }
 
     /**
-     * Changes the names and ids of a set of fields.
+     * Changes the form field names into array names.
      *
+     * The id as well as the name are changed:
      * - The id is prefixed with the data type to make it unique across different field
      *   sets with similar field names.
      * - The name is changed into array syntax where the original id becomes a key for an
@@ -655,12 +670,13 @@ class MappingsForm extends Form
      * Example: field 'address1" for data type 'invoice' gets id = 'invoice_address1', and
      * name = 'invoice[address1]'.
      */
-    protected function addNames(array $fields, string $dataType): array
+    protected function makeArrayFields(array $fields, string $dataType): array
     {
         $result = [];
         foreach ($fields as $id => $field) {
             $field['name'] = "{$dataType}[$id]";
-            $result["{$dataType}_$id"] = $field;
+            $field['id'] = "{$dataType}_$id";
+            $result[$field['name']] = $field;
         }
         return $result;
     }

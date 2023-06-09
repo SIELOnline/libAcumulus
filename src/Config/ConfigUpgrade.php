@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Config;
 
 use RuntimeException;
+use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
+use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Helpers\Severity;
@@ -186,6 +191,10 @@ class ConfigUpgrade
 
         if (version_compare($currentVersion, '7.4.0', '<')) {
             $result = $this->upgrade740() && $result;
+        }
+
+        if (version_compare($currentVersion, '8.0.0', '<')) {
+            $result = $this->upgrade800() && $result;
         }
 
         $this->getLog()->notice('Config: finished upgrading to %s (%s)', Version, $result ? 'success' : 'failure');
@@ -536,5 +545,72 @@ class ConfigUpgrade
         }
 
         return $this->getConfig()->save($newSettings);
+    }
+
+    /**
+     * 8.0.0 upgrade.
+     *
+     * - Settings to mappings:
+     *   - Keep the old settings (for emergency revert).
+     *   - Copy the settings that are a mapping to the 'mappings' settings.
+     *   - Cater for defaults that have been rephrased (start with Source::, use method
+     *     call syntax), so only copy those that are stored in the config.
+     */
+    protected function upgrade800(): bool
+    {
+        $mappingKeys = [
+            'contactYourId' => [DataType::Customer, Fld::ContactYourId],
+            'companyName1' => [AddressType::Invoice, Fld::CompanyName1],
+            'companyName2' => [AddressType::Invoice, Fld::CompanyName2],
+            'fullName' => [AddressType::Invoice, Fld::FullName],
+            'salutation' => [AddressType::Invoice, Fld::Salutation],
+            'address1' => [AddressType::Invoice, Fld::Address1],
+            'address2' => [AddressType::Invoice, Fld::Address2],
+            'postalCode' => [AddressType::Invoice, Fld::PostalCode],
+            'city' => [AddressType::Invoice, Fld::City],
+            'vatNumber' => [DataType::Customer, Fld::VatNumber],
+            'telephone' => [DataType::Customer, Fld::Telephone],
+            'fax' => [DataType::Customer, Fld::Fax],
+            'email' => [DataType::Customer, Fld::Email],
+            'mark' => [DataType::Customer, Fld::Mark],
+            'description' => [DataType::Invoice, Fld::Description],
+            'descriptionText' => [DataType::Invoice, Fld::DescriptionText],
+            'invoiceNotes' => [DataType::Invoice, Fld::InvoiceNotes],
+            'itemNumber' => [LineType::Item, Fld::ItemNumber],
+            'productName' => [LineType::Item, Fld::Product],
+            'nature' => [LineType::Item, Fld::Nature],
+            'costPrice' => [LineType::Item, Fld::CostPrice],
+            'emailFrom' => [EmailAsPdfType::Invoice, Fld::EmailFrom],
+            'emailTo' => [EmailAsPdfType::Invoice, Fld::EmailTo],
+            'emailBcc' => [EmailAsPdfType::Invoice, Fld::EmailBcc],
+            'subject' => [EmailAsPdfType::Invoice, Fld::Subject],
+            'confirmReading' => [EmailAsPdfType::Invoice, Fld::ConfirmReading],
+            'packingSlipEmailFrom' => [EmailAsPdfType::PackingSlip, Fld::EmailFrom],
+            'packingSlipEmailTo' => [EmailAsPdfType::PackingSlip, Fld::EmailTo],
+            'packingSlipEmailBcc' => [EmailAsPdfType::PackingSlip, Fld::EmailBcc],
+            'packingSlipSubject' => [EmailAsPdfType::PackingSlip, Fld::Subject],
+            'packingSlipConfirmReading' => [EmailAsPdfType::PackingSlip, Fld::ConfirmReading],
+        ];
+        $result = true;
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+        $mappings = $values[Config::Mappings] ?? [];
+        foreach ($mappingKeys as $key => [$group, $property]) {
+            // - Was the old key being overridden by the user? That is, is there a value,
+            //   even if it is empty?
+            // - Does the new mapping somehow already have a value: do not overwrite.
+            if (isset($values[$key]) && !isset($mappings[$group][$property])) {
+                // Chances are it won't work anymore, as you now probably have to start
+                // with 'Source::getSource()::{method on WC_Order}'.
+                $mappings[$group] = $mappings[$group] ?? [];
+                $mappings[$group][$property] = $values[$key];
+            }
+        }
+        if (!empty($mappings)) {
+            $values[Config::Mappings] = $mappings;
+            $result = $configStore->save($values);
+            // @todo: warn user.
+        }
+        return $result;
     }
 }

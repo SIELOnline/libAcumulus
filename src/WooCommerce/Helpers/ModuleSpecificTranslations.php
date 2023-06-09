@@ -30,6 +30,8 @@ Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten de "Btw-s
 LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR</a> heeft gekozen, of een btw-vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
 Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
+        // Address used for vat calculations.
+        'woocommerce_tax_based_on' => '"WooCommerce » Instellingen » tab Belasting » Bereken belasting gebaseerd op"',
         // Invoice status overview: shorter labels due to very limited available space.
         'vat_type' => 'soort',
         'foreign_vat' => 'EU btw',
@@ -59,6 +61,8 @@ Select the 2nd option ("%3$s") if you set the field "VAT status" to "None" on VA
 NOTE: this setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.
 Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
 
+        // Address used for vat calculations.
+        'woocommerce_tax_based_on' => 'WooCommerce » Settings » tab Tax » Calculate tax based on',
         // Invoice status overview: shorter labels due to available space.
         'vat_type' => 'type',
         'payment_status' => 'Status',

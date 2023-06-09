@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
@@ -25,27 +26,45 @@ class ConfigFormTranslations extends TranslationCollection
         'advanced_form_header' => 'Acumulus geavanceerde instellingen',
         'advanced_form_link_text' => 'Acumulus geavanceerde instellingen',
 
+        'settings_form_title' => 'Acumulus | Instellingen',
+        'settings_form_header' => 'Acumulus instellingen',
+        'settings_form_link_text' => 'Acumulus instellingen',
+
+        'mappings_form_title' => 'Acumulus | Veldverwijzingen',
+        'mappings_form_header' => 'Acumulus veldverwijzingen',
+        'mappings_form_link_text' => 'Acumulus veldverwijzingen',
+
         'button_submit_config'=> 'Instellingen opslaan',
         'button_submit_advanced'=> 'Instellingen opslaan',
+        'button_submit_settings'=> 'Instellingen opslaan',
+        'button_submit_mappings'=> 'Veldverwijzingen opslaan',
         'button_link' => '<a href="%2$s">%1$s</a>',
         'button_cancel' => 'Terug',
 
         'message_form_config_success' => 'De instellingen zijn opgeslagen.',
-        'message_form_config_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen',
+        'message_form_config_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen.',
 
         'message_form_advanced_success' => 'De instellingen zijn opgeslagen.',
-        'message_form_advanced_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen',
+        'message_form_advanced_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen.',
+
+        'message_form_settings_success' => 'De instellingen zijn opgeslagen.',
+        'message_form_settings_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen.',
+
+        'message_form_mappings_success' => 'De veldverwijzingen zijn opgeslagen.',
+        'message_form_mappings_error' => 'Er is een fout opgetreden bij het opslaan van de veldverwijzingen.',
 
         'message_uninstall' => 'Wilt u de configuratie-instellingen verwijderen?',
 
         'message_error_header' => 'Fout in uw Acumulus accountgegevens',
         'message_error_auth_form' => 'Uw Acumulus accountgegevens zijn onjuist.',
+        // @todo: mappings is not dependent on account settings: only show on settings form: clean up when legacy is gone.
         'message_error_auth' => 'Uw Acumulus accountgegevens zijn onjuist. Zodra u %2$s de correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_forb' => 'Uw Acumulus accountgegevens zijn juist maar staan geen toegang via de web service toe. Zodra u %2$s correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden hier de %1$s instellingen getoond.',
         'message_auth_unknown' => 'Zodra u %2$s uw Acumulus accountgegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_arg1_config' => 'basis',
         'message_error_arg1_advanced' => 'geavanceerde',
+        'message_error_arg1_settings' => 'overige',
         'message_error_arg2_config' => 'hier',
         'message_error_arg2_advanced' => 'in het "Acumulus basisinstellingenformulier"',
         'message_warning_role_deprecated' => 'U gebruikt accountgegevens met een gebruikerstype dat binnenkort niet meer gebruikt kan worden om de Acumulus API mee te benaderen. Voeg een andere gebruiker toe met gebruikerstype API-Gebruiker of verander het gebruikerstype van de huidige gebruiker.',
@@ -204,7 +223,29 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relatiebeheer',
-        'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren. De meeste velden hieronder kunnen opgenomen worden in uw factuursjablonen. Daarom is het handig om er hier controle over te hebben over wat er in die velden komt te staan.',
+        'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren. De meeste velden hieronder kunnen opgenomen worden in uw factuursjablonen. Daarom is het handig om hier controle te hebben over wat er in die velden komt te staan.',
+
+        'relationMappingsHeader' => 'Brongegevens voor de klantgegevens',
+        'desc_relationMappingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen waar deze gegevens vandaan komen.',
+        'invoiceAddressMappingsHeader' => 'Brongegevens voor het factuuradres',
+        'desc_invoiceAddressMappingsHeader' => 'Deze velden dien te verwijzen naar wat de webwinkel als het factuuradres beschouwt, ongeacht of dit het hoofd of alternatieve adres in Acumulus is.',
+        'shippingAddressMappingsHeader' => 'Brongegevens voor het verzendadres',
+        'desc_shippingAddressMappingsHeader' => 'Deze velden dien te verwijzen naar wat de webwinkel als het verzendadres beschouwt, ongeacht of dit het hoofd of alternatieve adres in Acumulus is.',
+        'invoiceMappingsHeader' => 'Brongegevens voor de factuurvelden',
+        'desc_invoiceMappingsHeader' => '',
+        'invoiceLinesMappingsHeader' => 'Brongegevens voor de factuurregels',
+        'desc_invoiceLinesMappingsHeader' => '',
+        'emailInvoicePdfMappingsHeader' => 'Brongegevens om de factuur als pdf te e-mailen',
+        'desc_emailInvoicePdfMappingsHeader' => '',
+        'emailPackingSlipPdfMappingsHeader' => 'Brongegevens om de pakbon als pdf te e-mailen',
+        'desc_emailPackingSlipPdfMappingsHeader' => '',
+
+        'field_countryCode' => 'Landcode',
+        'desc_countryCode' => 'De ISO 3166-1 alpha 2 landcode, pas dit niet aan tenzij u speciale plugins gebruikt voor het opslaan van adressen',
+        'field_telephone1' => 'Telefoon 1',
+        'field_telephone2' => 'Telefoon 2',
+        'desc_telephone12' => 'De telefoonnummers die u in Acumulus wilt opslaan.',
+        'desc_fax1' => 'De meeste webshops slaan geen faxnummer meer op.',
 
         'field_defaultCustomerType' => 'Importeer klanten als',
 
@@ -258,11 +299,22 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_empty' => 'Maak uw keuze',
         'option_use_default' => 'Gebruik standaard',
 
+        'field_mainAdress' => 'Hoofdadres',
+        'option_mainAddress_shop' => 'Volg de instelling van uw winkel (aangeraden)',
+        'desc_mainAddress' => 'Kies welk adres als hoofdadres gebruikt wordt en welk als alternatief adres. U kunt beide adressen gebruiken in uw templates in Acumulus, '
+            . 'maar Acumulus gebruikt het hoofdadres voor het bepalen van de toe te passen btw-tarieven.',
+        'desc_mainAddress_shopSetting' => 'U kunt de instelling van uw webwinkel aanpassen onder "<a href="%2$s" target="_blank">%1$s</a>".',
+        'desc_mainAddress_shopUses' => 'Uw webwinkel gebruikt altijd het %s voor btw-berekeningen',
+        AddressType::Invoice => 'factuuradres',
+        AddressType::Shipping => 'verzendadres',
+
         'field_invoiceNrSource' => 'Factuurnummer',
         'option_invoiceNrSource_1' => 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een bestelling gekoppeld is, zal het bestelnummer gebruikt worden!',
         'option_invoiceNrSource_2' => 'Gebruik het bestelnummer van uw webwinkel.',
         'option_invoiceNrSource_3' => 'Laat Acumulus het factuurnummer bepalen (aangeraden).',
-        'desc_invoiceNrSource' => 'U kunt hier kiezen welk nummer Acumulus als factuurnummer moet gebruiken.',
+        'desc_invoiceNrSource' => 'U kunt hier kiezen welk nummer Acumulus als factuurnummer moet gebruiken. '
+            . 'Als u Acumulus het factuurnummer laat bepalen krijgt u een aaneengesloten reeks van nummers, wat door de belastingdienst erg gewaardeerd wordt. '
+            . 'Het bestel of factuurnummer uit uw webwinkel kunt u als referentie meesturen, zodat u daar toch op kunt zoeken.',
 
         'field_dateToUse' => 'Factuurdatum',
         'option_dateToUse_1' => 'Gebruik de aanmaakdatum van de factuur. Let op: als er nog geen factuur aan uw bestelling gekoppeld is, zal de aanmaakdatum van de bestelling gebruikt worden!',
@@ -394,7 +446,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_validate_email_4' => 'Het veld "Afzender" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_subject' => 'Onderwerp',
-        'desc_subject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnummer te verwijzen.',
+        'desc_subject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om hier naar dat factuurnummer te verwijzen. U kunt wel naar het bestelnummer verwijzen',
 
         //  Email packing slip settings.
         'field_packingSlipEmailTo' => 'E-mailadres voor de pakbon',
@@ -413,7 +465,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'option_debug_2' => 'Ontvang altijd een mail met de resultaten bij het verzenden van een factuur naar Acumulus.',
         'option_debug_3' => 'Verstuur facturen in testmodus naar Acumulus. Acumulus zal de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan. U ontvangt altijd een mail met de resultaten.',
         'option_debug_4' => 'Verzend berichten niet naar Acumulus maar ontvang wel een mail met het bericht zoals dat verstuurd zou zijn.',
-        'desc_debug' => 'U kunt hier een verzendmodus kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
+        'desc_debug' => 'U kunt hier een verzendmodus kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen. De testmodus kunt u gebruiken als u uw webwinkel nog niet live is, of op een staging omgeving.',
 
         'field_logLevel' => 'Logniveau',
         'option_logLevel_3' => 'Log foutmeldingen, waarschuwingen en operationele mededelingen.',
@@ -427,6 +479,13 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 
         'desc_basicSettings' => 'U bevindt zich nu op het formulier met geavanceerde, ofwel minder gebruikte, instellingen. De basisinstellingen vindt u op het "%1$s" formulier onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
         'menu_basicSettings' => 'Instellingen → Acumulus',
+
+        // Link to other settings/mappings form.
+        'desc_mappings' => 'Om de factuurgegevens te verzamelen, haalt de plugin veel informatie uit de data van de webwinkel. Welk veld uit die data gebruikt wordt voor de velden van een Acumulus-factuur is grotendeels vastgelegd in de plugin, maar op het formulier "%1$s" onder "%2$s" kunt u dit waar nodig aanpassen. Nadat u hier de gegevens hebt ingevuld <strong>en opgeslagen</strong>, kunt u het andere formulier bezoeken:',
+        'menu_mappings' => 'Instellingen → Acumulus veldverwijzingen',
+
+        'desc_settings' => 'U bevindt zich nu op het formulier met veldverwijzingen, ofwel de links tussen de data uit de webwinkel en een Acumulus factuur. De "echte" instellingen vindt u op het "%1$s" formulier onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
+        'menu_settings' => 'Instellingen → Acumulus instellingen',
     ];
 
     protected array $en = [
@@ -439,15 +498,31 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'advanced_form_header' => 'Acumulus advanced settings',
         'advanced_form_link_text' => 'Acumulus advanced settings',
 
+        'settings_form_title' => 'Acumulus | Settings',
+        'settings_form_header' => 'Acumulus settings',
+        'settings_form_link_text' => 'Acumulus settings',
+
+        'mappings_form_title' => 'Acumulus | Mappings',
+        'mappings_form_header' => 'Acumulus mappings',
+        'mappings_form_link_text' => 'Acumulus mappings',
+
         'button_submit_config'=> 'Save settings',
         'button_submit_advanced'=> 'Save settings',
+        'button_submit_settings'=> 'Save settings',
+        'button_submit_mappings'=> 'Save mappings',
         'button_cancel' => 'Back',
 
         'message_form_config_success' => 'The settings are saved.',
-        'message_form_config_error' => 'an error occurred wile saving the settings.',
+        'message_form_config_error' => 'An error occurred wile saving the settings.',
 
         'message_form_advanced_success' => 'The settings are saved.',
-        'message_form_advanced_error' => 'an error occurred wile saving the settings.',
+        'message_form_advanced_error' => 'An error occurred wile saving the settings.',
+
+        'message_form_settings_success' => 'The settings are saved.',
+        'message_form_settings_error' => 'An error occurred wile saving the settings.',
+
+        'message_form_mappings_success' => 'The mappings are saved.',
+        'message_form_mappings_error' => 'An error occurred wile saving the mappings.',
 
         'message_uninstall' => 'Are you sure to delete the configuration settings?',
 
@@ -459,6 +534,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_auth_unknown' => 'When you have filled in your Acumulus connection settings %2$s, the %1$s settings will be shown as well.',
         'message_error_arg1_config' => 'other',
         'message_error_arg1_advanced' => 'advanced',
+        'message_error_arg1_settings' => 'other',
         'message_error_arg2_config' => 'here',
         'message_error_arg2_advanced' => 'in the "Acumulus basic settings form"',
         'message_warning_role_deprecated' => 'You are using a deprecated user role to connect to the Acumulus API. Please add another user with an API-compliant role or change the role for the current user.',
@@ -616,6 +692,28 @@ The properties known by your web shop are listed below.</p>
         // Relation management settings.
         'relationSettingsHeader' => 'Relation management',
         'desc_relationSettingsHeader' => 'With each invoice sent to Acumulus, its client data is sent as well. With these settings you can influence how this is done. Most fields below can be added to your invoice templates. That is why you can control its contents here.',
+
+        'relationMappingsHeader' => 'Customer source fields',
+        'desc_relationMappingsHeader' => 'Each invoice sent to Acumulus also contains customer data, you can define its sources here.',
+        'invoiceAddressMappingsHeader' => 'Invoice address source fields',
+        'desc_invoiceAddressMappingsHeader' => 'These fields should refer to what the web shop considers to be the invoice address, regardless whether this will be the main or alternative address in Acumulus.',
+        'shippingAddressMappingsHeader' => 'Shipping address source fields',
+        'desc_shippingAddressMappingsHeader' => 'These fields should refer to what the web shop considers to be the shipping address, regardless whether this will be the main or alternative address in Acumulus.',
+        'invoiceMappingsHeader' => 'Invoice source fields',
+        'desc_invoiceMappingsHeader' => '',
+        'invoiceLinesMappingsHeader' => 'Invoice lines source fields',
+        'desc_invoiceLinesMappingsHeader' => '',
+        'emailInvoicePdfMappingsHeader' => 'Sources when mailing an invoice pdf',
+        'desc_emailInvoicePdfMappingsHeader' => '',
+        'emailPackingSlipPdfMappingsHeader' => 'Sources when mailing a packing slip pdf',
+        'desc_emailPackingSlipPdfMappingsHeader' => '',
+
+        'field_countryCode' => 'Country code',
+        'desc_countryCode' => 'Thee ISO 3166-1 alpha 2 country code, do not change this unless you are using plugins to store addresses.',
+        'field_telephone1' => 'Phone 1',
+        'field_telephone2' => 'Phone 2',
+        'desc_telephone12' => 'The phonenumbers you want to store in Acumulus.',
+        'desc_fax1' => 'Most web shop do not store fax numbers anymore.',
 
         'field_defaultCustomerType' => 'Create customers as',
 
@@ -796,7 +894,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'message_validate_email_5' => 'The field To is not a valid e-mail address, please fill in a valid e-mail address.',
 
         'field_subject' => 'Subject',
-        'desc_subject' => 'The subject line of the e-mail. If you leave this empty "Invoice [number] [description]" will be used. Note: if you have Acumulus assign the invoice number, it is unfortunately not possible to refer to that invoice number in the subject.',
+        'desc_subject' => 'The subject line of the e-mail. If you leave this empty "Invoice [number] [description]" will be used. Note: if you have Acumulus assign the invoice number, it is unfortunately not possible to refer to that invoice number in the subject. However, you can refer to the order number or reference of the shop.',
 
         'field_emailBcc' => 'BCC',
         'desc_emailBcc' => 'Additional e-mail addresses to send the invoice to, e.g. the e-mail address of your own administration department. If you leave this empty the invoice e-mail will only be sent to your client. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;).',
@@ -823,7 +921,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'option_debug_2' => 'Always receive a mail with the results on sending an invoice to Acumulus.',
         'option_debug_3' => 'Send invoices to Acumulus in test mode. Acumulus will only check the input for errors and warnings but not store the invoice. You will always receive a mail with the results.',
         'option_debug_4' => 'Do not send messages to Acumulus, but receive a mail with the message as would have been sent.',
-        'desc_debug' => 'Select a mode that defines how to react on sending invoices to Acumulus. Choose for the 1st option unless otherwise instructed by support staff.',
+        'desc_debug' => 'Select a mode that defines how to react on sending invoices to Acumulus. Choose for the 1st option unless otherwise instructed by support staff. The test mode can e used when you are not yet live or when using a staging environment.',
 
         'field_logLevel' => 'Log level',
         'option_logLevel_3' => 'Log error messages, warnings, and operational notices.',
@@ -837,5 +935,12 @@ Please note that these documents are created by Acumulus, not the web shop. If y
 
         'desc_basicSettings' => 'This is the form with advanced, i.e. less commonly used, settings. You can find the basic settings in the "%1$s" under "%2$s", or via the button below. Note: if you click on this button, changes you made to this page will NOT be saved!',
         'menu_basicSettings' => 'Settings → Acumulus',
+
+        // Link to other settings/mappings form.
+        'desc_mappings' => 'To collect the invoice data, the plugin accesses the web shop data. Which field of the shop is used for each field in the Acumulus invoice is largely defined by the plugin itself. However, with the "%1$s" form at "%2$s" you can overrule this where necessary. After you have completed <strong>and saved</strong> the data here, you can visit the other form:',
+        'menu_mappings' => 'Settings → Acumulus mappings',
+
+        'desc_settings' => 'You are on the mappings form that defines the relations between the web shop data and the Acumulus invoice. The "real" settings can be found on the "%1$s" form at "%2$s", or via the button below. Note: if you click on this button, any completed or changed values will be lost! Save first!',
+        'menu_settings' => 'Settings → Acumulus settings',
     ];
 }

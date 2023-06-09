@@ -16,6 +16,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 use function array_key_exists;
@@ -195,7 +196,7 @@ class Config
         if (!empty($copy[Tag::Password])) {
             $copy[Tag::Password] = 'REMOVED FOR SECURITY';
         }
-        $this->log->notice('ConfigStore::save(): saving %s', serialize($copy));
+        $this->log->notice('ConfigStore::save(): saving %s', json_encode($copy, Meta::JsonFlags));
 
         // Remove password if not sent along. We have had some reports that
         // passwords were gone missing, perhaps some shops do not send the value

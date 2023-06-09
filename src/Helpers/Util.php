@@ -39,7 +39,9 @@ class Util
      * we use even more flags that enhance human readability.
      * See {@see Log::JsonFlags} and {@see \Siel\Acumulus\Meta::JsonFlags}.
      */
-    public const JsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
+    public const JsonFlags = JSON_UNESCAPED_SLASHES |
+        JSON_UNESCAPED_UNICODE |
+        JSON_THROW_ON_ERROR;
 
     /**
      * Converts a keyed, optionally multi-level, array to XML.

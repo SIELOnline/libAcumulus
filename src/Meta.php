@@ -33,9 +33,9 @@ interface Meta
      */
     public const JsonFlags = JSON_UNESCAPED_SLASHES |
         JSON_UNESCAPED_UNICODE |
+        JSON_THROW_ON_ERROR |
         JSON_NUMERIC_CHECK |
-        JSON_PRESERVE_ZERO_FRACTION |
-        JSON_THROW_ON_ERROR;
+        JSON_PRESERVE_ZERO_FRACTION;
 
     // Tags that may be used on multiple levels.
     /**

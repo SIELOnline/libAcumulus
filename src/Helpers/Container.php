@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '7.6.7';
+const Version = '7.6.8';
 
 namespace Siel\Acumulus\Helpers;
 

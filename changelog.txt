@@ -17,6 +17,13 @@ Refactoring:
 - PS: Use Appkernel::VERSION as version not the indirect _PS_VERSION_.
 
 
+7.6.8 (2023-06-11) (JOO)
+------------------------
+Bugs:
+- HS: AcumulusController::invoice(): Argument #1 ($orderId) must be of type ?int, string
+  given, called in plugins/hikashop/acumulus/acumulus.php on line 135.
+
+
 7.6.7 (2023-03-30) (PS)
 -----------------------
 Bugs:

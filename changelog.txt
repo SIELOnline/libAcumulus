@@ -3,13 +3,20 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.0.0 (2023-05-??)
+8.0.0 (2023-07-??)
 ------------------
 Bugs:
 - ValueError: DOMDocument::loadHTML(): Argument #1 ($source) must not be empty
   in siel/acumulus/src/Helpers/Util.php:251.
- 
+- HS: TypeError: date(): Argument #2 ($timestamp) must be of type ?int, string given in
+  siel/acumulus/src/Joomla/HikaShop/Invoice/Source.php:192.
+- OC: Fatal error: Uncaught TypeError: Argument 1 passed to ...eventViewSaleOrderInfo()
+  must be of type int, string given, called in
+  admin/controller/extension/module/acumulus.php on line 221.
+
 Refactorings:
+[Most are not completely finished yet. To start with, they will only be available for
+ WordPress/WooCommerce. Other webshops will follow soon.]
 - Introduced classes Currency and Totals that contain the meta information and can act on
   it, convert amounts resp. complete totals.
 - Class Source:
@@ -27,12 +34,15 @@ Refactorings:
 - Class Creator and Completor: extracted single task completors into the new Completors
   namespace.
 - Default source for the invoice number changed to the (recommended) "Let Acumulus create
-  the invoice number". 
+  the invoice number".
+- Complete overhaul from array to "smart" objects, increasing type correctness and DX.
 
 
-7.6.8 (2023-05-??)
------------------------
+7.6.8 (2023-06-11) (JOO)
+------------------------
 Bugs:
+- HS: AcumulusController::invoice(): Argument #1 ($orderId) must be of type ?int, string
+  given, called in plugins/hikashop/acumulus/acumulus.php on line 135.
 - PS: Nauwkeurigheid van bedragen bij creditfacturen is slechter dan aangenomen, precisie
   is nu op 1 cent gezet.
 - WC: TypeError: DateTime::createFromFormat() expects parameter 2 to be string, null given

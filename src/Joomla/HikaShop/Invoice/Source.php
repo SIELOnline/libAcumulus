@@ -166,6 +166,8 @@ class Source extends BaseSource
 
     public function getInvoiceDate(): ?string
     {
-        return !empty($this->getSource()->order_invoice_created) ? date(Api::DateFormat_Iso, $this->getSource()->order_invoice_created) : parent::getInvoiceDate();
+        return !empty($this->getSource()->order_invoice_created)
+            ? date(Api::DateFormat_Iso, (int) $this->getSource()->order_invoice_created)
+            : parent::getInvoiceDate();
     }
 }

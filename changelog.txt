@@ -5,6 +5,11 @@ This file contains a historical overview of changes in our own code.
 
 8.0.0 (2023-07-??)
 ------------------
+Features:
+- Support for alternative address. You can now send the invoice and shipping address to
+  Acumulus and you define which address becomes the main and which becomes the alternative
+  address.
+
 Bugs:
 - ValueError: DOMDocument::loadHTML(): Argument #1 ($source) must not be empty
   in siel/acumulus/src/Helpers/Util.php:251.
@@ -15,8 +20,8 @@ Bugs:
   admin/controller/extension/module/acumulus.php on line 221.
 
 Refactorings:
-[Most are not completely finished yet. To start with, they will only be available for
- WordPress/WooCommerce. Other webshops will follow soon.]
+[Most of these refactorings are not yet completely finished. To start with, they will only
+ be available for WordPress/WooCommerce. Other webshops will follow soon.]
 - Introduced classes Currency and Totals that contain the meta information and can act on
   it, convert amounts resp. complete totals.
 - Class Source:
@@ -35,7 +40,13 @@ Refactorings:
   namespace.
 - Default source for the invoice number changed to the (recommended) "Let Acumulus create
   the invoice number".
-- Complete overhaul from array to "smart" objects, increasing type correctness and DX.
+- Complete overhaul from array to "smart" objects.
+  - Test set of orders and credit notes to check the correct working of the module
+    when making changes.
+  - More exact way of defining field references. It is also more self explaining.
+  - Increasing type correctness.
+  - Better DX (less errors when developing software).
+
 
 
 7.6.8 (2023-06-11) (JOO)

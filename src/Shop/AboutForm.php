@@ -302,9 +302,11 @@ class AboutForm
      *   true: correct account data set.
      *
      * @return array
-     *   A, possibly empty,list of active support tokens. Format will be
+     *   A, possibly empty, list of active support tokens. Format will be
      *   something like: "Pro-support Acumulus-plugin WooCommerce for myshop.com
      *   from 2022-06-03 to 2023-06-05."
+     *
+     * @todo: expired support seems to be present in the mysupport response value anyway.
      */
     protected function getProSupportList(?bool $accountStatus): array
     {

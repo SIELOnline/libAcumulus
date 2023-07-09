@@ -257,7 +257,7 @@ class Config
                         break;
                     case 'bool':
                         if (!is_bool($values[$key])) {
-                            $values[$key] = $values[$key] === '' ? '' : (bool) $values[$key];
+                            $values[$key] = (bool) $values[$key];
                         }
                         break;
                     case 'array':

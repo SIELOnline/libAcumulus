@@ -304,9 +304,20 @@ class Config
      * @noinspection PhpUnused
      *    Called form shop specific code outside this library.
      */
-    public function getShowRatePluginMessage(): ?int
+    public function getShowRatePluginMessage(): int
     {
         return $this->get('showRatePluginMessage');
+    }
+
+    /**
+     * Returns the Plugin V8 Message config setting.
+     *
+     * @noinspection PhpUnused
+     *    Called from shop specific code outside this library.
+     */
+    public function getPluginV8Message(): int
+    {
+        return $this->get('showPluginV8Message');
     }
 
     /**
@@ -1170,6 +1181,11 @@ class Config
                     'default' => false,
                 ],
                 'showRatePluginMessage' => [
+                    'group' => 'other',
+                    'type' => 'int',
+                    'default' => 0,
+                ],
+                'showPluginV8Message' => [
                     'group' => 'other',
                     'type' => 'int',
                     'default' => 0,

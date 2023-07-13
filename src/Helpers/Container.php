@@ -343,6 +343,11 @@ class Container
         return $this->getInstance('FieldExpander', 'Helpers', [$this->getLog()]);
     }
 
+    public function getFieldExpanderHelp(): FieldExpanderHelp
+    {
+        return $this->getInstance('FieldExpanderHelp', 'Helpers');
+    }
+
     public function getFormHelper(): FormHelper
     {
         return $this->getInstance('FormHelper', 'Helpers', [$this->getTranslator()]);
@@ -744,6 +749,7 @@ class Container
             case 'mappings':
                 $class = 'Mappings';
                 $arguments[] = $this->getMappings();
+                $arguments[] = $this->getFieldExpanderHelp();
                 $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;
@@ -767,6 +773,9 @@ class Container
                 break;
             case 'rate':
                 $class = 'RatePlugin';
+                break;
+            case 'message':
+                $class = 'Message';
                 break;
             case 'uninstall':
                 $class = 'ConfirmUninstall';

@@ -1,0 +1,39 @@
+{
+    "source": {
+        "info": "An Acumulus wrapper around the webshop order or credit note. It defines some helper methods to extract info from those webshop specific sources, but it also defines methods to access those webshop specific data structures and traverse its data model.",
+        "getTypeLabel(2)": "'Order' or 'Credit note' (translated)",
+        "getId()": "The (technical) id",
+        "getReference()": "The (external) reference",
+        "getDate()": "The creation date",
+        "getStatus()": "The (internal) status (not necessarily a human readable and translated text)",
+        "getPaymentMethod()": "The (internal) status (not necessarily a human readable and translated text)",
+        "getPaymentStatus()": "2 for 'paid', 1 for 'due'",
+        "getPaymentDate()": "The payment date, or null if not yet paid",
+        "getCountryCode()": "2-character country code of this client",
+        "getCurrency()": {
+            "currency": "",
+            "rate": ""
+        },
+        "getTotals()": {
+            "amountEx": "",
+            "amountInc": "",
+            "amountVat": ""
+        },
+        "getSource()": "The webshop order or credit note for this Source. See the PHP code from the webshop to find out what properties and methods are available",
+        "getOrder()": "The Order (type = Source) for the credit note, if this source is a credit note, this Source object itself otherwise.",
+        "getParent()": "The Order (type = Source) for the credit note, if this source is a credit note, null otherwise. Can be used if you only want a value from the originating order for credit notes.",
+        "getCreditNote(index)": "The credit note (type = Source) for this order, if this source is an order and has a credit note; this Source object itself it this source is a credit note, null otherwise.",
+        "isOrder()": "This Source object itself (type = Source) if this is an order, null otherwise. Can be used if you only want a value from an order, not from a credit notes.",
+        "isCreditNote()": "This Source object itself (type = Source) if this is a credit note, null otherwise. Can be used if you only want a value from a credit note, not from an order.",
+        "getInvoice()": "The webshop invoice, if available.",
+        "getInvoiceId()": "",
+        "getInvoiceReference()": "",
+        "getInvoiceDate()": ""
+    },
+    "line" : {
+        "info": "Typically contains a webshop specific order line, defining the things like quantity, price, and tax. Only available when an item line is being processed."
+    },
+    "product": {
+        "info": "Typically contains the webshop specific product for the given 'line', defining the things like name and sku (or any other defining code). Only available when an item line is being processed."
+    }
+}

@@ -31,6 +31,8 @@ use Siel\Acumulus\Data\EmailPackingSlipAsPdf;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\CrashReporter;
+use Siel\Acumulus\Helpers\FieldExpander;
+use Siel\Acumulus\Helpers\FieldExpanderHelp;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\FormMapper;
 use Siel\Acumulus\Helpers\FormRenderer;
@@ -45,6 +47,7 @@ use Siel\Acumulus\Shop\BatchForm;
 use Siel\Acumulus\Shop\ConfigForm;
 use Siel\Acumulus\Shop\InvoiceManager;
 use Siel\Acumulus\Shop\InvoiceStatusForm;
+use Siel\Acumulus\Shop\MessageForm;
 use Siel\Acumulus\Shop\RatePluginForm;
 use Siel\Acumulus\Shop\RegisterForm;
 use Siel\Acumulus\TestWebShop\Config\ConfigStore;
@@ -86,6 +89,10 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Token::class, $object);
         $object = $container->getCountries();
         $this->assertInstanceOf(Countries::class, $object);
+        $object = $container->getFieldExpander();
+        $this->assertInstanceOf(FieldExpander::class, $object);
+        $object = $container->getFieldExpanderHelp();
+        $this->assertInstanceOf(FieldExpanderHelp::class, $object);
     }
 
     public function testConfigNamespace(): void
@@ -184,6 +191,8 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(InvoiceStatusForm::class, $object);
         $object = $container->getForm('rate');
         $this->assertInstanceOf(RatePluginForm::class, $object);
+        $object = $container->getForm('message');
+        $this->assertInstanceOf(MessageForm::class, $object);
     }
 
     public function testInvoiceNamespace(): void

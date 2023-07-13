@@ -48,7 +48,6 @@ Refactorings:
   - Better DX (less errors when developing software).
 
 
-
 7.6.8 (2023-06-11) (JOO)
 ------------------------
 Bugs:

@@ -174,17 +174,17 @@ Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met na
         // Tokens
         'tokenHelpHeader' => 'Uitleg over veldverwijzingen',
         'desc_tokens' => '<p>Op deze pagina staan een aantal velden die "veldverwijzingen" mogen bevatten.
-Dit wil zeggen dat ze naast vrije tekst ook gegevens van de bestelling, de klant of het klantadres kunnen bevatten.
-Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. [ en ], te plaatsen.
-De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
+Dit wil zeggen dat ze naast vrije tekst ook gegevens van de bestelling, de klant of een klantadres kunnen bevatten.
+Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. [ en ], te plaatsen.</p>
 <p>Om speciale situaties aan te kunnen, mogen veldverwijzingen op verschillende manieren samengevoegd worden:</p>
 <ol class="property-list">
-<dt>[property]:</dt><dd>Eenvoudigste vorm, vervang door de waarde van deze eigenschap of method (zonder argumenten).</dd>
-<dt>[property(arguments)]:</dt><dd>Vervang door de waarde die de method property teruggeeft. Als property een method is wordt "arguments" (een komma-gescheiden reeks van argumenten zonder aanhalingstekens om tekenreeksen heen) meegegeven bij het aanroepen van de method.</dd>
+<dt>[property]:</dt><dd>Eenvoudigste vorm, vervang door de waarde van deze eigenschap. Er wordt in alle beschikbare objecten gezocht.</dd>
+<dt>[property(arguments)]:</dt><dd>Vervang door de waarde die de method property teruggeeft. Als property een method is, wordt "arguments" (een komma-gescheiden reeks van argumenten zonder aanhalingstekens om tekenreeksen heen) meegegeven bij het aanroepen van de method.</dd>
 <dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bijv. id).</dd>
-<dt>[property1|property2|...]:</dt><dd>Vervang door de waarde van property1 of als deze geen waarde heeft door die van property2, en zo verder. Bijv.: handig om of het mobiele of het vaste telefoonnummer mee te sturen.</dd>
-<dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn. Bijv.: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
-<dt>[property1&property2&...]:</dt><dd>Vervang door de waarde van property1 en die van property2 maar plaats geen spatie tussen de properties.</dd>
+<dt>[object::property<i>1</i>::...::property<i>n</i>]:</dt><dd>Dit is de aangeraden manier. Doorloop de keten van objecten/properties/methods om de waarde te verkrijgen. Als een van de "tussen-resultaten" niet bestaat, wordt een lege tekst teruggegeven.</dd>
+<dt>[property<i>1</i>|property<i>2</i>|...]:</dt><dd>Vervang door de waarde van property1 of als deze geen waarde heeft door die van property2, en zo verder. Bijv.: handig om of het mobiele of het vaste telefoonnummer mee te sturen.</dd>
+<dt>[property<i>1</i>+property<i>2</i>+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn. Bijv.: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
+<dt>[property<i>1</i>&property<i>2</i>&...]:</dt><dd>Vervang door de waarde van property1 en die van property2 maar plaats geen spatie tussen de properties.</dd>
 <dt>["letterlijke tekst"]:</dt><dd>Vervang door de letterlijke tekst (zonder aanhalingstekens) maar alleen als het samengevoegd wordt, middels een + of &, met een andere eigenschap die niet leeg is.</dd>
 </ol>
 <p><strong>Let op:</strong> in de meeste situaties zal de standaardwaarde goed zijn. Pas deze velden alleen aan in speciale omstandigheden en als u weet wat u doet.</p>
@@ -643,17 +643,17 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         // Tokens
         'tokenHelpHeader' => 'Explanation of field references',
         'desc_tokens' => '<p>This form contains a number of fields that may contain "field references".
-This means that besides free literal text, these fields can contain data from the order, order lines, customer and customer address(es).
-Field references are denoted by placing the name of the property between square brackets, ie. [ and ].
-The properties known by your web shop are listed below.</p>
+This means that besides free literal text, these fields can contain data from the order, customer or customer address(es).
+Field references are denoted by placing the name of the property between square brackets, ie. [ and ].</p>
 <p>To handle some special situations, field references can be combined as follows:</p>
 <ol class="property-list">
-<dt>[property]:</dt><dd>Simplest form, replace by the value of the property or method (without arguments).</dd>
+<dt>[property]:</dt><dd>Simplest form, replace by the value of the property or method (without arguments). All available objects are searched for the given property.</dd>
 <dt>[property(arguments)]:</dt><dd>Replace by the return value of the method. "arguments" is a comma-separated list of arguments to pass to the method. Do not use quotes around strings.</dd>
-<dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the given object (see list below). Use this to get the valuefrom the correct object  if multiple objects have a property with the same name (e.g. id).</dd>
-<dt>[property1|property2|...]:</dt><dd>Replace by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR landline number.</dd>
-<dt>[property1+property2+...]:</dt><dd>Replace by the value of property1 and that of property2 with 1 space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
-<dt>[property1&property2&...]:</dt><dd>Replace by the value of property1 and that of property2 but with no space between it.</dd>
+<dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the given object (see list below). Use this to get the value from the correct object if multiple objects have a property with the same name (e.g. id).</dd>
+<dt>[object::property<i>1</i>::...::property<i>n</i>]:</dt><dd>This is the recommended way. Travers the chain of objects/properties/methods to retrieve the value. If one of the intermediate results does not exist, the empty string will be returned.</dd>
+<dt>[property<i>1</i>|property<i>2</i>|...]:</dt><dd>Replace by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR landline number.</dd>
+<dt>[property<i>1</i>+property<i>2</i>+...]:</dt><dd>Replace by the value of property1 and that of property2 with 1 space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
+<dt>[property<i>1</i>&property<i>2</i>&...]:</dt><dd>Replace by the value of property1 and that of property2 but with no space between it.</dd>
 <dt>["literal text"]:</dt><dd>Replace by the literal text (without quotes) but only if it is combined, using + or &, with another non-empty property.</dd>
 </ol>
 <p><strong>Attention:</strong> in most situations the default value will do fine! Only change these fields in special situations and when you know what you are doing.</p>

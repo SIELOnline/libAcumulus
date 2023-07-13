@@ -17,6 +17,7 @@ use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Helpers\FieldExpanderHelp;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
@@ -42,9 +43,11 @@ class MappingsForm extends Form
     protected const SizeLong = 150;
 
     protected Mappings $mappings;
+    protected FieldExpanderHelp $fieldExpanderHelp;
 
     public function __construct(
         Mappings $mappings,
+        FieldExpanderHelp $fieldExpanderHelp,
         AboutForm $aboutForm,
         Acumulus $acumulusApiClient,
         FormHelper $formHelper,
@@ -56,6 +59,7 @@ class MappingsForm extends Form
     ) {
         parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $environment, $translator, $log);
         $this->mappings = $mappings;
+        $this->fieldExpanderHelp = $fieldExpanderHelp;
         $this->aboutForm = $aboutForm;
         $this->translator->add(new ConfigFormTranslations());
     }
@@ -153,6 +157,8 @@ class MappingsForm extends Form
      * This override returns the config form. At the minimum, this includes the
      * account settings. If these are OK, the other settings are included as
      * well.
+     *
+     * @throws \JsonException|\RuntimeException
      */
     protected function getFieldDefinitions(): array
     {
@@ -165,11 +171,11 @@ class MappingsForm extends Form
                 'summary' => $this->t('config_form_header'),
                 'fields' => $this->getSettingsLinkFields(),
             ],
-            'tokenHelpHeader' => [
+            'fieldExpanderHelpHeader' => [
                 'type' => 'details',
                 'summary' => $this->t('tokenHelpHeader'),
                 'description' => $this->t('desc_tokens'),
-                'fields' => $this->getTokenFields(),
+                'fields' => $this->getFieldExpanderHelp(),
             ],
             'relationMappingsHeader' => [
                 'type' => 'fieldset',
@@ -215,11 +221,18 @@ class MappingsForm extends Form
 
     /**
      * @return array
-     *   The set of possible tokens per object
+     *   The set of possible tokens per object.
+     *
+     * @throws \JsonException|\RuntimeException
      */
-    protected function getTokenFields(): array
+    protected function getFieldExpanderHelp(): array
     {
-        return $this->tokenInfo2Fields($this->shopCapabilities->getTokenInfo());
+        return [
+            'fieldExpanderHelp' => [
+                'type' => 'markup',
+                'value' => $this->fieldExpanderHelp->getHelp(),
+            ],
+        ];
     }
 
     /**

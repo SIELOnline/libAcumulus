@@ -36,10 +36,7 @@ use const Siel\Acumulus\Version;
  * Configuration is stored in the host environment bridged via the ConfigStore
  * class.
  *
- * @todo: New settings/mappings
- *   - Alle mappings uit de settings formulieren en naar een mappings formulier.
- *   - Customer - address/alt address: which address is used to base tax on:
- *     follow shop, invoice, shipping.
+ * @todo: New settings:
  *   - Address - Country: Vermelden: nooit, altijd, buitenland
  *   - EmailAsPdf: ubl, gfx
  *   - Invoice: concept type???
@@ -1189,6 +1186,11 @@ class Config
                     'group' => 'other',
                     'type' => 'int',
                     'default' => 0,
+                ],
+                'showPluginV8MessageOverriddenMappings' => [
+                    'group' => 'other',
+                    'type' => 'array',
+                    'default' => [],
                 ],
                 Config::Mappings => [
                     'group' => 'other',

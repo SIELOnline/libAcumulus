@@ -263,7 +263,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $message = str_replace(["\r", "\n", "\t", ' '], '', $loggedMessage['message']);
         $severity = $loggedMessage['severity'];
         $this->assertStringContainsString('Response:status=200', $message);
-        $this->assertStringContainsString('"status":"0"', $message);
+        $this->assertStringContainsString('"status":0', $message);
         $this->assertEquals(Severity::Success, $severity);
     }
 }

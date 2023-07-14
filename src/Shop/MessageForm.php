@@ -121,6 +121,11 @@ class MessageForm extends Form
      */
     protected function getFieldDefinitionsFull(): array
     {
+        $detail = '';
+        $overriddenMappings = $this->acumulusConfig->get('showPluginV8MessageOverriddenMappings');
+        if (count($overriddenMappings) > 0) {
+            $detail = sprintf($this->t('plugin_v8_message_mappings_detail'), implode(', ', $overriddenMappings));
+        }
         return [
             'acumulus-rate' => [
                 'type' => 'fieldset',
@@ -134,7 +139,8 @@ class MessageForm extends Form
                         'value' => sprintf($this->t('plugin_v8_message'),
                             'https://forum.acumulus.nl/index.php/topic,8444.0.html',
                             $this->shopCapabilities->getLink('settings'),
-                            $this->shopCapabilities->getLink('mappings')),
+                            $this->shopCapabilities->getLink('mappings'),
+                            $detail),
                     ],
                     'later' => [
                         'type' => 'button',

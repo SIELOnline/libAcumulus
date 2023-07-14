@@ -16,8 +16,9 @@ class MessageFormTranslations extends TranslationCollection
  Het is belangrijk dat je:</p>
  <ul>
  <li>De <a href="%2$s">instellingen</a> controleert (met name het veld "hoofdadres").</li>
- <li>De <a href="%3$s">veldverwijzingen</a> naloopt.</li>
+ <li>De <a href="%3$s">veldverwijzingen</a> naloopt%4$s.</li>
  </ul>',
+        'plugin_v8_message_mappings_detail' => ' (met name de velden %1$s)',
         'later' => 'Herinner me later',
         'hide' => 'Niet meer tonen',
         'no_problem' => 'OK, geen probleem.',
@@ -29,8 +30,9 @@ class MessageFormTranslations extends TranslationCollection
  It is important to check:</p>
  <ul>
  <li>Check the <a href="%2$s">settings</a> (especially the field "main address").</li>
- <li>check the <a href="%3$s">field references</a>.</li>
+ <li>check the <a href="%3$s">field references</a>%4$s.</li>
  </ul>',
+        'plugin_v8_message_mappings_detail' => ' (especially the fields %1$s)',
         'hide' => "Don't show anymore",
         'later' => 'Remind me later',
         'no_problem' => 'OK, no problem.',

@@ -3,8 +3,8 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.0.0 (2023-07-??)
-------------------
+8.0.0 (2023-07-14) (WC)
+-----------------------
 Features:
 - Support for alternative address. You can now send the invoice and shipping address to
   Acumulus and you define which address becomes the main and which becomes the alternative
@@ -45,7 +45,7 @@ Refactorings:
     when making changes.
   - More exact way of defining field references. It is also more self explaining.
   - Increasing type correctness.
-  - Better DX (less errors when developing software).
+  - Better DX (fewer errors when developing software).
 
 
 7.6.8 (2023-06-11) (JOO)

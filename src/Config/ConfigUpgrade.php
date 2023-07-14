@@ -601,15 +601,35 @@ class ConfigUpgrade
             // - Does the new mapping somehow already have a value: do not overwrite.
             if (isset($values[$key]) && !isset($mappings[$group][$property])) {
                 // Chances are it won't work anymore, as you now probably have to start
-                // with 'Source::getSource()::{method on WC_Order}'.
+                // with 'Source::getSource()::{method on WC_Order}'. So we should issue a
+                // warning.
                 $mappings[$group] = $mappings[$group] ?? [];
                 $mappings[$group][$property] = $values[$key];
             }
         }
         if (!empty($mappings)) {
             $values[Config::Mappings] = $mappings;
+            // This is to warn the user.
+            $values['showPluginV8MessageOverriddenMappings'] = $this->getOverriddenMappings($mappings);
             $result = $configStore->save($values);
-            // @todo: warn user.
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a list of mappings that are overridden.
+     *
+     * @param string[][] $mappings
+     *
+     * @return string[]
+     */
+    private function getOverriddenMappings(array $mappings): array
+    {
+        $result = [];
+        foreach ($mappings as $object => $objectMappings) {
+            foreach ($objectMappings as $property => $mapping) {
+                $result[] = "$object::$property";
+            }
         }
         return $result;
     }

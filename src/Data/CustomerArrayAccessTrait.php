@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
-use Siel\Acumulus\Tag;
-
 /**
  * Allows access to {@see Customer} with array bracket syntax and Acumulus tags (all lower
  * case).

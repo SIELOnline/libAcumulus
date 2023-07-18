@@ -3,6 +3,17 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.0.1 (2023-07-??) (WC)
+-----------------------
+Bugs:
+- DomainException: type: not an allowed value: 0 in .../Data/AcumulusProperty.php:207.
+- TypeError: Siel\Acumulus\Helpers\Countries::isNl(): Argument #1 ($countryCode) must be
+  of type string, null given, called in src/Completors/Legacy/Completor.php on line 1531
+  and defined in src/Helpers/Countries.php:26
+- TypeError: preg_replace(): Argument #3 ($subject) must be of type array|string, int
+  given in src/Completors/Invoice/CompleteInvoiceNumber.php:51
+
+
 8.0.0 (2023-07-14) (WC)
 -----------------------
 Features:

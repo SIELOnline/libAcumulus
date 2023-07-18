@@ -21,8 +21,8 @@ class CompleteInvoiceNumber extends BaseCompletorTask
     /**
      * Completes the {@see \Siel\Acumulus\Data\AcumulusObject::$number} property.
      *
-     * Note that Acumulus only accepts real numeric values, no prefix, postfix,
-     * or filling with zeros.
+     * Note that Acumulus only accepts integer values, no prefix, postfix, or filling with
+     * zeros.
      *
      * @param \Siel\Acumulus\Data\Invoice $acumulusObject
      * @param int ...$args
@@ -48,7 +48,7 @@ class CompleteInvoiceNumber extends BaseCompletorTask
                 assert(false);
         }
         if ($number !== null) {
-            $acumulusObject->number = preg_replace('/\D/', '', $number);
+            $acumulusObject->number = preg_replace('/\D/', '', (string) $number);
         }
     }
 }

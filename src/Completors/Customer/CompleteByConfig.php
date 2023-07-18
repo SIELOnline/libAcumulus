@@ -27,7 +27,10 @@ class CompleteByConfig extends BaseCompletorTask
      */
     public function complete(AcumulusObject $acumulusObject, ...$args): void
     {
-        $acumulusObject->type = $this->configGet('defaultCustomerType');
+        $customerType = $this->configGet('defaultCustomerType');
+        if (!empty($customerType)) {
+            $acumulusObject->type = $customerType;
+        }
         $acumulusObject->contactStatus = $this->configGet('contactStatus');
         $acumulusObject->overwriteIfExists = $this->configGet('overwriteIfExists');
     }

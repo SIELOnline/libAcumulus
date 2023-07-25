@@ -3,7 +3,7 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.0.1 (2023-07-??) (WC)
+8.0.1 (2023-07-25) (WC)
 -----------------------
 Bugs:
 - DomainException: type: not an allowed value: 0 in .../Data/AcumulusProperty.php:207.
@@ -12,6 +12,17 @@ Bugs:
   and defined in src/Helpers/Countries.php:26
 - TypeError: preg_replace(): Argument #3 ($subject) must be of type array|string, int
   given in src/Completors/Invoice/CompleteInvoiceNumber.php:51
+- Error: Call to protected method
+  Siel\Acumulus\Completors\Legacy\Completor::changeInvoiceToConcept() from context
+  'Siel\Acumulus\Completors\Legacy\CompletorInvoiceLines' in
+  siel/acumulus/src/Completors/Legacy/CompletorInvoiceLines.php:262
+- PC|OC: PHP Fatal error: Uncaught Exception: Error: Duplicate entry '1' for key
+  'acumulus_idx_entry_id'<br />Error No: 1062<br />INSERT INTO `oc_acumulus_entry`
+  (store_id, entry_id, token, source_type, source_id, updated) VALUES (0, 1, 'Send locked,
+  delete if too old', 'Order', ..., '...')
+  Drop and recreate index (to make it non-unique). Already done in 6.0.0, but the create
+  statement was not adapted, so users who started using this module after 6.0.0, but
+  before 8.0.1, will still get a unique index.
 
 
 8.0.0 (2023-07-14) (WC)
@@ -57,6 +68,8 @@ Refactorings:
   - More exact way of defining field references. It is also more self explaining.
   - Increasing type correctness.
   - Better DX (fewer errors when developing software).
+- WC: libAcumulus is now added to the plugin via composer, i.e. via a vendor folder in the
+  plugin folder, as WordPress does not offer a central vendor folder.
 
 
 7.6.8 (2023-06-11) (JOO)

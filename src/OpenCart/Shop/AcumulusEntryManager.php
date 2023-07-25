@@ -185,7 +185,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
             `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
-            UNIQUE INDEX `acumulus_idx_entry_id` (`entry_id`),
+            INDEX `acumulus_idx_entry_id` (`entry_id`),
             UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
             )");
     }
@@ -205,8 +205,10 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 CHANGE COLUMN `token` `token` CHAR(32) NULL DEFAULT NULL");
         }
 
-        // Drop and recreate index (to make it non-unique).
-        if (version_compare($currentVersion, '6.0.0', '<')) {
+        // Drop and recreate index (to make it non-unique). (Already done in 6.0.0, but
+        // the create statement was not adapted, so users who started using this module
+        // after 6.0.0, and before 8.0.0, will still get a unique index.)
+        if (version_compare($currentVersion, '8.0.0', '<')) {
             $result = $this->getDb()->query("ALTER TABLE `$this->tableName` DROP INDEX `acumulus_idx_entry_id`")
                   AND $this->getDb()->query("CREATE INDEX `acumulus_idx_entry_id` ON `$this->tableName` (`entry_id`)");
         }

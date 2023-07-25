@@ -141,7 +141,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
             `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
-            UNIQUE INDEX `acumulus_idx_entry_id` (`id_entry`),
+            INDEX `acumulus_idx_entry_id` (`id_entry`),
             UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
             )"
         );

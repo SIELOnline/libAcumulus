@@ -1895,7 +1895,7 @@ class Completor
      * @param string ...$args
      *   Additional arguments to format the message.
      */
-    protected function changeInvoiceToConcept(&$array, string $messageKey, int $code, string ...$args): void
+    public function changeInvoiceToConcept(&$array, string $messageKey, int $code, string ...$args): void
     {
         $pdfMessage = '';
         $invoiceSettings = $this->config->getInvoiceSettings();

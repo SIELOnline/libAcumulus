@@ -48,6 +48,7 @@ class CompleteInvoiceNumberTest extends TestCase
     {
         return [
             [Config::InvoiceNrSource_Acumulus, '2022009', 'BR2022003', null],
+            [Config::InvoiceNrSource_Acumulus, 2022009, 'BR2022003', null],
             [Config::InvoiceNrSource_ShopOrder, '2022009', 'BR2022003', 2022009],
             [Config::InvoiceNrSource_ShopInvoice, '2022009', 'BR2022003', 2022003],
             [Config::InvoiceNrSource_ShopOrder, null, 'BR2022003', null],
@@ -55,6 +56,7 @@ class CompleteInvoiceNumberTest extends TestCase
             [Config::InvoiceNrSource_ShopInvoice, null, null, null],
             [Config::InvoiceNrSource_ShopInvoice, null, 0, 0],
             [Config::InvoiceNrSource_ShopInvoice, null, 'ABCD', null],
+            [Config::InvoiceNrSource_ShopInvoice, 10, 11, 11],
         ];
     }
 

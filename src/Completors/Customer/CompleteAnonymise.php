@@ -37,11 +37,14 @@ class CompleteAnonymise extends BaseCompletorTask
         assert($acumulusObject instanceof Customer);
         $sendCustomer = $this->configGet('sendCustomer');
         if (!$sendCustomer && !$acumulusObject->isCompany()) {
-            // Create address with only the country code set,
+            // Create address with only the country and postal code set, we may need the
+            // latter to distinguish XI from GB
             $countryCode = $acumulusObject->getFiscalAddress()->countryCode;
+            $postalCode = $acumulusObject->getFiscalAddress()->postalCode;
             /** @var \Siel\Acumulus\Data\Address $anonymousAdress */
             $anonymousAdress = $this->getContainer()->createAcumulusObject(DataType::Address);
             $anonymousAdress->countryCode = $countryCode;
+            $anonymousAdress->postalCode = $postalCode;
             //  ... and use this address for both addresses.
             $acumulusObject->setInvoiceAddress($anonymousAdress);
             $acumulusObject->setShippingAddress($anonymousAdress);

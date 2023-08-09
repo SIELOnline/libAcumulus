@@ -47,8 +47,12 @@ class Registry
             if ($bootstrap) {
                 $localBootstrap = $bootstrap;
             } else {
-                $pos = strpos(__DIR__, str_replace('/', DIRECTORY_SEPARATOR, '/vendor/siel/acumulus/src/Magento/Helpers'));
-                $root = substr(__DIR__, 0, $pos);
+                if (defined('BP')) {
+                    $root = BP;
+                } else {
+                    $pos = strpos(__DIR__, str_replace('/', DIRECTORY_SEPARATOR, '/vendor/siel/acumulus/src/Magento/Helpers'));
+                    $root = substr(__DIR__, 0, $pos);
+                }
                 $localBootstrap = Bootstrap::create($root, $_SERVER);
             }
             $objectManager = $localBootstrap->getObjectManager();

@@ -1,5 +1,7 @@
 <?php
 /**
+ * @noinspection PhpMissingParentCallCommonInspection  Base class contains a lot of
+ *   fallback implementations that are not useful to call.
  * @noinspection PhpClassConstantAccessedViaChildClassInspection
  */
 
@@ -9,13 +11,13 @@ namespace Siel\Acumulus\Magento\Invoice;
 
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
+use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\Magento\Helpers\Registry;
-use Siel\Acumulus\Meta;
 
 use Throwable;
 
@@ -38,27 +40,33 @@ class Source extends BaseSource
     /**
      * Loads an Order source for the set id.
      *
-     * @noinspection PhpUnused  Called via setShopSource().
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}.
      */
-    protected function setShopSourceOrder(): void
+    protected function setSourceOrder(): void
     {
         $this->shopSource = Registry::getInstance()->create(Order::class);
         /** @var \Magento\Sales\Model\ResourceModel\Order $loader */
         $loader = Registry::getInstance()->get(\Magento\Sales\Model\ResourceModel\Order::class);
         $loader->load($this->shopSource, $this->getId());
+        if ((int) $this->shopSource->getId() !== $this->getId()) {
+            throw new RuntimeException(sprintf('Not a valid source id (%s %d)', $this->getType(), $this->getId()));
+        }
     }
 
     /**
      * Loads a Credit memo source for the set id.
      *
-     * @noinspection PhpUnused  Called via setShopSource().
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}.
      */
-    protected function setShopSourceCreditNote(): void
+    protected function setSourceCreditNote(): void
     {
         $this->shopSource = Registry::getInstance()->create(Creditmemo::class);
         /** @var \Magento\Sales\Model\ResourceModel\Order $loader */
         $loader = Registry::getInstance()->get(\Magento\Sales\Model\ResourceModel\Order\Creditmemo::class);
         $loader->load($this->shopSource, $this->getId());
+        if ((int) $this->shopSource->getId() !== $this->getId()) {
+            throw new RuntimeException(sprintf('Not a valid source id (%s %d)', $this->type, $this->id));
+        }
     }
 
     public function getReference()
@@ -68,6 +76,8 @@ class Source extends BaseSource
 
     /**
      * Returns the order reference.
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getReferenceOrder(): string
     {
@@ -76,6 +86,8 @@ class Source extends BaseSource
 
     /**
      * Returns the credit note reference.
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getReferenceCreditNote(): string
     {
@@ -90,6 +102,8 @@ class Source extends BaseSource
 
     /**
      * Returns the status of this order.
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getStatusOrder(): string
     {
@@ -104,6 +118,8 @@ class Source extends BaseSource
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN     = 1;
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_REFUNDED = 2;
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED = 3;
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getStatusCreditNote(): int
     {
@@ -133,6 +149,8 @@ class Source extends BaseSource
      * @return int
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getPaymentStatusOrder(): int
     {
@@ -147,6 +165,8 @@ class Source extends BaseSource
      * @return int
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getPaymentStatusCreditNote(): int
     {
@@ -172,6 +192,8 @@ class Source extends BaseSource
      * @return string|null
      *   The payment date (yyyy-mm-dd) or null if the order has not been paid
      *   yet.
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getPaymentDateOrder(): ?string
     {
@@ -195,6 +217,8 @@ class Source extends BaseSource
      * @return string|null
      *   The payment date (yyyy-mm-dd) or null if the credit memo has not been
      *   paid yet.
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getPaymentDateCreditNote(): ?string
     {
@@ -231,6 +255,8 @@ class Source extends BaseSource
 
     /**
      * {@see Source::getInvoiceId()}
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     public function getInvoiceIdOrder()
     {
@@ -239,6 +265,8 @@ class Source extends BaseSource
 
     /**
      * {@see Source::getInvoiceReference()}
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     public function getInvoiceReferenceOrder()
     {
@@ -248,6 +276,8 @@ class Source extends BaseSource
 
     /**
      * {@see Source::getInvoiceDate()}
+     *
+     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     public function getInvoiceDateOrder()
     {

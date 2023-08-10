@@ -37,7 +37,7 @@ class Source extends BaseSource
     {
         $this->shopSource = WC()->order_factory::get_order($this->getId());
         if (!is_object($this->shopSource)) {
-            throw new RuntimeException("Not a valid source id ($this->id)");
+            throw new RuntimeException(sprintf('Not a valid source id (%s %d)', $this->type, $this->id));
         }
     }
 

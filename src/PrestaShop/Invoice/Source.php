@@ -34,6 +34,7 @@ class Source extends BaseSource
      */
     protected function setSource(): void
     {
+        // @error: throw exception when not found.
         if ($this->getType() === Source::Order) {
             $this->shopSource = new Order($this->getId());
         } else {

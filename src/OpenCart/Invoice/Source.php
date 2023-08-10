@@ -36,6 +36,7 @@ abstract class Source extends BaseSource
 
     protected function setSource(): void
     {
+        // @error: throw exception when not found.
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->shopSource = $this->getRegistry()->getOrder($this->getId());
     }

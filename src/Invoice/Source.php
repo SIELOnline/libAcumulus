@@ -17,6 +17,8 @@ use function get_class;
  * Source is used to pass an order or refund object (or array) around in a
  * strongly typed way and to provide unified access to information about the
  * order or refund.
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 abstract class Source
 {
@@ -30,7 +32,7 @@ abstract class Source
     /** @var array|object */
     protected $shopSource;
     protected Source $orderSource;
-    /** @var array|object */
+    /** @var array|object|null */
     protected $invoice;
 
     /**
@@ -54,8 +56,6 @@ abstract class Source
             $this->shopSource = $idOrSource;
             $this->setId();
         }
-        // @todo: lazy loading in getter.
-        $this->setInvoice();
     }
 
     /**
@@ -339,6 +339,10 @@ abstract class Source
      */
     protected function getInvoice()
     {
+        // Lazy loading.
+        if ($this->invoice === null) {
+            $this->setInvoice();
+        }
         return $this->invoice;
     }
 

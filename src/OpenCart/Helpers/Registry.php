@@ -221,7 +221,8 @@ abstract class Registry
      * @return \Opencart\Admin\Model\Sale\Order|\Opencart\Catalog\Model\Checkout\Order|\ModelCheckoutOrder|\ModelSaleOrder
      *
      * @noinspection ReturnTypeCanBeDeclaredInspection
-     *   Actually, this method returns a @see \Opencart\System\Engine\Proxy}.
+     *   Actually, this method returns a {@see \Opencart\System\Engine\Proxy}, not on of
+     *   the Order types.
      */
     public function getOrderModel()
     {

@@ -3,6 +3,18 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.0.2 (2023-08-??) (MA)
+-----------------------
+Bugs:
+- MA 2.4.6: The Zend_Mail framework has been removed in favor of the Laminas mail library.
+
+Features:
+- Updated the PHP compatibility table by adding a column for PHP 8.2.
+
+Refactorings:
+- MA: Implemented the new "collect-complete architecture" for Magento.
+
+
 8.0.1 (2023-07-25) (WC)
 -----------------------
 Bugs:

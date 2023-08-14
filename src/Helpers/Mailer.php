@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Helpers;
 
-use Exception;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Tag;
+use Throwable;
 
 use function is_string;
 
@@ -59,7 +59,7 @@ abstract class Mailer
      * Sends an email.
      *
      * @return mixed
-     *   Success (true); error message, error object or just false otherwise.
+     *   Success (true); error message, Throwable object or just false otherwise.
      */
     abstract public function sendMail(
         string $from,
@@ -75,8 +75,6 @@ abstract class Mailer
      * The mail is sent to the shop administrator ('emailonerror' setting).
      *
      * @param string|int $invoiceSourceReference
-     *
-     * @return bool
      */
     public function sendInvoiceAddMailResult(InvoiceAddResult $invoiceSendResult, string $invoiceSourceType, $invoiceSourceReference): bool
     {
@@ -93,11 +91,11 @@ abstract class Mailer
                 $message = 'false';
             } elseif ($result === null) {
                 $message = 'null';
-            } elseif ($result instanceof Exception) {
+            } elseif ($result instanceof Throwable) {
                 $message = $result->getMessage();
             } elseif (!is_string($result)) {
                 $message = print_r($result, true);
-            } /** @noinspection InvertedIfElseConstructsInspection */ else {
+            } else {
                 $message = $result;
             }
             $this->log->error('%s: failed: %s', $logMessage, $message);

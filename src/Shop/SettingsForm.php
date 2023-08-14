@@ -506,10 +506,12 @@ class SettingsForm extends BaseConfigForm
         );
         $fiscalAddressSetting = $this->shopCapabilities->getFiscalAddressSetting();
         if (in_array($fiscalAddressSetting, [AddressType::Invoice, AddressType::Shipping], true)) {
+            // Shop uses a fixed address.
             $descMainAdressAdditional = sprintf($this->t('desc_mainAddress_shopUses'), $this->t($fiscalAddressSetting));
         } else {
+            // Shop uses a setting to define which address to use.
             $descMainAdressAdditional = sprintf($this->t('desc_mainAddress_shopSetting'),
-                $this->t($fiscalAddressSetting),
+                $this->t('fiscal_address_setting'),
                 $this->shopCapabilities->getLink('fiscal-address-setting')
             );
         }

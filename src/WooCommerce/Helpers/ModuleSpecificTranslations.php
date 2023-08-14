@@ -31,7 +31,7 @@ LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor 
 Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
         // Address used for vat calculations.
-        'woocommerce_tax_based_on' => '"WooCommerce » Instellingen » tab Belasting » Bereken belasting gebaseerd op"',
+        'fiscal_address_setting' => '"WooCommerce » Instellingen » tab Belasting » Bereken belasting gebaseerd op"',
         // Invoice status overview: shorter labels due to very limited available space.
         'vat_type' => 'soort',
         'foreign_vat' => 'EU btw',
@@ -62,7 +62,7 @@ NOTE: this setting concerns whether the goods or services you offer are inherent
 Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
 
         // Address used for vat calculations.
-        'woocommerce_tax_based_on' => 'WooCommerce » Settings » tab Tax » Calculate tax based on',
+        'fiscal_address_setting' => 'WooCommerce » Settings » tab Tax » Calculate tax based on',
         // Invoice status overview: shorter labels due to available space.
         'vat_type' => 'type',
         'payment_status' => 'Status',

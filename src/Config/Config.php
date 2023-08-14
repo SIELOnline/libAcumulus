@@ -26,7 +26,6 @@ use function is_float;
 use function is_int;
 use function is_string;
 
-use function strlen;
 
 use const Siel\Acumulus\Version;
 
@@ -466,50 +465,6 @@ class Config
     }
 
     /**
-     * Returns the settings to collect the invoice address.
-     */
-    public function getInvoiceAddressSettings(): array
-    {
-        $keys = array_fill_keys([
-            'companyName1',
-            'companyName2',
-            'fullName',
-            'salutation',
-            'address1',
-            'address2',
-            'postalCode',
-            'city',
-            'countryCode',
-        ], true);
-        return array_intersect_key($this->getAll(), $keys);
-    }
-
-    /**
-     * Returns the settings to collect the shipping address.
-     */
-    public function getShippingAddressSettings(): array
-    {
-        $keys = array_fill_keys([
-            'alt_companyName1',
-            'alt_companyName2',
-            'alt_fullName',
-            'alt_salutation',
-            'alt_address1',
-            'alt_address2',
-            'alt_postalCode',
-            'alt_city',
-            'alt_countryCode',
-        ], true);
-        $settings = array_intersect_key($this->getAll(), $keys);
-        $result = [];
-        foreach ($settings as $key => $value) {
-            $newKey = strncmp($key, 'alt_', strlen('alt_')) === 0 ? substr($key, strlen('alt_')) : $key;
-            $result[$newKey] = $value;
-        }
-        return $result;
-    }
-
-    /**
      * Returns the set of settings related to the invoice part of an invoice.
      *
      * @return array
@@ -556,43 +511,6 @@ class Config
     public function getEmailAsPdfSettings(): array
     {
         return $this->getSettingsByGroup(Tag::EmailAsPdf);
-    }
-
-    /**
-     * Returns the set of settings related to e-mailing an invoice pdf.
-     */
-    public function getInvoiceEmailAsPdfSettings(): array
-    {
-        $keys = array_fill_keys([
-            'emailAsPdf',
-            'emailFrom',
-            'emailTo',
-            'emailBcc',
-            'subject',
-            'confirmReading',
-        ], true);
-        return array_intersect_key($this->getAll(), $keys);
-    }
-
-    /**
-     * Returns the set of settings related to e-mailing a packing slip ppf.
-     */
-    public function getPackingSlipEmailAsPdfSettings(): array
-    {
-        $keys = array_fill_keys([
-            'packingSlipEmailFrom',
-            'packingSlipEmailTo',
-            'packingSlipEmailBcc',
-            'packingSlipSubject',
-            'packingSlipConfirmReading',
-        ], true);
-        $settings = array_intersect_key($this->getAll(), $keys);
-        $result = [];
-        foreach ($settings as $key => $value) {
-            $newKey = strncmp($key, 'packingSlip', strlen('packingSlip')) === 0 ? lcfirst(substr($key, strlen('packingSlip'))) : $key;
-            $result[$newKey] = $value;
-        }
-        return $result;
     }
 
     /**

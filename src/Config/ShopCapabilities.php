@@ -63,7 +63,6 @@ abstract class ShopCapabilities
      * more info about the possible options to define combinations or a
      * selection of various tokens.
      */
-
     abstract public function getDefaultShopConfig(): array;
 
     /**
@@ -126,6 +125,8 @@ abstract class ShopCapabilities
      *
      * @return array[]
      *   A multi-level array of token infos keyed by the "property source" name.
+     *
+     * @legacy: old way of showing field references.
      */
     public function getTokenInfo(): array
     {
@@ -197,6 +198,8 @@ abstract class ShopCapabilities
 
     /**
      * Returns shop specific token info for the 'source' property.
+     *
+     * @legacy: old way of showing field references.
      */
     abstract protected function getTokenInfoSource(): array;
 
@@ -204,6 +207,8 @@ abstract class ShopCapabilities
      * Returns shop specific token info for the 'refund' property.
      *
      * Override if your shop supports refunds.
+     *
+     * @legacy: old way of showing field references.
      */
     protected function getTokenInfoRefund(): array
     {
@@ -214,6 +219,8 @@ abstract class ShopCapabilities
      * Returns shop specific token info for the 'refundedOrder' property.
      *
      * Override if your shop supports refunds.
+     *
+     * @legacy: old way of showing field references.
      */
     protected function getTokenInfoOrder(): array
     {
@@ -228,6 +235,8 @@ abstract class ShopCapabilities
      * - Customer
      * - Order item or line
      * - Product
+     *
+     * @legacy: old way of showing field references.
      */
     abstract protected function getTokenInfoShopProperties(): array;
 
@@ -401,7 +410,7 @@ abstract class ShopCapabilities
      */
     public function getLink(string $linkType): string
     {
-        if ($linkType === 'fiscal_address-setting') {
+        if ($linkType === 'fiscal-address-setting') {
             return '#';
         }
         throw new InvalidArgumentException(__METHOD__ . "('$linkType'): unknown link type");

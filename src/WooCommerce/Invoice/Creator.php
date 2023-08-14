@@ -122,7 +122,7 @@ class Creator extends BaseCreator
         }
         $this->addPropertySource('item', $item);
 
-        $this->addProductInfo($result);
+        $this->addProductInfo($result);  // copied to mappings (itemNumber, product).
         $result[Meta::Id] = $item->get_id();
 
         // Add quantity: quantity is negative on refunds, the unit price will be

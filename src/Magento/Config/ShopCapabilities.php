@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpMissingParentCallCommonInspection
+ *   Most parent methods are empty return fallback methods.
+ */
 
 declare(strict_types=1);
 
@@ -22,13 +26,17 @@ use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Meta;
 
 /**
  * Defines the Magento 2 web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    private array $order = [
+    /**
+     * @legacy  remove when moved to new architecture.
+     */
+    private static array $order = [
         'adjustmentNegative',
         'adjustmentPositive',
         'appliedRuleIds',
@@ -167,7 +175,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
         'statusHistories',
         'extensionAttributes',
     ];
-    private array $creditMemo = [
+
+    // @legacy  remove when moved to new architecture.
+    private static array $creditMemo = [
         'adjustment',
         'adjustmentNegative',
         'adjustmentPositive',
@@ -226,7 +236,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [
             'class' => [Order::class, Creditmemo::class],
             'file' => ['vendor/magento/module-sales/Model/Order.php', 'vendor/magento/module-sales/Model/Order/Creditmemo.php'],
-            'properties' => array_intersect($this->order, $this->creditMemo),
+            'properties' => array_intersect(self::$order, self::$creditMemo),
             'properties-more' => true,
         ];
     }
@@ -236,7 +246,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [
             'class' => 'Mage_Sales_Model_Order_CreditMemo',
             'file' => 'app/code/core/Mage/Sales/Model/Order/Creditmemo.php',
-            'properties' => array_diff($this->creditMemo, $this->order),
+            'properties' => array_diff(self::$creditMemo, self::$order),
             'properties-more' => true,
         ];
     }
@@ -246,7 +256,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [
             'class' => '\Magento\Sales\Model\Order\Order',
             'file' => 'vendor/magento/module-sales/Model/Order/Order.php',
-            'properties' => array_diff($this->order, $this->creditMemo),
+            'properties' => array_diff(self::$order, self::$creditMemo),
             'properties-more' => true,
         ];
     }
@@ -493,6 +503,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDefaultShopMappings(): array
     {
         return [
+            DataType::Invoice => [
+                // @todo: fields that come from the Order or its metadata, because, if it
+                //   comes from Source, it is not shop specific.
+            ],
             DataType::Customer => [
                 Fld::ContactYourId => '[source::getOrder()::getSource()::getCustomer()::getId()]', // Order, not Creditmemo
                 // Magento has 2 VAT numbers:
@@ -501,16 +515,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::VatNumber => '[source::getOrder()::getSource()::getCustomerTaxvat())', // Order, not Creditmemo
                 Fld::Telephone => '[source::getSource()::getBillingAddress()::getTelephone()]', // Address
                 Fld::Telephone2 => '[source::getSource()::getShippingAddress()::getTelephone()]', // Address
-                Fld::Fax => '[source::getSource()::getShippingAddress()::getFax()]', // Address
+                Fld::Fax => '[source::getSource()::getBillingAddress()::getFax()|source::getSource()::getShippingAddress()::getFax()]',
+                // Address
                 // Email field of Address seems to be a copy of the Customer email field.
-                Fld::Email => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
+                Fld::Email => '[source::getSource()::getBillingAddress()::getEmail()|source::getSource()::getShippingAddress()::getEmail()
+                ]', // Address
             ],
             // Both Order and Creditmemo have get(Billing|Shipping)Address() methods.
             AddressType::Invoice => [
                 Fld::CompanyName1 => '[source::getSource()::getBillingAddress()::getCompany()]', // Address
                 Fld::FullName => '[source::getSource()::getBillingAddress()::getName()]', // Address
                 Fld::Address1 => '[source::getSource()::getBillingAddress()::getStreetLine(1)]', // Address
-                Fld::Address2 => '[source::getSource()::getBillingAddress()::getStreetLine(1)]', // Address
+                Fld::Address2 => '[source::getSource()::getBillingAddress()::getStreetLine(2)]', // Address
                 Fld::PostalCode => '[source::getSource()::getBillingAddress()::getPostcode()]', // Address
                 Fld::City => '[source::getSource()::getBillingAddress()::getCity()]', // Adress
                 Fld::CountryCode => '[source::getSource()::getBillingAddress()::getCountryId()]', // Address
@@ -519,7 +535,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::CompanyName1 => '[source::getSource()::getShippingAddress()::getCompany()]', // Address
                 Fld::FullName => '[source::getSource()::getShippingAddress()::getName()]', // Address
                 Fld::Address1 => '[source::getSource()::getShippingAddress()::getStreetLine(1)]', // Address
-                Fld::Address2 => '[source::getSource()::getShippingAddress()::getStreetLine(1)]', // Address
+                Fld::Address2 => '[source::getSource()::getShippingAddress()::getStreetLine(2)]', // Address
                 Fld::PostalCode => '[source::getSource()::getShippingAddress()::getPostcode()]', // Address
                 Fld::City => '[source::getSource()::getShippingAddress()::getCity()]', // Adress
                 Fld::CountryCode => '[source::getSource()::getShippingAddress()::getCountryId()]', // Address
@@ -527,14 +543,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
             EmailAsPdfType::Invoice => [
                 Fld::EmailTo => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
-            DataType::Invoice => [
-                // @todo: fields that come from source, metadata
-            ],
             LineType::Item => [
-                // @todo: on which object?
-                Fld::ItemNumber => '[sku]',
-                Fld::Product => '[name]',
-                // @todo: others? (e.g. quantity, unit price, metadata)
+                Meta::Id => '[item::getId()]',
+                Fld::ItemNumber => '[item::getSku()]',
+                Fld::Product => '[product::getName()]',
+                Meta::ProductId => '[item::getProductId()]',
+                Meta::ProductType => '[item::getProductType()]',
+                Fld::UnitPrice => '[item::getBasePrice()]',
+                Meta::UnitPriceInc => '[item::getBasePriceInclTax()]',
+                Fld::Quantity => '[item::getQtyOrdered()]',
+                Fld::VatRate => '[item::getTaxPercent()|item::getOrderItem():;getTaxPercent()]'
             ],
         ];
     }
@@ -563,7 +581,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $result = [];
         /** @var \Magento\Payment\Model\PaymentMethodList $paymentMethodListModel */
         $paymentMethodListModel = Registry::getInstance()->get(PaymentMethodList::class);
-        // @todo: get active store/all stores
+        // @todo: get active store/all stores?
         /** @noinspection PhpParamsInspection   Wrong phpdoc */
         $paymentMethods = $paymentMethodListModel->getActiveList(null);
         foreach ($paymentMethods as $paymentMethod) {
@@ -590,6 +608,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
+    /**
+     * @noinspection MultipleReturnStatementsInspection
+     */
     public function getLink(string $linkType): string
     {
         $registry = Registry::getInstance();
@@ -600,9 +621,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'activate':
             case 'config':
             case 'batch':
+            case 'settings':
                 return $urlInterface->getUrl("acumulus/$linkType");
             case 'advanced':
                 return $urlInterface->getUrl('acumulus/config/advanced');
+            case 'mappings':
+                return $urlInterface->getUrl('acumulus/settings/mappings');
+            case 'fiscal-address-setting':
+                return $urlInterface->getUrl('admin/system_config/edit/section/tax');
             case 'logo':
                 $repository = Registry::getInstance()->get(AssetRepository::class);
                 return $repository->getUrl('Siel_AcumulusMa2::images/siel-logo.svg');
@@ -613,5 +639,22 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return 'https://pay.siel.nl/?p=GWFrqaYs68gnhRGP2UAHkXhvGQqWEDmP46DMuxa5BPXvpjmu';
         }
         return parent::getLink($linkType);
+    }
+
+    public function getFiscalAddressSetting(): string
+    {
+        return \Magento\Tax\Model\Config::CONFIG_XML_PATH_BASED_ON;
+    }
+
+    /**
+     * Magento switched to the new creation process!
+     *
+     * Note: in case of severe errors during the creation process: return false to revert
+     * to the old "tried and tested" code.
+     */
+    public function usesNewCode(): bool
+    {
+        return false; // Emergency revert: remove the // at the beginning of this line!
+        return true;
     }
 }

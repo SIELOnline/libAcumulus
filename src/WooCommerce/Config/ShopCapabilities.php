@@ -11,6 +11,7 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
+use Siel\Acumulus\Meta;
 use WC_Tax;
 
 use function function_exists;
@@ -226,6 +227,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [
             // Customer defaults.
             'mainAddress' => Config::MainAddress_FollowShop, // Option 'woocommerce_tax_based_on'
+            // @legacy: old way of storing mappings.
             //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
             'contactYourId' => '[customer_id]', // WC_Abstract_order
             'companyName1' => '[billing_company]', // WC_Abstract_order
@@ -250,8 +252,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
         // WooCommerce: The properties for both addresses are always filled.
         return [
             DataType::Invoice => [
-                // @todo: fields that come from the Order, metadata (if it comes
-                //   from Source, it should probably be in Config (for now).
+                // @todo: fields that come from the Order or its metadata, because, if it
+                //   comes from Source, it is not shop specific.
             ],
             DataType::Customer => [
                 // Customer defaults.
@@ -290,11 +292,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::EmailTo => '[source::getOrder()::getSource()::get_billing_email()]',
             ],
             LineType::Item => [
-                // @todo: check syntax (move to method calls).
-                Fld::ItemNumber => '[sku]',
-                Fld::Product => '[name]',
-                Fld::CostPrice => '[cost_price]',
-                // @todo: others? (e.g. quantity, unit price, metadata).
+                Meta::Id => '[item::get_id()]',
+                Fld::ItemNumber => '[product::get_sku()]',
+                Fld::Product => '[item::get_name()]',
+                Meta::ProductId => '[product::get_id()]',
+                Fld::Quantity => '[item::get_quantity()]',
             ],
         ];
     }
@@ -376,7 +378,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'mappings':
                 return admin_url("options-general.php?page=acumulus_$linkType");
             case 'fiscal-address-setting':
-                return admin_url('admin.php?page=wc-settings&tab=tax');
+                return admin_url('     * @legacy: old way of showing field references.
+     */
+');
             case 'logo':
                 return home_url('wp-content/plugins/acumulus/siel-logo.svg');
             case 'pro-support-image':

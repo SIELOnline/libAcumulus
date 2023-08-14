@@ -48,10 +48,12 @@ use function is_int;
  */
 abstract class Creator
 {
+    public const VatRateSource_Exact = 'exact';
     public const VatRateSource_Exact0 = 'exact-0';
     public const VatRateSource_Calculated = 'calculated';
     public const VatRateSource_Completor = 'completor';
     public const VatRateSource_Parent = 'parent';
+    public const VatRateSource_Child = 'child';
     public const VatRateSource_Strategy = 'strategy';
 
     public const LineType_OrderItem = 'order-item';
@@ -143,6 +145,7 @@ abstract class Creator
      */
     protected function setPropertySources(): void
     {
+        // @todo: all non line related property sources can be removed (i.e. all can be removed).
         $this->propertySources = [];
         $this->propertySources['invoiceSource'] = $this->invoiceSource;
         $this->propertySources['invoiceSourceType'] = ['label' => $this->t($this->propertySources['invoiceSource']->getType())];

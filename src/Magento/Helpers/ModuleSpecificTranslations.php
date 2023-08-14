@@ -28,6 +28,9 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'vat_class' => 'BTW-tariefgroep',
         'vat_classes' => 'BTW-tariefgroepen',
 
+        // Address used for vat calculations.
+        'fiscal_address_setting' => '"Configuratie » Verkopen » BTW » BTW berekeningsmethodiek » BTW berekening op basis van"',
+
         // Advanced config form.
         // @todo: is dit Engels hier correct?
         'see_billing_address' => 'Verzendadres, bevat dezelfde eigenschappen als het "billingAddress" object hierboven',
@@ -48,6 +51,9 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'field_triggerOrderStatus' => 'Order, based on status(es)',
         'vat_class' => 'tax class',
         'vat_classes' => 'tax classes',
+        // Address used for vat calculations.
+        'fiscal_address_setting' => '"Configuration » Sales » Taxes » Calculation Settings » Tax Calculation Method Based On"',
+
 
         // Advanced config form.
         'see_billing_address' => 'Shipping address, contains the same properties as the "billingAddress" object above',

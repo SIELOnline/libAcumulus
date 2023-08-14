@@ -27,5 +27,4 @@ class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
         ];
         $acumulusObject->setMainAddress($taxBasedOnMapping[$taxBasedOn] ?? null);
     }
-
 }

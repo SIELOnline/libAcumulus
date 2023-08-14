@@ -174,7 +174,7 @@ abstract class Source
      */
     public function getSign(): float
     {
-        return $this->getType() === self::CreditNote ? -1.0 : 1.0;
+        return $this->getType() === Source::CreditNote ? -1.0 : 1.0;
     }
 
     /**
@@ -422,9 +422,9 @@ abstract class Source
     public function getOrder(): Source
     {
         if (!isset($this->orderSource)) {
-            $this->orderSource = $this->getType() === self::Order
+            $this->orderSource = $this->getType() === Source::Order
                 ? $this
-                : new static(self::Order, $this->getShopOrderOrId());
+                : new static(Source::Order, $this->getShopOrderOrId());
         }
         return $this->orderSource;
     }
@@ -443,7 +443,7 @@ abstract class Source
      */
     public function getParent(): ?Source
     {
-        return $this->getType() !== self::Order ? $this->getOrder() : null;
+        return $this->getType() !== Source::Order ? $this->getOrder() : null;
     }
 
     /**
@@ -507,11 +507,11 @@ abstract class Source
      */
     public function getCreditNotes(): array
     {
-        if ($this->getType() === self::Order) {
+        if ($this->getType() === Source::Order) {
             $result = [];
             $shopCreditNotes = $this->getShopCreditNotesOrIds();
             foreach ($shopCreditNotes as $shopCreditNote) {
-                $result[] = new static(self::CreditNote, $shopCreditNote);
+                $result[] = new static(Source::CreditNote, $shopCreditNote);
             }
         } else {
             $result = [$this];

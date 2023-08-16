@@ -25,11 +25,8 @@ use Siel\Acumulus\Helpers\Severity;
 
 use Siel\Acumulus\Helpers\Translator;
 
-use function count;
-use function is_array;
-
 /**
- * Provides advanced config form handling.
+ * Provides form handling for the mappings.
  *
  * Shop specific may optionally (have to) override:
  * - setSubmittedValues()
@@ -68,6 +65,8 @@ class MappingsForm extends Form
      * {@inheritdoc}
      *
      * This is the set of values as are stored in the config.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Parent returns an empty array.
      */
     protected function getDefaultFormValues(): array
     {
@@ -85,6 +84,9 @@ class MappingsForm extends Form
         return $this->mappings->save($submittedValues);
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection  Parent is empty.
+     */
     protected function validate(): void
     {
         $this->validateEmailInvoiceFields();
@@ -233,140 +235,6 @@ class MappingsForm extends Form
                 'value' => $this->fieldExpanderHelp->getHelp(),
             ],
         ];
-    }
-
-    /**
-     * Returns a set of token info fields based on the shop specific token info.
-     *
-     * @param string[][][] $tokenInfo
-     *
-     * @return array
-     *   Form fields.
-     */
-    protected function tokenInfo2Fields(array $tokenInfo): array
-    {
-        $fields = [];
-        foreach ($tokenInfo as $variableName => $variableInfo) {
-            $fields["token-$variableName"] = $this->get1TokenField($variableName, $variableInfo);
-        }
-        return $fields;
-    }
-
-    /**
-     * Returns a set of token info fields based on the shop specific token info.
-     *
-     * @param string $variableName
-     * @param string[][] $variableInfo
-     *
-     * @return array Form fields.
-     * Form fields.
-     */
-    protected function get1TokenField(string $variableName, array $variableInfo): array
-    {
-        $value = "<p class='property-name'><strong>$variableName</strong>";
-
-        if (!empty($variableInfo['more-info'])) {
-            $value .= ' ' . $variableInfo['more-info'];
-        } else {
-            if (!empty($variableInfo['class'])) {
-                if (!empty($variableInfo['file'])) {
-                    $value .= ' (' . $this->see2Lists(
-                            'see_class_file',
-                            'see_classes_files',
-                            $variableInfo['class'],
-                            $variableInfo['file']
-                        ) . ')';
-                } else {
-                    $value .= ' (' . $this->seeList('see_class', 'see_classes', $variableInfo['class']) . ')';
-                }
-            } elseif (!empty($variableInfo['table'])) {
-                $value .= ' (' . $this->seeList('see_table', 'see_tables', $variableInfo['table']) . ')';
-            } elseif (!empty($variableInfo['file'])) {
-                $value .= ' (' . $this->seeList('see_file', 'see_files', $variableInfo['file']) . ')';
-            }
-
-            if (!empty($variableInfo['additional-info'])) {
-                $value .= ' (' . $variableInfo['additional-info'] . ')';
-            }
-        }
-
-        $value .= ':</p>';
-
-        if (!empty($variableInfo['properties'])) {
-            $value .= '<ul class="property-list">';
-            foreach ($variableInfo['properties'] as $property) {
-                $value .= "<li>$property</li>";
-            }
-
-            if (!empty($variableInfo['properties-more'])) {
-                if (!empty($variableInfo['class'])) {
-                    $value .= '<li>' . $this->seeList('see_class_more', 'see_classes_more', $variableInfo['class']) . '</li>';
-                } elseif (!empty($variableInfo['table'])) {
-                    $value .= '<li>' . $this->seeList('see_table_more', 'see_tables_more', $variableInfo['table']) . '</li>';
-                }
-            }
-            $value .= '</ul>';
-        }
-
-        return [
-            'type' => 'markup',
-            'value' => $value,
-        ];
-    }
-
-    /**
-     * Converts the contents of $list1 and $list2 to a human-readable string.
-     *
-     * @param string $keySingle
-     * @param string $keyPlural
-     * @param string|string[] $list1
-     * @param string|string[] $list2
-     *
-     * @return string
-     */
-    protected function see2Lists(string $keySingle, string $keyPlural, $list1, $list2): string
-    {
-        $sList1 = $this->listToString($list1);
-        $sList2 = $this->listToString($list2);
-        $key = is_array($list1) && count($list1) > 1 ? $keyPlural : $keySingle;
-        return sprintf($this->t($key), $sList1, $sList2);
-    }
-
-    /**
-     * Converts the contents of $list to a human-readable string.
-     *
-     * @param string $keySingle
-     * @param string $keyPlural
-     * @param string|string[] $list
-     *
-     * @return string
-     */
-    protected function seeList(string $keySingle, string $keyPlural, $list): string
-    {
-        $key = is_array($list) && count($list) > 1 ? $keyPlural : $keySingle;
-        $sList = $this->listToString($list);
-        return sprintf($this->t($key), $sList);
-    }
-
-    /**
-     * Returns $list as a grammatically correct and nice string.
-     *
-     * @param string|string[] $list
-     *
-     * @return string
-     */
-    protected function listToString($list): string
-    {
-        if (is_array($list)) {
-            if (count($list) > 1) {
-                $listLast = array_pop($list);
-                $listBeforeLast = array_pop($list);
-                $list[] = $listBeforeLast . ' ' . $this->t('and') . ' ' . $listLast;
-            }
-        } else {
-            $list = [$list];
-        }
-        return implode(', ', $list);
     }
 
     /**

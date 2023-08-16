@@ -38,7 +38,7 @@ class FormMapper extends BaseFormMapper
         return $this;
     }
 
-    public function map(Form $form)
+    public function map(Form $form): void
     {
         $this->isFirstElement = true;
         $this->fields($this->magentoForm, $form->getFields());

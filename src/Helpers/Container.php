@@ -281,7 +281,6 @@ class Container
      */
     public function addTranslations(string $class, string $subNameSpace): void
     {
-        /** @noinspection PhpParamsInspection */
         $this->getTranslator()->add($this->getInstance($class, $subNameSpace));
     }
 
@@ -350,7 +349,7 @@ class Container
 
     public function getFormHelper(): FormHelper
     {
-        return $this->getInstance('FormHelper', 'Helpers', [$this->getTranslator()]);
+        return $this->getInstance('FormHelper', 'Helpers', [$this->getTranslator(),$this->getLog()]);
     }
 
     public function getFormRenderer(bool $newInstance = false): FormRenderer
@@ -548,15 +547,6 @@ class Container
             );
     }
 
-    /**
-     * Returns a {@see \Siel\Acumulus\Collectors\Collector} instance of the
-     * given type.
-     *
-     * @param string $type
-     *   The child type of the {@see \Siel\Acumulus\Collectors\Collector}
-     *   requested. The class name only, without namespace and without Collector
-     *   at the end.
-     */
     public function getCollectorManager(): CollectorManager
     {
         $arguments = [
@@ -575,7 +565,7 @@ class Container
      * @param string $type
      *   The child type of the {@see \Siel\Acumulus\Collectors\Collector}
      *   requested. The class name only, without namespace and without Collector
-     *   at the end. Typically a {@see \Siel\Acumulus\Data\DataType} constant.
+     *   at the end. Typically, a {@see \Siel\Acumulus\Data\DataType} constant.
      */
     public function getCollector(string $type): CollectorInterface
     {
@@ -598,7 +588,7 @@ class Container
      * @param string $task
      *   The task to be executed. This is used to construct the class name of a
      *   class that performs the given task and implements
-     *   @see \Siel\Acumulus\Completor\CompletorTaskInterface}. Only the task
+     *   {@see \Siel\Acumulus\Completors\CompletorTaskInterface}. Only the task
      *   name should be provided, not the namespace, nor the 'Complete' at the
      *   beginning.
      */
@@ -721,6 +711,8 @@ class Container
      *   The type of form requested. Allowed values are: 'register', 'config',
      *   'advanced', 'settings', 'mappings', 'activate', batch', 'invoice', 'rate',
      *   'uninstall'.
+     *
+     * @noinspection PhpHalsteadMetricInspection
      */
     public function getForm(string $type): Form
     {

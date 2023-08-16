@@ -6,7 +6,6 @@ namespace Siel\Acumulus\Helpers;
 
 use stdClass;
 
-use function in_array;
 use function is_array;
 use function is_object;
 use function strlen;
@@ -32,13 +31,9 @@ class FormHelper
      * Name of the hidden meta field.
      */
     public const Meta = 'meta';
-    /**
-     * Prefix to add to option values (select or radio) to distinguish them from
-     * the empty value in a weak comparison.
-     */
-    public const Unique = 'UNIQUE_';
 
     protected Translator $translator;
+    protected Log $log;
     /**
      * @var object[]|null
      *   Metadata about the fields on the form.
@@ -50,9 +45,10 @@ class FormHelper
      */
     protected ?array $meta;
 
-    public function __construct(Translator $translator)
+    public function __construct(Translator $translator, Log $log)
     {
         $this->translator = $translator;
+        $this->log = $log;
         $this->meta = null;
     }
 
@@ -226,29 +222,9 @@ class FormHelper
     public function getPostedValues(): array
     {
         $result = $_POST;
-        $result = $this->removeUnique($result);
         $result = $this->alterPostedValues($result);
         unset($result[static::Meta]);
         return $result;
-    }
-
-    /**
-     * If options were made unique (wrt the empty value), remove that here.
-     *
-     * @param array $postedValues
-     *   The set of posted values to alter.
-     *
-     * @return array
-     *   The altered posted values.
-     */
-    protected function removeUnique(array $postedValues): array
-    {
-        array_walk_recursive($postedValues, static function(&$postedValue/*, $key*/) {
-            if (in_array(substr($postedValue, 0, strlen(self::Unique . 'i:')), [self::Unique . 'i:', self::Unique . 's:'], true)) {
-                $postedValue = unserialize(substr($postedValue, strlen(self::Unique)), ['allowed_classes' => false]);
-            }
-        });
-        return $postedValues;
     }
 
     /**
@@ -265,8 +241,16 @@ class FormHelper
      * Allows to alter the form values in a web shop specific way.
      *
      * This basic implementation returns the unaltered set of form values.
+     *
+     * @param array $formValues
+     *   A flat set of values for the form elements, keyed by the name of the element.
+     * @param array $fields
+     *   The hierarchical set of field definitions, keyed by name.
+     *
+     * @return array
+     *   The altered set of values for the form elements.
      */
-    public function alterFormValues(array $formValues): array
+    public function alterFormValues(array $formValues, array $fields): array
     {
         return $formValues;
     }

@@ -252,7 +252,10 @@ abstract class Form extends MessageCollection
             // - Prepend (checked) checkboxes with their collection name
             //   (PrestaShop).
             // - Place (checked) checkboxes in their collection (Magento).
-            $this->formValues = $this->formHelper->alterFormValues($this->formValues);
+            // - Make "empty" values non-empty (Magento).
+            // - Flatten array values: $this->formValues['Customer[email]'] =>
+            //   $this->formValues['Customer_email'] (Magento).
+            $this->formValues = $this->formHelper->alterFormValues($this->formValues, $this->getFields());
 
             $this->formValuesSet = true;
         }
@@ -642,7 +645,7 @@ abstract class Form extends MessageCollection
      * - Most picklist items contain a describing string in the 2nd entry.
      * - Some picklist items contain an alternative/additional description in
      *   the 3rd entry.
-     * - The company type picklist contains an english resp Dutch description in
+     * - The company type picklist contains an English resp. Dutch description in
      *   the 2nd and 3rd entry.
      *
      * @param \Siel\Acumulus\ApiClient\AcumulusResult $picklist
@@ -666,19 +669,10 @@ abstract class Form extends MessageCollection
         // Other values follow, we do not change the order.
         $pickListItems = $picklist->getMainAcumulusResponse();
         foreach ($pickListItems as $picklistItem) {
-            // Option value, may not clash with the "empty value" in a weak
-            // comparison (Magento uses in_array with the strict parameter set
-            // to false).
+            // Prefer integer ids.
             $optionId = reset($picklistItem);
             if (ctype_digit((string) $optionId)) {
                 $optionId = (int) $optionId;
-            }
-            /** @noinspection TypeUnsafeComparisonInspection */
-            if ($optionId == $emptyValue) {
-                if ($optionId === $emptyValue) {
-                    $this->log->warning('%s: option "%s" (picklist key: %s) equals empty option "%s"', __METHOD__, $optionId, key($picklistItem), $emptyValue);
-                }
-                $optionId = FormHelper::Unique . serialize($optionId);
             }
 
             // Option label
@@ -706,7 +700,6 @@ abstract class Form extends MessageCollection
                     }
                 }
             }
-            /** @noinspection OffsetOperationsInspection */
             $result[$optionId] = $optionText;
         }
 

@@ -480,6 +480,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDefaultShopConfig(): array
     {
         return [
+            // @legacy: old way of storing mappings.
             'contactYourId' => '[customer::incrementId|customer::entityId]', // \Mage\Customer\Model\Customer
             'companyName1' => '[company]', // \Magento\Sales\Model\Order\Address
             'fullName' => '[name]', // \Magento\Sales\Model\Order\Address
@@ -512,14 +513,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 // Magento has 2 VAT numbers:
                 // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
                 // Magento\Customer\Model\Address also has a getVatId() method, but that is not the Address we have here.
-                Fld::VatNumber => '[source::getOrder()::getSource()::getCustomerTaxvat())', // Order, not Creditmemo
+                Fld::VatNumber => '[source::getOrder()::getSource()::getCustomerTaxvat())]', // Order, not Creditmemo
                 Fld::Telephone => '[source::getSource()::getBillingAddress()::getTelephone()]', // Address
                 Fld::Telephone2 => '[source::getSource()::getShippingAddress()::getTelephone()]', // Address
                 Fld::Fax => '[source::getSource()::getBillingAddress()::getFax()|source::getSource()::getShippingAddress()::getFax()]',
                 // Address
                 // Email field of Address seems to be a copy of the Customer email field.
-                Fld::Email => '[source::getSource()::getBillingAddress()::getEmail()|source::getSource()::getShippingAddress()::getEmail()
-                ]', // Address
+                Fld::Email => '[source::getSource()::getBillingAddress()::getEmail()|source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
             // Both Order and Creditmemo have get(Billing|Shipping)Address() methods.
             AddressType::Invoice => [
@@ -622,11 +622,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'config':
             case 'batch':
             case 'settings':
+            case 'mappings':
                 return $urlInterface->getUrl("acumulus/$linkType");
             case 'advanced':
                 return $urlInterface->getUrl('acumulus/config/advanced');
-            case 'mappings':
-                return $urlInterface->getUrl('acumulus/settings/mappings');
             case 'fiscal-address-setting':
                 return $urlInterface->getUrl('admin/system_config/edit/section/tax');
             case 'logo':
@@ -654,7 +653,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function usesNewCode(): bool
     {
-        return false; // Emergency revert: remove the // at the beginning of this line!
+        //return false; // Emergency revert: remove the // at the beginning of this line!
         return true;
     }
 }

@@ -40,6 +40,9 @@ class SettingsForm extends BaseConfigForm
      */
     protected array $accountNumberOptions;
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection  Parent is empty.
+     */
     protected function validate(): void
     {
         $this->validateAccountFields();
@@ -519,7 +522,7 @@ class SettingsForm extends BaseConfigForm
         return [
             'mainAddress' => [
                 'type' => 'radio',
-                'label' => $this->t('field_mainAdress'),
+                'label' => $this->t('field_mainAddress'),
                 'description' => $this->t('desc_mainAddress') . ' ' . $descMainAdressAdditional,
                 'options' => $this->getMainAddressOptions(),
             ],

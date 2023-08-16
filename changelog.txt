@@ -7,6 +7,9 @@ This file contains a historical overview of changes in our own code.
 -----------------------
 Bugs:
 - MA 2.4.6: The Zend_Mail framework has been removed in favor of the Laminas mail library.
+- MA: Form values were not set for elements with different id and name (array style name).
+- MA: Radio options with an "empty" value (e.g. 0 or "0") did not have their button
+  rendered.
 
 Features:
 - Updated the PHP compatibility table by adding a column for PHP 8.2.

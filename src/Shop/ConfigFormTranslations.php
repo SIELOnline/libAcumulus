@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PropertyCanBeStaticInspection
  * @noinspection LongLine
  * @noinspection HtmlUnknownTarget
  */
@@ -132,8 +133,8 @@ class ConfigFormTranslations extends TranslationCollection
 • Kies de 3e optie als u tot nu toe, en om wat voor een reden dan ook, nog geen EU-btw hebt berekend.<br>
 Deze waarde wordt gebruikt als er twijfel is omdat het land van de klant hetzelfde btw-tarief heeft als Nederland (bijv. België).
 Het gaat dus niet zozeer om de actuele instelling, want deze waarde wordt ook gebruikt voor het versturen van gegevens van oudere facturen.<br>
-NB: Sinds 1 juli 2021 gelden er
-<a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">
+NB Sinds 1 juli 2021 gelden er
+<a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/btw-goederen-eu-particulieren" target="_blank">
 nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
         'option_euVat_1' => 'Altijd, dus vanaf het begin van het jaar',
         'option_euVat_2' => 'Zodra wij de drempel passeren',
@@ -175,7 +176,7 @@ Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met na
         'tokenHelpHeader' => 'Uitleg over veldverwijzingen',
         'desc_tokens' => '<p>Op deze pagina staan een aantal velden die "veldverwijzingen" mogen bevatten.
 Dit wil zeggen dat ze naast vrije tekst ook gegevens van de bestelling, de klant of een klantadres kunnen bevatten.
-Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. [ en ], te plaatsen.</p>
+Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. "[" en "]", te plaatsen.</p>
 <p>Om speciale situaties aan te kunnen, mogen veldverwijzingen op verschillende manieren samengevoegd worden:</p>
 <ol class="property-list">
 <dt>[property]:</dt><dd>Eenvoudigste vorm, vervang door de waarde van deze eigenschap. Er wordt in alle beschikbare objecten gezocht.</dd>
@@ -299,7 +300,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_empty' => 'Maak uw keuze',
         'option_use_default' => 'Gebruik standaard',
 
-        'field_mainAdress' => 'Hoofdadres',
+        'field_mainAddress' => 'Hoofdadres',
         'option_mainAddress_shop' => 'Volg de instelling van uw winkel (aangeraden)',
         'desc_mainAddress' => 'Kies welk adres als hoofdadres gebruikt wordt en welk als alternatief adres. U kunt beide adressen gebruiken in uw templates in Acumulus, '
             . 'maar Acumulus gebruikt het hoofdadres voor het bepalen van de toe te passen btw-tarieven.',
@@ -644,7 +645,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'tokenHelpHeader' => 'Explanation of field references',
         'desc_tokens' => '<p>This form contains a number of fields that may contain "field references".
 This means that besides free literal text, these fields can contain data from the order, customer or customer address(es).
-Field references are denoted by placing the name of the property between square brackets, ie. [ and ].</p>
+Field references are denoted by placing the name of the property between square brackets, i.e. [ and ].</p>
 <p>To handle some special situations, field references can be combined as follows:</p>
 <ol class="property-list">
 <dt>[property]:</dt><dd>Simplest form, replace by the value of the property or method (without arguments). All available objects are searched for the given property.</dd>
@@ -765,6 +766,15 @@ If you unchecked the first option, the second option only applies to business cl
         'invoiceSettingsHeader' => 'Your invoice settings',
         'option_empty' => 'Select one',
         'option_use_default' => 'Use default',
+
+        'field_mainAddress' => 'Main address',
+        'option_mainAddress_shop' => 'Follow your shop (recommended)',
+        'desc_mainAddress' => 'Choose which address to use as main address and which one as alternative address. You can use both addresses in your Acumulus templates, '
+            . 'however, Acumulus uses the main address to determine applicable vat rates.',
+        'desc_mainAddress_shopSetting' => 'You can change the webshop setting at "<a href="%2$s" target="_blank">%1$s</a>".',
+        'desc_mainAddress_shopUses' => 'Your webshop always uses the %s to determine the applicable vat rates',
+        AddressType::Invoice => 'invoice address',
+        AddressType::Shipping => 'shipping address',
 
         'field_invoiceNrSource' => 'Invoice number',
         'option_invoiceNrSource_1' => 'Use the web shop invoice number. Note: if no invoice has been created for the order yet, the order number will be used!',

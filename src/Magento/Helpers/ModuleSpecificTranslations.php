@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PropertyCanBeStaticInspection
  * @noinspection HtmlUnknownTarget
  */
 
@@ -29,7 +30,7 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'vat_classes' => 'BTW-tariefgroepen',
 
         // Address used for vat calculations.
-        'fiscal_address_setting' => '"Configuratie » Verkopen » BTW » BTW berekeningsmethodiek » BTW berekening op basis van"',
+        'fiscal_address_setting' => 'Configuratie » Verkopen » BTW » BTW berekeningsmethodiek » BTW berekening op basis van',
 
         // Advanced config form.
         // @todo: is dit Engels hier correct?
@@ -52,7 +53,7 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'vat_class' => 'tax class',
         'vat_classes' => 'tax classes',
         // Address used for vat calculations.
-        'fiscal_address_setting' => '"Configuration » Sales » Taxes » Calculation Settings » Tax Calculation Method Based On"',
+        'fiscal_address_setting' => 'Configuration » Sales » Taxes » Calculation Settings » Tax Calculation Method Based On',
 
 
         // Advanced config form.

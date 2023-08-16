@@ -70,8 +70,9 @@ class FormHelper extends BaseFormHelper
      *
      * Prestashop prepends checkboxes with their collection name.
      */
-    public function alterFormValues(array $formValues): array
+    public function alterFormValues(array $formValues, array $fields): array
     {
+        $formValues = parent::alterFormValues($formValues,$fields);
         foreach ($this->getMeta() as $key => $fieldMeta) {
             /** @var \stdClass $fieldMeta */
             if (($fieldMeta->type === 'checkbox') && isset($formValues[$key])) {

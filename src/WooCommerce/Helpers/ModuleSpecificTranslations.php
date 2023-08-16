@@ -31,7 +31,7 @@ LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor 
 Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
         // Address used for vat calculations.
-        'fiscal_address_setting' => '"WooCommerce » Instellingen » tab Belasting » Bereken belasting gebaseerd op"',
+        'fiscal_address_setting' => 'WooCommerce » Instellingen » tab Belasting » Bereken belasting gebaseerd op',
         // Invoice status overview: shorter labels due to very limited available space.
         'vat_type' => 'soort',
         'foreign_vat' => 'EU btw',

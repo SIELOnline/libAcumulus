@@ -225,8 +225,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDefaultShopConfig(): array
     {
         return [
-            // Customer defaults.
-            'mainAddress' => Config::MainAddress_FollowShop, // Option 'woocommerce_tax_based_on'
             // @legacy: old way of storing mappings.
             //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
             'contactYourId' => '[customer_id]', // WC_Abstract_order

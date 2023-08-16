@@ -706,7 +706,7 @@ class Config
                 'mainAddress' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
-                    'default' => '',
+                    'default' => Config::MainAddress_FollowShop,
                 ],
                 // @legacy  Is now a mapping.
                 'contactYourId' => [

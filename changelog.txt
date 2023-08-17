@@ -16,6 +16,12 @@ Features:
 
 Refactorings:
 - MA: Implemented the new "collect-complete architecture" for Magento.
+- ALL: many small, but possibly breaking, changes:
+  - Source: not all getters were correctly implemented. However, most errors had low risk
+    of appearing in live situations.
+  - Source: stricter type handling.
+  - Extract number from order or invoice reference: changed, should be more logical now.
+  - Call parent method more often, even if it is currently a no-op.
 
 
 8.0.1 (2023-07-25) (WC)

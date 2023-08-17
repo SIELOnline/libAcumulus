@@ -340,7 +340,7 @@ abstract class Source
     protected function getInvoice()
     {
         // Lazy loading.
-        if ($this->invoice === null) {
+        if (!isset($this->invoice)) {
             $this->setInvoice();
         }
         return $this->invoice;
@@ -353,13 +353,24 @@ abstract class Source
      * override if a shop supports invoices as proper objects on their own,
      * stored under their own id.
      *
-     * @return int|string|null
-     *   The reference of the (web shop) invoice linked to this source, or null
+     * @return int|null
+     *   The id of the (web shop) invoice linked to this source, or null
      *   if no invoice is linked to this source.
      */
-    public function getInvoiceId()
+    public function getInvoiceId(): ?int
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * See {@see getInvoiceId()}
+     *
+     * @noinspection PhpUnused  Called via callTypeSpecificMethod().
+     */
+    public function getInvoiceIdCreditNote(): ?int
+    {
+        // A credit note is to be considered an invoice on its own.
+        return $this->getId();
     }
 
     /**
@@ -375,7 +386,7 @@ abstract class Source
     }
 
     /**
-     * See {@see getInvoiceReference}
+     * See {@see getInvoiceReference()}
      *
      * @noinspection PhpUnused  Called via callTypeSpecificMethod().
      */

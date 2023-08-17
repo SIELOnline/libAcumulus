@@ -509,7 +509,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 //   comes from Source, it is not shop specific.
             ],
             DataType::Customer => [
-                Fld::ContactYourId => '[source::getOrder()::getSource()::getCustomer()::getId()]', // Order, not Creditmemo
+                Fld::ContactYourId => '[source::getOrder()::getSource()::getCustomerId()]', // Order, not Creditmemo
                 // Magento has 2 VAT numbers:
                 // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
                 // Magento\Customer\Model\Address also has a getVatId() method, but that is not the Address we have here.
@@ -544,6 +544,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::EmailTo => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
             LineType::Item => [
+                // @todo: allow to define a conversion to int when shops return strings
+                //   for int values that are read from the database. (also for productId.)
                 Meta::Id => '[item::getId()]',
                 Fld::ItemNumber => '[item::getSku()]',
                 Fld::Product => '[product::getName()]',

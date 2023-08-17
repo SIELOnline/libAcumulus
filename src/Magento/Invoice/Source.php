@@ -11,6 +11,7 @@ namespace Siel\Acumulus\Magento\Invoice;
 
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
+use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoCollection;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
@@ -69,7 +70,7 @@ class Source extends BaseSource
         }
     }
 
-    public function getReference()
+    public function getReference(): string
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -123,7 +124,7 @@ class Source extends BaseSource
      */
     protected function getStatusCreditNote(): int
     {
-        return $this->getSource()->getState();
+        return (int) $this->getSource()->getState();
     }
 
     /**
@@ -170,6 +171,7 @@ class Source extends BaseSource
      */
     protected function getPaymentStatusCreditNote(): int
     {
+        // @todo: how and when does a credit note get the state refunded?
         return $this->getSource()->getState() === Creditmemo::STATE_REFUNDED
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
@@ -199,7 +201,9 @@ class Source extends BaseSource
     {
         // Take date of last payment as payment date.
         $paymentDate = null;
-        foreach ($this->getSource()->getStatusHistoryCollection() as $statusChange) {
+        // @error: the history collection is largely empty in our test database??!
+        $statusHistoryCollection = $this->getSource()->getStatusHistoryCollection();
+        foreach ($statusHistoryCollection as $statusChange) {
             /** @var \Magento\Sales\Model\Order\Status\History $statusChange */
             if (!$paymentDate || $this->isPaidStatus($statusChange->getStatus())) {
                 $createdAt = substr($statusChange->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
@@ -222,7 +226,11 @@ class Source extends BaseSource
      */
     protected function getPaymentDateCreditNote(): ?string
     {
-        return substr($this->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+        // @todo: how and when does a credit note get the state refunded? when we know,
+        //   createdAt will probably no longer be correct.
+        return $this->getSource()->getState() === Creditmemo::STATE_REFUNDED
+            ? substr($this->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'))
+            : null;
     }
 
     public function getCurrency(): Currency
@@ -258,9 +266,9 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
-    public function getInvoiceIdOrder()
+    public function getInvoiceIdOrder(): ?int
     {
-        return $this->getInvoice() !== null ? $this->getInvoice()->getId() : null;
+        return $this->getInvoice() !== null ? (int) $this->getInvoice()->getId() : null;
     }
 
     /**
@@ -268,7 +276,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
-    public function getInvoiceReferenceOrder()
+    public function getInvoiceReferenceOrder(): ?string
     {
         // A credit note is to be considered an invoice on its own.
         return $this->getInvoice() !== null ? $this->getInvoice()->getIncrementId() : null;
@@ -279,19 +287,19 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
-    public function getInvoiceDateOrder()
+    public function getInvoiceDateOrder(): ?string
     {
         return $this->getInvoice() !== null ? substr($this->getInvoice()->getCreatedAt(), 0, strlen('2000-01-01')) : null;
     }
 
-    protected function getShopOrderOrId()
+    protected function getShopOrderOrId(): int
     {
         /** @var \Magento\Sales\Model\Order\Creditmemo $creditmemo */
         $creditmemo = $this->shopSource;
-        return $creditmemo->getOrderId();
+        return (int) $creditmemo->getOrderId();
     }
 
-    protected function getShopCreditNotesOrIds()
+    protected function getShopCreditNotesOrIds(): CreditmemoCollection
     {
         /** @var \Magento\Sales\Model\Order $order */
         $order = $this->shopSource;

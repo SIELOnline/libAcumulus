@@ -120,9 +120,9 @@ class Creator extends BaseCreator
         $this->addPropertySource('item', $item);
 
         $this->addProductInfo($result);  // copied to mappings (itemNumber, product).
-        $result[Meta::Id] = $item->getId(); // copied to mappings.
+        $result[Meta::Id] = (int) $item->getId(); // copied to mappings.
         $result[Meta::ProductType] = $item->getProductType(); // copied to mappings.
-        $result[Meta::ProductId] = $item->getProductId(); // copied to mappings.
+        $result[Meta::ProductId] = (int) $item->getProductId(); // copied to mappings.
 
         // For higher precision of the unit price, we will recalculate the price
         // ex vat later on, if product prices are entered inc vat by the admin.

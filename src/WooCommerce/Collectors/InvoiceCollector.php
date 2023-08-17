@@ -15,6 +15,7 @@ class InvoiceCollector extends BaseInvoiceCollector
 {
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
+        parent::collectLogicFields($acumulusObject);
         $acumulusObject->metadataSet(Meta::PricesIncludeVat, wc_prices_include_tax());
     }
 

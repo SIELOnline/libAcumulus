@@ -22,7 +22,9 @@ class CompleteInvoiceNumberTest extends TestCase
 {
     private Container $container;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection
+     */
     protected function setUp(): void
     {
         $this->container = new Container('TestWebShop', 'nl');
@@ -54,8 +56,9 @@ class CompleteInvoiceNumberTest extends TestCase
             [Config::InvoiceNrSource_ShopOrder, null, 'BR2022003', null],
             [Config::InvoiceNrSource_ShopInvoice, '2022009', null, 2022009],
             [Config::InvoiceNrSource_ShopInvoice, null, null, null],
-            [Config::InvoiceNrSource_ShopInvoice, null, 0, 0],
+            [Config::InvoiceNrSource_ShopInvoice, null, 0, null],
             [Config::InvoiceNrSource_ShopInvoice, null, 'ABCD', null],
+            [Config::InvoiceNrSource_ShopInvoice, null, 'BR2023001D', 2023001],
             [Config::InvoiceNrSource_ShopInvoice, 10, 11, 11],
         ];
     }

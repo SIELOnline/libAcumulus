@@ -29,11 +29,7 @@ use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Invoice\Completor;
-use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
-use Siel\Acumulus\Invoice\Creator;
-use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AboutForm;
@@ -449,7 +445,7 @@ class Container
     public function getCompletor(string $dataType = '')
     {
         if ($dataType === '') {
-            // @legacy
+            // @legacy remove when all shops are converted to new architecture.
             return $this->getInstance(
                 'Completor',
                 'Invoice',
@@ -465,7 +461,7 @@ class Container
                 true
             );
         } elseif ($dataType === 'legacy') {
-            // @legacy
+            // @legacy remove when all shops are converted to new architecture.
             return $this->getInstance(
                 'Completor',
                 'Completors\Legacy',
@@ -518,7 +514,7 @@ class Container
      */
     public function getCreator(bool $legacy = false)
     {
-        // @legacy
+        // @legacy remove when all shops are converted to new architecture.
         return $legacy
             ? $this->getInstance(
                 'Creator',

@@ -21,6 +21,7 @@ class AddressCollector extends \Siel\Acumulus\Collectors\AddressCollector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
+        parent::collectLogicFields($acumulusObject);
         if (!empty($acumulusObject->countryCode)) {
             $country = $this->getCountryInformation();
             $countryInfo = $country->getCountryInfo($acumulusObject->countryCode);

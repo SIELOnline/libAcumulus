@@ -509,6 +509,9 @@ abstract class Creator
     /**
      * Returns the number to use as invoice number.
      *
+     * As this number is meant to be user facing, the reference will be used as "invoice
+     * number".
+     *
      * @param int $invoiceNumberSource
      *   \Siel\Acumulus\PluginConfig::InvoiceNrSource_ShopInvoice or
      *   \Siel\Acumulus\PluginConfig::InvoiceNrSource_ShopOrder.
@@ -525,11 +528,10 @@ abstract class Creator
             $result = $this->invoiceSource->getReference();
         }
         if (is_string($result)) {
-            // Filter to an int. Just casting to an int would result in 0 with
-            // any invoice number that has a prefix.
-            $result = preg_replace('/\D/', '', $result);
+            // Remove any prefix consisting of non-numerical characters.
+            $result = preg_replace('/^\D+/', '', $result);
         }
-        return $result;
+        return (int) $result;
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Config;
 
 use InvalidArgumentException;
+use RuntimeException;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
 
@@ -440,15 +441,17 @@ abstract class ShopCapabilities
     }
 
     /**
-     * Returns the address type that the shop uses for fiscal calculations.
+     * Returns the name of the setting or the address type that the shop uses for fiscal
+     * calculations.
      *
      * @return string
-     *   One of the {@see \Siel\Acumulus\Data\AddressType} constants if the shop
-     *   does not allow to choose the address, or the name of the setting
+     *   One of the {@see \Siel\Acumulus\Data\AddressType} constants if the shop does not
+     *   allow to choose the address, the name of the setting that determines which
+     *   address is used otherwise.
      */
     public function getFiscalAddressSetting(): string
     {
-        throw new \RuntimeException(__METHOD__ . ' is not implemented');
+        throw new RuntimeException(__METHOD__ . ' is not implemented');
     }
 
     /**

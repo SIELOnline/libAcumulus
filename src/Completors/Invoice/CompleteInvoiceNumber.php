@@ -11,6 +11,7 @@ use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Meta;
 
 use function assert;
+use function is_string;
 
 /**
  * CompleteInvoiceNumber completes the {@see \Siel\Acumulus\Data\Invoice::$number}
@@ -47,8 +48,12 @@ class CompleteInvoiceNumber extends BaseCompletorTask
             default:
                 assert(false);
         }
-        if ($number !== null) {
-            $acumulusObject->number = preg_replace('/\D/', '', (string) $number);
+        if (is_string($number)) {
+            // Remove any prefix consisting of non-numerical characters.
+            $number = preg_replace('/^\D+/', '', $number);
+        }
+        if (!empty($number)) {
+            $acumulusObject->number = (int) $number;
         }
     }
 }

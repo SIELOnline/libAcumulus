@@ -30,7 +30,7 @@
         "getInvoiceReference()": "",
         "getInvoiceDate()": ""
     },
-    "line" : {
+    "item" : {
         "info": "Typically contains a webshop specific order line, defining the things like quantity, price, and tax. Only available when an item line is being processed."
     },
     "product": {

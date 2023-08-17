@@ -22,6 +22,7 @@ class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
+        parent::collectLogicFields($acumulusObject);
         $vatBasedOn = $this->getVatBasedOn();
         $acumulusObject->metadataSet(Meta::VatBasedOnShop, $vatBasedOn);
         $taxBasedOnMapping = [
@@ -33,10 +34,14 @@ class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
     }
 
     /**
-     * Returns the setting that determines which address to use for tax calculations.
+     * Returns the value of the setting indicating which address is used for tax
+     * calculations.
      */
     protected function getVatBasedOn(): string
     {
-        return $this->getScopeConfig()->getValue(MagentoTaxConfig::CONFIG_XML_PATH_BASED_ON, ScopeInterface::SCOPE_STORE);
+        return $this->getScopeConfig()->getValue(
+            $this->getContainer()->getShopCapabilities()->getFiscalAddressSetting(),
+            ScopeInterface::SCOPE_STORE
+        );
     }
 }

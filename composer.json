@@ -14,13 +14,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Siel\\Acumulus\\": "src/"
+            "Siel\\Acumulus\\": "src/",
+            "Siel\\Acumulus\\Tests\\": "tests/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Siel\\Acumulus\\TestWebShop\\": "tests/TestWebShop",
-            "Siel\\Acumulus\\Tests\\": "tests/"
+            "Siel\\Acumulus\\TestWebShop\\": "tests/TestWebShop"
         }
     },
     "require-dev": {

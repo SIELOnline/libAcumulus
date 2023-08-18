@@ -54,6 +54,7 @@ class CompleteAnonymise extends BaseCompletorTask
                 $acumulusObject->type,
                 $acumulusObject->vatTypeId,
                 $acumulusObject->contactYourId,
+                $acumulusObject->salutation,
                 $acumulusObject->website,
                 $acumulusObject->vatNumber,
                 $acumulusObject->telephone,

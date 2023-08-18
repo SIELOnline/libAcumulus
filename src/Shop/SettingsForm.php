@@ -476,18 +476,17 @@ class SettingsForm extends BaseConfigForm
     /**
      * Returns the set of invoice related fields.
      * The fields returned:
+     * - 'mainAddress'
      * - 'invoiceNrSource'
      * - 'dateToUse'
-     * - 'defaultCustomerType'
-     * - 'salutation'
-     * - 'defaultAccountNumber'
-     * - 'defaultCostCenter'
-     * - 'defaultInvoiceTemplate'
-     * - 'defaultInvoicePaidTemplate'
      * - 'concept'
      * - 'euCommerceThreshold'
-     * - 'sendEmptyInvoice'
-     * - 'sendEmptyShipping'
+     * - 'missingAmount'
+     * - 'sendWhat'
+     * - 'defaultInvoiceTemplate'
+     * - 'defaultInvoicePaidTemplate'
+     * - 'defaultAccountNumber'
+     * - 'defaultCostCenter'
      *
      * @return array[]
      *   The set of invoice related fields.

@@ -39,6 +39,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [];
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection parent method returns empty array.
+     */
     public function getDefaultShopMappings(): array
     {
         return [
@@ -48,13 +51,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             DataType::Customer => [
                 Fld::ContactYourId => '[source::getOrder()::getSource()::customer::id]',
+                Fld::Salutation => '["Beste"+source::getOrder()::getSource()::customer::first_name]',
                 Fld::Telephone => '[source::getOrder()::getSource()::customer::telephone]',
                 Fld::Telephone2 => '[source::getOrder()::getSource()::customer::mobile]',
                 Fld::Email => '[source::getOrder()::getSource()::customer::email]',
             ],
             AddressType::Invoice => [
                 Fld::CompanyName1 => '[source::getOrder()::getSource()::customer::company_name]',
-                Fld::Salutation => '["Beste"+source::getOrder()::getSource()::customer::first_name]',
                 Fld::FullName => '[source::getOrder()::getSource()::customer::first_name+source::getOrder()::getSource()::customer::last_name]',
                 Fld::Address1 => '[source::getOrder()::getSource()::customer::invoice_address::street]',
                 Fld::Address2 => '[source::getOrder()::getSource()::customer::invoice_address::street2]',
@@ -64,7 +67,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             AddressType::Shipping => [
                 Fld::CompanyName1 => '[source::getOrder()::getSource()::customer::company_name]',
-                Fld::Salutation => '["Beste"+source::getOrder()::getSource()::customer::first_name]',
                 Fld::FullName => '[source::getOrder()::getSource()::customer::first_name+source::getOrder()::getSource()::customer::last_name]',
                 Fld::Address1 => '[source::getOrder()::getSource()::customer::shipping_address::street]',
                 Fld::Address2 => '[source::getOrder()::getSource()::customer::shipping_address::street2]',

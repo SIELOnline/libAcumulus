@@ -39,6 +39,7 @@ use function in_array;
  * @property ?int $vatTypeId
  * @property ?string $contactYourId
  * @property ?bool $contactStatus
+ * @property ?string $salutation
  * @property ?string $website
  * @property ?string $vatNumber
  * @property ?string $telephone
@@ -55,6 +56,7 @@ use function in_array;
  * @method bool setVatTypeId(?int $value, int $mode = PropertySet::Always)
  * @method bool setContactYourId(?string $value, int $mode = PropertySet::Always)
  * @method bool setContactStatus(bool|int|null $value, int $mode = PropertySet::Always)
+ * @method bool setSalutation(?string $value, int $mode = PropertySet::Always)
  * @method bool setWebsite(?string $value, int $mode = PropertySet::Always)
  * @method bool setVatNumber(?string $value, int $mode = PropertySet::Always)
  * @method bool setTelephone(?string $value, int $mode = PropertySet::Always)
@@ -89,6 +91,7 @@ class Customer extends AcumulusObject
             ['name' => Fld::VatTypeId, 'type' => 'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],
             ['name' => Fld::ContactYourId, 'type' => 'string'],
             ['name' => Fld::ContactStatus, 'type' => 'bool', 'allowedValues' => [Api::ContactStatus_Disabled, Api::ContactStatus_Active]],
+            ['name' => Fld::Salutation, 'type' => 'string'],
             ['name' => Fld::Website, 'type' => 'string'],
             ['name' => Fld::VatNumber, 'type' => 'string'],
             ['name' => Fld::Telephone, 'type' => 'string'],

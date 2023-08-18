@@ -30,6 +30,7 @@ class CompleteAnonymiseTest extends TestCase
         $customer->vatTypeId = Api::VatTypeId_Private;
         $customer->contactYourId = 2;
         $customer->contactStatus = Api::ContactStatus_Active;
+        $customer->salutation = 'Mr Doe';
         $customer->website = 'https://example.com';
         $customer->vatNumber = null;
         $customer->telephone = '0123456789';
@@ -49,7 +50,6 @@ class CompleteAnonymiseTest extends TestCase
         $address->companyName1 = null;
         $address->companyName2 = null;
         $address->fullName = 'John Doe';
-        $address->salutation = 'Mr Doe';
         $address->address1 = 'street 1';
         $address->address2 = 'building 2';
         $address->postalCode = '1234 AB';
@@ -67,7 +67,6 @@ class CompleteAnonymiseTest extends TestCase
         $address->companyName1 = null;
         $address->companyName2 = null;
         $address->fullName = 'Mary Doe';
-        $address->salutation = 'Ms Doe';
         $address->address1 = 'street 3';
         $address->address2 = 'building 4';
         $address->postalCode = '12345';
@@ -88,6 +87,7 @@ class CompleteAnonymiseTest extends TestCase
         $customer->vatTypeId = null;
         $customer->contactYourId = null;
         $customer->contactStatus = Api::ContactStatus_Disabled;
+        $customer->salutation = null;
         $customer->website = null;
         $customer->vatNumber = null;
         $customer->telephone = null;
@@ -107,7 +107,6 @@ class CompleteAnonymiseTest extends TestCase
         $address->companyName1 = null;
         $address->companyName2 = null;
         $address->fullName = null;
-        $address->salutation = null;
         $address->address1 = null;
         $address->address2 = null;
         $address->postalCode = '1234 AB';
@@ -125,7 +124,6 @@ class CompleteAnonymiseTest extends TestCase
         $address->companyName1 = null;
         $address->companyName2 = null;
         $address->fullName = null;
-        $address->salutation = null;
         $address->address1 = null;
         $address->address2 = null;
         $address->postalCode = '12345';

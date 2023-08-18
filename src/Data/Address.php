@@ -24,7 +24,6 @@ use Siel\Acumulus\Fld;
  * @property ?string $companyName1
  * @property ?string $companyName2
  * @property ?string $fullName
- * @property ?string $salutation
  * @property ?string $address1
  * @property ?string $address2
  * @property ?string $postalCode
@@ -37,7 +36,6 @@ use Siel\Acumulus\Fld;
  * @method bool setCompanyName1(?string $value, int $mode = PropertySet::Always)
  * @method bool setCompanyName2(?string $value, int $mode = PropertySet::Always)
  * @method bool setFullName(?string $value, int $mode = PropertySet::Always)
- * @method bool setSalutation(?string $value, int $mode = PropertySet::Always)
  * @method bool setAddress1(?string $value, int $mode = PropertySet::Always)
  * @method bool setAddress2(?string $value, int $mode = PropertySet::Always)
  * @method bool setPostalCode(?string $value, int $mode = PropertySet::Always)
@@ -57,7 +55,6 @@ class Address extends AcumulusObject
             ['name' => Fld::CompanyName1, 'type' => 'string'],
             ['name' => Fld::CompanyName2, 'type' => 'string'],
             ['name' => Fld::FullName, 'type' => 'string'],
-            ['name' => Fld::Salutation, 'type' => 'string'],
             ['name' => Fld::Address1, 'type' => 'string'],
             ['name' => Fld::Address2, 'type' => 'string'],
             ['name' => Fld::PostalCode, 'type' => 'string'],

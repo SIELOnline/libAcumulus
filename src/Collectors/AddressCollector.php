@@ -14,7 +14,6 @@ use Siel\Acumulus\Data\PropertySet;
  * - string $companyName1
  * - string $companyName2
  * - string $fullName
- * - string $salutation
  * - string $address1
  * - string $address2
  * - string $postalCode

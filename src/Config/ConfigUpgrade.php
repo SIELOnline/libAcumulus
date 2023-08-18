@@ -598,11 +598,11 @@ class ConfigUpgrade
         foreach ($mappingKeys as $key => [$group, $property]) {
             // - Was the old key being overridden by the user? That is, is there a value,
             //   even if it is empty?
-            // - Does the new mapping somehow already have a value: do not overwrite.
+            // - Does the new mapping somehow already has a value? do not overwrite.
             if (isset($values[$key]) && !isset($mappings[$group][$property])) {
                 // Chances are it won't work anymore, as you now probably have to start
-                // with 'Source::getSource()::{method on WC_Order}'. So we should issue a
-                // warning.
+                // with 'Source::getSource()::{method on shop Order}'. So we should issue
+                // a warning.
                 $mappings[$group] = $mappings[$group] ?? [];
                 $mappings[$group][$property] = $values[$key];
             }
@@ -612,6 +612,38 @@ class ConfigUpgrade
             // This is to warn the user.
             $values['showPluginV8MessageOverriddenMappings'] = $this->getOverriddenMappings($mappings);
             $result = $configStore->save($values);
+        }
+        return $result;
+    }
+
+    /**
+     * 8.0.0 upgrade.
+     *
+     * - Move salutation from (invoice) address to customer.
+     */
+    protected function upgrade802(): bool
+    {
+        $result = true;
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+        $mappings = $values[Config::Mappings] ?? [];
+        $doSave = false;
+        if (isset($mappings[AddressType::Invoice][Fld::Salutation])) {
+            $mappings[DataType::Customer][Fld::Salutation] = $mappings[AddressType::Invoice][Fld::Salutation];
+            unset($mappings[AddressType::Invoice][Fld::Salutation]);
+            $doSave = true;
+        }
+        if (isset($mappings[AddressType::Shipping][Fld::Salutation])) {
+            if (!$doSave) {
+                // salutation field was not set on invoice address but is set on shipping
+                // address, copy it from that address.
+                $mappings[DataType::Customer][Fld::Salutation] = $mappings[AddressType::Shipping][Fld::Salutation];
+            }
+            unset($mappings[AddressType::Shipping][Fld::Salutation]);
+            $doSave = true;
+        }
+        if ($doSave) {
+            $result = $configStore->save([Config::Mappings => $mappings]);
         }
         return $result;
     }

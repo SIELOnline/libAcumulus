@@ -49,7 +49,6 @@ interface Fld
     public const AltCompanyName1 = 'altCompanyName1';
     public const AltCompanyName2 = 'altCompanyName2';
     public const AltFullName = 'altFullName';
-    public const AltSalutation = 'altSalutation';
     public const AltAddress1 = 'altAddress1';
     public const AltAddress2 = 'altAddress2';
     public const AltPostalCode = 'altPostalCode';

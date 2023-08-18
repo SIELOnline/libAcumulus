@@ -251,6 +251,14 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
+            'salutation' => [
+                'type' => 'text',
+                'label' => $this->t('field_salutation'),
+                'description' => $this->t('desc_salutation'),
+                'attributes' => [
+                    'size' => self::SizeLong,
+                ],
+            ],
             'vatNumber' => [
                 'type' => 'text',
                 'label' => $this->t('field_vatNumber'),
@@ -324,14 +332,6 @@ class MappingsForm extends Form
                 'type' => 'text',
                 'label' => $this->t('field_fullName'),
                 'description' => $this->t('desc_fullName'),
-                'attributes' => [
-                    'size' => self::SizeLong,
-                ],
-            ],
-            'salutation' => [
-                'type' => 'text',
-                'label' => $this->t('field_salutation'),
-                'description' => $this->t('desc_salutation'),
                 'attributes' => [
                     'size' => self::SizeLong,
                 ],

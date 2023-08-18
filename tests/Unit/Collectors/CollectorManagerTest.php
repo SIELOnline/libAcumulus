@@ -101,6 +101,7 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($customer->vatTypeId);
         $this->assertSame('2', $customer->contactYourId);
         $this->assertNull($customer->contactStatus);
+        $this->assertSame('Beste Erwin', $customer->salutation);
 
         $this->assertNull($customer->website);
         $this->assertNull($customer->vatNumber);
@@ -126,7 +127,6 @@ class CollectorManagerTest extends TestCase
         $this->assertSame('Buro RaDer', $invoiceAddress->companyName1);
         $this->assertNull($invoiceAddress->companyName2);
         $this->assertSame('Erwin Derksen', $invoiceAddress->fullName);
-        $this->assertSame('Beste Erwin', $invoiceAddress->salutation);
         $this->assertSame('Lindelaan 4', $invoiceAddress->address1);
         $this->assertSame('Achter de Linden', $invoiceAddress->address2);
         $this->assertSame('1234 AB', $invoiceAddress->postalCode);
@@ -140,7 +140,6 @@ class CollectorManagerTest extends TestCase
         $this->assertSame('Buro RaDer', $shippingAddress->companyName1);
         $this->assertNull($shippingAddress->companyName2);
         $this->assertSame('Erwin Derksen', $shippingAddress->fullName);
-        $this->assertSame('Beste Erwin', $shippingAddress->salutation);
         $this->assertSame('Lindelaan 5', $shippingAddress->address1);
         $this->assertSame('Achter den Linden', $shippingAddress->address2);
         $this->assertSame('1234 AB', $shippingAddress->postalCode);

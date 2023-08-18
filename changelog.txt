@@ -22,6 +22,7 @@ Refactorings:
   - Source: stricter type handling.
   - Extract number from order or invoice reference: changed, should be more logical now.
   - Call parent method more often, even if it is currently a no-op.
+  - Moved field Salutation from Address to Customer as there is no field altSalutation.
 
 
 8.0.1 (2023-07-25) (WC)

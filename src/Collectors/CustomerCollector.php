@@ -10,6 +10,7 @@ namespace Siel\Acumulus\Collectors;
  * Properties that are mapped:
  * - string $contactId
  * - string $contactYourId
+ * - string $salutation
  * - string $website
  * - string $vatNumber
  * - string $telephone

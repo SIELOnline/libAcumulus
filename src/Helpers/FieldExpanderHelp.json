@@ -1,6 +1,6 @@
 {
     "source": {
-        "info": "An Acumulus wrapper around the webshop order or credit note. It defines some helper methods to extract info from those webshop specific sources, but it also defines methods to access those webshop specific data structures and traverse its data model.",
+            "info": "An Acumulus wrapper around the webshop order or credit note. It defines some helper methods to extract info from those webshop specific sources, but it also defines methods to access those webshop specific data structures and traverse its data model.",
         "getTypeLabel(2)": "'Order' or 'Credit note' (translated)",
         "getId()": "The (technical) id",
         "getReference()": "The (external) reference",
@@ -20,20 +20,20 @@
             "amountVat": ""
         },
         "getSource()": "The webshop order or credit note for this Source. See the PHP code from the webshop to find out what properties and methods are available",
-        "getOrder()": "The Order (type = Source) for the credit note, if this source is a credit note, this Source object itself otherwise.",
-        "getParent()": "The Order (type = Source) for the credit note, if this source is a credit note, null otherwise. Can be used if you only want a value from the originating order for credit notes.",
+        "getOrder()": "If this Source object wraps an order, this Source object itself, otherwise the Source wrapper for the originating Order of this credit note.",
+        "getParent()": "The Source wrapper around the originating Order for this credit note, or null if this Source wraps an Order. Can be used if you only want a value from the originating order for credit notes.",
         "getCreditNote(index)": "The credit note (type = Source) for this order, if this source is an order and has a credit note; this Source object itself it this source is a credit note, null otherwise.",
-        "isOrder()": "This Source object itself (type = Source) if this is an order, null otherwise. Can be used if you only want a value from an order, not from a credit notes.",
-        "isCreditNote()": "This Source object itself (type = Source) if this is a credit note, null otherwise. Can be used if you only want a value from a credit note, not from an order.",
-        "getInvoice()": "The webshop invoice, if available.",
-        "getInvoiceId()": "",
-        "getInvoiceReference()": "",
-        "getInvoiceDate()": ""
+        "isOrder()": "This Source wrapper itself if this is an Order, null otherwise. Can be used if you only want a value from an order, not from a credit note.",
+        "isCreditNote()": "This Source wrapper itself if this is a Credit note, null otherwise. Can be used if you only want a value from a credit note, not from an order.",
+        "getInvoice()": "The web shop's invoice, if an invoice exists for this Order in the web shop.",
+        "getInvoiceId()": "The (technical) id from the web shop's invoice, if an invoice exists for this Order in the web shop.",
+        "getInvoiceReference()": "The reference from the web shop's invoice, if an invoice exists for this Order in the web shop.",
+        "getInvoiceDate()": "The date from the web shop's invoice, if an invoice exists for this Order in the web shop."
     },
     "item" : {
-        "info": "Typically contains a webshop specific order line, defining the things like quantity, price, and tax. Only available when an item line is being processed."
+        "info": "Typically contains a webshop specific order item line, defining the things like quantity, price, and tax. Only available when an item line is being processed."
     },
     "product": {
-        "info": "Typically contains the webshop specific product for the given 'line', defining the things like name and sku (or any other defining code). Only available when an item line is being processed."
+        "info": "Typically contains the webshop specific product for the given 'item', defining the things like name and sku (or any other defining code). Only available when an item line is being processed."
     }
 }

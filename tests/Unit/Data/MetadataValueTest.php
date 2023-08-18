@@ -24,7 +24,7 @@ class MetadataValueTest extends TestCase
         $mdv = new MetadataValue();
         $this->assertSame(0, $mdv->count());
         $this->assertNull($mdv->get());
-        $this->assertSame('null', $mdv->getApiValue());
+        $this->assertNull($mdv->getApiValue());
     }
 
     public function test1Value(): void
@@ -49,7 +49,7 @@ class MetadataValueTest extends TestCase
         $mdv = new MetadataValue($value1);
         $this->assertSame(1, $mdv->count());
         $this->assertNull($mdv->get());
-        $this->assertSame('null', $mdv->getApiValue());
+        $this->assertNull($mdv->getApiValue());
     }
 
     public function testMultipleValues(): void
@@ -89,7 +89,7 @@ class MetadataValueTest extends TestCase
     {
         return [
             [2, 2],
-            [null, 'null'],
+            [null, null],
             [true, true],
             [1.23, 1.23],
             ['2', '2'],

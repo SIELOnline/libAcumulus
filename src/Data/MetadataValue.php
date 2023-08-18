@@ -9,7 +9,6 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Meta;
 
 use function count;
-use function is_bool;
 
 /**
  * MetadataValue represents a metadata value.
@@ -108,7 +107,7 @@ class MetadataValue
     public function getApiValue()
     {
         $value = $this->get();
-        if (is_scalar($value)) {
+        if (is_scalar($value) || $value === null) {
             $result = $value;
         } elseif ($value instanceof DateTime) {
             if ($value->format('H:i:s') === '00:00:00') {

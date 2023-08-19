@@ -172,7 +172,7 @@ class Source extends BaseSource
     protected function getPaymentStatusCreditNote(): int
     {
         // @todo: how and when does a credit note get the state refunded?
-        return $this->getSource()->getState() === Creditmemo::STATE_REFUNDED
+        return (int) $this->getSource()->getState() === Creditmemo::STATE_REFUNDED
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -228,7 +228,7 @@ class Source extends BaseSource
     {
         // @todo: how and when does a credit note get the state refunded? when we know,
         //   createdAt will probably no longer be correct.
-        return $this->getSource()->getState() === Creditmemo::STATE_REFUNDED
+        return (int) $this->getSource()->getState() === Creditmemo::STATE_REFUNDED
             ? substr($this->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'))
             : null;
     }
@@ -296,6 +296,10 @@ class Source extends BaseSource
     {
         /** @var \Magento\Sales\Model\Order\Creditmemo $creditmemo */
         $creditmemo = $this->shopSource;
+        /**
+         * @noinspection PhpCastIsUnnecessaryInspection  despite the documented return
+         *   type, id is returned as a string.
+         */
         return (int) $creditmemo->getOrderId();
     }
 

@@ -284,6 +284,8 @@ abstract class Source
     /**
      * Returns the country code for the order.
      *
+     * The return value is not necessarily in upper case.
+     *
      * @return string
      *   The 2-letter country code for the current order or the empty string if
      *   not set.

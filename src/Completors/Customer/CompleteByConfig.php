@@ -8,7 +8,7 @@ use Siel\Acumulus\Completors\BaseCompletorTask;
 use Siel\Acumulus\Data\AcumulusObject;
 
 /**
- * CompleteEmail validates or fills the e-mail address.
+ * CompleteByConfig adds configuration based values.
  */
 class CompleteByConfig extends BaseCompletorTask
 {

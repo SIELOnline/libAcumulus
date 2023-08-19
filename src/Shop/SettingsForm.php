@@ -477,6 +477,7 @@ class SettingsForm extends BaseConfigForm
      * Returns the set of invoice related fields.
      * The fields returned:
      * - 'mainAddress'
+     * - 'countryAutoName'
      * - 'invoiceNrSource'
      * - 'dateToUse'
      * - 'concept'
@@ -524,6 +525,12 @@ class SettingsForm extends BaseConfigForm
                 'label' => $this->t('field_mainAddress'),
                 'description' => $this->t('desc_mainAddress') . ' ' . $descMainAdressAdditional,
                 'options' => $this->getMainAddressOptions(),
+            ],
+            'countryAutoName' => [
+                'type' => 'radio',
+                'label' => $this->t('field_countryAutoName'),
+                'description' => $this->t('desc_countryAutoName'),
+                'options' => $this->getCountryAutoNameOptions(),
             ],
             'invoiceNrSource' => $this->getOptionsOrHiddenField('invoiceNrSource', 'radio'),
             'dateToUse' => $this->getOptionsOrHiddenField('dateToUse', 'radio'),
@@ -645,7 +652,7 @@ class SettingsForm extends BaseConfigForm
      * @return array[]
      *   The set of options related fields.
      *
-     * @todo: deze velden samenvoegen met "verzend gratis vezending regels" in een
+     * @todo: deze velden samenvoegen met "verzend gratis verzending regels" in een
      *   fieldset Factuurregels?
      */
     protected function getOptionsFields(): array
@@ -960,6 +967,25 @@ class SettingsForm extends BaseConfigForm
         return [
             Api::ContactStatus_Active => $this->t('option_contactStatus_Active'),
             Api::ContactStatus_Disabled => $this->t('option_contactStatus_Disabled'),
+        ];
+    }
+
+    /**
+     * Returns the list of possible values for the country auto name field.
+     *
+     * @return array
+     *   The list of possible values for the country auto name field keyed by the
+     *   value to use in the API and translated labels as the values.
+     *
+     */
+    protected function getCountryAutoNameOptions(): array
+    {
+        return [
+            Api::CountryAutoName_No => $this->t('option_countryAutoName_No'),
+            Api::CountryAutoName_Yes => $this->t('option_countryAutoName_Yes'),
+            Api::CountryAutoName_OnlyForeign => $this->t('option_countryAutoName_OnlyForeign'),
+            Config::Country_FromShop => $this->t('option_country_FromShop'),
+            Config::Country_ForeignFromShop => $this->t('option_country_ForeignFromShop'),
         ];
     }
 

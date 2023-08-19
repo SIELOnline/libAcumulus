@@ -46,7 +46,7 @@ class CompleteInvoiceNumber extends BaseCompletorTask
                 $number = null;
                 break;
             default:
-                assert(false);
+                assert(false, __METHOD__ . ": setting 'invoiceNrSource' has an unknown value $sourceToUse");
         }
         if (is_string($number)) {
             // Remove any prefix consisting of non-numerical characters.

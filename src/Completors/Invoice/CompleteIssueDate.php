@@ -11,8 +11,6 @@ use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Meta;
 
 use function assert;
-use function count;
-use function in_array;
 
 /**
  * CompleteIssueDate completes the {@see \Siel\Acumulus\Data\Invoice::$issueDate}
@@ -48,7 +46,7 @@ class CompleteIssueDate extends BaseCompletorTask
                 $date = null;
                 break;
             default:
-                assert(false);
+                assert(false, __METHOD__ . ": setting 'dateToUse' has an unknown value $dateToUse");
         }
         if ($date !== null) {
             $acumulusObject->issueDate = $date;

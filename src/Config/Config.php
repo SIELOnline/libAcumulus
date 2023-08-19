@@ -52,6 +52,8 @@ class Config
     public const Send_SendAndMail = 2;
     public const Send_TestMode = 3;
 
+    public const Country_ForeignFromShop = 4;
+    public const Country_FromShop = 5;
     public const MainAddress_FollowShop = 'follow_shop';
     public const MainAddress_Invoice = AddressType::Invoice;
     public const MainAddress_Shipping = AddressType::Shipping;
@@ -707,6 +709,12 @@ class Config
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => Config::MainAddress_FollowShop,
+                ],
+                'countryAutoName' => [
+                    'group' => Tag::Customer,
+                    'type' => 'int',
+                    // The default Api::CountryAutoName_Yes matches the old behaviour.
+                    'default' => Api::CountryAutoName_Yes,
                 ],
                 // @legacy  Is now a mapping.
                 'contactYourId' => [

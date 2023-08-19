@@ -10,6 +10,9 @@ Bugs:
 - MA: Form values were not set for elements with different id and name (array style name).
 - MA: Radio options with an "empty" value (e.g. 0 or "0") did not have their button
   rendered.
+- countryautoname should be sent alongside countrycode, as the default implies that
+  country will not be looked up. Also added a configuration option and a UI to specify
+  the behaviour of these fields.
 
 Features:
 - Updated the PHP compatibility table by adding a column for PHP 8.2.

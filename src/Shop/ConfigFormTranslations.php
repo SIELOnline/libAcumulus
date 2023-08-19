@@ -309,6 +309,14 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         AddressType::Invoice => 'factuuradres',
         AddressType::Shipping => 'verzendadres',
 
+        'field_countryAutoName' => 'landnaam',
+        'desc_countryAutoName' => 'Geef aan wanneer en hoe de landnaam aan dde factuur toegevoegd moet worden. De land code wordt altijd naar Acumulus verzonden, maar het versturen en tonen van de landnaam is flexibeler. De landnaam kan van Acumulus komen (gebaseerd op de landcode) of van de naam zoals die in de webwinkel is ingevuld kan gebruikt worden. De 2e en 3e opties zijn de aanbevolen opties.',
+        'option_countryAutoName_No' => 'Voeg geen landnaam toe aan de factuur.',
+        'option_countryAutoName_Yes' => 'Laat Acumulus altijd de (Nederlandstalige) landnaam toevoegen (aanbevolen).',
+        'option_countryAutoName_OnlyForeign' => 'Laat Acumulus alleen aan buitenlandse adressen de (Nederlandstalige) landnaam toevoegen (aanbevolen).',
+        'option_country_FromShop' => 'Stuur altijd de webwinkel landnaam mee. Let op dat de taal waarin de landnaam verstuurd wordt, kan afhangen van de taalvoorkeur van de actuele klant of beheerder.',
+        'option_country_ForeignFromShop' => 'Stuur alleen de webwinkel landnaam mee voor buitenlandse adressen. Let op dat de taal waarin de landnaam verstuurd wordt, kan afhangen van de taalvoorkeur van de actuele klant of beheerder.',
+
         'field_invoiceNrSource' => 'Factuurnummer',
         'option_invoiceNrSource_1' => 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een bestelling gekoppeld is, zal het bestelnummer gebruikt worden!',
         'option_invoiceNrSource_2' => 'Gebruik het bestelnummer van uw webwinkel.',
@@ -713,7 +721,7 @@ Field references are denoted by placing the name of the property between square 
         'desc_countryCode' => 'Thee ISO 3166-1 alpha 2 country code, do not change this unless you are using plugins to store addresses.',
         'field_telephone1' => 'Phone 1',
         'field_telephone2' => 'Phone 2',
-        'desc_telephone12' => 'The phonenumbers you want to store in Acumulus.',
+        'desc_telephone12' => 'The phone numbers you want to store in Acumulus.',
         'desc_fax1' => 'Most web shop do not store fax numbers anymore.',
 
         'field_defaultCustomerType' => 'Create customers as',
@@ -775,6 +783,14 @@ If you unchecked the first option, the second option only applies to business cl
         'desc_mainAddress_shopUses' => 'Your webshop always uses the %s to determine the applicable vat rates',
         AddressType::Invoice => 'invoice address',
         AddressType::Shipping => 'shipping address',
+
+        'field_countryAutoName' => 'Country name',
+        'desc_countryAutoName' => 'Define if and how to add the country name to the invoice. The country code is always sent to Acumulus. However, the county name can be set flexibly, either by Acumulus based on the country code or by using the country name from the shop. The 2nd or 3rd option are the recommended ones.',
+        'option_countryAutoName_No' => 'Do not add the country name to the invoice.',
+        'option_countryAutoName_Yes' => 'Let Acumulus always add the (Dutch) country name to Acumulus (recommended).',
+        'option_countryAutoName_OnlyForeign' => 'Let Acumulus add only foreign country names to Acumulus (recommended).',
+        'option_country_FromShop' => "Always send the shop's country name to Acumulus. Note that the language in which the country name will be sent, may differ based on the current client's or administrator's language preference.",
+        'option_country_option_country_ForeignFromShop' => "Send the shop's country name to Acumulus if it is a foreign country. Note that the language in which the country name will be sent, may differ based on the current client's or administrator's language preference.",
 
         'field_invoiceNrSource' => 'Invoice number',
         'option_invoiceNrSource_1' => 'Use the web shop invoice number. Note: if no invoice has been created for the order yet, the order number will be used!',

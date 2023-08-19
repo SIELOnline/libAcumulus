@@ -36,9 +36,21 @@ class CustomerCompletor extends BaseCompletor
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
         $this->customer = $acumulusObject;
+        $this->completeAddresses($result);
         $this->getContainer()->getCompletorTask('Customer', 'Defaults')->complete($this->customer);
         $this->getContainer()->getCompletorTask('Customer', 'ByConfig')->complete($this->customer);
         $this->getContainer()->getCompletorTask('Customer', 'Email')->complete($this->customer);
         $this->getContainer()->getCompletorTask('Customer', 'Anonymise')->complete($this->customer);
     }
+
+    /**
+     * Completes the {@see \Siel\Acumulus\Data\Address}es of the
+     * {@see \Siel\Acumulus\Data\Customer}.
+     */
+    protected function completeAddresses(MessageCollection $result): void
+    {
+        $this->getContainer()->getCompletor('Address')->complete($this->customer->getInvoiceAddress(), $result);
+        $this->getContainer()->getCompletor('Address')->complete($this->customer->getShippingAddress(), $result);
+    }
+
 }

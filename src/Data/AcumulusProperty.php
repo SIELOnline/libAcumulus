@@ -40,8 +40,12 @@ use function strlen;
  *   map the 2 boolean values to their value on the Acumulus API.
  *
  * Other restrictions, e.g. a string that should contain an e-mail address, are
- * not (yet) supported by this class and can(/should) be checked on a higher
- * level.
+ * not (yet) supported by this class and should be checked on a higher level.
+ *
+ * In some cases, more specifically the customer data with an invoice_add call,
+ * the API distinguishes between an absent tag and an empty tag, the latter
+ * indicating to clear a value if "overwriteIfExists" is set to yes.
+ * @todo: This is not yet handled correctly by this class.
  */
 class AcumulusProperty
 {

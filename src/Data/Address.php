@@ -7,6 +7,8 @@ namespace Siel\Acumulus\Data;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
 
+use function is_string;
+
 /**
  * Represents a set of address fields of an Acumulus API Customer object.
  *
@@ -28,10 +30,10 @@ use Siel\Acumulus\Fld;
  * @property ?string $address2
  * @property ?string $postalCode
  * @property ?string $city
- * @property ?string $country
  * @property ?string $countryCode
  * @property ?int $countryAutoName
  * @property ?string $countryAutoNameLang
+ * @property ?string $country
  *
  * @method bool setCompanyName1(?string $value, int $mode = PropertySet::Always)
  * @method bool setCompanyName2(?string $value, int $mode = PropertySet::Always)
@@ -40,10 +42,10 @@ use Siel\Acumulus\Fld;
  * @method bool setAddress2(?string $value, int $mode = PropertySet::Always)
  * @method bool setPostalCode(?string $value, int $mode = PropertySet::Always)
  * @method bool setCity(?string $value, int $mode = PropertySet::Always)
- * @method bool setCountry(?string $value, int $mode = PropertySet::Always)
  * @method bool setCountryCode(?string $value, int $mode = PropertySet::Always)
  * @method bool setCountryAutoName(?int $value, int $mode = PropertySet::Always)
  * @method bool setCountryAutoNameLang(?string $value, int $mode = PropertySet::Always)
+ * @method bool setCountry(?string $value, int $mode = PropertySet::Always)
  *
  * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
  */
@@ -59,7 +61,6 @@ class Address extends AcumulusObject
             ['name' => Fld::Address2, 'type' => 'string'],
             ['name' => Fld::PostalCode, 'type' => 'string'],
             ['name' => Fld::City, 'type' => 'string'],
-            ['name' => Fld::Country, 'type' => 'string'],
             ['name' => Fld::CountryCode, 'type' => 'string'],
             [
                 'name' => Fld::CountryAutoName,
@@ -67,6 +68,18 @@ class Address extends AcumulusObject
                 'allowedValues' => [Api::CountryAutoName_No, Api::CountryAutoName_OnlyForeign, Api::CountryAutoName_Yes],
             ],
             ['name' => Fld::CountryAutoNameLang, 'type' => 'string'],
+            ['name' => Fld::Country, 'type' => 'string'],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function set(string $name, $value, int $mode = PropertySet::Always): bool
+    {
+        if (($name === Fld::CountryCode) && is_string($value)) {
+            $value = strtoupper($value);
+        }
+        return parent::set($name, $value, $mode);
     }
 }

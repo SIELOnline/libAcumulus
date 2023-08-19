@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests;
 
+use DateTime;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Translations;
 
@@ -21,15 +22,44 @@ trait AcumulusTestUtils
     /**
      * Returns an Acumulus Container instance.
      */
-    abstract protected function getAcumulusContainer(): Container;
+    abstract protected static function getAcumulusContainer(): Container;
 
     /**
-     * @before Adds translations that are not added by default when the Translator is
+     * @beforeClass Adds translations that are not added by default when the Translator is
      *   created.
      */
-    protected function addTranslations(): void
+    public static function addTranslations(): void
     {
-        $this->getAcumulusContainer()->getTranslator()->add(new Translations());
+        self::getAcumulusContainer()->getTranslator()->add(new Translations());
+    }
+
+    /**
+     * Returns a timing string.
+     *
+     * @param string $location
+     *   Will be printed along with the tine, to indicate where in the code the timing was
+     *   taken.
+     * @param bool $doEcho
+     *   Whether the resulting string should also be echoed to the output.
+     *
+     * @return string
+     *   The time (with microseconds) and location.
+     */
+    protected static function eTime(string $location = '', bool $doEcho = true): string
+    {
+        $line = self::getTime() . ' ' . $location . PHP_EOL;
+        if ($doEcho) {
+            echo $line;
+        }
+        return $line;
+    }
+
+    /**
+     * Returns the current time with microseconds.
+     */
+    protected static function getTime(): string
+    {
+        return (new DateTime())->format('H:i:s.u');
     }
 
     /**

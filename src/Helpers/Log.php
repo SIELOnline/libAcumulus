@@ -27,12 +27,13 @@ class Log
      * messages.
      * See {@see \Siel\Acumulus\Meta::JsonFlags} and {@see Util::JsonFlags}.
      */
-    public const JsonFlags = JSON_UNESCAPED_SLASHES |
+    public const JsonFlagsKeepType = JSON_UNESCAPED_SLASHES |
         JSON_UNESCAPED_UNICODE |
         JSON_THROW_ON_ERROR |
-        JSON_NUMERIC_CHECK |
         JSON_PRESERVE_ZERO_FRACTION |
         JSON_PRETTY_PRINT;
+    public const JsonFlags = Log::JsonFlagsKeepType |
+        JSON_NUMERIC_CHECK;
 
     protected int $logLevel = Severity::Info;
     protected string $libraryVersion;

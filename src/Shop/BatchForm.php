@@ -29,6 +29,10 @@ use function count;
  * - none
  * And may optionally (have to) override:
  * - setSubmittedValues()
+ *
+ * @todo: an additional filter (AND with other filters) on status is absolutely necessary
+ * @nth: to prevent problems, add an additional confirmation step, including a list of
+ *   sources that will be sent (with check boxes?).
  */
 class BatchForm extends Form
 {

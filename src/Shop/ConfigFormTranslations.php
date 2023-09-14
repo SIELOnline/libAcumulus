@@ -268,7 +268,7 @@ Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelli
         'desc_fullName' => 'De volledige naam, meestal opgebouwd uit de voornaam, achternaam en evt. een tussenvoegsel.',
 
         'field_salutation' => 'Volledige aanhef',
-        'desc_salutation' => 'U kunt hier de aanhef specificeren zoals u die wilt gebruiken als u communiceert met deze klant.',
+        'desc_salutation' => 'U kunt hier de aanhef specificeren zoals u die wilt gebruiken als u communiceert met deze klant. Plaats geen komma aan het eind.',
 
         'field_address1' => 'Adresregel 1',
         'field_address2' => 'Adresregel 2',
@@ -743,7 +743,7 @@ Field references are denoted by placing the name of the property between square 
         'desc_fullName' => 'The full name, normally constructed using the first, middle and last name and any pre or suffix. What and how this is stored, depends on the web shop you use.',
 
         'field_salutation' => 'Full salutations',
-        'desc_salutation' => 'Specify the salutations you want to use when communicating with this client.',
+        'desc_salutation' => 'Specify the salutations you want to use when communicating with this client. Do not use a comma at the end.',
 
         'field_address1' => 'Address 1',
         'field_address2' => 'Address 2',

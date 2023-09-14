@@ -260,8 +260,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::VatNumber => '[source::getOrder()::getSource()::get_meta(_billing_eu_vat_number)' // eu-vat-for-woocommerce
                     . '|source::getOrder()::getSource()::get_meta(_billing_vat_number)' // @todo: which plugin?
                     . '|source::getOrder()::getSource()::get_meta(_vat_number)' // @todo: which plugin?
-                    . '|source::getOrder()::getSource()::get_meta(vat_number)' // @todo: which plugin?
-                    . '|source::getOrder()::getSource()::get_meta(Vat Number)]',  // @todo: which plugin?
+                    . '|source::getOrder()::getSource()::get_meta(vat_number)' // EU Vat Assistant
+                    . '|source::getOrder()::getSource()::get_meta(VAT Number)]',  // WooCommerce EU/UK VAT Compliance
                 Fld::Telephone => '[source::getOrder()::getSource()::get_billing_phone()]',
                 Fld::Telephone2 => '[source::getOrder()::getSource()::get_shipping_phone()]',
                 Fld::Email => '[source::getOrder()::getSource()::get_billing_email()]',

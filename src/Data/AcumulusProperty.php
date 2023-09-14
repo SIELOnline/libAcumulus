@@ -151,6 +151,8 @@ class AcumulusProperty
      *   true if the value was actually set, false otherwise.
      *
      * @noinspection PhpFunctionCyclomaticComplexityInspection
+     * @noinspection CallableParameterUseCaseInTypeContextInspection yes, we are juggling
+     *   with types.
      */
     public function setValue($value, int $mode = PropertySet::Always): bool
     {
@@ -196,7 +198,6 @@ class AcumulusProperty
                     $value = $date;
                     break;
                 case 'bool':
-                    /** @noinspection CallableParameterUseCaseInTypeContextInspection */
                     if (!is_bool($value)) {
                         if (!in_array($value, $this->allowedValues, true)) {
                             throw new DomainException("$this->name: not a valid allowed bool value: " . var_export($value, true));

@@ -660,7 +660,7 @@ class ConfigUpgrade
         $result = [];
         foreach ($mappings as $object => $objectMappings) {
             foreach ($objectMappings as $property => $mapping) {
-                $result[] = "$object::$property";
+                $result[] = "$object::$property (was $mapping)";
             }
         }
         return $result;

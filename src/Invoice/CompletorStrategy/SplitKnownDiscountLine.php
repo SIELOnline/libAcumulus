@@ -64,6 +64,9 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     protected int $splitLineKey;
     protected int $splitLineCount;
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection  no-op parent.
+     */
     protected function init(): void
     {
         $this->splitLineCount = 0;
@@ -94,6 +97,9 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
         }
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection  no-op parent.
+     */
     protected function checkPreconditions(): bool
     {
         $result = false;
@@ -122,7 +128,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
             $line[Tag::Product] = "{$line[Tag::Product]} ($vatRate%)";
             $line[Meta::UnitPriceInc] = $discountAmountInc;
             unset($line[Tag::UnitPrice]);
-            $this->completeLine($line, $vatRate);
+            $this->completeLine($line, (float) $vatRate);
         }
         return true;
     }

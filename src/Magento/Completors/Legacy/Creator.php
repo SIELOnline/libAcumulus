@@ -380,7 +380,7 @@ class Creator extends BaseCreator
             // Store discount on this item to be able to get correct discount
             // lines later on in the completion phase.
             $tag = $this->discountIncludesTax() ? Meta::LineDiscountAmountInc : Meta::LineDiscountAmount;
-            $result[$tag] = $item->getBaseDiscountAmount();
+            $result[$tag] = (float) $item->getBaseDiscountAmount();
             $lineVat -= (float) $item->getBaseDiscountTaxCompensationAmount();
             if (Number::isZero($item->getBaseDiscountTaxCompensationAmount())) {
                 // We cannot trust lineVat, so do not add it but as we normally

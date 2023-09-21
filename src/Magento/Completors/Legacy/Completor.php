@@ -66,6 +66,7 @@ class Completor extends BaseCompletor
                 foreach ($invoiceLines as $line) {
                     if ($line[Meta::LineType] === Creator::LineType_Shipping && isset($line[Meta::LineDiscountAmountInc])) {
                         $line[Meta::LineDiscountAmountInc] += $discountLineAmountInc - $discountAmountInc;
+                        $line[Meta::LineDiscountAmountIncCorrected] = true;
                     }
                 }
             }

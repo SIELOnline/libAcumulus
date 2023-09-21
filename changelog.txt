@@ -3,7 +3,7 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.0.2 (2023-09-??) (MA+WC)
+8.0.2 (2023-09-21) (MA+WC)
 --------------------------
 Bugs:
 - WC: Typo in default mapping for field VatNumber: Vat Number instead of VAT Number for

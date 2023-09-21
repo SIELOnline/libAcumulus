@@ -6,7 +6,7 @@ This file contains a historical overview of changes in our own code.
 8.0.2 (2023-09-??) (MA+WC)
 --------------------------
 Bugs:
-- WP: Typo in default mapping for field VatNumber: Vat Number instead of VAT Number for
+- WC: Typo in default mapping for field VatNumber: Vat Number instead of VAT Number for
   WooCommerce EU/UK VAT Compliance plugin.
 - MA 2.4.6: The Zend_Mail framework has been removed in favor of the Laminas mail library.
 - MA: Form values were not set for elements with different id and name (array style name).

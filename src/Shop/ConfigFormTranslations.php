@@ -309,7 +309,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         AddressType::Invoice => 'factuuradres',
         AddressType::Shipping => 'verzendadres',
 
-        'field_countryAutoName' => 'landnaam',
+        'field_countryAutoName' => 'Landnaam',
         'desc_countryAutoName' => 'Geef aan wanneer en hoe de landnaam aan dde factuur toegevoegd moet worden. De land code wordt altijd naar Acumulus verzonden, maar het versturen en tonen van de landnaam is flexibeler. De landnaam kan van Acumulus komen (gebaseerd op de landcode) of van de naam zoals die in de webwinkel is ingevuld kan gebruikt worden. De 2e en 3e opties zijn de aanbevolen opties.',
         'option_countryAutoName_No' => 'Voeg geen landnaam toe aan de factuur.',
         'option_countryAutoName_Yes' => 'Laat Acumulus altijd de (Nederlandstalige) landnaam toevoegen (aanbevolen).',

@@ -20,7 +20,7 @@ System Requirements
       become the minimally required version and older versions WILL fail.
     * Note: due to an error in plugin version 7.2, all PHP versions below 7.4
       will already fail in that plugin version (solved in plugin version 7.3.0)
-    * Note: See the PHP versions table further below. for which PHP version can
+    * Note: See the PHP versions table further below for which PHP version can
       be used for which shop.
 - Database:
     * MySql: 5.6 or later.
@@ -54,7 +54,7 @@ Notes:
 |     |                  | 4.0.7                    | >= 4.0.5                            |
 | JOO | Joomla (+ VM)    | 3.10                     | >= 3.6                              |
 |     |                  | 4.2.7                    | >= 4.2.5                            |
-| WC  | WooCommerce      | 7.1.0                    | >= 5.0 (3 and 4 will probably work) |
+| WC  | WooCommerce      | 7.1.0                    | >= 5.0 (3 and 4 may work)           |
 |     | WordPress        | 6.1.1                    | >= 5.9 (earlier versions WILL fail) |
 
 Supported PHP versions

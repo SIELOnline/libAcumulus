@@ -125,7 +125,11 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
         $this->replacingLines = [];
         foreach ($this->discountsPerVatRate as $vatRate => $discountAmountInc) {
             $line = $this->splitLine;
-            $line[Tag::Product] = "{$line[Tag::Product]} ($vatRate%)";
+            if (count($this->discountsPerVatRate) > 1) {
+                $vatName = $this->t('vat');
+                $vatRateStripped = rtrim($vatRate, '.0');
+                $line[Tag::Product] = "{$line[Tag::Product]} ($vatRateStripped% $vatName)";
+            }
             $line[Meta::UnitPriceInc] = $discountAmountInc;
             unset($line[Tag::UnitPrice]);
             $this->completeLine($line, (float) $vatRate);

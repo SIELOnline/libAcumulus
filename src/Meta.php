@@ -239,6 +239,7 @@ interface Meta
      * line (used by the SplitKnownDiscountLine strategy, Magento only).
      */
     public const LineDiscountAmountInc = 'meta-line-discount-amountinc';
+    public const LineDiscountAmountIncCorrected = 'meta-line-discount-amountinc-corrected';
     /**
      * Creator -> Strategy: the discount vat amount that was applied to this
      * line (used by the SplitKnownDiscountLine strategy, Magento only).

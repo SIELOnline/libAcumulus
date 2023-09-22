@@ -119,7 +119,7 @@ abstract class OcHelper
         $isAlreadyInstalled = count($setting) > 0;
 
         if ($isAlreadyInstalled) {
-            // Config already exists:this is not a clean install: upgrade.
+            // Config already exists: this is not a clean install: upgrade.
             $result = $this->doUpgrade();
         } else {
             // Call the actual install method.

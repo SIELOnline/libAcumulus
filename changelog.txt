@@ -3,6 +3,12 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.0.3 (2023-10-??) (JOO)
+------------------------
+Refactorings:
+- JOO: Implemented the new "collect-complete architecture" for VirtueMart and HikaShop.
+
+
 8.0.2 (2023-09-21) (MA+WC)
 --------------------------
 Bugs:

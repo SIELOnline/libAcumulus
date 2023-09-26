@@ -28,4 +28,9 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         }
         return parent::getLink($linkType);
     }
+
+    public function usesNewCode(): bool
+    {
+        return true;
+    }
 }

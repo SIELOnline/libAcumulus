@@ -27,7 +27,7 @@ class Event implements EventInterface
     {
         $this->getEventManager()->dispatch(
             'acumulus_invoice_collect_after',
-            ['source' => $invoiceSource, 'localResult' => $localResult]
+            ['invoice' => $invoice, 'source' => $invoiceSource, 'localResult' => $localResult]
         );
     }
 

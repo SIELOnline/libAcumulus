@@ -19,7 +19,7 @@ interface Event
      * This event allows you to:
      * - Prevent the invoice from being created and sent at all. To do so,
      *   change the send status using {@see InvoiceAddResult::setSendStatus()}
-     *   on the $result parameter.
+     *   on the $localResult parameter.
      * - Inject custom behaviour before the invoice is created (collected and
      *   completed) and sent.
      *
@@ -41,14 +41,14 @@ interface Event
      *   this library is running in.
      * - Prevent the invoice from being completed and sent. To do so, change the
      *   send status using {@see InvoiceAddResult::setSendStatus()} on the
-     *   $result parameter.
+     *   $localResult parameter.
      * - Inject custom behaviour after the invoice has been created (collected),
      *   but before it is completed and sent.
      *
      * @param \Siel\Acumulus\Data\Invoice $invoice
      *   The invoice that has been collected.
      * @param Source $invoiceSource
-     *   The source object (order, credit note) for which the invoice was created.
+     *   The source object (order, credit note) for which the invoice is created.
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *   Contains any earlier generated messages and the initial send status.
      *   You can add your own messages and/or change the send status.

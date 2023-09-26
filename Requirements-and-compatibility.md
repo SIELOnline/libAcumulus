@@ -45,7 +45,7 @@ Notes:
 |-----|------------------|--------------------------|-------------------------------------|
 | ALL | All web shops.   |                          |                                     |
 | HS  | HikaShop (JOO)   | 4.7.1 (starter)          | >= 3.0.0                            |
-| JOO | Joomla (+ HS)    | 4.2.7                    | >= 3.6                              |
+| JOO | Joomla (+ HS)    | 4.3.4                    | >= 3.6                              |
 | MA  | Magento          | 2.4.6 (community)        | >= 2.4, 2.3 might still work        |
 | OC  | OpenCart         | 3.0.3.7                  | >= 3.0                              |
 |     |                  | 4.x.y.z                  | Not yet tested/supported            |
@@ -53,7 +53,7 @@ Notes:
 | VM  | VirtueMart (JOO) | 3                        | >= 3.0                              |
 |     |                  | 4.0.7                    | >= 4.0.5                            |
 | JOO | Joomla (+ VM)    | 3.10                     | >= 3.6                              |
-|     |                  | 4.2.7                    | >= 4.2.5                            |
+|     |                  | 4.3.4                    | >= 4.2.5                            |
 | WC  | WooCommerce      | 7.1.0                    | >= 5.0 (3 and 4 may work)           |
 |     | WordPress        | 6.1.1                    | >= 5.9 (earlier versions WILL fail) |
 

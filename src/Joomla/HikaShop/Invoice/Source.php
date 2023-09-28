@@ -23,9 +23,9 @@ class Source extends BaseSource
     /**
      * Loads an Order source for the set id.
      *
-     * @noinspection PhpUnused  Called via setShopSource().
+     * @noinspection PhpUnused  Called via setSource().
      */
-    protected function setShopSourceOrder(): void
+    protected function setSourceOrder(): void
     {
         /** @var hikashopOrderClass $class */
         $class = hikashop_get('class.order');

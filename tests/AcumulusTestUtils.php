@@ -8,7 +8,9 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests;
 
 use DateTime;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Translations;
 
 use function in_array;
@@ -63,6 +65,33 @@ trait AcumulusTestUtils
     }
 
     /**
+     * Tests the Creation process, i.e. collecting and completing an
+     * {@see \Siel\Acumulus\Data\Invoice}.
+     *
+     * @throws \JsonException
+     */
+    protected function _testCreate(string $dataPath, string $type, int $id, array $excludeFields = []): void
+    {
+        $invoiceSource = $this->getAcumulusContainer()->createSource($type, $id);
+        $invoiceAddResult = $this->getAcumulusContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = $this->getAcumulusContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $result = $invoice->toArray();
+        // Get order from Order{id}.json.
+        $expected = $this->getTestSource($dataPath, $type, $id);
+        if ($expected !== null) {
+            // Save order to Order{id}.latest.json, so we can compare differences ourselves.
+            $this->saveTestSource($dataPath, $type, $id, false, $result);
+            $this->assertCount(1, $result);
+            $this->assertArrayHasKey(Fld::Customer, $result);
+            $this->compareAcumulusObjects($expected[Fld::Customer], $result[Fld::Customer], Fld::Customer, $excludeFields);
+        } else {
+            // File does not yet exist: first time for a new test order: save order to Order{id}.json.
+            // Will raise a warning that no asserts have been executed.
+            $this->saveTestSource($dataPath, $type, $id, true, $result);
+        }
+    }
+
+    /**
      * Asserts that 2 Acumulus objects are equal.
      *
      * @param array $expected
@@ -101,5 +130,37 @@ trait AcumulusTestUtils
                 }
             }
         }
+    }
+
+    /**
+     * Returns test data, typically a created and completed invoice converted to an array.
+     *
+     * @return mixed|null
+     *   The json decoded testdata, or null if the file does not yet exist.
+     *
+     * @throws \JsonException
+     */
+    protected function getTestSource(string $path, string $type, int $id)
+    {
+        $filename = "$path/$type$id.json";
+        if (!is_readable($filename)) {
+            return null;
+        }
+        $json = file_get_contents($filename);
+        return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * Saves test data, typically a created and completed invoice converted to an array.
+     *
+     * @param mixed $data
+     *   The data to be saved (in json format).
+     */
+    protected function saveTestSource(string $path, string $type, int $id, bool $isNew, $data): void
+    {
+        $append = $isNew ? '' : '.latest';
+        $filename = "$path/$type$id$append.json";
+        /** @noinspection JsonEncodingApiUsageInspection  false positive */
+        file_put_contents($filename, json_encode($data, Log::JsonFlags));
     }
 }

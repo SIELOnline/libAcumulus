@@ -9,7 +9,6 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
-use Siel\Acumulus\Meta;
 use stdClass;
 
 use function in_array;

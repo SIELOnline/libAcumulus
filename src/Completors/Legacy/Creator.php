@@ -55,6 +55,8 @@ abstract class Creator
     public const VatRateSource_Parent = 'parent';
     public const VatRateSource_Child = 'child';
     public const VatRateSource_Strategy = 'strategy';
+    public const VatRateSource_Creator_Lookup = 'creator-lookup';
+    public const VatRateSource_Creator_Missing_Amount = 'creator-missing-amount';
 
     public const LineType_OrderItem = 'order-item';
     public const LineType_Shipping = 'shipping';
@@ -329,13 +331,13 @@ abstract class Creator
 
         $line = $this->getPaymentFeeLine();
         if ($line) {
-            $line = $this->addLineType($line,static::LineType_PaymentFee);
+            $line = $this->addLineType($line, static::LineType_PaymentFee);
             $result[] = $line;
         }
 
         $line = $this->getGiftWrappingLine();
         if ($line) {
-            $line = $this->addLineType($line,static::LineType_GiftWrapping);
+            $line = $this->addLineType($line, static::LineType_GiftWrapping);
             $result[] = $line;
         }
 
@@ -599,7 +601,7 @@ abstract class Creator
      *   is an exact vat rate, not a vat range.
      *
      * @param float $numerator
-          *   The amount of VAT as received from the web shop.
+     *   The amount of VAT as received from the web shop.
      * @param float $denominator
      *   The price of a product excluding VAT as received from the web shop.
      * @param float $numeratorPrecision

@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\HikaShop\Config;
 
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
+use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Meta;
 
 /**
  * Defines the HikaShop web shop specific capabilities.
@@ -166,6 +173,69 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
+    public function getDefaultShopMappings(): array
+    {
+        return [
+            DataType::Invoice => [
+                // @todo: fields that come from the Order or its metadata, because, if it
+                //   comes from Source, it is not shop specific.
+            ],
+            DataType::Customer => [
+                // Customer defaults.
+                Fld::ContactYourId => '[source::getSource()::order_user_id]',
+                Fld::VatNumber =>
+                    '[source::getSource()::billing_address::address_vat|source::getSource()::shipping_address::address_vat]',
+                Fld::Telephone =>
+                    '[source::getSource()::billing_address::address_telephone' .
+                    '|source::getSource()::billing_address::address_telephone2' .
+                    '|source::getSource()::shipping_address::address_telephone' .
+                    '|source::getSource()::shipping_address::address_telephone2]',
+                Fld::Telephone2 =>
+                    '[source::getSource()::shipping_address::address_telephone2' .
+                    '|source::getSource()::shipping_address::address_telephone' .
+                    '|source::getSource()::billing_address::address_telephone2' .
+                    '|source::getSource()::billing_address::address_telephone]',
+                Fld::Email => '[source::getSource()::customer::user_email|source::getSource()::customer::email]',
+            ],
+            AddressType::Invoice => [
+                Fld::CompanyName1 => '[source::getSource()::billing_address::address_company]',
+                Fld::FullName =>
+                    '[source::getSource()::billing_address::address_firstname' .
+                    '+source::getSource()::billing_address::address_middle_name' .
+                    '+source::getSource()::billing_address::address_lastname' .
+                    '|source::getSource()::customer::name]',
+                Fld::Address1 => '[source::getSource()::billing_address::address_street1]',
+                Fld::Address2 => '[source::getSource()::billing_address::address_street2]',
+                Fld::PostalCode => '[source::getSource()::billing_address::address_postcode]',
+                Fld::City => '[source::getSource()::billing_address::address_city]',
+                Fld::CountryCode => '[source::getSource()::billing_address::address_country_code_2]',
+                Meta::ShopCountryName => '[source::getSource()::shipping_address::address_country_name]',
+            ],
+            AddressType::Shipping => [
+                Fld::CompanyName1 => '[source::getSource()::shipping_address::address_company]',
+                Fld::FullName =>
+                    '[source::getSource()::shipping_address::address_firstname' .
+                    '+source::getSource()::shipping_address::address_middle_name' .
+                    '+source::getSource()::shipping_address::address_lastname' .
+                    '|source::getSource()::customer::name]',
+                Fld::Address1 => '[source::getSource()::shipping_address::address_street1]',
+                Fld::Address2 => '[source::getSource()::shipping_address::address_street2]',
+                Fld::PostalCode => '[source::getSource()::shipping_address::address_postcode]',
+                Fld::City => '[source::getSource()::shipping_address::address_city]',
+                Fld::CountryCode => '[source::getSource()::shipping_address::address_country_code_2]',
+                Meta::ShopCountryName => '[source::getSource()::shipping_address::address_country_name_english]',
+            ],
+            EmailAsPdfType::Invoice => [
+                Fld::EmailTo => '[source::getSource()::customer::user_email|source::getSource()::customer::email]',
+            ],
+            LineType::Item => [
+                // @todo: complete when we start converting lines to using collectors.
+                Fld::ItemNumber => '[product::order_product_code]',
+                Fld::Product => '[item::order_product_name]',
+            ],
+        ];
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -243,11 +313,24 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getLink(string $linkType): string
     {
         switch ($linkType) {
+            case 'fiscal-address-setting':
+                return Route::_('index.php?option=com_hikashop&ctrl=config#main_tax');
             case 'pro-support-image':
                 return Uri::root(true) . '/administrator/components/com_acumulus/media/pro-support-hikashop.png';
             case 'pro-support-link':
                 return 'https://pay.siel.nl/?p=b5TeLbPw6BtNXRioORwnUtNbpU3yhUAgXLuuEMgk5zcttHbU';
         }
         return parent::getLink($linkType);
+    }
+
+    public function getFiscalAddressSetting(): string
+    {
+        return 'tax_zone_type';
+    }
+
+    public function usesNewCode(): bool
+    {
+        //return false; // Emergency revert: remove the // at the beginning of this line!
+        return true;
     }
 }

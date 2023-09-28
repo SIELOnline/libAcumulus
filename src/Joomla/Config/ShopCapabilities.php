@@ -18,6 +18,8 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         switch ($linkType) {
             case 'register':
             case 'activate':
+            case 'settings':
+            case 'mappings':
             case 'config':
             case 'advanced':
             case 'batch':
@@ -27,10 +29,5 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
                 return Uri::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg';
         }
         return parent::getLink($linkType);
-    }
-
-    public function usesNewCode(): bool
-    {
-        return true;
     }
 }

@@ -19,7 +19,7 @@ class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
         parent::collectLogicFields($acumulusObject);
-        $taxBasedOn = get_option('woocommerce_tax_based_on');
+        $taxBasedOn = $this->getVatBasedOn();
         $acumulusObject->metadataSet(Meta::VatBasedOnShop, $taxBasedOn);
         $taxBasedOnMapping = [
             'shipping' => AddressType::Shipping,
@@ -27,5 +27,14 @@ class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
             'base' => null,
         ];
         $acumulusObject->setMainAddress($taxBasedOnMapping[$taxBasedOn] ?? null);
+    }
+
+    /**
+     * Returns the value of the setting indicating which address is used for tax
+     * calculations.
+     */
+    protected function getVatBasedOn(): string
+    {
+        return get_option($this->getContainer()->getShopCapabilities()->getFiscalAddressSetting());
     }
 }

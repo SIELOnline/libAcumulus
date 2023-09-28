@@ -298,6 +298,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
         ];
     }
+
     public function getShopOrderStatuses(): array
     {
         $result = [];

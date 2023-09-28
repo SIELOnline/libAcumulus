@@ -5,6 +5,11 @@ This file contains a historical overview of changes in our own code.
 
 8.0.3 (2023-10-??) (JOO)
 ------------------------
+Bugs:
+- JOO: Message on uninstall: com_acumulusInstallerScript::preflight(): Argument #2
+  ($parent) must be of type Joomla\CMS\Installer\Adapter\ComponentAdapter,
+  Joomla\CMS\Installer\Adapter\PluginAdapter given.
+
 Refactorings:
 - JOO: Implemented the new "collect-complete architecture" for VirtueMart and HikaShop.
 

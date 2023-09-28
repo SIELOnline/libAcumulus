@@ -27,13 +27,8 @@ class Log
      * messages.
      * See {@see \Siel\Acumulus\Meta::JsonFlags} and {@see Util::JsonFlags}.
      */
-    public const JsonFlagsKeepType = JSON_UNESCAPED_SLASHES |
-        JSON_UNESCAPED_UNICODE |
-        JSON_THROW_ON_ERROR |
-        JSON_PRESERVE_ZERO_FRACTION |
-        JSON_PRETTY_PRINT;
-    public const JsonFlags = Log::JsonFlagsKeepType |
-        JSON_NUMERIC_CHECK;
+    public const JsonFlagsKeepType = Util::JsonFlags | JSON_PRESERVE_ZERO_FRACTION | JSON_PRETTY_PRINT;
+    public const JsonFlags = Log::JsonFlagsKeepType | JSON_NUMERIC_CHECK;
 
     protected int $logLevel = Severity::Info;
     protected string $libraryVersion;
@@ -96,7 +91,6 @@ class Log
     protected function addLoggedMessage(int $severity, string $message, string $format, array $values): void
     {
         $this->loggedMessages[] = compact('message', 'severity', 'format', 'values');
-
     }
 
     protected function hasBeenLogged(string $message): bool
@@ -169,7 +163,7 @@ class Log
      * @return string
      *   The formatted message whether it got logged or not.
      */
-    public function success(string $message, ... $values): string
+    public function success(string $message, ...$values): string
     {
         return $this->log(Severity::Success, $message, $values);
     }
@@ -186,7 +180,7 @@ class Log
      * @return string
      *   The formatted message whether it got logged or not.
      */
-    public function info(string $message, ... $values): string
+    public function info(string $message, ...$values): string
     {
         return $this->log(Severity::Info, $message, $values);
     }
@@ -203,7 +197,7 @@ class Log
      * @return string
      *   The formatted message whether it got logged or not.
      */
-    public function notice(string $message, ... $values): string
+    public function notice(string $message, ...$values): string
     {
         return $this->log(Severity::Notice, $message, $values);
     }
@@ -220,7 +214,7 @@ class Log
      * @return string
      *   The formatted message whether it got logged or not.
      */
-    public function warning(string $message, ... $values): string
+    public function warning(string $message, ...$values): string
     {
         return $this->log(Severity::Warning, $message, $values);
     }
@@ -237,7 +231,7 @@ class Log
      * @return string
      *   The formatted message whether it got logged or not.
      */
-    public function error(string $message, ... $values): string
+    public function error(string $message, ...$values): string
     {
         return $this->log(Severity::Error, $message, $values);
     }

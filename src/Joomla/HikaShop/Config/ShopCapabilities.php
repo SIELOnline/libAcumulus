@@ -209,7 +209,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::PostalCode => '[source::getSource()::billing_address::address_postcode]',
                 Fld::City => '[source::getSource()::billing_address::address_city]',
                 Fld::CountryCode => '[source::getSource()::billing_address::address_country_code_2]',
-                Meta::ShopCountryName => '[source::getSource()::shipping_address::address_country_name]',
+                Meta::ShopCountryName => '[source::getSource()::billing_address::address_country_name]',
             ],
             AddressType::Shipping => [
                 Fld::CompanyName1 => '[source::getSource()::shipping_address::address_company]',

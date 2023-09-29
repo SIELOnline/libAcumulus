@@ -850,7 +850,7 @@ class Completor
                 // Exactly 1 vat type was found to be possible for all lines:
                 // use that one as the vat type for the invoice.
                 $invoice[Tag::VatType] = reset($vatTypeInfo['intersection']);
-                $invoice[Meta::VatTypeSource] = 'Completor::completeVatType: Only one choice fits all';
+                $invoice[Meta::VatTypeSource] = 'Completor::completeVatType: Only 1 choice fits all';
             } else {
                 // Multiple vat types were found to be possible for all lines:
                 // Guess which one to take or add a warning.

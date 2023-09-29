@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests;
 
 use DateTime;
+use PHPUnit\Framework\ExpectationFailedException;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
@@ -83,7 +84,10 @@ trait AcumulusTestUtils
             $this->saveTestSource($dataPath, $type, $id, false, $result);
             $this->assertCount(1, $result);
             $this->assertArrayHasKey(Fld::Customer, $result);
-            $this->compareAcumulusObjects($expected[Fld::Customer], $result[Fld::Customer], Fld::Customer, $excludeFields);
+            $messages = [];
+            $this->compareAcumulusObjects($expected[Fld::Customer], $result[Fld::Customer], Fld::Customer, $excludeFields, $messages);
+            /** @noinspection JsonEncodingApiUsageInspection  false positive */
+            $this->assertCount(0, $messages, json_encode($messages, Log::JsonFlagsKeepType));
         } else {
             // File does not yet exist: first time for a new test order: save order to Order{id}.json.
             // Will raise a warning that no asserts have been executed.
@@ -104,30 +108,48 @@ trait AcumulusTestUtils
      *   The name of the (sub)object, e.g. 'invoice', or 'line'.
      * @param array $excludeFields
      *   A, possibly empty, list of fields to exclude in the comparison.
+     *
+     * @todo: collect errors an return as 1 failure.
      */
-    protected function compareAcumulusObjects(array $expected, array $object, string $objectName, array $excludeFields): void
-    {
+    protected function compareAcumulusObjects(
+        array $expected,
+        array $object,
+        string $objectName,
+        array $excludeFields,
+        array &$messages
+    ):
+    void {
         foreach ($expected as $field => $value) {
-            if (!in_array($field, $excludeFields, true)) {
-                $this->assertArrayHasKey($field, $object);
-                switch ($field) {
-                    case 'invoice':
-                    case 'emailAsPdf':
-                        $this->compareAcumulusObjects($value, $object[$field], $field, $excludeFields);
-                        break;
-                    case 'line':
-                        foreach ($value as $index => $line) {
-                            $this->compareAcumulusObjects($line, $object[$field][$index], $field, $excludeFields);
-                        }
-                        break;
-                    default:
-                        if (is_float($value)) {
-                            $this->assertEqualsWithDelta($value, $object[$field], 0.005);
-                        } else {
-                            $this->assertSame($value, $object[$field], "$objectName::$field");
-                        }
-                        break;
+            try {
+                if (!in_array($field, $excludeFields, true)) {
+                    $this->assertArrayHasKey($field, $object, $objectName);
+                    switch ($field) {
+                        case 'invoice':
+                        case 'emailAsPdf':
+                            $this->compareAcumulusObjects($value, $object[$field], "$objectName::$field", $excludeFields, $messages);
+                            break;
+                        case 'line':
+                            foreach ($value as $index => $line) {
+                                $this->compareAcumulusObjects(
+                                    $line,
+                                    $object[$field][$index],
+                                    "$objectName::{$field}[$index]",
+                                    $excludeFields,
+                                    $messages
+                                );
+                            }
+                            break;
+                        default:
+                            if (is_float($value)) {
+                                $this->assertEqualsWithDelta($value, $object[$field], 0.005, "$objectName::$field");
+                            } else {
+                                $this->assertSame($value, $object[$field], "$objectName::$field");
+                            }
+                            break;
+                    }
                 }
+            } catch (ExpectationFailedException $e) {
+                $messages[] = $e->getMessage();
             }
         }
     }
@@ -161,6 +183,6 @@ trait AcumulusTestUtils
         $append = $isNew ? '' : '.latest';
         $filename = "$path/$type$id$append.json";
         /** @noinspection JsonEncodingApiUsageInspection  false positive */
-        file_put_contents($filename, json_encode($data, Log::JsonFlags));
+        file_put_contents($filename, json_encode($data, Log::JsonFlagsKeepType));
     }
 }

@@ -74,16 +74,16 @@ Notes:
   already require a newer version than the shop does. This table cannot keep
   track of that.
 
-| Tag | Shop Version      | 7.4 | 8.0 | 8.1 | 8.2 | Remarks                     |
-|-----|-------------------|-----|-----|-----|-----|-----------------------------|
-| JOO | 3.10.x            | ✅ | ❌ | ❌ | ❌ | Many warnings on PHP 8.1       |
-| JOO | 4.2.8             | ❌ | ✅ | ✅ | ❓ | Will warn not to use PHP 7.4   |
-| HS  | 4.7.1 (starter)   | ✅ | ✅ | ✅ | ❓ |                                |
-| MA  | 2.4.6 (community) | ❌ | ❌ | ✅ | ✅ | Contains PHP 8 constructs      |
-| OC  | 3.0.3.7           | ✅ | ✅ | ❌ | ❌ | Many warnings on PHP 8.1       |
-|     | 4.x.y.z           | ❌ | ✅ | ✅ | ❓ | Not yet supported              |
-| PS  | 1.7.8.7           | ✅ | ❌ | ❌ | ❌ | Fatal runtime errors on PHP 8  |
-|     | 8.0.1             | ✅ | ✅ | ✅ | ❓ | Warnings get logged on PHP 8.1 |
-| VM  | 3.x.y             | ✅ | ❌ | ❌ | ❌ |                                |
-|     | 4.0.4             | ✅ | ✅ | ✅ | ❓ |                                |
-| WC  | 7.1.0             | ✅ | ✅ | ❓ | ❌ |Many warnings from other plugins|
+| Tag | Shop Version      | 7.4 | 8.0 | 8.1 | 8.2 | Remarks                               |
+|-----|-------------------|-----|-----|-----|-----|---------------------------------------|
+| JOO | 3.10.x            | ✅ | ❌ | ❌ | ❌ | Many warnings on PHP 8.1              |
+| JOO | 4.2.8             | ❌ | ✅ | ✅ | ❓ | Will warn not to use PHP 7.4          |
+| HS  | 4.7.1 (starter)   | ✅ | ✅ | ✅ | ❓ |                                       |
+| MA  | 2.4.6 (community) | ❌ | ❌ | ✅ | ✅ | Contains PHP 8 constructs             |
+| OC  | 3.0.3.7           | ✅ | ✅ | ❌ | ❌ | Many warnings on PHP 8.1              |
+|     | 4.x.y.z           | ❌ | ✅ | ✅ | ❓ | Not yet supported                     |
+| PS  | 1.7.8.7           | ✅ | ❌ | ❌ | ❌ | Fatal runtime errors on PHP 8         |
+|     | 8.0.1             | ✅ | ✅ | ✅ | ❓ | Warnings get logged on PHP 8.1        |
+| VM  | 3.x.y             | ✅ | ❌ | ❌ | ❌ |                                       |
+|     | 4.2.0             | ✅ | ✅ | ✅ | ❓ | VM 4.2 still produces warnings on 8.1 |
+| WC  | 7.1.0             | ✅ | ✅ | ❓ | ❌ | Many warnings from other plugins      |

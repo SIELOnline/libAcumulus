@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpMissingParentCallCommonInspection  Most parent methods are base/no-op implementations.
+ */
 
 declare(strict_types=1);
 

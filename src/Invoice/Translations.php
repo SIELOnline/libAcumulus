@@ -39,7 +39,7 @@ class Translations extends TranslationCollection
         // @nth: try to better distinguish free shipping and pickup: for now only WC, HS, and PS do so
         'free_shipping' => 'Gratis verzending',
         'pickup' => 'Afhalen',
-        'payment_costs' => 'Betalingskosten',
+        'payment_costs' => 'Betaalkosten',
         'discount' => 'Korting',
         'discount_code' => 'Kortingscode',
         'coupon_code' => 'Cadeaubon',

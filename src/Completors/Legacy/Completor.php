@@ -1185,6 +1185,9 @@ class Completor
      *   invoice targets a vat exempt company: the company is EU (outside NL)
      *   and the invoice type is not EU reversed and the invoice is not vat-free
      *   as vat-free trumps reversed vat.
+     *
+     * @todo: Convert to a {@see \Siel\Acumulus\Completors\CompletorTaskInterface} and use
+     *   the fiscal address
      */
     protected function completeVatTypeId(): void
     {

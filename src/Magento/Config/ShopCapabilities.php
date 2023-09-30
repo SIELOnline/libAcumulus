@@ -1,7 +1,6 @@
 <?php
 /**
- * @noinspection PhpMissingParentCallCommonInspection
- *   Most parent methods are empty return fallback methods.
+ * @noinspection PhpMissingParentCallCommonInspection  Most parent methods are base/no-op implementations.
  */
 
 declare(strict_types=1);

@@ -2,6 +2,7 @@
 /**
  * Not all constants may have actual usages, in that case they are here for
  * completeness and future use/auto-completion.
+ *
  * @noinspection PhpUnused
  */
 
@@ -15,7 +16,7 @@ namespace Siel\Acumulus;
  * Metadata can be added to the Acumulus invoice structure for reasons of
  * support or to pass additional information from the creator phase to the
  * completor phase. In the latter case, some metadata is expected to be present
- * though perhaps only under certainc onditions,  e.g. when a vat rate is
+ * though perhaps only under certain conditions,  e.g. when a vat rate is
  * missing.
  *
  * Meta tags start with 'meta-', except the tags 'unitpriceinc' and 'vatamount',
@@ -26,16 +27,11 @@ namespace Siel\Acumulus;
 interface Meta
 {
     /**
-     * Enhanced set of json_encode flags we use to improve readability of
-     * metadata in xml messages.
-     * See {@see \Siel\Acumulus\Helpers\Log::JsonFlags} and
-     * {@see \Siel\Acumulus\Helpers\Util::JsonFlags}.
+     * Set of json_encode flags we use to improve readability of metadata in xml messages.
+     * Also see {@see \Siel\Acumulus\Helpers\Log::JsonFlags}.
      */
-    public const JsonFlags = JSON_UNESCAPED_SLASHES |
-        JSON_UNESCAPED_UNICODE |
-        JSON_THROW_ON_ERROR |
-        JSON_NUMERIC_CHECK |
-        JSON_PRESERVE_ZERO_FRACTION;
+    public const JsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION;
+    public const JsonFlagsLooseType = Meta::JsonFlags | JSON_NUMERIC_CHECK;
 
     // Tags that may be used on multiple levels.
     /**
@@ -60,13 +56,10 @@ interface Meta
     public const Notice = 'meta-notice';
     public const Info = 'meta-info';
 
-    // Shop settings.
-    // @todo: why is this added to Customer, looks like shop settings (like this
-    //   one and "prices include vat") should be on Invoice.
-    public const VatBasedOnShop = 'meta-vat-based-on-shop';
-    public const MainAddress = 'meta-main-address';
-
     // Customer + addresses:
+    public const MainAddress = 'meta-main-address';
+    public const ShopVatBasedOn = 'meta-shop-vat-based-on';
+    public const ShopCountryId = 'meta-shop-country-code';
     public const ShopCountryName = 'meta-shop-country-name';
     /**
      * An {@see \Siel\Acumulus\Data\Address} object itself does not know which

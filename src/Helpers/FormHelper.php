@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Helpers;
 
+use Siel\Acumulus\Meta;
 use stdClass;
 
 use function is_array;
@@ -119,7 +120,7 @@ class FormHelper
         $this->setMeta($this->constructFieldMeta($fields));
         $metaField = [
             'type' => 'hidden',
-            'value' => json_encode($this->getMeta(), Util::JsonFlags),
+            'value' => json_encode($this->getMeta(), Meta::JsonFlags),
         ];
         foreach ($fields as &$field) {
             if (isset($field['fields'])) {

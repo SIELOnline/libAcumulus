@@ -8,6 +8,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Table\Extension;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 use Siel\Acumulus\Helpers\Util;
+use Siel\Acumulus\Meta;
 
 /**
  * Implements the connection to the Joomla config component.
@@ -28,7 +29,7 @@ class ConfigStore extends BaSeConfigStore
         /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
         $extensionTable = new Extension(Factory::getDbo());
         $extensionTable->load(['element' => 'com_acumulus']);
-        $extensionTable->set('custom_data', json_encode($values, JSON_FORCE_OBJECT | Util::JsonFlags));
+        $extensionTable->set('custom_data', json_encode($values, Meta::JsonFlags | JSON_FORCE_OBJECT));
         return $extensionTable->store();
     }
 }

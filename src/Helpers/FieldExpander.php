@@ -10,6 +10,8 @@ namespace Siel\Acumulus\Helpers;
 
 use Exception;
 
+use Siel\Acumulus\Meta;
+
 use function array_key_exists;
 use function call_user_func_array;
 use function count;
@@ -697,7 +699,7 @@ class FieldExpander
                 $value = (string) $value;
             } else {
                 // object without a _toString().
-                $value = (string) json_encode($value, Util::JsonFlags);
+                $value = (string) json_encode($value, Meta::JsonFlagsLooseType);
             }
         } catch (Exception $e) {
             $this->log->exception($e);

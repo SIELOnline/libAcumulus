@@ -258,7 +258,7 @@ abstract class OcHelper
         }
         // Send the output.
         $this->registry->response->addHeader('Content-Type: application/json;charset=utf-8');
-        $this->registry->response->setOutput(json_encode(['content' => $this->outputForm(true)], Util::JsonFlags));
+        $this->registry->response->setOutput(json_encode(['content' => $this->outputForm(true)], Meta::JsonFlags));
     }
 
     /**

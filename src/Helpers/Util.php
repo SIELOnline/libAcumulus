@@ -15,6 +15,8 @@ use RuntimeException;
 use SensitiveParameter;
 use Siel\Acumulus\ApiClient\AcumulusException;
 
+use Siel\Acumulus\Meta;
+
 use function is_array;
 use function is_bool;
 use function is_int;
@@ -34,13 +36,6 @@ use function strlen;
  */
 class Util
 {
-    /**
-     * Minimal set of json_encode flags we use. For logging and metadata logging
-     * we use even more flags that enhance human readability.
-     * See {@see Log::JsonFlags} and {@see \Siel\Acumulus\Meta::JsonFlags}.
-     */
-    public const JsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
-
     /**
      * Converts a keyed, optionally multi-level, array to XML.
      *
@@ -184,7 +179,7 @@ class Util
         if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
             throw new AcumulusException('Not an object or array');
         }
-        $result = json_encode($objectOrArray, static::JsonFlags);
+        $result = json_encode($objectOrArray, Meta::JsonFlags);
         if (!$result) {
             $this->raiseJsonError();
         }

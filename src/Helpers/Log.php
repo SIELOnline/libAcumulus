@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Helpers;
 
+use Siel\Acumulus\Meta;
 use Throwable;
 
 use function count;
@@ -23,12 +24,12 @@ use function get_class;
 class Log
 {
     /**
-     * Enhanced set of json_encode flags we use to improve readability of log
-     * messages.
-     * See {@see \Siel\Acumulus\Meta::JsonFlags} and {@see Util::JsonFlags}.
+     * Set of json_encode flags we use to improve readability of log messages. See
+     * {@see \Siel\Acumulus\Meta::JsonFlags} and
+     * {@see \Siel\Acumulus\Meta::JsonFlagsLooseType}.
      */
-    public const JsonFlagsKeepType = Util::JsonFlags | JSON_PRESERVE_ZERO_FRACTION | JSON_PRETTY_PRINT;
-    public const JsonFlags = Log::JsonFlagsKeepType | JSON_NUMERIC_CHECK;
+    public const JsonFlags = Meta::JsonFlags | JSON_PRETTY_PRINT;
+    public const JsonFlagsLooseType = Meta::JsonFlagsLooseType | JSON_PRETTY_PRINT;
 
     protected int $logLevel = Severity::Info;
     protected string $libraryVersion;

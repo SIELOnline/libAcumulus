@@ -87,7 +87,7 @@ trait AcumulusTestUtils
             $messages = [];
             $this->compareAcumulusObjects($expected[Fld::Customer], $result[Fld::Customer], Fld::Customer, $excludeFields, $messages);
             /** @noinspection JsonEncodingApiUsageInspection  false positive */
-            $this->assertCount(0, $messages, json_encode($messages, Log::JsonFlagsKeepType));
+            $this->assertCount(0, $messages, json_encode($messages, Log::JsonFlags));
         } else {
             // File does not yet exist: first time for a new test order: save order to Order{id}.json.
             // Will raise a warning that no asserts have been executed.
@@ -183,6 +183,6 @@ trait AcumulusTestUtils
         $append = $isNew ? '' : '.latest';
         $filename = "$path/$type$id$append.json";
         /** @noinspection JsonEncodingApiUsageInspection  false positive */
-        file_put_contents($filename, json_encode($data, Log::JsonFlagsKeepType));
+        file_put_contents($filename, json_encode($data, Log::JsonFlags));
     }
 }

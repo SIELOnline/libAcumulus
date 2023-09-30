@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpMissingParentCallCommonInspection  Most parent methods are base/no-op implementations.
+ */
 
 declare(strict_types=1);
 
@@ -183,18 +186,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
             DataType::Customer => [
                 // Customer defaults.
                 Fld::ContactYourId => '[source::getSource()::order_user_id]',
-                Fld::VatNumber =>
-                    '[source::getSource()::billing_address::address_vat|source::getSource()::shipping_address::address_vat]',
+                Fld::VatNumber => '[source::getSource()::billing_address::address_vat|source::getSource()::shipping_address::address_vat]',
                 Fld::Telephone =>
-                    '[source::getSource()::billing_address::address_telephone' .
-                    '|source::getSource()::billing_address::address_telephone2' .
-                    '|source::getSource()::shipping_address::address_telephone' .
-                    '|source::getSource()::shipping_address::address_telephone2]',
+                    '[source::getSource()::billing_address::address_telephone|source::getSource()::shipping_address::address_telephone]',
                 Fld::Telephone2 =>
-                    '[source::getSource()::shipping_address::address_telephone2' .
-                    '|source::getSource()::shipping_address::address_telephone' .
-                    '|source::getSource()::billing_address::address_telephone2' .
-                    '|source::getSource()::billing_address::address_telephone]',
+                    '[source::getSource()::billing_address::address_telephone2|source::getSource()::shipping_address::address_telephone2]',
+                Fld::Fax => '[source::getSource()::billing_address::address_fax|source::getSource()::shipping_address::address_fax]',
                 Fld::Email => '[source::getSource()::customer::user_email|source::getSource()::customer::email]',
             ],
             AddressType::Invoice => [

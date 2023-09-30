@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpMissingParentCallCommonInspection  Most parent methods are base/no-op implementations.
+ */
 
 declare(strict_types=1);
 
@@ -6,8 +9,14 @@ namespace Siel\Acumulus\Joomla\VirtueMart\Config;
 
 use Joomla\CMS\Uri\Uri;
 use JText;
+use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
+use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Meta;
 use VirtueMartModelCalc;
 use VirtueMartModelOrderstatus;
 use VmModel;
@@ -173,6 +182,57 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
+    public function getDefaultShopMappings(): array
+    {
+        return [
+            DataType::Invoice => [
+                // @todo: fields that come from the Order or its metadata, because, if it
+                //   comes from Source, it is not shop specific.
+            ],
+            DataType::Customer => [
+                // Customer defaults.
+                Fld::ContactYourId => '[source::getSource()::details::BT::virtuemart_user_id]',
+                Fld::VatNumber => '[source::getSource()::details::BT::tax_exemption_number]',
+                Fld::Telephone => '[source::getSource()::details::BT::phone_1|source::getSource()::details::ST::phone_1]',
+                Fld::Telephone2 => '[source::getSource()::details::BT::phone_2|source::getSource()::details::ST::phone_2]',
+                Fld::Fax => '[source::getSource()::details::BT::fax|source::getSource()::details::ST::fax]',
+                Fld::Email => '[source::getSource()::details::BT::email|source::getSource()::details::ST::email]',
+            ],
+            AddressType::Invoice => [
+                Fld::CompanyName1 => '[source::getSource()::details::BT::company]',
+                Fld::FullName =>
+                    '[source::getSource()::details::BT::first_name' .
+                    '+source::getSource()::details::BT::middle_name' .
+                    '+source::getSource()::details::BT::last_name]',
+                Fld::Address1 => '[source::getSource()::details::BT::address_1]',
+                Fld::Address2 => '[source::getSource()::details::BT::address_2]',
+                Fld::PostalCode => '[source::getSource()::details::BT::zip]',
+                Fld::City => '[source::getSource()::details::BT::city]',
+                Meta::ShopCountryId => '[source::getSource()::details::BT::virtuemart_country_id]',
+            ],
+            AddressType::Shipping => [
+                Fld::CompanyName1 => '[source::getSource()::details::ST::company]',
+                Fld::FullName =>
+                    '[source::getSource()::details::ST::first_name' .
+                    '+source::getSource()::details::ST::middle_name' .
+                    '+source::getSource()::details::ST::last_name]',
+                Fld::Address1 => '[source::getSource()::details::ST::address_1]',
+                Fld::Address2 => '[source::getSource()::details::ST::address_2]',
+                Fld::PostalCode => '[source::getSource()::details::ST::zip]',
+                Fld::City => '[source::getSource()::details::ST::city]',
+                Meta::ShopCountryId => '[source::getSource()::details::ST::virtuemart_country_id]',
+            ],
+            EmailAsPdfType::Invoice => [
+                Fld::EmailTo => '[source::getSource()::details::BT::email|source::getSource()::details::ST::email]',
+            ],
+            LineType::Item => [
+                // @todo: complete when we start converting lines to using collectors.
+                Fld::ItemNumber => '[product::order_item_sku]',
+                Fld::Product => '[item::order_item_name]',
+            ],
+        ];
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -242,5 +302,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return 'https://pay.siel.nl/?p=t7jYwPSWYgFJdWQuWVJmC0R6d6LWHKmNVsNUlgtv82TIhgNS';
         }
         return parent::getLink($linkType);
+    }
+
+    public function getFiscalAddressSetting(): string
+    {
+        return AddressType::Shipping;
+    }
+
+    public function usesNewCode(): bool
+    {
+        return false; // Emergency revert: remove the // at the beginning of this line!
+        return true;
     }
 }

@@ -190,7 +190,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::Telephone =>
                     '[source::getSource()::billing_address::address_telephone|source::getSource()::shipping_address::address_telephone]',
                 Fld::Telephone2 =>
-                    '[source::getSource()::billing_address::address_telephone2|source::getSource()::shipping_address::address_telephone2]',
+                    '[source::getSource()::billing_address::address_telephone2' .
+                    '|source::getSource()::shipping_address::address_telephone2' .
+                    '|source::getSource()::shipping_address::address_telephone]',
                 Fld::Fax => '[source::getSource()::billing_address::address_fax|source::getSource()::shipping_address::address_fax]',
                 Fld::Email => '[source::getSource()::customer::user_email|source::getSource()::customer::email]',
             ],

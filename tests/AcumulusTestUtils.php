@@ -183,6 +183,6 @@ trait AcumulusTestUtils
         $append = $isNew ? '' : '.latest';
         $filename = "$path/$type$id$append.json";
         /** @noinspection JsonEncodingApiUsageInspection  false positive */
-        file_put_contents($filename, json_encode($data, Log::JsonFlags));
+        file_put_contents($filename, json_encode($data, Log::JsonFlags) . "\n");
     }
 }

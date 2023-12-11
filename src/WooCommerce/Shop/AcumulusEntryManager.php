@@ -34,6 +34,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * Helper method that converts a WP/WC post type to a source type constant.
+     *
+     * @todo: WooCommerce HPOS compatibility.
+     *   Check if the order types are still there and are still the same.
      */
     protected function shopTypeToSourceType(string $shopType): string
     {
@@ -50,6 +53,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     public function getByEntryId(?int $entryId)
     {
+        // @todo: WooCommerce HPOS compatibility.
         $metaQuery = [
             'posts_per_page' => 1,
             'meta_key' => static::$keyEntryId,
@@ -73,6 +77,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $result = null;
         $invoiceSourceType = $invoiceSource->getType();
         $invoiceSourceId = (int) $invoiceSource->getId();
+        // @todo: WooCommerce HPOS compatibility.
         $post = get_post($invoiceSourceId);
         if (!empty($post)) {
             if ($this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
@@ -100,6 +105,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $now = $this->sqlNow();
         $postId = $invoiceSource->getId();
+        // @todo: WooCommerce HPOS compatibility.
         // Add meta data.
         $result1 = add_post_meta($postId, static::$keyCreated, $now, true);
         $result2 = add_post_meta($postId, static::$keyEntryId, $entryId, true);
@@ -111,6 +117,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         $postId = $entry->getSourceId();
+        // @todo: WooCommerce HPOS compatibility.
         // Overwrite fields. To be able to return a correct success value, we
         // should not update with the same value as that returns false ...!
         if ($entry->getEntryId() !== null) {
@@ -128,6 +135,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function delete(BaseAcumulusEntry $entry): bool
     {
+        // @todo: WooCommerce HPOS compatibility.
         $postId = $entry->getSourceId();
         delete_post_meta($postId, static::$keyEntryId);
         delete_post_meta($postId, static::$keyToken);
@@ -160,6 +168,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function uninstall(): bool
     {
+        // @todo: WooCommerce HPOS compatibility.
+        //   Correct comment.
         // We do not delete the Acumulus metadata, not even via a confirmation
         // page. If we want to do so, we can use this code:
         // delete_post_meta_by_key('_acumulus_entry_id'); // for other keys as well.

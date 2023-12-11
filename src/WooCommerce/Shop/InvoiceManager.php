@@ -22,6 +22,8 @@ use function strlen;
  *
  * SECURITY REMARKS
  * ----------------
+ * @todo: WooCommerce HPOS compatibility.
+ *   Update comment.
  * In WooCommerce/WordPress querying orders is done via the WordPress
  * WP_Query::get_posts() method or via self constructed queries. In the latter
  * case we use the $wpdb->prepare() method to sanitize arguments.
@@ -34,6 +36,9 @@ class InvoiceManager extends BaseInvoiceManager
      * @param string $invoiceSourceType
      *
      * @return string
+     *
+     * @todo: WooCommerce HPOS compatibility.
+     *   Check if the order types are still there and are still the same.
      */
     protected function sourceTypeToShopType(string $invoiceSourceType): string
     {
@@ -54,6 +59,7 @@ class InvoiceManager extends BaseInvoiceManager
         string $InvoiceSourceIdTo
     ): array
     {
+        // @todo: WooCommerce HPOS compatibility.
         // We use our own query here as defining a range of post ids based on a
         // between does not seem to be possible with the query syntax.
         global $wpdb;

@@ -311,7 +311,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             if (strncmp($key, 'wc-', 3) === 0) {
                 $key = substr($key, strlen('wc-'));
             }
-            /** @noinspection OffsetOperationsInspection */
             $result[$key] = $label;
         }
         return $result;

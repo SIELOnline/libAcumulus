@@ -9,7 +9,6 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Util;
@@ -131,7 +130,7 @@ class AcumulusRequest
     public function execute(string $uri, $submit, bool $needContract): AcumulusResult
     {
         assert($this->uri === null);
-        assert(is_array($submit) || $submit instanceof Invoice);
+        assert(is_array($submit) || $submit instanceof AcumulusObject);
 
         $this->uri = $uri;
         $this->submit = $this->constructFullSubmit($submit, $needContract);
@@ -223,8 +222,11 @@ class AcumulusRequest
      * @return array
      *   The post fields to send to Acumulus.
      *
-     * @todo: convert submit to (Acumulus)Object? (though not all messages are
-     *   AcumulusObjects yet, in fact only 1 is).
+     * @throws \RuntimeException
+     *    Required property is not set.
+     *
+     * @todo: convert submit to (Acumulus)Object? Though not all messages are
+     *   AcumulusObjects yet, in fact only 1 is.
      */
     protected function constructFullSubmit($submit, bool $needContract): array
     {

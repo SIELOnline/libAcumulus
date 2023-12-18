@@ -33,7 +33,7 @@ Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met na
         // Address used for vat calculations.
         'fiscal_address_setting' => 'WooCommerce » Instellingen » tab Belasting » Bereken belasting gebaseerd op',
         // Invoice status overview: shorter labels due to very limited available space.
-        'vat_type' => 'soort',
+        'vat_type' => 'factuurtype',
         'foreign_vat' => 'EU btw',
         'foreign_national_vat' => '(EU) btw',
         'payment_status' => 'Status',
@@ -64,7 +64,7 @@ Also note that VAT free differs from the 0%% VAT rate below. This difference mai
         // Address used for vat calculations.
         'fiscal_address_setting' => 'WooCommerce » Settings » tab Tax » Calculate tax based on',
         // Invoice status overview: shorter labels due to available space.
-        'vat_type' => 'type',
+        'vat_type' => 'invoice type',
         'payment_status' => 'Status',
         'documents' => 'Pdfs',
         'document' => 'Pdf',

@@ -108,7 +108,7 @@ class InvoiceAddResult extends MessageCollection
     /**
      * @param int $sendStatus
      *   A status indicating if and why an invoice was sent or not sent. It will
-     *   contain 1 of the Result::Sent_... or Result::Invoice_NotSent_...
+     *   contain 1 of the {@see InvoiceAddResult}::Sent_... or {@see InvoiceAddResult}::Invoice_NotSent_...
      *   constants.
      * @param array $arguments
      *   A list of parameters to use when getting the send-status as text.

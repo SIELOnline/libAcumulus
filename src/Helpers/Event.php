@@ -79,6 +79,10 @@ interface Event
     /**
      * Triggers an event after an invoice for Acumulus has been sent.
      *
+     * This event will also be triggered when sending the invoice resulted in an error,
+     * but not when sending was prevented locally due to e.g. no need to send, an earlier
+     * event that prevented sending, or the dry-run modus.
+     *
      * This event allows you to:
      * - Inject custom behavior to react to the result of sending the invoice.
      *

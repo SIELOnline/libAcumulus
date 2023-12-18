@@ -158,39 +158,40 @@ class InvoiceSend
      */
     protected function lockAndSend(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
-        $didLock = $this->lock($invoiceSource, $result);
+        $didLock = false;
+        if ($this->isDryRun()) {
+            $result->setSendStatus(InvoiceAddResult::NotSent_DryRun);
+        } else {
+            $didLock = $this->lock($invoiceSource, $result);
+        }
+
         if (!$result->isSendingPrevented()) {
-            if (!$this->isDryRun()) {
-                $this->doSend($invoice, $invoiceSource, $result);
-            } else {
-                $result->setSendStatus(InvoiceAddResult::NotSent_DryRun);
+            $this->doSend($invoice, $invoiceSource, $result);
+
+            // When everything went well, the lock will have been replaced by a real
+            // entry. So we only delete the lock in case of errors.
+            //
+            // deleteLock() is expected to return AcumulusEntry::Lock_Deleted, so we don't
+            // act on that return status. With any of the other statuses it is unclear
+            // what happened and what the status will be in Acumulus: tell user to check.
+            if ($didLock
+                && $result->hasError()
+                && ($lockStatus = $this->getAcumulusEntryManager()->deleteLock($invoiceSource)) !== AcumulusEntry::Lock_Deleted
+            ) {
+                $code = $lockStatus === AcumulusEntry::Lock_NoLongerExists ? 903 : 904;
+                $result->createAndAddMessage(
+                    sprintf($this->t('message_warning_delete_lock_failed'), $this->t($invoiceSource->getType())),
+                    Severity::Warning,
+                    $code
+                );
             }
+
+            // Trigger the InvoiceSent event.
+            $this->getEvent()->triggerInvoiceSendAfter($invoice, $invoiceSource, $result);
+
+            // Send a mail if there are messages.
+            $this->mailInvoiceAddResult($result, $invoiceSource);
         }
-
-        // When everything went well, the lock will have been replaced by a real
-        // entry. So we only delete the lock in case of errors.
-        //
-        // deleteLock() is expected to return AcumulusEntry::Lock_Deleted,
-        // so we don't act on that return status. With any of the other
-        // statuses it is unclear what happened and what the status will be
-        // in Acumulus: tell user to check.
-        if ($didLock
-            && $result->hasError()
-            && ($lockStatus = $this->getAcumulusEntryManager()->deleteLock($invoiceSource)) !== AcumulusEntry::Lock_Deleted
-        ) {
-            $code = $lockStatus === AcumulusEntry::Lock_NoLongerExists ? 903 : 904;
-            $result->createAndAddMessage(
-                sprintf($this->t('message_warning_delete_lock_failed'), $this->t($invoiceSource->getType())),
-                Severity::Warning,
-                $code
-            );
-        }
-
-        // Trigger the InvoiceSent event.
-        $this->getEvent()->triggerInvoiceSendAfter($invoice, $invoiceSource, $result);
-
-        // Send a mail if there are messages.
-        $this->mailInvoiceAddResult($result, $invoiceSource);
     }
 
     /**
@@ -344,7 +345,8 @@ class InvoiceSend
     /**
      * Sends an email with the results of sending an invoice.
      *
-     * The mail is sent to the shop administrator ('emailonerror' setting).
+     * The mail is only sent when sending the invoice was not prevented and will be sent
+     * to the shop administrator ('emailonerror' setting).
      *
      * @return bool
      *   Success.

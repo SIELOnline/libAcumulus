@@ -9,6 +9,8 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 use WC_Abstract_Order;
+use WC_Order;
+use WC_Order_Refund;
 
 use function get_class;
 use function gettype;
@@ -23,7 +25,7 @@ use function strlen;
  * 'shop_order' and 'shop_order_refund'. The base class for all these types of
  * orders is WC_Abstract_Order
  *
- * @method \WC_Order|\WC_Order_Refund getSource()
+ * @method WC_Order|WC_Order_Refund|WC_Abstract_Order getSource()
  */
 class Source extends BaseSource
 {
@@ -35,7 +37,7 @@ class Source extends BaseSource
      */
     protected function setSource(): void
     {
-        $this->shopSource = WC()->order_factory::get_order($this->getId());
+        $this->shopSource = wc_get_order($this->getId());
         if (!is_object($this->shopSource)) {
             throw new RuntimeException(sprintf('Not a valid source id (%s %d)', $this->type, $this->id));
         }
@@ -57,15 +59,25 @@ class Source extends BaseSource
             }
             throw new RuntimeException("$type is not a WC_Abstract_Order");
         }
+        /** @noinspection PhpUndefinedMethodInspection */
         $this->id = $this->getSource()->get_id();
     }
 
+    /**
+     * Returns the user facing reference for the web shop's invoice source.
+     *
+     * Method get_order_number() is used for when other plugins are installed that add an
+     * order number that differs from the ID. Known plugins that do so:
+     * - woocommerce-sequential-order-numbers(-pro)
+     * - wc-sequential-order-numbers
+     * - custom-order-numbers-for-woocommerce(-pro)
+     *
+     * @return string|int
+     *   The user facing id for the web shop's invoice source. This is not
+     *   necessarily the internal id.
+     */
     public function getReference()
     {
-        // Method get_order_number() is used for when other plugins are
-        // installed that add an order number that differs from the ID. Known
-        // plugins that do so: woocommerce-sequential-order-numbers(-pro),
-        // wc-sequential-order-numbers, and custom-order-numbers-for-woocommerce(-pro).
         if ($this->getType() === Source::Order) {
             /** @var \WC_Order $order */
             $order = $this->shopSource;
@@ -88,6 +100,7 @@ class Source extends BaseSource
      */
     public function getStatus(): string
     {
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         return $this->getSource()->get_status();
     }
 
@@ -146,6 +159,7 @@ class Source extends BaseSource
     protected function getPaymentDateOrder(): string
     {
         // get_date_paid() returns a WC_DateTime which has a _toString() method.
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         return substr((string) $this->getSource()->get_date_paid(), 0, strlen('2000-01-01'));
     }
 

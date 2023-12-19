@@ -21,13 +21,13 @@ use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
  */
 class InvoiceManager extends BaseInvoiceManager
 {
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(
                 'select virtuemart_order_id from #__virtuemart_orders where virtuemart_order_id between %d and %d',
-                $InvoiceSourceIdFrom,
-                $InvoiceSourceIdTo
+                $invoiceSourceIdFrom,
+                $invoiceSourceIdTo
             );
             return $this->getSourcesByQuery($invoiceSourceType, $query);
         }

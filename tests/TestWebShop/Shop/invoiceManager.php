@@ -13,7 +13,7 @@ use Siel\Acumulus\Invoice\Source;
  */
 class invoiceManager extends \Siel\Acumulus\Shop\InvoiceManager
 {
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
     {
         return [];
     }

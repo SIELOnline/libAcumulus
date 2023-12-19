@@ -155,7 +155,6 @@ abstract class InvoiceManager
         return $pluginSettings['debug'] === Config::Send_TestMode;
     }
 
-
     /**
      * Returns a list of existing invoice sources for the given id range.
      *
@@ -164,8 +163,8 @@ abstract class InvoiceManager
      */
     abstract public function getInvoiceSourcesByIdRange(
         string $invoiceSourceType,
-        string $InvoiceSourceIdFrom,
-        string $InvoiceSourceIdTo
+        int $invoiceSourceIdFrom,
+        int $invoiceSourceIdTo
     ): array;
 
     /**
@@ -180,7 +179,7 @@ abstract class InvoiceManager
         string $invoiceSourceReferenceFrom,
         string $invoiceSourceReferenceTo
     ): array {
-        return $this->getInvoiceSourcesByIdRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo);
+        return $this->getInvoiceSourcesByIdRange($invoiceSourceType, (int) $invoiceSourceReferenceFrom, (int) $invoiceSourceReferenceTo);
     }
 
     /**

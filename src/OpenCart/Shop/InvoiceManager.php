@@ -47,7 +47,7 @@ class InvoiceManager extends BaseInvoiceManager
         ];
     }
 
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
     {
         $key = $this->tableInfo[$invoiceSourceType]['key'];
         /** @var \stdClass $result (documentation error in DB) */
@@ -57,8 +57,8 @@ class InvoiceManager extends BaseInvoiceManager
                 $key,
                 $this->tableInfo[$invoiceSourceType]['table'],
                 $key,
-                $InvoiceSourceIdFrom,
-                $InvoiceSourceIdTo
+                $invoiceSourceIdFrom,
+                $invoiceSourceIdTo
             )
         );
         return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($result->rows, $key));

@@ -168,7 +168,7 @@ class BatchForm extends Form
             if (count($invoiceSources) === 0) {
                 // Empty set when searching on references: retrieve by order/
                 // refund id range.
-                $invoiceSources = $this->invoiceManager->getInvoiceSourcesByIdRange($type, $from, $to);
+                $invoiceSources = $this->invoiceManager->getInvoiceSourcesByIdRange($type, (int) $from, (int) $to);
                 $this->screenLog['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_id"), $from, $to);
             }
         } else {

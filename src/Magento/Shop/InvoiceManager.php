@@ -24,12 +24,12 @@ use Magento\Framework\Event\ManagerInterface;
  */
 class InvoiceManager extends BaseInvoiceManager
 {
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
     {
         $field = 'entity_id';
         $condition = [
-            'from' => $InvoiceSourceIdFrom,
-            'to' => $InvoiceSourceIdTo,
+            'from' => $invoiceSourceIdFrom,
+            'to' => $invoiceSourceIdTo,
         ];
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }

@@ -73,9 +73,9 @@ trait AcumulusTestUtils
      */
     protected function _testCreate(string $dataPath, string $type, int $id, array $excludeFields = []): void
     {
-        $invoiceSource = $this->getAcumulusContainer()->createSource($type, $id);
-        $invoiceAddResult = $this->getAcumulusContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = $this->getAcumulusContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceSource = self::getAcumulusContainer()->createSource($type, $id);
+        $invoiceAddResult = self::getAcumulusContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = self::getAcumulusContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
         $result = $invoice->toArray();
         // Get order from Order{id}.json.
         $expected = $this->getTestSource($dataPath, $type, $id);
@@ -108,8 +108,6 @@ trait AcumulusTestUtils
      *   The name of the (sub)object, e.g. 'invoice', or 'line'.
      * @param array $excludeFields
      *   A, possibly empty, list of fields to exclude in the comparison.
-     *
-     * @todo: collect errors an return as 1 failure.
      */
     protected function compareAcumulusObjects(
         array $expected,

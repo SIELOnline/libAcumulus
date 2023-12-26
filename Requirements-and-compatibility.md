@@ -16,7 +16,7 @@ System Requirements
 
 - PHP:
     * Minimum version: 7.4, older versions WILL fail.
-    * Recommended version: 8.0, soon - probably plugin version 8.0, this will
+    * Recommended version: 8.0, soon - probably plugin version 8.2, this will
       become the minimally required version and older versions WILL fail.
     * Note: due to an error in plugin version 7.2, all PHP versions below 7.4
       will already fail in that plugin version (solved in plugin version 7.3.0)
@@ -54,19 +54,19 @@ Notes:
 |     |                  | 4.0.7                    | >= 4.0.5                            |
 | JOO | Joomla (+ VM)    | 3.10                     | >= 3.6                              |
 |     |                  | 4.3.4                    | >= 4.2.5                            |
-| WC  | WooCommerce      | 7.1.0                    | >= 5.0 (3 and 4 may work)           |
-|     | WordPress        | 6.1.1                    | >= 5.9 (earlier versions WILL fail) |
+| WC  | WooCommerce      | 8.4.0                    | >= 5.0 (3 and 4 may work)           |
+|     | WordPress        | 6.4.2                    | >= 5.9 (earlier versions WILL fail) |
 
 Supported PHP versions
 ----------------------
-This is an incomplete, and probably outdated, overview of which PHP version can
-be used with the supported shops.
+This is an overview of which PHP version can be used with the supported shops.
+This overview is not updated with each release of this plugin so may be a bit outdated.
 
 Notes:
 
 - Latest, or almost latest, point releases are used of the listed PHP versions.
 - PHP 8.0 and 8.1 are only tested with Joomla 4.
-- WooCommerce is listed in combination with WordPress 6.1.x. Other plugins gave
+- WooCommerce is listed in combination with WordPress 6.4.x. Other plugins gave
   warnings in my test environment, but those were paid plugins that I cannot
   upgrade, and thus for which I have an outdated version.
 - Other installed plugins/modules may not have been updated to the latest
@@ -86,4 +86,4 @@ Notes:
 |     | 8.0.1             | ✅ | ✅ | ✅ | ❓ | Warnings get logged on PHP 8.1        |
 | VM  | 3.x.y             | ✅ | ❌ | ❌ | ❌ |                                       |
 |     | 4.2.0             | ✅ | ✅ | ✅ | ❓ | VM 4.2 still produces warnings on 8.1 |
-| WC  | 7.1.0             | ✅ | ✅ | ❓ | ❌ | Many warnings from other plugins      |
+| WC  | 8.4.0             | ✅ | ✅ | ❓ | ❌ | Many warnings from other plugins      |

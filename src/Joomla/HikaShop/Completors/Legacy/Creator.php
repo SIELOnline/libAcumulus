@@ -379,7 +379,7 @@ class Creator extends BaseCreator
                                 Meta::VatClassName => Config::VatClass_Null,
                                 Meta::Warning => 'Amounts for this shipping method do not add up: '
                                     . 'probably vat free product or rates have changed. (order_shipping_params->prices = '
-                                    . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
+                                    . str_replace('"', "'", json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags))
                                     . ')',
                             ];
                         $warningAdded = true;
@@ -398,7 +398,7 @@ class Creator extends BaseCreator
                         $result[count($result) - 1],
                         'Amounts for the shipping method(s) do not add up: lost too much precision?'
                         . ' (order_shipping_params->prices = '
-                        . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
+                        . str_replace('"', "'", json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags))
                         . ')'
                     );
                 }

@@ -312,6 +312,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function usesNewCode(): bool
     {
         return false; // Emergency revert: remove the // at the beginning of this line!
-        return true;
+        //return true;
     }
 }

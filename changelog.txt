@@ -3,8 +3,11 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.0.3 (2023-10-??) (JOO)
-------------------------
+8.1.0 (2024-01-03) (JOO, WC)
+----------------------------
+Features:
+- WC: We now support HPOS.
+
 Bugs:
 - JOO: Message on uninstall: com_acumulusInstallerScript::preflight(): Argument #2
   ($parent) must be of type Joomla\CMS\Installer\Adapter\ComponentAdapter,

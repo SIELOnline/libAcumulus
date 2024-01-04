@@ -86,7 +86,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @throws \Exception
      */
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $record */
         try {
@@ -108,7 +108,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @noinspection BadExceptionsProcessingInspection
      */
-    public function delete(BaseAcumulusEntry $entry): bool
+    public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
         $result = true;
         /** @var \Siel\AcumulusMa2\Model\Entry $record */

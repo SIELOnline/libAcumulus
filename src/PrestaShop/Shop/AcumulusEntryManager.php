@@ -83,7 +83,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
     {
         $record = $entry->getRecord();
         return $this->getDb()->execute(sprintf(
@@ -96,7 +96,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    public function delete(BaseAcumulusEntry $entry): bool
+    public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
         $record = $entry->getRecord();
         /** @noinspection PhpUnhandledExceptionInspection */

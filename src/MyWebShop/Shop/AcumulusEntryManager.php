@@ -67,7 +67,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         // @todo: insert a new entry (note that save() takes care of distinguishing between insert and update).
     }
 
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
     {
         // @todo: update an existing entry (note that save() takes care of distinguishing between insert and update).
     }
@@ -75,7 +75,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * @inheritDoc
      */
-    public function delete(BaseAcumulusEntry $entry): bool
+    public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
         // @todo: delete an existing entry.
     }

@@ -84,7 +84,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
+    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
     {
         $record = $entry->getRecord();
         return (bool) $this->getDb()->query(sprintf(
@@ -97,7 +97,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    public function delete(AcumulusEntry $entry): bool
+    public function delete(AcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
         $record = $entry->getRecord();
         return (bool) $this->getDb()->query(sprintf(

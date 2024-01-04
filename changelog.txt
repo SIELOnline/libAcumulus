@@ -3,6 +3,18 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.1.1 (2024-01-04) (WC)
+-----------------------
+NOTE: code changes are breaking backwards compatibility, but as the changed methods are
+  only called form within the library this may only be a problem with custom code.
+
+Bugs:
+- WC: Metadata in in-memory Order object does not get updated when AcumulusEntry metadata
+  is updated or deleted. Acumulus status meta box does not get updated after clicking the
+  "Send Now" button, even while the data has been successfully sent to Acumulus.
+
+
+
 8.1.0 (2024-01-03) (JOO, WC)
 ----------------------------
 Features:

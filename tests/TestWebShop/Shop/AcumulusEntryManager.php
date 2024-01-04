@@ -33,12 +33,12 @@ class AcumulusEntryManager extends \Siel\Acumulus\Shop\AcumulusEntryManager
         return true;
     }
 
-    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
+    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
     {
         return true;
     }
 
-    public function delete(AcumulusEntry $entry): bool
+    public function delete(AcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
         return true;
     }

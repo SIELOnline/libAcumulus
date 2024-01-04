@@ -73,7 +73,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table->store(true);
     }
 
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updatedSource, ?Source $invoiceSource = null): bool
     {
         // Continue with existing table object with already loaded record.
         /** @var \AcumulusTableAcumulusEntry $table */
@@ -84,7 +84,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table->store(true);
     }
 
-    public function delete(BaseAcumulusEntry $entry): bool
+    public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
         /** @var \AcumulusTableAcumulusEntry $table */
         $table = $entry->getRecord();

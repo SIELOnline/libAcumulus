@@ -144,7 +144,7 @@ abstract class AcumulusEntryManager
         }
         if ($entry->isSendLock()) {
             // The lock is still there: remove it.
-            $this->delete($entry);
+            $this->delete($entry, $invoiceSource);
             return AcumulusEntry::Lock_Deleted;
         }
         // The AcumulusEntry became a real entry: apparently the process that
@@ -181,7 +181,7 @@ abstract class AcumulusEntryManager
         if ($record === null) {
             $result = $this->insert($invoiceSource, $entryId, $token, $now);
         } else {
-            $result = $this->update($record, $entryId, $token, $now);
+            $result = $this->update($record, $entryId, $token, $now, $invoiceSource);
         }
         return $result;
     }
@@ -225,11 +225,13 @@ abstract class AcumulusEntryManager
      * @param int|string $updated
      *   The update time (= current time), in the format as the actual database
      *   layer expects for a timestamp.
+     * @param \Siel\Acumulus\Invoice\Source|null $invoiceSource
+     *    The source object for which the invoice was updated.
      *
      * @return bool
      *   Success.
      */
-    abstract protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool;
+    abstract protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool;
 
     /**
      * Deletes the Acumulus entry for the given entry id.
@@ -258,11 +260,13 @@ abstract class AcumulusEntryManager
      *
      * @param \Siel\Acumulus\Shop\AcumulusEntry $entry
      *   The Acumulus entry to delete.
+     * @param \Siel\Acumulus\Invoice\Source|null $invoiceSource
+     *   The source object for which to delete the {@see \Siel\Acumulus\Shop\AcumulusEntry}.
      *
      * @return bool
      *   Success.
      */
-    abstract public function delete(AcumulusEntry $entry): bool;
+    abstract public function delete(AcumulusEntry $entry, ?Source $invoiceSource = null): bool;
 
     /**
      * Installs the data model. Called when the module gets installed.

@@ -16,8 +16,10 @@ use function get_class;
 /**
  * Implements the WooCommerce/WordPress specific acumulus entry model class.
  *
- * In WordPress this data is stored as metadata. As such, the "records" returned
- * here are an array of all metadata values, thus not filtered by Acumulus keys.
+ * In WordPress this data is stored as metadata. As the metadata is stored in the Order
+ * object, we need to pass the Order object when updating or deleting the
+ * {@see \Siel\Acumulus\WooCommerce\Shop\AcumulusEntry} data as to not get an outdated
+ * in-memory Order object ([SIEL #215828]).
  *
  * SECURITY REMARKS
  * ----------------
@@ -29,8 +31,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
     public static string $keyEntryId = '_acumulus_entry_id';
     public static string $keyToken = '_acumulus_token';
-    // Note: these 2 meta keys are not actually stored, as the post_id and
-    // post_type give us that information.
+    // Note: thes following 2 meta keys are not actually stored, as the post/order id and
+    // post/order type give us that information.
     public static string $keySourceId = '_acumulus_id';
     public static string $keySourceType = '_acumulus_type';
     public static string $keyCreated = '_acumulus_created';
@@ -111,42 +113,32 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         /** @var \WC_Abstract_Order $source */
         $source = $invoiceSource->getSource();
         // Add meta data.
-        $result1 = $source->add_meta_data(static::$keyCreated, $now, true);
-        $result2 = $source->add_meta_data(static::$keyEntryId, $entryId, true);
-        $result3 = $source->add_meta_data(static::$keyToken, $token, true);
-        $result4 = $source->add_meta_data(static::$keyUpdated, $now, true);
+        $source->add_meta_data(static::$keyCreated, $now, true);
+        $source->add_meta_data(static::$keyEntryId, $entryId, true);
+        $source->add_meta_data(static::$keyToken, $token, true);
+        $source->add_meta_data(static::$keyUpdated, $now, true);
         $source->save_meta_data();
-        return $result1 !== false && $result2 !== false && $result3 !== false && $result4 !== false;
+        return true;
     }
 
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
     {
-        $postId = $entry->getSourceId();
         /** @var \WC_Abstract_Order $source */
-        $source = wc_get_order($postId);
-        // Overwrite fields. To be able to return a correct success value, we
-        // should not update with the same value as that returns false ...!
-        if ($entry->getEntryId() !== null) {
-            // Invoice stored as real entry.
-            $result1 = $entry->getEntryId() === $entryId || $source->update_meta_data($postId, static::$keyEntryId, $entryId);
-        } else {
-            // Invoice stored as concept
-            $result1 = $entry->getConceptId() === $entryId || $source->update_meta_data($postId, static::$keyEntryId, $entryId);
-        }
-        $result2 = $entry->getToken() === $token || $source->update_meta_data($postId, static::$keyToken, $token);
-        $result3 = $entry->getUpdated(true) == $updated || $source->update_meta_data($postId, static::$keyUpdated, $updated);
+        $source = $invoiceSource !== null ? $invoiceSource->getSource() : wc_get_order($entry->getSourceId());
+        $source->update_meta_data(static::$keyEntryId, $entryId);
+        $source->update_meta_data(static::$keyToken, $token);
+        $source->update_meta_data(static::$keyUpdated, $updated);
         $source->save_meta_data();
-        return $result1 !== false && $result2 !== false && $result3 !== false;
+        return true;
     }
 
     /**
      * @inheritDoc
      */
-    public function delete(BaseAcumulusEntry $entry): bool
+    public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
-        $postId = $entry->getSourceId();
         /** @var \WC_Abstract_Order $source */
-        $source = wc_get_order($postId);
+        $source = $invoiceSource !== null ? $invoiceSource->getSource() : wc_get_order($entry->getSourceId());
         $source->delete_meta_data(static::$keyEntryId);
         $source->delete_meta_data(static::$keyToken);
         $source->delete_meta_data(static::$keyCreated);

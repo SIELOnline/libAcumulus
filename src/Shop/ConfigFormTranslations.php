@@ -127,15 +127,12 @@ class ConfigFormTranslations extends TranslationCollection
         'vat_class_left_empty' => '%1$s laat ik leeg',
 
         'field_euVat' => 'Berekent u EU-btw?',
-        'desc_euVat' => 'Geef aan of en wanneer u EU-btw berekent voor (niet btw-plichtige) EU-klanten.<br>
+        'desc_euVat' => 'Geef aan of en wanneer u <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/afstandsverkopen-zoals-e-commerce-en-diensten-voor-particulieren-in-andere-eu-landen/afstandsverkopen-zoals-e-commerce-binnen-de-eu/">EU-btw berekent voor (niet btw-plichtige) EU-klanten</a>.<br>
 • Kies de 1e optie als u die altijd, dus al vanaf het begin van het jaar, berekent.<br>
 • Kies de 2e optie als u die pas berekent zodra u de drempel passeert.<br>
 • Kies de 3e optie als u tot nu toe, en om wat voor een reden dan ook, nog geen EU-btw hebt berekend.<br>
 Deze waarde wordt gebruikt als er twijfel is omdat het land van de klant hetzelfde btw-tarief heeft als Nederland (bijv. België).
-Het gaat dus niet zozeer om de actuele instelling, want deze waarde wordt ook gebruikt voor het versturen van gegevens van oudere facturen.<br>
-NB Sinds 1 juli 2021 gelden er
-<a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/btw-goederen-eu-particulieren" target="_blank">
-nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
+Het gaat dus niet zozeer om de actuele instelling, want deze waarde wordt ook gebruikt voor het versturen van gegevens van oudere facturen.',
         'option_euVat_1' => 'Altijd, dus vanaf het begin van het jaar',
         'option_euVat_2' => 'Zodra wij de drempel passeren',
         'option_euVat_3' => 'Nee, nog nooit gebruikt',
@@ -548,7 +545,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_error_arg2_advanced' => 'in the "Acumulus basic settings form"',
         'message_warning_role_deprecated' => 'You are using a deprecated user role to connect to the Acumulus API. Please add another user with an API-compliant role or change the role for the current user.',
         'message_warning_role_insufficient' => 'You are using the user role API-Creator. This role does not have all permissions this plugin needs. Change the role of the current user to API-User or create a new user.',
-        'message_warning_role_overkill' => 'You are using the user role API-Manager. This role has mre permissions than this plugin needs. We advice you to change the role to API-User.',
+        'message_warning_role_overkill' => 'You are using the user role API-Manager. This role has more permissions than this plugin needs. We advice you to change the role to API-User.',
 
         // Register.
         'config_form_register' => 'You have not entered your account details yet. If you don\'t have an account yet you can create a trial account with this %1$s',
@@ -605,14 +602,12 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'vat_class_left_empty' => 'I leave the %1$s empty',
 
         'field_euVat' => 'Do you charge EU VAT?',
-        'desc_euVat' => 'Indicate if and when you charge EU VAT to (non vat subjected) EU customers.<br>
+        'desc_euVat' => 'Indicate if and when you charge <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/afstandsverkopen-zoals-e-commerce-en-diensten-voor-particulieren-in-andere-eu-landen/afstandsverkopen-zoals-e-commerce-binnen-de-eu/">EU VAT to (non vat subjected) EU customers</a>.<br>
 • Select the 1st option if you always charge it, thus as of the start of the year.<br>
 • Select the 2nd option if you charge it only when you pass the threshold.<br>
-• Select the 3rd option if, until now, you never charged it..<br>
+• Select the 3rd option if, until now, you never charged it.<br>
 • NOTE: This is not about the actual state of charging it, as this setting is also used for sending data for older invoices.<br>
-• NB1: his value is only used in case of conflict because the country of the customer uses the same VAT rate as the Netherlands.<br>
-• NB2: As of july 2021 <a href="https://www.belastingdienst
-.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">new regulations and thresholds for EU sales (in Dutch)</a> apply.',
+• NB1: This value is only used in case of conflict, i.e. when the country of the customer uses the same VAT rate as the Netherlands.',
         'option_euVat_1' => 'Always, thus as of the start of the year',
         'option_euVat_2' => 'When we pass the threshold',
         'option_euVat_3' => 'No, so far we never used it',

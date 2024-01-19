@@ -183,6 +183,10 @@ class Invoice extends AcumulusObject
         $invoice[Fld::Line] = $lines;
 
         if ($this->metadataGet(Meta::AddEmailAsPdfSection)) {
+            // @todo: catch 'Required property %s::%s is not set' and make it a warning
+            //   that the invoice has been exported but the pdf could not be sent.
+            // @todo: probably better: handle this in emailAsPdf object??? Otherwise,
+            //   other fields will be missing as well.
             $invoice[Fld::EmailAsPdf] = $this->getEmailAsPdf()->toArray();
         }
         $invoice += $this->metadataToArray();

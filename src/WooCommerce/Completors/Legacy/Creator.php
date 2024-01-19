@@ -567,7 +567,6 @@ class Creator extends BaseCreator
         // For refunds without any articles (probably just a manual refund) we
         // don't need to know what discounts were applied on the original order.
         // So skip get_used_coupons() on refunds without articles.
-        /** @noinspection PhpClassConstantAccessedViaChildClassInspection */
         if ($this->invoiceSource->getType() !== Source::CreditNote || $this->hasItemLines) {
             // Add a line for all coupons applied. Coupons are only stored on
             // the order, not on refunds, so use the order.
@@ -590,9 +589,8 @@ class Creator extends BaseCreator
      * - have a fixed amount or a percentage.
      * - be applied to the whole cart or only be used for a set of products.
      *
-     * Discounts are already applied, add a descriptive line with 0 amount. The
-     * VAT rate to categorize this line under should be determined by the
-     * completor.
+     * Discounts are already applied, we just add a descriptive line with 0 amount. The
+     * VAT rate to categorize this line under should be determined by the completor.
      *
      * @param \WC_Coupon $coupon
      *

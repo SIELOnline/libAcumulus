@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Data;
 
 use ArrayAccess;
 use BadMethodCallException;
+use ReflectionClass;
 use RuntimeException;
 
 use function array_key_exists;
@@ -250,7 +251,10 @@ abstract class AcumulusObject implements ArrayAccess
             if (isset($this->$name)) {
                 $result[$name] = $property->getApiValue();
             } elseif ($this->data[$name]->isRequired()) {
-                throw new RuntimeException("Required property $name is not set");
+                throw new RuntimeException(sprintf('Required property %s::%s is not set',
+                    (new ReflectionClass($this))->getShortName(),
+                    $name
+                ));
             }
         }
         return $result;

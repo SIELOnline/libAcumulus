@@ -19,7 +19,7 @@ use const Siel\Acumulus\Version;
  */
 abstract class Environment
 {
-    protected const Unknown = 'unknown';
+    public const Unknown = 'unknown';
     protected const QueryVariables = 'show variables where Variable_name in ("version", "version_comment")';
 
     protected array $data = [];

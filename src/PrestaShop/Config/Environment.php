@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Config;
 
+use AppKernel;
 use Db;
 use Module;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;

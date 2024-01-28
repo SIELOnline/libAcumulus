@@ -19,6 +19,14 @@ class Mailer extends BaseMailer
     protected string $templateDir;
     protected string $templateName;
 
+    /**
+     * Sends an email.
+     *
+     * @return bool|string
+     *   Success (true); error message, Throwable object or just false otherwise.
+     *
+     * @throws \PrestaShopException
+     */
     public function sendMail(
         string $from,
         string $fromName,

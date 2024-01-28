@@ -9,6 +9,12 @@ use Module;
 use OrderState;
 use PaymentModule;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
+use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
+use Siel\Acumulus\Meta;
 use TaxRulesGroup;
 
 /**
@@ -255,6 +261,61 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
+    public function getDefaultShopMappings(): array
+    {
+        // PrestaShop: both addresses are always filled.
+        return [
+            DataType::Invoice => [
+                // @todo: fields that come from the Order or its metadata, because, if it
+                //   comes from Source, it is not shop specific and defined in
+                //   Mappings::getShopIndependentDefaults().
+            ],
+            DataType::Customer => [
+                // Customer defaults.
+                Fld::ContactYourId => '[source::getSource()::id_customer]', // Order|OrderSlip
+                // @todo: add addresses as property sources.
+                Fld::VatNumber => '[address_invoice::vat_number' // Address
+                    . '|address_shipping::vat_number]', // Address
+                Fld::Telephone => '[address_invoice::phone|address_invoice::phone_mobile'
+                    . '|address_shipping::phone|address_shipping::phone_mobile]', // Address
+                Fld::Telephone2 => '[address_shipping::phone|address_shipping::phone_mobile'
+                    . '|address_invoice::phone|address_invoice::phone_mobile]', // Address
+                Fld::Email => '[source::getOrder::getSource()::getCustomer()::email]', // Customer
+                Fld::Website => '[source::getOrder::getSource()::getCustomer()::website]', // Customer
+                Fld::Mark => '[source::getOrder::getSource()::getCustomer()::note]', // Customer (but not used?)
+            ],
+            AddressType::Invoice => [ // address_invoice instanceof Address
+                Fld::CompanyName1 => '[address_invoice::company]',
+                Fld::FullName => '[address_invoice::firstname+address_invoice::lastname]',
+                Fld::Address1 => '[address_invoice::address1]',
+                Fld::Address2 => '[address_invoice::address2]',
+                Fld::PostalCode => '[address_invoice::postcode]',
+                Fld::City => '[address_invoice::city]',
+            ],
+            AddressType::Shipping => [ // address_shipping instanceof Address
+                Fld::CompanyName1 => '[address_shipping::company]',
+                Fld::FullName => '[address_shipping::firstname+address_shipping::lastname]',
+                Fld::Address1 => '[address_shipping::address1]',
+                Fld::Address2 => '[address_shipping::address2]',
+                Fld::PostalCode => '[address_shipping::postcode]',
+                Fld::City => '[address_shipping::city]',
+            ],
+            EmailAsPdfType::Invoice => [
+                Fld::EmailTo => '[source::getOrder::getSource()::getCustomer()::email]',
+            ],
+            LineType::Item => [ // item instanceof OrderDetail
+                Meta::Id => '[item::get_id()]',
+                Fld::ItemNumber => '[item::product_reference'
+                    . '|item::product_ean13|item::product_isbn|item::product_upc|item::product_mpn'
+                    . '|item::product_supplier_reference]',
+                Fld::Product => '[item::product_name]',
+                Meta::ProductId => '[product::product_id]',
+                Fld::Quantity => '[item::product_quantity]',
+                Fld::CostPrice => '[item::purchase_supplier_price]',
+            ],
+        ];
+    }
+
     public function getShopOrderStatuses(): array
     {
         $statuses = OrderState::getOrderStates(Context::getContext()->language->id);
@@ -293,13 +354,19 @@ class ShopCapabilities extends ShopCapabilitiesBase
         switch ($linkType) {
             case 'register':
             case 'activate':
+            /* @legacy: old way of showing settings. */
             case 'advanced':
+            case 'mappings':
             case 'batch':
             case 'invoice':
                 $action = ucfirst($linkType);
-                return Context::getContext()->link->getAdminLink("AdminAcumulus$action", true);
+                return Context::getContext()->link->getAdminLink("AdminAcumulus$action");
+            /* @legacy: old way of showing settings. */
             case 'config':
+            case 'settings':
                 return Context::getContext()->link->getAdminLink('AdminModules', true, [], ['configure' => 'acumulus']);
+            case 'fiscal-address-setting':
+                return Context::getContext()->link->getAdminLink('AdminTaxes') . '#form';
             case 'logo':
                 return  __PS_BASE_URI__ . 'modules/acumulus/views/img/siel-logo.svg';
             case 'pro-support-image':
@@ -308,5 +375,22 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return 'https://pay.siel.nl/?p=KL9pPSIIdMzqIieXB0FA56mTgyOvlEfUEosWM3ODsTZODa0P';
         }
         return parent::getLink($linkType);
+    }
+
+    public function getFiscalAddressSetting(): string
+    {
+        return 'PS_TAX_ADDRESS_TYPE'; // 'id_address_invoice' or 'id_address_delivery'
+    }
+
+    /**
+     * PrestaShop switched to the new creation process!
+     *
+     * Note: in case of severe errors during the creation process: return false to revert
+     * to the old "tried and tested" code.
+     */
+    public function usesNewCode(): bool
+    {
+        //return false; // Emergency revert: remove the // at the beginning of this line!
+        return true;
     }
 }

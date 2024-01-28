@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Config;
 
-use AppKernel;
 use Db;
 use Module;
+use PrestaShop\PrestaShop\Core\Version;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 
 /**
@@ -17,7 +17,7 @@ class Environment extends EnvironmentBase
     protected function setShopEnvironment(): void
     {
         $this->data['moduleVersion'] = Module::getInstanceByName('acumulus')->version;
-        $this->data['shopVersion'] = AppKernel::VERSION;
+        $this->data['shopVersion'] = Version::VERSION;
     }
 
     /**

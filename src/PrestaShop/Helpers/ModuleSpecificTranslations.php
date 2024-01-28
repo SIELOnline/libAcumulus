@@ -23,11 +23,13 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'menu_advancedSettings' => 'Geavanceerde instellingen → Acumulus geavanceerde instellingen',
         'menu_basicSettings' => 'Instellingen → Acumulus → Configureer',
 
-        // @todo: is dit Engels hier correct?
         'see_billing_address' => 'Verzendadres, bevat dezelfde eigenschappen als het "address_invoice" object hierboven',
 
         'vat_class' => 'belastingregel',
         'vat_classes' => 'belastingregels',
+
+        // Address used for vat calculations.
+        'fiscal_address_setting' => 'Internationaal » BTW » kopje Btw-opties » Gebaseerd op',
     ];
 
     protected array $en = [
@@ -39,5 +41,8 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 
         'vat_class' => 'tax rule',
         'vat_classes' => 'tax rules',
+
+        // Address used for vat calculations.
+        'fiscal_address_setting' => 'International » VAT » Heading VAT options » Based on',
     ];
 }

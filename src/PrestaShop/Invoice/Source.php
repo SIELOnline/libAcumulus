@@ -12,6 +12,7 @@ use Currency;
 use Db;
 use Order;
 use OrderSlip;
+use PrestaShop\PrestaShop\Core\Version;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Currency as InvoiceCurrency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
@@ -238,7 +239,7 @@ class Source extends BaseSource
      */
     protected function addProperties(): void
     {
-        if (version_compare(_PS_VERSION_, '1.7.5', '<')) {
+        if (version_compare(Version::VERSION, '1.7.5', '<')) {
             $row = Db::getInstance()->executeS(sprintf('SELECT * FROM `%s` WHERE `%s` = %u',
                 _DB_PREFIX_ . OrderSlip::$definition['table'], OrderSlip::$definition['primary'], $this->getId()));
             // Get 1st (and only) result.

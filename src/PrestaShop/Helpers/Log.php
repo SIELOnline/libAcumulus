@@ -9,6 +9,7 @@ namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use AbstractLogger;
 use FileLogger;
+use PrestaShop\PrestaShop\Core\Version;
 use Siel\Acumulus\Helpers\Log as BaseLog;
 use Siel\Acumulus\Helpers\Severity;
 
@@ -59,7 +60,7 @@ class Log extends BaseLog
     {
         if (!isset($this->logger)) {
 
-            if (version_compare(_PS_VERSION_, '1.7.5', '>=')) {
+            if (version_compare(Version::VERSION, '1.7.5', '>=')) {
                 $logDirectory = 'var/logs';
             } else {
                 $logDirectory = 'app/logs';

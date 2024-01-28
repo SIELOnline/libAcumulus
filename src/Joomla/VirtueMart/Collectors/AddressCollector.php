@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\LanguageFactoryInterface;
+use Siel\Acumulus\Collectors\AddressCollector as BaseAddressCollector;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Meta;
 use VmModel;
@@ -13,7 +14,7 @@ use VmModel;
 /**
  * AddressCollector for VirtueMart.
  */
-class AddressCollector extends \Siel\Acumulus\Collectors\AddressCollector
+class AddressCollector extends BaseAddressCollector
 {
     /**
      * @param \Siel\Acumulus\Data\Address $acumulusObject

@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 
+use Siel\Acumulus\Collectors\CustomerCollector as BaseCustomerCollector;
 use Siel\Acumulus\Data\AddressType;
 
 /**
  * CustomerCollector for Magento.
  */
-class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
+class CustomerCollector extends BaseCustomerCollector
 {
     /**
      * Returns the value {@see AddressType::Invoice}}, VM cannot be configured for this

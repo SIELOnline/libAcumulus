@@ -6,12 +6,13 @@ namespace Siel\Acumulus\Magento\Collectors;
 
 use Magento\Store\Model\ScopeInterface;
 use Magento\Tax\Model\Config as MagentoTaxConfig;
+use Siel\Acumulus\Collectors\CustomerCollector as BaseCustomerCollector;
 use Siel\Acumulus\Data\AddressType;
 
 /**
  * CustomerCollector for Magento.
  */
-class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
+class CustomerCollector extends BaseCustomerCollector
 {
     use MagentoRegistryTrait;
 

@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Collectors;
 
+use Siel\Acumulus\Collectors\CustomerCollector as BaseCustomerCollector;
 use Siel\Acumulus\Data\AddressType;
 
 /**
  * CustomerCollector for WooCommerce.
  */
-class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
+class CustomerCollector extends BaseCustomerCollector
 {
     protected function getVatBasedOn(): string
     {

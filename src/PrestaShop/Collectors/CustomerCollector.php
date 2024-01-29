@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Siel\Acumulus\PrestaShop\Collectors;
 
 use Configuration;
+use Siel\Acumulus\Collectors\CustomerCollector as BaseCustomerCollector;
 use Siel\Acumulus\Data\AddressType;
 
 /**
- * CustomerCollector for WooCommerce.
+ * CustomerCollector for PrestaShop.
  */
-class CustomerCollector extends \Siel\Acumulus\Collectors\CustomerCollector
+class CustomerCollector extends BaseCustomerCollector
 {
     protected function getVatBasedOn(): string
     {

@@ -20,7 +20,8 @@ class AddressCollector extends BaseAddressCollector
      * @param \Siel\Acumulus\Data\Address $acumulusObject
      *
      * @noinspection MissingIssetImplementationInspection  class vObject does
-     *    create real properties for all fields.     */
+     *    create real properties for all fields.
+     */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
         // Country code lookup:

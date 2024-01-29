@@ -40,7 +40,7 @@ use Siel\Acumulus\Meta;
  * Note that all address data, shipping and invoice address, are placed in
  * separate {@see \Siel\Acumulus\Data\Address} objects.
  */
-abstract class CustomerCollector extends Collector
+class CustomerCollector extends Collector
 {
     /**
      * @param \Siel\Acumulus\Data\Customer $acumulusObject
@@ -58,12 +58,19 @@ abstract class CustomerCollector extends Collector
      * Returns the value of the setting indicating which address is used for tax
      * calculations.
      *
+     * The base implementations returns the default setting, {@see AddressType::Invoice},
+     * and is to be overridden by shops that do have a setting that specifies the address
+     * to use or that always use the shipping address.
+     *
      * @return string
      *   Either the (shop specific) value from the corresponding setting in the shop's
      *   config, or one of the constants {@see \Siel\Acumulus\Data\AddressType::Invoice}
      *   or {@see \Siel\Acumulus\Data\AddressType::Shipping}.
      */
-    abstract protected function getVatBasedOn(): string;
+    protected function getVatBasedOn(): string
+    {
+        return AddressType::Invoice;
+    }
 
     /**
      * Returns a mapping for the possible values returned by {@see getVatBasedOn} to an

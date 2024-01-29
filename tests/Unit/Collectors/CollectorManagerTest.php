@@ -48,7 +48,7 @@ class CollectorManagerTest extends TestCase
     public function testCollectInvoice(): void
     {
         $manager = $this->getContainer()->getCollectorManager();
-        $invoice = $manager->collectInvoice($this->getInvoiceSource());
+        $invoice = $manager->collectInvoiceForSource($this->getInvoiceSource());
 
         $this->assertNull($invoice->concept);
         $this->assertNull($invoice->conceptType);
@@ -93,8 +93,9 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectCustomer(): void
     {
-        $manager = $this->getContainer()->getCollectorManager();
-        $customer = $manager->collectCustomer($this->getInvoiceSource());
+        $customer = $this->getContainer()->getCollectorManager()
+            ->setPropertySourcesForSource($this->getInvoiceSource())
+            ->collectCustomer();
 
         $this->assertNull($customer->contactId);
         $this->assertNull($customer->type);
@@ -121,8 +122,9 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectAddress(): void
     {
-        $manager = $this->getContainer()->getCollectorManager();
-        $invoiceAddress = $manager->collectAddress($this->getInvoiceSource(), AddressType::Invoice);
+        $invoiceAddress = $this->getContainer()->getCollectorManager()
+            ->setPropertySourcesForSource($this->getInvoiceSource())
+            ->collectAddress(AddressType::Invoice);
 
         $this->assertSame('Buro RaDer', $invoiceAddress->companyName1);
         $this->assertNull($invoiceAddress->companyName2);
@@ -136,7 +138,8 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($invoiceAddress->countryAutoName);
         $this->assertNull($invoiceAddress->countryAutoNameLang);
 
-        $shippingAddress = $manager->collectAddress($this->getInvoiceSource(), AddressType::Shipping);
+        $shippingAddress = $this->getContainer()->getCollectorManager()
+            ->collectAddress(AddressType::Shipping);
         $this->assertSame('Buro RaDer', $shippingAddress->companyName1);
         $this->assertNull($shippingAddress->companyName2);
         $this->assertSame('Erwin Derksen', $shippingAddress->fullName);
@@ -150,9 +153,9 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectEmailAsPdf(): void
     {
-        $manager = $this->getContainer()->getCollectorManager();
-        /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $invoiceEmailAsPdf */
-        $invoiceEmailAsPdf = $manager->collectEmailAsPdf($this->getInvoiceSource(), EmailAsPdfType::Invoice);
+        $invoiceEmailAsPdf = $this->getContainer()->getCollectorManager()
+            ->setPropertySourcesForSource($this->getInvoiceSource())
+            ->collectEmailAsPdf(EmailAsPdfType::Invoice);
 
         $this->assertNull($invoiceEmailAsPdf->emailFrom);
         $this->assertSame('customer@example.com', $invoiceEmailAsPdf->emailTo);
@@ -163,7 +166,8 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($invoiceEmailAsPdf->ubl);
 
         /** @var \Siel\Acumulus\Data\EmailPackingSlipAsPdf $packingSlipEmailAsPdf */
-        $packingSlipEmailAsPdf = $manager->collectEmailAsPdf($this->getInvoiceSource(), EmailAsPdfType::PackingSlip);
+        $packingSlipEmailAsPdf = $this->getContainer()->getCollectorManager()
+            ->collectEmailAsPdf(EmailAsPdfType::PackingSlip);
 
         $this->assertNull($packingSlipEmailAsPdf->emailFrom);
         $this->assertSame('customer@example.com', $packingSlipEmailAsPdf->emailTo);

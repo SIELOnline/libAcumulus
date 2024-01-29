@@ -49,7 +49,7 @@ class CollectorManager
     protected Log $log;
 
     /** deprecated?  Only Source remains with multi-level FieldExpander? */
-    protected array $propertySources;
+    private array $propertySources;
 
     public function __construct(FieldExpander $fieldExpander, Mappings $mappings, Container $container, Log $log)
     {
@@ -70,23 +70,20 @@ class CollectorManager
         return $this->mappings;
     }
 
-    /**
-     * @deprecated?  Only Source remains with multi-level FieldExpander?
-     */
     protected function getPropertySources(): array
     {
         return $this->propertySources;
     }
 
     /**
-     * Sets the list of sources to search for a property when expanding fields.
+     * Clears the list of sources to search for a property when expanding fields.
      *
-     * @deprecated?  Only Source remains with multi-level FieldExpander?
+     * @return $this
      */
-    protected function setPropertySources(Source $invoiceSource): void
+    public function clearPropertySources(): CollectorManager
     {
         $this->propertySources = [];
-        $this->propertySources['source'] = $invoiceSource->getSource();
+        return $this;
     }
 
     /**
@@ -102,11 +99,12 @@ class CollectorManager
      * @param object|array $property
      *   The source object to add.
      *
-     * @deprecated?  Only Source remains with multi-level FieldExpander?
+     * @return $this
      */
-    public function addPropertySource(string $name, $property): void
+    public function addPropertySource(string $name, $property): CollectorManager
     {
-        $this->propertySources = [$name => $property] + $this->propertySources;
+        $this->propertySources = array_merge($this->propertySources, [$name => $property]);
+        return $this;
     }
 
     /**
@@ -115,64 +113,85 @@ class CollectorManager
      * @param string $name
      *   The name of the source to remove.
      *
-     * @deprecated?  Only Source remains with multi-level FieldExpander?
+     * @return $this
      */
-    protected function removePropertySource(string $name): void
+    public function removePropertySource(string $name): CollectorManager
     {
         unset($this->propertySources[$name]);
+        return $this;
     }
 
-    public function collectInvoice(Source $source): Invoice
+    /**
+     * Sets the property sources for the given {@see \Siel\Acumulus\Invoice\Source}.
+     */
+    public function setPropertySourcesForSource(Source $source): CollectorManager
+    {
+        $this->addPropertySource('source', $source);
+        return $this;
+    }
+
+    /**
+     * Collects an invoice for the given {@see \Siel\Acumulus\Invoice\Source}.
+     */
+    public function collectInvoiceForSource(Source $source): Invoice
+    {
+        return $this->clearPropertySources()->setPropertySourcesForSource($source)->collectInvoice();
+    }
+
+    public function collectInvoice(): Invoice
     {
         $invoiceCollector = $this->getContainer()->getCollector(DataType::Invoice);
         $invoiceMappings = $this->getMappings()->getFor(DataType::Invoice);
-        /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $invoiceCollector->collect(['source' => $source], $invoiceMappings);
 
-        $invoice->setCustomer($this->collectCustomer($source));
-        $invoice->setEmailAsPdf($this->collectEmailAsPdf($source, EmailAsPdfType::Invoice));
+        /** @var \Siel\Acumulus\Data\Invoice $invoice */
+        $invoice = $invoiceCollector->collect($this->getPropertySources(), $invoiceMappings);
+
+        $invoice->setCustomer($this->collectCustomer());
+        $invoice->setEmailAsPdf($this->collectEmailAsPdf(EmailAsPdfType::Invoice));
 
         // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
         //   version in the Legacy sub namespace that is stripped down to these features
         //   that has not yet been converted.
         /** @var \Siel\Acumulus\Completors\Legacy\Creator $creator */
         $creator = $this->getContainer()->getCreator(true);
-        $creator->create($source, $invoice);
+        $creator->create($this->getPropertySources()['source'], $invoice);
         // @legacy end
 
         return $invoice;
     }
 
-    public function collectCustomer(Source $source): Customer
+    public function collectCustomer(): Customer
     {
         $customerCollector = $this->getContainer()->getCollector(DataType::Customer);
         $customerMappings = $this->getMappings()->getFor(DataType::Customer);
 
         /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = $customerCollector->collect(['source' => $source], $customerMappings);
+        $customer = $customerCollector->collect($this->getPropertySources(), $customerMappings);
 
-        $customer->setInvoiceAddress($this->collectAddress($source, AddressType::Invoice));
-        $customer->setShippingAddress($this->collectAddress($source, AddressType::Shipping));
+        $customer->setInvoiceAddress($this->collectAddress(AddressType::Invoice));
+        $customer->setShippingAddress($this->collectAddress(AddressType::Shipping));
 
         return $customer;
     }
 
-    public function collectAddress(Source $source, string $type): Address
+    public function collectAddress(string $type): Address
     {
         $addressCollector = $this->getContainer()->getCollector(DataType::Address);
         $addressMappings = $this->getMappings()->getFor($type);
+
         /** @var \Siel\Acumulus\Data\Address $address */
-        $address = $addressCollector->collect(['source' => $source], $addressMappings);
+        $address = $addressCollector->collect($this->getPropertySources(), $addressMappings);
         return $address;
     }
 
-    public function collectEmailAsPdf(Source $source, string $type): EmailAsPdf
+    public function collectEmailAsPdf(string $type): EmailAsPdf
     {
         $emailAsPdfCollector = $this->getContainer()->getCollector(DataType::EmailAsPdf);
         $emailAsPdfMappings = $this->getMappings()->getFor($type);
         $emailAsPdfMappings['emailAsPdfType'] = $type;
+
         /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */
-        $emailAsPdf = $emailAsPdfCollector->collect(['source' => $source], $emailAsPdfMappings);
+        $emailAsPdf = $emailAsPdfCollector->collect($this->getPropertySources(), $emailAsPdfMappings);
         return $emailAsPdf;
     }
 }

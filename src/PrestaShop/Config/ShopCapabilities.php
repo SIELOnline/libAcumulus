@@ -291,6 +291,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::Address2 => '[address_invoice::address2]',
                 Fld::PostalCode => '[address_invoice::postcode]',
                 Fld::City => '[address_invoice::city]',
+                Meta::ShopCountryId => '[address_invoice::id_country]',
             ],
             AddressType::Shipping => [ // address_shipping instanceof Address
                 Fld::CompanyName1 => '[address_shipping::company]',
@@ -299,6 +300,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::Address2 => '[address_shipping::address2]',
                 Fld::PostalCode => '[address_shipping::postcode]',
                 Fld::City => '[address_shipping::city]',
+                Meta::ShopCountryId => '[address_shipping::id_country]',
             ],
             EmailAsPdfType::Invoice => [
                 Fld::EmailTo => '[source::getOrder::getSource()::getCustomer()::email]',

@@ -14,13 +14,15 @@ use Siel\Acumulus\Invoice\Source;
  */
 class CollectorManager extends BaseCollectorManager
 {
-    protected function setPropertySourcesForSource(Source $source): void
+    public function setPropertySourcesForSource(Source $source): BaseCollectorManager
     {
         parent::setPropertySourcesForSource($source);
 
         /** @var \Order $order */
-        $order = $source->getOrder();
+        $order = $source->getOrder()->getSource();
         $this->addPropertySource('address_invoice', new Address($order->id_address_invoice));
-        $this->addPropertySource('address_delivery', new Address($order->id_address_delivery));
+        $this->addPropertySource('address_shipping', new Address($order->id_address_delivery));
+
+        return $this;
     }
 }

@@ -37,10 +37,10 @@ class CompleteInvoiceNumber extends BaseCompletorTask
         switch ($sourceToUse) {
             case Config::InvoiceNrSource_ShopInvoice:
                 $number = $acumulusObject->metadataGet(Meta::ShopInvoiceReference)
-                    ?? $acumulusObject->metadataGet(Meta::Reference);
+                    ?? $acumulusObject->metadataGet(Meta::SourceReference);
                 break;
             case Config::InvoiceNrSource_ShopOrder:
-                $number = $acumulusObject->metadataGet(Meta::Reference);
+                $number = $acumulusObject->metadataGet(Meta::SourceReference);
                 break;
             case Config::InvoiceNrSource_Acumulus:
                 $number = null;

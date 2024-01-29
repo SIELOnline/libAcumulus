@@ -243,15 +243,15 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDefaultShopConfig(): array
     {
         return [
-            'contactYourId' => '[id]', // Customer
-            'companyName1' => '[company]', // InvoiceAddress
-            'fullName' => '[firstname+lastname]', // InvoiceAddress
-            'address1' => '[address1]', // InvoiceAddress
-            'address2' => '[address2]', // InvoiceAddress
-            'postalCode' => '[postcode]', // InvoiceAddress
-            'city' => '[city]', // InvoiceAddress
-            'vatNumber' => '[vat_number]', // InvoiceAddress
-            'telephone' => '[phone|phone_mobile]', // InvoiceAddress
+            'contactYourId' => '[customer::id_customer]', // Customer
+            'companyName1' => '[company]', // DeliveryAddress
+            'fullName' => '[firstname+lastname]', // DeliveryAddress
+            'address1' => '[address1]', // DeliveryAddress
+            'address2' => '[address2]', // DeliveryAddress
+            'postalCode' => '[postcode]', // DeliveryAddress
+            'city' => '[city]', // DeliveryAddress
+            'vatNumber' => '[vat_number]', // DeliveryAddress
+            'telephone' => '[phone|phone_mobile]', // DeliveryAddress
             'email' => '[email]', // Customer
 
             // Invoice lines defaults.

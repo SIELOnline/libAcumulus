@@ -209,6 +209,7 @@ class Creator extends BaseCreator
         // Add vat meta data.
         $product = $item->getProduct();
         if ($product) {
+            // @todo: Can we lookup vat rate meta data?
             /** @noinspection PhpUndefinedMethodInspection */
             $result += $this->getVatClassMetaData($product->getTaxClassId());
         }

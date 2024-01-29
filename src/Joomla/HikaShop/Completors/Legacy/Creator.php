@@ -160,6 +160,7 @@ class Creator extends BaseCreator
             //  'company_with_vat_number'.
             // - The category id of the tax class, which we have in $category.
             if (isset($category->category_id)) {
+                // @todo: address to use should be be based on setting {@see Meta::ShopVatBasedOn}.
                 $address = $this->order->billing_address;
                 $zone_name = !empty($address->address_state_orig) ? $address->address_state_orig : $address->address_country_orig;
                 if (empty($zone_name)) {

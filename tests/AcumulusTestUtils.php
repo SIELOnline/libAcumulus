@@ -128,6 +128,7 @@ trait AcumulusTestUtils
                             break;
                         case 'line':
                             foreach ($value as $index => $line) {
+                                $this->assertArrayHasKey($index, $object[$field], "$objectName::{$field}[$index]");
                                 $this->compareAcumulusObjects(
                                     $line,
                                     $object[$field][$index],

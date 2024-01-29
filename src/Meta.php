@@ -37,14 +37,10 @@ interface Meta
     /**
      * The internal id of the level it is part of:
      * - Addresses (if available separately)
-     * - Order (debug only)
      * - Order line (Creator->Event: WooCommerce and Magento only).
-     *
      * - Customer (available via contactYourId)
      */
     public const Id = 'meta-id';
-    public const Reference = 'meta-reference';
-    public const Status = 'meta-status';
     /**
      * Messages can be added at any level and are placed at the level it applies to
      * (order, order line, ...). It tells that the code discovered a problem (warning) or
@@ -68,8 +64,11 @@ interface Meta
     public const AddressType = 'meta-address-type';
 
     // Invoice
-    public const ShopSourceType = 'meta-shop-source-type';
-    public const ShopSourceDate = 'meta-shop-source-date';
+    public const SourceType = 'meta-source-type';
+    public const SourceId = 'meta-source-id';
+    public const SourceReference = 'meta-source-reference';
+    public const SourceStatus = 'meta-source-status';
+    public const SourceDate = 'meta-source-date';
     public const PricesIncludeVat = 'meta-prices-include-vat';
     public const PrecisionPrice = 'meta-precision-price';
     public const PrecisionVat = 'meta-precision-vat';

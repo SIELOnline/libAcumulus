@@ -446,7 +446,8 @@ abstract class Creator
         $this->addDefaultEmpty($invoice, Tag::Concept, $concept);
 
         // Meta info: internal order/refund id
-        $invoice[Meta::Id] = $this->invoiceSource->getId();
+        $invoice[Meta::SourceType] = $this->invoiceSource->getType();
+        $invoice[Meta::SourceId] = $this->invoiceSource->getId();
 
         // Invoice number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];

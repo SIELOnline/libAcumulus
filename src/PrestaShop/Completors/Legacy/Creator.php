@@ -217,6 +217,7 @@ class Creator extends BaseCreator
                 $this->precision, $this->precision);
         }
         $taxRulesGroupId = isset($item['id_tax_rules_group']) ? (int) $item['id_tax_rules_group'] : 0;
+        // @todo: address to use should be be based on setting {@see Meta::ShopVatBasedOn}.
         $result += $this->getVatRateLookupMetadata($this->order->id_address_invoice, $taxRulesGroupId);
 
         /** @noinspection UnsupportedStringOffsetOperationsInspection */
@@ -228,6 +229,10 @@ class Creator extends BaseCreator
 
     protected function getShippingLine(): array
     {
+        if (empty($this->order->id_carrier)) {
+            // No carrier (virtual products) => no shipping line.
+            return [];
+        }
         $sign = $this->invoiceSource->getSign();
         $carrier = new Carrier($this->order->id_carrier);
         // total_shipping_tax_excl is not very precise (rounded to the cent) and

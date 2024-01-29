@@ -422,7 +422,7 @@ class Creator extends BaseCreator
                 Meta::VatClassName => $calcRule->calc_rule_name,
             ];
         } elseif (Number::isZero($vatAmount)) {
-            // No vat class assigned to payment.
+            // No vat class assigned to payment or shipping fee.
             $vatInfo = [
                 Tag::VatRate => Api::VatFree,
                 Meta::VatRateSource => static::VatRateSource_Exact0,

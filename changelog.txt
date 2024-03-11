@@ -14,7 +14,7 @@ Features:
 
 Refactorings:
 - PS: Use Version::VERSION as version, not the indirect _PS_VERSION_ or AppKernel::VERSION.
-- ALL: Renames some meta keys (key + string value).
+- ALL: Renamed some meta keys (key + string value).
 
 8.1.1 (2024-01-04) (WC)
 -----------------------

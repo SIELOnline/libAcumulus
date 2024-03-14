@@ -202,6 +202,7 @@ class AboutForm
         );
         $moreAcumulus = [
             $this->t('link_login') . '.',
+            $this->t('link_mobile') . '.',
             $this->t('link_app') . '.',
             $this->t('link_manual') . '.',
             $this->t('link_website') . '.',

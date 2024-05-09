@@ -143,19 +143,19 @@ class Customer extends AcumulusObject
      * @return string
      *   Either AddressType::Invoice or AddressType::Shipping.
      */
-    protected function getMainAddress(): string
+    public function getMainAddressType(): string
     {
-        return $this->metadataGet(Meta::MainAddress) ?? AddressType::Invoice;
+        return $this->metadataGet(Meta::MainAddressType) ?? AddressType::Invoice;
     }
 
     /**
-     * @param string|null $vatAddress
+     * @param string|null $vatAddressType
      *   Either AddressType::Invoice, AddressType::Shipping, or null.
      */
-    public function setMainAddress(?string $vatAddress): void
+    public function setMainAddressType(?string $vatAddressType): void
     {
-        assert(in_array($vatAddress, [AddressType::Invoice, AddressType::Shipping, null], true));
-        $this->metadataSet(Meta::MainAddress, $vatAddress);
+        assert(in_array($vatAddressType, [AddressType::Invoice, AddressType::Shipping, null], true));
+        $this->metadataSet(Meta::MainAddressType, $vatAddressType);
     }
 
     /**
@@ -163,11 +163,11 @@ class Customer extends AcumulusObject
      *
      * @return Address|null
      *   Returns either the {@see getInvoiceAddress()} (default if
-     *   {@see Meta::MainAddress} is not set), or the {@see getShippingAddress()}.
+     *   {@see Meta::MainAddressType} is not set), or the {@see getShippingAddress()}.
      */
     public function getFiscalAddress(): ?Address
     {
-        return $this->getMainAddress() === AddressType::Shipping
+        return $this->getMainAddressType() === AddressType::Shipping
             ? $this->getShippingAddress()
             : $this->getInvoiceAddress();
     }
@@ -191,7 +191,7 @@ class Customer extends AcumulusObject
      */
     public function toArray(): array
     {
-        if ($this->getMainAddress() === AddressType::Invoice) {
+        if ($this->getMainAddressType() === AddressType::Invoice) {
             $address = $this->getInvoiceAddress() ?? $this->getShippingAddress();
             $altAddress = $this->getShippingAddress() ?? $this->getInvoiceAddress();
         } else {

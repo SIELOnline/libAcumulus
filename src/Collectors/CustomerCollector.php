@@ -51,7 +51,7 @@ class CustomerCollector extends Collector
         $taxBasedOn = $this->getVatBasedOn();
         $acumulusObject->metadataSet(Meta::ShopVatBasedOn, $taxBasedOn);
         $taxBasedOnMapping = $this->getVatBasedOnMapping();
-        $acumulusObject->setMainAddress($taxBasedOnMapping[$taxBasedOn] ?? null);
+        $acumulusObject->setMainAddressType($taxBasedOnMapping[$taxBasedOn] ?? null);
     }
 
     /**

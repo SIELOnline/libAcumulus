@@ -53,7 +53,7 @@ interface Meta
     public const Info = 'meta-info';
 
     // Customer + addresses:
-    public const MainAddress = 'meta-main-address';
+    public const MainAddressType = 'meta-main-address-type';
     public const ShopVatBasedOn = 'meta-shop-vat-based-on';
     public const ShopCountryId = 'meta-shop-country-code';
     public const ShopCountryName = 'meta-shop-country-name';

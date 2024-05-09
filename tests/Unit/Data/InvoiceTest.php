@@ -72,7 +72,7 @@ class InvoiceTest extends TestCase
         $invoice->concept = Api::Concept_Yes;
         $customer = new Customer();
         $customer->email = 'test@example.com';
-        $customer->setMainAddress(AddressType::Invoice);
+        $customer->setMainAddressType(AddressType::Invoice);
         $address1 = new Address();
         $address1->address1 = 'Street 1';
         $customer->setInvoiceAddress($address1);

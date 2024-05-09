@@ -26,6 +26,7 @@ use Order;
 use OrderSlip;
 use Siel\Acumulus\Completors\Legacy\Creator as BaseCreator;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
@@ -102,7 +103,7 @@ class Creator extends BaseCreator
         parent::setPropertySources();
         $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
         $this->propertySources['address_delivery'] = new Address($this->order->id_address_delivery);
-        $this->propertySources['customer'] = $this->invoiceSource->getSource()->getCustomer();
+        $this->propertySources['customer'] = $this->order->getCustomer();
     }
 
     protected function getItemLines(): array
@@ -217,8 +218,11 @@ class Creator extends BaseCreator
                 $this->precision, $this->precision);
         }
         $taxRulesGroupId = isset($item['id_tax_rules_group']) ? (int) $item['id_tax_rules_group'] : 0;
-        // @todo: address to use should be be based on setting {@see Meta::ShopVatBasedOn}.
-        $result += $this->getVatRateLookupMetadata($this->order->id_address_invoice, $taxRulesGroupId);
+        // VAT lookup metadata should be based on the address used.
+        /** @noinspection NullPointerExceptionInspection */
+        $vatBasedOn = $this->invoice->getCustomer()->getMainAddressType();
+        $addressId = $vatBasedOn === AddressType::Invoice ? $this->order->id_address_invoice : $this->order->id_address_delivery;
+        $result += $this->getVatRateLookupMetadata($addressId, $taxRulesGroupId);
 
         /** @noinspection UnsupportedStringOffsetOperationsInspection */
         $result[Meta::FieldsCalculated][] = Meta::VatAmount;

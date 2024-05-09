@@ -136,7 +136,7 @@ class Source extends BaseSource
         // @todo: override if MyWebShop supports credit notes, otherwise remove.
     }
 
-    protected function getShopCreditNotesOrIds()
+    protected function getShopCreditNotesOrIds(): iterable
     {
         // @todo: override if MyWebShop supports credit notes, otherwise remove.
     }

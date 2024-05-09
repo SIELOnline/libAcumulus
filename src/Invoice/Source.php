@@ -542,10 +542,10 @@ abstract class Source
      * notes. Do not do any object loading here if only the ids are readily
      * available.
      *
-     * @return array[]|object[]|int[]|\Traversable
+     * @return \iterable
      *   The - possibly empty - set of refunds or refund-ids for this order.
      */
-    protected function getShopCreditNotesOrIds()
+    protected function getShopCreditNotesOrIds(): iterable
     {
         return [];
     }

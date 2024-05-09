@@ -3,16 +3,14 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.1.2 (2024-02-??) (PS)
+8.1.2 (2024-05-??) (PS)
 -----------------------
 Bugs:
 - ALL: NOTICE ...\Collector::expandAndSet: Siel\Acumulus\Data\EmailInvoiceAsPdf does not
   have a property emailAsPdfType, nor is it considered metadata.
 
-Features:
-- PS: Implemented the new "collect-complete architecture" for PrestaShop.
-
 Refactorings:
+- PS: Implemented the new "collect-complete architecture" for PrestaShop.
 - PS: Use Version::VERSION as version, not the indirect _PS_VERSION_ or AppKernel::VERSION.
 - ALL: Renamed some meta keys (key + string value).
 

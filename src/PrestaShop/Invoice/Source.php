@@ -13,12 +13,13 @@ use Db;
 use Order;
 use OrderSlip;
 use PrestaShop\PrestaShop\Core\Version;
+use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Currency as InvoiceCurrency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
-use Siel\Acumulus\Meta;
 
+use function is_array;
 use function strlen;
 
 /**
@@ -35,12 +36,14 @@ class Source extends BaseSource
      */
     protected function setSource(): void
     {
-        // @error: throw exception when not found.
         if ($this->getType() === Source::Order) {
             $this->shopSource = new Order($this->getId());
         } else {
             $this->shopSource = new OrderSlip($this->getId());
             $this->addProperties();
+        }
+        if (!isset($this->shopSource->id)) {
+            throw new RuntimeException(sprintf('Not a valid source id (%s %d)', $this->type, $this->id));
         }
     }
 
@@ -88,10 +91,8 @@ class Source extends BaseSource
     /**
      * Returns the status of this credit note.
      *
-     * @noinspection PhpUnused
-     *   Called via getStatus().
-     * @noinspection ReturnTypeCanBeDeclaredInspection
-     *   null !== void
+     * @noinspection PhpUnused  Called via getStatus().
+     * @noinspection ReturnTypeCanBeDeclaredInspection  null !== void
      */
     protected function getStatusCreditNote()
     {
@@ -160,7 +161,7 @@ class Source extends BaseSource
      * {@inheritdoc}
      *
      * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-amount.
+     * meta-invoice-amount for PrestaShop
      */
     public function getTotals(): Totals
     {
@@ -177,7 +178,7 @@ class Source extends BaseSource
         } else {
             // On credit notes, the amount ex VAT will not have been corrected
             // for discounts that are subtracted from the refund. This will be
-            // corrected later in getDiscountLinesCreditNote().
+            // corrected later in {#see Creator::setDiscountLinesCreditNote()}.
             $amountEx = $this->getSource()->total_products_tax_excl
                       + $this->getSource()->total_shipping_tax_excl;
             $amountInc = $this->getSource()->total_products_tax_incl
@@ -190,8 +191,7 @@ class Source extends BaseSource
     /**
      * Returns the invoice reference for an order
      *
-     * @noinspection PhpUnused
-     *   Called via getInvoiceReference().
+     * @noinspection PhpUnused  Called via getInvoiceReference().
      */
     public function getInvoiceReferenceOrder(): ?string
     {
@@ -203,8 +203,7 @@ class Source extends BaseSource
     /**
      * Returns the invoice date for an order
      *
-     * @noinspection PhpUnused
-     *   Called via getInvoiceDate().
+     * @noinspection PhpUnused  Called via getInvoiceDate().
      */
     public function getInvoiceDateOrder(): ?string
     {
@@ -213,14 +212,17 @@ class Source extends BaseSource
             : null;
     }
 
-    protected function getShopOrderOrId()
+    protected function getShopOrderOrId(): int
     {
         /** @var \OrderSlip $orderSlip */
         $orderSlip = $this->shopSource;
-        return $orderSlip->id_order;
+        /** @noinspection PhpCastIsUnnecessaryInspection  despite the documented return
+         *   type, id is returned as a string.
+         */
+        return (int) $orderSlip->id_order;
     }
 
-    protected function getShopCreditNotesOrIds()
+    protected function getShopCreditNotesOrIds(): iterable
     {
         /** @var \Order $order */
         $order = $this->shopSource;
@@ -242,11 +244,13 @@ class Source extends BaseSource
         if (version_compare(Version::VERSION, '1.7.5', '<')) {
             $row = Db::getInstance()->executeS(sprintf('SELECT * FROM `%s` WHERE `%s` = %u',
                 _DB_PREFIX_ . OrderSlip::$definition['table'], OrderSlip::$definition['primary'], $this->getId()));
-            // Get 1st (and only) result.
-            $row = reset($row);
-            foreach ($row as $key => $value) {
-                /** @noinspection PhpVariableVariableInspection */
-                $this->getSource()->$key ??= $value;
+            if (is_array($row)) {
+                // Get 1st (and only) result if no error
+                $row = reset($row);
+                foreach ($row as $key => $value) {
+                    /** @noinspection PhpVariableVariableInspection */
+                    $this->getSource()->$key ??= $value;
+                }
             }
         }
     }

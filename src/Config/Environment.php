@@ -44,12 +44,14 @@ abstract class Environment
         $this->data['apiVersion'] = Api::apiVersion;
         $this->data['libraryVersion'] = Version;
         $this->data['hostName'] = $this->getHostName();
-        $this->data['phpVersion'] = phpversion();
+        $this->data['phpVersion'] = PHP_VERSION;
         $variables = $this->getDbVariables();
         $this->data['dbName'] = $variables['version_comment'] ?? '??MySQL??';
         $this->data['dbVersion'] = $variables['version'] ?? static::Unknown;
         $this->data['os'] = php_uname();
+        /** @noinspection PhpComposerExtensionStubsInspection  false positive in projects with a higher level composer.json */
         $curlVersion = curl_version();
+        /** @noinspection OffsetOperationsInspection */
         $this->data['curlVersion'] = "{$curlVersion['version']} (ssl: {$curlVersion['ssl_version']}; zlib: {$curlVersion['libz_version']})";
         $pos = strrpos($shopNamespace, '\\');
         $this->data['shopName'] = $pos !== false ? substr($shopNamespace, $pos + 1) : $shopNamespace;
@@ -82,6 +84,10 @@ abstract class Environment
     protected function getHostName(): string
     {
         $hostName = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'example.com';
+        if (empty($hostName)) {
+            // In OC testing $_SERVER['HTTP_HOST'] is not null but equals false.
+            $hostName = 'example.com';
+        }
         if (($pos = strpos($hostName, 'www.')) !== false) {
             $hostName = substr($hostName, $pos + strlen('www.'));
         }

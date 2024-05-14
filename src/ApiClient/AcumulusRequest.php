@@ -164,6 +164,8 @@ class AcumulusRequest
      *   - The communication level, e.g. time-out or no response received.
      *   Note that errors at the application level will be detected when the
      *   response is interpreted.
+     *
+     * @noinspection SpellCheckingInspection
      */
     protected function executeWithPostXmlStringApproach(): HttpResponse
     {

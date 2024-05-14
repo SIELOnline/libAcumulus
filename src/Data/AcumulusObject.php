@@ -9,6 +9,8 @@ use BadMethodCallException;
 use ReflectionClass;
 use RuntimeException;
 
+use Siel\Acumulus\Meta;
+
 use function array_key_exists;
 use function count;
 use function strlen;
@@ -251,10 +253,13 @@ abstract class AcumulusObject implements ArrayAccess
             if (isset($this->$name)) {
                 $result[$name] = $property->getApiValue();
             } elseif ($this->data[$name]->isRequired()) {
-                throw new RuntimeException(sprintf('Required property %s::%s is not set',
+                // Do not throw an exception as that will prevent the message being part
+                // of the error mail, but instead add a meta warning.
+                $result[Meta::Error] = sprintf(
+                    'Required property %s::%s is not set',
                     (new ReflectionClass($this))->getShortName(),
                     $name
-                ));
+                );
             }
         }
         return $result;

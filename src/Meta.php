@@ -48,6 +48,7 @@ interface Meta
      * notice). Warnings are often the result of a failing sanity check (a check that
      * should result in true but didn't).
      */
+    public const Error = 'meta-error';
     public const Warning = 'meta-warning';
     public const Notice = 'meta-notice';
     public const Info = 'meta-info';

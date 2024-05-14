@@ -5,6 +5,11 @@ This file contains a historical overview of changes in our own code.
 
 8.1.2 (2024-05-??) (PS)
 -----------------------
+Features
+- ALL: Message "Required property vatRate is not set ..."  prevents the xml-message being
+  sent and subsequently, as the request will fail, be part of the mail. Add it as a meta
+  error and do send the message, even knowing it will fail.
+
 Bugs:
 - ALL: NOTICE ...\Collector::expandAndSet: Siel\Acumulus\Data\EmailInvoiceAsPdf does not
   have a property emailAsPdfType, nor is it considered metadata.

@@ -24,6 +24,7 @@ use Configuration;
 use Exception;
 use Order;
 use OrderSlip;
+use PrestaShop\PrestaShop\Core\Domain\Order\VoucherRefundType;
 use Siel\Acumulus\Completors\Legacy\Creator as BaseCreator;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AddressType;
@@ -33,8 +34,6 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 use TaxManagerFactory;
 use TaxRulesGroup;
-
-use function array_slice;
 
 /**
  * Creates a raw version of the Acumulus invoice from a PrestaShop {@see \Siel\Acumulus\PrestaShop\Invoice\Source}.
@@ -407,9 +406,11 @@ class Creator extends BaseCreator
     }
 
     /**
-     * In a Prestashop credit slip, the discounts are not visible anymore, but
-     * can be computed by looking at the difference between the value of
-     * total_products_tax_incl and the sum of the OrderSlipDetail amounts.
+     * In a Prestashop credit slip, the discounts are not directly visible but can be
+     * retrieved by looking at the cart rules form the original order and the field
+     * {@see OrderSlip::$order_slip_type} which indicates if the cart rules from the
+     * original order are to be revoked ({@see VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND})
+     * or remain ({@see VoucherRefundType::PRODUCT_PRICES_REFUND}).
      *
      * @return array[]
      *
@@ -419,62 +420,72 @@ class Creator extends BaseCreator
     {
         $result = [];
 
-        // Get total amount credited.
-        $creditSlipAmountInc = $this->creditSlip->total_products_tax_incl;
-
-        // Get sum of product lines.
-        $lines = $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
-        $detailsAmountInc = array_reduce($lines, static function ($sum, $item) {
-            $sum += $item['total_price_tax_incl'];
-            return $sum;
-        }, 0.0);
-
-        // We assume that if total < sum(details), a discount given on the
-        // original order has now been subtracted from the amount credited.
-        if (!Number::floatsAreEqual($creditSlipAmountInc, $detailsAmountInc, 0.05)
-            && $creditSlipAmountInc < $detailsAmountInc
-        ) {
-            // PS Error: total_products_tax_excl is not adjusted (whereas
-            // total_products_tax_incl is) when a discount is subtracted from
-            // the amount to be credited.
-            // So we cannot calculate the discount ex VAT ourselves.
-            // What we can try is the following: Get the order cart rules to see
-            // if 1 or all of those match the discount amount here.
-            $discountAmountInc = $detailsAmountInc - $creditSlipAmountInc;
-            $totalOrderDiscountInc = 0.0;
-            // Note: The sign of the entries in $orderDiscounts will be correct.
-            $orderDiscounts = $this->getDiscountLinesOrder();
-
-            foreach ($orderDiscounts as $key => $orderDiscount) {
-                if (Number::floatsAreEqual($orderDiscount[Meta::UnitPriceInc], $discountAmountInc)) {
-                    // Return this single line.
-                    $from = $key;
-                    $to = $key;
-                    break;
-                }
-                $totalOrderDiscountInc += $orderDiscount[Meta::UnitPriceInc];
-                if (Number::floatsAreEqual($totalOrderDiscountInc, $discountAmountInc)) {
-                    // Return all lines up to here.
-                    $from = 0;
-                    $to = $key;
-                    break;
-                }
-            }
-
-            if (isset($from, $to)) {
-                $result = array_slice($orderDiscounts, $from, $to - $from + 1);
-                // Correct meta-invoice-amount.
-                $totalOrderDiscountEx = array_reduce($result, static function ($sum, $item) {
-                    $sum += $item[Tag::Quantity] * $item[Tag::UnitPrice];
-                    return $sum;
-                }, 0.0);
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::Totals]->amountEx += $totalOrderDiscountEx;
-            } //else {
-                // We could not match a discount with the difference between the
-                // total amount credited and the sum of the products returned. A
-                // manual line will correct the invoice.
-            //}
+        /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
+        if ((int) $this->creditSlip->order_slip_type === VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND) {
+            // Vouchers are deducted from the refund amount, add a discount line per
+            // discount applied to the original order. The amounts will be positive as
+            // {@see Creator::getDiscountLineOrder()} takes the 'sign' into account.
+            $result = $this->getDiscountLinesOrder();
         }
+
+        // BR 2024-05-14 Old, replaced by looking at order_slip_type
+        // Get total amount credited.
+//        $creditSlipAmountInc = $this->creditSlip->total_products_tax_incl;
+//
+//        // Get sum of product lines.
+//        $lines = $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
+//        $detailsAmountInc = array_reduce($lines, static function ($sum, $item) {
+//            $sum += $item['total_price_tax_incl'];
+//            return $sum;
+//        }, 0.0);
+//
+//        // We assume that if total < sum(details), a discount given on the
+//        // original order has now been subtracted from the amount credited.
+//        if (!Number::floatsAreEqual($creditSlipAmountInc, $detailsAmountInc, 0.05)
+//            && $creditSlipAmountInc < $detailsAmountInc
+//        ) {
+//            // PS Error: total_products_tax_excl is not adjusted (whereas
+//            // total_products_tax_incl is) when a discount is subtracted from
+//            // the amount to be credited.
+//            // So we cannot calculate the discount ex VAT ourselves.
+//            // What we can try is the following: Get the order cart rules to see
+//            // if 1 or all of those match the discount amount here.
+//            $discountAmountInc = $detailsAmountInc - $creditSlipAmountInc;
+//            $totalOrderDiscountInc = 0.0;
+//            // Note: The sign of the entries in $orderDiscounts will be correct.
+//            $orderDiscounts = $this->getDiscountLinesOrder();
+//
+//            foreach ($orderDiscounts as $key => $orderDiscount) {
+//                if (Number::floatsAreEqual($orderDiscount[Meta::UnitPriceInc], $discountAmountInc)) {
+//                    // Return this single line.
+//                    $from = $key;
+//                    $to = $key;
+//                    break;
+//                }
+//                $totalOrderDiscountInc += $orderDiscount[Meta::UnitPriceInc];
+//                if (Number::floatsAreEqual($totalOrderDiscountInc, $discountAmountInc)) {
+//                    // Return all lines up to here.
+//                    $from = 0;
+//                    $to = $key;
+//                    break;
+//                }
+//            }
+//
+//            if (isset($from, $to)) {
+//                $result = array_slice($orderDiscounts, $from, $to - $from + 1);
+//                // Correct meta-invoice-amount.
+//                $totalOrderDiscountEx = array_reduce($result, static function ($sum, $item) {
+//                    $sum += $item[Tag::Quantity] * $item[Tag::UnitPrice];
+//                    return $sum;
+//                }, 0.0);
+//                $this->invoice[Tag::Customer][Tag::Invoice][Meta::Totals]->amountEx += $totalOrderDiscountEx;
+//            } //else {
+//                // We could not match a discount with the difference between the
+//                // total amount credited and the sum of the products returned. A
+//                // manual line will correct the invoice.
+//            //}
+//        }
+        // End of BR 2024-05-14 Old, replaced by looking at order_slip_type
         return $result;
     }
 

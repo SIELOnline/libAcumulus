@@ -12,12 +12,15 @@ use Currency;
 use Db;
 use Order;
 use OrderSlip;
+use PrestaShop\PrestaShop\Core\Domain\Order\VoucherRefundType;
 use PrestaShop\PrestaShop\Core\Version;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Currency as InvoiceCurrency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
+
+use Validate;
 
 use function is_array;
 use function strlen;
@@ -42,7 +45,7 @@ class Source extends BaseSource
             $this->shopSource = new OrderSlip($this->getId());
             $this->addProperties();
         }
-        if (!isset($this->shopSource->id)) {
+        if (!Validate::isLoadedObject($this->shopSource)) {
             throw new RuntimeException(sprintf('Not a valid source id (%s %d)', $this->type, $this->id));
         }
     }
@@ -154,6 +157,7 @@ class Source extends BaseSource
     public function getCurrency(): InvoiceCurrency
     {
         $currency = Currency::getCurrencyInstance($this->getOrder()->shopSource->id_currency);
+        /** @noinspection PhpCastIsUnnecessaryInspection  conversion_rate contains the string representation of a float */
         return new InvoiceCurrency($currency->iso_code, (float) $this->getSource()->conversion_rate, true);
     }
 
@@ -167,22 +171,39 @@ class Source extends BaseSource
     {
         $sign = $this->getSign();
         if ($this->getType() === Source::Order) {
-            $amountEx = $this->getSource()->getTotalProductsWithoutTaxes()
-                      + $this->getSource()->total_shipping_tax_excl
-                      + $this->getSource()->total_wrapping_tax_excl
-                      - $this->getSource()->total_discounts_tax_excl;
-            $amountInc = $this->getSource()->getTotalProductsWithTaxes()
-                         + $this->getSource()->total_shipping_tax_incl
-                         + $this->getSource()->total_wrapping_tax_incl
-                         - $this->getSource()->total_discounts_tax_incl;
+            /** @var Order $order */
+            $order = $this->getSource();
+            $amountEx = $order->getTotalProductsWithoutTaxes()
+                      + $order->total_shipping_tax_excl
+                      + $order->total_wrapping_tax_excl
+                      - $order->total_discounts_tax_excl;
+            $amountInc = $order->getTotalProductsWithTaxes()
+                         + $order->total_shipping_tax_incl
+                         + $order->total_wrapping_tax_incl
+                         - $order->total_discounts_tax_incl;
         } else {
-            // On credit notes, the amount ex VAT will not have been corrected
-            // for discounts that are subtracted from the refund. This will be
-            // corrected later in {#see Creator::setDiscountLinesCreditNote()}.
-            $amountEx = $this->getSource()->total_products_tax_excl
-                      + $this->getSource()->total_shipping_tax_excl;
-            $amountInc = $this->getSource()->total_products_tax_incl
-                         + $this->getSource()->total_shipping_tax_incl;
+            // On credit notes:
+            // - The amount incl. VAT will not have been corrected for discounts that are
+            //   revoked on the refund.
+            // - The amount excl. VAT has been corrected with the discount amount incl. VAT!
+            // Use the cart rules to correct these errors.
+            /** @var OrderSlip $creditNote */
+            $creditNote = $this->getSource();
+            $amountEx = $creditNote->total_products_tax_excl
+                      + $creditNote->total_shipping_tax_excl;
+            $amountInc = $creditNote->total_products_tax_incl
+                         + $creditNote->total_shipping_tax_incl;
+            /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
+            if ((int) $creditNote->order_slip_type === VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND) {
+                /** @var Order $order */
+                $order = $this->getOrder()->getSource();
+                /** @var \OrderCartRule[] $cartRules */
+                $cartRules = $order->getCartRules();
+                foreach ($cartRules as $cartRule) {
+                    $amountEx += $cartRule['value'] - $cartRule['value_tax_excl'];
+                    $amountInc -= $cartRule['value'];
+                }
+            }
         }
 
         return new Totals($sign * $amountInc, null, $sign * $amountEx);

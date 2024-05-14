@@ -16,6 +16,7 @@ Bugs:
 
 Refactorings:
 - PS: Implemented the new "collect-complete architecture" for PrestaShop.
+- PS: Better handling of discounts in refunds, including adding tests for it.
 - PS: Use Version::VERSION as version, not the indirect _PS_VERSION_ or AppKernel::VERSION.
 - ALL: Renamed some meta keys (key + string value).
 

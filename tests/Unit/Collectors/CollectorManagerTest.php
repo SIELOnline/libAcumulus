@@ -66,7 +66,7 @@ class CollectorManagerTest extends TestCase
 
         $meta = $invoice->getMetadata();
         $this->assertSame(Source::Order, $meta->get(Meta::SourceType));
-        $this->assertSame(3, $meta->get(Meta::Id));
+        $this->assertSame(3, $meta->get(Meta::SourceId));
         $this->assertSame(3, $meta->get(Meta::SourceReference));
         $this->assertEquals('2022-12-01', $meta->get(Meta::SourceDate));
         $this->assertSame('pending', $meta->get(Meta::SourceStatus));

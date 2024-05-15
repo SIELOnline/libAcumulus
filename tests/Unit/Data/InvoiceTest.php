@@ -90,7 +90,7 @@ class InvoiceTest extends TestCase
                 'email' => 'test@example.com',
                 'address1' => 'Street 1',
                 'altAddress1' => 'Street 2',
-                'meta-main-address' => 'invoice',
+                'meta-main-address-type' => 'invoice',
                 'invoice' => [
                     'concept' => 1,
                     'line' => [],

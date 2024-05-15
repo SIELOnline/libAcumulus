@@ -3,8 +3,8 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.1.2 (2024-05-15) (PS)
------------------------
+8.1.2 (2024-05-15) (PS, WC)
+---------------------------
 Features
 - ALL: Message "Required property vatRate is not set ..."  prevents the xml-message being
   sent and subsequently, as the request will fail, be part of the mail. Add it as a meta

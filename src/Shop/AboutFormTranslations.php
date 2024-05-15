@@ -61,11 +61,12 @@ Heeft u nog geen pro-support aangeschaft of wilt u het verlengen? Verzeker jouw 
 LONGSTRING
         ,
 
-        // Moore Acumulus links.
+        // More Acumulus links.
         'moreAcumulusTitle' => 'Meer Acumulus (links openen in een nieuwe tab)',
         'link_login' => '<a href="https://www.sielsystems.nl/" target="_blank">Inloggen op Acumulus</a>',
-        'link_app' => '<a href="https://www.sielsystems.nl/app" target="_blank">Installeer de Acumulus app voor iPhone of Android</a>',
-        'link_manual' => '<a href="https://wiki.acumulus.nl/" target="_blank">Lees de Online handleiding over Acumulus</a>',
+        'link_app' => '<a href="https://www.siel.nl/acumulus/app" target="_blank">Installeer de Acumulus app voor iPhone of Android</a>',
+        'link_mobile' => '<a href="https://m.acumulus.nl/" target="_blank">Gebruik de praktische web-app voor elke telefoon</a>',
+        'link_manual' => '<a href="https://www.siel.nl/acumulus/handleiding/" target="_blank">Lees de Online handleiding over Acumulus</a>',
         'link_website' => '<a href="https://siel.nl/" target="_blank">Bezoek de website van SIEL</a>',
         'link_buy_support' => '<a href="https://www.siel.nl/acumulus/koppelingen/support/" target="_blank"><span class="acumulus-blue">Pro-</span>support voor deze Acumulus %1$s</a>',
         'link_forum' => '<span class="acumulus-blue">Basic-</span>support: <a href="https://forum.acumulus.nl/index.php" target="_blank">Bezoek het Acumulus forum</a> waar u algemene vragen kunt stellen of de antwoorden op al gestelde vragen kunt opzoeken',

@@ -182,10 +182,19 @@ class Source extends BaseSource
                          + $order->total_wrapping_tax_incl
                          - $order->total_discounts_tax_incl;
         } else {
-            // On credit notes:
+            // On credit notes with order_slip_type = VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND:
             // - The amount incl. VAT will not have been corrected for discounts that are
             //   revoked on the refund.
             // - The amount excl. VAT has been corrected with the discount amount incl. VAT!
+            //
+            // On credit notes with order_slip_type = VoucherRefundType::SPECIFIC_AMOUNT_REFUND:
+            // - The amount excl. VAT will have been corrected with the discount amount
+            //   incl. VAT!.
+            // - The total amount incl. that will be refunded will NOT contain any discount
+            //   amount ... (as if the specific amount refunded specified = 0,00)
+            // So to follow the shop we will have to treat this as if no voucher has been
+            // revoked.
+            //
             // Use the cart rules to correct these errors.
             /** @var OrderSlip $creditNote */
             $creditNote = $this->getSource();
@@ -194,14 +203,19 @@ class Source extends BaseSource
             $amountInc = $creditNote->total_products_tax_incl
                          + $creditNote->total_shipping_tax_incl;
             /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
-            if ((int) $creditNote->order_slip_type === VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND) {
+            if ((int) $creditNote->order_slip_type !== VoucherRefundType::PRODUCT_PRICES_REFUND) {
                 /** @var Order $order */
                 $order = $this->getOrder()->getSource();
                 /** @var \OrderCartRule[] $cartRules */
                 $cartRules = $order->getCartRules();
                 foreach ($cartRules as $cartRule) {
-                    $amountEx += $cartRule['value'] - $cartRule['value_tax_excl'];
-                    $amountInc -= $cartRule['value'];
+                    /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
+                    if ((int) $creditNote->order_slip_type === VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND) {
+                        $amountEx += $cartRule['value'] - $cartRule['value_tax_excl'];
+                        $amountInc -= $cartRule['value'];
+                    } else {
+                        $amountEx += $cartRule['value'];
+                    }
                 }
             }
         }

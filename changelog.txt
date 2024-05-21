@@ -3,6 +3,12 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.1.3 (2024-05-21) (JOO)
+------------------------
+Bugs:
+- JOO: Update procedure was not adapted to new library location.
+
+
 8.1.2 (2024-05-15) (PS, WC)
 ---------------------------
 Features

@@ -14,7 +14,6 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Helpers\Util;
 use Siel\Acumulus\Invoice\Source;
 use stdClass;
 use Throwable;
@@ -47,7 +46,6 @@ abstract class OcHelper
     public function __construct($registry, Container $acumulusContainer)
     {
         $this->acumulusContainer = $acumulusContainer;
-        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->registry = $this->acumulusContainer->getInstance('Registry', 'Helpers', [$registry]);
         $this->data = [];
 
@@ -139,6 +137,26 @@ abstract class OcHelper
         $this->uninstallEvents();
         $this->doUninstall();
         $this->registry->response->redirect($this->registry->getRouteUrl('marketplace/extension', ''));
+    }
+
+    /**
+     * Controller action: show/process the settings form.
+     *
+     * @throws \Throwable
+     */
+    public function settings(): void
+    {
+        $this->handleForm('settings');
+    }
+
+    /**
+     * Controller action: show/process the advanced settings form.
+     *
+     * @throws \Throwable
+     */
+    public function mappings(): void
+    {
+        $this->handleForm('mappings');
     }
 
     /**
@@ -322,7 +340,7 @@ abstract class OcHelper
             'separator' => false,
         ];
         // Add an intermediate level to the config breadcrumb.
-        if ($type === 'config') {
+        if ($type === 'settings' || $type === 'config') {
             $this->data['breadcrumbs'][] = $this->getExtensionsBreadcrumb();
         }
         $this->data['breadcrumbs'][] = [
@@ -467,7 +485,7 @@ abstract class OcHelper
     public function extractOrderId(array $args): int
     {
         [$route, $event_args, $output] = $args;
-        $order_id = substr($route, -strlen('/addOrder')) ===  '/addOrder' ? $output : $event_args[0];
+        $order_id = substr($route, -strlen('/addOrder')) === '/addOrder' ? $output : $event_args[0];
         return (int) $order_id;
     }
 
@@ -492,31 +510,21 @@ abstract class OcHelper
     {
         foreach ($menus as &$menu) {
             if ($menu['id'] === 'menu-sale') {
+                $items = $this->acumulusContainer->getShopCapabilities()->usesNewCode()
+                    ? ['batch', 'settings', 'mappings', 'activate']
+                    : ['batch', 'config', 'advanced', 'activate'];
+                $acumulusMenuItems = [];
+                foreach ($items as $name) {
+                    $acumulusMenuItems[] = [
+                        'name' => $this->t("{$name}_form_link_text"),
+                        'href' => $this->acumulusContainer->getShopCapabilities()->getLink($name),
+                        'children' => [],
+                    ];
+                }
                 $menu['children'][] = [
                     'name' => 'Acumulus',
                     'href' => '',
-                    'children' => [
-                        [
-                            'name' => $this->t('batch_form_link_text'),
-                            'href' => $this->acumulusContainer->getShopCapabilities()->getLink('batch'),
-                            'children' => [],
-                        ],
-                        [
-                            'name' => $this->t('config_form_link_text'),
-                            'href' => $this->acumulusContainer->getShopCapabilities()->getLink('config'),
-                            'children' => [],
-                        ],
-                        [
-                            'name' => $this->t('advanced_form_link_text'),
-                            'href' => $this->acumulusContainer->getShopCapabilities()->getLink('advanced'),
-                            'children' => [],
-                        ],
-                        [
-                            'name' => $this->t('activate_form_link_text'),
-                            'href' => $this->acumulusContainer->getShopCapabilities()->getLink('activate'),
-                            'children' => [],
-                        ],
-                    ],
+                    'children' => $acumulusMenuItems,
                 ];
             }
         }
@@ -544,7 +552,8 @@ abstract class OcHelper
      * @return bool
      *   Success.
      *
-     * @noinspection PhpDocMissingThrowsInspection*/
+     * @noinspection PhpDocMissingThrowsInspection
+     */
     protected function doInstall(): bool
     {
         $requirements = $this->acumulusContainer->getRequirements();
@@ -583,8 +592,11 @@ abstract class OcHelper
             $this->acumulusContainer->getConfig()->save([Config::VersionKey => Version]);
         }
 
-        $this->acumulusContainer->getLog()->info('%s: installed version = %s, $result = %s',
-            __METHOD__, Version, $result ? 'true' : 'false'
+        $this->acumulusContainer->getLog()->info(
+            '%s: installed version = %s, $result = %s',
+            __METHOD__,
+            Version,
+            $result ? 'true' : 'false'
         );
         return $result;
     }
@@ -674,8 +686,11 @@ abstract class OcHelper
             $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
         }
 
-        $this->acumulusContainer->getLog()->info('%s: updated to version = %s, $result = %s',
-            __METHOD__, Version, $result ? 'true' : 'false'
+        $this->acumulusContainer->getLog()->info(
+            '%s: updated to version = %s, $result = %s',
+            __METHOD__,
+            Version,
+            $result ? 'true' : 'false'
         );
         return $result;
     }

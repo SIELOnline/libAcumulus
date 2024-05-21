@@ -13,4 +13,6 @@ interface AddressType
 {
     public const Shipping = 'shipping';
     public const Invoice = 'invoice';
+    // @todo: do we need a constant for store address
+    public const Store = 'store';
 }

@@ -2,6 +2,7 @@
 /**
  * @noinspection DuplicatedCode This form started as a duplicate of
  *   {@see \Siel\Acumulus\Shop\AdvancedConfigForm}.
+ * @todo: Change form field names to constants from the Fld class.
  */
 
 declare(strict_types=1);
@@ -427,7 +428,7 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'productName' => [
+            'product' => [
                 'type' => 'text',
                 'label' => $this->t('field_productName'),
                 'description' => $this->t('desc_productName'),
@@ -534,7 +535,11 @@ class MappingsForm extends Form
             ],
             'basicSettingsLink' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('button_link'), $this->t('settings_form_link_text'), $this->shopCapabilities->getLink('settings')),
+                'value' => sprintf(
+                    $this->t('button_link'),
+                    $this->t('settings_form_link_text'),
+                    $this->shopCapabilities->getLink('settings')
+                ),
             ],
         ];
     }

@@ -3,6 +3,16 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.1.5 (2024-06-??) (OC)
+-----------------------
+Bugs:
+- ALL: Field product name on mappings form does not correspond with mapping for product
+  name. As it was not yet really used, this is no big deal.
+
+Refactorings:
+- OC: Implemented the new "collect-complete architecture" for OpenCart.
+
+
 8.1.4 (2024-05-22) (JOO)
 ------------------------
 Bugs:

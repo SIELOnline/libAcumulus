@@ -488,9 +488,11 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 
         // Link to other settings/mappings form.
         'desc_mappings' => 'Om de factuurgegevens te verzamelen, haalt de plugin veel informatie uit de data van de webwinkel. Welk veld uit die data gebruikt wordt voor de velden van een Acumulus-factuur is grotendeels vastgelegd in de plugin, maar op het formulier "%1$s" onder "%2$s" kunt u dit waar nodig aanpassen. Nadat u hier de gegevens hebt ingevuld <strong>en opgeslagen</strong>, kunt u het andere formulier bezoeken:',
+        // @todo: translate this for other shops (this is WP/WC specific...).
         'menu_mappings' => 'Instellingen → Acumulus veldverwijzingen',
 
         'desc_settings' => 'U bevindt zich nu op het formulier met veldverwijzingen, ofwel de links tussen de data uit de webwinkel en een Acumulus factuur. De "echte" instellingen vindt u op het "%1$s" formulier onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
+        // @todo: translate this for other shops (this is WP/WC specific...).
         'menu_settings' => 'Instellingen → Acumulus instellingen',
     ];
 

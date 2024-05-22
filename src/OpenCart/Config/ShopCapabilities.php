@@ -11,6 +11,7 @@ namespace Siel\Acumulus\OpenCart\Config;
 
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
@@ -309,13 +310,17 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     {
         $registry = $this->getRegistry();
         switch ($linkType) {
+            case 'settings':
             case 'config':
             case 'register':
             case 'activate':
+            case 'mappings':
             case 'advanced':
             case 'batch':
             case 'invoice':
                 return $registry->getRouteUrl($linkType);
+            case 'fiscalAddressSetting':
+                return $registry->getRouteUrl('tax_class', 'localisation', '');
             case 'logo':
                 return $registry->getFileUrl('view/image/acumulus/siel-logo.png');
             case 'pro-support-image':
@@ -324,5 +329,32 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
                 return 'https://pay.siel.nl/?p=0nKmWpoNV0wtqeac43dqc5YUAcaHFJkldwy1alKD1G3EJHmC';
         }
         return parent::getLink($linkType);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * In OpenCart this is not a setting but a property per tax rate per tax class. This
+     * property can have one of the following values: 'shipping', 'payment', or 'store'.
+     *
+     * @todo: So, this cannot for all possible situations unambiguously be mapped to the
+     *   way Acumulus handles this. so, we may have to dynamically determine this when
+     *   collecting an invoice.
+     */
+    public function getFiscalAddressSetting(): string
+    {
+        return AddressType::Store;
+    }
+
+    /**
+     * OpenCart switched to the new creation process!
+     *
+     * Note: in case of severe errors during the creation process: return false to revert
+     * to the old "tried and tested" code.
+     */
+    public function usesNewCode(): bool
+    {
+        //return false; // Emergency revert: remove the // at the beginning of this line!
+        return true;
     }
 }

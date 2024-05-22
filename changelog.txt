@@ -3,6 +3,25 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.1.4 (2024-05-22) (JOO)
+------------------------
+Bugs:
+- JOO3: TypeError: Return value of Siel\Acumulus\Joomla\Helpers\Event::getCMSApplication()
+  must be an instance of Joomla\CMS\Application\CMSApplicationInterface, instance of
+  Joomla\CMS\Application\AdministratorApplication returned in Joomla/Helpers/Event.php:51
+- JOO3: Return value of AcumulusController::getApp() must be an instance of
+  Joomla\CMS\Application\CMSApplicationInterface, instance of
+  Joomla\CMS\Application\AdministratorApplication returned.
+- VM: TypeError: Argument 4 passed to
+  Siel\Acumulus\Joomla\VirtueMart\Completors\Legacy\Creator::getVatData() must be of the
+  type int, string given, called in Joomla\VirtueMart\Completors\Legacy\Creator.php on
+  line 162 and defined in Joomla\VirtueMart\Completors\Legacy\Creator.php:414.
+- VM: TypeError: Argument 2 passed to
+  Siel\Acumulus\Joomla\VirtueMart\Completors\Legacy\Creator::getVariantLines() must be of
+  the type int, string given, called in Joomla\VirtueMart\Completors\Legacy\Creator.php on
+  line 181 and defined in Joomla\VirtueMart\Completors\Legacy\Creator.php:201.
+
+
 8.1.3 (2024-05-21) (JOO)
 ------------------------
 Bugs:

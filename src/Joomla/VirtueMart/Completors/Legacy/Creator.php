@@ -159,7 +159,7 @@ class Creator extends BaseCreator
         $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
         $productPriceInc = (float) $item->product_final_price;
         $productVat = (float) $item->product_tax;
-        $vatInfo = $this->getVatData('VatTax', $productPriceEx, $productVat, $item->virtuemart_order_item_id);
+        $vatInfo = $this->getVatData('VatTax', $productPriceEx, $productVat, (int) $item->virtuemart_order_item_id);
 
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
@@ -174,7 +174,7 @@ class Creator extends BaseCreator
                 Meta::VatAmount => $productVat,
             ];
         }
-        $result[Tag::Quantity] = $item->product_quantity;
+        $result[Tag::Quantity] = (int) $item->product_quantity;
         $result += $vatInfo;
 
         // Add variant info.

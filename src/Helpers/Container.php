@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '8.1.3';
+const Version = '8.1.4';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -345,7 +345,7 @@ class Container
 
     public function getFormHelper(): FormHelper
     {
-        return $this->getInstance('FormHelper', 'Helpers', [$this->getTranslator(),$this->getLog()]);
+        return $this->getInstance('FormHelper', 'Helpers', [$this->getTranslator(), $this->getLog()]);
     }
 
     public function getFormRenderer(bool $newInstance = false): FormRenderer

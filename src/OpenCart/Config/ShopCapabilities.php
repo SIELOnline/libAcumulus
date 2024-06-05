@@ -318,7 +318,8 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         $statuses = $model->getOrderStatuses();
         $result = [];
         foreach ($statuses as $status) {
-            [$optionValue, $optionText] = array_values($status);
+            $optionValue = $status['order_status_id'];
+            $optionText = $status['name'];
             $result[$optionValue] = $optionText;
         }
         return $result;

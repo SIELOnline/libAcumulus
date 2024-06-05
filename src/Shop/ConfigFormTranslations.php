@@ -709,9 +709,9 @@ Field references are denoted by placing the name of the property between square 
         'desc_invoiceMappingsHeader' => '',
         'invoiceLinesMappingsHeader' => 'Invoice lines source fields',
         'desc_invoiceLinesMappingsHeader' => '',
-        'emailInvoicePdfMappingsHeader' => 'Sources when mailing an invoice pdf',
+        'emailInvoicePdfMappingsHeader' => 'Source fields when mailing an invoice pdf',
         'desc_emailInvoicePdfMappingsHeader' => '',
-        'emailPackingSlipPdfMappingsHeader' => 'Sources when mailing a packing slip pdf',
+        'emailPackingSlipPdfMappingsHeader' => 'Source fields when mailing a packing slip pdf',
         'desc_emailPackingSlipPdfMappingsHeader' => '',
 
         'field_countryCode' => 'Country code',

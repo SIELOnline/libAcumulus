@@ -792,7 +792,7 @@ class Acumulus
      *   False to prevent any embedded graphics from being applied to the
      *   document; true, null, or absent otherwise.
      *
-     *   @return AcumulusResult
+     * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
      * - 'token'

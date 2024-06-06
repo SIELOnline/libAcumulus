@@ -48,6 +48,9 @@ class CustomerCollector extends Collector
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
         parent::collectLogicFields($acumulusObject);
+        // @todo: in fact, this is not the correct place to retrieve and store this. This
+        //   should be either "global" metadata (except in OC) or at the invoice level
+        //   where it is used for checking valid vat rates.
         $taxBasedOn = $this->getVatBasedOn();
         $acumulusObject->metadataSet(Meta::ShopVatBasedOn, $taxBasedOn);
         $taxBasedOnMapping = $this->getVatBasedOnMapping();

@@ -13,6 +13,7 @@ interface AddressType
 {
     public const Shipping = 'shipping';
     public const Invoice = 'invoice';
-    // @todo: do we need a constant for store address
+    // @todo: which shops do support this address type to base vat calculations on? OC, ???.
+    // @todo: start using this in the collectors/completors.
     public const Store = 'store';
 }

@@ -254,9 +254,10 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         // OpenCart: both addresses are always filled.
         return [
             DataType::Invoice => [
-                // @todo: fields that come from the Order, because, if it comes from
-                //   Source, it is not shop specific and defined in
+                // @todo: fields that come from the Order (or are constant), because, if
+                //   it would come from Source, it is not shop specific and defined in
                 //   Mappings::getShopIndependentDefaults().
+                Meta::PricesIncludeVat => false,
             ],
             DataType::Customer => [
                 // Customer defaults.

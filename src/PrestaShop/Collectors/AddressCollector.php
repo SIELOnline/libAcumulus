@@ -41,7 +41,7 @@ class AddressCollector extends BaseAddressCollector
             } else {
                 $name = $country->name;
             }
-            $acumulusObject->metadataSet( Meta::ShopCountryName, $name);
+            $acumulusObject->metadataSet(Meta::ShopCountryName, $name);
         }
     }
 }

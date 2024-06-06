@@ -21,8 +21,8 @@ class CustomerCollector extends BaseCustomerCollector
     protected function getVatBasedOnMapping(): array
     {
         return [
-            'id_address_delivery' => AddressType::Shipping,
-            'id_address_invoice' => AddressType::Invoice,
+                'id_address_delivery' => AddressType::Shipping,
+                'id_address_invoice' => AddressType::Invoice,
             ] + parent::getVatBasedOnMapping();
     }
 }

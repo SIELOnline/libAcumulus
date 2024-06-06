@@ -266,9 +266,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
         // PrestaShop: both addresses are always filled.
         return [
             DataType::Invoice => [
-                // @todo: fields that come from the Order or its metadata, because, if it
-                //   comes from Source, it is not shop specific and defined in
+                // @todo: fields that come from the Order (or are constant), because, if
+                //   it would come from Source, it is not shop specific and defined in
                 //   Mappings::getShopIndependentDefaults().
+                // In PrestaShop you can enter a price with or without vat, the other being
+                // automatically updated. So we can not know how prices where entered.
+                Meta::PricesIncludeVat => null,
             ],
             DataType::Customer => [
                 // Customer defaults.

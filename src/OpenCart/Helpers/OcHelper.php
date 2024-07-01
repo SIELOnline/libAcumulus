@@ -15,6 +15,7 @@ use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Meta;
 use stdClass;
 use Throwable;
 

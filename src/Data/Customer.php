@@ -154,7 +154,7 @@ class Customer extends AcumulusObject
      */
     public function setMainAddressType(?string $vatAddressType): void
     {
-        assert(in_array($vatAddressType, [AddressType::Invoice, AddressType::Shipping, null], true));
+        assert(in_array($vatAddressType, [AddressType::Invoice, AddressType::Shipping, AddressType::Store, null], true));
         $this->metadataSet(Meta::MainAddressType, $vatAddressType);
     }
 

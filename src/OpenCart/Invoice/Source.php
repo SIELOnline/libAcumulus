@@ -15,10 +15,10 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
-use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 use function in_array;
+use function is_array;
 use function strlen;
 
 /**
@@ -82,7 +82,20 @@ abstract class Source extends BaseSource
      */
     public function getPaymentMethod(): ?string
     {
-        return $this->shopSource['payment_code'] ?? parent::getPaymentMethod();
+        if (is_array($this->shopSource['payment_method'])) {
+            // Spotted in OC4 2024.
+            $code = $this->shopSource['payment_method']['code'];
+            if (strpos($code, '.') !== false) {
+                $code = substr($code, 0, strpos($code, '.'));
+            }
+        } elseif (!empty($this->shopSource['payment_custom_field']) && is_array($this->shopSource['payment_custom_field'])) {
+            // Spotted in OC4 2023.
+            $code = $this->shopSource['payment_custom_field']['code'];
+        } elseif (!empty($this->shopSource['payment_code'])) {
+            // Spotted in OC3.
+            $code = $this->shopSource['payment_code'];
+        }
+        return $code ?? null;
     }
 
     public function getPaymentStatus(): int
@@ -152,7 +165,7 @@ abstract class Source extends BaseSource
      */
     abstract public function getOrderTotalLines(): array;
 
-    public function getInvoiceReference()
+    public function getInvoiceReference(): ?string
     {
         $result = null;
         if (!empty($this->shopSource['invoice_no'])) {

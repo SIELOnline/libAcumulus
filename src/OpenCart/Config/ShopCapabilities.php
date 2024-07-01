@@ -270,8 +270,8 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             AddressType::Invoice => [ // address_invoice instanceof Address, comes from Order object
                 Fld::CompanyName1 => '[source::getSource()::payment_company]',
                 Fld::FullName => '[source::getSource()::payment_firstname+source::getSource()::payment_lastname|source::getSource()::firstname+source::getSource()::lastname]',
-                Fld::Address1 => '[source::getSource()::payment_address1]',
-                Fld::Address2 => '[source::getSource()::payment_address2]',
+                Fld::Address1 => '[source::getSource()::payment_address_1]',
+                Fld::Address2 => '[source::getSource()::payment_address_2]',
                 Fld::PostalCode => '[source::getSource()::payment_postcode]',
                 Fld::City => '[source::getSource()::payment_city]',
                 Meta::ShopCountryId => '[source::getSource()::payment_country_id]',
@@ -280,8 +280,8 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             AddressType::Shipping => [ // address_shipping instanceof Address, comes from Order object
                 Fld::CompanyName1 => '[source::getSource()::shipping_company]',
                 Fld::FullName => '[source::getSource()::shipping_firstname+source::getSource()::shipping_lastname|source::getSource()::firstname+source::getSource()::lastname]',
-                Fld::Address1 => '[source::getSource()::shipping_address1]',
-                Fld::Address2 => '[source::getSource()::shipping_address2]',
+                Fld::Address1 => '[source::getSource()::shipping_address_1]',
+                Fld::Address2 => '[source::getSource()::shipping_address_2]',
                 Fld::PostalCode => '[source::getSource()::shipping_postcode]',
                 Fld::City => '[source::getSource()::shipping_city]',
                 Meta::ShopCountryId => '[source::getSource()::shipping_country_id]',

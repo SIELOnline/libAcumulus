@@ -8,6 +8,8 @@ This file contains a historical overview of changes in our own code.
 Bugs:
 - ALL: Field product name on mappings form does not correspond with mapping for product
   name. As it was not yet really used, this is no big deal.
+- ALL: Completing invoice lines: computing unitprice based on unitpriceinc with a vatrate
+  of -1 (vat free) was not done correctly. Known usages: OC.
 - OC4: Order statuses were not presented by their name (but by their language_id).
 
 Refactorings:

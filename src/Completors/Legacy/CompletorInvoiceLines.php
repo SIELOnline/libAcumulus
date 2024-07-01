@@ -391,7 +391,6 @@ class CompletorInvoiceLines
                 $line[Meta::LineType] = $parent[Meta::LineType];
             }
 
-
             if (!isset($line[Tag::UnitPrice])) {
                 // With margin scheme, the unit price should be known but may
                 // have ended up in the unit price inc.
@@ -404,7 +403,9 @@ class CompletorInvoiceLines
                         // Free products are free with and without VAT.
                         $line[Tag::UnitPrice] = 0;
                     } elseif (isset($line[Tag::VatRate]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
-                         $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] / (100.0 + $line[Tag::VatRate]) * 100.0;
+                        $line[Tag::UnitPrice] = $this->completor->isNoVat($line[Tag::VatRate])
+                            ? $line[Meta::UnitPriceInc]
+                            : $line[Meta::UnitPriceInc] / (100.0 + $line[Tag::VatRate]) * 100.0;
                     } elseif (isset($line[Meta::VatAmount])) {
                         $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] - $line[Meta::VatAmount];
                     } // else {

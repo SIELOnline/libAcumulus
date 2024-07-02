@@ -246,7 +246,7 @@ class Completor
      * - The shop settings (using EU vat or selling vat free products).
      * - Optionally, the date of the invoice.
      *
-     * See also: {@link https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland}.
+     * See also: {@link https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland}.
      */
     protected function initPossibleVatTypes(): void
     {
@@ -1319,7 +1319,7 @@ class Completor
      *
      * See:
      * - {@link https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/tarieven_en_vrijstellingen/}
-     * - {@link https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland}:
+     * - {@link https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland}:
      */
     protected function correctNoVatLines(): void
     {

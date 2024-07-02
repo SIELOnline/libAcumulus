@@ -113,7 +113,7 @@ LONGSTRING
         // Moore Acumulus links.
         'moreAcumulusTitle' => 'More Acumulus (links open in a new tab)',
         'link_login' => '<a href="https://www.sielsystems.nl/" target="_blank">Login to Acumulus</a>',
-        'link_app' => '<a href="https://www.sielsystems.nl/app" target="_blank">Install the Acumulus app for iPhone or Android</a>',
+        'link_app' => '<a href="https://www.siel.nl/acumulus/app/" target="_blank">Install the Acumulus app for iPhone or Android</a>',
         'link_mobile' => '<a href="https://m.acumulus.nl/" target="_blank">Use the mobile web app</a> (for all phones)',
         'link_manual' => '<a href="https://wiki.acumulus.nl/" target="_blank">Read the online manual about Acumulus</a>',
         'link_forum' => '<a href="https://forum.acumulus.nl/index.php" target="_blank">Visit the Acumulus forum</a> where you can ask general questions or look up the answers to already asked questions.',

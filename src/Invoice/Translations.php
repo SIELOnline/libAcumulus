@@ -53,8 +53,8 @@ class Translations extends TranslationCollection
 
         'message_warning_no_email' => 'De factuur bevat geen e-mailadres van de klant. Hierdoor kan er geen relatie in Acumulus aangemaakt of bijgewerkt worden. U kunt zelf in Acumulus een andere relatie aan deze factuur koppelen.',
         'message_warning_no_vatrate' => 'Een van de bestelregels bevat een foutief btw percentage. ' . self::sharedNl,
-        'message_warning_no_vattype' => 'Het factuurtype (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) kan niet bepaald worden. ' . self::sharedNl,
-        'message_warning_multiple_vattypes' => 'Er zijn meerdere factuurtypes (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) mogelijk. ' . self::sharedNl,
+        'message_warning_no_vattype' => 'Het factuurtype (https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland) kan niet bepaald worden. ' . self::sharedNl,
+        'message_warning_multiple_vattypes' => 'Er zijn meerdere factuurtypes (https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland) mogelijk. ' . self::sharedNl,
         'message_warning_no_vattype_at_all' => '%1$s Dit is hoogstwaarschijnlijk het gevolg van: bestelregels die ten onrechte geen btw hebben; foute "Over uw winkel" instellingen; of verkeerd ingestelde btw tarieven. Controleer deze.',
         'message_warning_no_vattype_incorrect_lines' => '%1$s Dit is hoogstwaarschijnlijk het gevolg van: enkele (handmatig ingevoerde) bestelregels die ten onrechte geen btw hebben; of foute "Over uw winkel" instellingen, controleer deze.',
         'message_warning_no_vattype_may_split' => '%1$s Hoogstwaarschijnlijk dient u de factuur te splitsen in verschillende factuurtypes. Echter, controleer voor de zekerheid ook de "Over uw winkel" instellingen.',
@@ -118,8 +118,8 @@ class Translations extends TranslationCollection
 
         'message_warning_no_email' => 'The invoice does not have a customer email address. Therefore we could not create or update a relation in Acumulus. You can connect a relation to this invoice yourself.',
         'message_warning_no_vatrate' => 'One of the invoice lines contains an invalid vat rate. The invoice has been saved as concept. Correct the invoice in Acumulus.',
-        'message_warning_no_vattype' => 'The invoice type for the invoice (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) could not be determined. The invoice has been saved as concept. Correct the invoice in Acumulus.',
-        'message_warning_multiple_vattypes' => 'The invoice can have multiple vat types (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) . The invoice has been saved as concept. Correct the invoice in Acumulus.',
+        'message_warning_no_vattype' => 'The invoice type for the invoice (https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland) could not be determined. The invoice has been saved as concept. Correct the invoice in Acumulus.',
+        'message_warning_multiple_vattypes' => 'The invoice can have multiple vat types (https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland) . The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_no_vattype_at_all' => '%1$s This is very likely caused by: order lines incorrectly not having vat; incorrect "About your shop" settings; or incorrect vat rates. Check these.',
         'message_warning_no_vattype_incorrect_lines' => '%1$s This is very likely caused by: some (manually entered) order lines incorrectly not having vat; or incorrect "About your shop" settings, check these.',
         'message_warning_no_vattype_may_split' => '%1$s You likely have to split the invoice over multiple invoice types. However, please also check your "About your shop" settings.',

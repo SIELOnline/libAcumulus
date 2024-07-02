@@ -3,15 +3,17 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.1.5 (2024-06-??) (OC)
+8.2.0 (2024-07-0?) (OC)
 -----------------------
 Bugs:
+- ALL: External links on a form: were not all opened in a new tab; and some referred to
+  outdated URLs.
 - ALL: Field product name on mappings form does not correspond with mapping for product
   name. As it was not yet really used, this is no big deal.
 - ALL: Completing invoice lines: computing unitprice based on unitpriceinc with a vatrate
   of -1 (vat free) was not done correctly. Known usages: OC.
-- OC4: Source::getPaymentMethod(): storage of this info has changed in OC4 wrt OC3 and a
-  2nd time within OC4.
+- OC4: Source::getPaymentMethod(): storage of this info has changed in OC4 compared to OC3
+  and a 2nd time within OC4.
 - OC4: Order statuses were not presented by their name (but by their language_id).
 
 Refactorings:
@@ -61,6 +63,7 @@ Refactorings:
   calculations the shop makes.
 - PS: Use Version::VERSION as version, not the indirect _PS_VERSION_ or AppKernel::VERSION.
 - ALL: Renamed some meta keys (key + string value).
+
 
 8.1.1 (2024-01-04) (WC)
 -----------------------

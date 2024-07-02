@@ -107,7 +107,7 @@ class ConfigFormTranslations extends TranslationCollection
 
         // Shop settings.
         'shopSettingsHeader' => 'Over uw winkel',
-        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw-tarieven terugrekenen.',
+        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw-tarieven terugrekenen.',
 
         'field_nature_shop' => 'Soort: wat verkoopt u?',
         'option_nature_1' => 'Zowel producten als diensten.',
@@ -127,7 +127,7 @@ class ConfigFormTranslations extends TranslationCollection
         'vat_class_left_empty' => '%1$s laat ik leeg',
 
         'field_euVat' => 'Berekent u EU-btw?',
-        'desc_euVat' => 'Geef aan of en wanneer u <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/afstandsverkopen-zoals-e-commerce-en-diensten-voor-particulieren-in-andere-eu-landen/afstandsverkopen-zoals-e-commerce-binnen-de-eu/">EU-btw berekent voor (niet btw-plichtige) EU-klanten</a>.<br>
+        'desc_euVat' => 'Geef aan of en wanneer u <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/afstandsverkopen-zoals-e-commerce-en-diensten-voor-particulieren-in-andere-eu-landen/afstandsverkopen-zoals-e-commerce-binnen-de-eu/" target="_blank">EU-btw berekent voor (niet btw-plichtige) EU-klanten</a>.<br>
 • Kies de 1e optie als u die altijd, dus al vanaf het begin van het jaar, berekent.<br>
 • Kies de 2e optie als u die pas berekent zodra u de drempel passeert.<br>
 • Kies de 3e optie als u tot nu toe, en om wat voor een reden dan ook, nog geen EU-btw hebt berekend.<br>
@@ -584,7 +584,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 
         // Shop settings.
         'shopSettingsHeader' => 'About your shop',
-        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland" target="_blank">invoice type</a>; perform some sanity checks; and to compute VAT rates.',
+        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland" target="_blank">invoice type</a>; perform some sanity checks; and to compute VAT rates.',
 
         'field_nature_shop' => 'Nature: what do you sell?',
         'option_nature_1' => 'Products and services.',
@@ -604,7 +604,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'vat_class_left_empty' => 'I leave the %1$s empty',
 
         'field_euVat' => 'Do you charge EU VAT?',
-        'desc_euVat' => 'Indicate if and when you charge <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/afstandsverkopen-zoals-e-commerce-en-diensten-voor-particulieren-in-andere-eu-landen/afstandsverkopen-zoals-e-commerce-binnen-de-eu/">EU VAT to (non vat subjected) EU customers</a>.<br>
+        'desc_euVat' => 'Indicate if and when you charge <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/afstandsverkopen-zoals-e-commerce-en-diensten-voor-particulieren-in-andere-eu-landen/afstandsverkopen-zoals-e-commerce-binnen-de-eu/" target="_blank">EU VAT to (non vat subjected) EU customers</a>.<br>
 • Select the 1st option if you always charge it, thus as of the start of the year.<br>
 • Select the 2nd option if you charge it only when you pass the threshold.<br>
 • Select the 3rd option if, until now, you never charged it.<br>

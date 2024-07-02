@@ -3,10 +3,10 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.2.0 (2024-07-0?) (OC)
+8.1.5 (2024-07-02) (OC)
 -----------------------
 Bugs:
-- ALL: External links on a form: were not all opened in a new tab; and some referred to
+- ALL: External links on our forms: were not all opened in a new tab; and some referred to
   outdated URLs.
 - ALL: Field product name on mappings form does not correspond with mapping for product
   name. As it was not yet really used, this is no big deal.

@@ -63,24 +63,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         $results = [];
         $registry = $this->getRegistry();
-        $directory = 'extension/payment/';
         foreach ($extensions as $extension) {
             $route = $registry->getLoadRoute($extension, '', 'payment');
             $registry->language->load($route);
             $results[$extension] = $registry->language->get('heading_title');
         }
         return $results;
-    }
-
-    /**
-     * OpenCart 3 remains on the old model (for now).
-     *
-     * Note: in case of severe errors during the creation process: return false to revert
-     * to the old "tried and tested" code.
-     */
-    public function usesNewCode(): bool
-    {
-        return false; // Emergency revert: remove the // at the beginning of this line!
-        //return true;
     }
 }

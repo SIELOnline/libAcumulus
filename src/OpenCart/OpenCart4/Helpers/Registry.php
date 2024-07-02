@@ -13,10 +13,11 @@ class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
 {
     public function getRoute(string $method, string $extension = 'acumulus', string $extensionType = 'module'): string
     {
-        if ($extension === '') {
-            // OpenCart core controller action: use unchanged.
-            $route = $method;
+        if ($extensionType === '') {
+            // OpenCart core controller action.
+            $route = "$extension/$method";
         } else {
+            // One of our own routes:
             $route = "extension/$extension/$extensionType/$extension";
             if ($method !== '') {
                 $route .= '|' . $method;

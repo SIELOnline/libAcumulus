@@ -137,7 +137,7 @@ abstract class OcHelper
         // "Disable" (delete) events, regardless the confirmation answer.
         $this->uninstallEvents();
         $this->doUninstall();
-        $this->registry->response->redirect($this->registry->getRouteUrl('marketplace/extension', ''));
+        $this->registry->response->redirect($this->registry->getRouteUrl('extension', 'marketplace', ''));
     }
 
     /**
@@ -337,7 +337,7 @@ abstract class OcHelper
         $this->data['breadcrumbs'] = [];
         $this->data['breadcrumbs'][] = [
             'text' => $this->t('text_home'),
-            'href' => $this->registry->getRouteUrl('common/dashboard', ''),
+            'href' => $this->registry->getRouteUrl('dashboard', 'common', ''),
             'separator' => false,
         ];
         // Add an intermediate level to the config breadcrumb.
@@ -363,7 +363,7 @@ abstract class OcHelper
         }
         $this->data['button_save'] = $this->t("button_submit_$type");
         $this->data['button_cancel'] = $this->t('button_cancel');
-        $this->data['back'] = $this->registry->getRouteUrl('common/dashboard', '');
+        $this->data['back'] = $this->registry->getRouteUrl('dashboard', 'common', '');
     }
 
     /**
@@ -450,7 +450,7 @@ abstract class OcHelper
     {
         return [
             'text' => $this->t('extensions'),
-            'href' => Registry::getInstance()->getRouteUrl('marketplace/extension', ''),
+            'href' => Registry::getInstance()->getRouteUrl('extension', 'marketplace', ''),
             'separator' => ' :: '
         ];
     }

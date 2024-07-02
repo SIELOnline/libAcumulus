@@ -376,7 +376,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             case 'batch':
             case 'invoice':
                 return $registry->getRouteUrl($linkType);
-            case 'fiscalAddressSetting':
+            case 'fiscal-address-setting':
                 return $registry->getRouteUrl('tax_class', 'localisation', '');
             case 'logo':
                 return $registry->getFileUrl('view/image/acumulus/siel-logo.png');

@@ -65,6 +65,11 @@ class Invoice extends AcumulusObject
 {
     use InvoiceArrayAccessTrait;
 
+    protected ?Customer $customer = null;
+    /** @var Line[] */
+    protected array $lines = [];
+    protected ?EmailAsPdf $emailAsPdf = null;
+
     protected function getPropertyDefinitions(): array
     {
         return [
@@ -99,11 +104,6 @@ class Invoice extends AcumulusObject
             ['name' => Fld::InvoiceNotes, 'type' => 'string'],
         ];
     }
-
-    protected ?Customer $customer = null;
-    /** @var Line[] */
-    protected array $lines = [];
-    protected ?EmailAsPdf $emailAsPdf = null;
 
     public function getCustomer(): ?Customer
     {

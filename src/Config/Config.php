@@ -1030,6 +1030,11 @@ class Config
                     'type' => 'bool',
                     'default' => false,
                 ],
+                'ubl' => [
+                    'group' => Tag::EmailAsPdf,
+                    'type' => 'bool',
+                    'default' => false,
+                ],
                 // @legacy  Is now a mapping.
                 // @todo  Should this be a UI editable setting?
                 'emailFrom' => [

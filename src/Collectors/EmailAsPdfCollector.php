@@ -19,7 +19,7 @@ use Siel\Acumulus\Data\EmailAsPdfType;
  * - bool $ubl (invoices only)
  *
  * Properties that are based on configuration and thus are not set here:
- * - none
+ * - ubl
  *
  * Properties that are not set:
  * - string $message

@@ -72,6 +72,7 @@ class InvoiceCompletor extends BaseCompletor
         $this->getCompletorTask('Invoice', 'MultiLineProperties')->complete($this->invoice);
         $this->getCompletorTask('Invoice', 'Template')->complete($this->invoice);
         $this->getCompletorTask('Invoice', 'AddEmailAsPdfSection')->complete($this->invoice);
+        $this->completeEmailAsPdf($result);
 
         // @legacy: Not all Completing tasks are already converted, certainly not those that complete Lines.
         /** @var \Siel\Acumulus\Completors\Legacy\Completor $legacyCompletor */
@@ -90,5 +91,14 @@ class InvoiceCompletor extends BaseCompletor
     protected function completeCustomer(MessageCollection $result): void
     {
         $this->getContainer()->getCompletor('Customer')->complete($this->invoice->getCustomer(), $result);
+    }
+
+    /**
+     * Completes the {@see \Siel\Acumulus\Data\EmailInvoiceAsPdf} part of the
+     * {@see \Siel\Acumulus\Data\Invoice}.
+     */
+    protected function completeEmailAsPdf(MessageCollection $result): void
+    {
+        $this->getContainer()->getCompletor('EmailInvoiceAsPdf')->complete($this->invoice->getEmailAsPdf(), $result);
     }
 }

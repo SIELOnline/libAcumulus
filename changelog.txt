@@ -3,6 +3,19 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.2.0 (2024-07-1?) (ALL)
+------------------------
+Features:
+- ALL: A new setting has been introduced that allows to add the e-invoice to the Acumulus
+  invoice pdf when it gets mailed to the customer (either on sending the invoice data to
+  Acumulus or using the buttons specific for mailing the invoice pdf (on the invoice list
+  and/or details screens).
+
+Bugs:
+- ALL: If tax is based on shipping address, and the shipping country differs from the
+  invoice country, the vat rate lookups/checks would still use the invoice country.
+
+
 8.1.5 (2024-07-02) (OC)
 -----------------------
 Bugs:

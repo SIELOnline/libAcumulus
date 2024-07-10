@@ -742,6 +742,7 @@ class SettingsForm extends BaseConfigForm
             'description' => $this->t('desc_emailAsPdf'),
             'options' => [
                 'emailAsPdf' => $this->t('option_emailAsPdf'),
+                'ubl' => $this->t('option_ubl'),
             ],
         ];
         $fields['detailInvoice'] = [

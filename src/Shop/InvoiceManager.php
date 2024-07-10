@@ -112,6 +112,7 @@ abstract class InvoiceManager
 
     protected function getCreator(): Creator
     {
+        // @todo: switch to Collect/Complete
         return $this->container->getCreator();
     }
 

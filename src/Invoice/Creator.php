@@ -31,6 +31,7 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 use function array_key_exists;
+use function count;
 use function func_get_args;
 use function in_array;
 use function is_array;
@@ -267,9 +268,9 @@ abstract class Creator
         if ($emailAsPdfSettings['emailAsPdf']) {
             $emailTo = !empty($this->invoice[Tag::Customer][Tag::Email]) ? $this->invoice[Tag::Customer][Tag::Email] : '';
             $emailAsPdf = $this->getEmailAsPdf($emailTo);
-        }
-        if (!empty($emailAsPdf)) {
-            $this->invoice[Tag::Customer][Tag::Invoice][Tag::EmailAsPdf] = $emailAsPdf;
+            if (count($emailAsPdf) !== 0) {
+                $this->invoice[Tag::Customer][Tag::Invoice][Tag::EmailAsPdf] = $emailAsPdf;
+            }
         }
         return $this->invoice;
     }
@@ -277,11 +278,11 @@ abstract class Creator
     /**
      * Creates an Acumulus emailAsPdf structure from an order or credit note.
      *
-     * NOTE: This is a temporary function, added in 7.4.0, to allow the new
-     * mail invoice buttons (on the order list or detail page) to also use token
-     * expansion. For 8.0, we are already working on new "Collectors" that will
-     * replace this Creator and are more fine-grained, so we wil have a ready to
-     * use separate emailAsPdf Collector.
+     * @deprecated  This is a temporary function, added in 7.4.0, to allow the new
+     *   mail invoice buttons (on the order list or detail page) to also use token
+     *   expansion. For 8.0, we are already working on new "Collectors" that will
+     *   replace this Creator and are more fine-grained, so we wil have a ready to
+     *   use separate emailAsPdf Collector.
      *
      * @param Source $source
      *  The web shop order.
@@ -908,6 +909,7 @@ abstract class Creator
                 $this->addTokenDefault($emailAsPdf, Tag::EmailBcc, $emailAsPdfSettings['emailBcc']);
                 $this->addTokenDefault($emailAsPdf, Tag::EmailFrom, $emailAsPdfSettings['emailFrom']);
                 $this->addTokenDefault($emailAsPdf, Tag::Subject, $emailAsPdfSettings['subject']);
+                $emailAsPdf[Tag::Ubl] = $emailAsPdfSettings['ubl'] ? Api::UblInclude_Yes : Api::UblInclude_No;
                 $emailAsPdf[Tag::ConfirmReading] = $emailAsPdfSettings['confirmReading'] ? Api::ConfirmReading_Yes : Api::ConfirmReading_No;
             } else {
                 $this->addTokenDefault($emailAsPdf, Tag::EmailBcc, $emailAsPdfSettings['packingSlipEmailBcc']);

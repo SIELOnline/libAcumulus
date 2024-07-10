@@ -84,6 +84,7 @@ interface Tag
     public const EmailFrom = 'emailfrom';
     public const Subject = 'subject';
     public const Message = 'message';
+    public const Ubl = 'ubl';
     public const ConfirmReading = 'confirmreading';
 
     public const LoginName = 'loginname';

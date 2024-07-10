@@ -437,7 +437,8 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         // Email invoice settings.
         'field_emailAsPdf' => 'Factuur automatisch versturen',
         'option_emailAsPdf' => 'Laat Acumulus de pdf van de factuur automatisch mailen, direct nadat de factuurgegevens naar Acumulus verzonden zijn.',
-        'desc_emailAsPdf' => 'Als u mail-opties hebt aangevinkt, kunt u de verdere opties gebruiken om de e-mailverzending aan uw wensen aan te passen. Het bericht in de e-mail body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (geavanceerde instelling), Acumulus geen factuur-pdf kan versturen.',
+        'option_ubl' => 'Voeg een e-factuur toe aan de pdf.',
+        'desc_emailAsPdf' => 'Geef aan of u Acumulus een pdf van de factuur wilt laten versturen, al dan niet inclusief een e-factuur in de vorm van een <a href="https://nl.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL-document</a>. Het bericht in de e-mail body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (geavanceerde instelling), Acumulus geen factuur-pdf kan versturen.',
 
         'field_emailTo' => 'Aan',
         'desc_emailTo' => 'Het e-mailadres waar naartoe de factuur verstuurd moet worden. Als u dit leeg laat wordt het e-mailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
@@ -910,7 +911,8 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         // Email invoice settings.
         'field_emailAsPdf' => 'Send invoice automatically',
         'option_emailAsPdf' => 'Have Acumulus send the invoice, as a PDF, to your customer, directly after sending the invoice data to Acumulus.',
-        'desc_emailAsPdf' => 'If you enabled mail options, you can customise the mail sending process with the settings below. Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (advanced setting), Acumulus cannot send invoice-pdfs.',
+        'option_ubl' => 'Add an e-invoice to the pdf.',
+        'desc_emailAsPdf' => 'Indicate whether you want Acumulus to send the invoice (as pdf), with optionally an e-invoice added in <a href="https://en.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL format</a>. Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (advanced setting), Acumulus cannot send invoice-pdfs.',
 
         'field_emailTo' => 'To',
         'desc_emailTo' => 'The e-mail address to send the invoice to. If you leave this empty the e-mail address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;).',

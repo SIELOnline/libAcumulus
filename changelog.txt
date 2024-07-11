@@ -3,7 +3,7 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.2.0 (2024-07-1?) (ALL)
+8.2.0 (2024-07-11) (ALL)
 ------------------------
 Features:
 - ALL: A new setting has been introduced that allows to add the e-invoice to the Acumulus

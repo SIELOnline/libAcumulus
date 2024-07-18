@@ -107,9 +107,7 @@ abstract class Collector implements CollectorInterface
     protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldSpecifications): void
     {
         foreach ($fieldSpecifications as $field => $pattern) {
-            if ($pattern !== null) {
-                $this->expandAndSet($acumulusObject, $field, $pattern);
-            }
+            $this->expandAndSet($acumulusObject, $field, $pattern);
         }
     }
 
@@ -145,7 +143,7 @@ abstract class Collector implements CollectorInterface
     protected function expandAndSet(AcumulusObject $acumulusObject, string $field, $value, int $mode = PropertySet::Always): bool
     {
         if ($acumulusObject->isProperty($field)) {
-            return $acumulusObject->set($field, $this->expandValue($value), $mode);
+            return $value !== null && $acumulusObject->set($field, $this->expandValue($value), $mode);
         } elseif ($this->isMetadata($field)) {
             $acumulusObject->metadataAdd($field, $this->expandValue($value));
             return true;

@@ -14,6 +14,11 @@ Minimal requirements:
   Note that PHP 8.0 already reached end of life and will no longer receive security
   updates. So, in the near future we will upgrade our minimal requirements to PHP 8.1.
 
+Bugs:
+- PS: Settings form: set of order statuses to trigger sending the invoice data to Acumulus
+  was not stored or displayed correctly.
+- ALL: mapping for a metadata value may be the constant null but this was rejected when
+  expanding mappings (as fields may not set to null).
 
 8.2.0 (2024-07-11) (ALL)
 ------------------------

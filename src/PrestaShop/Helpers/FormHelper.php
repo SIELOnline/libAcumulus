@@ -78,6 +78,9 @@ class FormHelper extends BaseFormHelper
             if (($fieldMeta->type === 'checkbox') && isset($formValues[$key])) {
                 $prestaShopName = $fieldMeta->collection . '_' . $key;
                 $formValues[$prestaShopName] = $formValues[$key];
+            } elseif ($fieldMeta->type === 'select' && str_ends_with($fieldMeta->name, '[]')) {
+                $prestaShopName = $fieldMeta->name;
+                $formValues[$prestaShopName] = $formValues[$key];
             }
         }
         return $formValues;

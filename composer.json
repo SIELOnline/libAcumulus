@@ -5,7 +5,7 @@
         "GPL-3.0-or-later"
     ],
     "require": {
-        "php": "^7.4 || ^8",
+        "php": "^8",
         "ext-json": "*",
         "ext-dom": "*",
         "ext-libxml": "*",

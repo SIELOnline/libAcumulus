@@ -31,10 +31,10 @@ class Requirements
     {
         $result = [];
 
-        if (version_compare(phpversion(), '7.4', '<')) {
-            $result['message_error_req_php'] = 'The minimally required PHP version for the Acumulus module is PHP 7.4 (and soon to become 8.0).';
-        } elseif (version_compare(phpversion(), '8.0', '<')) {
-            $result['message_warning_req_php'] = 'The minimally required PHP version for the Acumulus module will soon be raised to PHP 8.0. Start upgrading your PHP version now';
+        if (version_compare(phpversion(), '8.0', '<')) {
+            $result['message_error_req_php'] = 'The minimally required PHP version for the Acumulus module is PHP 8.0 (and soon to become 8.1).';
+        } elseif (version_compare(phpversion(), '8.1', '<')) {
+            $result['message_warning_req_php'] = 'The minimally required PHP version for the Acumulus module will soon be raised to PHP 8.1. Start upgrading your PHP version now';
         }
         if (!extension_loaded('json')) {
             $result['message_error_req_json'] = 'The JSON PHP extension needs to be activated on your server for the Acumulus module to be able to work with the json format.';

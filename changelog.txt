@@ -3,6 +3,18 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.3.0 (2024-08-??) (ALL)
+------------------------
+Minimal requirements:
+- This plugin now requires PHP 8.0. This means that support has been dropped for the
+  following shop/CMS versions:
+    * Joomla 3
+    * PrestaShop 1.7
+    * VirtueMart 3
+  Note that PHP 8.0 already reached end of life and will no longer receive security
+  updates. So, in the near future we will upgrade our minimal requirements to PHP 8.1.
+
+
 8.2.0 (2024-07-11) (ALL)
 ------------------------
 Features:

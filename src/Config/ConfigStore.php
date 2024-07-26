@@ -39,6 +39,8 @@ abstract class ConfigStore
      *
      * @return array
      *   An array with the stored configuration values keyed by their name.
+     *
+     * @throws \JsonException
      */
     abstract public function load(): array;
 
@@ -51,6 +53,8 @@ abstract class ConfigStore
      *
      * @return bool
      *   Success.
+     *
+     * @throws \JsonException
      */
     abstract public function save(
         #[SensitiveParameter]

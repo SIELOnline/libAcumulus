@@ -65,6 +65,12 @@ trait AcumulusTestUtils
         return (new DateTime())->format('H:i:s.u');
     }
 
+    protected function getDiffInSeconds(DateTime $time1, DateTime $time2): int
+    {
+        $interval = $time1->diff($time2);
+        return (int) (new DateTime('@0'))->add($interval)->format('U');
+    }
+
     /**
      * Tests the Creation process, i.e. collecting and completing an
      * {@see \Siel\Acumulus\Data\Invoice}.

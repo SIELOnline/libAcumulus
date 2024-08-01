@@ -39,6 +39,7 @@ abstract class AcumulusEntryManager
      * @param int|null $entryId
      *   The entry id to look up. If $entryId === null, multiple records may be
      *   found, in which case a numerically indexed array will be returned.
+     * @todo: remove the possibility to pass null as $entryId, which also simplifies the return type.
      *
      * @return AcumulusEntry|AcumulusEntry[]|null
      *   Acumulus entry record for the given entry id or null if the entry id is

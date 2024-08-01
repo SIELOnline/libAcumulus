@@ -658,7 +658,7 @@ class InvoiceStatusForm extends Form
                             $invoiceStatus = static::Invoice_SentConcept;
                             $statusSeverity = static::Status_Warning;
                             $description = 'concept_no_conceptid';
-                        } else  {
+                        } else {
                             $invoiceStatus = static::Invoice_CommunicationError;
                             $statusSeverity = static::Status_Error;
                         }

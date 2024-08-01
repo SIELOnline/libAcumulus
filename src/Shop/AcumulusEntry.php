@@ -179,7 +179,7 @@ class AcumulusEntry
      *
      * @param bool $raw
      *   Whether to return the raw value as stored in the database, or a
-     *   Datetime object. The raw value will differ per web shop.
+     *   DateTime object. The raw value will differ per web shop.
      *
      * @return string|int|\DateTime
      *   The timestamp when this record was created.
@@ -217,8 +217,7 @@ class AcumulusEntry
         return $result;
     }
 
-    /** @noinspection PhpDocMissingThrowsInspection
-     *
+    /**
      * Returns a DateTime object based on the timestamp in database format.
      *
      * @param int|string $timestamp
@@ -307,8 +306,7 @@ class AcumulusEntry
         return $this->getToken() === static::lockToken;
     }
 
-    /** @noinspection PhpDocMissingThrowsInspection
-     *
+    /**
      * Returns whether there is a lock on sending the invoice, but has expired.
      *
      * @return bool

@@ -48,7 +48,11 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * @noinspection NullPointerExceptionInspection
      */
-    public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
+    public function getInvoiceSourcesByReferenceRange(
+        string $invoiceSourceType,
+        string $invoiceSourceReferenceFrom,
+        string $invoiceSourceReferenceTo
+    ): array
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(

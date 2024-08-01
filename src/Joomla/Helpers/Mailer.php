@@ -6,6 +6,9 @@ namespace Siel\Acumulus\Joomla\Helpers;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Mail\MailerFactoryInterface;
+use Joomla\CMS\Mail\MailerInterface;
+use PHPMailer\PHPMailer\PHPMailer;
 use RuntimeException;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
@@ -16,9 +19,6 @@ class Mailer extends BaseMailer
 {
     /**
      * {@inheritdoc}
-     *
-     * @throws \PHPMailer\PHPMailer\Exception
-     *   J4 exception type
      */
     public function sendMail(
         string $from,
@@ -28,15 +28,17 @@ class Mailer extends BaseMailer
         string $bodyText,
         string $bodyHtml
     ) {
-        $mailer = Factory::getMailer();
-        /** @noinspection PhpRedundantOptionalArgumentInspection */
-        $mailer->isHtml(true);
+        /** @var MailerInterface $mailer */
+        $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+        if ($mailer instanceof PHPMailer) {
+            $mailer->isHTML(true);
+        }
         $mailer->setSender([$from, $fromName]);
         $mailer->addRecipient($to);
         $mailer->setSubject(html_entity_decode($subject));
         $mailer->setBody($bodyHtml);
         try {
-            $result = $mailer->Send();
+            $result = $mailer->send();
             if ($result === false) {
                 $result = Text::_('JLIB_MAIL_FUNCTION_OFFLINE');
             }

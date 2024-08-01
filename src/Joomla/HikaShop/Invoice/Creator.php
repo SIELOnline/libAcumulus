@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection DuplicatedCode
  * @noinspection StaticInvocationViaThisInspection
  * @noinspection PhpClassConstantAccessedViaChildClassInspection
  */
@@ -177,7 +178,7 @@ class Creator extends BaseCreator
                         /** @var \hikashopCurrencyClass $currencyClass */
                         $currencyClass = hikashop_get('class.currency');
                         $vatRate = $currencyClass->getTax($zone->zone_id, $category->category_id, 'individual');
-                        $result[Meta::VatRateLookup] =  (float) $vatRate * 100;
+                        $result[Meta::VatRateLookup] = (float) $vatRate * 100;
                     }
                 }
             }
@@ -219,10 +220,10 @@ class Creator extends BaseCreator
             if (is_string($key) && is_string($value)) {
                 // Add variant.
                 $result[] = [
-                    Tag::Product => $key . ': ' . $value,
-                    Tag::UnitPrice => 0,
-                    Tag::Quantity => $parentQuantity,
-                ] + $vatRangeTags;
+                        Tag::Product => $key . ': ' . $value,
+                        Tag::UnitPrice => 0,
+                        Tag::Quantity => $parentQuantity,
+                    ] + $vatRangeTags;
             }
         }
 
@@ -251,7 +252,8 @@ class Creator extends BaseCreator
      * - {"prices":{"27@0":{"price_with_tax":"20.00000","tax":0}}}
      * - {"prices":{"30@0":{"price_with_tax":8,"tax":0,"taxes":{"EUICL":0}}}}
      * - {"prices":{"6@0":{"price_with_tax":4.000018,"tax":0.694218,"taxes":{"BTW":0.694218}}}}
-     * - {"prices":{"5@0":{"price_with_tax":4.6177850629697,"tax":0.48558506296965,"taxes":{"BTW Laag":0.11063016598247,"BTW 0%":0,"BTW":0.37495489698718}}}}
+     * - {"prices":{"5@0":{"price_with_tax":4.6177850629697,"tax":0.48558506296965,"taxes":{"BTW Laag":0.11063016598247,"BTW
+     * 0%":0,"BTW":0.37495489698718}}}}
      * - {"prices":{"5@0":{"price_with_tax":4.617861669234271,"tax":0.485661669234271,"taxes":{"BTW":0.485661669234271}}}}
      *
      * Explanation:
@@ -308,6 +310,7 @@ class Creator extends BaseCreator
 
             foreach ($this->order->order_shipping_params->prices as $key => $price) {
                 [$shipping_id, $index] = explode('@', $key);
+                $index = (int) $index;
                 $shippingLineDefaults = [
                     Tag::Product => $this->getShippingMethodName($shipping_id),
                     Tag::Quantity => 1,
@@ -341,9 +344,9 @@ class Creator extends BaseCreator
                             $addMissingAmountIndex = count($result);
                         }
                         $shippingLine = $shippingLineDefaults + [
-                            Tag::UnitPrice => $shippingEx,
-                            Meta::VatAmount => $shippingVat,
-                        ];
+                                Tag::UnitPrice => $shippingEx,
+                                Meta::VatAmount => $shippingVat,
+                            ];
 
                         if ($taxClass !== null) {
                             $shippingLine += [
@@ -376,7 +379,8 @@ class Creator extends BaseCreator
                                 Meta::VatAmount => 0.0,
                                 Meta::VatRateSource => static::VatRateSource_Creator_Missing_Amount,
                                 Meta::VatClassName => Config::VatClass_Null,
-                                Meta::Warning => 'Amounts for this shipping method do not add up: probably vat free product or rates have changed.'
+                                Meta::Warning => 'Amounts for this shipping method do not add up:'
+                                    . ' probably vat free product or rates have changed.'
                                     . ' (order_shipping_params->prices = '
                                     . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
                                     . ')',
@@ -393,11 +397,13 @@ class Creator extends BaseCreator
                 // changed: we will already have discovered that above, so we do
                 // not produce this warning here.)
                 if (!$warningAdded) {
-                    $this->addWarning($result[count($result) - 1],
+                    $this->addWarning(
+                        $result[count($result) - 1],
                         'Amounts for the shipping method(s) do not add up: lost too much precision?'
                         . ' (order_shipping_params->prices = '
                         . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
-                        . ')');
+                        . ')'
+                    );
                 }
             }
         }
@@ -447,7 +453,7 @@ class Creator extends BaseCreator
                     Meta::PrecisionUnitPriceInc => $this->precision,
                     Meta::RecalculatePrice => $recalculatePrice,
                     Meta::VatAmount => -$discountVat,
-                        ] + $vatInfo;
+                ] + $vatInfo;
         }
 
         return $result;

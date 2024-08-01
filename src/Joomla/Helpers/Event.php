@@ -1,19 +1,18 @@
 <?php
-/**
- * @noinspection PhpUndefinedClassInspection \Joomla\CMS\Application\CMSApplicationInterface is J4 only
- * @noinspection PhpDeprecationInspection @todo: Method 'triggerEvent' is deprecated (in J4).
- */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\Helpers;
 
+use Joomla\CMS\Application\CMSApplicationInterface;
+use Joomla\CMS\Event\AbstractEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Event as EventInterface;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Joomla\Component\Acumulus\Administrator\Extension\AcumulusComponent;
 
 /**
  * Event implements the Event interface for Joomla.
@@ -25,8 +24,7 @@ class Event implements EventInterface
      */
     public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
     {
-        PluginHelper::importPlugin('acumulus');
-        $this->getCMSApplication()->triggerEvent('onAcumulusInvoiceCreateBefore', [$invoiceSource, $localResult]);
+        $this->triggerEvent('onAcumulusInvoiceCreateBefore', compact('invoiceSource', 'localResult'));
     }
 
     /**
@@ -34,8 +32,7 @@ class Event implements EventInterface
      */
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
-        PluginHelper::importPlugin('acumulus');
-        $this->getCMSApplication()->triggerEvent('onAcumulusInvoiceCollectAfter', [$invoice, $invoiceSource, $localResult]);
+        $this->triggerEvent('onAcumulusInvoiceCollectAfter', compact('invoice', 'invoiceSource', 'localResult'));
     }
 
     /**
@@ -43,8 +40,7 @@ class Event implements EventInterface
      */
     public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
     {
-        PluginHelper::importPlugin('acumulus');
-        $this->getCMSApplication()->triggerEvent('onAcumulusInvoiceSendBefore', [$invoice, $localResult]);
+        $this->triggerEvent('onAcumulusInvoiceSendBefore', compact('invoice', 'localResult'));
     }
 
     /**
@@ -52,23 +48,35 @@ class Event implements EventInterface
      */
     public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
-        PluginHelper::importPlugin('acumulus');
-        $this->getCMSApplication()->triggerEvent('onAcumulusInvoiceSendAfter', [$invoice, $invoiceSource, $result]);
+        $this->triggerEvent('onAcumulusInvoiceSendAfter', compact('invoice', 'invoiceSource', 'result'));
     }
 
     /**
-     * Description.
-     *
-     * @return \Joomla\CMS\Application\CMSApplicationInterface|\Joomla\CMS\Application\BaseApplication
-     *   Description.
-     *
      * @throws \Exception
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection J3 vc J4
      */
-    private function getCMSApplication()
+    private function triggerEvent(string $eventName, array $params): void
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
+        PluginHelper::importPlugin('acumulus');
+        $params['subject'] = $this->getAcumulusComponent();
+        $event = AbstractEvent::create($eventName, $params);
+        // @todo: in Joomla 6 interface CMSApplicationInterface will no longer extend EventAwareInterface.
+        $this->getCMSApplication()->getDispatcher()->dispatch($eventName, $event);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getAcumulusComponent(): AcumulusComponent
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getCMSApplication()->bootComponent('acumulus');
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getCMSApplication(): CMSApplicationInterface
+    {
         return Factory::getApplication();
     }
 }

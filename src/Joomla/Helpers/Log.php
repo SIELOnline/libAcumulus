@@ -15,7 +15,7 @@ class Log extends BaseLog
 {
     protected string $category;
 
-    public function __construct($libraryVersion)
+    public function __construct(string $libraryVersion)
     {
         parent::__construct($libraryVersion);
         $this->category = 'com_acumulus_' . $this->getLibraryVersion();

@@ -8,6 +8,7 @@ use DateTimeZone;
 use Joomla\CMS\Date\Date;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\Database\DatabaseInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
@@ -53,13 +54,10 @@ abstract class InvoiceManager extends BaseInvoiceManager
 
     /**
      * Helper method to get the db object.
-     *
-     * @return \Joomla\Database\DatabaseDriver|\JDatabaseDriver|null
      */
-    protected function getDb()
+    protected function getDb(): DatabaseInterface
     {
-        /** @noinspection PhpDeprecationInspection  Deprecated as of J4. */
-        return Factory::getDbo();
+        return Factory::getContainer()->get(DatabaseInterface::class);
     }
 
     /**
@@ -75,26 +73,18 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function toSql(string $dateStr): string
     {
-        /** @noinspection NullPointerExceptionInspection */
-        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
-        $date = new Date($dateStr);
-        $date->setTimezone($tz);
-        return $date->toSql(true);
+        return (new Date($dateStr, new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 
     /**
      * {@inheritdoc}
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceCreated' event.
-     *
-     * @throws \Exception
-     *
-     * @noinspection PhpDeprecationInspection  Deprecated as of J4.
      */
     protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         PluginHelper::importPlugin('acumulus');
-        /** @noinspection NullPointerExceptionInspection */
+        /** @noinspection PhpUnhandledExceptionInspection */
         $results = Factory::getApplication()->triggerEvent('onAcumulusInvoiceCreated', [&$invoice, $invoiceSource, $localResult]);
         if (count(
                 array_filter($results, static function ($value) {
@@ -110,16 +100,11 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * {@inheritdoc}
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceSendBefore' event.
-     *
-     * @throws \Exception
-     *
-     * @noinspection PhpDeprecationInspection
-     *   Deprecated as of J4.
-     * @noinspection NullPointerExceptionInspection
      */
     protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         PluginHelper::importPlugin('acumulus');
+        /** @noinspection PhpUnhandledExceptionInspection */
         $results = Factory::getApplication()->triggerEvent('onAcumulusInvoiceSendBefore', [&$invoice, $invoiceSource, $localResult]);
         if (count(
                 array_filter($results, static function ($value) {
@@ -135,16 +120,11 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * {@inheritdoc}
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceSent' event.
-     *
-     * @throws \Exception
-     *
-     * @noinspection PhpDeprecationInspection
-     *   Deprecated as of J4.
-     * @noinspection NullPointerExceptionInspection
      */
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         PluginHelper::importPlugin('acumulus');
+        /** @noinspection PhpUnhandledExceptionInspection */
         Factory::getApplication()->triggerEvent('onAcumulusInvoiceSendAfter', [$invoice, $invoiceSource, $result]);
     }
 }

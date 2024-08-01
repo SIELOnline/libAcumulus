@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\Shop;
 
-use AcumulusTableAcumulusEntry;
 use DateTimeZone;
+use Exception;
 use Joomla\CMS\Date\Date;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Table\Table;
 use RuntimeException;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
+use Siel\Joomla\Component\Acumulus\Administrator\Extension\AcumulusComponent;
+use Siel\Joomla\Component\Acumulus\Administrator\Table\AcumulusEntryTable;
 
 /**
  * Implements the VirtueMart specific acumulus entry model class.
@@ -25,16 +26,18 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
-    protected function newTable(): AcumulusTableAcumulusEntry
+    private function getAcumulusComponent(): AcumulusComponent
     {
-        /**
-         * @var bool|\AcumulusTableAcumulusEntry $table
-         *
-         * @noinspection PhpDeprecationInspection
-         *   Deprecated as of J4.
-         */
-        $table = Table::getInstance('AcumulusEntry', 'AcumulusTable');
-        if ($table === false) {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return Factory::getApplication()->bootComponent('acumulus');
+    }
+
+    protected function newTable(): AcumulusEntryTable
+    {
+        try {
+            $table = $this->getAcumulusComponent()->getAcumulusEntryTable();
+        } catch (Exception) {
             $e = new RuntimeException('AcumulusEntryManager::newTable(): table not created');
             $this->log->error($e->getMessage());
             throw $e;
@@ -55,7 +58,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         // If we do not set it to null, it will remain undefined when we want to update
         // or delete it later.
         $table->id = null;
-        /** @noinspection PhpRedundantOptionalArgumentInspection */
         $result = $table->load(['source_type' => $invoiceSource->getType(), 'source_id' => $invoiceSource->getId()], true);
         return $result ? $this->convertDbResultToAcumulusEntries($table, $ignoreLock) : null;
     }
@@ -73,10 +75,10 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table->store(true);
     }
 
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updatedSource, ?Source $invoiceSource = null): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
     {
         // Continue with existing table object with already loaded record.
-        /** @var \AcumulusTableAcumulusEntry $table */
+        /** @var AcumulusEntryTable $table */
         $table = $entry->getRecord();
         $table->entry_id = $entryId;
         $table->token = $token;
@@ -86,7 +88,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
-        /** @var \AcumulusTableAcumulusEntry $table */
+        /** @var AcumulusEntryTable $table */
         $table = $entry->getRecord();
         return $table->delete();
     }
@@ -94,11 +96,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function sqlNow()
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        /** @noinspection NullPointerExceptionInspection */
-        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
-        $date = new Date();
-        $date->setTimezone($tz);
-        return $date->toSql(true);
+        return (new Date('now', new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 
     /**

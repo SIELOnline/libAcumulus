@@ -310,6 +310,7 @@ class Creator extends BaseCreator
 
             foreach ($this->order->order_shipping_params->prices as $key => $price) {
                 [$shipping_id, $index] = explode('@', $key);
+                $index = (int) $index;
                 $shippingLineDefaults = [
                     Tag::Product => $this->getShippingMethodName($shipping_id),
                     Tag::Quantity => 1,

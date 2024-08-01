@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\Config;
 
+use Joomla\CMS\Extension\ExtensionHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Table\Table;
+use Joomla\CMS\Version;
+use Joomla\Database\DatabaseInterface;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 
 /**
@@ -13,33 +15,30 @@ use Siel\Acumulus\Config\Environment as EnvironmentBase;
  */
 class Environment extends EnvironmentBase
 {
+    /**
+     * @throws \JsonException
+     */
     protected function setShopEnvironment(): void
     {
         /** @var \Joomla\CMS\Table\Extension $extension */
-        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
-        $extension = Table::getInstance('extension');
-
-        $id = $extension->find(['element' => 'com_acumulus', 'type' => 'component']);
-        if (!empty($id) && $extension->load($id)) {
-            /** @noinspection PhpUndefinedFieldInspection */
-            $componentInfo = json_decode($extension->manifest_cache, true);
+        $extension = ExtensionHelper::getExtensionRecord('com_acumulus', 'component');
+        if ($extension !== null) {
+            $componentInfo = json_decode($extension->manifest_cache, true, 512, JSON_THROW_ON_ERROR);
             $this->data['moduleVersion'] = $componentInfo['version'];
         }
 
-        $id = $extension->find(['element' => 'com_' . strtolower($this->data['shopName']), 'type' => 'component']);
-        if (!empty($id) && $extension->load($id)) {
-            /** @noinspection PhpUndefinedFieldInspection */
-            $componentInfo = json_decode($extension->manifest_cache, true);
+        $extension = ExtensionHelper::getExtensionRecord('com_' . strtolower($this->data['shopName']), 'component');
+        if ($extension !== null) {
+            $componentInfo = json_decode($extension->manifest_cache, true, 512, JSON_THROW_ON_ERROR);
             $this->data['shopVersion'] = $componentInfo['version'];
         }
 
-        $this->data['cmsName'] = 'Joomla';
-        $this->data['cmsVersion'] = JVERSION;
+        $this->data['cmsName'] = Version::PRODUCT;
+        $this->data['cmsVersion'] = (new Version())->getShortVersion();
     }
 
     protected function executeQuery(string $query): array
     {
-        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
-        return Factory::getDbo()->setQuery($query)->loadAssocList();
+        return Factory::getContainer()->get(DatabaseInterface::class)->setQuery($query)->loadAssocList();
     }
 }

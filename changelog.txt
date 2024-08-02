@@ -14,6 +14,11 @@ Minimal requirements:
   Note that PHP 8.0 already reached end of life and will no longer receive security
   updates. So, in the near future we will upgrade our minimal requirements to PHP 8.1.
 
+Features:
+- JOO: Native support for Joomla 5, our component and plugins do no longer need the compat
+  plugin. However note, that VirtueMart does need that plugin. hikaShop has its own compat
+  layer, so probably does not need that plugin.
+
 Bugs:
 - PS: Settings form: set of order statuses to trigger sending the invoice data to Acumulus
   was not stored or displayed correctly.

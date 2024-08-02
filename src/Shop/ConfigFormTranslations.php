@@ -73,7 +73,7 @@ class ConfigFormTranslations extends TranslationCollection
         'message_warning_role_overkill' => 'U gebruikt een account met het gebruikerstype API-Beheerder. Dit gebruikerstype heeft meer rechten dan deze plugin nodig heeft. Wij raden u aan om het gebruikerstype te veranderen naar API-Gebruiker.',
 
         // Register.
-        'config_form_register' => 'U heeft nog geen accountgegevens ingevuld. Als u nog geen account heeft kunt u vanuit deze %1$s een proefaccount aanmaken:',
+        'config_form_register' => 'U heeft nog geen accountgegevens ingevuld. Als u nog geen account heeft kunt u via de knop hieronder een (proef)account aanmaken:',
         'config_form_register_button' => '<a class="%2$s" href="%1$s">Nu vrijblijvend een gratis Acumulus proefaccount aanmaken</a>',
 
         // Account settings.
@@ -551,7 +551,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_warning_role_overkill' => 'You are using the user role API-Manager. This role has more permissions than this plugin needs. We advice you to change the role to API-User.',
 
         // Register.
-        'config_form_register' => 'You have not entered your account details yet. If you don\'t have an account yet you can create a trial account with this %1$s',
+        'config_form_register' => 'You have not entered your account details yet. If you don\'t have an account yet, you can create a trial account via the button below',
         'config_form_register_button' => '<a class="%2$s" href="%1$s">Create a free Acumulus trial account now without any obligation</a>',
 
         // Account settings.

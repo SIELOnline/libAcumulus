@@ -56,7 +56,6 @@ class SettingsForm extends BaseConfigForm
      */
     protected function validateAccountFields(): void
     {
-
         if (empty($this->submittedValues[Tag::ContractCode])) {
             $this->addFormMessage($this->t('message_validate_contractcode_0'), Severity::Error, Tag::ContractCode);
         } elseif (!ctype_digit($this->submittedValues[Tag::ContractCode])) {
@@ -134,7 +133,9 @@ class SettingsForm extends BaseConfigForm
         ) {
             $this->addFormMessage(
                 sprintf($this->t('message_validate_zero_vat_class_0'), $this->t('vat_classes')),
-                Severity::Error, 'zeroVatClass');
+                Severity::Error,
+                'zeroVatClass'
+            );
         }
 
         // Check the marginProducts setting in combination with other settings.
@@ -411,16 +412,17 @@ class SettingsForm extends BaseConfigForm
             'vatFreeClass' => [
                 'type' => 'select',
                 'label' => sprintf($this->t('field_vatFreeClass'), $this->t('vat_class')),
-                'description' => sprintf($this->t('desc_vatFreeClass'),
+                'description' => sprintf(
+                    $this->t('desc_vatFreeClass'),
                     $this->t('vat_class'),
                     $this->t('vat_class_not_applicable'),
                     sprintf($this->t('vat_class_left_empty'), $this->t('vat_class'))
                 ),
                 'options' => [
-                                 0 => $this->t('option_empty'),
-                                 Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),
-                                 Config::VatClass_Null => ucfirst(sprintf($this->t('vat_class_left_empty'), $this->t('vat_class'))),
-                             ] + $vatClasses,
+                        0 => $this->t('option_empty'),
+                        Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),
+                        Config::VatClass_Null => ucfirst(sprintf($this->t('vat_class_left_empty'), $this->t('vat_class'))),
+                    ] + $vatClasses,
                 'attributes' => [
                     'required' => true,
                     'multiple' => false,
@@ -431,9 +433,9 @@ class SettingsForm extends BaseConfigForm
                 'label' => sprintf($this->t('field_zeroVatClass'), $this->t('vat_class')),
                 'description' => sprintf($this->t('desc_zeroVatClass'), $this->t('vat_class'), $this->t('vat_class_not_applicable')),
                 'options' => [
-                                 0 => $this->t('option_empty'),
-                                 Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),
-                             ] + $vatClasses,
+                        0 => $this->t('option_empty'),
+                        Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),
+                    ] + $vatClasses,
                 'attributes' => [
                     'required' => true,
                     'multiple' => false,
@@ -513,7 +515,8 @@ class SettingsForm extends BaseConfigForm
             $descMainAdressAdditional = sprintf($this->t('desc_mainAddress_shopUses'), $this->t($fiscalAddressSetting));
         } else {
             // Shop uses a setting to define which address to use.
-            $descMainAdressAdditional = sprintf($this->t('desc_mainAddress_shopSetting'),
+            $descMainAdressAdditional = sprintf(
+                $this->t('desc_mainAddress_shopSetting'),
                 $this->t('fiscal_address_setting'),
                 $this->shopCapabilities->getLink('fiscal-address-setting')
             );
@@ -1006,7 +1009,7 @@ class SettingsForm extends BaseConfigForm
         $mail = $this->t('option_document_mail');
 
         // Change to "camel case".
-        $document =  str_replace('_', '', ucwords($document, '_'));
+        $document = str_replace('_', '', ucwords($document, '_'));
         return [
             "show$document$page" => sprintf($this->t('option_document'), $label, $show),
             "mail$document$page" => sprintf($this->t('option_document'), $label, $mail),

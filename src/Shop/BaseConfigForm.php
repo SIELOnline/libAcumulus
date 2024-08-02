@@ -67,14 +67,14 @@ abstract class BaseConfigForm extends Form
     protected function getDefaultFormValues(): array
     {
         return $this->acumulusConfig->getCredentials()
-               + $this->acumulusConfig->getShopSettings()
-               + $this->acumulusConfig->getShopEventSettings()
-               + $this->acumulusConfig->getCustomerSettings()
-               + $this->acumulusConfig->getInvoiceSettings()
-               + $this->acumulusConfig->getEmailAsPdfSettings()
-               + $this->acumulusConfig->getInvoiceStatusSettings()
-               + $this->acumulusConfig->getDocumentsSettings()
-               + $this->acumulusConfig->getPluginSettings();
+            + $this->acumulusConfig->getShopSettings()
+            + $this->acumulusConfig->getShopEventSettings()
+            + $this->acumulusConfig->getCustomerSettings()
+            + $this->acumulusConfig->getInvoiceSettings()
+            + $this->acumulusConfig->getEmailAsPdfSettings()
+            + $this->acumulusConfig->getInvoiceStatusSettings()
+            + $this->acumulusConfig->getDocumentsSettings()
+            + $this->acumulusConfig->getPluginSettings();
     }
 
     /**
@@ -111,11 +111,15 @@ abstract class BaseConfigForm extends Form
         return [
             'register_text' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('config_form_register'), $this->t('module')),
+                'value' => $this->t('config_form_register'),
             ],
             'register_button' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('config_form_register_button'), $this->shopCapabilities->getLink('register'), $this->t('button_class')),
+                'value' => sprintf(
+                    $this->t('config_form_register_button'),
+                    $this->shopCapabilities->getLink('register'),
+                    $this->t('button_class')
+                ),
             ],
         ];
     }

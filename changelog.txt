@@ -18,6 +18,7 @@ Features:
 - JOO: Native support for Joomla 5, our component and plugins do no longer need the compat
   plugin. However note, that VirtueMart does need that plugin. hikaShop has its own compat
   layer, so probably does not need that plugin.
+- ALL: improved register message after install.
 
 Bugs:
 - PS: Settings form: set of order statuses to trigger sending the invoice data to Acumulus

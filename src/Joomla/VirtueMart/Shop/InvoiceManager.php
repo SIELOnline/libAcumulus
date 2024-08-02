@@ -42,8 +42,6 @@ class InvoiceManager extends BaseInvoiceManager
      * introduce sequential order numbers, E.g:
      * http://extensions.joomla.org/profile/extension/extension-specific/virtuemart-extensions/human-readable-order-numbers
      *
-     * @noinspection NullPointerExceptionInspection
-     *   getDb() won't fail anymore when we arrived here.
      * @noinspection PhpMissingParentCallCommonInspection
      *   Parent is a fallback implementation.
      */
@@ -51,8 +49,7 @@ class InvoiceManager extends BaseInvoiceManager
         string $invoiceSourceType,
         string $invoiceSourceReferenceFrom,
         string $invoiceSourceReferenceTo
-    ): array
-    {
+    ): array {
         if ($invoiceSourceType === Source::Order) {
             if (ctype_digit($invoiceSourceReferenceFrom) && ctype_digit($invoiceSourceReferenceTo)) {
                 $from = sprintf('%d', $invoiceSourceReferenceFrom);

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\Shop;
 
+use DateTime;
 use DateTimeZone;
-use Joomla\CMS\Date\Date;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\Database\DatabaseInterface;
@@ -48,7 +48,6 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function loadColumn(string $query): array
     {
-        /** @noinspection NullPointerExceptionInspection */
         return $this->getDb()->setQuery($query)->loadColumn();
     }
 
@@ -73,7 +72,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function toSql(string $dateStr): string
     {
-        return (new Date($dateStr, new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
+        return (new DateTime($dateStr, new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 
     /**

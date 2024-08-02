@@ -192,6 +192,7 @@ abstract class AcumulusEntryManager
      *
      * @return int|string
      *   Timestamp
+     * @todo: check timezone handling in all shops (already done: Joomla).
      */
     abstract protected function sqlNow();
 

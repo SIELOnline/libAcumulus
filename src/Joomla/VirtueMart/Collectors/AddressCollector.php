@@ -21,6 +21,8 @@ class AddressCollector extends BaseAddressCollector
      *
      * @noinspection MissingIssetImplementationInspection  class vObject does
      *    create real properties for all fields.
+     *
+     * @throws \Exception
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {

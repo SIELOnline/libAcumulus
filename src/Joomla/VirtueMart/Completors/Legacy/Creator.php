@@ -39,8 +39,6 @@ use function in_array;
  *   does not weigh up against the loss of information on the invoice.
  * - The VMInvoice extension offers credit notes, but for now we do not support
  *   this.
- *
- * @noinspection EfferentObjectCouplingInspection
  */
 class Creator extends BaseCreator
 {

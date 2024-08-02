@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
+use DateTimeZone;
+use Joomla\CMS\Factory;
 use Siel\Acumulus\Api;
 
 use function array_key_exists;
 use function call_user_func;
-use function count;
 use function is_array;
 use function is_object;
 
@@ -65,7 +66,6 @@ class AcumulusEntry
     public const Lock_NoLongerExists = 1;
     public const Lock_Deleted = 2;
     public const Lock_BecameRealEntry = 3;
-
 
     /**
      * Access to the fields, may differ per web shop as we follow db naming
@@ -157,6 +157,7 @@ class AcumulusEntry
      *   The type of shop source being Source::Order or Source::CreditNote.
      *
      * @noinspection PhpUnused
+     * @todo: change return type: this property should always be set when retrieved.
      */
     public function getSourceType(): ?string
     {
@@ -168,6 +169,7 @@ class AcumulusEntry
      *
      * @return int
      *   The id of the shop source.
+     * @todo: change return type: this property should always be set when retrieved.
      */
     public function getSourceId(): ?int
     {
@@ -210,7 +212,7 @@ class AcumulusEntry
         // be string, null given in src/Shop/AcumulusEntry.php:230. No idea how or why
         // this can occur, but let's just take the created value for the updated value.
         if (empty($result)) {
-            $result =  $this->getCreated($raw);
+            $result = $this->getCreated($raw);
         } elseif (!$raw) {
             $result = $this->toDateTime($result);
         }
@@ -231,8 +233,14 @@ class AcumulusEntry
             $result = new DateTime();
             $result->setTimestamp((int) $timestamp);
         } else {
-            // Formatted timestamp, e.g. yyyy-mm-dd hh:mm:ss.
-            $result = DateTime::createFromFormat(static::$timestampFormat, $timestamp);
+            // Formatted timestamp, e.g. yyyy-mm-dd hh:mm:ss. Is assumed to be in the
+            // timezone of the webshop if no timezone is specified in the string to parse.
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $result = DateTime::createFromFormat(
+                static::$timestampFormat,
+                $timestamp,
+                new DateTimeZone(Factory::getApplication()->get('offset'))
+            );
         }
         return $result;
     }

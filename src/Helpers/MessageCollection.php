@@ -6,6 +6,9 @@ namespace Siel\Acumulus\Helpers;
 
 use Throwable;
 
+use function in_array;
+use function is_int;
+
 /**
  * Class MessageCollection contains a set of Messages.
  *
@@ -154,8 +157,9 @@ class MessageCollection
      * 1st found will be returned.
      *
      * @param int|string $code
-     *   The code to search for, note that due to the PHP comparison rules 403
-     *   will match '403 Forbidden', but '403' won't.
+     *   The code to search for. This is a lax search: a message with code '403 Forbidden'
+     *   should be returned when $code is one of the following: '403 Forbidden',
+     *   '403 forbidden', 403, '403', 'Forbidden', or 'forbidden'.
      *
      * @return Message|null
      *   The message with the given code if the result contains such a message,
@@ -163,9 +167,15 @@ class MessageCollection
      */
     public function getByCode($code): ?Message
     {
+        $code = strtolower((string) $code);
         foreach ($this->getMessages() as $message) {
-            /** @noinspection TypeUnsafeComparisonInspection */
-            if ($message->getCode() == $code) {
+            // Look at the parts. No strict comparison.
+            $messageCode = strtolower((string) $message->getCode());
+            if ($code === $messageCode) {
+                return $message;
+            }
+            $parts = array_filter(explode(' ', $messageCode));
+            if (in_array($code, $parts, false)) {
                 return $message;
             }
         }

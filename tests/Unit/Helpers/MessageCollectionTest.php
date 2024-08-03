@@ -119,8 +119,11 @@ class MessageCollectionTest extends TestCase
         $this->assertSame(Severity::Error, $collection->getSeverity());
         $this->assertTrue($collection->hasError());
         $this->assertNull($collection->getByCode(701));
+        $this->assertInstanceOf(Message::class, $collection->getByCode('403 Forbidden'));
+        $this->assertInstanceOf(Message::class, $collection->getByCode('403 forbidden'));
         $this->assertInstanceOf(Message::class, $collection->getByCode(403));
-        $this->assertNull($collection->getByCode('403'));
+        $this->assertInstanceOf(Message::class, $collection->getByCode('403'));
+        $this->assertInstanceOf(Message::class, $collection->getByCode('forbidden'));
         $this->assertNull($collection->getByCodeTag('E1'));
         $this->assertEmpty($collection->getByField('email'));
         $this->assertCount(3, $collection->getMessages());

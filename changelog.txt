@@ -25,6 +25,8 @@ Bugs:
   was not stored or displayed correctly.
 - ALL: mapping for a metadata value may be the constant null but this was rejected when
   expanding mappings (as fields may not set to null).
+- ALL (minor): Comparison of codes of Messages changed due to changes in how PHP8 compares
+  strings and numbers.
 
 8.2.0 (2024-07-11) (ALL)
 ------------------------

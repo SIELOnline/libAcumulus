@@ -322,6 +322,19 @@ abstract class Source
     abstract public function getTotals(): Totals;
 
     /**
+     * Returns VAT breakdown metadata (a breakdown of the total vat amount per tax
+     * class/rate).
+     *
+     * The default implementation returns null, i.e. no vat breakdown information.
+     * Override if the shop needs and has this info. Currently only HS and OC override
+     * this.
+     */
+    public function getVatBreakdown(): ?array
+    {
+        return null;
+    }
+
+    /**
      * Loads and sets the web shop invoice linked to this source.
      *
      * This default implementation assumes that the web shop does not have

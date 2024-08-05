@@ -183,6 +183,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 // @todo: fields that come from the Order (or are constant), because, if
                 //   it would come from Source, it is not shop specific and defined in
                 //   Mappings::getShopIndependentDefaults().
+                Meta::VatBreakdown => '[source::getVatBreakdown()]',
                 // In HikaShop you can enter a price with or without vat, the other being
                 // automatically updated. So we can not know how prices where entered.
                 Meta::PricesIncludeVat => null,

@@ -142,15 +142,25 @@ abstract class Source extends BaseSource
     public function getTotals(): Totals
     {
         $vatAmount = 0.0;
-        $vatBreakdown = [];
         $orderTotals = $this->getOrderTotalLines();
         foreach ($orderTotals as $totalLine) {
             if ($totalLine['code'] === 'tax') {
                 $vatAmount += $totalLine['value'];
+            }
+        }
+        return new Totals((float) $this->shopSource['total'], $vatAmount, null);
+    }
+
+    public function getVatBreakdown(): array
+    {
+        $vatBreakdown = [];
+        $orderTotals = $this->getOrderTotalLines();
+        foreach ($orderTotals as $totalLine) {
+            if ($totalLine['code'] === 'tax') {
                 $vatBreakdown[$totalLine['title']] = $totalLine['value'];
             }
         }
-        return new Totals((float) $this->shopSource['total'], $vatAmount, null, $vatBreakdown);
+        return $vatBreakdown;
     }
 
     /**

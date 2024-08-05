@@ -146,16 +146,28 @@ class Source extends BaseSource
     {
         // No order_tax_info => no tax (?) => vat amount = 0.
         $vatAmount = 0.0;
-        $vatBreakdown = [];
         if (!empty($this->getSource()->order_tax_info)) {
             foreach ($this->getSource()->order_tax_info as $taxInfo) {
                 if (!empty($taxInfo->tax_amount)) {
                     $vatAmount += $taxInfo->tax_amount;
+                }
+            }
+        }
+        return new Totals((float) $this->getSource()->order_full_price, $vatAmount, null);
+    }
+
+    public function getVatBreakdown(): array
+    {
+        // No order_tax_info => no tax (?) => no vat breakdown
+        $vatBreakdown = [];
+        if (!empty($this->getSource()->order_tax_info)) {
+            foreach ($this->getSource()->order_tax_info as $taxInfo) {
+                if (!empty($taxInfo->tax_amount)) {
                     $vatBreakdown[$taxInfo->tax_namekey] = $taxInfo->tax_amount;
                 }
             }
         }
-        return new Totals((float) $this->getSource()->order_full_price, $vatAmount, null, $vatBreakdown);
+        return $vatBreakdown;
     }
 
     public function getInvoiceReference()

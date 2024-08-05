@@ -338,14 +338,7 @@ class Creator extends BaseCreator
               Meta::FieldsCalculated => [Tag::UnitPrice, Meta::VatAmount],
             ];
 
-            /**
-             * @var \Siel\Acumulus\Invoice\Totals $totals
-             *   Add these amounts to the invoice totals.
-             *  {@see \Siel\Acumulus\Invoice\Source::getTotals()}
-             */
-            $totals = $this->invoice[Tag::Customer][Tag::Invoice][Meta::Totals];
-            $totals->amountEx += $paymentEx;
-            $totals->amountInc += $paymentInc;
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::Totals]->add($paymentInc, null, $paymentEx);
             return $result;
         }
         return parent::getPaymentFeeLine();

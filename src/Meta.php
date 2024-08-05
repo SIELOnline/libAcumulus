@@ -113,6 +113,10 @@ interface Meta
      */
     public const Totals = 'meta-totals';
     /**
+     * Invoice: Source vat breakdown (usage: Opencart?, ???).
+     */
+    public const VatBreakdown = 'meta-vat-breakdown';
+    /**
      * Creator -> Completor: the total amount ex vat of the invoice.
      */
     public const InvoiceAmount = 'meta-total-amount';

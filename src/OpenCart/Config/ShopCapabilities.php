@@ -257,6 +257,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
                 // @todo: fields that come from the Order (or are constant), because, if
                 //   it would come from Source, it is not shop specific and defined in
                 //   Mappings::getShopIndependentDefaults().
+                Meta::VatBreakdown => '[source::getVatBreakdown()]',
                 Meta::PricesIncludeVat => false,
             ],
             DataType::Customer => [

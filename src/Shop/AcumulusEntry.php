@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeZone;
-use Joomla\CMS\Factory;
 use Siel\Acumulus\Api;
 
 use function array_key_exists;
@@ -147,19 +146,21 @@ class AcumulusEntry
      */
     public function getToken(): ?string
     {
-        return $this->get(static::$keyToken);
+        $token = $this->get(static::$keyToken);
+        // WorDPress cannot store null as meta value, so we store(d) '' for an empty
+        // token, although the meta key can also be just not set.
+        return !empty($token) ? $token : null;
     }
 
     /**
      * Return the type of shop source this Acumulus entry was created for.
      *
      * @return string
-     *   The type of shop source being Source::Order or Source::CreditNote.
+     *   The type of shop source: Source::Order or Source::CreditNote.
      *
      * @noinspection PhpUnused
-     * @todo: change return type: this property should always be set when retrieved.
      */
-    public function getSourceType(): ?string
+    public function getSourceType(): string
     {
         return $this->get(static::$keySourceType);
     }
@@ -169,9 +170,8 @@ class AcumulusEntry
      *
      * @return int
      *   The id of the shop source.
-     * @todo: change return type: this property should always be set when retrieved.
      */
-    public function getSourceId(): ?int
+    public function getSourceId(): int
     {
         return $this->get(static::$keySourceId);
     }
@@ -183,8 +183,10 @@ class AcumulusEntry
      *   Whether to return the raw value as stored in the database, or a
      *   DateTime object. The raw value will differ per web shop.
      *
-     * @return string|int|\DateTime
+     * @return string|int|\DateTimeInterface
      *   The timestamp when this record was created.
+     *
+     * @throws \Exception
      */
     public function getCreated(bool $raw = false)
     {
@@ -202,8 +204,10 @@ class AcumulusEntry
      *   Whether to return the raw value as stored in the database, or a
      *   Datetime object. The raw value will differ per web shop.
      *
-     * @return string|int|\DateTime
+     * @return string|int|\DateTimeInterface
      *   The timestamp when this record was last updated.
+     *
+     * @throws \Exception
      */
     public function getUpdated(bool $raw = false)
     {
@@ -224,25 +228,34 @@ class AcumulusEntry
      *
      * @param int|string $timestamp
      *
-     * @return bool|\DateTime
+     * @return bool|\DateTimeInterface
+     *
+     * @throws \Exception
      */
     protected function toDateTime($timestamp)
     {
         if (is_numeric($timestamp)) {
             // Unix timestamp.
-            $result = new DateTime();
-            $result->setTimestamp((int) $timestamp);
+            $result = new DateTimeImmutable();
+            $result = $result->setTimestamp((int) $timestamp);
         } else {
             // Formatted timestamp, e.g. yyyy-mm-dd hh:mm:ss. Is assumed to be in the
             // timezone of the webshop if no timezone is specified in the string to parse.
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $result = DateTime::createFromFormat(
-                static::$timestampFormat,
-                $timestamp,
-                new DateTimeZone(Factory::getApplication()->get('offset'))
-            );
+            $result = DateTimeImmutable::createFromFormat(static::$timestampFormat, $timestamp, $this->getDefaultTimeZone());
         }
         return $result;
+    }
+
+    /**
+     * Returns the default time zone as used by the shop.
+     *
+     * The default implementation returns the default time zone of the web server.
+     *
+     * @throws \Exception
+     */
+    protected function getDefaultTimeZone(): DateTimeZone
+    {
+        return new DateTimeZone(date_default_timezone_get());
     }
 
     /**
@@ -320,6 +333,8 @@ class AcumulusEntry
      * @return bool
      *   True if the entry indicates that there is a lock on sending the
      *   invoice, but has expired, false otherwise.
+     *
+     * @throws \Exception
      */
     public function hasLockExpired(): bool
     {

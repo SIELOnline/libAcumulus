@@ -31,7 +31,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
     public static string $keyEntryId = '_acumulus_entry_id';
     public static string $keyToken = '_acumulus_token';
-    // Note: thes following 2 meta keys are not actually stored, as the post/order id and
+    // Note: the following 2 meta keys are not actually stored, as the post/order id and
     // post/order type give us that information.
     public static string $keySourceId = '_acumulus_id';
     public static string $keySourceType = '_acumulus_type';

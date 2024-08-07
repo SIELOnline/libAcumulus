@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Shop;
 
+use DateTimeZone;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
 use function is_array;
@@ -41,5 +42,10 @@ class AcumulusEntry extends BaseAcumulusEntry
             $result = reset($result);
         }
         return $result;
+    }
+
+    protected function getDefaultTimeZone(): DateTimeZone
+    {
+        return wp_timezone();
     }
 }

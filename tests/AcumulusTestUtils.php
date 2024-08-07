@@ -8,6 +8,8 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests;
 
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use PHPUnit\Framework\ExpectationFailedException;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
@@ -65,7 +67,7 @@ trait AcumulusTestUtils
         return (new DateTime())->format('H:i:s.u');
     }
 
-    protected function getDiffInSeconds(DateTime $time1, DateTime $time2): int
+    protected function getDiffInSeconds(DateTimeInterface $time1, DateTimeInterface $time2): int
     {
         $interval = $time1->diff($time2);
         return (int) (new DateTime('@0'))->add($interval)->format('U');

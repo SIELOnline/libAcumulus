@@ -31,6 +31,9 @@ Bugs:
 Refactorings:
 - ALL: Removed vat breakdown from Totals. Totals now merely represents an amount (broken
   down in a price inc, price ex, and vat amount).
+- ALL: Started using DateTimeImmutable (and as  a consequence DateTimeInterface for type
+  hinting.
+
 
 8.2.0 (2024-07-11) (ALL)
 ------------------------

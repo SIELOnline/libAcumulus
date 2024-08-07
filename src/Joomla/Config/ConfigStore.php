@@ -18,8 +18,15 @@ class ConfigStore extends BaSeConfigStore
 {
     public function load(): array
     {
+        // Do not use the ExtensionHelper class: it caches the extension records without
+        // any way to clear that cache. So when we update the config values (on one of the
+        // config forms or during an update) we do not get the fresh values.
         $extension = ExtensionHelper::getExtensionRecord('com_acumulus', 'component');
         $values = $extension->custom_data;
+
+        $extensionTable = new Extension(Factory::getContainer()->get(DatabaseInterface::class));
+        $extensionTable->load(['element' => 'com_acumulus']);
+        $values = $extensionTable->custom_data;
         return !empty($values) ? json_decode($values, true, 512, JSON_THROW_ON_ERROR) : [];
     }
 

@@ -145,14 +145,7 @@ class CollectorManager
 
         $invoice->setCustomer($this->collectCustomer());
         $invoice->setEmailAsPdf($this->collectEmailAsPdf(EmailAsPdfType::Invoice));
-
-        // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
-        //   version in the Legacy sub namespace that is stripped down to these features
-        //   that has not yet been converted.
-        /** @var \Siel\Acumulus\Completors\Legacy\Creator $creator */
-        $creator = $this->getContainer()->getCreator(true);
-        $creator->create($this->getPropertySources()['source'], $invoice);
-        // @legacy end
+        $this->collectLines($invoice);
 
         return $invoice;
     }
@@ -171,6 +164,10 @@ class CollectorManager
         return $customer;
     }
 
+    /**
+     * @param string $type
+     *   One of the {@see AddressType} constants Invoice or Shipping.
+     */
     public function collectAddress(string $type): Address
     {
         $addressCollector = $this->getContainer()->getCollector(DataType::Address);
@@ -185,10 +182,24 @@ class CollectorManager
     {
         $emailAsPdfCollector = $this->getContainer()->getCollector(DataType::EmailAsPdf);
         $emailAsPdfMappings = $this->getMappings()->getFor($type);
-        $emailAsPdfMappings['emailAsPdfType'] = $type;
+        $emailAsPdfMappings[EmailAsPdfType::class] = $type;
 
         /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */
         $emailAsPdf = $emailAsPdfCollector->collect($this->getPropertySources(), $emailAsPdfMappings);
         return $emailAsPdf;
+    }
+
+    /**
+     * Collects the invoice lines.
+     */
+    private function collectLines(Invoice $invoice): void
+    {
+        // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
+        //   version in the Legacy sub namespace that is stripped down to these features
+        //   that has not yet been converted.
+        /** @var \Siel\Acumulus\Completors\Legacy\Creator $creator */
+        $creator = $this->getContainer()->getCreator(true);
+        $creator->create($this->getPropertySources()['source'], $invoice);
+        // @legacy end
     }
 }

@@ -8,7 +8,7 @@ namespace Siel\Acumulus\Data;
  * EmailAsPdfType defines for what type of pdf the EmailAsPdfTarget section will
  * be used.
  *
- * PHP8.1: enumeration.
+ * @nth: PHP8.1: enumeration.
  */
 interface EmailAsPdfType
 {

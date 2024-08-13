@@ -7,7 +7,7 @@ namespace Siel\Acumulus\Data;
 /**
  * DataType defines (the short class names for) the possible data types.
  *
- * PHP8.1: enumeration.
+ * @nth: PHP8.1: enumeration.
  */
 interface DataType
 {

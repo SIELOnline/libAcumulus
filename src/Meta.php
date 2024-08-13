@@ -93,18 +93,21 @@ interface Meta
      * Creator->Completor: Conversion rate from the used currency to the shop's
      * default currency:
      *   amount in shop currency = CurrencyRate * amount in other currency
+     * @deprecated We store a Currency object in meta-currency.
      */
     public const CurrencyRate = 'meta-currency-rate';
     /**
      * Creator->Completor: true if we should use the above meta info to convert
      * amounts, false if the amounts are already in the shop's default currency
      * (which should be euro) and this info is thus purely informational.
+     * @deprecated We store a Currency object in meta-currency.
      */
     public const CurrencyDoConvert = 'meta-currency-do-convert';
     /**
      * Completor: Whether the currency rate
      *   should be inverted (shop default is not EUR, but order is in EUR).
      *   AND has been inverted (we invert of course only once).
+     * @deprecated We store a Currency object in meta-currency.
      */
     public const CurrencyRateInverted = 'meta-currency-rate-inverted';
 
@@ -164,8 +167,8 @@ interface Meta
      */
     public const FieldsCalculated = 'meta-fields-calculated';
     /**
-     * Instruction: if and what price (unitprice or unitpriceinc) to recalculate
-     * when the exact vatrate is known.
+     * Instruction: if and what price to recalculate when the exact vat rate is known.
+     * Can be 'unitprice' or 'unitpriceinc' or not set.
      */
     public const RecalculatePrice = 'meta-recalculate-price';
     /**

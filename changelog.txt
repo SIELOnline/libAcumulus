@@ -29,6 +29,9 @@ Bugs:
   strings and numbers.
 
 Refactorings:
+- ALL: Removed the old Creator and Completor code from the Invoice namespace and moved the
+  Completors\Legacy namespace "back" to invoice. This lead to many clean-ups of no longer
+  used code all over the code base.
 - ALL: Removed vat breakdown from Totals. Totals now merely represents an amount (broken
   down in a price inc, price ex, and vat amount).
 - ALL: Started using DateTimeImmutable (and as  a consequence DateTimeInterface for type

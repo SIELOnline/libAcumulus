@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
-use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\PropertySet;
-
 /**
  * Collects address data from the shop.
  *
@@ -34,19 +31,4 @@ use Siel\Acumulus\Data\PropertySet;
  */
 class AddressCollector extends Collector
 {
-    /**
-     * @param \Siel\Acumulus\Data\Address $acumulusObject
-     */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
-    {
-        // Not needed for: MA, WC, HS, VM (does its own lookup); Needed for: -
-        if ($acumulusObject->countryCode === null) {
-            /** @var \Siel\Acumulus\Invoice\Source $invoiceSource */
-            $invoiceSource = $this->propertySources['source'];
-            // Set 'nl' as default country code, but overwrite with the real country
-            // code, if not empty.
-            $acumulusObject->setCountryCode('nl');
-            $acumulusObject->setCountryCode($invoiceSource->getCountryCode(), PropertySet::NotEmpty);
-        }
-    }
 }

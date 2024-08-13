@@ -7,7 +7,9 @@ namespace Siel\Acumulus\Data;
 /**
  * LineType defines the possible types of invoice lines.
  *
- * PHP8.1: enumeration.
+ * Line type are used to define the type of line collected.
+ *
+ * @nth: PHP8.1: enumeration.
  */
 interface LineType
 {

@@ -98,6 +98,8 @@ use function strlen;
  *   passed as argument.
  * - The key or a variable may be used in a property definition to indicate
  *   that the result may only come from that variable.
+ *
+ * @deprecated Use {@see \Siel\Acumulus\Helpers\FieldExpander}
  */
 class Token
 {

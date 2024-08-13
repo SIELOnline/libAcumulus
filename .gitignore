@@ -5,3 +5,4 @@
 # that any other vendor directories are not ignored unless you purposely do so.
 composer.lock
 /vendor/
+/zremoved/

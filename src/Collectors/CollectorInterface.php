@@ -28,7 +28,7 @@ interface CollectorInterface
      * - A field pattern. In most cases, a field pattern will come from the
      *   module configuration. Field patterns may be as simple as a literal
      *   string; the value of 1 property from one of the property sources; to a
-     *   (complex) combination of these. The {@see \Siel\Acumulus\Helpers\Token}
+     *   (complex) combination of these. The {@see \Siel\Acumulus\Helpers\FieldExpander}
      *   class is typically used to compute a value given a field pattern. As
      *   this option gives a lot of flexibility to the user to override default
      *   behaviour via simple configuration, this way should, if possible, be
@@ -43,7 +43,7 @@ interface CollectorInterface
      *
      * @param array[] $propertySources
      *   The objects that serve as a source for property extraction. Note that
-     *    the {@see \Siel\Acumulus\Helpers\Token} class can also call
+     *    the {@see \Siel\Acumulus\Helpers\FieldExpander} class can also call
      *    (parameterless) methods on the property sources.
      * @param string[] $fieldSpecifications
      *   The patterns for the fields that can be collected via a simple mapping.

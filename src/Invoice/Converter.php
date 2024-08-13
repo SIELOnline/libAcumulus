@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Completors\Legacy;
+namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;

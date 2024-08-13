@@ -113,7 +113,7 @@ class Creator extends BaseCreator
         // Support for some often used plugins that extend WooCommerce,
         // especially in the area of products (bundles, bookings, ...).
         /** @var \Siel\Acumulus\WooCommerce\Invoice\CreatorPluginSupport $creatorPluginSupport */
-        $creatorPluginSupport = $this->container->getInstance('CreatorPluginSupport', 'Invoice');
+        $creatorPluginSupport = $this->getContainer()->getInstance('CreatorPluginSupport', 'Invoice');
         $creatorPluginSupport->getItemLineBefore($this, $item, $product);
 
         // $product can be null if the product has been deleted.
@@ -122,7 +122,7 @@ class Creator extends BaseCreator
         }
         $this->addPropertySource('item', $item);
 
-        $this->addProductInfo($result);  // copied to mappings (itemNumber, product).
+        $this->addProductInfo($result);
         $result[Meta::Id] = $item->get_id();
 
         // Add quantity: quantity is negative on refunds, the unit price will be
@@ -154,7 +154,7 @@ class Creator extends BaseCreator
             $precisionEx = $this->precision;
             $reason = $this->isPriceIncRealistic($productPriceInc, $taxes, $product);
             if ($reason !== '') {
-                $this->addWarning($result, "Price inc is realistic: $reason");
+                $this->addWarning($result, "Price inc is realistic: $reason", Meta::Info);
                 $precisionInc = 0.001;
                 $recalculatePrice = Tag::UnitPrice;
             } else {
@@ -445,11 +445,11 @@ class Creator extends BaseCreator
         $option = get_option($optionName);
 
         if (!empty($option['cost'])) {
-            // Note that "Cost" may contain a formula or use commas: 'Vul een
-            // bedrag(excl. btw) in of een berekening zoals 10.00 * [qty].
-            // Gebruik [qty] voor het aantal artikelen, [cost] voor de totale
-            // prijs van alle artikelen, en [fee percent="10" min_fee="20"
-            // max_fee=""] voor prijzen gebaseerd op percentage.'
+        // Note that "Cost" may contain a formula or use commas: 'Vul een bedrag(excl.
+        // btw) in of een berekening zoals 10.00 * [qty]. Gebruik [qty] voor het
+        // aantal artikelen, [cost] voor de totale prijs van alle artikelen, en
+        // [fee percent="10" min_fee="20" max_fee=""] voor prijzen gebaseerd op
+        // percentage.'
             $cost = str_replace(',', '.', $option['cost']);
             if (is_numeric($cost)) {
                 $cost = (float) $cost;
@@ -459,7 +459,6 @@ class Creator extends BaseCreator
                 }
             }
         }
-
         $quantity = $item->get_quantity();
         $shippingEx /= $quantity;
         $shippingVat = $item->get_total_tax() / $quantity;
@@ -567,7 +566,6 @@ class Creator extends BaseCreator
         // For refunds without any articles (probably just a manual refund) we
         // don't need to know what discounts were applied on the original order.
         // So skip get_used_coupons() on refunds without articles.
-        /** @noinspection PhpClassConstantAccessedViaChildClassInspection */
         if ($this->invoiceSource->getType() !== Source::CreditNote || $this->hasItemLines) {
             // Add a line for all coupons applied. Coupons are only stored on
             // the order, not on refunds, so use the order.
@@ -590,9 +588,8 @@ class Creator extends BaseCreator
      * - have a fixed amount or a percentage.
      * - be applied to the whole cart or only be used for a set of products.
      *
-     * Discounts are already applied, add a descriptive line with 0 amount. The
-     * VAT rate to categorize this line under should be determined by the
-     * completor.
+     * Discounts are already applied, we just add a descriptive line with 0 amount. The
+     * VAT rate to categorize this line under should be determined by the completor.
      *
      * @param \WC_Coupon $coupon
      *
@@ -656,6 +653,7 @@ class Creator extends BaseCreator
      */
     protected function productPricesIncludeTax(): bool
     {
+        /** @noinspection PhpUndefinedFunctionInspection   false positive */
         return wc_prices_include_tax();
     }
 

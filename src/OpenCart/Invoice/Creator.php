@@ -17,6 +17,7 @@
  * @noinspection PhpMultipleClassDeclarationsInspection OC3 has many double class definitions
  * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
  * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
+ * @noinspection DuplicatedCode  This is a copy of the old Creator.
  */
 
 namespace Siel\Acumulus\OpenCart\Invoice;
@@ -164,13 +165,13 @@ abstract class Creator extends BaseCreator
             $optionsVatInfo[Meta::VatAmount] = 0;
             foreach ($options as $option) {
                 $result[Meta::ChildrenLines][] = [
-                    Tag::Product => "{$option['name']}: {$option['value']}",
-                    Tag::UnitPrice => 0,
-                      // Table order_option does not have a quantity field, so
-                      // composite products with multiple same sub product
-                      // are apparently not covered. Take quantity from parent.
-                    Tag::Quantity => $item['quantity'],
-                                                 ] + $optionsVatInfo;
+                        Tag::Product => "{$option['name']}: {$option['value']}",
+                        Tag::UnitPrice => 0,
+                        // Table order_option does not have a quantity field, so
+                        // composite products with multiple same sub product
+                        // are apparently not covered. Take quantity from parent.
+                        Tag::Quantity => $item['quantity'],
+                    ] + $optionsVatInfo;
             }
         }
         $this->removePropertySource('product');
@@ -454,7 +455,7 @@ abstract class Creator extends BaseCreator
      */
     protected function getTaxClass(int $tax_class_id): array
     {
-        /** @var \stdClass $query  (documentation error in DB) */
+        /** @var \stdClass $query (documentation error in DB) */
         $query = $this->getDb()->query('SELECT * FROM ' . DB_PREFIX . "tax_class WHERE tax_class_id = '" . $tax_class_id . "'");
         return $query->row;
     }
@@ -472,7 +473,7 @@ abstract class Creator extends BaseCreator
      */
     protected function getTaxRules(int $tax_class_id): array
     {
-        /** @var \stdClass $query  (documentation error in DB) */
+        /** @var \stdClass $query (documentation error in DB) */
         $query = $this->getDb()->query('SELECT * FROM ' . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . $tax_class_id . "'");
         return $query->rows;
     }
@@ -490,13 +491,14 @@ abstract class Creator extends BaseCreator
      */
     protected function getTaxRate(int $tax_rate_id): array
     {
-        /** @var \stdClass $query  (documentation error in DB) */
+        /** @var \stdClass $query (documentation error in DB) */
         $query = $this->getDb()->query(
             'SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id,
             gz.name AS geo_zone, tr.date_added, tr.date_modified
             FROM ' . DB_PREFIX . 'tax_rate tr
             LEFT JOIN ' . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id)
-            WHERE tr.tax_rate_id = '" . $tax_rate_id . "'");
+            WHERE tr.tax_rate_id = '" . $tax_rate_id . "'"
+        );
         return $query->row;
     }
 
@@ -516,7 +518,7 @@ abstract class Creator extends BaseCreator
         static $geoZonesCache = [];
 
         if (!isset($geoZonesCache[$geo_zone_id])) {
-            /** @var \stdClass $query  (documentation error in DB) */
+            /** @var \stdClass $query (documentation error in DB) */
             $query = $this->getDb()->query('SELECT * FROM ' . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . $geo_zone_id . "'");
             $geoZonesCache[$geo_zone_id] = $query->rows;
         }

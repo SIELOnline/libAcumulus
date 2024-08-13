@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection DuplicatedCode  We have a copy of this class in Completors\Legacy.
+ * @noinspection DuplicatedCode  Yes, this is a duplicate of WooCommerce\Invoice\Creator.
  */
 
 declare(strict_types=1);

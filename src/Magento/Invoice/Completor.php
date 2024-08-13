@@ -9,13 +9,16 @@
  *   regardless the type for vat class ids as used by the shop itself.
  * So for now, we will ignore the warnings about non strictly typed comparisons
  * in this code, and we won't use strict_types=1.
+ *
  * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection DuplicatedCode  This is a copy of the old Completor.
  */
 
 namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor as BaseCompletor;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
@@ -63,6 +66,7 @@ class Completor extends BaseCompletor
                 foreach ($invoiceLines as $line) {
                     if ($line[Meta::LineType] === Creator::LineType_Shipping && isset($line[Meta::LineDiscountAmountInc])) {
                         $line[Meta::LineDiscountAmountInc] += $discountLineAmountInc - $discountAmountInc;
+                        $line[Meta::LineDiscountAmountIncCorrected] = true;
                     }
                 }
             }

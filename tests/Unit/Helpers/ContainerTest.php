@@ -1,9 +1,6 @@
 <?php
 /**
- * @noinspection EfferentObjectCouplingInspection
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
  */
 
 declare(strict_types=1);
@@ -37,7 +34,9 @@ use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\FormMapper;
 use Siel\Acumulus\Helpers\FormRenderer;
 use Siel\Acumulus\Invoice\Completor;
+use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\Creator;
+use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntry;
@@ -60,10 +59,12 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Util;
-use Siel\Acumulus\Helpers\Token;
 
 use function get_class;
 
+/**
+ * ContainerTest tests the Acumulus {@see \Siel\Acumulus\Helpers\Container}.
+ */
 class ContainerTest extends TestCase
 {
     protected function getContainer(string $namespace): Container
@@ -85,8 +86,6 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Requirements::class, $object);
         $object = $container->getUtil();
         $this->assertInstanceOf(Util::class, $object);
-        $object = $container->getToken();
-        $this->assertInstanceOf(Token::class, $object);
         $object = $container->getCountries();
         $this->assertInstanceOf(Countries::class, $object);
         $object = $container->getFieldExpander();
@@ -206,6 +205,10 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Completor::class, $object);
         $object = $container->createInvoiceAddResult('');
         $this->assertInstanceOf(InvoiceAddResult::class, $object);
+        $object = $container->getCompletorInvoiceLines();
+        $this->assertInstanceOf(CompletorInvoiceLines::class, $object);
+        $object = $container->getFlattenerInvoiceLines();
+        $this->assertInstanceOf(FlattenerInvoiceLines::class, $object);
     }
 
     public function testShopNamespace(): void
@@ -232,14 +235,6 @@ class ContainerTest extends TestCase
         }
         $object = $container->getCollectorManager();
         $this->assertInstanceOf(CollectorManager::class, $object);
-        $object = $container->getCreator(true);
-        $this->assertInstanceOf(\Siel\Acumulus\Completors\Legacy\Creator::class, $object);
-        $object = $container->getCompletor('legacy');
-        $this->assertInstanceOf(\Siel\Acumulus\Completors\Legacy\Completor::class, $object);
-        $object = $container->getCompletorInvoiceLines(true);
-        $this->assertInstanceOf(\Siel\Acumulus\Completors\Legacy\CompletorInvoiceLines::class, $object);
-        $object = $container->getFlattenerInvoiceLines(true);
-        $this->assertInstanceOf(\Siel\Acumulus\Completors\Legacy\FlattenerInvoiceLines::class, $object);
     }
 
 //    public function testGetInstance()

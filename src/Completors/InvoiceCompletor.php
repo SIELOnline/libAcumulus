@@ -75,9 +75,9 @@ class InvoiceCompletor extends BaseCompletor
         $this->completeEmailAsPdf($result);
 
         // @legacy: Not all Completing tasks are already converted, certainly not those that complete Lines.
-        /** @var \Siel\Acumulus\Completors\Legacy\Completor $legacyCompletor */
-        $legacyCompletor = $this->getContainer()->getCompletor('legacy');
-        $legacyCompletor->complete($this->invoice, $this->getSource(), $result);
+        /** @var \Siel\Acumulus\Invoice\Completor $completor */
+        $completor = $this->getContainer()->getCompletor();
+        $completor->complete($this->invoice, $this->getSource(), $result);
         // end of @legacy: Not all Completing tasks are already converted, certainly not those that complete Lines.
 
         // As last!

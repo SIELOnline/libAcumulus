@@ -1,19 +1,6 @@
 <?php
 
-/**
- * Although we would like to use strict equality, i.e. including type equality,
- * unconditionally changing each comparison in this file will lead to problems
- * - API responses return each value as string, even if it is an int or float.
- * - The shop environment may be lax in its typing by, e.g. using strings for
- *   each value coming from the database.
- * - Our own config object is type aware, but, e.g, uses string for a vat class
- *   regardless the type for vat class ids as used by the shop itself.
- * So for now, we will ignore the warnings about non strictly typed comparisons
- * in this code, and we won't use strict_types=1.
- * @noinspection TypeUnsafeComparisonInspection
- * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
@@ -21,11 +8,13 @@ use DOMDocument;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 use stdClass;
 use VirtueMartModelCustomfields;
+use VirtueMartModelOrders;
 use VmModel;
 
 use function in_array;
@@ -50,8 +39,7 @@ use function in_array;
  */
 class Creator extends BaseCreator
 {
-    /** @var \VirtueMartModelOrders */
-    protected $orderModel;
+    protected VirtueMartModelOrders $orderModel;
 
     /**
      * Array with keys:
@@ -70,7 +58,7 @@ class Creator extends BaseCreator
      *
      * @var array
      */
-    protected $order;
+    protected array $order;
 
     /**
      * Array with fields from the virtuemart_invoices table:
@@ -80,8 +68,9 @@ class Creator extends BaseCreator
      * - xhtml
      * - + others
      *
-     * @var array */
-    protected $shopInvoice = [];
+     * @var array
+     */
+    protected array $shopInvoice = [];
 
     /**
      * Precision of amounts stored in VM. In VM, you can enter either the price
@@ -90,7 +79,7 @@ class Creator extends BaseCreator
      *
      * @var float
      */
-    protected $precision = 0.001;
+    protected float $precision = 0.001;
 
     /**
      * {@inheritdoc}
@@ -98,29 +87,33 @@ class Creator extends BaseCreator
      * This override also initializes VM specific properties related to the
      * source.
      */
-    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
+    protected function setInvoiceSource(Source $invoiceSource): void
     {
         parent::setInvoiceSource($invoiceSource);
         $this->order = $this->invoiceSource->getSource();
         $this->orderModel = VmModel::getModel('orders');
+
+        // @todo: dow we use the shop invoice?
         /** @var \TableInvoices $invoicesTable */
-        $invoicesTable = $this->orderModel->getTable('invoices');
-        if ($invoice = $invoicesTable->load($this->order['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
-            $this->shopInvoice = $invoice->getProperties();
-        }
+//        $invoicesTable = $this->orderModel->getTable('invoices');
+//        if ($invoice = $invoicesTable->load($this->order['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
+//            $this->shopInvoice = $invoice->getProperties();
+//        }
 
-        if (!empty($this->order['details']['BT']->virtuemart_user_id)) {
-            /** @var \VirtueMartModelUser $userModel */
-            $userModel = VmModel::getModel('user');
-            $userModel->setId($this->order['details']['BT']->virtuemart_user_id);
-            $user = $userModel->getUser();
-
-            foreach ($user->userInfo as $userInfo) {
-                if ($userInfo->address_type === 'BT') {
-                    $this->order['details']['BT']->tax_exemption_number = $userInfo->tax_exemption_number;
-                }
-            }
-        }
+// @todo: why did we copy the tax_exemption_number? Is it not always there?
+//
+//        if (!empty($this->order['details']['BT']->virtuemart_user_id)) {
+//            /** @var \VirtueMartModelUser $userModel */
+//            $userModel = VmModel::getModel('user');
+//            $userModel->setId($this->order['details']['BT']->virtuemart_user_id);
+//            $user = $userModel->getUser();
+//
+//            foreach ($user->userInfo as $userInfo) {
+//                if ($userInfo->address_type === 'BT') {
+//                    $this->order['details']['BT']->tax_exemption_number = $userInfo->tax_exemption_number;
+//                }
+//            }
+//        }
     }
 
     protected function setPropertySources(): void
@@ -131,7 +124,7 @@ class Creator extends BaseCreator
         unset($this->propertySources['source']);
         $this->propertySources['BT'] = $this->order['details']['BT'];
         $this->propertySources['ST'] = $this->order['details']['ST'];
-        $this->propertySources['shopInvoice'] = $this->shopInvoice;
+//        $this->propertySources['shopInvoice'] = $this->shopInvoice;
     }
 
     /**
@@ -161,7 +154,7 @@ class Creator extends BaseCreator
         $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
         $productPriceInc = (float) $item->product_final_price;
         $productVat = (float) $item->product_tax;
-        $vatInfo = $this->getVatData('VatTax', $productPriceEx, $productVat, $item->virtuemart_order_item_id);
+        $vatInfo = $this->getVatData('VatTax', $productPriceEx, $productVat, (int) $item->virtuemart_order_item_id);
 
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
@@ -176,7 +169,7 @@ class Creator extends BaseCreator
                 Meta::VatAmount => $productVat,
             ];
         }
-        $result[Tag::Quantity] = $item->product_quantity;
+        $result[Tag::Quantity] = (int) $item->product_quantity;
         $result += $vatInfo;
 
         // Add variant info.
@@ -224,10 +217,10 @@ class Creator extends BaseCreator
                 // spans.
                 if ($span->getElementsByTagName('span')->length === 0) {
                     $result[] = [
-                        Tag::Product => $span->textContent,
-                        Tag::UnitPrice => 0,
-                        Tag::Quantity => $parentQuantity,
-                                ] + $vatRangeTags;
+                            Tag::Product => $span->textContent,
+                            Tag::UnitPrice => 0,
+                            Tag::Quantity => $parentQuantity,
+                        ] + $vatRangeTags;
                 }
             }
         }
@@ -250,7 +243,7 @@ class Creator extends BaseCreator
                     Tag::UnitPrice => $shippingEx,
                     Tag::Quantity => 1,
                     Meta::VatAmount => $shippingVat,
-                      ] + $this->getVatData('shipment', $shippingEx, $shippingVat);
+                ] + $this->getVatData('shipment', $shippingEx, $shippingVat);
         }
         return $result;
     }
@@ -284,8 +277,11 @@ class Creator extends BaseCreator
         // However, these fields seem to be totals based on applied non-tax
         // calculation rules. So it is better to add a line per calc rule with a
         // negative amount: this gives us descriptions of the discounts as well.
-        $result = array_merge($result, array_map([$this, 'getCalcRuleDiscountLine'],
-            array_filter($this->order['calc_rules'], [$this, 'isDiscountCalcRule'])));
+        $result = array_merge(
+            $result,
+            array_map([$this, 'getCalcRuleDiscountLine'],
+                array_filter($this->order['calc_rules'], [$this, 'isDiscountCalcRule']))
+        );
 
         // Coupon codes are not stored in calc rules, so handle them separately.
         if (!Number::isZero($this->order['details']['BT']->coupon_discount)) {
@@ -306,7 +302,7 @@ class Creator extends BaseCreator
     protected function isDiscountCalcRule(stdClass $calcRule): bool
     {
         return $calcRule->calc_amount < 0.0
-               && !in_array($calcRule->calc_kind, ['VatTax', 'shipment', 'payment']);
+            && !in_array($calcRule->calc_kind, ['VatTax', 'shipment', 'payment']);
     }
 
     /**
@@ -368,7 +364,7 @@ class Creator extends BaseCreator
                         Tag::UnitPrice => $paymentEx,
                         Tag::Quantity => 1,
                         Meta::VatAmount => $paymentVat,
-                          ] + $this->getVatData('payment', $paymentEx, $paymentVat);
+                    ] + $this->getVatData('payment', $paymentEx, $paymentVat);
             }
         }
         return $result;
@@ -389,8 +385,8 @@ class Creator extends BaseCreator
     protected function getCalcRule(string $calcKind, int $orderItemId = 0): ?object
     {
         foreach ($this->order['calc_rules'] as $calcRule) {
-            if ($calcRule->calc_kind == $calcKind) {
-                if (empty($orderItemId) || $calcRule->virtuemart_order_item_id == $orderItemId) {
+            if ($calcRule->calc_kind === $calcKind) {
+                if (empty($orderItemId) || (int) $calcRule->virtuemart_order_item_id === $orderItemId) {
                     return $calcRule;
                 }
             }
@@ -421,13 +417,14 @@ class Creator extends BaseCreator
                 Meta::VatClassName => $calcRule->calc_rule_name,
             ];
         } elseif (Number::isZero($vatAmount)) {
-            // No vat class assigned to payment.
+            // No vat class assigned to payment or shipping fee.
             $vatInfo = [
                 Tag::VatRate => Api::VatFree,
                 Meta::VatRateSource => static::VatRateSource_Exact0,
                 Meta::VatClassId => Config::VatClass_Null,
             ];
         } else {
+            /** @noinspection PhpStaticAsDynamicMethodCallInspection */
             $vatInfo = $this->getVatRangeTags($vatAmount, $amountEx, $this->precision);
         }
 

@@ -59,7 +59,7 @@ abstract class ShopCapabilities
      * - At the item line level, the fields 'itemnumber', 'product', 'nature',
      *   and 'costprice' may use tokens.
      *
-     * See{@see \Siel\Acumulus\Helpers\Token} or the help text under key
+     * See {@see \Siel\Acumulus\Helpers\FieldExpander} or the help text under key
      * 'desc_tokens' in siel/acumulus/src/Shop/ConfigFormTranslations.php for
      * more info about the possible options to define combinations or a
      * selection of various tokens.

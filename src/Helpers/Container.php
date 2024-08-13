@@ -29,7 +29,10 @@ use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
+use Siel\Acumulus\Invoice\Creator;
+use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AboutForm;
@@ -328,11 +331,6 @@ class Container
         ]);
     }
 
-    public function getToken(): Token
-    {
-        return $this->getInstance('Token', 'Helpers', [$this->getLog()]);
-    }
-
     public function getFieldExpander(): FieldExpander
     {
         return $this->getInstance('FieldExpander', 'Helpers', [$this->getLog()]);
@@ -460,48 +458,20 @@ class Container
                 ],
                 true
             );
-        } elseif ($dataType === 'legacy') {
-            // @legacy remove when all shops are converted to new architecture.
-            return $this->getInstance(
-                'Completor',
-                'Completors\Legacy',
-                [
-                    $this->getCompletorInvoiceLines(true),
-                    $this->getCompletorStrategyLines(),
-                    $this->getCountries(),
-                    $this->getAcumulusApiClient(),
-                    $this->getConfig(),
-                    $this->getTranslator(),
-                    $this->getLog(),
-                ],
-                true
-            );
         } else {
             $arguments = [$this, $this->getConfig(), $this->getTranslator()];
             return $this->getInstance("{$dataType}Completor", 'Completors', $arguments);
         }
     }
 
-    /**
-     * @return \Siel\Acumulus\Invoice\CompletorInvoiceLines|\Siel\Acumulus\Completors\Legacy\CompletorInvoiceLines
-     */
-    public function getCompletorInvoiceLines(bool $legacy = false)
+    public function getCompletorInvoiceLines(): CompletorInvoiceLines
     {
-        $subNamespace = $legacy ? 'Completors\Legacy' : 'Invoice';
-        return $this->getInstance(
-            'CompletorInvoiceLines',
-            $subNamespace,
-            [$this->getFlattenerInvoiceLines($legacy), $this->getConfig()]
-        );
+        return $this->getInstance('CompletorInvoiceLines', 'invoice', [$this->getFlattenerInvoiceLines(), $this->getConfig()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Invoice\FlattenerInvoiceLines|\Siel\Acumulus\Completors\Legacy\FlattenerInvoiceLines
-     */
-    public function getFlattenerInvoiceLines(bool $legacy = false)
+    public function getFlattenerInvoiceLines(): FlattenerInvoiceLines
     {
-        $subNamespace = $legacy ? 'Completors\Legacy' : 'Invoice';
-        return $this->getInstance('FlattenerInvoiceLines', $subNamespace, [$this->getConfig()]);
+        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', [$this->getConfig()]);
     }
 
     public function getCompletorStrategyLines(): CompletorStrategyLines
@@ -509,31 +479,14 @@ class Container
         return $this->getInstance('CompletorStrategyLines', 'Invoice', [$this->getConfig(), $this->getTranslator()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Invoice\Creator|\Siel\Acumulus\Completors\Legacy\Creator
-     */
-    public function getCreator(bool $legacy = false)
+    public function getCreator(): Creator
     {
         // @legacy remove when all shops are converted to new architecture.
-        return $legacy
-            ? $this->getInstance(
-                'Creator',
-                'Completors\Legacy',
-                [
-                    $this->getFieldExpander(),
-                    $this->getShopCapabilities(),
-                    $this,
-                    $this->getConfig(),
-                    $this->getTranslator(),
-                    $this->getLog(),
-                ]
-            )
-            : $this->getInstance(
+        return  $this->getInstance(
                 'Creator',
                 'Invoice',
                 [
-                    $this->getToken(),
-                    $this->getCountries(),
+                    $this->getFieldExpander(),
                     $this->getShopCapabilities(),
                     $this,
                     $this->getConfig(),
@@ -580,7 +533,7 @@ class Container
      * @param string $dataType
      *   The data type it operates on. One of the
      *   {@see \Siel\Acumulus\Data\DataType} constants. This is used as a
-     *   subnamespace when constructing the class name to load.
+     *   sub namespace when constructing the class name to load.
      * @param string $task
      *   The task to be executed. This is used to construct the class name of a
      *   class that performs the given task and implements

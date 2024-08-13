@@ -1,9 +1,12 @@
 <?php
-
+/**
+ * @noinspection DuplicatedCode  This is indeed a copy of the original Invoice\FlattenerInvoiceLines.
+ */
 declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
@@ -22,7 +25,7 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
      * This plugin allows to define a base price for the parent but to keep
      * price info on the children, so this should all be added.
      */
-    protected function collectInfoFromChildren(array $parent, array $children): array
+    protected function collectInfoFromChildren(Line $parent, array $children): Line
     {
         if (isset($parent[Meta::BundleId])) {
             $childrenLineAmount = 0.0;

@@ -9,13 +9,16 @@
  *   regardless the type for vat class ids as used by the shop itself.
  * So for now, we will ignore the warnings about non strictly typed comparisons
  * in this code, and we won't use strict_types=1.
+ *
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode  This is a copy of the old Completor.
  */
 
 namespace Siel\Acumulus\Magento\Invoice;
 
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
 use Siel\Acumulus\Tag;
@@ -37,7 +40,7 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
      * We keep the info on the parent and remove it from the children to prevent
      * accounting amounts twice.
      */
-    protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children): void
+    protected function correctInfoBetweenParentAndChildren(Line $parent, array &$children): void
     {
         parent::correctInfoBetweenParentAndChildren($parent, $children);
 

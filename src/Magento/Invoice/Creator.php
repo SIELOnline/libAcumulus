@@ -12,6 +12,7 @@
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode  This is a copy of the old Creator.
  */
 
 namespace Siel\Acumulus\Magento\Invoice;
@@ -21,14 +22,13 @@ use Magento\Customer\Model\Customer;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
-use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Item;
-use Magento\Sales\Model\ResourceModel\Order\Invoice\Collection;
 use Magento\Tax\Model\ClassModel as TaxClass;
 use Magento\Tax\Model\Config as MagentoTaxConfig;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -45,8 +45,6 @@ class Creator extends BaseCreator
 {
     protected Order $order;
     protected ?Creditmemo $creditNote;
-    protected Collection $shopInvoices;
-    protected ?Invoice $shopInvoice;
 
     /**
      * {@inheritdoc}
@@ -54,7 +52,7 @@ class Creator extends BaseCreator
      * This override also initializes Magento specific properties related to the
      * source.
      */
-    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
+    protected function setInvoiceSource(Source $invoiceSource): void
     {
         parent::setInvoiceSource($invoiceSource);
         switch ($this->invoiceSource->getType()) {
@@ -67,14 +65,13 @@ class Creator extends BaseCreator
                 $this->order = $this->creditNote->getOrder();
                 break;
         }
-        $this->shopInvoices = $this->order->getInvoiceCollection();
-        $this->shopInvoice = count($this->shopInvoices) > 0 ? $this->shopInvoices->getFirstItem() : null;
     }
 
     protected function setPropertySources(): void
     {
         parent::setPropertySources();
 
+        // @todo: all non line related property sources can be removed (i.e. all can be removed).
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $source */
         $source = $this->invoiceSource->getSource();
         if ($source->getBillingAddress() !== null) {
@@ -93,6 +90,8 @@ class Creator extends BaseCreator
 
     /**
      * Returns the item lines for an order.
+     *
+     * @noinspection PhpUnused  Called via {@see callSourceTypeSpecificMethod()}.
      */
     protected function getItemLinesOrder(): array
     {
@@ -148,7 +147,7 @@ class Creator extends BaseCreator
         // - Tax percent = VAT % as specified in product settings, for the
         //   parent of bundled products this may be 0 and incorrect.
         $vatRate = (float) $item->getTaxPercent(); // copied to mappings.
-        // - (Base) tax amount = VAT over discounted item line =
+        // - (Base) tax amount = VAT on discounted item line =
         //   ((product price - discount) * qty) * vat rate.
         // But as discounts get their own lines, this order item line should
         // show the vat amount over the normal, not discounted, price. To get
@@ -162,9 +161,8 @@ class Creator extends BaseCreator
             // lines later on in the completion phase.
             $tag = $this->discountIncludesTax() ? Meta::LineDiscountAmountInc : Meta::LineDiscountAmount;
             $result[$tag] = -$item->getBaseDiscountAmount();
-            if (!Number::isZero($item->getBaseDiscountTaxCompensationAmount())) {
-                $lineVat += (float) $item->getBaseDiscountTaxCompensationAmount();
-            } else {
+            $lineVat += (float) $item->getBaseDiscountTaxCompensationAmount();
+            if (Number::isZero($item->getBaseDiscountTaxCompensationAmount())) {
                 // We cannot trust lineVat, so do not add it but as we normally
                 // have an exact vat rate, this is surplus data anyway.
                 $lineVat = null;
@@ -209,8 +207,7 @@ class Creator extends BaseCreator
         // Add vat meta data.
         $product = $item->getProduct();
         if ($product) {
-            // @todo: Can we lookup vat rate meta data?
-            /** @noinspection PhpUndefinedMethodInspection */
+            /** @noinspection PhpUndefinedMethodInspection  handled by __call*/
             $result += $this->getVatClassMetaData($product->getTaxClassId());
         }
 
@@ -311,6 +308,7 @@ class Creator extends BaseCreator
     protected function isChildSameAsParent(array $parent, array $children): bool
     {
         if ($parent[Meta::ProductType] === 'configurable' && count($children) === 1) {
+            /** @var array $child */
             $child = reset($children);
             if ($parent[Tag::ItemNumber] === $child[Tag::ItemNumber]
                 && $parent[Tag::Quantity] === $child[Tag::Quantity]
@@ -325,7 +323,7 @@ class Creator extends BaseCreator
     /**
      * Returns the item lines for a credit mote.
      *
-     * @noinspection PhpUnused : Called via Creator::callSourceTypeSpecificMethod().
+     * @noinspection PhpUnused  Called via {@see callSourceTypeSpecificMethod()}.
      */
     protected function getItemLinesCreditNote(): array
     {
@@ -383,9 +381,8 @@ class Creator extends BaseCreator
             // lines later on in the completion phase.
             $tag = $this->discountIncludesTax() ? Meta::LineDiscountAmountInc : Meta::LineDiscountAmount;
             $result[$tag] = (float) $item->getBaseDiscountAmount();
-            if (!Number::isZero($item->getBaseDiscountTaxCompensationAmount())) {
-                $lineVat -= (float) $item->getBaseDiscountTaxCompensationAmount();
-            } else {
+            $lineVat -= (float) $item->getBaseDiscountTaxCompensationAmount();
+            if (Number::isZero($item->getBaseDiscountTaxCompensationAmount())) {
                 // We cannot trust lineVat, so do not add it but as we normally
                 // have an exact vat rate, this is surplus data anyway.
                 $lineVat = null;
@@ -402,7 +399,7 @@ class Creator extends BaseCreator
                 Meta::VatRateSource => static::VatRateSource_Exact,
             ];
         } elseif (isset($lineVat)) {
-            $result += $this->getVatRangeTags(
+            $result += self::getVatRangeTags(
                 $lineVat / $result[Tag::Quantity],
                 $productPriceEx,
                 0.02 / min($result[Tag::Quantity], 2),
@@ -410,7 +407,7 @@ class Creator extends BaseCreator
             );
         } else {
             // No exact vat rate and no line vat: just use price inc - price ex.
-            $result += $this->getVatRangeTags($productPriceInc - $productPriceEx, $productPriceEx, 0.02, 0.01);
+            $result += self::getVatRangeTags($productPriceInc - $productPriceEx, $productPriceEx, 0.02, 0.01);
             $result[Meta::FieldsCalculated][] = Meta::VatAmount;
         }
 
@@ -466,7 +463,7 @@ class Creator extends BaseCreator
                         Tag::UnitPrice => $shippingEx,
                         Meta::UnitPriceInc => $shippingInc,
                         Meta::RecalculatePrice => $this->shippingPriceIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
-                    ] + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02, $this->shippingPriceIncludeTax() ? 0.02 : 0.01);
+                    ] + self::getVatRangeTags($shippingVat, $shippingEx, 0.02, $this->shippingPriceIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
                 // Add vat class meta data.
@@ -507,6 +504,9 @@ class Creator extends BaseCreator
         return parent::getShippingMethodName();
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection Empty base method.
+     */
     protected function getDiscountLines(): array
     {
         $result = [];
@@ -537,6 +537,8 @@ class Creator extends BaseCreator
      * {@inheritdoc}
      *
      * This implementation may return a manual line for a credit memo.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Empty base method.
      */
     protected function getManualLines(): array
     {

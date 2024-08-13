@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests;
 
 use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use PHPUnit\Framework\ExpectationFailedException;
 use Siel\Acumulus\Fld;
@@ -20,7 +19,8 @@ use function in_array;
 use function is_float;
 
 /**
- * CompareAcumulusObjects contains.
+ * AcumulusTestUtils contains test functionalities for the various shop specific test
+ * environments.
  */
 trait AcumulusTestUtils
 {

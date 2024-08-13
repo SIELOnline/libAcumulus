@@ -1,9 +1,4 @@
 <?php
-/**
- * @noinspection DuplicatedCode
- * @noinspection StaticInvocationViaThisInspection
- * @noinspection PhpClassConstantAccessedViaChildClassInspection
- */
 
 declare(strict_types=1);
 
@@ -12,6 +7,7 @@ namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 use RuntimeException;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
@@ -52,7 +48,7 @@ class Creator extends BaseCreator
      * This override also initializes HS specific properties related to the
      * source.
      */
-    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
+    protected function setInvoiceSource(Source $invoiceSource): void
     {
         parent::setInvoiceSource($invoiceSource);
         $this->order = $this->invoiceSource->getSource();
@@ -161,6 +157,7 @@ class Creator extends BaseCreator
             //  'company_with_vat_number'.
             // - The category id of the tax class, which we have in $category.
             if (isset($category->category_id)) {
+                // @todo: address to use should be be based on setting {@see Meta::ShopVatBasedOn}.
                 $address = $this->order->billing_address;
                 $zone_name = !empty($address->address_state_orig) ? $address->address_state_orig : $address->address_country_orig;
                 if (empty($zone_name)) {
@@ -379,10 +376,9 @@ class Creator extends BaseCreator
                                 Meta::VatAmount => 0.0,
                                 Meta::VatRateSource => static::VatRateSource_Creator_Missing_Amount,
                                 Meta::VatClassName => Config::VatClass_Null,
-                                Meta::Warning => 'Amounts for this shipping method do not add up:'
-                                    . ' probably vat free product or rates have changed.'
-                                    . ' (order_shipping_params->prices = '
-                                    . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
+                                Meta::Warning => 'Amounts for this shipping method do not add up: '
+                                    . 'probably vat free product or rates have changed. (order_shipping_params->prices = '
+                                    . str_replace('"', "'", json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags))
                                     . ')',
                             ];
                         $warningAdded = true;
@@ -401,7 +397,7 @@ class Creator extends BaseCreator
                         $result[count($result) - 1],
                         'Amounts for the shipping method(s) do not add up: lost too much precision?'
                         . ' (order_shipping_params->prices = '
-                        . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
+                        . str_replace('"', "'", json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags))
                         . ')'
                     );
                 }

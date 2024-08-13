@@ -197,8 +197,7 @@ class CollectorManager
         // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
         //   version in the Legacy sub namespace that is stripped down to these features
         //   that has not yet been converted.
-        /** @var \Siel\Acumulus\Completors\Legacy\Creator $creator */
-        $creator = $this->getContainer()->getCreator(true);
+        $creator = $this->getContainer()->getCreator();
         $creator->create($this->getPropertySources()['source'], $invoice);
         // @legacy end
     }

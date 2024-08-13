@@ -12,6 +12,7 @@
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode  This is indeed a copy of the original Invoice\Completor.
  */
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
@@ -21,6 +22,7 @@ use Siel\Acumulus\Invoice\Completor as BaseCompletor;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
+use function count;
 use function in_array;
 
 /**

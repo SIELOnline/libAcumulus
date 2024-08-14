@@ -151,7 +151,7 @@ abstract class OcHelper
     }
 
     /**
-     * Controller action: show/process the advanced settings form.
+     * Controller action: show/process the mappings form.
      *
      * @throws \Throwable
      */

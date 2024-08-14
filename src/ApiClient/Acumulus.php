@@ -10,6 +10,7 @@ namespace Siel\Acumulus\ApiClient;
 use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Environment;
+use Siel\Acumulus\Data\EmailAsPdf;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
@@ -791,6 +792,7 @@ class Acumulus
      * @param ?bool $applyGraphics
      *   False to prevent any embedded graphics from being applied to the
      *   document; true, null, or absent otherwise.
+     *   @todo: not used for now, will become part of emailAsPdf structure?
      *
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -805,13 +807,11 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      *
-     * @noinspection PhpUnused
      * @noinspection PhpUnusedParameterInspection
-     * @todo: not used for now, will become part of emailAsPdf structure?
      */
     public function emailInvoiceAsPdf(
         string $token,
-        array $emailAsPdf,
+        EmailAsPdf $emailAsPdf,
         ?int $invoiceType = null,
         string $invoiceNotes = '',
         ?bool $applyGraphics = null
@@ -887,13 +887,11 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      *
-     * @noinspection PhpUnused
      * @noinspection PhpUnusedParameterInspection
-     * @todo: not used for now, will become part of emailAsPdf structure?
      */
     public function emailPackingSlipAsPdf(
         string $token,
-        array $emailAsPdf,
+        EmailAsPdf $emailAsPdf,
         string $deliveryNotes = '',
         ?bool $applyGraphics = null
     ): AcumulusResult {

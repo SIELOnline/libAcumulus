@@ -22,7 +22,7 @@ use function is_array;
  * It offers:
  * - Adding the basic submit structure - contract, connector, testmode, ... - to
  *   create a complete request structure.
- * - Conversion from the request structure array to XML.
+ * - Conversion from the request structure (array or AcumulusObject) to XML.
  * - Sending the request.
  * - Creating the {@see AcumulusResult} from the {@see HttpResponse}.
  * - Good error handling, including:
@@ -226,16 +226,11 @@ class AcumulusRequest
      *
      * @throws \RuntimeException
      *    Required property is not set.
-     *
-     * @todo: convert submit to (Acumulus)Object? Though not all messages are
-     *   AcumulusObjects yet, in fact only 1 is.
      */
     protected function constructFullSubmit($submit, bool $needContract): array
     {
         $basicSubmit = $this->getBasicSubmit($needContract);
-        if ($submit instanceof AcumulusObject) {
-            $submit = $submit->toArray();
-        }
+        $submit = $this->submitToArray($submit);
         return array_merge($basicSubmit, $submit);
     }
 
@@ -296,5 +291,24 @@ class AcumulusRequest
         ];
 
         return $result;
+    }
+
+    /**
+     * Recursively converts a $submit structure to an array.
+     *
+     * @param array|AcumulusObject $submit
+     */
+    protected function submitToArray($submit): array
+    {
+        if ($submit instanceof AcumulusObject) {
+            $submit = $submit->toArray();
+        }
+
+        foreach ($submit as $key => &$value) {
+            if (is_array($value) || $value instanceof AcumulusObject) {
+                $value = $this->submitToArray($value);
+            }
+        }
+        return $submit;
     }
 }

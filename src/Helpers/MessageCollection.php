@@ -7,7 +7,6 @@ namespace Siel\Acumulus\Helpers;
 use Throwable;
 
 use function in_array;
-use function is_int;
 
 /**
  * Class MessageCollection contains a set of Messages.

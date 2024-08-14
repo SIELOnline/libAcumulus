@@ -22,16 +22,4 @@ class invoiceManager extends \Siel\Acumulus\Shop\InvoiceManager
     {
         return [];
     }
-
-    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-    }
-
-    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-    }
-
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
-    {
-    }
 }

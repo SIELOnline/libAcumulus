@@ -81,53 +81,6 @@ class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * This OpenCart override triggers the 'acumulus.invoice.created' event.
-     */
-    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $route = Registry::getInstance()->getAcumulusTrigger('invoiceCreated', 'after');
-        $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
-        $this->getEvent()->trigger($route, [&$route, $args]);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This OpenCart override triggers the 'acumulus.invoice.completed' event.
-     */
-    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $route = Registry::getInstance()->getAcumulusTrigger('invoiceSend', 'before');
-        $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
-        $this->getEvent()->trigger($route, [&$route, $args]);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This OpenCart override triggers the 'acumulus.invoice.sent' event.
-     */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
-    {
-        $route = Registry::getInstance()->getAcumulusTrigger('invoiceSend', 'after');
-        $args = ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result];
-        $this->getEvent()->trigger($route, [&$route, $args]);
-    }
-
-    /**
-     * Wrapper around the event class instance.
-     *
-     * @return \Opencart\System\Engine\Event|\Event|\Light_Event
-     *   [SIEL #194403]: https://lightning.devs.mx/ defines its own event class.
-     */
-    protected function getEvent()
-    {
-        return $this->getRegistry()->event;
-    }
-
-    /**
      * Wrapper method to get {@see Registry::$db}.
      *
      * @return \Opencart\System\Library\DB|\DB

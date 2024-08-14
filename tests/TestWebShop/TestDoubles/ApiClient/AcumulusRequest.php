@@ -12,15 +12,8 @@ use Siel\Acumulus\Helpers\Util;
 use Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples;
 
 /**
- * Communicator implements the communication with the Acumulus web API.
- *
- * It offers:
- * - Conversion between array and XML.
- * - Conversion from Json to array.
- * - Communicating with the Acumulus webservice using the
- *   {@se HttpCommunicator}.
- * - Good error handling, including detecting html responses from the proxy
- *   before the actual web service.
+ * The AcumulusRequest test double overrules the real AcumulusRequest class by injecting
+ * example message structures
  */
 class AcumulusRequest extends BaseAcumulusRequest
 {
@@ -37,4 +30,10 @@ class AcumulusRequest extends BaseAcumulusRequest
     {
         return $this->examples->getBasicSubmit($needContract);
     }
+
+    public function submitToArray($submit): array
+    {
+        return parent::submitToArray($submit);
+    }
+
 }

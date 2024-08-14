@@ -218,34 +218,4 @@ class InvoiceManager extends BaseInvoiceManager
         $orders = wc_get_orders($args);
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $orders);
     }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This WooCommerce override applies the 'acumulus_invoice_created' filter.
-     */
-    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $invoice = apply_filters('acumulus_invoice_created', $invoice, $invoiceSource, $localResult);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This WooCommerce override applies the 'acumulus_invoice_send_before' filter.
-     */
-    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $invoice = apply_filters('acumulus_invoice_send_before', $invoice, $invoiceSource, $localResult);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This WooCommerce override executes the 'acumulus_invoice_send_after' action.
-     */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
-    {
-        do_action('acumulus_invoice_send_after', $invoice, $invoiceSource, $result);
-    }
 }

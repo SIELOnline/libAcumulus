@@ -63,37 +63,4 @@ class InvoiceManager extends BaseInvoiceManager
     {
         // @todo: provide implementation.
     }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This MyWebShop override executes the 'actionAcumulusInvoiceCreated' hook.
-     */
-    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
-        Hook::exec('actionAcumulusInvoiceCreated', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This MyWebShop override executes the 'actionAcumulusInvoiceSendBefore' hook.
-     */
-    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
-        Hook::exec('actionAcumulusInvoiceSendBefore', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This MyWebShop override executes the 'actionAcumulusInvoiceSentAfter' hook.
-     */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
-    {
-        // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value) to the event handlers).
-        Hook::exec('actionAcumulusInvoiceSendAfter', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);
-    }
 }

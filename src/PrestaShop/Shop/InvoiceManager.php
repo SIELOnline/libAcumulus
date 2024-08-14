@@ -105,37 +105,4 @@ class InvoiceManager extends BaseInvoiceManager
         }
         return [];
     }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceCreated' hook.
-     */
-    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        Hook::exec('actionAcumulusInvoiceCreated', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceSendBefore' hook.
-     */
-    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        Hook::exec('actionAcumulusInvoiceSendBefore', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceSentAfter' hook.
-     */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
-    {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        Hook::exec('actionAcumulusInvoiceSendAfter', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);
-    }
 }

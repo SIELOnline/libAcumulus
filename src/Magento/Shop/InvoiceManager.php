@@ -85,48 +85,4 @@ class InvoiceManager extends BaseInvoiceManager
             : CreditmemoCollection::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * This Magento override dispatches the 'acumulus_invoice_created' event.
-     */
-    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $this->dispatchEvent('acumulus_invoice_created', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This Magento override dispatches the 'acumulus_invoice_completed' event.
-     */
-    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $this->dispatchEvent('acumulus_invoice_send_before', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This Magento override dispatches the 'acumulus_invoice_sent' event.
-     */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
-    {
-        $this->dispatchEvent('acumulus_invoice_send_after', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);
-    }
-
-    /**
-     * Dispatches an event.
-     *
-     * @param string $name
-     *   The name of the event.
-     * @param array $parameters
-     *   The parameters to the event that cannot be changed.
-     */
-    protected function dispatchEvent(string $name, array $parameters): void
-    {
-        /** @var \Magento\Framework\Event\ManagerInterface $dispatcher */
-        $dispatcher = Registry::getInstance()->get(ManagerInterface::class);
-        $dispatcher->dispatch($name, $parameters);
-    }
 }

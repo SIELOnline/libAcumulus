@@ -49,31 +49,28 @@ abstract class ShopCapabilities
      * given a more logical value given that the library is running in a given
      * web shop software, should be returned here.
      *
-     * This base method is abstract, because at least these keys that allow
-     * tokens (veldverwijzingen) to get customer, invoice and invoice line fields
-     * should be returned.
-     * - See {@see \Siel\Acumulus\Invoice\Creator::getCustomer()} to get a list
-     *   of fields at the customer level that use tokens.
-     * - See {@see \Siel\Acumulus\Invoice\Creator::getInvoice()} to get a list
-     *   of fields at the invoice level that use tokens.
-     * - At the item line level, the fields 'itemnumber', 'product', 'nature',
-     *   and 'costprice' may use tokens.
-     *
-     * See {@see \Siel\Acumulus\Helpers\FieldExpander} or the help text under key
-     * 'desc_tokens' in siel/acumulus/src/Shop/ConfigFormTranslations.php for
-     * more info about the possible options to define combinations or a
-     * selection of various tokens.
+     * With most keys susceptible to have a shop specific default now moved to the
+     * mappings, this base method, which was abstract before, now returns an empty array.
      */
-    abstract public function getDefaultShopConfig(): array;
+    public function getDefaultShopConfig(): array
+    {
+        return [];
+    }
 
     /**
      * Returns an array with shop specific property mapping defaults.
      *
      * This base method is abstract, because mappings are almost per definition
      * shop dependent.
+     *
      * See the {@see \Siel\Acumulus\Data\_Documentation Data namespace} to get
      * all the possible {@see \Siel\Acumulus\Data\AcumulusObject} types and
      * their {@see \Siel\Acumulus\Data\AcumulusProperty} properties.
+     *
+     * See {@see \Siel\Acumulus\Helpers\FieldExpander} or the help text under key
+     * 'desc_tokens' in siel/acumulus/src/Shop/ConfigFormTranslations.php for
+     * more info about the possible options to define combinations or a
+     * selection of various tokens.
      *
      * @return string[][]
      *   A keyed array of keyed arrays. At the 1st level the keys are the
@@ -81,13 +78,8 @@ abstract class ShopCapabilities
      *   object type. A mapping being a keyed array, with as keys the property
      *   names and as values a so-called field expansion specification, see
      *   {@see \Siel\Acumulus\Helpers\FieldExpander}.
-     *
-     * @todo: make abstract when implemented for all shops.
      */
-    public function getDefaultShopMappings(): array
-    {
-        return [];
-    }
+    abstract public function getDefaultShopMappings(): array;
 
     /**
      * Returns a list with the shop specific token info.
@@ -451,23 +443,5 @@ abstract class ShopCapabilities
     public function getFiscalAddressSetting(): string
     {
         throw new RuntimeException(__METHOD__ . ' is not implemented');
-    }
-
-    /**
-     * Returns whether the new code is used.
-     *
-     * The default return here is that the old code is used, so override for webshops that
-     * do use the new code (the override gives an emergency switch back to the old code).
-     *
-     * @return bool
-     *   True if the new {@see \Siel\Acumulus\Data\_Documentation data objects},
-     *   its {@see \Siel\Acumulus\Collectors\_Documentation collectors},
-     *   {@see \Siel\Acumulus\Config\Mappings},
-     *   and {@see \Siel\Acumulus\Completors\_Documentation completors} are used,
-     *   false otherwise.
-     */
-    public function usesNewCode(): bool
-    {
-        return false;
     }
 }

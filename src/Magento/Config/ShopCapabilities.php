@@ -476,36 +476,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getDefaultShopConfig(): array
-    {
-        return [
-            // @legacy: old way of storing mappings.
-            'contactYourId' => '[customer::incrementId|customer::entityId]', // \Mage\Customer\Model\Customer
-            'companyName1' => '[company]', // \Magento\Sales\Model\Order\Address
-            'fullName' => '[name]', // \Magento\Sales\Model\Order\Address
-            'address1' => '[streetLine(1)]', // \Magento\Sales\Model\Order\Address
-            'address2' => '[streetLine(2)]', // \Magento\Sales\Model\Order\Address
-            'postalCode' => '[postcode]', // \Magento\Sales\Model\Order\Address
-            'city' => '[city]', // \Magento\Sales\Model\Order\Address
-            // Magento has 2 VAT numbers:
-            // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
-            'vatNumber' => '[vatId|customerTaxvat]', // \Magento\Sales\Model\Order
-            'telephone' => '[telephone]', // \Magento\Sales\Model\Order\Address
-            'fax' => '[fax]', // \Magento\Sales\Model\Order\Address
-            'email' => '[email]', // \Magento\Sales\Model\Order\Address
-
-            // Invoice lines defaults.
-            'itemNumber' => '[sku]',
-            'productName' => '[name]',
-        ];
-    }
-
     public function getDefaultShopMappings(): array
     {
         return [
             DataType::Invoice => [
-                // @todo: fields that come from the Order or its metadata, because, if it
-                //   comes from Source, it is not shop specific.
             ],
             DataType::Customer => [
                 Fld::ContactYourId => '[source::getOrder()::getSource()::getCustomerId()]', // Order, not Creditmemo
@@ -641,17 +615,5 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getFiscalAddressSetting(): string
     {
         return \Magento\Tax\Model\Config::CONFIG_XML_PATH_BASED_ON;
-    }
-
-    /**
-     * Magento switched to the new creation process!
-     *
-     * Note: in case of severe errors during the creation process: return false to revert
-     * to the old "tried and tested" code.
-     */
-    public function usesNewCode(): bool
-    {
-        //return false; // Emergency revert: remove the // at the beginning of this line!
-        return true;
     }
 }

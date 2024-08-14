@@ -185,41 +185,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ];
     }
 
-    public function getDefaultShopConfig(): array
+    public function getDefaultShopMappings(): array
     {
-        // @todo: fill in the appropriate property names, remove a line when no appropriate default exists.
-        // @todo: ensure that all these objects are defined in the method getTokenInfoShopProperties() above.
-        return [
-            // Customer defaults.
-            'contactYourId' => '[id]',
-            'companyName1' => '[company1]',
-            'companyName2' => '[company2]',
-            'vatNumber' => '[vat_number]',
-            'fullName' => '[firstname+lastname]',
-            'salutation' => 'Dear [firstname+lastname]',
-            'address1' => '[address1]',
-            'address2' => '[address2]',
-            'postalCode' => '[postcode]',
-            'city' => '[city]',
-            'telephone' => '[phone|phone_mobile]',
-            'fax' => '[phone_mobile]',
-            'email' => '[email]',
-            'mark' => '',
-
-            // Invoice defaults.
-            // @todo: remove this line when it equals the default as set in Config::getKeyInfo().
-            'description' => '[invoiceSource::type] [invoiceSource::reference]',
-            'descriptionText' => '',
-            'invoiceNotes' => '',
-
-            // Invoice lines defaults.
-            // @todo: ensure that your Creator class calls addPropertySource() and removePropertySource per item line to add all objects necessary.
-            // @todo: ensure that all these objects are defined in the method getTokenInfoShopProperties() above.
-            'itemNumber' => '[product_reference|product_supplier_reference|product_ean13|product_upc]',
-            'productName' => '[product_name]',
-            'nature' => '',
-            'costPrice' => '[purchase_supplier_price]',
-        ];
+        // @todo: fill in the appropriate method or property names,
+        return [];
     }
 
     public function getShopOrderStatuses(): array

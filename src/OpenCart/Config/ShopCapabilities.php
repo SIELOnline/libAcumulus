@@ -254,9 +254,6 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         // OpenCart: both addresses are always filled.
         return [
             DataType::Invoice => [
-                // @todo: fields that come from the Order (or are constant), because, if
-                //   it would come from Source, it is not shop specific and defined in
-                //   Mappings::getShopIndependentDefaults().
                 Meta::VatBreakdown => '[source::getVatBreakdown()]',
                 Meta::PricesIncludeVat => false,
             ],
@@ -264,7 +261,9 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
                 // Customer defaults.
                 Fld::ContactYourId => '[source::getSource()::customer_id]', // Order
                 //Fld::VatNumber => '', // OpenCart core does not provide a vat number field.
-                Fld::Telephone => '[source::getSource()::telephone|source::getSource()::fax]', // Order (fax = OC3)
+                // @todo: we had this as default (in OC3): 'vatNumber' => '[payment_tax_id]', // Order
+                //   where did this come from?
+                Fld::Telephone => '[source::getSource()::telephone]', // Order
                 Fld::Fax => '[source::getSource()::fax]', // Order in OC3
                 Fld::Email => '[source::getSource()::email]', // Order
             ],
@@ -400,17 +399,5 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     public function getFiscalAddressSetting(): string
     {
         return AddressType::Store;
-    }
-
-    /**
-     * OpenCart switched to the new creation process!
-     *
-     * Note: in case of severe errors during the creation process: return false to revert
-     * to the old "tried and tested" code.
-     */
-    public function usesNewCode(): bool
-    {
-        //return false; // Emergency revert: remove the // at the beginning of this line!
-        return true;
     }
 }

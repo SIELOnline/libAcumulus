@@ -452,7 +452,8 @@ class Container
     public function getCompletor(string $dataType = '')
     {
         if ($dataType === '') {
-            // @legacy remove when all shops are converted to new architecture.
+            // @legacy remove when all shops are fully converted to new architecture and
+            //   the old Completor has been removed.
             return $this->getInstance(
                 'Completor',
                 'Invoice',
@@ -490,7 +491,8 @@ class Container
 
     public function getCreator(): Creator
     {
-        // @legacy remove when all shops are converted to new architecture.
+        // @legacy remove when all shops are fully converted to new architecture and
+        //   the old Creator has been removed.
         return $this->getInstance(
             'Creator',
             'Invoice',

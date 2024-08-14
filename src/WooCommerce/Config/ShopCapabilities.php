@@ -218,43 +218,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * WooCommerce core does not support entering a VAT number. However, various
      * plugins exists that do allow so, and that also allow for the reversed VAT
      * and EU-VAT schemes. These plugins use different keys to store the vat
-     * number in the order post meta:
+     * number in the order meta:
      * - WooCommerce EU VAT assistent: 'vat_number', or in older versions
      *   'VAT Number'. Note that this plugin is no longer supported (mid 2022).
      * - WooCommerce EU VAT number: _vat_number, see
      *   http://docs.woothemes.com/document/eu-vat-number-2/.
      * - current WooCommerce EU VAT number: billing_vat_number
      */
-    public function getDefaultShopConfig(): array
-    {
-        return [
-            // @legacy: old way of storing mappings.
-            //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
-            'contactYourId' => '[customer_id]', // WC_Abstract_order
-            'companyName1' => '[billing_company]', // WC_Abstract_order
-            'fullName' => '[billing_first_name+billing_last_name]', // WC_Abstract_order
-            'address1' => '[billing_address_1]', // WC_Abstract_order
-            'address2' => '[billing_address_2]', // WC_Abstract_order
-            'postalCode' => '[billing_postcode]', // WC_Abstract_order
-            'city' => '[billing_city]', // WC_Abstract_order
-            'vatNumber' => '[billing_eu_vat_number|billing_vat_number|_vat_number|vat_number|VAT Number]', // Post meta
-            'telephone' => '[billing_phone]', // WC_Abstract_order
-            'email' => '[billing_email]', // WC_Abstract_order
-
-            // Invoice lines defaults.
-            'itemNumber' => '[sku]',
-            'productName' => '[name]',
-            'costPrice' => '[cost_price]',
-        ];
-    }
-
     public function getDefaultShopMappings(): array
     {
         // WooCommerce: The properties for both addresses are always filled.
         return [
             DataType::Invoice => [
-                // @todo: fields that come from the Order or its metadata, because, if it
-                //   comes from Source, it is not shop specific.
             ],
             DataType::Customer => [
                 // Customer defaults.
@@ -298,6 +273,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::Product => '[item::get_name()]',
                 Meta::ProductId => '[product::get_id()]',
                 Fld::Quantity => '[item::get_quantity()]',
+                Fld::CostPrice => '[item::get_cost_price()]', // @todo: does this exist?
             ],
         ];
     }
@@ -396,17 +372,5 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getFiscalAddressSetting(): string
     {
         return 'woocommerce_tax_based_on';
-    }
-
-    /**
-     * WooCommerce switched to the new creation process!
-     *
-     * Note: in case of severe errors during the creation process: return false to revert
-     * to the old "tried and tested" code.
-     */
-    public function usesNewCode(): bool
-    {
-        //return false; // Emergency revert: remove the // at the beginning of this line!
-        return true;
     }
 }

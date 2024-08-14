@@ -18,7 +18,8 @@ use function is_array;
 /**
  * Converter converts between the new AcumulusObject and the old array storage.
  *
- * @legacy: conversion code.
+ * @legacy remove when all shops are fully converted to new architecture and
+ *    the old Creator and Completor have been removed.
  */
 class Converter
 {

@@ -240,35 +240,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getDefaultShopConfig(): array
-    {
-        return [
-            'contactYourId' => '[customer::id_customer]', // Customer
-            'companyName1' => '[company]', // DeliveryAddress
-            'fullName' => '[firstname+lastname]', // DeliveryAddress
-            'address1' => '[address1]', // DeliveryAddress
-            'address2' => '[address2]', // DeliveryAddress
-            'postalCode' => '[postcode]', // DeliveryAddress
-            'city' => '[city]', // DeliveryAddress
-            'vatNumber' => '[vat_number]', // DeliveryAddress
-            'telephone' => '[phone|phone_mobile]', // DeliveryAddress
-            'email' => '[email]', // Customer
-
-            // Invoice lines defaults.
-            'itemNumber' => '[product_reference|product_supplier_reference|product_ean13|product_upc]',
-            'productName' => '[product_name]',
-            'costPrice' => '[purchase_supplier_price]',
-        ];
-    }
-
     public function getDefaultShopMappings(): array
     {
         // PrestaShop: both addresses are always filled.
         return [
             DataType::Invoice => [
-                // @todo: fields that come from the Order (or are constant), because, if
-                //   it would come from Source, it is not shop specific and defined in
-                //   Mappings::getShopIndependentDefaults().
                 // In PrestaShop you can enter a price with or without vat, the other being
                 // automatically updated. So we can not know how prices where entered.
                 Meta::PricesIncludeVat => null,
@@ -276,7 +252,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             DataType::Customer => [
                 // Customer defaults.
                 Fld::ContactYourId => '[source::getSource()::id_customer]', // Order|OrderSlip
-                // @todo: add addresses as property sources.
                 Fld::VatNumber => '[address_invoice::vat_number' // Address
                     . '|address_shipping::vat_number]', // Address
                 Fld::Telephone => '[address_invoice::phone|address_invoice::phone_mobile'
@@ -381,17 +356,5 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getFiscalAddressSetting(): string
     {
         return 'PS_TAX_ADDRESS_TYPE'; // 'id_address_invoice' or 'id_address_delivery'
-    }
-
-    /**
-     * PrestaShop switched to the new creation process!
-     *
-     * Note: in case of severe errors during the creation process: return false to revert
-     * to the old "tried and tested" code.
-     */
-    public function usesNewCode(): bool
-    {
-        //return false; // Emergency revert: remove the // at the beginning of this line!
-        return true;
     }
 }

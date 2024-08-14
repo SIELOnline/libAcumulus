@@ -155,34 +155,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getDefaultShopConfig(): array
-    {
-        return [
-            'contactYourId' => '[order_user_id]', // order
-            'companyName1' => '[address_company]', // billing_address
-            'fullName' => '[address_firstname+address_middle_name+address_lastname|name]', // billing_address, customer
-            'address1' => '[address_street]', // billing_address
-            'address2' => '[address_street2]', // billing_address
-            'postalCode' => '[address_post_code]', // billing_address
-            'city' => '[address_city]', // billing_address
-            'vatNumber' => '[address_vat]', // billing_address
-            'telephone' => '[address_telephone|address_telephone2]', // billing_address
-            'fax' => '[address_telephone2|address_fax]', // billing_address
-            'email' => '[user_email|email]', // customer
-
-            // Invoice lines defaults.
-            'itemNumber' => '[order_product_code]',
-            'productName' => '[order_product_name]',
-        ];
-    }
-
     public function getDefaultShopMappings(): array
     {
         return [
             DataType::Invoice => [
-                // @todo: fields that come from the Order (or are constant), because, if
-                //   it would come from Source, it is not shop specific and defined in
-                //   Mappings::getShopIndependentDefaults().
                 Meta::VatBreakdown => '[source::getVatBreakdown()]',
                 // In HikaShop you can enter a price with or without vat, the other being
                 // automatically updated. So we can not know how prices where entered.
@@ -330,11 +306,5 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getFiscalAddressSetting(): string
     {
         return 'tax_zone_type';
-    }
-
-    public function usesNewCode(): bool
-    {
-        //return false; // Emergency revert: remove the // at the beginning of this line!
-        return true;
     }
 }

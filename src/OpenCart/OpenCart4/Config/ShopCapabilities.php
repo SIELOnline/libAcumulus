@@ -11,25 +11,6 @@ use Siel\Acumulus\OpenCart\Config\ShopCapabilities as ShopCapabilitiesBase;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    public function getDefaultShopConfig(): array
-    {
-        return [
-            'contactYourId' => '[customer_id]', // Order
-            'companyName1' => '[payment_company]', // Order
-            'fullName' => '[firstname+lastname]', // Order
-            'address1' => '[payment_address_1|shipping_address_1]', // Order
-            'address2' => '[payment_address_2|shipping_address_2]', // Order
-            'postalCode' => '[payment_postcode|shipping_postcode]', // Order
-            'city' => '[payment_city|shipping_city]', // Order
-            'telephone' => '[telephone]', // Order
-            'email' => '[email]', // Order
-
-            // Invoice lines defaults.
-            'itemNumber' => '[sku|upc|ean|jan|isbn|mpn]',
-            'productName' => '[name+"("&model&")"]',
-        ];
-    }
-
     public function getPaymentMethods(): array
     {
         $registry = $this->getRegistry();

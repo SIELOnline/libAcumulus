@@ -161,34 +161,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getDefaultShopConfig(): array
-    {
-        return [
-            'contactYourId' => '[virtuemart_user_id]', // Order BT
-            'companyName1' => '[company]', // Order BT
-            'fullName' => '[first_name+middle_name+last_name]', // Order BT
-            'address1' => '[address_1]', // Order BT
-            'address2' => '[address_2]', // Order BT
-            'postalCode' => '[zip]', // Order BT
-            'city' => '[city]', // Order BT
-            'vatNumber' => '[tax_exemption_number]', // Order BT
-            'telephone' => '[phone_1|phone_2]', // Order BT
-            'fax' => '[fax]', // Order BT
-            'email' => '[email]', // Order BT
-
-            // Invoice lines defaults.
-            'itemNumber' => '[order_item_sku]',
-            'productName' => '[order_item_name]',
-        ];
-    }
-
     public function getDefaultShopMappings(): array
     {
         return [
             DataType::Invoice => [
-                // @todo: fields that come from the Order (or are constant), because, if
-                //   it would come from Source, it is not shop specific and defined in
-                //   Mappings::getShopIndependentDefaults().
                 Meta::PricesIncludeVat => false,
             ],
             DataType::Customer => [
@@ -309,11 +285,5 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getFiscalAddressSetting(): string
     {
         return AddressType::Shipping;
-    }
-
-    public function usesNewCode(): bool
-    {
-        //return false; // Emergency revert: remove the // at the beginning of this line!
-        return true;
     }
 }

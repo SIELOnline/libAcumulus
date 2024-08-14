@@ -20,8 +20,6 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             case 'activate':
             case 'settings':
             case 'mappings':
-            case 'config':
-            case 'advanced':
             case 'batch':
             case 'invoice':
                 return Route::_("index.php?option=com_acumulus&task=$linkType");

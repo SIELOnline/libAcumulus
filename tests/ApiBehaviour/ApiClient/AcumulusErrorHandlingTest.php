@@ -14,6 +14,7 @@ use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusException;
 use Siel\Acumulus\ApiClient\AcumulusResponseException;
 use Siel\Acumulus\Config\Environment;
+use Siel\Acumulus\Data\EmailInvoiceAsPdf;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
@@ -68,7 +69,7 @@ class AcumulusErrorHandlingTest extends TestCase
         try {
             $this->acumulusClient->timeout(static::ValidEntryId);
             $this->fail('Should not arrive here');
-        } catch (AcumulusException $e) {
+        } catch (AcumulusException) {
             $this->assertCount(2 + $offset, $this->log->getLoggedMessages());
             $this->assertSubmittedRequestHasBeenLogged(0, Severity::Exception);
             $loggedMessages = $this->log->getLoggedMessages();
@@ -89,7 +90,7 @@ class AcumulusErrorHandlingTest extends TestCase
         try {
             $this->acumulusClient->notExisting();
             $this->fail('Should not arrive here');
-        } catch (AcumulusResponseException $e) {
+        } catch (AcumulusResponseException) {
             $this->assertCount(2, $this->log->getLoggedMessages());
             $this->assertSubmittedRequestHasBeenLogged(0, Severity::Exception);
             $this->assertHttpLevelErrorHasBeenLogged(-1, 404, 'Not Found', Severity::Exception);
@@ -185,7 +186,10 @@ class AcumulusErrorHandlingTest extends TestCase
 
     public function testEmailAsPdfInvalidToken(): void
     {
-        $result = $this->acumulusClient->emailInvoiceAsPdf(static::InvalidToken, ['emailto' => 'unit.test@burorader.com']);
+        $emailInvoiceAsPdf = new EmailInvoiceAsPdf();
+        $emailInvoiceAsPdf->setEmailTo('test@example.com');
+
+        $result = $this->acumulusClient->emailInvoiceAsPdf(static::InvalidToken, $emailInvoiceAsPdf);
         $this->assertTrue($result->hasError());
         $this->assertNotNull($result->getByCode(400));
         $this->assertCount(2, $this->log->getLoggedMessages());

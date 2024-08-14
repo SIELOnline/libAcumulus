@@ -18,6 +18,7 @@ use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\FieldExpanderHelp;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
@@ -49,13 +50,14 @@ class MappingsForm extends Form
         AboutForm $aboutForm,
         Acumulus $acumulusApiClient,
         FormHelper $formHelper,
+        CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
         Config $config,
         Environment $environment,
         Translator $translator,
         Log $log
     ) {
-        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $environment, $translator, $log);
+        parent::__construct($acumulusApiClient, $formHelper, $checkAccount, $shopCapabilities, $config, $environment, $translator, $log);
         $this->mappings = $mappings;
         $this->fieldExpanderHelp = $fieldExpanderHelp;
         $this->aboutForm = $aboutForm;

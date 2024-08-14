@@ -8,15 +8,12 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Helpers;
 
 use RuntimeException;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\ApiClient\AcumulusResponseException;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Shop\AboutForm;
-use Siel\Acumulus\Tag;
 
 use function array_key_exists;
 use function count;
@@ -90,6 +87,7 @@ abstract class Form extends MessageCollection
     protected Log $log;
     protected ?AboutForm $aboutForm = null;
     protected FormHelper $formHelper;
+    protected CheckAccount $checkAccount;
     protected ShopCapabilities $shopCapabilities;
     protected Config $acumulusConfig;
     protected Environment $environment;
@@ -143,13 +141,13 @@ abstract class Form extends MessageCollection
     public function __construct(
         ?Acumulus $acumulusApiClient,
         FormHelper $formHelper,
+        CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
         Config $config,
         Environment $environment,
         Translator $translator,
         Log $log
-    )
-    {
+    ) {
         parent::__construct($translator);
         $this->formValuesSet = false;
         $this->submittedValues = [];
@@ -174,7 +172,7 @@ abstract class Form extends MessageCollection
      */
     public function getType(): string
     {
-      return $this->type;
+        return $this->type;
     }
 
     /**
@@ -541,9 +539,6 @@ abstract class Form extends MessageCollection
     /**
      * Adds a form message.
      *
-     * @param string $message
-     * @param int $severity
-     *   One of the Severity::... constants.
      * @param string $field
      *   The id of the form field. Does not have to be specified if multiple
      *   fields are involved
@@ -561,50 +556,11 @@ abstract class Form extends MessageCollection
      * This is done by calling the 'About' API call and checking the result.
      *
      * @return string
-     *   Message to show in the 2nd and 3rd fieldset. Empty if successful.
+     *   Message to show in the form. Empty if successful.
      */
     protected function checkAccountSettings(): string
     {
-        // Check if we can retrieve a picklist. This indicates if the account
-        // settings are correct.
-        if ($this->emptyCredentials()) {
-            // First fill in your account details.
-            $message = 'message_auth_unknown';
-        } else {
-            try {
-                $about = $this->acumulusApiClient->getAbout();
-                if ($about->getByCode(403) !== null) {
-                    $message = 'message_error_auth';
-                    $this->addFormMessage($this->t('message_error_auth_form'), Severity::Error, Tag::ContractCode);
-                } elseif ($about->hasError()) {
-                    $message = 'message_error_comm';
-                    $this->addMessages($about->getMessages(Severity::WarningOrWorse));
-                } else {
-                    // Check role.
-                    $message = '';
-                    $response = $about->getMainAcumulusResponse();
-                    $roleId = (int)$response['roleid'];
-                    switch ($roleId) {
-                        case Api::RoleApiUser:
-                            // Correct role: no additional message.
-                            break;
-                        case Api::RoleApiCreator:
-                            $this->addFormMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
-                            break;
-                        case Api::RoleApiManager:
-                            $this->addFormMessage($this->t('message_warning_role_overkill'), Severity::Warning, Tag::UserName);
-                            break;
-                        default:
-                            $this->addFormMessage($this->t('message_warning_role_deprecated'), Severity::Warning, Tag::UserName);
-                            break;
-                    }
-                }
-            } catch (AcumulusResponseException $e) {
-                $message = 'message_error_comm';
-                $this->addException($e);
-            }
-        }
-        return $message;
+        return $this->checkAccount->doCheck();
     }
 
     /**
@@ -615,8 +571,7 @@ abstract class Form extends MessageCollection
      */
     protected function emptyCredentials(): bool
     {
-        $credentials = $this->acumulusConfig->getCredentials();
-        return empty($credentials[Tag::ContractCode]) || empty($credentials[Tag::UserName]) || empty($credentials[Tag::Password]);
+        return $this->checkAccountSettings() === 'message_auth_unknown';
     }
 
     /**
@@ -712,7 +667,11 @@ abstract class Form extends MessageCollection
     protected function getLogo(int $size = 150): string
     {
         /** @noinspection HtmlUnknownTarget */
-        return sprintf('<img src="%1$s" alt="Logo SIEL Acumulus" title="SIEL Acumulus" width="%2$d" height="%2$d">', $this->getLogoUrl(), $size);
+        return sprintf(
+            '<img src="%1$s" alt="Logo SIEL Acumulus" title="SIEL Acumulus" width="%2$d" height="%2$d">',
+            $this->getLogoUrl(),
+            $size
+        );
     }
 
     /**
@@ -722,7 +681,7 @@ abstract class Form extends MessageCollection
      */
     protected function getLogoUrl(): string
     {
-      return $this->shopCapabilities->getLink('logo');
+        return $this->shopCapabilities->getLink('logo');
     }
 
     /**
@@ -789,8 +748,6 @@ abstract class Form extends MessageCollection
             case 'batch':
                 $wrapperType = 'details';
                 break;
-            case 'config':
-            case 'advanced':
             case 'settings':
             case 'mappings':
                 $wrapperType = in_array($accountStatus, [null, false], true) ? 'details' : 'fieldset';

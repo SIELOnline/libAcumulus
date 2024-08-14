@@ -8,6 +8,7 @@ use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
@@ -32,16 +33,17 @@ class ActivateSupportForm extends Form
         AboutForm $aboutForm,
         Acumulus $acumulusApiClient,
         FormHelper $formHelper,
+        CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
         Config $config,
         Environment $environment,
         Translator $translator,
         Log $log
-    )
-    {
+    ) {
         parent::__construct(
             $acumulusApiClient,
             $formHelper,
+            $checkAccount,
             $shopCapabilities,
             $config,
             $environment,
@@ -57,7 +59,7 @@ class ActivateSupportForm extends Form
     protected function validate(): void
     {
         $hostName = $this->environment->get()['hostName'];
-        if (preg_match('/^'. self::RegExp_Token . '$/', $this->submittedValues['support_token']) === false) {
+        if (preg_match('/^' . self::RegExp_Token . '$/', $this->submittedValues['support_token']) === false) {
             $this->addFormMessage($this->t('message_validate_invalid_token'), Severity::Error, 'support_token');
         }
         if ($this->submittedValues['support_website'] !== $hostName) {

@@ -303,6 +303,15 @@ class Container
         return $this->getInstance('Util', 'Helpers');
     }
 
+    public function getCheckAccount(): CheckAccount
+    {
+        return $this->getInstance('CheckAccount', 'Helpers', [
+            $this->getAcumulusApiClient(),
+            $this->getConfig(),
+            $this->getTranslator(),
+        ]);
+    }
+
     public function getCountries(): Countries
     {
         return $this->getInstance('Countries', 'Helpers');
@@ -482,18 +491,18 @@ class Container
     public function getCreator(): Creator
     {
         // @legacy remove when all shops are converted to new architecture.
-        return  $this->getInstance(
-                'Creator',
-                'Invoice',
-                [
-                    $this->getFieldExpander(),
-                    $this->getShopCapabilities(),
-                    $this,
-                    $this->getConfig(),
-                    $this->getTranslator(),
-                    $this->getLog(),
-                ]
-            );
+        return $this->getInstance(
+            'Creator',
+            'Invoice',
+            [
+                $this->getFieldExpander(),
+                $this->getShopCapabilities(),
+                $this,
+                $this->getConfig(),
+                $this->getTranslator(),
+                $this->getLog(),
+            ]
+        );
     }
 
     public function getCollectorManager(): CollectorManager
@@ -657,11 +666,8 @@ class Container
      * Returns a form instance of the given type.
      *
      * @param string $type
-     *   The type of form requested. Allowed values are: 'register', 'config',
-     *   'advanced', 'settings', 'mappings', 'activate', batch', 'invoice', 'rate',
-     *   'uninstall'.
-     *
-     * @noinspection PhpHalsteadMetricInspection
+     *   The type of form requested. Allowed values are: 'register', 'settings',
+     *   'mappings', 'activate', batch', 'invoice', 'rate', 'uninstall'.
      */
     public function getForm(string $type): Form
     {
@@ -669,16 +675,6 @@ class Container
         switch (strtolower($type)) {
             case 'register':
                 $class = 'Register';
-                $arguments[] = $this->getAboutBlockForm();
-                $arguments[] = $this->getAcumulusApiClient();
-                break;
-            case 'config':
-                $class = 'Config';
-                $arguments[] = $this->getAboutBlockForm();
-                $arguments[] = $this->getAcumulusApiClient();
-                break;
-            case 'advanced':
-                $class = 'AdvancedConfig';
                 $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;
@@ -727,6 +723,7 @@ class Container
         }
         $arguments = array_merge($arguments, [
             $this->getFormHelper(),
+            $this->getCheckAccount(),
             $this->getShopCapabilities(),
             $this->getConfig(),
             $this->getEnvironment(),

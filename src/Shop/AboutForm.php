@@ -34,8 +34,7 @@ class AboutForm
         Config $acumulusConfig,
         Environment $environment,
         Translator $translator
-    )
-    {
+    ) {
         $this->acumulusApiClient = $acumulusApiClient;
         $this->shopCapabilities = $shopCapabilities;
         $this->acumulusConfig = $acumulusConfig;
@@ -189,7 +188,8 @@ class AboutForm
 
         $support = $environment['supportEmail'];
         $subject = sprintf($this->t('support_subject'), $environment['shopName'], $this->t('module'));
-        $body = sprintf("%s:\n%s%s%s%s:\n%s%s\n%s\n%s\n",
+        $body = sprintf(
+            "%s:\n%s%s%s%s:\n%s%s\n%s\n%s\n",
             $this->t('contract'),
             $contractMsg,
             $this->arrayToList($contract, false),
@@ -329,7 +329,8 @@ class AboutForm
                 return [$a['startdate'], $a['location']] <=> [$b['startdate'], $b['location']];
             });
             foreach ($mySupportItems as $mySupportItem) {
-                $proSupportList[] = sprintf($this->t('pro_support_line'),
+                $proSupportList[] = sprintf(
+                    $this->t('pro_support_line'),
                     $mySupportItem['description'],
                     $mySupportItem['location'],
                     $mySupportItem['startdate'],
@@ -415,7 +416,8 @@ class AboutForm
      */
     protected function addProgressBar(string $nlTaxed, string $threshold, string $percentage, string $status): string
     {
-        return "<span class='acumulus-progressbar'><span class='acumulus-progress acumulus-$status' style='min-width:$percentage%'>$nlTaxed €</span></span><span class='acumulus-threshold'>$threshold €</span>";
+        return "<span class='acumulus-progressbar'><span class='acumulus-progress acumulus-$status' style='min-width:$percentage%'>"
+            . "$nlTaxed €</span></span><span class='acumulus-threshold'>$threshold €</span>";
     }
 
     /**

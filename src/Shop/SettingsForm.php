@@ -493,9 +493,6 @@ class SettingsForm extends BaseConfigForm
      *
      * @return array[]
      *   The set of invoice related fields.
-     *
-     * @noinspection PhpMemberCanBePulledUpInspection : AdvancedConfigForm has a
-     *   method with the same name but a different result.
      */
     protected function getInvoiceFields(): array
     {

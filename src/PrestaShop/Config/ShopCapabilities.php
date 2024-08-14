@@ -359,15 +359,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
         switch ($linkType) {
             case 'register':
             case 'activate':
-            /* @legacy: old way of showing settings. */
-            case 'advanced':
             case 'mappings':
             case 'batch':
             case 'invoice':
                 $action = ucfirst($linkType);
                 return Context::getContext()->link->getAdminLink("AdminAcumulus$action");
-            /* @legacy: old way of showing settings. */
-            case 'config':
             case 'settings':
                 return Context::getContext()->link->getAdminLink('AdminModules', true, [], ['configure' => 'acumulus']);
             case 'fiscal-address-setting':

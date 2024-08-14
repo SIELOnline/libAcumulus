@@ -373,10 +373,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'activate':
             case 'batch':
                 return admin_url("admin.php?page=acumulus_$linkType");
-            /* @legacy: old way of showing settings. */
-            case 'config':
-            /* @legacy: old way of showing field references. */
-            case 'advanced':
             case 'settings':
             case 'mappings':
                 return admin_url("options-general.php?page=acumulus_$linkType");

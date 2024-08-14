@@ -261,10 +261,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // @todo: adapt to MyWebShop's way of creating links.
         switch ($linkType) {
-            case 'config':
+            case 'settings':
                 return Context::getContext()->link->getAdminLink('AdminModules', true, [], ['configure' => 'acumulus']);
-            case 'advanced':
-                return Context::getContext()->link->getAdminLink('AdminAcumulusAdvanced', true);
+            case 'mappings':
+                return Context::getContext()->link->getAdminLink('AdminAcumulusMappings', true);
             case 'batch':
                 return Context::getContext()->link->getAdminLink('AdminAcumulusBatch', true);
         }

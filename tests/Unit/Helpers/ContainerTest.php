@@ -177,11 +177,6 @@ class ContainerTest extends TestCase
     public function testGetForms(): void
     {
         $container = new Container('TestWebShop');
-        $object = $container->getForm('config');
-        $this->assertInstanceOf(ConfigForm::class, $object);
-        $object = $container->getForm('advanced');
-        $this->assertInstanceOf(AdvancedConfigForm::class, $object);
-        // Error : Cannot instantiate abstract class Siel\Acumulus\Shop\InvoiceManager
         $object = $container->getForm('batch');
         $this->assertInstanceOf(BatchForm::class, $object);
         $object = $container->getForm('register');

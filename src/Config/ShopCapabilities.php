@@ -402,9 +402,8 @@ abstract class ShopCapabilities
      * administrative links, the returned link should contain so as well.
      *
      * @param string $linkType
-     *   The form or resource to get the link to: 'settings', 'mappings', 'config',
-     *   'advanced', 'batch', 'activate', 'register', 'logo', 'pro-support-link',
-     *   'pro-support-img'.
+     *   The form or resource to get the link to: 'settings', 'mappings', 'batch',
+     *   'activate', 'register', 'logo', 'pro-support-link', 'pro-support-img'.
      *
      * @throws \InvalidArgumentException
      *   Unknown link type.

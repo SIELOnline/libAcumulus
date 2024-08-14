@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Shop;
 
-use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
+use Siel\Acumulus\Shop\SettingsForm as BaseSettingsForm;
 use Siel\Acumulus\Tag;
 
 use function array_key_exists;
 
 /**
- * Provides PrestaShop specific handling for the Config form.
+ * Provides PrestaShop specific handling for the Settings form.
  */
-class ConfigForm extends BaseConfigForm
+class SettingsForm extends BaseSettingsForm
 {
     /**
      * {@inheritdoc}

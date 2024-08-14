@@ -16,6 +16,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
@@ -104,6 +105,7 @@ class InvoiceStatusForm extends Form
         Acumulus $acumulusApiClient,
         Container $container,
         FormHelper $formHelper,
+        CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
         Config $config,
         Environment $environment,
@@ -113,6 +115,7 @@ class InvoiceStatusForm extends Form
         parent::__construct(
             $acumulusApiClient,
             $formHelper,
+            $checkAccount,
             $shopCapabilities,
             $config,
             $environment,

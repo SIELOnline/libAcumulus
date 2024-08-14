@@ -10,6 +10,7 @@ use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
@@ -40,6 +41,7 @@ class RegisterForm extends Form
         AboutForm $aboutForm,
         Acumulus $acumulusApiClient,
         FormHelper $formHelper,
+        CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
         Config $config,
         Environment $environment,
@@ -49,6 +51,7 @@ class RegisterForm extends Form
         parent::__construct(
             $acumulusApiClient,
             $formHelper,
+            $checkAccount,
             $shopCapabilities,
             $config,
             $environment,
@@ -575,7 +578,7 @@ class RegisterForm extends Form
                     ],
                     'basicSettingsLink' => [
                         'type' => 'markup',
-                        'value' => sprintf($this->t('register_form_success_config_button'), $this->t('module'), $this->shopCapabilities->getLink('config'), $this->t('button_class')),
+                        'value' => sprintf($this->t('register_form_success_config_button'), $this->t('module'), $this->shopCapabilities->getLink('settings'), $this->t('button_class')),
                     ],
                     'next3' => [
                         'type' => 'markup',

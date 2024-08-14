@@ -369,11 +369,9 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         $registry = $this->getRegistry();
         switch ($linkType) {
             case 'settings':
-            case 'config':
             case 'register':
             case 'activate':
             case 'mappings':
-            case 'advanced':
             case 'batch':
             case 'invoice':
                 return $registry->getRouteUrl($linkType);

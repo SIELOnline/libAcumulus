@@ -27,8 +27,8 @@ class Environment extends EnvironmentBase
     {
         // 'show variables where Variable_name in ("version", "version_comment")'
         return [
-          ['Variable_name' => 'version', 'Value' => '8.0.27'],
-          ['Variable_name' => 'version_comment', 'Value' => 'MySQL Community Server - GPL'],
+            ['Variable_name' => 'version', 'Value' => '8.0.27'],
+            ['Variable_name' => 'version_comment', 'Value' => 'MySQL Community Server - GPL'],
         ];
     }
 }

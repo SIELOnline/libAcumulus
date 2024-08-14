@@ -14,6 +14,8 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
  * Contains translations for the configuration form.
+ *
+ * @todo: try to find a way to find out if there are unused strings.
  */
 class ConfigFormTranslations extends TranslationCollection
 {
@@ -68,7 +70,7 @@ class ConfigFormTranslations extends TranslationCollection
         'message_error_arg1_settings' => 'overige',
         'message_error_arg2_config' => 'hier',
         'message_error_arg2_advanced' => 'in het "Acumulus basisinstellingenformulier"',
-        'message_warning_role_deprecated' => 'U gebruikt accountgegevens met een gebruikerstype dat binnenkort niet meer gebruikt kan worden om de Acumulus API mee te benaderen. Voeg een andere gebruiker toe met gebruikerstype API-Gebruiker of verander het gebruikerstype van de huidige gebruiker.',
+        'message_error_role_deprecated' => 'U gebruikt accountgegevens met een gebruikerstype dat binnenkort niet meer gebruikt kan worden om de Acumulus API mee te benaderen. Voeg een andere gebruiker toe met gebruikerstype API-Gebruiker of verander het gebruikerstype van de huidige gebruiker.',
         'message_warning_role_insufficient' => 'U gebruikt een account met het gebruikerstype API-Invoerder. Dit gebruikerstype heeft niet alle rechten die deze plugin gebruikt. Verander het gebruikerstype van de huidige gebruiker naar API-Gebruiker of voeg een andere gebruiker toe.',
         'message_warning_role_overkill' => 'U gebruikt een account met het gebruikerstype API-Beheerder. Dit gebruikerstype heeft meer rechten dan deze plugin nodig heeft. Wij raden u aan om het gebruikerstype te veranderen naar API-Gebruiker.',
 
@@ -546,7 +548,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_error_arg1_settings' => 'other',
         'message_error_arg2_config' => 'here',
         'message_error_arg2_advanced' => 'in the "Acumulus basic settings form"',
-        'message_warning_role_deprecated' => 'You are using a deprecated user role to connect to the Acumulus API. Please add another user with an API-compliant role or change the role for the current user.',
+        'message_error_role_deprecated' => 'You are using a deprecated user role to connect to the Acumulus API. Please add another user with an API-compliant role or change the role for the current user.',
         'message_warning_role_insufficient' => 'You are using the user role API-Creator. This role does not have all permissions this plugin needs. Change the role of the current user to API-User or create a new user.',
         'message_warning_role_overkill' => 'You are using the user role API-Manager. This role has more permissions than this plugin needs. We advice you to change the role to API-User.',
 

@@ -620,13 +620,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
         switch ($linkType) {
             case 'register':
             case 'activate':
-            case 'config':
             case 'batch':
             case 'settings':
             case 'mappings':
                 return $urlInterface->getUrl("acumulus/$linkType");
-            case 'advanced':
-                return $urlInterface->getUrl('acumulus/config/advanced');
             case 'fiscal-address-setting':
                 return $urlInterface->getUrl('admin/system_config/edit/section/tax');
             case 'logo':

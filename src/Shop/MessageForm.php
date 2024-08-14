@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Shop;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
@@ -33,13 +34,14 @@ class MessageForm extends Form
 
     public function __construct(
         FormHelper $formHelper,
+        CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
         Config $config,
         Environment $environment,
         Translator $translator,
         Log $log
     ) {
-        parent::__construct(null, $formHelper, $shopCapabilities, $config, $environment, $translator, $log);
+        parent::__construct(null, $formHelper, $checkAccount, $shopCapabilities, $config, $environment, $translator, $log);
         $this->addMeta = false;
         $this->isFullPage = false;
         $this->addSeverityClassToFields = false;

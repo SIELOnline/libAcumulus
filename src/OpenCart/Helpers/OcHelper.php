@@ -161,26 +161,6 @@ abstract class OcHelper
     }
 
     /**
-     * Controller action: show/process the settings form.
-     *
-     * @throws \Throwable
-     */
-    public function config(): void
-    {
-        $this->handleForm('config');
-    }
-
-    /**
-     * Controller action: show/process the advanced settings form.
-     *
-     * @throws \Throwable
-     */
-    public function advancedConfig(): void
-    {
-        $this->handleForm('advanced');
-    }
-
-    /**
      * Controller action: show/process the batch form.
      *
      * @throws \Throwable
@@ -296,7 +276,7 @@ abstract class OcHelper
                 $crashReporter = $this->acumulusContainer->getCrashReporter();
                 $message = $crashReporter->logAndMail($e);
                 $form->createAndAddMessage($message, Severity::Exception);
-            } catch (Throwable $inner) {
+            } catch (Throwable) {
                 // We do not know if we have informed the user per mail or
                 // screen, so assume not, and rethrow the original exception.
                 throw $e;
@@ -341,7 +321,7 @@ abstract class OcHelper
             'separator' => false,
         ];
         // Add an intermediate level to the config breadcrumb.
-        if ($type === 'settings' || $type === 'config') {
+        if ($type === 'settings') {
             $this->data['breadcrumbs'][] = $this->getExtensionsBreadcrumb();
         }
         $this->data['breadcrumbs'][] = [
@@ -366,15 +346,11 @@ abstract class OcHelper
         $this->data['back'] = $this->registry->getRouteUrl('dashboard', 'common', '');
     }
 
-    /**
-     * @param string $type
-     *
-     * @return void
-     */
     public function initFormCommon(string $type): void
     {
         // Are we posting? If not so, handle this as a trigger to update.
         if ($this->registry->request->server['REQUEST_METHOD'] !== 'POST') {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $this->doUpgrade();
         }
 
@@ -511,9 +487,11 @@ abstract class OcHelper
     {
         foreach ($menus as &$menu) {
             if ($menu['id'] === 'menu-sale') {
-                $items = $this->acumulusContainer->getShopCapabilities()->usesNewCode()
-                    ? ['batch', 'settings', 'mappings', 'activate']
-                    : ['batch', 'config', 'advanced', 'activate'];
+                $items = ['batch', 'settings', 'mappings', 'activate'];
+                $message = $this->acumulusContainer->getCheckAccount()->doCheck();
+                if (!empty($message)) {
+                    $items[] = 'register';
+                }
                 $acumulusMenuItems = [];
                 foreach ($items as $name) {
                     $acumulusMenuItems[] = [
@@ -553,7 +531,7 @@ abstract class OcHelper
      * @return bool
      *   Success.
      *
-     * @noinspection PhpDocMissingThrowsInspection
+     * @throws \JsonException
      */
     protected function doInstall(): bool
     {
@@ -627,7 +605,7 @@ abstract class OcHelper
      * @return bool
      *   Whether the upgrade was successful.
      *
-     * @noinspection PhpDocMissingThrowsInspection
+     * @throws \JsonException
      */
     protected function doUpgrade(): bool
     {

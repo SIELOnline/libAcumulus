@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Shop;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
@@ -16,7 +17,7 @@ use Siel\Acumulus\ApiClient\Acumulus;
 use function count;
 
 /**
- * Provides basic config form handling.
+ * Provides basic config form (settings and mappings) handling.
  */
 abstract class BaseConfigForm extends Form
 {
@@ -24,13 +25,14 @@ abstract class BaseConfigForm extends Form
         AboutForm $aboutForm,
         Acumulus $acumulusApiClient,
         FormHelper $formHelper,
+        CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
         Config $config,
         Environment $environment,
         Translator $translator,
         Log $log
     ) {
-        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $environment, $translator, $log);
+        parent::__construct($acumulusApiClient, $formHelper, $checkAccount, $shopCapabilities, $config, $environment, $translator, $log);
         $this->aboutForm = $aboutForm;
         $this->translator->add(new ConfigFormTranslations());
     }
@@ -81,6 +83,8 @@ abstract class BaseConfigForm extends Form
      * {@inheritdoc}
      *
      * Saves the submitted and validated form values in the configuration store.
+     *
+     * @throws \JsonException
      */
     protected function execute(): bool
     {

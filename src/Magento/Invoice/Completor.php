@@ -16,6 +16,7 @@
 
 namespace Siel\Acumulus\Magento\Invoice;
 
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor as BaseCompletor;
 use Siel\Acumulus\Invoice\Source;
@@ -53,7 +54,7 @@ class Completor extends BaseCompletor
                     $discountAmountInc += $line[Meta::LineDiscountAmountInc];
                 }
 
-                if ($line[Meta::LineType] === Creator::LineType_Discount) {
+                if ($line[Meta::LineType] === LineType::Discount) {
                     if (isset($line[Meta::LineAmountInc])) {
                         $discountLineAmountInc += $line[Meta::LineAmountInc];
                     } elseif (isset($line[Meta::UnitPriceInc])) {
@@ -64,7 +65,7 @@ class Completor extends BaseCompletor
 
             if (!Number::floatsAreEqual($discountAmountInc, $discountLineAmountInc)) {
                 foreach ($invoiceLines as $line) {
-                    if ($line[Meta::LineType] === Creator::LineType_Shipping && isset($line[Meta::LineDiscountAmountInc])) {
+                    if ($line[Meta::LineType] === LineType::Shipping && isset($line[Meta::LineDiscountAmountInc])) {
                         $line[Meta::LineDiscountAmountInc] += $discountLineAmountInc - $discountAmountInc;
                         $line[Meta::LineDiscountAmountIncCorrected] = true;
                     }

@@ -17,6 +17,7 @@
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -372,7 +373,7 @@ class Creator extends BaseCreator
         // not been tested yet!.
         foreach ($this->invoiceSource->getSource()->get_fees() as $feeLine) {
             $line = $this->getFeeLine($feeLine);
-            $line = $this->addLineType($line, static::LineType_Other);
+            $line = $this->addLineType($line, LineType::Other);
             $result[] = $line;
         }
         return $result;

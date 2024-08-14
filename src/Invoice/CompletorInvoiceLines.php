@@ -21,6 +21,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -524,7 +525,7 @@ class CompletorInvoiceLines
         $nature = $this->getMaxAppearingNature($lines);
         if (!empty($nature)) {
             foreach ($lines as &$line) {
-                if (isset($line[Meta::LineType]) && $line[Meta::LineType] !== Creator::LineType_OrderItem && !isset($line[Tag::Nature])) {
+                if (isset($line[Meta::LineType]) && $line[Meta::LineType] !== LineType::Item && !isset($line[Tag::Nature])) {
                     $line[Tag::Nature] = $nature;
                 }
             }
@@ -555,7 +556,7 @@ class CompletorInvoiceLines
     {
         $amountPerNature = ['' => 0.0, Api::Nature_Product => 0.0, Api::Nature_Service => 0.0];
         foreach ($lines as $line) {
-            if (isset($line[Meta::LineType]) && $line[Meta::LineType] === Creator::LineType_OrderItem) {
+            if (isset($line[Meta::LineType]) && $line[Meta::LineType] === LineType::Item) {
                 $nature = !empty($line[Tag::Nature]) ? $line[Tag::Nature] : '';
                 $amount = abs($line[Tag::Quantity] * $line[Tag::UnitPrice]);
                 $amountPerNature[$nature] += $amount;

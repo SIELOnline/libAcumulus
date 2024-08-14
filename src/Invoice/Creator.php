@@ -55,12 +55,6 @@ abstract class Creator
     public const VatRateSource_Creator_Lookup = 'creator-lookup';
     public const VatRateSource_Creator_Missing_Amount = 'creator-missing-amount';
 
-    public const LineType_OrderItem = 'order-item';
-    public const LineType_Shipping = 'shipping';
-    public const LineType_Discount = 'discount';
-    public const LineType_Voucher = 'voucher';
-    public const LineType_Other = 'other';
-
     private Container $container;
     protected Config $config;
     protected Translator $translator;

@@ -89,7 +89,7 @@ abstract class Creator extends BaseCreator
     protected function getInvoiceLines(): array
     {
         $itemLines = $this->getItemLines();
-        $itemLines = $this->addLineType($itemLines, static::LineType_OrderItem);
+        $itemLines = $this->addLineType($itemLines, LineType::Item);
         $totalLines = $this->getTotalLines();
         return array_merge($itemLines, $totalLines);
     }
@@ -256,11 +256,11 @@ abstract class Creator extends BaseCreator
                     break;
                 case 'shipping':
                     $line = $this->getTotalLine($totalLine, $exVat);
-                    $line = $this->addLineType($line, static::LineType_Shipping);
+                    $line = $this->addLineType($line, LineType::Shipping);
                     break;
                 case 'coupon':
                     $line = $this->getTotalLine($totalLine, $exVat);
-                    $line = $this->addLineType($line, static::LineType_Discount);
+                    $line = $this->addLineType($line, LineType::Discount);
                     break;
                 case 'tax':
                     // Tax line: added to invoice level
@@ -269,7 +269,7 @@ abstract class Creator extends BaseCreator
                     break;
                 case 'voucher':
                     $line = $this->getTotalLine($totalLine, $exVat);
-                    $line = $this->addLineType($line, static::LineType_Voucher);
+                    $line = $this->addLineType($line, LineType::Voucher);
                     break;
                 case 'total':
                     // Overall total: ignore.
@@ -277,7 +277,7 @@ abstract class Creator extends BaseCreator
                     break;
                 default:
                     $line = $this->getTotalLine($totalLine, $exVat);
-                    $line = $this->addLineType($line, static::LineType_Other);
+                    $line = $this->addLineType($line, LineType::Other);
                     break;
             }
             if ($line) {

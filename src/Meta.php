@@ -351,7 +351,7 @@ interface Meta
     public const ProductType = 'meta-product-type';
     /**
      * Creator->Completor: the type of line: product, shipping, payment fee,
-     * discount line, etc. Defined with the Creator::LineType_... constants.
+     * discount line, etc. Defined with the {@see LineType} constant.
      */
     public const LineType = 'meta-line-type';
     /**

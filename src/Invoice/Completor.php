@@ -1031,7 +1031,7 @@ class Completor
                             // not change the vat type just because they are a
                             // service.
                             if ($this->isOutsideEu()
-                                && $line[Meta::LineType] === Creator::LineType_OrderItem
+                                && $line[Meta::LineType] === LineType::Item
                                 && !empty($line[Tag::Nature])
                             ) {
                                 if ($vatType === Api::VatType_National && $line[Tag::Nature] === Api::Nature_Product) {
@@ -1365,7 +1365,7 @@ class Completor
             $this->invoice[Tag::Line] = array_filter(
                 $this->invoice[Tag::Line],
                 static function ($line) {
-                    return $line[Meta::LineType] !== Creator::LineType_Shipping || !Number::isZero($line[Tag::UnitPrice]);
+                    return $line[Meta::LineType] !== LineType::Shipping || !Number::isZero($line[Tag::UnitPrice]);
                 }
             );
         }

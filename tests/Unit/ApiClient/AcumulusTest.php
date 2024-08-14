@@ -12,6 +12,11 @@ namespace Siel\Acumulus\Tests\Unit\ApiClient;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
+use Siel\Acumulus\Data\Address;
+use Siel\Acumulus\Data\Customer;
+use Siel\Acumulus\Data\EmailInvoiceAsPdf;
+use Siel\Acumulus\Data\EmailPackingSlipAsPdf;
+use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 
 /**
@@ -40,6 +45,14 @@ class AcumulusTest extends TestCase
     public function argumentsPassed(): array
     {
         // See for the meaning of each entry the parameter list of testApiCalls.
+        $emailInvoiceAsPdf = new EmailInvoiceAsPdf();
+        $emailInvoiceAsPdf->setEmailTo('test@example.com');
+        $emailPackingslipAsPdf = new EmailPackingSlipAsPdf();
+        $emailPackingslipAsPdf->setEmailTo('test@example.com');
+        $invoice = new Invoice();
+        $customer = new Customer();
+        $customer->setInvoiceAddress(new Address());
+        $invoice->setCustomer($customer);
         return [
             'About' => ['getAbout', [], 'general/general_about', true, []],
             'MyAcumulus' => ['getMyAcumulus', [], 'general/my_acumulus', true, []],
@@ -55,17 +68,17 @@ class AcumulusTest extends TestCase
             'VatInfo' => ['getVatInfo', ['nl'], 'lookups/lookup_vatinfo', true, ['vatcountry' => 'nl', 'vatdate' => date(Api::DateFormat_Iso)]],
             'EuThreshold' => ['reportThresholdEuCommerce', [], 'reports/report_threshold_eu_ecommerce', true, []],
             'EuThresholdYear' => ['reportThresholdEuCommerce', [2021], 'reports/report_threshold_eu_ecommerce', true, ['year' => 2021]],
-            'InvoiceAdd' => ['invoiceAdd', [['customer' => []]], 'invoices/invoice_add', true, ['customer' => []]],
+            'InvoiceAdd' => ['invoiceAdd', [$invoice], 'invoices/invoice_add', true, ['customer' => ['invoice' => ['line' => []]]]],
             'ConceptInfo' => ['getConceptInfo', [12345], 'invoices/invoice_concept_info', true, ['conceptid' => 12345]],
             'Entry' => ['getEntry', [12345], 'entry/entry_info', true, ['entryid' => 12345]],
             'SetDeleteStatus1' => ['setDeleteStatus', [12345, Api::Entry_Delete], 'entry/entry_deletestatus_set', true, ['entryid' => 12345, 'entrydeletestatus' => 1]],
             'SetDeleteStatus0' => ['setDeleteStatus', [12345, Api::Entry_UnDelete], 'entry/entry_deletestatus_set', true, ['entryid' => 12345, 'entrydeletestatus' => 0]],
             'GetPaymentStatus' => ['getPaymentStatus', ['TOKEN'], 'invoices/invoice_paymentstatus_get', true, ['token' => 'TOKEN']],
             'SetPaymentStatus' => ['setPaymentStatus', ['TOKEN', Api::PaymentStatus_Paid, '2020-02-02'], 'invoices/invoice_paymentstatus_set', true, ['token' => 'TOKEN', 'paymentstatus' => Api::PaymentStatus_Paid, 'paymentdate' => '2020-02-02']],
-            'emailInvoice' => ['emailInvoiceAsPdf', ['TOKEN', ['emailto' => 'test@example.com']], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']]],
-            'emailInvoiceReminder' => ['emailInvoiceAsPdf', ['TOKEN', ['emailto' => 'test@example.com'], Api::Email_Reminder], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'invoicetype' => Api::Email_Reminder, 'emailaspdf' => ['emailto' => 'test@example.com']]],
-            'emailInvoiceNotes' => ['emailInvoiceAsPdf', ['TOKEN', ['emailto' => 'test@example.com'], null, 'my notes'], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com'], 'invoicenotes' => 'my notes']],
-            'emailPackingSlip' => ['emailPackingSlipAsPdf', ['TOKEN', ['emailto' => 'test@example.com']], 'delivery/packing_slip_mail_pdf', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']]],
+            'emailInvoice' => ['emailInvoiceAsPdf', ['TOKEN', $emailInvoiceAsPdf], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailTo' => 'test@example.com']]],
+            'emailInvoiceReminder' => ['emailInvoiceAsPdf', ['TOKEN', $emailInvoiceAsPdf, Api::Email_Reminder], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'invoicetype' => Api::Email_Reminder, 'emailaspdf' => ['emailTo' => 'test@example.com']]],
+            'emailInvoiceNotes' => ['emailInvoiceAsPdf', ['TOKEN', $emailInvoiceAsPdf, null, 'my notes'], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailTo' => 'test@example.com'], 'invoicenotes' => 'my notes']],
+            'emailPackingSlip' => ['emailPackingSlipAsPdf', ['TOKEN', $emailPackingslipAsPdf], 'delivery/packing_slip_mail_pdf', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailTo' => 'test@example.com']]],
             'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, ['signup' => ['companyname' => 'BR']]],
             'stockAdd' => ['stockAdd', [12345, 1, 'description', '2022-02-02'], 'stock/stock_add', true, ['stock' => ['productid' => 12345, 'stockamount' => 1, 'stockdescription' => 'description', 'stockdate' => '2022-02-02']]],
         ];

@@ -11,7 +11,6 @@ namespace Siel\Acumulus\Tests\Unit\ApiClient;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\ApiClient\AcumulusResult;
-use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Helpers\Container;
 
 /**
@@ -88,29 +87,5 @@ class AcumulusRequestTest extends TestCase
         $this->getAcumulusRequest($uri);
 
         $this->assertArrayHasKey('contract', $this->acumulusRequest->getSubmit());
-    }
-
-    public function testSubmitToArray(): void
-    {
-        $this->createAcumulusRequest();
-        $token = 'TOKEN';
-        $type = EmailAsPdfType::Invoice;
-        /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $emailAsPdf */
-        $emailAsPdf = $this->container->createAcumulusObject($type);
-        $emailAsPdf->emailFrom = 'from@example.com';
-        $emailAsPdf->emailTo = 'test@example.com';
-        $emailAsPdf->subject = 'test';
-        $emailAsPdf->message = 'test1 test2';
-        $emailAsPdf->ubl = true;
-        $message = [
-            'token' => $token,
-            'emailaspdf' => $emailAsPdf,
-        ];
-        $expected = $message;
-        $expected['emailaspdf'] = $emailAsPdf->toArray();
-
-        $array = $this->acumulusRequest->submitToArray($message);
-
-        $this->assertEqualsCanonicalizing($expected, $array);
     }
 }

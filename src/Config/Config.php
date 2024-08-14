@@ -36,8 +36,7 @@ use const Siel\Acumulus\Version;
  * class.
  *
  * @todo: New settings:
- *   - Address - Country: Vermelden: nooit, altijd, buitenland
- *   - EmailAsPdf: ubl, gfx
+ *   - EmailAsPdf: gfx
  *   - Invoice: concept type???
  *
  * @noinspection PhpLackOfCohesionInspection
@@ -156,6 +155,8 @@ class Config
      *
      * After loading this method checks if the stored values need an upgrade
      * and, if so, will trigger that update.
+     *
+     * @throws \JsonException
      */
     protected function load(): void
     {
@@ -184,6 +185,8 @@ class Config
      *
      * @return bool
      *   Success.
+     *
+     * @throws \JsonException
      */
     public function save(
         #[SensitiveParameter]
@@ -278,7 +281,7 @@ class Config
      * - Keys that are unknown.
      *
      * @param array $values
-     *   The array to remove values from.
+     *   The array to remove values from. will contain all config values
      *
      * @return array
      *   The set of values passed in reduced to those values to be stored.
@@ -304,6 +307,7 @@ class Config
      */
     public function getShowRatePluginMessage(): int
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->get('showRatePluginMessage');
     }
 
@@ -315,6 +319,7 @@ class Config
      */
     public function getPluginV8Message(): int
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->get('showPluginV8Message');
     }
 
@@ -323,6 +328,8 @@ class Config
      *
      * @return array
      *   An array with all configuration values keyed by their name.
+     *
+     * @throws \JsonException
      */
     public function getAll(): array
     {
@@ -340,6 +347,8 @@ class Config
      *   The value of the given configuration value or null if not defined. This
      *   will be a simple type (string, int, bool) or a keyed array with simple
      *   values.
+     *
+     * @throws \JsonException
      */
     public function get(string $key)
     {
@@ -359,6 +368,8 @@ class Config
      *
      * @return mixed
      *   The old value, or null if it was not yet set.
+     *
+     * @throws \JsonException
      */
     public function set(string $key, $value)
     {
@@ -553,12 +564,15 @@ class Config
      *
      * @return array
      *   An array with all settings belonging to the given group.
+     *
+     * @noinspection PhpDocMissingThrowsInspection
      */
     protected function getSettingsByGroup(string $group): array
     {
         $result = [];
         foreach ($this->getKeyInfo() as $key => $keyInfo) {
             if ($keyInfo['group'] === $group) {
+                /** @noinspection PhpUnhandledExceptionInspection */
                 $result[$key] = $this->get($key);
             }
         }
@@ -716,101 +730,15 @@ class Config
                     // The default Api::CountryAutoName_Yes matches the old behaviour.
                     'default' => Api::CountryAutoName_Yes,
                 ],
-                // @legacy  Is now a mapping.
-                'contactYourId' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
                 'contactStatus' => [
                     'group' => Tag::Customer,
                     'type' => 'int',
                     'default' => Api::ContactStatus_Active,
                 ],
-                // @legacy  Is now a mapping.
-                'companyName1' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @todo: the address fields below should be duplicated and renamed (when
-                //   we would use config keys for mappings). For now this is legacy code.
-                // @legacy  Is now a mapping.
-                'companyName2' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'fullName' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'salutation' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'address1' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'address2' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'postalCode' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'city' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'vatNumber' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'telephone' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'fax' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'email' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
-                ],
                 'overwriteIfExists' => [
                     'group' => Tag::Customer,
                     'type' => 'bool',
                     'default' => true,
-                ],
-                // @legacy  Is now a mapping.
-                'mark' => [
-                    'group' => Tag::Customer,
-                    'type' => 'string',
-                    'default' => '',
                 ],
                 'concept' => [
                     'group' => Tag::Invoice,
@@ -881,49 +809,6 @@ class Config
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 80,
-                ],
-                // @legacy  Is now a mapping.
-                'description' => [
-                    'group' => Tag::Invoice,
-                    'type' => 'string',
-                    'default' => '[invoiceSourceType::label+invoiceSource::reference'
-                        . '+"-"+refundedInvoiceSourceType::label+refundedInvoiceSource::reference]',
-                ],
-                // @legacy  Is now a mapping.
-                'descriptionText' => [
-                    'group' => Tag::Invoice,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'invoiceNotes' => [
-                    'group' => Tag::Invoice,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'itemNumber' => [
-                    'group' => Tag::Invoice,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'productName' => [
-                    'group' => Tag::Invoice,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'nature' => [
-                    'group' => Tag::Invoice,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'costPrice' => [
-                    'group' => Tag::Invoice,
-                    'type' => 'string',
-                    'default' => '',
                 ],
                 'nature_shop' => [
                     'group' => 'shop',
@@ -1031,79 +916,6 @@ class Config
                     'default' => false,
                 ],
                 'ubl' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'bool',
-                    'default' => false,
-                ],
-                // @legacy  Is now a mapping.
-                // @todo  Should this be a UI editable setting?
-                'emailFrom' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                'emailTo' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                // @todo  Should this be a UI editable setting?
-                'emailBcc' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                // @todo  Should this be a UI editable setting?
-                'subject' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // For now, we do not make the invoice message configurable...
-                // For now, we don't present the confirmReading option in the UI.
-                // @legacy  Can now be handled via a mapping.
-                'confirmReading' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'bool',
-                    'default' => false,
-                ],
-                // For now, we don't present the packingSlipEmailFrom option in the UI.
-                // @legacy  Can now be handled via a mapping.
-                // @todo  Should this be a UI editable setting?
-                'packingSlipEmailFrom' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                // @todo  Should this be a UI editable setting?
-                'packingSlipEmailTo' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // @legacy  Is now a mapping.
-                // @todo  Should this be a UI editable setting?
-                'packingSlipEmailBcc' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // For now, we don't present the packingSlipSubject option in the UI.
-                // @legacy  Can now be handled via a mapping.
-                // @todo  Should this be a UI editable setting?
-                'packingSlipSubject' => [
-                    'group' => Tag::EmailAsPdf,
-                    'type' => 'string',
-                    'default' => '',
-                ],
-                // For now, we do not make packing slip mail message configurable...
-                // For now, we don't present the packingSlipConfirmReading option in the UI.
-                // @legacy  Can now be handled via a mapping.
-                'packingSlipConfirmReading' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,

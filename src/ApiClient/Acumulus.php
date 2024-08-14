@@ -10,7 +10,9 @@ namespace Siel\Acumulus\ApiClient;
 use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Environment;
+use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\EmailAsPdf;
+use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
@@ -384,7 +386,7 @@ class Acumulus
      *
      * See {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/}
      *
-     * @param \Siel\Acumulus\Data\Invoice|array $invoice
+     * @param \Siel\Acumulus\Data\Invoice
      *   The invoice to send.
      *
      * @return AcumulusResult
@@ -399,9 +401,9 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function invoiceAdd($invoice): AcumulusResult
+    public function invoiceAdd(Invoice $invoice): AcumulusResult
     {
-        return $this->callApiFunction('invoices/invoice_add', $invoice)->setMainAcumulusResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_add', $invoice->toArray())->setMainAcumulusResponseKey('invoice');
     }
 
     /**
@@ -819,7 +821,7 @@ class Acumulus
     {
         $message = [
             'token' => $token,
-            'emailaspdf' => $emailAsPdf,
+            'emailaspdf' => $emailAsPdf->toArray(),
         ];
         if ($invoiceType !== null) {
             $message['invoicetype'] = $invoiceType;
@@ -897,7 +899,7 @@ class Acumulus
     ): AcumulusResult {
         $message = [
             'token' => $token,
-            'emailaspdf' => $emailAsPdf,
+            'emailaspdf' => $emailAsPdf->toArray(),
         ];
         if (!empty($deliveryNotes)) {
             $message['deliverynotes'] = $deliveryNotes;
@@ -928,7 +930,7 @@ class Acumulus
      *
      * @param string $apiFunction
      *   The API function to invoke.
-     * @param \Siel\Acumulus\Data\AcumulusObject|array $message
+     * @param array $message
      *   The values to submit.
      * @param bool $needContract
      *   Indicates whether this api function needs the contract details. Most
@@ -946,7 +948,7 @@ class Acumulus
      *   - {@see HttpResponse} might be set or not;
      *   - {@see AcumulusResult} will not be set.
      */
-    protected function callApiFunction(string $apiFunction, $message, bool $needContract = true): AcumulusResult
+    protected function callApiFunction(string $apiFunction, array $message, bool $needContract = true): AcumulusResult
     {
         $acumulusRequest = $this->createAcumulusRequest();
         $uri = $this->constructUri($apiFunction);

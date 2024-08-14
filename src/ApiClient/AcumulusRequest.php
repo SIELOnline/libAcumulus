@@ -8,13 +8,11 @@ use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
-use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Util;
 
 use function assert;
-use function is_array;
 
 /**
  * AcumulusRequest turns a call to {@see Acumulus} into an {@see HttpRequest}.
@@ -102,7 +100,7 @@ class AcumulusRequest
      *
      * @param string $uri
      *   The uri of the API resource to invoke.
-     * @param \Siel\Acumulus\Data\AcumulusObject|array $submit
+     * @param array $submit
      *   The main submit part to send to the Acumulus web API.
      * @param bool $needContract
      *   Indicates whether this api function needs the contract details. Most
@@ -127,10 +125,9 @@ class AcumulusRequest
      *   Note that errors at the application level will not be thrown as an
      *   exception, but will have to be handled by the calling code.
      */
-    public function execute(string $uri, $submit, bool $needContract): AcumulusResult
+    public function execute(string $uri, array $submit, bool $needContract): AcumulusResult
     {
         assert($this->uri === null);
-        assert(is_array($submit) || $submit instanceof AcumulusObject);
 
         $this->uri = $uri;
         $this->submit = $this->constructFullSubmit($submit, $needContract);
@@ -215,7 +212,7 @@ class AcumulusRequest
      *   part containing a.o. tags like <contract>, <testmode>, and <connector>.
      * - An endpoint specific part, the actual data to be sent.
      *
-     * @param \Siel\Acumulus\Data\AcumulusObject|array $submit
+     * @param array $submit
      *   The endpoint specific part to be sent.
      * @param bool $needContract
      *   Whether this endpoint needs the <contract> part to authorize and
@@ -227,10 +224,9 @@ class AcumulusRequest
      * @throws \RuntimeException
      *    Required property is not set.
      */
-    protected function constructFullSubmit($submit, bool $needContract): array
+    protected function constructFullSubmit(array $submit, bool $needContract): array
     {
         $basicSubmit = $this->getBasicSubmit($needContract);
-        $submit = $this->submitToArray($submit);
         return array_merge($basicSubmit, $submit);
     }
 
@@ -291,24 +287,5 @@ class AcumulusRequest
         ];
 
         return $result;
-    }
-
-    /**
-     * Recursively converts a $submit structure to an array.
-     *
-     * @param array|AcumulusObject $submit
-     */
-    protected function submitToArray($submit): array
-    {
-        if ($submit instanceof AcumulusObject) {
-            $submit = $submit->toArray();
-        }
-
-        foreach ($submit as $key => &$value) {
-            if (is_array($value) || $value instanceof AcumulusObject) {
-                $value = $this->submitToArray($value);
-            }
-        }
-        return $submit;
     }
 }

@@ -149,13 +149,7 @@ class Invoice extends AcumulusObject
 
     public function hasWarning(): bool
     {
-        $hasWarning = parent::hasWarning();
-        if (!$hasWarning && $this->getCustomer() !== null) {
-            $hasWarning = $this->getCustomer()->hasWarning();
-        }
-        if (!$hasWarning && $this->getEmailAsPdf() !== null) {
-            $hasWarning = $this->getEmailAsPdf()->hasWarning();
-        }
+        $hasWarning = parent::hasWarning() || (bool) $this->getCustomer()?->hasWarning() || (bool) $this->getEmailAsPdf()?->hasWarning();
         if (!$hasWarning) {
             foreach ($this->getLines() as $line) {
                 if ($line->hasWarning()) {
@@ -170,8 +164,6 @@ class Invoice extends AcumulusObject
     /**
      * @throws Error
      *   customer or emailAsPdf not (yet) set.
-     * @todo: remove/exclude polyfills
-     * @noinspection NullPointerExceptionInspection
      */
     public function toArray(): array
     {
@@ -183,14 +175,12 @@ class Invoice extends AcumulusObject
         $invoice[Fld::Line] = $lines;
 
         if ($this->metadataGet(Meta::AddEmailAsPdfSection)) {
-            // @todo: catch 'Required property %s::%s is not set' and make it a warning
-            //   that the invoice has been exported but the pdf could not be sent.
-            // @todo: probably better: handle this in emailAsPdf object??? Otherwise,
-            //   other fields will be missing as well.
+            /** @noinspection NullPointerExceptionInspection  should throw on null */
             $invoice[Fld::EmailAsPdf] = $this->getEmailAsPdf()->toArray();
         }
         $invoice += $this->metadataToArray();
 
+        /** @noinspection NullPointerExceptionInspection  should throw on null */
         $customer = $this->getCustomer()->toArray();
         $customer[Fld::Invoice] = $invoice;
         return [Fld::Customer => $customer];

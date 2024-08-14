@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpUnhandledExceptionInspection Config::save may throw but we ignore that.
+ */
 
 declare(strict_types=1);
 
@@ -99,6 +102,7 @@ class ConfigUpgrade
         }
         return $result;
     }
+
     /**
      * Applies all updates since the $currentVersion to the config.
      *
@@ -197,6 +201,10 @@ class ConfigUpgrade
             $result = $this->upgrade800() && $result;
         }
 
+        if (version_compare($currentVersion, '8.3.0', '<')) {
+            $result = $this->upgrade830() && $result;
+        }
+
         $this->getLog()->notice('Config: finished upgrading to %s (%s)', Version, $result ? 'success' : 'failure');
         return $result;
     }
@@ -286,7 +294,8 @@ class ConfigUpgrade
     /**
      * 4.7.0 upgrade.
      *
-     * - salutation could already use token, but with old syntax: remove # after [.
+     * - salutation could already use token, but with old syntax: remove '#' after '['.
+     *   @noinspection GrazieInspection
      */
     protected function upgrade470(): bool
     {
@@ -646,6 +655,18 @@ class ConfigUpgrade
             $result = $configStore->save([Config::Mappings => $mappings]);
         }
         return $result;
+    }
+
+    /**
+     * 8.3.0 upgrade.
+     *
+     * - removed all settings that are now a mapping: just save the config to remove these
+     *   settings.
+     */
+    protected function upgrade830(): bool
+    {
+        $newSettings = [];
+        return $this->getConfig()->save($newSettings);
     }
 
     /**

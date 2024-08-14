@@ -223,13 +223,10 @@ abstract class AcumulusObject implements ArrayAccess
     /**
      * Returns the AcumulusObject as a keyed array.
      *
-     * @return string[]
+     * @return array
      *   The properties and metadata of this object as a keyed array. The keys
-     *   are the (lower cased) property names or metadata keys, the values will
-     *   be strings or a(n) (recursive)  array of strings.
-     *
-     * @throws \RuntimeException
-     *   When a required property is not set.
+     *   are the (non-lower-cased) property names or metadata keys, the values will
+     *   be scalars or a(n) (recursive) array of scalars.
      */
     public function toArray(): array
     {
@@ -239,17 +236,15 @@ abstract class AcumulusObject implements ArrayAccess
     /**
      *  Returns the AcumulusObject properties as a keyed array of strings.
      *
-     * @return string[]
-     *   The properties as a keyed array of strings.
-     *
-     * @throws \RuntimeException
-     *   Required property is not set.
-     * @noinspection PhpVariableVariableInspection
+     * @return array
+     *   The properties as a keyed array of values, the keys being the (non-lower-cased)
+     *   names of the property
      */
     protected function propertiesToArray(): array
     {
         $result = [];
         foreach ($this->data as $name => $property) {
+            /** @noinspection PhpVariableVariableInspection */
             if (isset($this->$name)) {
                 $result[$name] = $property->getApiValue();
             } elseif ($this->data[$name]->isRequired()) {

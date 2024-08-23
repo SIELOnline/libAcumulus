@@ -14,7 +14,9 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class Translations extends TranslationCollection
 {
-    public const sharedNl = 'De factuur is als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Controleer en corrigeer daar de factuur.';
+    // @todo:  current versions of the API are less forgiving and use a lot more errors
+    //   instead of warnings. This shared message is thus probably too optimistic
+    public const sharedNl = 'De factuur is mogelijk nog als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Controleer en corrigeer daar de factuur.';
 
     protected array $nl = [
         Source::Order => 'bestelling',

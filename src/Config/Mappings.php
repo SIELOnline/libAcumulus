@@ -220,11 +220,9 @@ class Mappings
             ],
             AddressType::Invoice => [
                 Fld::CountryCode => '[source::getCountryCode()|"nl"]',
-                Meta::AddressType => AddressType::Invoice,
             ],
             AddressType::Shipping => [
                 Fld::CountryCode => '[source::getCountryCode()|"nl"]',
-                Meta::AddressType => AddressType::Shipping,
             ],
             EmailAsPdfType::Invoice => [
                 Fld::Subject => 'Factuur voor [source::getTypeLabel(1)+source::getReference()'

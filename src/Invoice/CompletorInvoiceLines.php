@@ -119,9 +119,7 @@ class CompletorInvoiceLines
     {
         $lines = &$invoice[Tag::Line];
 
-        if ($this->completor->shouldConvertCurrency($invoice)) {
-            $this->convertToEuro($lines, $invoice[Meta::CurrencyRate]);
-        }
+        $this->convertToEuro($lines, $invoice[Meta::Currency]);
         // @todo: we could combine all completor phase methods of getting the
         //   correct vat rate:
         //     - possible vat rates
@@ -170,28 +168,30 @@ class CompletorInvoiceLines
      * is handled by the completor and already has been converted.
      *
      * @param Line[] $lines
-     *   The invoice lines to convert recursively.
-     * @param float $conversionRate
+     *   The invoice lines to (recursively) convert.
+     * @param Currency $currency
+     *   The rate of the Euro expressed in the foreign currency.
      */
-    protected function convertToEuro(array &$lines, float $conversionRate): void
+    protected function convertToEuro(array &$lines, Currency $currency): void
     {
-        // @error: use new meta structure
-        foreach ($lines as &$line) {
-            $this->completor->convertAmount($line, Tag::UnitPrice, $conversionRate);
-            // Cost price may well be in purchase currency, let's assume it already is in euros ...
-            //$this->completor->convertAmount($line, Tag::CostPrice, $conversionRate);
-            $this->completor->convertAmount($line, Meta::UnitPriceInc, $conversionRate);
-            $this->completor->convertAmount($line, Meta::VatAmount, $conversionRate);
-            $this->completor->convertAmount($line, Meta::LineAmount, $conversionRate);
-            $this->completor->convertAmount($line, Meta::LineAmountInc, $conversionRate);
-            $this->completor->convertAmount($line, Meta::LineVatAmount, $conversionRate);
-            $this->completor->convertAmount($line, Meta::LineDiscountAmount, $conversionRate);
-            $this->completor->convertAmount($line, Meta::LineDiscountAmountInc, $conversionRate);
-            $this->completor->convertAmount($line, Meta::LineDiscountVatAmount, $conversionRate);
+        if ($currency->shouldConvert()) {
+            foreach ($lines as &$line) {
+                $this->completor->convertAmount($line, Tag::UnitPrice, $currency);
+                // Cost price may well be in purchase currency, let's assume it already is in euros ...
+                //$this->completor->convertAmount($line, Tag::CostPrice, $conversionRate);
+                $this->completor->convertAmount($line, Meta::UnitPriceInc, $currency);
+                $this->completor->convertAmount($line, Meta::VatAmount, $currency);
+                $this->completor->convertAmount($line, Meta::LineAmount, $currency);
+                $this->completor->convertAmount($line, Meta::LineAmountInc, $currency);
+                $this->completor->convertAmount($line, Meta::LineVatAmount, $currency);
+                $this->completor->convertAmount($line, Meta::LineDiscountAmount, $currency);
+                $this->completor->convertAmount($line, Meta::LineDiscountAmountInc, $currency);
+                $this->completor->convertAmount($line, Meta::LineDiscountVatAmount, $currency);
 
-            // Recursively convert any amount.
-            if (!empty($line[Meta::ChildrenLines])) {
-                $this->convertToEuro($line[Meta::ChildrenLines], $conversionRate);
+                // Recursively convert any amount.
+                if (!empty($line[Meta::ChildrenLines])) {
+                    $this->convertToEuro($line[Meta::ChildrenLines], $currency);
+                }
             }
         }
     }
@@ -385,10 +385,10 @@ class CompletorInvoiceLines
                 $line[Meta::VatAmount] = $line[Meta::LineVatAmount] / $line[Tag::Quantity];
                 $fieldsCalculated[] = Meta::VatAmount . ' (from ' . Meta::LineVatAmount . ')';
             }
-            if (!isset($line[Meta::LineType]) && $parent !== null) {
+            if (!isset($line[Meta::SubType]) && $parent !== null) {
                 // Known usages: WooCommerce TM Extra Product Options that adds
                 // child lines.
-                $line[Meta::LineType] = $parent[Meta::LineType];
+                $line[Meta::SubType] = $parent[Meta::SubType];
             }
 
             if (!isset($line[Tag::UnitPrice])) {
@@ -525,7 +525,7 @@ class CompletorInvoiceLines
         $nature = $this->getMaxAppearingNature($lines);
         if (!empty($nature)) {
             foreach ($lines as &$line) {
-                if (isset($line[Meta::LineType]) && $line[Meta::LineType] !== LineType::Item && !isset($line[Tag::Nature])) {
+                if (isset($line[Meta::SubType]) && $line[Meta::SubType] !== LineType::Item && !isset($line[Tag::Nature])) {
                     $line[Tag::Nature] = $nature;
                 }
             }
@@ -556,7 +556,7 @@ class CompletorInvoiceLines
     {
         $amountPerNature = ['' => 0.0, Api::Nature_Product => 0.0, Api::Nature_Service => 0.0];
         foreach ($lines as $line) {
-            if (isset($line[Meta::LineType]) && $line[Meta::LineType] === LineType::Item) {
+            if (isset($line[Meta::SubType]) && $line[Meta::SubType] === LineType::Item) {
                 $nature = !empty($line[Tag::Nature]) ? $line[Tag::Nature] : '';
                 $amount = abs($line[Tag::Quantity] * $line[Tag::UnitPrice]);
                 $amountPerNature[$nature] += $amount;

@@ -16,7 +16,7 @@ use PrestaShop\PrestaShop\Core\Domain\Order\VoucherRefundType;
 use PrestaShop\PrestaShop\Core\Version;
 use RuntimeException;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Invoice\Currency as InvoiceCurrency;
+use Siel\Acumulus\Invoice\Currency as AcumulusCurrency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 
@@ -154,11 +154,11 @@ class Source extends BaseSource
      * PrestaShop stores the internal currency id, so look up the currency
      * object first then extract the ISO code for it.
      */
-    public function getCurrency(): InvoiceCurrency
+    public function getCurrency(): AcumulusCurrency
     {
         $currency = Currency::getCurrencyInstance($this->getOrder()->shopSource->id_currency);
         /** @noinspection PhpCastIsUnnecessaryInspection  conversion_rate contains the string representation of a float */
-        return new InvoiceCurrency($currency->iso_code, (float) $this->getSource()->conversion_rate, true);
+        return new AcumulusCurrency($currency->iso_code, (float) $this->getSource()->conversion_rate, true);
     }
 
     /**

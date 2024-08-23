@@ -434,7 +434,7 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
-     *   - nature_shop
+     *   - 'nature_shop'
      *   - 'marginProducts'
      *   - 'euVat'
      *   - 'vatFreeClass'
@@ -452,25 +452,14 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
-     *   - 'sendCustomer'
-     *   - 'overwriteIfExists'
      *   - 'defaultCustomerType'
-     *   - 'contactStatus'
-     *   - 'contactYourId'
-     *   - 'companyName1'
-     *   - 'companyName2'
-     *   - 'vatNumber'
-     *   - 'fullName'
-     *   - 'salutation'
-     *   - 'address1'
-     *   - 'address2'
-     *   - 'postalCode'
-     *   - 'city'
-     *   - 'telephone'
-     *   - 'fax'
-     *   - 'email'
-     *   - 'mark'
+     *   - 'sendCustomer'
      *   - 'genericCustomerEmail'
+     *   - 'emailIfAbsent'
+     *   - 'mainAddress'
+     *   - 'countryAutoName'
+     *   - 'contactStatus'
+     *   - 'overwriteIfExists'
      */
     public function getCustomerSettings(): array
     {
@@ -493,16 +482,10 @@ class Config
      *   - 'paymentMethodCostCenter'
      *   - 'sendEmptyShipping'
      *   - 'description'
-     *   - 'descriptionText'
-     *   - 'invoiceNotes'
      *   - 'optionsShow'
      *   - 'optionsAllOn1Line'
      *   - 'optionsAllOnOwnLine'
      *   - 'optionsMaxLength'
-     *   - 'itemNumber'
-     *   - 'productName'
-     *   - 'nature'
-     *   - 'costPrice'
      */
     public function getInvoiceSettings(): array
     {

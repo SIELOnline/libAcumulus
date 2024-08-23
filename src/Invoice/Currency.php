@@ -9,6 +9,10 @@ use Siel\Acumulus\Helpers\Number;
 /**
  * Currency holds metadata about the currency of an order/refund.
  *
+ * Individual orders/refunds can be paid in a currency different from the shop's default
+ * currency (which should be Euro). If so, all amounts should be converted to euro before
+ * sending them to Acumulus. This object contains the necessary information to do so.
+ *
  * @todo: PHP8.1: readonly properties. We made all properties public so we don't
  *   need additional code to convert it into a json string. However, please note
  *   that this object should be treated as immutable.

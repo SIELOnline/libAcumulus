@@ -7,8 +7,10 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice;
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\LineType;
@@ -56,6 +58,7 @@ abstract class Creator
     public const VatRateSource_Creator_Missing_Amount = 'creator-missing-amount';
 
     private Container $container;
+    protected Mappings $mappings;
     protected Config $config;
     protected Translator $translator;
     protected Source $invoiceSource;
@@ -77,6 +80,7 @@ abstract class Creator
         FieldExpander $field,
         ShopCapabilities $shopCapabilities,
         Container $container,
+        Mappings $mappings,
         Config $config,
         Translator $translator,
         Log $log
@@ -85,6 +89,7 @@ abstract class Creator
         $this->fieldExpander = $field;
         $this->shopCapabilities = $shopCapabilities;
         $this->container = $container;
+        $this->mappings = $mappings;
         $this->config = $config;
         $this->translator = $translator;
         $invoiceHelperTranslations = new Translations();
@@ -135,6 +140,7 @@ abstract class Creator
     protected function setPropertySources(): void
     {
         // @todo: all non line related property sources can be removed (i.e. all can be removed).
+        //    Is this true? Retrieving tax class/rate metadata, etc?
         $this->propertySources = [];
         $this->propertySources['invoiceSource'] = $this->invoiceSource;
         $this->propertySources['invoiceSourceType'] = ['label' => $this->t($this->propertySources['invoiceSource']->getType())];
@@ -246,18 +252,12 @@ abstract class Creator
      */
     protected function addProductInfo(array &$line): void
     {
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($line, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($line, Tag::Product, $invoiceSettings['productName']);
+        $invoiceMappings = $this->mappings->getFor(LineType::Item);
+        $this->addTokenDefault($line, Tag::ItemNumber, $invoiceMappings);
+        $this->addTokenDefault($line, Tag::Product, $invoiceMappings);
         $this->addNature($line);
-        if (!empty($invoiceSettings['costPrice'])) {
-            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
-            if (!empty($value) && !Number::isZero($value)) {
-                // If we have a cost price we add it, even if this is no margin
-                // invoice.
-                $line[Tag::CostPrice] = $value;
-            }
-        }
+        // If we have a cost price we add it, even if this is not a margin invoice.
+        $this->addTokenDefault($line, Tag::CostPrice, $invoiceMappings);
     }
 
     /**
@@ -287,8 +287,8 @@ abstract class Creator
                     $line[Tag::Nature] = Api::Nature_Service;
                     break;
                 default:
-                    $invoiceSettings = $this->config->getInvoiceSettings();
-                    $this->addTokenDefault($line, Tag::Nature, $invoiceSettings['nature']);
+                    $invoiceMappings = $this->mappings->getFor(LineType::Item);
+                    $this->addTokenDefault($line, Tag::Nature, $invoiceMappings);
                     break;
             }
         }
@@ -298,7 +298,7 @@ abstract class Creator
      * Returns all the fee lines for the order.
      *
      * Override this method if it is easier to return all fee lines at once.
-     * If you do so, you are responsible for adding the line Meta::LineType
+     * If you do so, you are responsible for adding the line Meta::SubType
      * metadata. Otherwise, override the methods getShippingLines() (or
      * getShippingLine()), getPaymentFeeLine() (if applicable), and
      * getGiftWrappingLine() (if available).
@@ -468,16 +468,16 @@ abstract class Creator
      *
      * @param array $array
      * @param string $key
-     * @param string $token
-     *   String value that may contain token definitions.
+     * @param array $mappings
+     *   Set of mappings that may contain a mapping for the given $key.
      *
      * @return bool
      *   Whether the default was added.
      */
-    protected function addTokenDefault(array &$array, string $key, string $token): bool
+    protected function addTokenDefault(array &$array, string $key, array $mappings): bool
     {
-        if (empty($array[$key]) && !empty($token)) {
-            $value = $this->getTokenizedValue($token);
+        if (empty($array[$key]) && !empty($mappings[$key])) {
+            $value = $this->getTokenizedValue($mappings[$key]);
             if (!empty($value)) {
                 $array[$key] = $value;
                 return true;
@@ -497,7 +497,7 @@ abstract class Creator
      *   the first and only ']' is at the end, the type of the returned value is that of
      *   the property referred to, otherwise it is a string or null if not found.
      */
-    protected function getTokenizedValue(string $pattern)
+    private function getTokenizedValue(string $pattern)
     {
         return $this->getFieldExpander()->expand($pattern, $this->propertySources);
     }
@@ -563,7 +563,7 @@ abstract class Creator
                 }
             } else {
                 // String key: single line.
-                $this->addDefault($lines, Meta::LineType, $lineType);
+                $this->addDefault($lines, Meta::SubType, $lineType);
                 if (isset($lines[Meta::ChildrenLines])) {
                     $lines[Meta::ChildrenLines] = $this->addLineType($lines[Meta::ChildrenLines], $lineType);
                 }

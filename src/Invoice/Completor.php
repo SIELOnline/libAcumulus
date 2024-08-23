@@ -31,11 +31,6 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Invoice\CompletorStrategyLines;
-use Siel\Acumulus\Invoice\Creator;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Invoice\Translations;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -712,7 +707,7 @@ class Completor
                 Tag::UnitPrice => $missingAmount,
             ];
             $line += Creator::getVatRangeTags($missingVatAmount, $missingAmount, $countLines * 0.02, $countLines * 0.02);
-            $line[Meta::LineType] = LineType::Corrector;
+            $line[Meta::SubType] = LineType::Corrector;
             // Correct and add this line (round of correcting has already been
             // executed).
             $line = Converter::getLineFromArray($line);
@@ -1031,7 +1026,7 @@ class Completor
                             // not change the vat type just because they are a
                             // service.
                             if ($this->isOutsideEu()
-                                && $line[Meta::LineType] === LineType::Item
+                                && $line[Meta::SubType] === LineType::Item
                                 && !empty($line[Tag::Nature])
                             ) {
                                 if ($vatType === Api::VatType_National && $line[Tag::Nature] === Api::Nature_Product) {
@@ -1365,7 +1360,7 @@ class Completor
             $this->invoice[Tag::Line] = array_filter(
                 $this->invoice[Tag::Line],
                 static function ($line) {
-                    return $line[Meta::LineType] !== LineType::Shipping || !Number::isZero($line[Tag::UnitPrice]);
+                    return $line[Meta::SubType] !== LineType::Shipping || !Number::isZero($line[Tag::UnitPrice]);
                 }
             );
         }
@@ -1605,65 +1600,19 @@ class Completor
     }
 
     /**
-     * Returns whether the amounts in the invoice are in another currency.
-     *
-     * The amounts in te invoice are to be converted if:
-     * - All currency meta tags are set.
-     * - The "currency rate" does not equal 1.0, otherwise converting would
-     *   result in the same amounts.
-     * - The meta tag "do convert" equals "currency !== 'EUR'".
-     *
-     * @param Invoice $invoice
-     *   The invoice (starting with the customer part).
-     *
-     * @return bool
-     *   True if the invoice uses another currency, false otherwise.
-     */
-    public function shouldConvertCurrency(Invoice $invoice): bool
-    {
-        // @error: use new meta structure
-        $currencyMetaAvailable = isset(
-            $invoice[Meta::Currency],
-            $invoice[Meta::CurrencyRate],
-            $invoice[Meta::CurrencyDoConvert]
-        );
-        $shouldConvert = $currencyMetaAvailable
-            && !Number::floatsAreEqual($invoice[Meta::CurrencyRate], 1.0, 0.0001);
-        if ($shouldConvert) {
-            if ($invoice[Meta::Currency] !== 'EUR') {
-                // Order/refund is not in euro's: convert if amounts are stored
-                // in the order's currency, not the shop's default currency
-                // (which should be EUR).
-                $shouldConvert = $invoice[Meta::CurrencyDoConvert];
-                $invoice[Meta::CurrencyRateInverted] = false;
-            } else {
-                // Order/refund is in euro's but that is not the shop's default:
-                // convert if the amounts are in the shop's default currency,
-                // not the order's currency (which is EUR).
-                $shouldConvert = !$invoice[Meta::CurrencyDoConvert];
-                // Invert the rate only once, even if this method may be called
-                // multiple times per invoice.
-                if (!isset($invoice[Meta::CurrencyRateInverted])) {
-                    $invoice[Meta::CurrencyRateInverted] = true;
-                    $invoice[Meta::CurrencyRate] = 1.0 / (float) $invoice[Meta::CurrencyRate];
-                }
-            }
-        }
-        return $shouldConvert;
-    }
-
-    /**
      * Helper method to convert an amount field to euros.
      *
      * @param array|ArrayAccess $array
+     * @param string $key
+     * @param Currency $currency
      *
      * @return bool
      *   Whether the amount was converted.
      */
-    public function convertAmount(&$array, string $key, float $conversionRate): bool
+    public function convertAmount(&$array, string $key, Currency $currency): bool
     {
-        if (!empty($array[$key]) && !empty($conversionRate)) {
-            $array[$key] = (float) $array[$key] / $conversionRate;
+        if (isset($array[$key])) {
+            $array[$key] = $currency->convertAmount($array[$key]);
             return true;
         }
         return false;

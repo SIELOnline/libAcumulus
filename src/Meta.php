@@ -58,12 +58,6 @@ interface Meta
     public const ShopVatBasedOn = 'meta-shop-vat-based-on';
     public const ShopCountryId = 'meta-shop-country-code';
     public const ShopCountryName = 'meta-shop-country-name';
-    /**
-     * An {@see \Siel\Acumulus\Data\Address} object itself does not know which
-     * type of address it represents.
-     * @deprecated Use Meta::SubType
-     */
-    public const AddressType = 'meta-address-type';
     public const SubType = 'meta-sub-type';
 
 
@@ -85,34 +79,10 @@ interface Meta
      * Support: the payment method used for this order or refund.
      */
     public const PaymentMethod = 'meta-payment-method';
-
-    // Invoice: Currency related meta tags.
     /**
-     * Creator->Completor: Currency code the amounts are expressed in: ISO4217,
-     * ISO 3166-1
+     * Creator->Completor
      */
     public const Currency = 'meta-currency';
-    /**
-     * Creator->Completor: Conversion rate from the used currency to the shop's
-     * default currency:
-     *   amount in shop currency = CurrencyRate * amount in other currency
-     * @deprecated We store a Currency object in meta-currency.
-     */
-    public const CurrencyRate = 'meta-currency-rate';
-    /**
-     * Creator->Completor: true if we should use the above meta info to convert
-     * amounts, false if the amounts are already in the shop's default currency
-     * (which should be euro) and this info is thus purely informational.
-     * @deprecated We store a Currency object in meta-currency.
-     */
-    public const CurrencyDoConvert = 'meta-currency-do-convert';
-    /**
-     * Completor: Whether the currency rate
-     *   should be inverted (shop default is not EUR, but order is in EUR).
-     *   AND has been inverted (we invert of course only once).
-     * @deprecated We store a Currency object in meta-currency.
-     */
-    public const CurrencyRateInverted = 'meta-currency-rate-inverted';
 
     /**
      * Invoice: Source totals meta tags.
@@ -352,12 +322,6 @@ interface Meta
      * (Magento only).
      */
     public const ProductType = 'meta-product-type';
-    /**
-     * Creator->Completor: the type of line: product, shipping, payment fee,
-     * discount line, etc. Defined with the {@see LineType} constant.
-     * @deprecated Use Meta::SubType
-     */
-    public const LineType = 'meta-line-type';
     /**
      * Creator->Strategy: boolean that indicates if this line may be split into
      * multiple lines to divide it over multiple vat rates during the strategy

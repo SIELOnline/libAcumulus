@@ -64,7 +64,6 @@ class MappingsTest extends TestCase
             ],
             AddressType::Invoice => [
                 Fld::CountryCode => '3.5',
-                Meta::AddressType => 3.5,
             ],
         ];
         $final = [
@@ -86,7 +85,6 @@ class MappingsTest extends TestCase
             ],
             AddressType::Invoice => [
                 Fld::CountryCode => '4.5',
-                Meta::AddressType => '4.5',
             ],
         ];
         $expected = [
@@ -100,7 +98,6 @@ class MappingsTest extends TestCase
             ],
             AddressType::Invoice => [
                 Fld::CountryCode => '4.5',
-                Meta::AddressType => '4.5',
             ],
         ];
         $actual = $mappings->getOverriddenValues($final, $defaults);

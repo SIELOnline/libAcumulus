@@ -54,7 +54,7 @@ class Completor extends BaseCompletor
                     $discountAmountInc += $line[Meta::LineDiscountAmountInc];
                 }
 
-                if ($line[Meta::LineType] === LineType::Discount) {
+                if ($line[Meta::SubType] === LineType::Discount) {
                     if (isset($line[Meta::LineAmountInc])) {
                         $discountLineAmountInc += $line[Meta::LineAmountInc];
                     } elseif (isset($line[Meta::UnitPriceInc])) {
@@ -65,7 +65,7 @@ class Completor extends BaseCompletor
 
             if (!Number::floatsAreEqual($discountAmountInc, $discountLineAmountInc)) {
                 foreach ($invoiceLines as $line) {
-                    if ($line[Meta::LineType] === LineType::Shipping && isset($line[Meta::LineDiscountAmountInc])) {
+                    if ($line[Meta::SubType] === LineType::Shipping && isset($line[Meta::LineDiscountAmountInc])) {
                         $line[Meta::LineDiscountAmountInc] += $discountLineAmountInc - $discountAmountInc;
                         $line[Meta::LineDiscountAmountIncCorrected] = true;
                     }

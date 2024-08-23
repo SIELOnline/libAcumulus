@@ -7,20 +7,19 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice;
 
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 use function array_key_exists;
 use function count;
@@ -253,11 +252,11 @@ abstract class Creator
     protected function addProductInfo(array &$line): void
     {
         $invoiceMappings = $this->mappings->getFor(LineType::Item);
-        $this->addTokenDefault($line, Tag::ItemNumber, $invoiceMappings);
-        $this->addTokenDefault($line, Tag::Product, $invoiceMappings);
+        $this->addTokenDefault($line, Fld::ItemNumber, $invoiceMappings);
+        $this->addTokenDefault($line, Fld::Product, $invoiceMappings);
         $this->addNature($line);
         // If we have a cost price we add it, even if this is not a margin invoice.
-        $this->addTokenDefault($line, Tag::CostPrice, $invoiceMappings);
+        $this->addTokenDefault($line, Fld::CostPrice, $invoiceMappings);
     }
 
     /**
@@ -277,18 +276,18 @@ abstract class Creator
      */
     protected function addNature(array &$line): void
     {
-        if (empty($line[Tag::Nature])) {
+        if (empty($line[Fld::Nature])) {
             $shopSettings = $this->config->getShopSettings();
             switch ($shopSettings['nature_shop']) {
                 case Config::Nature_Products:
-                    $line[Tag::Nature] = Api::Nature_Product;
+                    $line[Fld::Nature] = Api::Nature_Product;
                     break;
                 case Config::Nature_Services:
-                    $line[Tag::Nature] = Api::Nature_Service;
+                    $line[Fld::Nature] = Api::Nature_Service;
                     break;
                 default:
                     $invoiceMappings = $this->mappings->getFor(LineType::Item);
-                    $this->addTokenDefault($line, Tag::Nature, $invoiceMappings);
+                    $this->addTokenDefault($line, Fld::Nature, $invoiceMappings);
                     break;
             }
         }
@@ -541,7 +540,7 @@ abstract class Creator
     }
 
     /**
-     * Adds a meta-line-type tag to the line(s) and its children, if any.
+     * Adds a meta-sub-type tag to the line(s) and its children, if any.
      *
      * @param array|array[] $lines
      *   This may be a single line not placed in an array.
@@ -618,20 +617,20 @@ abstract class Creator
     ): array {
         if (Number::isZero($denominator, 0.0001)) {
             $result = [
-                Tag::VatRate => null,
+                Fld::VatRate => null,
                 Meta::VatAmount => $numerator,
                 Meta::VatRateSource => static::VatRateSource_Completor,
             ];
         } elseif (Number::isZero($numerator, 0.0001)) {
             $result = [
-                Tag::VatRate => 0,
+                Fld::VatRate => 0,
                 Meta::VatAmount => $numerator,
                 Meta::VatRateSource => static::VatRateSource_Exact0,
             ];
         } else {
             $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
             $result = [
-                Tag::VatRate => 100.0 * $range['calculated'],
+                Fld::VatRate => 100.0 * $range['calculated'],
                 Meta::VatRateMin => 100.0 * $range['min'],
                 Meta::VatRateMax => 100.0 * $range['max'],
                 Meta::VatAmount => $numerator,

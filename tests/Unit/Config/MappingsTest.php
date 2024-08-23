@@ -59,7 +59,6 @@ class MappingsTest extends TestCase
                 Meta::ShopInvoiceId => 2,
                 Meta::ShopInvoiceReference => '2',
                 Meta::ShopInvoiceDate => '2',
-                Meta::Currency => 3.5,
                 Meta::Totals => '3.5',
             ],
             AddressType::Invoice => [
@@ -80,7 +79,6 @@ class MappingsTest extends TestCase
                 Meta::ShopInvoiceId => '3',
                 Meta::ShopInvoiceReference => '2',
                 Meta::ShopInvoiceDate => '3',
-                Meta::Currency => '3.5',
                 Meta::Totals => '3.5',
             ],
             AddressType::Invoice => [

@@ -13,7 +13,7 @@ namespace Siel\Acumulus\Data;
  */
 interface LineType
 {
-    public const Item = 'OrderItem';
+    public const Item = 'Item';
     public const Shipping = 'Shipping';
     public const PaymentFee = 'Payment';
     public const GiftWrapping = 'Gift';

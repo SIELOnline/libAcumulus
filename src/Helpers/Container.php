@@ -542,7 +542,7 @@ class Container
             $this,
             $this->getLog(),
         ]);
-        return $this->getInstance("{$type}Collector", 'Collectors', $arguments);
+        return $this->getInstance("{$type}Collector", 'Collectors', $arguments, $subType !== null);
     }
 
     /**

@@ -206,6 +206,7 @@ class Customer extends AcumulusObject
         });
         $altAddress = array_combine($altAddressKeys, $altAddress);
 
+        /** @noinspection PhpArithmeticTypeCheckInspection  false positive */
         return $this->propertiesToArray() + $address + $altAddress + $this->metadataToArray();
     }
 

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
-use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\EmailAsPdfType;
-
 /**
  * Collects emailAsPdf data from the shop and the module's settings.
  *
@@ -25,20 +22,14 @@ use Siel\Acumulus\Data\EmailAsPdfType;
  * - string $message
  * - bool $confirmReading
  */
-class EmailAsPdfCollector extends Collector
+class EmailAsPdfCollector extends SubTypedCollector
 {
-    private string $type;
-
+    /**
+     * This override changes the {@see \Siel\Acumulus\Data\AcumulusObject} type as
+     * {@see \Siel\Acumulus\Data\EmailAsPdfType} has 2 real subclasses, not just subtypes.
+     */
     protected function getAcumulusObjectType(): string
     {
-        return $this->type;
+        return $this->subType;
     }
-
-    public function collect(array $propertySources, array $fieldSpecifications): AcumulusObject
-    {
-        $this->type = $fieldSpecifications[EmailAsPdfType::class] ?? EmailAsPdfType::Invoice;
-        unset($fieldSpecifications[EmailAsPdfType::class]);
-        return parent::collect($propertySources, $fieldSpecifications);
-    }
-
 }

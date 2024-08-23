@@ -500,6 +500,7 @@ class Container
                 $this->getFieldExpander(),
                 $this->getShopCapabilities(),
                 $this,
+                $this->getMappings(),
                 $this->getConfig(),
                 $this->getTranslator(),
                 $this->getLog(),
@@ -526,14 +527,21 @@ class Container
      *   The child type of the {@see \Siel\Acumulus\Collectors\Collector}
      *   requested. The class name only, without namespace and without Collector
      *   at the end. Typically, a {@see \Siel\Acumulus\Data\DataType} constant.
+     * @param ?string $subType
+     *   The grandchild type of the {@see \Siel\Acumulus\Collectors\Collector}
+     *    requested. The class name only, without namespace and without Collector
+     *    at the end. E.g:
+     *      - A {@see \Siel\Acumulus\Data\LineType} constant for $type = 'Line', or a
+     *      - {@see \Siel\Acumulus\Data\EmailAsPdfType} constant for $type = 'EmailAsPdf'
      */
-    public function getCollector(string $type): CollectorInterface
+    public function getCollector(string $type, ?string $subType = null): CollectorInterface
     {
-        $arguments = [
+        $arguments = $subType !== null ? [$subType] : [];
+        $arguments = array_merge($arguments, [
             $this->getFieldExpander(),
             $this,
             $this->getLog(),
-        ];
+        ]);
         return $this->getInstance("{$type}Collector", 'Collectors', $arguments);
     }
 

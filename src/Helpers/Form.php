@@ -154,6 +154,7 @@ abstract class Form extends MessageCollection
 
         $this->acumulusApiClient = $acumulusApiClient;
         $this->formHelper = $formHelper;
+        $this->checkAccount = $checkAccount;
         $this->shopCapabilities = $shopCapabilities;
         $this->acumulusConfig = $config;
         $this->environment = $environment;

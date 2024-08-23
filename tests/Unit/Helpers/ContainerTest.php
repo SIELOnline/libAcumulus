@@ -16,17 +16,21 @@ use Siel\Acumulus\Collectors\CollectorManager;
 use Siel\Acumulus\Collectors\CustomerCollector;
 use Siel\Acumulus\Collectors\EmailAsPdfCollector;
 use Siel\Acumulus\Collectors\InvoiceCollector;
+use Siel\Acumulus\Collectors\LineCollector;
 use Siel\Acumulus\Completors\CustomerCompletor;
 use Siel\Acumulus\Completors\InvoiceCompletor;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ConfigUpgrade;
 use Siel\Acumulus\Data\Address;
+use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\EmailInvoiceAsPdf;
 use Siel\Acumulus\Data\EmailPackingSlipAsPdf;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Helpers\CrashReporter;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\FieldExpanderHelp;
@@ -128,8 +132,8 @@ class ContainerTest extends TestCase
             DataType::Customer => Customer::class,
             DataType::EmailInvoiceAsPdf => EmailInvoiceAsPdf::class,
             DataType::EmailPackingSlipAsPdf => EmailPackingSlipAsPdf::class,
-            DataType::Line => Line::class,
             DataType::Invoice => Invoice::class,
+            DataType::Line => Line::class,
         ];
         foreach ($dataTypes as $dataType => $dataClass) {
             $object = $container->createAcumulusObject($dataType);
@@ -142,14 +146,17 @@ class ContainerTest extends TestCase
     {
         $container = new Container('TestWebShop');
         $collectorTypes = [
-            DataType::Address => AddressCollector::class,
-            DataType::Customer => CustomerCollector::class,
-            DataType::EmailAsPdf => EmailAsPdfCollector::class,
-            DataType::Invoice => InvoiceCollector::class,
+            DataType::Address => [AddressCollector::class, AddressType::Invoice],
+            DataType::Customer => [CustomerCollector::class, null],
+            DataType::EmailAsPdf => [EmailAsPdfCollector::class, EmailAsPdfType::Invoice],
+            DataType::Invoice => [InvoiceCollector::class, null],
+            DataType::Line => [LineCollector::class, LineType::Item],
         ];
-        foreach ($collectorTypes as $dataType => $collectorType) {
-            $object = $container->getCollector($dataType);
-            $this->assertInstanceOf($collectorType, $object);
+        foreach ($collectorTypes as $dataType => $collectorInfo) {
+            $collectorClass = reset($collectorInfo);
+            $collectorSubType = end($collectorInfo);
+            $object = $container->getCollector($dataType, $collectorSubType);
+            $this->assertInstanceOf($collectorClass, $object);
         }
         $object = $container->getCollectorManager();
         $this->assertInstanceOf(CollectorManager::class, $object);

@@ -19,8 +19,7 @@ use Siel\Acumulus\Meta;
  * Properties that can be mapped:
  * - string $itemNumber
  * - string $product
- * - string $nature: it will be rare that Nature can be mapped from data stored in the
- *   web shop
+ * - string $nature *
  * - float $unitPrice
  * - float $vatRate
  * - float $quantity
@@ -42,25 +41,12 @@ use Siel\Acumulus\Meta;
  * - {@see \Siel\Acumulus\Meta::VatRateLookupLabel}
  * - {@see \Siel\Acumulus\Meta::VatRateLookupSource}
  * - {@see \Siel\Acumulus\Meta::PrecisionUnitPrice} and many other for other amounts.
- * -
+ * - ...
  *
- * Properties that may be based on configuration (if not mapped):
- * - string $nature
+ * Properties that may be based on configuration, if not mapped:
+ * - string $nature, though it will be rare that Nature can be mapped from data stored in
+ *   the web shop.
  */
-class LineCollector extends Collector
+class LineCollector extends SubTypedCollector
 {
-    private string $type;
-
-    public function collect(array $propertySources, array $fieldSpecifications): AcumulusObject
-    {
-        $this->type = $fieldSpecifications[LineType::class] ?? LineType::Other;
-        unset($fieldSpecifications[LineType::class]);
-        return parent::collect($propertySources, $fieldSpecifications);
-    }
-
-    protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldSpecifications): void
-    {
-        parent::collectMappedFields($acumulusObject, $fieldSpecifications);
-        $acumulusObject->metadataSet(Meta::LineType, $this->type);
-    }
 }

@@ -29,6 +29,6 @@ namespace Siel\Acumulus\Collectors;
  * - string $countryAutoNameLang
  * - string $country
  */
-class AddressCollector extends Collector
+class AddressCollector extends SubTypedCollector
 {
 }

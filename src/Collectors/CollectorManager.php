@@ -165,24 +165,23 @@ class CollectorManager
     }
 
     /**
-     * @param string $type
+     * @param string $subType
      *   One of the {@see AddressType} constants Invoice or Shipping.
      */
-    public function collectAddress(string $type): Address
+    public function collectAddress(string $subType): Address
     {
-        $addressCollector = $this->getContainer()->getCollector(DataType::Address);
-        $addressMappings = $this->getMappings()->getFor($type);
+        $addressCollector = $this->getContainer()->getCollector(DataType::Address, $subType);
+        $addressMappings = $this->getMappings()->getFor($subType);
 
         /** @var \Siel\Acumulus\Data\Address $address */
         $address = $addressCollector->collect($this->getPropertySources(), $addressMappings);
         return $address;
     }
 
-    public function collectEmailAsPdf(string $type): EmailAsPdf
+    public function collectEmailAsPdf(string $subType): EmailAsPdf
     {
-        $emailAsPdfCollector = $this->getContainer()->getCollector(DataType::EmailAsPdf);
-        $emailAsPdfMappings = $this->getMappings()->getFor($type);
-        $emailAsPdfMappings[EmailAsPdfType::class] = $type;
+        $emailAsPdfCollector = $this->getContainer()->getCollector(DataType::EmailAsPdf, $subType);
+        $emailAsPdfMappings = $this->getMappings()->getFor($subType);
 
         /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */
         $emailAsPdf = $emailAsPdfCollector->collect($this->getPropertySources(), $emailAsPdfMappings);

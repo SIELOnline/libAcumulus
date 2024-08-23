@@ -61,8 +61,11 @@ interface Meta
     /**
      * An {@see \Siel\Acumulus\Data\Address} object itself does not know which
      * type of address it represents.
+     * @deprecated Use Meta::SubType
      */
     public const AddressType = 'meta-address-type';
+    public const SubType = 'meta-sub-type';
+
 
     // Invoice
     public const SourceType = 'meta-source-type';
@@ -352,6 +355,7 @@ interface Meta
     /**
      * Creator->Completor: the type of line: product, shipping, payment fee,
      * discount line, etc. Defined with the {@see LineType} constant.
+     * @deprecated Use Meta::SubType
      */
     public const LineType = 'meta-line-type';
     /**

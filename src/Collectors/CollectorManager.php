@@ -194,11 +194,28 @@ class CollectorManager
      */
     private function collectLines(Invoice $invoice): void
     {
+        /** @var Source $source */
+        $source = $this->getPropertySources()['source'];
+        $this->collectItemLines($invoice, $source);
+
+        // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
+        //   version that is stripped down to these features that have not yet been
+        //   converted.
+        $creator = $this->getContainer()->getCreator();
+        $creator->create($source, $invoice);
+        // @legacy end
+    }
+
+    /**
+     * Collects all item lines.
+     *
+     * @param \Siel\Acumulus\Data\Invoice $invoice
+     */
+    private function collectItemLines(Invoice $invoice, Source $source): void
+    {
         $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Item);
         $lineMappings = $this->getMappings()->getFor(LineType::Item);
 
-        /** @var Source $source */
-        $source = $this->getPropertySources()['source'];
         $items = $source->getItems();
         foreach ($items as $item) {
             $this->addPropertySource('item', $item);
@@ -209,11 +226,5 @@ class CollectorManager
             $this->removePropertySource('product');
             $this->removePropertySource('item');
         }
-        // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
-        //   version in the Legacy sub namespace that is stripped down to these features
-        //   that has not yet been converted.
-        $creator = $this->getContainer()->getCreator();
-        $creator->create($source, $invoice);
-        // @legacy end
     }
 }

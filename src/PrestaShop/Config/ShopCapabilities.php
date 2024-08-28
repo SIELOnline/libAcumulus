@@ -15,6 +15,7 @@ use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 use TaxRulesGroup;
 
 /**
@@ -284,14 +285,19 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::EmailTo => '[source::getOrder::getSource()::getCustomer()::email]',
             ],
             LineType::Item => [ // item instanceof OrderDetail
-                Meta::Id => '[item::get_id()]',
+                Meta::Id => '[item::id_order_detail]',
+                Meta::ProductId => '[item::product_id]',
                 Fld::ItemNumber => '[item::product_reference'
                     . '|item::product_ean13|item::product_isbn|item::product_upc|item::product_mpn'
                     . '|item::product_supplier_reference]',
                 Fld::Product => '[item::product_name]',
-                Meta::ProductId => '[product::product_id]',
                 Fld::Quantity => '[item::product_quantity]',
-                Fld::CostPrice => '[item::purchase_supplier_price]',
+                Fld::CostPrice => '[item::purchase_supplier_price]', // @todo: use sign?
+                Fld::UnitPrice => '[item::unit_price_tax_excl]', // @todo: use sign
+                Meta::UnitPriceInc => '[item::unit_price_tax_incl]', // @todo: use sign
+                Meta::LineAmount => 'item::total_price_tax_excl]', // @todo: use sign
+                Meta::LineAmountInc => '[item::total_price_tax_incl]', // @todo: use sign
+                Fld::VatRate => '[item::rate]',  //@todo: not set for orderSlips: add logic, also to set Meta::VatRateSource
             ],
         ];
     }

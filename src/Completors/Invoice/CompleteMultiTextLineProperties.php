@@ -11,12 +11,12 @@ use Siel\Acumulus\Data\Invoice;
 use function assert;
 
 /**
- * CompleteMultiLineInfo completes the
+ * CompleteMultiTextLineInfo completes the
  * {@see \Siel\Acumulus\Data\Invoice::$descriptionText} and
  * {@see \Siel\Acumulus\Data\Invoice::$invoiceNotes} properties of an
  * {@see \Siel\Acumulus\Data\Invoice}.
  */
-class CompleteMultiLineProperties extends BaseCompletorTask
+class CompleteMultiTextLineProperties extends BaseCompletorTask
 {
     /**
      * Completes the

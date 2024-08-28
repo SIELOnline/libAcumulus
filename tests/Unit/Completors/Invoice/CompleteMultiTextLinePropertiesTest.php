@@ -13,10 +13,10 @@ use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 
 /**
- * CompleteMultiLineInfoTest tests the
- * {@see \Siel\Acumulus\Completors\Invoice\CompleteMultiLineProperties} class.
+ * CompleteMultiTextLineInfoTest tests the
+ * {@see \Siel\Acumulus\Completors\Invoice\CompleteMultiTextLineProperties} class.
  */
-class CompleteMultiLinePropertiesTest extends TestCase
+class CompleteMultiTextLinePropertiesTest extends TestCase
 {
     private Container $container;
 
@@ -44,7 +44,7 @@ class CompleteMultiLinePropertiesTest extends TestCase
 
     public function testComplete(): void
     {
-        $completor = $this->getContainer()->getCompletorTask('Invoice','MultiLineProperties');
+        $completor = $this->getContainer()->getCompletorTask('Invoice','MultiTextLineProperties');
         $invoice = $this->getInvoice();
 
         $invoice->descriptionText = ' ';

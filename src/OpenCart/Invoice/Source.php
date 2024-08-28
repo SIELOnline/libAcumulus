@@ -34,11 +34,11 @@ abstract class Source extends BaseSource
      */
     protected array $orderTotalLines;
 
-    protected function setSource(): void
+    protected function setShopObject(): void
     {
         // @error: throw exception when not found.
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->shopSource = $this->getRegistry()->getOrder($this->getId());
+        $this->shopObject = $this->getRegistry()->getOrder($this->getId());
     }
 
     /**
@@ -46,12 +46,12 @@ abstract class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = $this->shopSource['order_id'];
+        $this->id = $this->shopObject['order_id'];
     }
 
     public function getDate(): string
     {
-        return substr($this->shopSource['date_added'], 0, strlen('2000-01-01'));
+        return substr($this->shopObject['date_added'], 0, strlen('2000-01-01'));
     }
 
     /**
@@ -61,15 +61,15 @@ abstract class Source extends BaseSource
      */
     public function getStatus(): int
     {
-        return (int) $this->shopSource['order_status_id'];
+        return (int) $this->shopObject['order_status_id'];
     }
 
     public function getCountryCode(): string
     {
-        if (!empty($this->shopSource['payment_iso_code_2'])) {
-            return $this->shopSource['payment_iso_code_2'];
-        } elseif (!empty($this->shopSource['shipping_iso_code_2'])) {
-            return $this->shopSource['shipping_iso_code_2'];
+        if (!empty($this->shopObject['payment_iso_code_2'])) {
+            return $this->shopObject['payment_iso_code_2'];
+        } elseif (!empty($this->shopObject['shipping_iso_code_2'])) {
+            return $this->shopObject['shipping_iso_code_2'];
         } else {
             return '';
         }
@@ -82,18 +82,18 @@ abstract class Source extends BaseSource
      */
     public function getPaymentMethod(): ?string
     {
-        if (is_array($this->shopSource['payment_method'])) {
+        if (is_array($this->shopObject['payment_method'])) {
             // Spotted in OC4 2024.
-            $code = $this->shopSource['payment_method']['code'];
+            $code = $this->shopObject['payment_method']['code'];
             if (strpos($code, '.') !== false) {
                 $code = substr($code, 0, strpos($code, '.'));
             }
-        } elseif (!empty($this->shopSource['payment_custom_field']) && is_array($this->shopSource['payment_custom_field'])) {
+        } elseif (!empty($this->shopObject['payment_custom_field']) && is_array($this->shopObject['payment_custom_field'])) {
             // Spotted in OC4 2023.
-            $code = $this->shopSource['payment_custom_field']['code'];
-        } elseif (!empty($this->shopSource['payment_code'])) {
+            $code = $this->shopObject['payment_custom_field']['code'];
+        } elseif (!empty($this->shopObject['payment_code'])) {
             // Spotted in OC3.
-            $code = $this->shopSource['payment_code'];
+            $code = $this->shopObject['payment_code'];
         }
         return $code ?? null;
     }
@@ -108,7 +108,7 @@ abstract class Source extends BaseSource
         // completed...
         $orderStatuses = (array) $this->getRegistry()->config->get('config_complete_status');
 
-        return (empty($orderStatuses) || in_array($this->shopSource['order_status_id'], $orderStatuses, true))
+        return (empty($orderStatuses) || in_array($this->shopObject['order_status_id'], $orderStatuses, true))
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -130,7 +130,7 @@ abstract class Source extends BaseSource
      */
     public function getCurrency(): Currency
     {
-        return new Currency($this->shopSource['currency_code'], (float) $this->shopSource['currency_value']);
+        return new Currency($this->shopObject['currency_code'], (float) $this->shopObject['currency_value']);
     }
 
     /**
@@ -148,7 +148,7 @@ abstract class Source extends BaseSource
                 $vatAmount += $totalLine['value'];
             }
         }
-        return new Totals((float) $this->shopSource['total'], $vatAmount, null);
+        return new Totals((float) $this->shopObject['total'], $vatAmount, null);
     }
 
     public function getVatBreakdown(): array
@@ -178,8 +178,8 @@ abstract class Source extends BaseSource
     public function getInvoiceReference(): ?string
     {
         $result = null;
-        if (!empty($this->shopSource['invoice_no'])) {
-            $result = $this->shopSource['invoice_prefix'] . $this->shopSource['invoice_no'];
+        if (!empty($this->shopObject['invoice_no'])) {
+            $result = $this->shopObject['invoice_prefix'] . $this->shopObject['invoice_no'];
         }
         return $result;
     }
@@ -198,5 +198,10 @@ abstract class Source extends BaseSource
     protected function getRegistry(): Registry
     {
         return Registry::getInstance();
+    }
+
+    protected function getShopItems(): array
+    {
+        return []; // @error: Change the autogenerated stub
     }
 }

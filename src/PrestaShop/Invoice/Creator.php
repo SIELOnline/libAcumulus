@@ -25,6 +25,7 @@ use Exception;
 use Order;
 use OrderSlip;
 use PrestaShop\PrestaShop\Core\Domain\Order\VoucherRefundType;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AddressType;
@@ -177,7 +178,6 @@ class Creator extends BaseCreator
 
         $this->addPropertySource('item', $item);
 
-        $this->addProductInfo($result);
         $sign = $this->invoiceSource->getSign();
 
         // Check for cost price and margin scheme.
@@ -187,10 +187,6 @@ class Creator extends BaseCreator
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_incl'];
         } else {
-            $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_excl'];
-            $result[Meta::UnitPriceInc] = $sign * $item['unit_price_tax_incl'];
-            $result[Meta::LineAmount] = $sign * $item['total_price_tax_excl'];
-            $result[Meta::LineAmountInc] = $sign * $item['total_price_tax_incl'];
             // 'unit_amount' (table order_detail_tax) is not always set: assume
             // no discount if not set, so not necessary to add the value.
             if (isset($item['unit_amount']) &&
@@ -199,7 +195,6 @@ class Creator extends BaseCreator
                 $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
             }
         }
-        $result[Tag::Quantity] = $item['product_quantity'];
 
         // Try to get the vat rate:
         // The field 'rate' comes from order->getOrderDetailTaxes() and is thus
@@ -210,7 +205,7 @@ class Creator extends BaseCreator
         // cannot be used to get the vat rate.
         if (isset($item['rate'])) {
             $result[Tag::VatRate] = $item['rate'];
-            $result[Meta::VatRateSource] = Creator::VatRateSource_Exact;
+            $result[Meta::VatRateSource] = VatRateSource::Exact;
         } else {
             $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']),
                 $sign * $item['unit_price_tax_excl'],
@@ -254,7 +249,7 @@ class Creator extends BaseCreator
             Tag::Quantity => 1,
             Tag::VatRate => $vatRate,
             Meta::VatAmount => $shippingVat,
-            Meta::VatRateSource => static::VatRateSource_Exact,
+            Meta::VatRateSource => VatRateSource::Exact,
             Meta::FieldsCalculated => [Tag::UnitPrice, Meta::VatAmount],
                ] + $this->getVatRateLookupMetadata($this->order->id_address_invoice, $carrier->getIdTaxRulesGroup());
     }
@@ -333,7 +328,7 @@ class Creator extends BaseCreator
               Tag::UnitPrice => $paymentEx,
               Meta::UnitPriceInc => $paymentInc,
               Tag::VatRate => $paymentVatRate,
-              Meta::VatRateSource => static::VatRateSource_Exact,
+              Meta::VatRateSource => VatRateSource::Exact,
               Meta::VatAmount => $paymentVat,
               Meta::FieldsCalculated => [Tag::UnitPrice, Meta::VatAmount],
             ];

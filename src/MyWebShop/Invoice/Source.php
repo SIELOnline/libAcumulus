@@ -41,13 +41,13 @@ use Siel\Acumulus\Meta;
  */
 class Source extends BaseSource
 {
-    protected function setSource(): void
+    protected function setShopObject(): void
     {
         // @todo: set the source, given an id (and type).
         if ($this->getType() === Source::Order) {
-            $this->shopSource = new Order($this->id);
+            $this->shopObject = new Order($this->id);
         } else {
-            $this->shopSource = new CreditNote($this->id);
+            $this->shopObject = new CreditNote($this->id);
         }
     }
 
@@ -139,5 +139,10 @@ class Source extends BaseSource
     protected function getShopCreditNotesOrIds(): iterable
     {
         // @todo: override if MyWebShop supports credit notes, otherwise remove.
+    }
+
+    protected function getShopItems(): array
+    {
+        // @todo: implement
     }
 }

@@ -1,8 +1,7 @@
 <?php
 /**
  * @noinspection PhpPrivateFieldCanBeLocalVariableInspection  In the future,
- *   $invoice may be made a local variable, but probably we will need it as a
- *   property.
+ *   $invoice may be made a local variable, but probably we will need it as a property.
  */
 
 declare(strict_types=1);
@@ -10,6 +9,8 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Completors;
 
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Invoice\Source;
@@ -66,13 +67,14 @@ class InvoiceCompletor extends BaseCompletor
         $this->invoice = $acumulusObject;
 
         $this->completeCustomer($result);
-        $this->getCompletorTask('Invoice', 'InvoiceNumber')->complete($this->invoice);
-        $this->getCompletorTask('Invoice', 'IssueDate')->complete($this->invoice);
-        $this->getCompletorTask('Invoice', 'AccountingInfo')->complete($this->invoice);
-        $this->getCompletorTask('Invoice', 'MultiLineProperties')->complete($this->invoice);
-        $this->getCompletorTask('Invoice', 'Template')->complete($this->invoice);
-        $this->getCompletorTask('Invoice', 'AddEmailAsPdfSection')->complete($this->invoice);
+        $this->getCompletorTask(DataType::Invoice, 'InvoiceNumber')->complete($this->invoice);
+        $this->getCompletorTask(DataType::Invoice, 'IssueDate')->complete($this->invoice);
+        $this->getCompletorTask(DataType::Invoice, 'AccountingInfo')->complete($this->invoice);
+        $this->getCompletorTask(DataType::Invoice, 'MultiTextLineProperties')->complete($this->invoice);
+        $this->getCompletorTask(DataType::Invoice, 'Template')->complete($this->invoice);
+        $this->getCompletorTask(DataType::Invoice, 'AddEmailAsPdfSection')->complete($this->invoice);
         $this->completeEmailAsPdf($result);
+        $this->completeLines($result);
 
         // @legacy: Not all Completing tasks are already converted, certainly not those that complete Lines.
         /** @var \Siel\Acumulus\Invoice\Completor $completor */
@@ -81,7 +83,7 @@ class InvoiceCompletor extends BaseCompletor
         // end of @legacy: Not all Completing tasks are already converted, certainly not those that complete Lines.
 
         // As last!
-        $this->getCompletorTask('Invoice', 'Concept')->complete($this->invoice);
+        $this->getCompletorTask(DataType::Invoice, 'Concept')->complete($this->invoice);
     }
 
     /**
@@ -90,7 +92,7 @@ class InvoiceCompletor extends BaseCompletor
      */
     protected function completeCustomer(MessageCollection $result): void
     {
-        $this->getContainer()->getCompletor('Customer')->complete($this->invoice->getCustomer(), $result);
+        $this->getContainer()->getCompletor(DataType::Customer)->complete($this->invoice->getCustomer(), $result);
     }
 
     /**
@@ -99,6 +101,14 @@ class InvoiceCompletor extends BaseCompletor
      */
     protected function completeEmailAsPdf(MessageCollection $result): void
     {
-        $this->getContainer()->getCompletor('EmailInvoiceAsPdf')->complete($this->invoice->getEmailAsPdf(), $result);
+        $this->getContainer()->getCompletor(EmailAsPdfType::Invoice)->complete($this->invoice->getEmailAsPdf(), $result);
+    }
+
+    protected function completeLines(MessageCollection $result): void
+    {
+        $lineCompletor = $this->getContainer()->getCompletor(DataType::Line);
+        foreach ($this->invoice->getLines() as $line) {
+            $lineCompletor->complete($line, $result);
+        }
     }
 }

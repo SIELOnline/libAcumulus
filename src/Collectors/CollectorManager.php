@@ -12,6 +12,7 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdf;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
@@ -193,11 +194,26 @@ class CollectorManager
      */
     private function collectLines(Invoice $invoice): void
     {
+        $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Item);
+        $lineMappings = $this->getMappings()->getFor(LineType::Item);
+
+        /** @var Source $source */
+        $source = $this->getPropertySources()['source'];
+        $items = $source->getItems();
+        foreach ($items as $item) {
+            $this->addPropertySource('item', $item);
+            $this->addPropertySource('product', $item->getProduct());
+            /** @var \Siel\Acumulus\Data\Line $line */
+            $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);
+            $invoice->addLine($line);
+            $this->removePropertySource('product');
+            $this->removePropertySource('item');
+        }
         // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
         //   version in the Legacy sub namespace that is stripped down to these features
         //   that has not yet been converted.
         $creator = $this->getContainer()->getCreator();
-        $creator->create($this->getPropertySources()['source'], $invoice);
+        $creator->create($source, $invoice);
         // @legacy end
     }
 }

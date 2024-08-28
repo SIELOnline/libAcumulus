@@ -16,8 +16,8 @@ Minimal requirements:
 
 Features:
 - JOO: Native support for Joomla 5, our component and plugins do no longer need the compat
-  plugin. However note, that VirtueMart does need that plugin. hikaShop has its own compat
-  layer, so probably does not need that plugin.
+  plugin. However, please note that VirtueMart still needs that plugin. HikaShop has its 
+  own compat layer, so probably does not need that plugin.
 - ALL: improved register message after install.
 
 Bugs:
@@ -29,12 +29,27 @@ Bugs:
   strings and numbers.
 
 Refactorings:
+- ALL: Incompatibilities: If, in the past, you have defined mappings for order item lines
+  (in the advanced settings form), you MUST check and probably redo those settings in the
+  mappings form. The following properties are no longer available:
+  - invoiceSource: use source::
+  - invoiceSourceType::label: use source:getTypeLabel(2)
+  - originalInvoiceSource: ...
+  - originalInvoiceSourceType: ...
+  - refund: use source::isCreditNote()::...
+  - order or refundedOrder: use source::getOrder() resp. source::getParent().
+  - refundedInvoiceSource: ...
+  - refundedInvoiceSourceType: ...
+- ALL: Introduced Item and Product as wrapper/adapter around item lines and product
+  objects from the web shop. Extracted common wrapper/adapter code into WrapperTrait.
+- ALL: Started using Line collectors and completors the new way, gradually moving code
+  from the old Creator and Completor to the new Collectors, Mappings, and Completors.  
 - ALL: Removed the old Creator and Completor code from the Invoice namespace and moved the
   Completors\Legacy namespace "back" to invoice. This lead to many clean-ups of no longer
   used code all over the code base.
 - ALL: Removed vat breakdown from Totals. Totals now merely represents an amount (broken
   down in a price inc, price ex, and vat amount).
-- ALL: Started using DateTimeImmutable (and as  a consequence DateTimeInterface for type
+- ALL: Started using DateTimeImmutable and, as a consequence, DateTimeInterface for type
   hinting.
 
 
@@ -1088,7 +1103,7 @@ Bugs:
 Refactorings:
 - ALL: Creator::setInvoiceSource(): parameter in overrides was not everywhere
   named as in parent method.
-- HS: Use Creator::VatRateSource_Exact0 for 0 vat rates.
+- HS: Use VatRateSource::Exact0 for 0 vat rates.
 
 6.1.1 (2020-12-22) (MA)
 -----------------------

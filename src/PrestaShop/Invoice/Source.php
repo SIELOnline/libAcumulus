@@ -16,6 +16,7 @@ use PrestaShop\PrestaShop\Core\Domain\Order\VoucherRefundType;
 use PrestaShop\PrestaShop\Core\Version;
 use RuntimeException;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Currency as AcumulusCurrency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
@@ -37,15 +38,15 @@ class Source extends BaseSource
      *
      * @throws \PrestaShopException
      */
-    protected function setSource(): void
+    protected function setShopObject(): void
     {
         if ($this->getType() === Source::Order) {
-            $this->shopSource = new Order($this->getId());
+            $this->shopObject = new Order($this->getId());
         } else {
-            $this->shopSource = new OrderSlip($this->getId());
+            $this->shopObject = new OrderSlip($this->getId());
             $this->addProperties();
         }
-        if (!Validate::isLoadedObject($this->shopSource)) {
+        if (!Validate::isLoadedObject($this->shopObject)) {
             throw new RuntimeException(sprintf('Not a valid source id (%s %d)', $this->type, $this->id));
         }
     }
@@ -110,7 +111,7 @@ class Source extends BaseSource
     public function getPaymentMethod()
     {
         /** @var \Order $order */
-        $order = $this->getOrder()->shopSource;
+        $order = $this->getOrder()->shopObject;
         return $order->module ?? parent::getPaymentMethod();
     }
 
@@ -127,7 +128,7 @@ class Source extends BaseSource
         if ($this->getType() === Source::Order) {
             $paymentDate = null;
             /** @var \Order $order */
-            $order = $this->getOrder()->shopSource;
+            $order = $this->getOrder()->shopObject;
             foreach ($order->getOrderPaymentCollection() as $payment) {
                 /** @var \OrderPayment $payment */
                 if ($payment->date_add && ($paymentDate === null || $payment->date_add > $paymentDate)) {
@@ -144,7 +145,7 @@ class Source extends BaseSource
 
     public function getCountryCode(): string
     {
-        $invoiceAddress = new Address($this->getOrder()->shopSource->id_address_invoice);
+        $invoiceAddress = new Address($this->getOrder()->shopObject->id_address_invoice);
         return !empty($invoiceAddress->id_country) ? Country::getIsoById($invoiceAddress->id_country) : '';
     }
 
@@ -156,7 +157,7 @@ class Source extends BaseSource
      */
     public function getCurrency(): AcumulusCurrency
     {
-        $currency = Currency::getCurrencyInstance($this->getOrder()->shopSource->id_currency);
+        $currency = Currency::getCurrencyInstance($this->getOrder()->shopObject->id_currency);
         /** @noinspection PhpCastIsUnnecessaryInspection  conversion_rate contains the string representation of a float */
         return new AcumulusCurrency($currency->iso_code, (float) $this->getSource()->conversion_rate, true);
     }
@@ -250,7 +251,7 @@ class Source extends BaseSource
     protected function getShopOrderOrId(): int
     {
         /** @var \OrderSlip $orderSlip */
-        $orderSlip = $this->shopSource;
+        $orderSlip = $this->shopObject;
         /** @noinspection PhpCastIsUnnecessaryInspection  despite the documented return
          *   type, id is returned as a string.
          */
@@ -260,7 +261,7 @@ class Source extends BaseSource
     protected function getShopCreditNotesOrIds(): iterable
     {
         /** @var \Order $order */
-        $order = $this->shopSource;
+        $order = $this->shopObject;
         return $order->getOrderSlipsCollection();
     }
 
@@ -288,5 +289,60 @@ class Source extends BaseSource
                 }
             }
         }
+    }
+
+    protected function getShopItems(): array
+    {
+        if ($this->getType() === Source::Order) {
+            // @todo: simplify by sticking to the object and its relations:  can we just
+            //   return items and lookup related data as and when needed?
+            $orderDetails = $this->mergeProductLines($this->getSource()->getProductsDetail(), $this->getSource()->getOrderDetailTaxes());
+        } else {
+            $orderDetails = OrderSlip::getOrdersSlipProducts($this->getId(), $this->getOrder()->getSource());
+        }
+        $items = [];
+        foreach ($orderDetails as $orderDetail) {
+            $items[] = $this->getContainer()->createItem($this, $orderDetail);
+        }
+        return $items;
+    }
+
+    /**
+     * Merges the product and tax details arrays.
+     *
+     * @param array $productLines
+     *   An array with order line information, the fields being about the
+     *   product of this order line.
+     * @param array $taxLines
+     *   An array with line tax information, the fields being about the tax on
+     *   this order line.
+     *
+     * @return array
+     *   An array with the product and tax lines merged based on the field
+     *   'id_order_detail', the unique identifier for an order line.
+     */
+    protected function mergeProductLines(array $productLines, array $taxLines): array
+    {
+        // Key the product lines on id_order_detail, so we can easily add the
+        // tax lines in the 2nd loop.
+        $result = array_column($productLines, null, 'id_order_detail');
+
+        // Add the tax lines without overwriting existing entries (though in a
+        // consistent db the same keys should contain the same values).
+        foreach ($taxLines as $taxLine) {
+            if (isset($result[$taxLine['id_order_detail']])) {
+                $result[$taxLine['id_order_detail']] += $taxLine;
+            } else {
+                // We have a tax line for a non product item line ([SIEL #200452]).
+                Container::getContainer()->getLog()->notice(sprintf(
+                    '%s: Tax detail found for order item line %d (of order %d) without product info',
+                    __METHOD__,
+                    $taxLine['id_order_detail'],
+                    $this->getId()
+                ));
+                $result[$taxLine['id_order_detail']] = $taxLine;
+            }
+        }
+        return $result;
     }
 }

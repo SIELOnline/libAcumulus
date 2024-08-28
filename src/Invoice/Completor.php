@@ -58,16 +58,6 @@ use function is_float;
  */
 class Completor
 {
-//    public const VatRateSource_Completor_Range = 'completor-range';
-//    public const VatRateSource_Completor_Lookup = 'completor-lookup';
-//    public const VatRateSource_Completor_Range_Lookup = 'completor-range-lookup';
-//    public const VatRateSource_Completor_Range_Lookup_Foreign = 'completor-range-lookup-foreign';
-//    public const VatRateSource_Completor_Max_Appearing = 'completor-max-appearing';
-//    public const VatRateSource_Strategy_Completed = 'strategy-completed';
-//    public const VatRateSource_Copied_From_Children = 'copied-from-children';
-//    public const VatRateSource_Copied_From_Parent = 'copied-from-parent';
-//    public const VatRateSource_Corrected_NoVat = 'corrected-no-vat';
-
     private const EuSales_Unknown = 0;
     private const EuSales_Safe = 1;
     private const EuSales_Warning = 2;

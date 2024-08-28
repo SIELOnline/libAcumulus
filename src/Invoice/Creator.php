@@ -7,12 +7,12 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
@@ -46,16 +46,6 @@ use function is_int;
  */
 abstract class Creator
 {
-    public const VatRateSource_Exact = 'exact';
-    public const VatRateSource_Exact0 = 'exact-0';
-    public const VatRateSource_Calculated = 'calculated';
-    public const VatRateSource_Completor = 'completor';
-    public const VatRateSource_Parent = 'parent';
-    public const VatRateSource_Child = 'child';
-    public const VatRateSource_Strategy = 'strategy';
-    public const VatRateSource_Creator_Lookup = 'creator-lookup';
-    public const VatRateSource_Creator_Missing_Amount = 'creator-missing-amount';
-
     private Container $container;
     protected Mappings $mappings;
     protected Config $config;
@@ -175,7 +165,7 @@ abstract class Creator
      * @param object|array $property
      *   The source object to add.
      */
-    public function addPropertySource(string $name, $property): void
+    public function addPropertySource(string $name, object|array $property): void
     {
         $this->propertySources = [$name => $property] + $this->propertySources;
     }
@@ -210,9 +200,6 @@ abstract class Creator
      */
     protected function getInvoiceLines(): array
     {
-        $itemLines = $this->getItemLines();
-        $itemLines = $this->addLineType($itemLines, LineType::Item);
-
         $feeLines = $this->getFeeLines();
 
         $discountLines = $this->getDiscountLines();
@@ -221,7 +208,7 @@ abstract class Creator
         $manualLines = $this->getManualLines();
         $manualLines = $this->addLineType($manualLines, LineType::Manual);
 
-        return array_merge($itemLines, $feeLines, $discountLines, $manualLines);
+        return array_merge($feeLines, $discountLines, $manualLines);
     }
 
     /**
@@ -236,61 +223,6 @@ abstract class Creator
     protected function getItemLines(): array
     {
         return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
-    }
-
-    /**
-     * Adds the product based tags to a line.
-     *
-     * The product based tags are:
-     * - item number
-     * - product name
-     * - nature
-     * - cost price
-     *
-     * @param array $line
-     */
-    protected function addProductInfo(array &$line): void
-    {
-        $invoiceMappings = $this->mappings->getFor(LineType::Item);
-        $this->addTokenDefault($line, Fld::ItemNumber, $invoiceMappings);
-        $this->addTokenDefault($line, Fld::Product, $invoiceMappings);
-        $this->addNature($line);
-        // If we have a cost price we add it, even if this is not a margin invoice.
-        $this->addTokenDefault($line, Fld::CostPrice, $invoiceMappings);
-    }
-
-    /**
-     * Adds the nature tag to the line.
-     *
-     * The nature tag indicates the nature of the article for which the line is
-     * being constructed. It can be Product or Service.
-     *
-     * The nature can come from the:
-     * - Shop settings: the nature_shop setting.
-     * - Data settings: The nature field reference.
-     *
-     * It will be left undefined when no value can be given to it based on these
-     * settings.
-     *
-     * @param array $line
-     */
-    protected function addNature(array &$line): void
-    {
-        if (empty($line[Fld::Nature])) {
-            $shopSettings = $this->config->getShopSettings();
-            switch ($shopSettings['nature_shop']) {
-                case Config::Nature_Products:
-                    $line[Fld::Nature] = Api::Nature_Product;
-                    break;
-                case Config::Nature_Services:
-                    $line[Fld::Nature] = Api::Nature_Service;
-                    break;
-                default:
-                    $invoiceMappings = $this->mappings->getFor(LineType::Item);
-                    $this->addTokenDefault($line, Fld::Nature, $invoiceMappings);
-                    break;
-            }
-        }
     }
 
     /**
@@ -462,66 +394,6 @@ abstract class Creator
     }
 
     /**
-     * Helper method to add a non-empty possibly tokenized value to an array.
-     * This method will not overwrite existing values.
-     *
-     * @param array $array
-     * @param string $key
-     * @param array $mappings
-     *   Set of mappings that may contain a mapping for the given $key.
-     *
-     * @return bool
-     *   Whether the default was added.
-     */
-    protected function addTokenDefault(array &$array, string $key, array $mappings): bool
-    {
-        if (empty($array[$key]) && !empty($mappings[$key])) {
-            $value = $this->getTokenizedValue($mappings[$key]);
-            if (!empty($value)) {
-                $array[$key] = $value;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Wrapper method around Token::expand().
-     *
-     * @param string $pattern
-     *
-     * @return mixed
-     *   The pattern with fields expanded with their actual value. If the $pattern
-     *   contains exactly 1 variable field specification, i.e. it begins with a '[' and
-     *   the first and only ']' is at the end, the type of the returned value is that of
-     *   the property referred to, otherwise it is a string or null if not found.
-     */
-    private function getTokenizedValue(string $pattern)
-    {
-        return $this->getFieldExpander()->expand($pattern, $this->propertySources);
-    }
-
-    /**
-     * Helper method to add a default non-empty value to an array.
-     * This method will not overwrite existing values.
-     *
-     * @param array $array
-     * @param string $key
-     * @param mixed $value
-     *
-     * @return bool
-     *   Whether the default was added.
-     */
-    protected function addDefault(array &$array, string $key, $value): bool
-    {
-        if (empty($array[$key]) && !empty($value)) {
-            $array[$key] = $value;
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Helper method to add a warning to an array.
      * Warnings are placed in the $array under the key Meta::Warning. If no
      * warning is set, $warning is added as a string, otherwise it becomes an
@@ -562,10 +434,7 @@ abstract class Creator
                 }
             } else {
                 // String key: single line.
-                $this->addDefault($lines, Meta::SubType, $lineType);
-                if (isset($lines[Meta::ChildrenLines])) {
-                    $lines[Meta::ChildrenLines] = $this->addLineType($lines[Meta::ChildrenLines], $lineType);
-                }
+                $lines[Meta::SubType] = $lineType;
             }
         }
         return $lines;
@@ -619,13 +488,13 @@ abstract class Creator
             $result = [
                 Fld::VatRate => null,
                 Meta::VatAmount => $numerator,
-                Meta::VatRateSource => static::VatRateSource_Completor,
+                Meta::VatRateSource => VatRateSource::Completor,
             ];
         } elseif (Number::isZero($numerator, 0.0001)) {
             $result = [
                 Fld::VatRate => 0,
                 Meta::VatAmount => $numerator,
-                Meta::VatRateSource => static::VatRateSource_Exact0,
+                Meta::VatRateSource => VatRateSource::Exact0,
             ];
         } else {
             $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
@@ -636,7 +505,7 @@ abstract class Creator
                 Meta::VatAmount => $numerator,
                 Meta::PrecisionUnitPrice => $denominatorPrecision,
                 Meta::PrecisionVatAmount => $numeratorPrecision,
-                Meta::VatRateSource => static::VatRateSource_Calculated,
+                Meta::VatRateSource => VatRateSource::Calculated,
             ];
         }
         return $result;
@@ -661,7 +530,7 @@ abstract class Creator
      *   The return value of that method call, or null if the method does not
      *   exist.
      */
-    protected function callSourceTypeSpecificMethod(string $method, array $args = [])
+    protected function callSourceTypeSpecificMethod(string $method, array $args = []): mixed
     {
         $method .= $this->invoiceSource->getType();
         if (method_exists($this, $method)) {

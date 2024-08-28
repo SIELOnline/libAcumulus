@@ -34,6 +34,8 @@ use Siel\Acumulus\Invoice\CompletorStrategyLines;
 use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\Item;
+use Siel\Acumulus\Invoice\Product;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AboutForm;
 use Siel\Acumulus\Shop\AcumulusEntry;
@@ -403,20 +405,54 @@ class Container
     }
 
     /**
-     * Creates a new wrapper object for the given invoice source.
+     * Creates a new adapter/wrapper object for the given invoice source.
      *
      * @param string $invoiceSourceType
      *   The type of the invoice source to create.
-     * @param int|object|array $invoiceSourceOrId
+     * @param int|string|object|array $invoiceSourceOrId
      *   The invoice source itself or its id to create a
      *   \Siel\Acumulus\Invoice\Source instance for.
      *
      * @return \Siel\Acumulus\Invoice\Source
      *   A wrapper object around a shop specific invoice source object.
      */
-    public function createSource(string $invoiceSourceType, $invoiceSourceOrId): Source
+    public function createSource(string $invoiceSourceType, int|string|object|array $invoiceSourceOrId): Source
     {
-        return $this->getInstance('Source', 'Invoice', [$invoiceSourceType, $invoiceSourceOrId], true);
+        return $this->getInstance('Source', 'Invoice', [$invoiceSourceType, $invoiceSourceOrId, $this], true);
+    }
+
+    /**
+     * Creates a new adapter/wrapper object for the given invoice source.
+     *
+     * @param Source $source
+     *   The type of the invoice source to create.
+     * @param int|string|object|array $idOrItem
+     *   The invoice source itself or its id to create a
+     *   \Siel\Acumulus\Invoice\Source instance for.
+     *
+     * @return \Siel\Acumulus\Invoice\Source
+     *   A wrapper object around a shop specific invoice source object.
+     */
+    public function createItem(Source $source, int|string|object|array $idOrItem): Item
+    {
+        return $this->getInstance('Item', 'Invoice', [$source, $idOrItem, $this], true);
+    }
+
+    /**
+     * Creates a new adapter/wrapper object for the given invoice source.
+     *
+     * @param Source $source
+     *   The type of the invoice source to create.
+     * @param int|string|object|array $idOrItem
+     *   The invoice source itself or its id to create a
+     *   \Siel\Acumulus\Invoice\Source instance for.
+     *
+     * @return \Siel\Acumulus\Invoice\Source
+     *   A wrapper object around a shop specific invoice source object.
+     */
+    public function createProduct(Item $item, int|string|object|array $idOrItem): Product
+    {
+        return $this->getInstance('Product', 'Invoice', [$item, $idOrItem, $this], true);
     }
 
     /**
@@ -550,9 +586,10 @@ class Container
      * that performs the given task.
      *
      * @param string $dataType
-     *   The data type it operates on. One of the
-     *   {@see \Siel\Acumulus\Data\DataType} constants. This is used as a
-     *   sub namespace when constructing the class name to load.
+     *   The data type it operates on. One of the {@see \Siel\Acumulus\Data\DataType},
+     *   {@see \Siel\Acumulus\Data\LineType}, or {@see \Siel\Acumulus\Data\EmailAsPdfType}
+     *   constants. This is used as a sub namespace when constructing the class name to
+     *   load.
      * @param string $task
      *   The task to be executed. This is used to construct the class name of a
      *   class that performs the given task and implements

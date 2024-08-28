@@ -12,50 +12,38 @@ use function function_exists;
 use function get_class;
 
 /**
- * A wrapper around a web shop order or refund.
+ * Source is an adapter (and wrapper) class around a web shop order or refund.
  *
- * Source is used to pass an order or refund object (or array) around in a
- * strongly typed way and to provide unified access to information about the
- * order or refund.
+ * Source is used to provide unified access to information about an order or refund from
+ * the web shop. Furthermore, by wrapping it in a single, library defined, object type,
+ * web shop orders and refunds can be passed around in a strongly typed way.
  *
  * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 abstract class Source
 {
+    use WrapperTrait;
+
     // Invoice source type constants.
     public const Order = 'Order';
     public const CreditNote = 'CreditNote';
     public const Other = 'Other';
 
     protected string $type;
-    protected int $id;
-    /** @var array|object */
-    protected $shopSource;
     protected Source $orderSource;
-    /** @var array|object|null */
-    protected $invoice;
+    protected object|array|null $invoice;
+    protected ?array $items;
 
     /**
      * Constructor.
      *
-     * @param string $type
-     * @param int|string|array|object $idOrSource
-     *
-     * @throws  \RuntimeException
+     * @throws \RuntimeException
      *   If $idOrSource is empty or not a valid source.
      */
-    public function __construct(string $type, $idOrSource)
+    public function __construct(string $type, int|string|object|array|null $idOrObject, Container $container)
     {
         $this->type = $type;
-        if (empty($idOrSource)) {
-            throw new RuntimeException('Empty source');
-        } elseif (is_scalar($idOrSource)) {
-            $this->id = (int) $idOrSource;
-            $this->setSource();
-        } else {
-            $this->shopSource = $idOrSource;
-            $this->setId();
-        }
+        $this->initializeWrapper($idOrObject, $container);
     }
 
     /**
@@ -86,7 +74,7 @@ abstract class Source
      */
     public function getTypeLabel(int $case = -1): string
     {
-        $label = Container::getContainer()->getTranslator()->get($this->getType());
+        $label = $this->getContainer()->getTranslator()->get($this->getType());
         if ($case !== -1) {
             if (function_exists('mb_convert_case')) {
                 $label = mb_convert_case($label, $case);
@@ -108,46 +96,17 @@ abstract class Source
     }
 
     /**
-     * Returns the internal id of the web shop's invoice source.
-     *
-     * @return int
-     *   The internal id of the web shop's invoice source.
-     */
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    /**
-     * Sets the id based on type and source.
-     */
-    protected function setId(): void
-    {
-        $this->callTypeSpecificMethod(__FUNCTION__);
-    }
-
-    /**
      * Returns the web shop specific source for an invoice.
      *
      * @return array|object
      *   The web shop specific source for an invoice.
+     *
+     * @legacy: wrapper around the newer, more generic, getShopObject.
+     * @todo: deprecate this method? Check all mappings!!!
      */
     public function getSource()
     {
-        return $this->shopSource;
-    }
-
-    /**
-     * Sets the web shop specific source based on type and id.
-     *
-     * Only called by the constructor as this wrapper object should be
-     * "immutable": it should only represent one source over its lifetime.
-     *
-     * @throws \RuntimeException
-     */
-    protected function setSource(): void
-    {
-        $this->callTypeSpecificMethod(__FUNCTION__);
+        return $this->getShopObject();
     }
 
     /**
@@ -450,7 +409,7 @@ abstract class Source
         if (!isset($this->orderSource)) {
             $this->orderSource = $this->getType() === Source::Order
                 ? $this
-                : new static(Source::Order, $this->getShopOrderOrId());
+                : $this->getContainer()->createSource(Source::Order, $this->getShopOrderOrId());
         }
         return $this->orderSource;
     }
@@ -537,7 +496,7 @@ abstract class Source
             $result = [];
             $shopCreditNotes = $this->getShopCreditNotesOrIds();
             foreach ($shopCreditNotes as $shopCreditNote) {
-                $result[] = new static(Source::CreditNote, $shopCreditNote);
+                $result[] = $this->getContainer()->createSource(Source::CreditNote, $shopCreditNote);
             }
         } else {
             $result = [$this];
@@ -586,6 +545,31 @@ abstract class Source
     }
 
     /**
+     * Returns the item lines for this Source.
+     *
+     * @return Item[]
+     */
+    public function getItems(): array
+    {
+        if (!isset($this->items)) {
+            $this->items = $this->getShopItems();
+        }
+        return $this->items;
+    }
+
+    /**
+     * Returns the {@see Item}s ordered on this {@see Source}.
+     *
+     * Overrides can use the {@see $shopObject} property to retrieve the item lines.
+     * If no item lines exist, highly unlikely, an empty array should be returned.
+     * Normally, this method will be called only once by the public method
+     * {@see getItems()}, so it is correct to just instantiate new {@see Item} objects.
+     *
+     * @return Item[]
+     */
+    abstract protected function getShopItems(): array;
+
+    /**
      * Calls a type specific implementation of $method.
      *
      * This allows to separate logic for different source types into different
@@ -603,6 +587,7 @@ abstract class Source
      *   exist.
      *
      * @todo: all methods called via this method can be made protected/private.
+     *   Is this so? Isn't visibility taken into account?
      */
     protected function callTypeSpecificMethod(string $method, ...$args)
     {

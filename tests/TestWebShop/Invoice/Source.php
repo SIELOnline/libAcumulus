@@ -16,9 +16,9 @@ use stdClass;
  */
 class Source extends BaseSource
 {
-    protected function setSource(): void
+    protected function setShopObject(): void
     {
-        $this->shopSource = new stdClass();
+        $this->shopObject = new stdClass();
         $this->getSource()->type = $this->getType();
         $this->getSource()->id = $this->id;
     }
@@ -79,4 +79,8 @@ class Source extends BaseSource
     {
         return [];
     }
+
+    protected function getShopItems(): array
+    {
+        return [];    }
 }

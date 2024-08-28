@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Meta;
@@ -104,7 +105,7 @@ class SplitLine extends CompletorStrategyBase
 
         $this->nonStrategyAmount = 0.0;
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
-            if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy) {
+            if ($line[Meta::VatRateSource] !== VatRateSource::Strategy) {
                 $this->nonStrategyAmount += $line[Tag::UnitPrice] * $line[Tag::Quantity];
             }
         }

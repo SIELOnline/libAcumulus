@@ -19,6 +19,7 @@ namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -430,7 +431,7 @@ class FlattenerInvoiceLines
             }
 
             if (Completor::isCorrectVatRate($parent[Meta::VatRateSource])) {
-                $child[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Parent;
+                $child[Meta::VatRateSource] = VatRateSource::Copied_From_Parent;
             } else {
                 // The parent does not yet have correct vat rate info, so also
                 // copy the metadata to the child, so later phases can also
@@ -468,7 +469,7 @@ class FlattenerInvoiceLines
         // Copy vat rate info from a child when the parent has no vat rate info.
         if (empty($parent[Tag::VatRate]) || Number::isZero($parent[Tag::VatRate])) {
             $parent[Tag::VatRate] = CompletorInvoiceLines::getMaxAppearingVatRate($children, $index);
-            $parent[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Children;
+            $parent[Meta::VatRateSource] = VatRateSource::Copied_From_Children;
             if (isset($children[$index][Meta::VatRateMin])) {
                 $parent[Meta::VatRateMin] = $children[$index][Meta::VatRateMin];
             } else {

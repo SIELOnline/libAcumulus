@@ -20,6 +20,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
@@ -203,7 +204,7 @@ abstract class CompletorStrategyBase
         // amount of the invoice minus all known vat amounts per line.
         $this->vat2Divide = (float) $this->vatAmount;
         foreach ($invoicePart[Tag::Line] as $line) {
-            if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy) {
+            if ($line[Meta::VatRateSource] !== VatRateSource::Strategy) {
                 // Deduct the vat amount from this line: if set, deduct it directly,
                 // otherwise calculate the vat amount using the vat rate and unit price.
                 if (isset($line[Meta::VatAmount])) {
@@ -225,7 +226,7 @@ abstract class CompletorStrategyBase
         $this->linesCompleted = [];
         $this->lines2Complete = [];
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $key => $line) {
-            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
+            if ($line[Meta::VatRateSource] === VatRateSource::Strategy) {
                 $this->linesCompleted[] = $key;
                 $this->lines2Complete[$key] = $line;
             }
@@ -255,7 +256,7 @@ abstract class CompletorStrategyBase
 
         // Add amounts and count for appearing vat rates.
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
-            if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy && isset($line[Tag::VatRate])) {
+            if ($line[Meta::VatRateSource] !== VatRateSource::Strategy && isset($line[Tag::VatRate])) {
                 $amount = $line[Tag::UnitPrice] * $line[Tag::Quantity];
                 $vatAmount = $this->isNoVat($line[Tag::VatRate])
                     ? 0.0

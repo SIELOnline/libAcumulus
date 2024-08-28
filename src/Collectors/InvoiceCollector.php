@@ -96,7 +96,7 @@ use Siel\Acumulus\Invoice\Source;
  *
  * ad 1)
  * For each option or variant you add a child line. Set the meta tag
- * 'meta-vatrate-source' to Creator::VatRateSource_Parent. Copy the quantity
+ * 'meta-vatrate-source' to VatRateSource::Parent. Copy the quantity
  * from the parent to the child. Price info is probably on the parent line only,
  * unless your shop administers additional or reduced costs for a given option
  * on the child lines.

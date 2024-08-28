@@ -22,6 +22,7 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -208,7 +209,7 @@ class CompletorInvoiceLines
     protected function correctCalculatedVatRates(array &$lines): void
     {
         foreach ($lines as &$line) {
-            if (!empty($line[Meta::VatRateSource]) && $line[Meta::VatRateSource] === Creator::VatRateSource_Calculated) {
+            if (!empty($line[Meta::VatRateSource]) && $line[Meta::VatRateSource] === VatRateSource::Calculated) {
                 $this->correctVatRateByRange($line);
             }
             if (!empty($line[Meta::ChildrenLines])) {
@@ -220,7 +221,7 @@ class CompletorInvoiceLines
     /**
      * Checks and corrects a 'calculated' vat rate to an allowed vat rate.
      *
-     * The 'meta-vatrate-source' must be Creator::VatRateSource_Calculated.
+     * The 'meta-vatrate-source' must be VatRateSource::Calculated.
      *
      * The check is done on comparing allowed vat rates with the
      * 'meta-vatrate-min' and 'meta-vatrate-max' values. If only 1 match is
@@ -252,13 +253,13 @@ class CompletorInvoiceLines
                 // though 2 out of the 3 fields ex, inc, and vat are known).
                 // This way the strategy phase may be able to correct this line.
                 $line[Tag::VatRate] = null;
-                $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
+                $line[Meta::VatRateSource] = VatRateSource::Strategy;
             } else {
                 // Set vat rate to null and try to use lookup data to get a vat
                 // rate. It will be invalid but may be better than the "setting
                 // to standard 21%".
                 $line[Tag::VatRate] = null;
-                $line[Meta::VatRateSource] = Creator::VatRateSource_Completor;
+                $line[Meta::VatRateSource] = VatRateSource::Completor;
                 $this->completor->changeInvoiceToConcept($line, 'message_warning_no_vatrate', 821);
                 // @todo: this can also happen with exact or looked up vat rates
                 //   add a checker in the Completor that checks all lines for
@@ -268,11 +269,11 @@ class CompletorInvoiceLines
         } elseif ($vatRate === false) {
             // Multiple matches: set vat rate to null and try to use lookup data.
             $line[Tag::VatRate] = null;
-            $line[Meta::VatRateSource] = Creator::VatRateSource_Completor;
+            $line[Meta::VatRateSource] = VatRateSource::Completor;
         } else {
             // Single match: fill it in as the vat rate for this line.
             $line[Tag::VatRate] = $vatRate;
-            $line[Meta::VatRateSource] = Completor::VatRateSource_Completor_Range;
+            $line[Meta::VatRateSource] = VatRateSource::Completor_Range;
         }
     }
 
@@ -306,7 +307,7 @@ class CompletorInvoiceLines
     protected function addVatRateUsingLookupData(array &$lines): void
     {
         foreach ($lines as &$line) {
-            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
+            if ($line[Meta::VatRateSource] === VatRateSource::Completor) {
                 // Do we have lookup data and not the exception for situation 2?
                 // Required data is not guaranteed to be available at this
                 // stage, so use the price that is available: both will be zero
@@ -317,7 +318,7 @@ class CompletorInvoiceLines
                 ) {
                     // Filter lookup rate(s) by the rates of the possible vat types.
                     $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByVatRates($line[Meta::VatRateLookup]);
-                    $vatRateSource = Completor::VatRateSource_Completor_Lookup;
+                    $vatRateSource = VatRateSource::Completor_Lookup;
 
                     // Try to reduce the set by intersecting with the vat rate
                     // range matches.
@@ -325,7 +326,7 @@ class CompletorInvoiceLines
                         $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByVatRates(
                             $line[Meta::VatRateRangeMatches],
                             $line[Meta::VatRateLookupMatches]);
-                        $vatRateSource = Completor::VatRateSource_Completor_Range_Lookup;
+                        $vatRateSource = VatRateSource::Completor_Range_Lookup;
                     }
 
                     if ($this->getUniqueVatRate($line[Meta::VatRateLookupMatches])) {
@@ -336,7 +337,7 @@ class CompletorInvoiceLines
                     }
                 }
 
-                if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
+                if ($line[Meta::VatRateSource] === VatRateSource::Completor) {
                     // We either do not have lookup data, the looked up vat rate
                     // is not possible, or we have a 0-price line with multiple
                     // vat rates possible: give the strategy phase a chance to
@@ -347,7 +348,7 @@ class CompletorInvoiceLines
                     // (as that can be more precise with small prices and large
                     // quantities). However, for now, I am not going to use the
                     // line totals as they are hardly available.
-                    $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
+                    $line[Meta::VatRateSource] = VatRateSource::Strategy;
                 }
             }
 
@@ -442,14 +443,14 @@ class CompletorInvoiceLines
 
             if (!isset($line[Tag::VatRate])) {
                 // Can we copy it from the parent?
-                if ($line[Meta::VatRateSource] === Creator::VatRateSource_Parent && $parent !== null) {
+                if ($line[Meta::VatRateSource] === VatRateSource::Parent && $parent !== null) {
                     if (Completor::isCorrectVatRate($parent[Meta::VatRateSource])) {
                         $line[Tag::VatRate] = $parent[Tag::VatRate];
-                        $line[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Parent;
+                        $line[Meta::VatRateSource] = VatRateSource::Copied_From_Parent;
                     } else {
                         // Allow strategy phase to also add a vat rate to the
                         // child lines.
-                        $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
+                        $line[Meta::VatRateSource] = VatRateSource::Strategy;
                     }
                 } elseif (isset($line[Meta::VatAmount], $line[Tag::UnitPrice])) {
                     // This may use the easy gain, so known usages: Magento.
@@ -586,12 +587,12 @@ class CompletorInvoiceLines
 
         foreach ($lines as &$line) {
             $price = $line[Tag::UnitPrice] ?? $line[Meta::UnitPriceInc];
-            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor && Number::isZero($price)) {
+            if ($line[Meta::VatRateSource] === VatRateSource::Completor && Number::isZero($price)) {
                 if ($maxVatRate !== null) {
                     $line[Tag::VatRate] = $maxVatRate;
-                    $line[Meta::VatRateSource] = Completor::VatRateSource_Completor_Max_Appearing;
+                    $line[Meta::VatRateSource] = VatRateSource::Completor_Max_Appearing;
                 } else {
-                    $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
+                    $line[Meta::VatRateSource] = VatRateSource::Strategy;
                 }
             }
         }
@@ -782,7 +783,7 @@ class CompletorInvoiceLines
                         / $line[Tag::VatRate] * (100 + $line[Tag::VatRate]);
                     $fieldsCalculated[] = Meta::LineDiscountAmountInc;
                 }
-            } elseif ($line[Meta::VatRateSource] == Creator::VatRateSource_Strategy && !empty($line[Meta::StrategySplit])) {
+            } elseif ($line[Meta::VatRateSource] == VatRateSource::Strategy && !empty($line[Meta::StrategySplit])) {
                 if (isset($line[Tag::UnitPrice], $line[Meta::UnitPriceInc])) {
                     if (!isset($line[Meta::LineAmount])) {
                         $line[Meta::LineAmount] = $line[Tag::UnitPrice] * $line[Tag::Quantity];

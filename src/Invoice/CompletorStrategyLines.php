@@ -19,6 +19,7 @@ namespace Siel\Acumulus\Invoice;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -129,7 +130,7 @@ class CompletorStrategyLines
     {
         $result = false;
         foreach ($this->invoiceLines as $line) {
-            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
+            if ($line[Meta::VatRateSource] === VatRateSource::Strategy) {
                 $result = true;
                 break;
             }
@@ -180,8 +181,8 @@ class CompletorStrategyLines
 
         // And merge in the new completed ones.
         foreach ($completedLines as &$completedLine) {
-            if ($completedLine[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
-                $completedLine[Meta::VatRateSource] = Completor::VatRateSource_Strategy_Completed;
+            if ($completedLine[Meta::VatRateSource] === VatRateSource::Strategy) {
+                $completedLine[Meta::VatRateSource] = VatRateSource::Strategy_Completed;
                 $completedLine[Meta::CompletorStrategyUsed] = $strategyName;
             }
         }

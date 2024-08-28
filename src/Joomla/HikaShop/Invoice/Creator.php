@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
 use RuntimeException;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Invoice\Source;
@@ -84,7 +85,6 @@ class Creator extends BaseCreator
     {
         $result = [];
         $this->addPropertySource('item', $item);
-        $this->addProductInfo($result);
         // Remove html with variant info from product name, we'll add that later
         // using children lines.
         if (isset($result[Tag::Product]) && ($pos = strpos($result[Tag::Product], '<span')) !== false) {
@@ -129,7 +129,7 @@ class Creator extends BaseCreator
         if (isset($vatRate)) {
             $vatInfo = [
                 Tag::VatRate => 100.0 * $vatRate,
-                Meta::VatRateSource => Number::isZero($productVat) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
+                Meta::VatRateSource => Number::isZero($productVat) ? VatRateSource::Exact0 : VatRateSource::Exact,
             ];
         } else {
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
@@ -279,7 +279,7 @@ class Creator extends BaseCreator
                     Tag::Quantity => 1,
                     Tag::UnitPrice => 0.0,
                     Tag::VatRate => null,
-                    Meta::VatRateSource => static::VatRateSource_Completor,
+                    Meta::VatRateSource => VatRateSource::Completor,
                 ];
             }
         } elseif (empty($this->order->order_shipping_params)
@@ -294,7 +294,7 @@ class Creator extends BaseCreator
                 Meta::UnitPriceInc => $this->order->order_shipping_price,
                 Meta::VatAmount => $this->order->order_shipping_tax,
                 Tag::VatRate => null,
-                Meta::VatRateSource => static::VatRateSource_Completor,
+                Meta::VatRateSource => VatRateSource::Completor,
             ];
         } else {
             // For each shipment we are going to add 1 or more shipping lines.
@@ -321,7 +321,7 @@ class Creator extends BaseCreator
                     $result[] = $shippingLineDefaults + [
                             Meta::UnitPriceInc => $price->price_with_tax,
                             Meta::VatAmount => $price->tax,
-                            Meta::VatRateSource => static::VatRateSource_Completor,
+                            Meta::VatRateSource => VatRateSource::Completor,
                         ];
                 } else {
                     // Detailed tax breakdown is available: add a line per vat rate.
@@ -348,14 +348,14 @@ class Creator extends BaseCreator
                         if ($taxClass !== null) {
                             $shippingLine += [
                                 Tag::VatRate => 100.0 * $vatRate,
-                                Meta::VatRateSource => static::VatRateSource_Creator_Lookup,
+                                Meta::VatRateSource => VatRateSource::Creator_Lookup,
                                 Meta::VatClassName => $taxNameKey,
                                 Meta::VatRateLookup => 100.0 * $vatRate,
                             ];
                         } else {
                             $shippingLine += [
                                 Tag::VatRate => null,
-                                Meta::VatRateSource => static::VatRateSource_Completor,
+                                Meta::VatRateSource => VatRateSource::Completor,
                                 Meta::Warning => "Tax class '$taxNameKey' does no longer exist",
                             ];
                         }
@@ -374,7 +374,7 @@ class Creator extends BaseCreator
                                 Tag::UnitPrice => $price->price_with_tax - $shippingMethodAmountIncTotal,
                                 Tag::VatRate => 0,
                                 Meta::VatAmount => 0.0,
-                                Meta::VatRateSource => static::VatRateSource_Creator_Missing_Amount,
+                                Meta::VatRateSource => VatRateSource::Creator_Missing_Amount,
                                 Meta::VatClassName => Config::VatClass_Null,
                                 Meta::Warning => 'Amounts for this shipping method do not add up: '
                                     . 'probably vat free product or rates have changed. (order_shipping_params->prices = '

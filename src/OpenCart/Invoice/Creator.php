@@ -133,8 +133,6 @@ abstract class Creator extends BaseCreator
         }
         $this->addPropertySource('item', $item);
 
-        $this->addProductInfo($result);
-
         // Get vat range info from item line.
         $productPriceEx = $item['price'];
         $productVat = $item['tax'];
@@ -316,13 +314,13 @@ abstract class Creator extends BaseCreator
             // A voucher is to be seen as a partial payment, thus no tax.
             $result += [
                 Tag::VatRate => -1,
-                Meta::VatRateSource => Creator::VatRateSource_Exact0,
+                Meta::VatRateSource => VatRateSource::Exact0,
             ];
         } elseif ($line['code'] === 'coupon') {
             // Coupons may have to be split over various taxes.
             $result += [
                 Tag::VatRate => null,
-                Meta::VatRateSource => Creator::VatRateSource_Strategy,
+                Meta::VatRateSource => VatRateSource::Strategy,
                 Meta::StrategySplit => $line['code'] === 'coupon',
             ];
         } else {
@@ -333,7 +331,7 @@ abstract class Creator extends BaseCreator
             // strategy phase.
             $result += [
                     Tag::VatRate => null,
-                    Meta::VatRateSource => Creator::VatRateSource_Completor,
+                    Meta::VatRateSource => VatRateSource::Completor,
                     Meta::StrategySplit => false,
                 ] + $vatRateLookupMetaData;
         }

@@ -7,8 +7,8 @@ declare(strict_types=1);
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -83,7 +83,7 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
             // same vat rate).
             if (empty($parent[Tag::VatRate]) && !empty($childrenVatRate)) {
                 $parent[Tag::VatRate] = $childrenVatRate;
-                $parent[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Children;
+                $parent[Meta::VatRateSource] = VatRateSource::Copied_From_Children;
             }
         }
         return parent::collectInfoFromChildren($parent, $children);

@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
@@ -281,7 +282,7 @@ class CreatorPluginSupport
                 if ($line !== null) {
                     $commonTags = [
                         Tag::Quantity => $line[Tag::Quantity],
-                        Meta::VatRateSource => Creator::VatRateSource_Parent,
+                        Meta::VatRateSource => VatRateSource::Parent,
                     ];
                     if (!isset($line[Meta::ChildrenLines])) {
                         $line[Meta::ChildrenLines] = [];

@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
 use DOMDocument;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Invoice\Source;
@@ -148,8 +149,6 @@ class Creator extends BaseCreator
     {
         $result = [];
         $this->addPropertySource('item', $item);
-
-        $this->addProductInfo($result);
 
         $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
         $productPriceInc = (float) $item->product_final_price;
@@ -323,7 +322,7 @@ class Creator extends BaseCreator
             Tag::UnitPrice => null,
             Meta::UnitPriceInc => (float) $calcRule->calc_amount,
             Tag::VatRate => null,
-            Meta::VatRateSource => static::VatRateSource_Strategy,
+            Meta::VatRateSource => VatRateSource::Strategy,
             Meta::StrategySplit => true,
         ];
     }
@@ -342,7 +341,7 @@ class Creator extends BaseCreator
             Tag::Quantity => 1,
             Meta::UnitPriceInc => (float) $this->order['details']['BT']->coupon_discount,
             Tag::VatRate => null,
-            Meta::VatRateSource => static::VatRateSource_Strategy,
+            Meta::VatRateSource => VatRateSource::Strategy,
             Meta::StrategySplit => true,
         ];
     }
@@ -412,7 +411,7 @@ class Creator extends BaseCreator
         if ($calcRule !== null && !empty($calcRule->calc_value)) {
             $vatInfo = [
                 Tag::VatRate => (float) $calcRule->calc_value,
-                Meta::VatRateSource => Number::isZero($vatAmount) ? static::VatRateSource_Exact0 : static::VatRateSource_Exact,
+                Meta::VatRateSource => Number::isZero($vatAmount) ? VatRateSource::Exact0 : VatRateSource::Exact,
                 Meta::VatClassId => $calcRule->virtuemart_calc_id,
                 Meta::VatClassName => $calcRule->calc_rule_name,
             ];
@@ -420,7 +419,7 @@ class Creator extends BaseCreator
             // No vat class assigned to payment or shipping fee.
             $vatInfo = [
                 Tag::VatRate => Api::VatFree,
-                Meta::VatRateSource => static::VatRateSource_Exact0,
+                Meta::VatRateSource => VatRateSource::Exact0,
                 Meta::VatClassId => Config::VatClass_Null,
             ];
         } else {

@@ -18,6 +18,7 @@
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -123,7 +124,6 @@ class Creator extends BaseCreator
         }
         $this->addPropertySource('item', $item);
 
-        $this->addProductInfo($result);
         $result[Meta::Id] = $item->get_id();
 
         // Add quantity: quantity is negative on refunds, the unit price will be
@@ -199,7 +199,7 @@ class Creator extends BaseCreator
         }
 
         // Add variants/options.
-        $commonTags[Meta::VatRateSource] = static::VatRateSource_Parent;
+        $commonTags[Meta::VatRateSource] = VatRateSource::Parent;
         if ($product instanceof WC_Product && $item->get_variation_id()) {
             $result[Meta::ChildrenLines] = $this->getVariantLines($item, $product, $commonTags);
         }
@@ -640,7 +640,7 @@ class Creator extends BaseCreator
             Tag::Quantity => 1,
             Tag::VatRate => null,
             Meta::VatAmount => 0,
-            Meta::VatRateSource => static::VatRateSource_Completor,
+            Meta::VatRateSource => VatRateSource::Completor,
             Meta::Id => $couponId,
         ];
     }

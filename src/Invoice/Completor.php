@@ -26,6 +26,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Message;
@@ -57,15 +58,15 @@ use function is_float;
  */
 class Completor
 {
-    public const VatRateSource_Completor_Range = 'completor-range';
-    public const VatRateSource_Completor_Lookup = 'completor-lookup';
-    public const VatRateSource_Completor_Range_Lookup = 'completor-range-lookup';
-    public const VatRateSource_Completor_Range_Lookup_Foreign = 'completor-range-lookup-foreign';
-    public const VatRateSource_Completor_Max_Appearing = 'completor-max-appearing';
-    public const VatRateSource_Strategy_Completed = 'strategy-completed';
-    public const VatRateSource_Copied_From_Children = 'copied-from-children';
-    public const VatRateSource_Copied_From_Parent = 'copied-from-parent';
-    public const VatRateSource_Corrected_NoVat = 'corrected-no-vat';
+//    public const VatRateSource_Completor_Range = 'completor-range';
+//    public const VatRateSource_Completor_Lookup = 'completor-lookup';
+//    public const VatRateSource_Completor_Range_Lookup = 'completor-range-lookup';
+//    public const VatRateSource_Completor_Range_Lookup_Foreign = 'completor-range-lookup-foreign';
+//    public const VatRateSource_Completor_Max_Appearing = 'completor-max-appearing';
+//    public const VatRateSource_Strategy_Completed = 'strategy-completed';
+//    public const VatRateSource_Copied_From_Children = 'copied-from-children';
+//    public const VatRateSource_Copied_From_Parent = 'copied-from-parent';
+//    public const VatRateSource_Corrected_NoVat = 'corrected-no-vat';
 
     private const EuSales_Unknown = 0;
     private const EuSales_Safe = 1;
@@ -79,17 +80,17 @@ class Completor
      *   considered correct.
      */
     protected static array $CorrectVatRateSources = [
-        Creator::VatRateSource_Exact,
-        Creator::VatRateSource_Exact0,
-        Creator::VatRateSource_Creator_Lookup,
-        self::VatRateSource_Completor_Range,
-        self::VatRateSource_Completor_Lookup,
-        self::VatRateSource_Completor_Range_Lookup,
-        self::VatRateSource_Completor_Range_Lookup_Foreign,
-        self::VatRateSource_Completor_Max_Appearing,
-        self::VatRateSource_Strategy_Completed,
-        self::VatRateSource_Copied_From_Children,
-        self::VatRateSource_Copied_From_Parent,
+        VatRateSource::Exact,
+        VatRateSource::Exact0,
+        VatRateSource::Creator_Lookup,
+        VatRateSource::Completor_Range,
+        VatRateSource::Completor_Lookup,
+        VatRateSource::Completor_Range_Lookup,
+        VatRateSource::Completor_Range_Lookup_Foreign,
+        VatRateSource::Completor_Max_Appearing,
+        VatRateSource::Strategy_Completed,
+        VatRateSource::Copied_From_Children,
+        VatRateSource::Copied_From_Parent,
     ];
 
     /**
@@ -711,7 +712,7 @@ class Completor
             // Correct and add this line (round of correcting has already been
             // executed).
             $line = Converter::getLineFromArray($line);
-            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Calculated) {
+            if ($line[Meta::VatRateSource] === VatRateSource::Calculated) {
                 $this->LineCompletor->correctVatRateByRange($line);
             }
             $invoice[Tag::Line][] = $line;
@@ -1330,7 +1331,7 @@ class Completor
                  */
                 if ($this->is0VatClass($line) || !in_array($vatType, static::$vatTypesAllowingVatFree)) {
                     $line[Tag::VatRate] = 0.0;
-                    $line[Meta::VatRateSource] .= ',' . self::VatRateSource_Corrected_NoVat;
+                    $line[Meta::VatRateSource] .= ',' . VatRateSource::Corrected_NoVat;
                 }
             } elseif ($this->is0VatRate($line)) {
                 // Change if the vat class indicates a vat free rate and vat
@@ -1344,7 +1345,7 @@ class Completor
                     || !$this->is0VatPossibleForVatType($vatType)
                 ) {
                     $line[Tag::VatRate] = Api::VatFree;
-                    $line[Meta::VatRateSource] .= ',' . self::VatRateSource_Corrected_NoVat;
+                    $line[Meta::VatRateSource] .= ',' . VatRateSource::Corrected_NoVat;
                 }
             }
         }

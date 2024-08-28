@@ -26,6 +26,7 @@ use Magento\Sales\Model\Order\Item;
 use Magento\Tax\Model\ClassModel as TaxClass;
 use Magento\Tax\Model\Config as MagentoTaxConfig;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Invoice\Source;
@@ -118,7 +119,6 @@ class Creator extends BaseCreator
 
         $this->addPropertySource('item', $item);
 
-        $this->addProductInfo($result);  // copied to mappings (itemNumber, product).
         $result[Meta::Id] = (int) $item->getId(); // copied to mappings.
         $result[Meta::ProductType] = $item->getProductType(); // copied to mappings.
         $result[Meta::ProductId] = (int) $item->getProductId(); // copied to mappings.
@@ -184,7 +184,7 @@ class Creator extends BaseCreator
             // @todo: should we do this here or in the completor?
             $result += [
                 Tag::VatRate => null,
-                Meta::VatRateSource => BaseCreator::VatRateSource_Completor,
+                Meta::VatRateSource => BaseVatRateSource::Completor,
                 Meta::VatRateLookup => $vatRate,
                 Meta::VatRateLookupSource => '$item->getTaxPercent()',
             ];
@@ -200,7 +200,7 @@ class Creator extends BaseCreator
             // the vat rate is real.
             $result += [
                 Tag::VatRate => $vatRate,
-                Meta::VatRateSource => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
+                Meta::VatRateSource => Number::isZero($vatRate) ? VatRateSource::Exact0 : VatRateSource::Exact,
             ];
         }
 
@@ -235,7 +235,7 @@ class Creator extends BaseCreator
                 // We may have to copy vat data.
                 if (empty($result[Tag::VatRate]) && $childLine[Tag::VatRate] !== $result[Tag::VatRate]) {
                     $result[Tag::VatRate] = $childLine[Tag::VatRate];
-                    $result[Meta::VatRateSource] = Creator::VatRateSource_Child;
+                    $result[Meta::VatRateSource] = VatRateSource::Child;
                     if (!empty($childLine[Meta::VatRateLookup])) {
                         $result[Meta::VatRateLookup] = $childLine[Meta::VatRateLookup];
                     } else {
@@ -272,7 +272,7 @@ class Creator extends BaseCreator
                 $child[Tag::Product] = $customizableOption['label'] . ': ' . $customizableOption['print_value'];
                 $child[Tag::Quantity] = $result[Tag::Quantity];
                 $child[Tag::UnitPrice] = 0;
-                $child[Meta::VatRateSource] = static::VatRateSource_Parent;
+                $child[Meta::VatRateSource] = VatRateSource::Parent;
                 $result[Meta::ChildrenLines][] = $child;
             }
         }
@@ -347,8 +347,6 @@ class Creator extends BaseCreator
 
         $this->addPropertySource('item', $item);
 
-        $this->addProductInfo($result);  // copied to mappings (itemNumber, product).
-
         /** @noinspection PhpCastIsUnnecessaryInspection */
         $productPriceEx = -((float) $item->getBasePrice());  // copied to mappings
         $productPriceInc = -((float) $item->getBasePriceInclTax());  // copied to mappings.
@@ -396,7 +394,7 @@ class Creator extends BaseCreator
         if (isset($vat_rate)) {
             $result += [
                 Tag::VatRate => $vat_rate,  // copied to mappings.
-                Meta::VatRateSource => static::VatRateSource_Exact,
+                Meta::VatRateSource => VatRateSource::Exact,
             ];
         } elseif (isset($lineVat)) {
             $result += self::getVatRangeTags(
@@ -488,7 +486,7 @@ class Creator extends BaseCreator
                 $result += [
                     Tag::UnitPrice => 0,
                     Tag::VatRate => null,
-                    Meta::VatRateSource => static::VatRateSource_Completor,
+                    Meta::VatRateSource => VatRateSource::Completor,
                 ];
             }
         }
@@ -518,7 +516,7 @@ class Creator extends BaseCreator
                 Tag::ItemNumber => '',
                 Tag::Product => $this->getDiscountDescription(),
                 Tag::VatRate => null,
-                Meta::VatRateSource => static::VatRateSource_Strategy,
+                Meta::VatRateSource => VatRateSource::Strategy,
                 Meta::StrategySplit => true,
                 Tag::Quantity => 1,
             ];

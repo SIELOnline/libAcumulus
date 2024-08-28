@@ -92,7 +92,6 @@ class Creator extends BaseCreator
         // @todo: add property source(s) for this item line.
         $this->addPropertySource('item', $item);
 
-        $this->addProductInfo($result);
         $sign = $this->invoiceSource->getSign();
 
         // @todo: add other tags and available meta tags (* = required):

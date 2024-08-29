@@ -29,7 +29,7 @@
         },
         "payment": {
             "provider": "paypal",
-            "paid": 50.40,
+            "paid": "50.40",
             "timestamp": "2022-12-02T15:40:05+02:00"
         }
     },

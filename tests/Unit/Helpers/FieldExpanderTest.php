@@ -90,6 +90,7 @@ class FieldExpanderTest extends TestCase
             ['[invoiceSource::customer::invoice_address::id]', 4],
             ['[date]', '2022-12-01'],
             ['[amount]', 50.40],
+            ['[order::payment::paid]', 50.40],
             ['[paid]', true],
             ['[returned]', null],
         ];
@@ -250,5 +251,50 @@ class FieldExpanderTest extends TestCase
         $result3 = $field->expand('[container::getFormRenderer(true)]', $objects);
         $this->assertInstanceOf(FormRenderer::class, $result3);
         $this->assertNotSame($result1, $result3);
+    }
+
+    /**
+     * Tests using sign for numeric values.
+     */
+    public function testSign(): void
+    {
+        $objects = $this->getObjects() + [
+            'source' => new class {
+                public function getSign(): int
+                {
+                    return 1;
+                }
+            },
+        ];
+        $field = $this->getFieldExpander();
+        $result1 = $field->expand('[order::amount]', $objects);
+        $result2 = $field->expand('[sign*order::amount]', $objects);
+        $this->assertSame($result1, $result2);
+
+        $objects = $this->getObjects() + [
+            'source' => new class {
+                public function getSign(): int
+                {
+                    return -1;
+                }
+            },
+        ];
+        $field = $this->getFieldExpander();
+        $result1 = $field->expand('[order::amount]', $objects);
+        $result2 = $field->expand('[sign*order::amount]', $objects);
+        $this->assertSame(-$result1, $result2);
+
+        $objects = $this->getObjects() + [
+            'source' => new class {
+                public function getSign(): int
+                {
+                    return -1;
+                }
+            },
+        ];
+        $field = $this->getFieldExpander();
+        $result1 = $field->expand('[order::amount1|order::amount]', $objects);
+        $result2 = $field->expand('[sign*order::amount1|order::amount]', $objects);
+        $this->assertSame(-$result1, $result2);
     }
 }

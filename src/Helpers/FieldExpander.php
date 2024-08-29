@@ -57,14 +57,16 @@ use function strlen;
  *   arrays, or (getter) methods on real objects. Even methods with parameters
  *   can be used.
  * - A "field expansion specification" that consists of a single property
- *   specification is returned in the type of the property, but as soon as
- *   properties get concatenated they are converted to a string:
- *     - bool: to the string 'true' or 'false'.
- *     - null: empty string.
- *     - number: string representation of the number. (@todo: precision?)
- *     - array: imploded with glue = ' '.
- *     - object: if the _toString() exists it will be called, otherwise
- *       {@see json_encode()} will be used.
+ *   specification:
+ *     - Can be signed by placing sign* directly after the '[' opening bracket.
+ *     - Is returned in the type of the property, but as soon as properties get
+ *       concatenated they are converted to a string:
+ *         - bool: to the string 'true' or 'false'.
+ *         - null: empty string.
+ *         - number: string representation of the number. (@todo: precision?)
+ *         - array: imploded with glue = ' '.
+ *         - object: if the _toString() exists it will be called, otherwise
+ *           {@see json_encode()} will be used.
  *
  * The syntax specification below formalizes the description above:
  * - field-expansion-specification = (free-text|'['expansion-specification']')*
@@ -287,6 +289,13 @@ class FieldExpander
     protected function expandSpecification(string $expansionSpecification)
     {
         $value = null;
+        if (str_starts_with($expansionSpecification, 'sign*')) {
+            $sign = $this->objects['source']?->getSign() ?? 1;
+            $expansionSpecification = substr($expansionSpecification, strlen('sign*'));
+        } else {
+            $sign = null;
+        }
+
         $propertyAlternatives = explode('|', $expansionSpecification);
         foreach ($propertyAlternatives as $propertyAlternative) {
             $value = $this->expandAlternative($propertyAlternative);
@@ -300,6 +309,9 @@ class FieldExpander
             $this->log->debug("Field::expandSpecification('%s'): not found", $expansionSpecification);
         }
 
+        if ($sign !== null) {
+            $value = $sign * $value;
+        }
         return $value;
     }
 
@@ -523,7 +535,7 @@ class FieldExpander
             }
         }
 
-        return $value;
+        return $this->castNumericValue($value);
     }
 
     /**
@@ -704,6 +716,21 @@ class FieldExpander
         } catch (Exception $e) {
             $this->log->exception($e);
             $value = '';
+        }
+        return $value;
+    }
+
+    /**
+     * Casts a numeric string value to an int or float.
+     */
+    protected function castNumericValue(mixed $value): mixed
+    {
+        if (is_string($value) && is_numeric($value)) {
+            if (preg_match('/^-?\d+$/', $value)) {
+                $value = (int) $value;
+            } else {
+                $value = (float) $value;
+            }
         }
         return $value;
     }

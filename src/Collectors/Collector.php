@@ -8,10 +8,11 @@ use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
-
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Meta;
 
 use function get_class;
+use function in_array;
 use function is_string;
 use function strlen;
 
@@ -72,6 +73,19 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
+     * returns the property source with the given name.
+     *
+     * @param string $property
+     *
+     * @return mixed
+     *   The property source with the given name, or null if not existing.
+     */
+    protected function getPropertySource(string $property): mixed
+    {
+        return $this->propertySources[$property] ?? null;
+    }
+
+    /**
      * Returns a new child class of {@see \Siel\Acumulus\Data\AcumulusObject}
      * that will contain the collected values.
      */
@@ -114,10 +128,10 @@ abstract class Collector implements CollectorInterface
     /**
      * Collects fields using logic more complex than a simple mapping.
      *
-     * This base implementation does nothing as it cannot contain any logic
-     * about the properties. Override if the actual data object does have
-     * properties that cannot be set with a simple mapping, but do depend on
-     * shop data (thus not configuration only).
+     * This base implementation does nothing as it cannot contain any (shop specific)
+     * logic about the properties. Override if the actual data object does have properties
+     * that cannot be set with a simple mapping and depend on shop data (thus not
+     * configuration only).
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
@@ -140,7 +154,7 @@ abstract class Collector implements CollectorInterface
      * @return bool
      *   Whether the value was set.
      */
-    protected function expandAndSet(AcumulusObject $acumulusObject, string $field, $value, int $mode = PropertySet::Always): bool
+    protected function expandAndSet(AcumulusObject $acumulusObject, string $field, mixed $value, int $mode = PropertySet::Always): bool
     {
         if ($acumulusObject->isProperty($field)) {
             return $value !== null && $acumulusObject->set($field, $this->expandValue($value), $mode);
@@ -168,7 +182,7 @@ abstract class Collector implements CollectorInterface
      *   The expanded value, or the value itself it was not a field
      *   specification.
      */
-    protected function expandValue($value)
+    protected function expandValue(mixed $value)
     {
         if (is_string($value)) {
             $value = $this->expand($value);
@@ -201,7 +215,7 @@ abstract class Collector implements CollectorInterface
      */
     public function isMetadata(string $field): bool
     {
-        // @todo: add exceptions to the rule (amountinc, vatamount, ...?).
-        return strncmp($field, 'meta', strlen('meta')) === 0;
+        return strncmp($field, 'meta', strlen('meta')) === 0
+            || in_array($field, [Meta::UnitPriceInc, Meta::VatAmount], true);
     }
 }

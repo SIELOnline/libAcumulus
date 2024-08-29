@@ -259,9 +259,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     . '|address_shipping::phone|address_shipping::phone_mobile]', // Address
                 Fld::Telephone2 => '[address_shipping::phone|address_shipping::phone_mobile'
                     . '|address_invoice::phone|address_invoice::phone_mobile]', // Address
-                Fld::Email => '[source::getOrder::getSource()::getCustomer()::email]', // Customer
-                Fld::Website => '[source::getOrder::getSource()::getCustomer()::website]', // Customer
-                Fld::Mark => '[source::getOrder::getSource()::getCustomer()::note]', // Customer (but not used?)
+                Fld::Email => '[source::getOrder()::getSource()::getCustomer()::email]', // Customer
+                Fld::Website => '[source::getOrder()::getSource()::getCustomer()::website]', // Customer
+                Fld::Mark => '[source::getOrder()::getSource()::getCustomer()::note]', // Customer (but not used?)
             ],
             AddressType::Invoice => [ // address_invoice instanceof Address
                 Fld::CompanyName1 => '[address_invoice::company]',
@@ -282,22 +282,25 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Meta::ShopCountryId => '[address_shipping::id_country]',
             ],
             EmailAsPdfType::Invoice => [
-                Fld::EmailTo => '[source::getOrder::getSource()::getCustomer()::email]',
+                Fld::EmailTo => '[source::getOrder()::getSource()::getCustomer()::email]',
             ],
-            LineType::Item => [ // item instanceof OrderDetail
-                Meta::Id => '[item::id_order_detail]',
-                Meta::ProductId => '[item::product_id]',
-                Fld::ItemNumber => '[item::product_reference'
-                    . '|item::product_ean13|item::product_isbn|item::product_upc|item::product_mpn'
-                    . '|item::product_supplier_reference]',
-                Fld::Product => '[item::product_name]',
-                Fld::Quantity => '[item::product_quantity]',
-                Fld::CostPrice => '[item::purchase_supplier_price]', // @todo: use sign?
-                Fld::UnitPrice => '[item::unit_price_tax_excl]', // @todo: use sign
-                Meta::UnitPriceInc => '[item::unit_price_tax_incl]', // @todo: use sign
-                Meta::LineAmount => 'item::total_price_tax_excl]', // @todo: use sign
-                Meta::LineAmountInc => '[item::total_price_tax_incl]', // @todo: use sign
-                Fld::VatRate => '[item::rate]',  //@todo: not set for orderSlips: add logic, also to set Meta::VatRateSource
+            LineType::Item => [ // item instanceof Item
+                Meta::Id => '[item::getShopObject()::id_order_detail]',
+                Meta::ProductId => '[item::getShopObject()::product_id]',
+                Fld::ItemNumber => '[item::getShopObject()::product_reference'
+                    . '|item::getShopObject()::product_ean13'
+                    . '|item::getShopObject()::product_isbn'
+                    . '|item::getShopObject()::product_upc'
+                    . '|item::getShopObject()::product_mpn'
+                    . '|item::getShopObject()::product_supplier_reference]',
+                Fld::Product => '[item::getShopObject()::product_name]',
+                Fld::Quantity => '[item::getShopObject()::product_quantity]',
+                Fld::CostPrice => '[sign*item::getShopObject()::purchase_supplier_price]',
+                Fld::UnitPrice => '[sign*item::getShopObject()::unit_price_tax_excl]',
+                Meta::UnitPriceInc => '[sign*item::getShopObject()::unit_price_tax_incl]',
+                Meta::LineAmount => '[sign*item::getShopObject()::total_price_tax_excl]',
+                Meta::LineAmountInc => '[sign*item::getShopObject()::total_price_tax_incl]',
+                Fld::VatRate => '[item::getShopObject()::rate]',  //@todo: not set for orderSlips: add logic, also to set Meta::VatRateSource
             ],
         ];
     }

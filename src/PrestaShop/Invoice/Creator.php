@@ -163,68 +163,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * Returns 1 item line, both for an order or credit slip.
-     *
-     * @param array $item
-     *   An array of an OrderDetail line combined with a tax detail line OR
-     *   an array with an OrderSlipDetail line.
-     *
-     * @return array
-     */
-    protected function getItemLine(array $item): array
-    {
-        $result = [];
-
-        $this->addPropertySource('item', $item);
-
-        $sign = $this->invoiceSource->getSign();
-
-        // Check for cost price and margin scheme.
-        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
-            // - But still send the VAT rate to Acumulus.
-            $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_incl'];
-        } else {
-            // 'unit_amount' (table order_detail_tax) is not always set: assume
-            // no discount if not set, so not necessary to add the value.
-            if (isset($item['unit_amount']) &&
-                !Number::floatsAreEqual($item['unit_amount'], $result[Meta::UnitPriceInc] - $result[Tag::UnitPrice])
-            ) {
-                $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
-            }
-        }
-
-        // Try to get the vat rate:
-        // The field 'rate' comes from order->getOrderDetailTaxes() and is thus
-        // only available for orders and was not filled before PS1.6.1.1. So,
-        // check if the field is available.
-        // The fields 'unit_amount' and 'total_amount' (also from table
-        // order_detail_tax) are based on the discounted product price and thus
-        // cannot be used to get the vat rate.
-        if (isset($item['rate'])) {
-            $result[Tag::VatRate] = $item['rate'];
-            $result[Meta::VatRateSource] = VatRateSource::Exact;
-        } else {
-            $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']),
-                $sign * $item['unit_price_tax_excl'],
-                $this->precision, $this->precision);
-        }
-        $taxRulesGroupId = isset($item['id_tax_rules_group']) ? (int) $item['id_tax_rules_group'] : 0;
-        // VAT lookup metadata should be based on the address used.
-        /** @noinspection NullPointerExceptionInspection */
-        $vatBasedOn = $this->invoice->getCustomer()->getMainAddressType();
-        $addressId = $vatBasedOn === AddressType::Invoice ? $this->order->id_address_invoice : $this->order->id_address_delivery;
-        $result += $this->getVatRateLookupMetadata($addressId, $taxRulesGroupId);
-
-        /** @noinspection UnsupportedStringOffsetOperationsInspection */
-        $result[Meta::FieldsCalculated][] = Meta::VatAmount;
-
-        $this->removePropertySource('item');
-        return $result;
-    }
-
     protected function getShippingLine(): array
     {
         if (empty($this->order->id_carrier)) {

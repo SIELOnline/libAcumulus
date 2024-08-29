@@ -8,6 +8,11 @@ use Context;
 use Country;
 use Siel\Acumulus\Collectors\AddressCollector as BaseAddressCollector;
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Fld;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
 use function is_array;
@@ -18,6 +23,9 @@ use function is_array;
 class AddressCollector extends BaseAddressCollector
 {
     /**
+     * This PrestaShop override collects:
+     * - The country code and shop country name based on the internal country id.
+     *
      * @param \Siel\Acumulus\Data\Address $acumulusObject
      *
      * @throws \PrestaShopDatabaseException

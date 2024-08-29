@@ -159,7 +159,7 @@ class Source extends BaseSource
     {
         $currency = Currency::getCurrencyInstance($this->getOrder()->shopObject->id_currency);
         /** @noinspection PhpCastIsUnnecessaryInspection  conversion_rate contains the string representation of a float */
-        return new AcumulusCurrency($currency->iso_code, (float) $this->getSource()->conversion_rate, true);
+        return new AcumulusCurrency($currency->iso_code, (float) 1.0 / $this->getSource()->conversion_rate, true);
     }
 
     /**

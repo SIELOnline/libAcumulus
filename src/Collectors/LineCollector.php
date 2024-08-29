@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
-use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
 /**
@@ -49,4 +51,87 @@ use Siel\Acumulus\Meta;
  */
 class LineCollector extends SubTypedCollector
 {
+    /**
+     * Adds information about the range in which the vat rate will lie.
+     *
+     * If a web shop does not store the vat rates used in the order, we must
+     * calculate them using a (product) price and the vat on it. But as web
+     * shops often store these numbers rounded to cents, the vat rate
+     * calculation becomes imprecise. Therefore, we compute the range in which
+     * it will lie and will let the Completor do a comparison with the actual
+     * vat rates that an order can have.
+     * - If $denominator = 0 (free product), the vat rate will be set to null
+     *   and the Completor will try to get this line listed under the correct
+     *   vat rate.
+     * - If $numerator = 0 the vat rate will be set to 0 and be treated as if it
+     *   is an exact vat rate, not a vat range.
+     *
+     *  The following fields and metadata will be set/added::
+     *  - vatRate
+     *  - 'vatamount'
+     *  - 'meta-vatrate-min'
+     *  - 'meta-vatrate-max'
+     *  - 'meta-vatamount-precision'
+     *  - 'meta-vatrate-source'
+     *
+     * @param float $numerator
+     *   The amount of VAT as received from the web shop.
+     * @param float $denominator
+     *   The price of a product excluding VAT as received from the web shop.
+     * @param float $numeratorPrecision
+     *   The precision used when rounding the number. This means that the
+     *   original numerator will not differ more than half of this.
+     * @param float $denominatorPrecision
+     *   The precision used when rounding the number. This means that the
+     *   original denominator will not differ more than half of this.
+     *
+     * @legacy: Move this from the (plugin specific) creators to the completor phase.
+     *   This would aid in simplifying the creators towards raw data collectors.
+     */
+    public static function addVatRangeTags(
+        Line $line,
+        float $numerator,
+        float $denominator,
+        float $numeratorPrecision = 0.01,
+        float $denominatorPrecision = 0.01
+    ): void {
+        if (Number::isZero($denominator, 0.0001)) {
+            // zero amount (and zero vat): we cannot determine the range.
+            $line->vatRate = null;
+            $line->metadataAdd(Meta::VatAmount, $numerator);
+            $line->metadataAdd(Meta::VatRateSource, VatRateSource::Completor);
+        } elseif (Number::isZero($numerator, 0.0001)) {
+            // zero vat with non-zero amount: rate = 0
+            $line->vatRate = 0;
+            $line->metadataAdd(Meta::VatAmount, $numerator);
+            $line->metadataAdd(Meta::VatRateSource, VatRateSource::Exact0);
+        } else {
+            $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
+            $line->vatRate = 100.0 * $range['calculated'];
+            $line->metadataAdd(Meta::VatRateMin, 100.0 * $range['min']);
+            $line->metadataAdd(Meta::VatRateMax, 100.0 * $range['max']);
+            $line->metadataAdd(Meta::VatAmount, $numerator);
+            $line->metadataAdd(Meta::PrecisionUnitPrice, $denominatorPrecision);
+            $line->metadataAdd(Meta::PrecisionVatAmount, $numeratorPrecision);
+            $line->metadataAdd(Meta::VatRateSource, VatRateSource::Calculated);
+        }
+    }
+
+    /**
+     * Returns whether the margin scheme may be used.
+     *
+     * @return bool
+     *
+     * @legacy: remove margin scheme handling from (plugin specific) creators and move it
+     *   to the completor phase. This will aid in simplifying the creators towards raw
+     *   data collectors.
+     *
+     * @noinspection PhpDocMissingThrowsInspection JsonException will not be thrown when
+     *    we arrived here.
+     */
+    protected function allowMarginScheme(): bool
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return $this->getContainer()->getConfig()->get('marginProducts') !== Config::MarginProducts_No;
+    }
 }

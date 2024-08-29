@@ -194,6 +194,8 @@ class CollectorManager
      */
     private function collectLines(Invoice $invoice): void
     {
+        $this->addPropertySource('invoice', $invoice);
+
         /** @var Source $source */
         $source = $this->getPropertySources()['source'];
         $this->collectItemLines($invoice, $source);
@@ -204,6 +206,8 @@ class CollectorManager
         $creator = $this->getContainer()->getCreator();
         $creator->create($source, $invoice);
         // @legacy end
+
+        $this->removePropertySource('invoice');
     }
 
     /**

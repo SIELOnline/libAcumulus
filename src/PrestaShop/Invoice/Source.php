@@ -294,8 +294,8 @@ class Source extends BaseSource
     protected function getShopItems(): array
     {
         if ($this->getType() === Source::Order) {
-            // @todo: simplify by sticking to the object and its relations:  can we just
-            //   return items and lookup related data as and when needed?
+            // @nth: these methods return "raw"  database results, not objects from the
+            //   PrestaShop datamodel. Do we want this?
             $orderDetails = $this->mergeProductLines($this->getSource()->getProductsDetail(), $this->getSource()->getOrderDetailTaxes());
         } else {
             $orderDetails = OrderSlip::getOrdersSlipProducts($this->getId(), $this->getOrder()->getSource());

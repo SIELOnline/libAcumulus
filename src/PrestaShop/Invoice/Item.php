@@ -11,7 +11,7 @@ use Siel\Acumulus\Invoice\Product;
 /**
  * Item is the PrestaShop specific class to wrap an order/refund item.
  *
- * @property \OrderSlip $shopObject
+ * @property \Order|\OrderSlip $shopObject
  */
 class Item extends BaseItem
 {

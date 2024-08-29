@@ -25,7 +25,7 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
-     * {@see \Siel\Acumulus\Data\MetadataCollection::exists()}.
+     * See {@see \Siel\Acumulus\Data\MetadataCollection::exists()}.
      */
     public function metadataExists(string $name): bool
     {
@@ -33,7 +33,7 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
-     * {@see \Siel\Acumulus\Data\MetadataCollection::get()}.
+     * See {@see \Siel\Acumulus\Data\MetadataCollection::get()}.
      */
     public function metadataGet(string $name)
     {
@@ -41,7 +41,7 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
-     * {@see \Siel\Acumulus\Data\MetadataCollection::remove()}.
+     * See {@see \Siel\Acumulus\Data\MetadataCollection::remove()}.
      */
     public function metadataRemove(string $name): void
     {
@@ -49,7 +49,7 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
-     * {@see \Siel\Acumulus\Data\MetadataCollection::set()}.
+     * See {@see \Siel\Acumulus\Data\MetadataCollection::set()}.
      */
     public function metadataSet(string $name, $value): void
     {
@@ -57,7 +57,7 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
-     * {@see \Siel\Acumulus\Data\MetadataCollection::add()}.
+     * See {@see \Siel\Acumulus\Data\MetadataCollection::add()}.
      */
     public function metadataAdd(string $name, $value): void
     {

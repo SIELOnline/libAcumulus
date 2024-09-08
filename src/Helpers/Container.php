@@ -210,7 +210,7 @@ class Container
     public function __construct(string $shopNamespace, string $language = 'nl')
     {
         $this->shopNamespace = '';
-        if (strpos($shopNamespace, 'Acumulus') === false) {
+        if (!str_contains($shopNamespace, 'Acumulus')) {
             $this->shopNamespace = static::baseNamespace;
         }
         $this->shopNamespace .= '\\' . $shopNamespace;
@@ -422,16 +422,16 @@ class Container
     }
 
     /**
-     * Creates a new adapter/wrapper object for the given invoice source.
+     * Creates a new adapter/wrapper object for the given invoice item line.
      *
      * @param Source $source
      *   The type of the invoice source to create.
      * @param int|string|object|array $idOrItem
-     *   The invoice source itself or its id to create a
-     *   \Siel\Acumulus\Invoice\Source instance for.
+     *   The invoice source itself or its id to create an
+     *   \Siel\Acumulus\Invoice\Item instance for.
      *
-     * @return \Siel\Acumulus\Invoice\Source
-     *   A wrapper object around a shop specific invoice source object.
+     * @return \Siel\Acumulus\Invoice\Item
+     *   A wrapper object around a shop specific invoice item line object.
      */
     public function createItem(Source $source, int|string|object|array $idOrItem): Item
     {
@@ -439,15 +439,15 @@ class Container
     }
 
     /**
-     * Creates a new adapter/wrapper object for the given invoice source.
+     * Creates a new adapter/wrapper object for the given product.
      *
-     * @param Source $source
-     *   The type of the invoice source to create.
+     * @param Item $item
+     *   The item line on which the product appears.
      * @param int|string|object|array $idOrItem
-     *   The invoice source itself or its id to create a
-     *   \Siel\Acumulus\Invoice\Source instance for.
+     *   The product itself or its id to create a
+     *   \Siel\Acumulus\Invoice\Product instance for.
      *
-     * @return \Siel\Acumulus\Invoice\Source
+     * @return \Siel\Acumulus\Invoice\Product
      *   A wrapper object around a shop specific invoice source object.
      */
     public function createProduct(Item $item, int|string|object|array $idOrItem): Product
@@ -690,10 +690,10 @@ class Container
     /**
      * Returns a new AcumulusEntry instance.
      *
-     * @param array|object $record
+     * @param object|array $record
      *   The Acumulus entry data to populate the object with.
      */
-    public function createAcumulusEntry($record): AcumulusEntry
+    public function createAcumulusEntry(object|array $record): AcumulusEntry
     {
         return $this->getInstance('AcumulusEntry', 'Shop', [$record], true);
     }

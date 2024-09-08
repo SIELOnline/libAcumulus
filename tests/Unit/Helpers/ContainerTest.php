@@ -45,9 +45,7 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager;
-use Siel\Acumulus\Shop\AdvancedConfigForm;
 use Siel\Acumulus\Shop\BatchForm;
-use Siel\Acumulus\Shop\ConfigForm;
 use Siel\Acumulus\Shop\InvoiceManager;
 use Siel\Acumulus\Shop\InvoiceStatusForm;
 use Siel\Acumulus\Shop\MessageForm;
@@ -155,6 +153,7 @@ class ContainerTest extends TestCase
         foreach ($collectorTypes as $dataType => $collectorInfo) {
             $collectorClass = reset($collectorInfo);
             $collectorSubType = end($collectorInfo);
+            /** @noinspection PhpStrictTypeCheckingInspection false positive */
             $object = $container->getCollector($dataType, $collectorSubType);
             $this->assertInstanceOf($collectorClass, $object);
         }

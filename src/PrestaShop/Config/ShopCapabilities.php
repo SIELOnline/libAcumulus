@@ -15,7 +15,6 @@ use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 use TaxRulesGroup;
 
 /**

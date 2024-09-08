@@ -28,7 +28,6 @@ use PrestaShop\PrestaShop\Core\Domain\Order\VoucherRefundType;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
@@ -104,63 +103,6 @@ class Creator extends BaseCreator
         $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
         $this->propertySources['address_delivery'] = new Address($this->order->id_address_delivery);
         $this->propertySources['customer'] = $this->order->getCustomer();
-    }
-
-    protected function getItemLines(): array
-    {
-        $result = [];
-        if ($this->invoiceSource->getType() === Source::Order) {
-            // Note: getOrderDetailTaxes() is new in 1.6.1.0.
-            $lines = method_exists($this->order, 'getOrderDetailTaxes')
-                ? $this->mergeProductLines($this->order->getProductsDetail(), $this->order->getOrderDetailTaxes())
-                : $this->order->getProductsDetail();
-        } else {
-            $lines = $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
-        }
-
-        foreach ($lines as $line) {
-            $result[] = $this->getItemLine($line);
-        }
-        return $result;
-    }
-
-    /**
-     * Merges the product and tax details arrays.
-     *
-     * @param array $productLines
-     *   An array with order line information, the fields being about the
-     *   product of this order line.
-     * @param array $taxLines
-     *   An array with line tax information, the fields being about the tax on
-     *   this order line.
-     *
-     * @return array
-     *   An array with the product and tax lines merged based on the field
-     *   'id_order_detail', the unique identifier for an order line.
-     */
-    public function mergeProductLines(array $productLines, array $taxLines): array
-    {
-        // Key the product lines on id_order_detail, so we can easily add the
-        // tax lines in the 2nd loop.
-        $result = array_column($productLines, null, 'id_order_detail');
-
-        // Add the tax lines without overwriting existing entries (though in a
-        // consistent db the same keys should contain the same values).
-        foreach ($taxLines as $taxLine) {
-            if (isset($result[$taxLine['id_order_detail']])) {
-                $result[$taxLine['id_order_detail']] += $taxLine;
-            } else {
-                // We have a tax line for a non product line ([SIEL #200452]).
-                $this->log->notice(sprintf(
-                    '%s: Tax detail found for order line %d (of order %d) without product info',
-                    __METHOD__,
-                    $taxLine['id_order_detail'],
-                    $this->order->id
-                ));
-                $result[$taxLine['id_order_detail']] = $taxLine;
-            }
-        }
-        return $result;
     }
 
     protected function getShippingLine(): array
@@ -354,64 +296,6 @@ class Creator extends BaseCreator
             $result = $this->getDiscountLinesOrder();
         }
 
-        // BR 2024-05-14 Old, replaced by looking at order_slip_type
-        // Get total amount credited.
-//        $creditSlipAmountInc = $this->creditSlip->total_products_tax_incl;
-//
-//        // Get sum of product lines.
-//        $lines = $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
-//        $detailsAmountInc = array_reduce($lines, static function ($sum, $item) {
-//            $sum += $item['total_price_tax_incl'];
-//            return $sum;
-//        }, 0.0);
-//
-//        // We assume that if total < sum(details), a discount given on the
-//        // original order has now been subtracted from the amount credited.
-//        if (!Number::floatsAreEqual($creditSlipAmountInc, $detailsAmountInc, 0.05)
-//            && $creditSlipAmountInc < $detailsAmountInc
-//        ) {
-//            // PS Error: total_products_tax_excl is not adjusted (whereas
-//            // total_products_tax_incl is) when a discount is subtracted from
-//            // the amount to be credited.
-//            // So we cannot calculate the discount ex VAT ourselves.
-//            // What we can try is the following: Get the order cart rules to see
-//            // if 1 or all of those match the discount amount here.
-//            $discountAmountInc = $detailsAmountInc - $creditSlipAmountInc;
-//            $totalOrderDiscountInc = 0.0;
-//            // Note: The sign of the entries in $orderDiscounts will be correct.
-//            $orderDiscounts = $this->getDiscountLinesOrder();
-//
-//            foreach ($orderDiscounts as $key => $orderDiscount) {
-//                if (Number::floatsAreEqual($orderDiscount[Meta::UnitPriceInc], $discountAmountInc)) {
-//                    // Return this single line.
-//                    $from = $key;
-//                    $to = $key;
-//                    break;
-//                }
-//                $totalOrderDiscountInc += $orderDiscount[Meta::UnitPriceInc];
-//                if (Number::floatsAreEqual($totalOrderDiscountInc, $discountAmountInc)) {
-//                    // Return all lines up to here.
-//                    $from = 0;
-//                    $to = $key;
-//                    break;
-//                }
-//            }
-//
-//            if (isset($from, $to)) {
-//                $result = array_slice($orderDiscounts, $from, $to - $from + 1);
-//                // Correct meta-invoice-amount.
-//                $totalOrderDiscountEx = array_reduce($result, static function ($sum, $item) {
-//                    $sum += $item[Tag::Quantity] * $item[Tag::UnitPrice];
-//                    return $sum;
-//                }, 0.0);
-//                $this->invoice[Tag::Customer][Tag::Invoice][Meta::Totals]->amountEx += $totalOrderDiscountEx;
-//            } //else {
-//                // We could not match a discount with the difference between the
-//                // total amount credited and the sum of the products returned. A
-//                // manual line will correct the invoice.
-//            //}
-//        }
-        // End of BR 2024-05-14 Old, replaced by looking at order_slip_type
         return $result;
     }
 
@@ -448,7 +332,7 @@ class Creator extends BaseCreator
                     Meta::VatClassId => Config::VatClass_Null,
                 ];
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             $result = [];
         }
         return $result;

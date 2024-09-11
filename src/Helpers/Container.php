@@ -578,6 +578,19 @@ class Container
             $this,
             $this->getLog(),
         ]);
+        try {
+            if ($subType !== null) {
+                // If a $subType collector exists, the constructor arguments will be the
+                // same for each instance creation of that $subType, so no need to create
+                // multiple instances.
+                return $this->getInstance("{$subType}Collector", 'Collectors', $arguments);
+            }
+        } catch (InvalidArgumentException) {
+        }
+        // We need separate instances if $subType is part of the constructor arguments but
+        // not of the class name.
+        // (We would need only 1 instance per subtype, but for now the caching keys cannot
+        // take this into account, so we create a new instance with every call.)
         return $this->getInstance("{$type}Collector", 'Collectors', $arguments, $subType !== null);
     }
 

@@ -6,7 +6,7 @@ namespace Siel\Acumulus\PrestaShop\Collectors;
 
 use Address;
 use Exception;
-use Siel\Acumulus\Collectors\LineCollector as BaseLineCollector;
+use Siel\Acumulus\Collectors\LineCollector;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AddressType;
@@ -22,7 +22,7 @@ use TaxRulesGroup;
  *
  * @noinspection PhpUnused  Instantiated via a factory.
  */
-class LineCollector extends BaseLineCollector
+class ItemLineCollector extends LineCollector
 {
     /**
      * Precision: 1 of the amounts, probably the prince incl tax, is entered by
@@ -46,7 +46,6 @@ class LineCollector extends BaseLineCollector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
-        parent::collectLogicFields($acumulusObject);
         $this->getItemLine($acumulusObject);
     }
 

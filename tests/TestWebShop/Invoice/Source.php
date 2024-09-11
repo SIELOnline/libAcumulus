@@ -54,7 +54,7 @@ class Source extends BaseSource
             $timestamp = $this->getSource()->payment->timestamp;
             $date = new DateTime($timestamp);
             $result = $date->format('Y-m-d');
-        } catch (Exception $e) {
+        } catch (Exception) {
             $result = null;
         }
         return $result;
@@ -73,11 +73,6 @@ class Source extends BaseSource
     protected function getShopOrderOrId(): int
     {
         return $this->getSource()->id;
-    }
-
-    protected function getShopCreditNotesOrIds(): array
-    {
-        return [];
     }
 
     protected function getShopItems(): array

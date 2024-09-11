@@ -29,6 +29,8 @@ use function strlen;
 /**
  * Wraps a Magento order or credit memo in an invoice source object.
  *
+ * @property Order|Creditmemo shopObject
+ * @method Order|Creditmemo getShopObject()
  * @method Order|Creditmemo getSource()
  */
 class Source extends BaseSource
@@ -147,7 +149,7 @@ class Source extends BaseSource
     public function getPaymentMethod()
     {
         try {
-            return $this->getOrder()->shopSource->getPayment()->getMethod();
+            return $this->getOrder()->getShopObject()->getPayment()->getMethod();
         } catch (Throwable $e) {
             return parent::getPaymentMethod();
         }

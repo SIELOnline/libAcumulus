@@ -24,7 +24,8 @@ use function strlen;
 /**
  * Wraps an OpenCart order in an invoice source object.
  *
- * @property array $shopSource
+ * @property array $shopObject
+ * @method array getShopObject()
  */
 abstract class Source extends BaseSource
 {

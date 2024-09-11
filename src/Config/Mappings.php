@@ -232,14 +232,13 @@ class Mappings
                 Fld::Subject => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
             ],
             LineType::Item => [
-                Fld::ItemNumber => '[product::getReference()]',
-                Fld::Product => '[product::getName()]',
-                Fld::Quantity => '[product::getQuantity()]',
+//                Fld::ItemNumber => '[product::getReference()]',
+//                Fld::Product => '[product::getName()]',
+//                Fld::Quantity => '[product::getQuantity()]',
+//                Meta::VatClassId => '[product::getVatClassId()]',
+//                Meta::VatClassName => '[product::getVatClassName()]',
                 Meta::Id => '[item::getId()]',
                 Meta::ProductId => '[product::getId()]',
-                // @todo: probably not shop independent
-                Meta::VatClassId => '[product::getVatClassId()]',
-                Meta::VatClassName => '[product::getVatClassName()]',
             ],
         ];
     }

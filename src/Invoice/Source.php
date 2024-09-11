@@ -563,7 +563,7 @@ abstract class Source
      * Overrides can use the {@see $shopObject} property to retrieve the item lines.
      * If no item lines exist, highly unlikely, an empty array should be returned.
      * Normally, this method will be called only once by the public method
-     * {@see getItems()}, so it is correct to just instantiate new {@see Item} objects.
+     * {@see getItems()}, so it is correct to instantiate new {@see Item} objects.
      *
      * @return Item[]
      */

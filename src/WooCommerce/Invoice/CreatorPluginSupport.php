@@ -1,15 +1,19 @@
 <?php
 /**
- * @noinspection DuplicatedCode  Yes, this is a duplicate of WooCommerce\Invoice\Creator.
+ * @noinspection PhpUnusedParameterInspection  Event handlers often do not need all
+ *   parameters that were passed with the event, but we have to declare them anyway.
  */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 use WC_Booking;
@@ -27,73 +31,58 @@ use function is_string;
  * to standard WooCommerce. Supporting all these plugins is difficult and
  * results in hard to read and maintain code. Therefore, we try to split support
  * for these other plugins off into its own containers that react to the
- * Acumulus filters and actions.
+ * Acumulus events (actions).
  */
 class CreatorPluginSupport
 {
     /**
-     * Called at the beginning of Creator::getItemLine().
-     *
-     * @param WC_Order_Item_Product $item
-     *   An array representing an order item line, meta values are already
-     *   available under their own names and as an array under key 'item_meta'.
-     * @param WC_Product|bool|null $product
-     *   The product that was sold on this line, may also be a bool according to
-     *   the WC3 php documentation. I guess it will be false if the product has
-     *   been deleted since.
-     *
-     * @noinspection PhpUnused
+     * See {@see \Siel\Acumulus\Helpers\Event::triggerItemLineCollectBefore()}
      */
-    public function getItemLineBefore(Creator $creator, WC_Order_Item_Product $item, $product): void
+    public function itemLineCollectBefore(Item $item, CollectorManager $collectorManager): void
     {
-        $this->getItemLineBeforeBookings($creator, $item, $product);
+        $this->itemLineCollectBeforeBookings($item, $collectorManager);
     }
 
     /**
-     * Called at the end of Creator::getItemLine().
-     *
-     * @param WC_Order_Item_Product $item
-     *   An array representing an order item line, meta values are already
-     *   available under their own names and as an array under key 'item_meta'.
-     * @param WC_Product|bool|null $product
-     *   The product that was sold on this line, may also be a bool according to
-     *   the WC3 php documentation. I guess it will be false if the product has
-     *   been deleted since.
-     *
-     * @noinspection PhpUnused
+     * See {@see \Siel\Acumulus\Helpers\Event::triggerItemLineCollectAfter()}
      */
-    public function getItemLineAfter(
-        Creator $creator,
-        /** @noinspection PhpUnusedParameterInspection */ WC_Order_Item_Product $item,
-        /** @noinspection PhpUnusedParameterInspection */$product
-    ): void {
-        $this->getItemLineAfterBookings($creator);
+    public function itemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void
+    {
+        $this->itemLineCollectAfterBookings($line, $item, $collectorManager);
+    }
+
+    /**
+     * See {@see \Siel\Acumulus\Helpers\Event::triggerInvoiceCollectAfter()}
+     */
+    public function acumulusInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
+        $this->supportBundleProducts($invoice, $invoiceSource, $localResult);
+        $this->supportTMExtraProductOptions($invoice, $invoiceSource, $localResult);
     }
 
     /**
      * Support for the "WooCommerce Bookings" plugin.
      *
-     * Bookings are stored in a separate entity, we add that as a separate
-     * property source, so its properties can be used.
-     *
-     * @param WC_Product|bool|null $product
+     * Bookings are stored in a separate entity, we add that as a separate property
+     * source, so its properties can be used.
      */
-    public function getItemLineBeforeBookings(Creator $creator, WC_Order_Item_Product $item, $product): void
+    public function itemLineCollectBeforeBookings(Item $item, CollectorManager $collectorManager): void
     {
-        if (($product instanceof WC_Product)
-            && function_exists('is_wc_booking_product')
-            && is_wc_booking_product($product)
-        ) {
-            $booking_ids = WC_Booking_Data_Store::get_booking_ids_from_order_item_id($item->get_id());
-            if ($booking_ids) {
-                // I cannot imagine multiple bookings belonging to the same
-                // order line, but if that occurs, only the 1st booking will
-                // be added as a property source.
-                $booking = new WC_Booking(reset($booking_ids));
-                $creator->addPropertySource('booking', $booking);
-                $resource = $booking->get_resource();
-                if ($resource) {
-                    $creator->addPropertySource('resource', $resource);
+        if (($item->getProduct() !== null) && function_exists('is_wc_booking_product')) {
+            /** @var WC_Product $product */
+            $product = $item->getProduct()->getShopObject();
+            if (is_wc_booking_product($product)) {
+                $booking_ids = WC_Booking_Data_Store::get_booking_ids_from_order_item_id($item->getId());
+                if ($booking_ids) {
+                    // I cannot imagine multiple bookings belonging to the same
+                    // order line, but if that occurs, only the 1st booking will
+                    // be added as a property source.
+                    $booking = new WC_Booking(reset($booking_ids));
+                    $collectorManager->addPropertySource('booking', $booking);
+                    $resource = $booking->get_resource();
+                    if ($resource) {
+                        $collectorManager->addPropertySource('resource', $resource);
+                    }
                 }
             }
         }
@@ -102,26 +91,16 @@ class CreatorPluginSupport
     /**
      * Supports the "WooCommerce Bookings" plugin.
      *
-     * Removes the property source.
+     * Removes the property sources.
      */
-    public function getItemLineAfterBookings(Creator $creator): void
+    public function itemLineCollectAfterBookings(Line $line, Item $item, CollectorManager $collectorManager): void
     {
-        $creator->removePropertySource('resource');
-        $creator->removePropertySource('booking');
+        $collectorManager->removePropertySource('resource');
+        $collectorManager->removePropertySource('booking');
     }
 
     /**
-     * Filter that reacts to the acumulus_invoice_created event.
-     */
-    public function acumulusInvoiceCreated(?array $invoice, BaseSource $invoiceSource, InvoiceAddResult $localResult): ?array
-    {
-        $invoice = $this->supportBundleProducts($invoice, $invoiceSource, $localResult);
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $invoice = $this->supportTMExtraProductOptions($invoice, $invoiceSource, $localResult);
-        return $invoice;
-    }
-
-    /**
+     * @error this only adds metadata to lines: make it an item line collect after (or before) event
      * Supports the "WooCommerce Bundle Products" plugin.
      * This method supports the woocommerce-product-bundles extension that
      * stores the bundle products as separate item lines below the bundle line
@@ -141,7 +120,7 @@ class CreatorPluginSupport
      * 2) In a 2nd pass, we group the bundled items as children into the parent
      *    line.
      */
-    protected function supportBundleProducts(?array $invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ InvoiceAddResult $localResult): ?array
+    protected function supportBundleProducts(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         /** @var \WC_Abstract_Order $shopSource */
         $shopSource = $invoiceSource->getSource();
@@ -154,11 +133,11 @@ class CreatorPluginSupport
                 $line = &$this->getLineByMetaId($invoice[Tag::Customer][Tag::Invoice][Tag::Line], $item->get_id());
                 if ($line !== null) {
                     // Add bundle meta data.
-                    if ( !empty($bundleId)) {
+                    if (!empty($bundleId)) {
                         // Bundle or bundled product.
                         $line[Meta::BundleId] = $bundleId;
                     }
-                    if ( !empty($bundledBy)) {
+                    if (!empty($bundledBy)) {
                         // Bundled products only.
                         $line[Meta::BundleParentId] = $bundledBy;
                         $line[Meta::BundleVisible] = $item->get_meta('bundled_item_hidden') !== 'yes';
@@ -168,8 +147,6 @@ class CreatorPluginSupport
         }
 
         $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->groupBundles($invoice[Tag::Customer][Tag::Invoice][Tag::Line]);
-
-        return $invoice;
     }
 
     protected function &getLineByMetaId(array &$lines, int $id): ?array
@@ -261,12 +238,8 @@ class CreatorPluginSupport
      * options.
      * This method adds the option data as children to the invoice line.
      */
-    protected function supportTMExtraProductOptions(
-        ?array $invoice,
-        BaseSource $invoiceSource,
-        /** @noinspection PhpUnusedParameterInspection */
-        InvoiceAddResult $localResult
-    ): ?array {
+    protected function supportTMExtraProductOptions(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
         /** @var \WC_Abstract_Order $shopSource */
         $shopSource = $invoiceSource->getSource();
         /** @var WC_Order_Item_Product[] $items */
@@ -287,12 +260,13 @@ class CreatorPluginSupport
                     if (!isset($line[Meta::ChildrenLines])) {
                         $line[Meta::ChildrenLines] = [];
                     }
-                    $line[Meta::ChildrenLines] = array_merge($line[Meta::ChildrenLines], $this->getExtraProductOptionsLines($item, $commonTags));
+                    $line[Meta::ChildrenLines] = array_merge(
+                        $line[Meta::ChildrenLines],
+                        $this->getExtraProductOptionsLines($item, $commonTags)
+                    );
                 }
             }
         }
-
-        return $invoice;
     }
 
     /**
@@ -319,7 +293,7 @@ class CreatorPluginSupport
         if (is_string($options)) {
             $options = (array) maybe_unserialize($options);
         } else {
-            array_walk($options, static function(&$value) {
+            array_walk($options, static function (&$value) {
                 if (is_string($value)) {
                     $value = maybe_unserialize($value);
                 }
@@ -331,9 +305,9 @@ class CreatorPluginSupport
             $label = $option['name'];
             $choice = $option['value'];
             $result[] = [
-                            Tag::Product => $label . ': ' . $choice,
-                            Tag::UnitPrice => 0,
-                        ] + $commonTags;
+                    Tag::Product => $label . ': ' . $choice,
+                    Tag::UnitPrice => 0,
+                ] + $commonTags;
         }
 
         return $result;

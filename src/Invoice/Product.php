@@ -7,7 +7,7 @@ namespace Siel\Acumulus\Invoice;
 use Siel\Acumulus\Helpers\Container;
 
 /**
- * Product is an adapter (and wrapper) class around a product (or service) ordered (or
+ * Product is an adapter (and wrapper) class around a product (variant) ordered (or
  * refunded) on an {@see Item item line} of a web shop order or refund.
  *
  * Product is used to provide unified access to information about a product or service
@@ -31,9 +31,29 @@ abstract class Product
         $this->initializeWrapper($idOrProduct, $container);
     }
 
-    abstract public function getReference(): string;
+    // @todo: Next phase: add methods that implement the adapter part: getReference(),
+    //   getName(), etc. Actual implementations should be copied from
+    //   ShopCapabilities::getDefaultShopMappings().
+    /**
+     * Returns the reference of the product.
+     *
+     * The reference is typically the SKU, ISBN, EAN13, or any other string used to
+     * uniquely identify this product (variant).
+     */
+//    abstract public function getReference(): string;
 
-    abstract public function getName(): string;
+    /**
+     * Returns the name of the product.
+     */
+//    abstract public function getName(): string;
 
-    abstract public function getVatClass(): string;
+    /**
+     * Returns the id of the vat class of the product.
+     */
+//    abstract public function getVatClassId(): int|string;
+
+    /**
+     * Returns the name of the vat class of the product.
+     */
+//    abstract public function getVatClassName(): string;
 }

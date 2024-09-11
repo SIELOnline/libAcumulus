@@ -23,7 +23,7 @@ abstract class Item
      * @var Source
      *   The parent Source for this Item.
      */
-    protected Source $shopSource;
+    protected Source $source;
 
     /**
      * @var \Siel\Acumulus\Invoice\Product|null
@@ -31,10 +31,15 @@ abstract class Item
      */
     protected ?Product $product;
 
-    public function __construct(Source $shopSource, int|string|object|array|null $idOrItem, Container $container)
+    public function __construct(Source $source, int|string|object|array|null $idOrItem, Container $container)
     {
-        $this->shopSource = $shopSource;
+        $this->source = $source;
         $this->initializeWrapper($idOrItem, $container);
+    }
+
+    public function getSource(): Source
+    {
+        return $this->source;
     }
 
     public function getProduct(): ?Product

@@ -11,7 +11,10 @@ use Siel\Acumulus\Invoice\Product;
 /**
  * Item is the PrestaShop specific class to wrap an order/refund item.
  *
- * @property \Order|\OrderSlip $shopObject
+ * @property array $shopObject Combination of OrderDetail and order detail taxes.
+ *
+ * @todo: do we get PrestaShop\PrestaShop\Core\Domain\Order\ValueObject\OrderDetailRefund
+ *   objects with order slips?
  */
 class Item extends BaseItem
 {
@@ -26,9 +29,9 @@ class Item extends BaseItem
     }
 
     /**
-     * This override returns null as PrestaShop stores all relevant product data in the
-     * item (an OrderDetail) itself, allowing to retrieve product data as it was at the
-     * time of placing the order.
+     * This PrestaShop override returns null as PrestaShop stores all relevant product
+     * data in the item (an OrderDetail) itself, allowing to retrieve product data as it
+     * was at the time of placing the order.
      */
     protected function getShopProduct(): ?Product
     {

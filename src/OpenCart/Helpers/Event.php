@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Helpers;
 
+use Siel\Acumulus\Collectors\CollectorManager;
 use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Event as EventInterface;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 
 /**
@@ -17,28 +20,42 @@ class Event implements EventInterface
     public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $route = Registry::getInstance()->getAcumulusTrigger('invoiceCreate', 'before');
-        $args = ['source' => $invoiceSource, 'localResult' => $localResult];
+        $args = compact('invoiceSource', 'localResult');
+        $this->getEvent()->trigger($route, $args);
+    }
+
+    public function triggerItemLineCollectBefore(Item $item, CollectorManager $collectorManager): void
+    {
+        $route = Registry::getInstance()->getAcumulusTrigger('itemLineCollect', 'before');
+        $args = compact('item', 'collectorManager');
+        $this->getEvent()->trigger($route, $args);
+    }
+
+    public function triggerItemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void
+    {
+        $route = Registry::getInstance()->getAcumulusTrigger('itemLineCollect', 'after');
+        $args = compact('line', 'item', 'collectorManager');
         $this->getEvent()->trigger($route, $args);
     }
 
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $route = Registry::getInstance()->getAcumulusTrigger('invoiceCollect', 'after');
-        $args = ['invoice' => $invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
+        $args = compact('invoice', 'invoiceSource', 'localResult');
         $this->getEvent()->trigger($route, $args);
     }
 
     public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
     {
         $route = Registry::getInstance()->getAcumulusTrigger('invoiceSend', 'before');
-        $args = ['invoice' => $invoice, 'localResult' => $localResult];
+        $args = compact('invoice', 'localResult');
         $this->getEvent()->trigger($route, $args);
     }
 
     public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         $route = Registry::getInstance()->getAcumulusTrigger('invoiceSend', 'after');
-        $args = ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result];
+        $args = compact('invoice', 'invoiceSource', 'result');
         $this->getEvent()->trigger($route, $args);
     }
 

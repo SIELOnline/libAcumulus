@@ -8,9 +8,12 @@ use Joomla\CMS\Application\CMSApplicationInterface;
 use Joomla\CMS\Event\AbstractEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
+use Siel\Acumulus\Collectors\CollectorManager;
 use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Event as EventInterface;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Joomla\Component\Acumulus\Administrator\Extension\AcumulusComponent;
 
@@ -25,6 +28,16 @@ class Event implements EventInterface
     public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $this->triggerEvent('onAcumulusInvoiceCreateBefore', compact('invoiceSource', 'localResult'));
+    }
+
+    public function triggerItemLineCollectBefore(Item $item, CollectorManager $collectorManager): void
+    {
+        $this->triggerEvent('onAcumulusItemLineCollectBefore', compact('item', 'collectorManager'));
+    }
+
+    public function triggerItemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void
+    {
+        $this->triggerEvent('onAcumulusItemLineCollectAfter', compact('line', 'item', 'collectorManager'));
     }
 
     /**

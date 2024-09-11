@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Helpers;
 
 use RuntimeException;
 
+use function count;
 use function is_array;
 
 /**

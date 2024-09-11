@@ -25,6 +25,11 @@
                 "product": "Comment",
                 "qty": 0,
                 "price": 0.0
+            },
+            {
+                "product": "Comment2",
+                "qty": "0",
+                "price": "0.0"
             }
         ],
         "shipping": {
@@ -46,7 +51,7 @@
         "last_name": "Derksen",
         "email": "customer@example.com",
         "telephone": "0123456789",
-        "mobile": "0612345978"
+        "mobile": "+33612345978"
     },
     "invoice_address": {
         "id": 4,

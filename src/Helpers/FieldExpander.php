@@ -266,7 +266,7 @@ class FieldExpander
     protected function expansionSpecificationMatch(array $matches): string
     {
         $expandedValue = $this->expandSpecification($matches[1]);
-        if(!is_string($expandedValue)) {
+        if (!is_string($expandedValue)) {
             $expandedValue = $this->valueToString($expandedValue);
         }
         return $expandedValue;
@@ -377,7 +377,7 @@ class FieldExpander
         } elseif ($this->isConstant($singleProperty)) {
             $type = self::TypeLiteral;
             $value = $this->getConstant($singleProperty);
-        } elseif (strpos($singleProperty, '::') !== false) {
+        } elseif (str_contains($singleProperty, '::')) {
             $type = self::TypeProperty;
             $value = $this->expandPropertyInObject($singleProperty);
         } else {
@@ -500,7 +500,7 @@ class FieldExpander
      *   The value for the property of the given name, or null or the empty
      *   string if not available.
      */
-    protected function getProperty(string $property, $object)
+    protected function getProperty(string $property, object|array $object)
     {
         $value = null;
 
@@ -581,18 +581,18 @@ class FieldExpander
         } elseif (method_exists($variable, '__call')) {
             try {
                 $value = @call_user_func_array([$variable, $method1], $args);
-            } catch (Exception $e) {
+            } catch (Exception) {
             }
             if ($value === null || $value === '') {
                 try {
                     $value = @call_user_func_array([$variable, $method2], $args);
-                } catch (Exception $e) {
+                } catch (Exception) {
                 }
             }
             if ($value === null || $value === '') {
                 try {
                     $value = @call_user_func_array([$variable, $method3], $args);
-                } catch (Exception $e) {
+                } catch (Exception) {
                 }
             }
         }
@@ -688,7 +688,7 @@ class FieldExpander
      *
      * @return string
      */
-    protected  function valueToString($value): string
+    protected function valueToString(mixed $value): string
     {
         try {
             if (is_bool($value)) {
@@ -711,6 +711,7 @@ class FieldExpander
                 $value = (string) $value;
             } else {
                 // object without a _toString().
+                /** @noinspection JsonEncodingApiUsageInspection false positive */
                 $value = (string) json_encode($value, Meta::JsonFlagsLooseType);
             }
         } catch (Exception $e) {
@@ -722,10 +723,14 @@ class FieldExpander
 
     /**
      * Casts a numeric string value to an int or float.
+     *
+     * Note that we don't want to cast phone numbers that often start with a 0 or +. So we
+     * check that the first digit is not a zero, and we only allow a minus sign before the
+     * number, not a (redundant) plus sign.
      */
     protected function castNumericValue(mixed $value): mixed
     {
-        if (is_string($value) && is_numeric($value)) {
+        if (is_string($value) && is_numeric($value) && strncmp($value, '+', 1) !== 0 && !preg_match('/^0\d+$/', $value)) {
             if (preg_match('/^-?\d+$/', $value)) {
                 $value = (int) $value;
             } else {

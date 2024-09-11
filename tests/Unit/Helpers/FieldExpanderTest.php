@@ -88,6 +88,8 @@ class FieldExpanderTest extends TestCase
             ['[id]', 3],
             ['[invoiceSource::customer::id]', 2],
             ['[invoiceSource::customer::invoice_address::id]', 4],
+            ['[invoiceSource::customer::telephone]', '0123456789'],
+            ['[invoiceSource::customer::mobile]', '+33612345978'],
             ['[date]', '2022-12-01'],
             ['[amount]', 50.40],
             ['[order::payment::paid]', 50.40],
@@ -245,6 +247,8 @@ class FieldExpanderTest extends TestCase
             ['[order::lines::2::qty|source::getSign()]', 1],
             ['[order::lines::2::price]', 0.0],
             ['[order::lines::2::price|source::getSign()]', 1],
+            ['[order::lines::3::qty]', 0],
+            ['[order::lines::3::price]', 0.0],
         ];
     }
 

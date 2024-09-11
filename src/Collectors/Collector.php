@@ -9,6 +9,7 @@ use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Meta;
 
 use function get_class;
@@ -35,9 +36,13 @@ abstract class Collector implements CollectorInterface
 {
     private FieldExpander $fieldExpander;
     private Container $container;
-    protected Log $log;
-
-    protected array $propertySources;
+    private Log $log;
+    /**
+     * @var (array|object)[]
+     *   String keyed array of "objects" that can provide properties to the
+     *   {@see FieldExpander}.
+     */
+    private array $propertySources;
 
     public function __construct(FieldExpander $fieldExpander, Container $container, Log $log)
     {
@@ -62,6 +67,11 @@ abstract class Collector implements CollectorInterface
         return substr($shortClass, 0, -strlen('Collector'));
     }
 
+    protected function getLog(): Log
+    {
+        return $this->log;
+    }
+
     protected function getContainer(): Container
     {
         return $this->container;
@@ -73,14 +83,25 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
+     * Will throw an {@see \ErrorException} if no InvoiceAddResult is set as property
+     * source under the name 'localResult'.
+     */
+    public function getLocalResult(): InvoiceAddResult
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection  might indeed throw. */
+        return $this->getPropertySource('localResult');
+    }
+
+
+    /**
      * returns the property source with the given name.
      *
      * @param string $property
      *
-     * @return mixed
+     * @return array|object|null
      *   The property source with the given name, or null if not existing.
      */
-    protected function getPropertySource(string $property): mixed
+    protected function getPropertySource(string $property): array|object|null
     {
         return $this->propertySources[$property] ?? null;
     }
@@ -162,7 +183,7 @@ abstract class Collector implements CollectorInterface
             $acumulusObject->metadataAdd($field, $this->expandValue($value));
             return true;
         } else {
-            $this->log->notice(
+            $this->getLog()->notice(
                 '%s: %s does not have a property %s, nor is it considered metadata',
                 __METHOD__,
                 get_class($acumulusObject),
@@ -217,5 +238,19 @@ abstract class Collector implements CollectorInterface
     {
         return strncmp($field, 'meta', strlen('meta')) === 0
             || in_array($field, [Meta::UnitPriceInc, Meta::VatAmount], true);
+    }
+
+    /**
+     * Helper method to add a warning to an InvoiceAddResult.
+     *
+     * Warnings are placed in the $array under the key Meta::Warning. If no
+     * warning is set, $warning is added as a string, otherwise it becomes an
+     * array of warnings to which this $warning is added.
+     *
+     * @todo: deprecate and inline.
+     */
+    protected function addWarning(AcumulusObject $acumulusObject, string $warning, string $severity = Meta::Warning): void
+    {
+        $acumulusObject->metadataAdd($severity, $warning);
     }
 }

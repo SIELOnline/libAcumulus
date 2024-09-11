@@ -16,6 +16,7 @@ use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 
 /**
@@ -44,9 +45,8 @@ class CollectorManager
     protected FieldExpander $fieldExpander;
     private Container $container;
     private Mappings $mappings;
-    protected Log $log;
+    private Log $log;
 
-    /** deprecated?  Only Source remains with multi-level FieldExpander? */
     private array $propertySources;
 
     public function __construct(FieldExpander $fieldExpander, Mappings $mappings, Container $container, Log $log)
@@ -66,6 +66,11 @@ class CollectorManager
     protected function getMappings(): Mappings
     {
         return $this->mappings;
+    }
+
+    protected function getLog(): Log
+    {
+        return $this->log;
     }
 
     protected function getPropertySources(): array
@@ -99,7 +104,7 @@ class CollectorManager
      *
      * @return $this
      */
-    public function addPropertySource(string $name, $property): CollectorManager
+    public function addPropertySource(string $name, object|array $property): CollectorManager
     {
         $this->propertySources = array_merge($this->propertySources, [$name => $property]);
         return $this;
@@ -131,9 +136,12 @@ class CollectorManager
     /**
      * Collects an invoice for the given {@see \Siel\Acumulus\Invoice\Source}.
      */
-    public function collectInvoiceForSource(Source $source): Invoice
+    public function collectInvoiceForSource(Source $source, InvoiceAddResult $localResult): Invoice
     {
-        return $this->clearPropertySources()->setPropertySourcesForSource($source)->collectInvoice();
+        return $this->clearPropertySources()
+            ->addPropertySource('localResult', $localResult)
+            ->setPropertySourcesForSource($source)
+            ->collectInvoice();
     }
 
     public function collectInvoice(): Invoice
@@ -211,9 +219,7 @@ class CollectorManager
     }
 
     /**
-     * Collects all item lines.
-     *
-     * @param \Siel\Acumulus\Data\Invoice $invoice
+     * Collects all item lines, that is the lines with the products sold.
      */
     private function collectItemLines(Invoice $invoice, Source $source): void
     {
@@ -224,8 +230,10 @@ class CollectorManager
         foreach ($items as $item) {
             $this->addPropertySource('item', $item);
             $this->addPropertySource('product', $item->getProduct());
+            $this->getContainer()->getEvent()->triggerItemLineCollectBefore($item, $this);
             /** @var \Siel\Acumulus\Data\Line $line */
             $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);
+            $this->getContainer()->getEvent()->triggerItemLineCollectAfter($line, $item, $this);
             $invoice->addLine($line);
             $this->removePropertySource('product');
             $this->removePropertySource('item');

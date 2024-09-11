@@ -72,7 +72,7 @@ class InvoiceCreate
     {
         $this->getEvent()->triggerInvoiceCreateBefore($invoiceSource, $result);
         if (!$result->isSendingPrevented()) {
-            $invoice = $this->getCollectorManager()->collectInvoiceForSource($invoiceSource);
+            $invoice = $this->getCollectorManager()->collectInvoiceForSource($invoiceSource, $result);
             $result->setInvoice($invoice);
             $this->getEvent()->triggerInvoiceCollectAfter($invoice, $invoiceSource, $result);
             if (!$result->isSendingPrevented()) {

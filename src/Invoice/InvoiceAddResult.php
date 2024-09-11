@@ -14,7 +14,7 @@ use Siel\Acumulus\Helpers\Translator;
 use function count;
 
 /**
- * Extends Result with properties and features specific to the InvoiceAdd web
+ * Extends {@see AcumulusResult} with properties and features specific to the InvoiceAdd web
  * service call.
  *
  * @noinspection PhpLackOfCohesionInspection
@@ -253,7 +253,7 @@ class InvoiceAddResult extends MessageCollection
 
     public function getMainApiResponse(): ?array
     {
-        return $this->getAcumulusResult() !== null ? $this->getAcumulusResult()->getMainAcumulusResponse() : null ;
+        return $this->getAcumulusResult()?->getMainAcumulusResponse();
     }
 
     public function getAcumulusResult(): ?AcumulusResult

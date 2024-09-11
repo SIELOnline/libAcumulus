@@ -232,9 +232,13 @@ class Mappings
                 Fld::Subject => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
             ],
             LineType::Item => [
+// @todo: The adapter part of Product has been stalled temporarily: first move code from
+//    the Creators to ItemLineCollectors without changing it, only then refactor that
+//    code to use this.
 //                Fld::ItemNumber => '[product::getReference()]',
 //                Fld::Product => '[product::getName()]',
 //                Fld::Quantity => '[product::getQuantity()]',
+// @todo: are these 2 meta keys used by all webshops?
 //                Meta::VatClassId => '[product::getVatClassId()]',
 //                Meta::VatClassName => '[product::getVatClassName()]',
                 Meta::Id => '[item::getId()]',

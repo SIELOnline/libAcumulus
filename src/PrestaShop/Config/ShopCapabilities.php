@@ -284,7 +284,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::EmailTo => '[source::getOrder()::getSource()::getCustomer()::email]',
             ],
             LineType::Item => [ // item instanceof Item
-                Meta::Id => '[item::getShopObject()::id_order_detail]',
                 Meta::ProductId => '[item::getShopObject()::product_id]',
                 Fld::ItemNumber => '[item::getShopObject()::product_reference'
                     . '|item::getShopObject()::product_ean13'

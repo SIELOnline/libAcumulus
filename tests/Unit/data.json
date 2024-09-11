@@ -20,6 +20,11 @@
                 "qty": 2,
                 "price": 24.95,
                 "vat_rate": 21
+            },
+            {
+                "product": "Comment",
+                "qty": 0,
+                "price": 0.0
             }
         ],
         "shipping": {

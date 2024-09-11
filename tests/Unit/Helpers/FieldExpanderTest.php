@@ -236,6 +236,36 @@ class FieldExpanderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function objectWithNumericArrayAnd0ValuesProvider(): array
+    {
+        return [
+            ['[order::lines::0::product]', 'Buro'],
+            ['[order::lines::2::product]', 'Comment'],
+            ['[order::lines::2::qty]', 0],
+            ['[order::lines::2::qty|source::getSign()]', 1],
+            ['[order::lines::2::price]', 0.0],
+            ['[order::lines::2::price|source::getSign()]', 1],
+        ];
+    }
+
+    /**
+     * @dataProvider objectWithNumericArrayAnd0ValuesProvider
+     */
+    public function testObjectWithNumericArray(string $fieldDefinition, $expected): void
+    {
+        $objects = $this->getObjects() + [
+                'source' => new class {
+                    public function getSign(): int
+                    {
+                        return 1;
+                    }
+                },
+            ];
+        $field = $this->getFieldExpander();
+        $result = $field->expand($fieldDefinition, $objects);
+        $this->assertSame($expected, $result);
+    }
+
     /**
      * Tests parameter passing without type strictness.
      */
@@ -270,6 +300,9 @@ class FieldExpanderTest extends TestCase
         $result1 = $field->expand('[order::amount]', $objects);
         $result2 = $field->expand('[sign*order::amount]', $objects);
         $this->assertSame($result1, $result2);
+        $result3 = $field->expand('[order::amount1|order::amount]', $objects);
+        $result4 = $field->expand('[sign*order::amount1|order::amount]', $objects);
+        $this->assertSame($result3, $result4);
 
         $objects = $this->getObjects() + [
             'source' => new class {
@@ -283,18 +316,8 @@ class FieldExpanderTest extends TestCase
         $result1 = $field->expand('[order::amount]', $objects);
         $result2 = $field->expand('[sign*order::amount]', $objects);
         $this->assertSame(-$result1, $result2);
-
-        $objects = $this->getObjects() + [
-            'source' => new class {
-                public function getSign(): int
-                {
-                    return -1;
-                }
-            },
-        ];
-        $field = $this->getFieldExpander();
-        $result1 = $field->expand('[order::amount1|order::amount]', $objects);
-        $result2 = $field->expand('[sign*order::amount1|order::amount]', $objects);
-        $this->assertSame(-$result1, $result2);
+        $result3 = $field->expand('[order::amount1|order::amount]', $objects);
+        $result4 = $field->expand('[sign*order::amount1|order::amount]', $objects);
+        $this->assertSame(-$result3, $result4);
     }
 }

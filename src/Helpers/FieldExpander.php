@@ -300,16 +300,16 @@ class FieldExpander
         foreach ($propertyAlternatives as $propertyAlternative) {
             $value = $this->expandAlternative($propertyAlternative);
             // Stop as soon as an alternative resulted in a non-empty value.
-            if ($value !== null && $value !== '') {
+            if (!empty($value)) {
                 break;
             }
         }
 
-        if ($value === null || $value === '') {
+        if (empty($value)) {
             $this->log->debug("Field::expandSpecification('%s'): not found", $expansionSpecification);
         }
 
-        if ($sign !== null) {
+        if ($sign !== null && !empty($value)) {
             $value = $sign * $value;
         }
         return $value;

@@ -48,7 +48,10 @@ class CollectorManagerTest extends TestCase
     public function testCollectInvoice(): void
     {
         $manager = $this->getContainer()->getCollectorManager();
-        $invoice = $manager->collectInvoiceForSource($this->getInvoiceSource());
+        $invoice = $manager->collectInvoiceForSource(
+            $this->getInvoiceSource(),
+            $this->getContainer()->createInvoiceAddResult('CollectorManagerTest::testCollectInvoice()')
+        );
 
         $this->assertNull($invoice->concept);
         $this->assertNull($invoice->conceptType);
@@ -107,7 +110,7 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($customer->website);
         $this->assertNull($customer->vatNumber);
         $this->assertSame('0123456789', $customer->telephone);
-        $this->assertSame('0612345978', $customer->telephone2);
+        $this->assertSame('+33612345978', $customer->telephone2);
         $this->assertNull($customer->fax);
         $this->assertSame('customer@example.com', $customer->email);
         $this->assertNull($customer->overwriteIfExists);

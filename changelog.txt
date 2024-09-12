@@ -3,7 +3,7 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.3.0 (2024-08-??) (ALL)
+8.3.0 (2024-09-??) (ALL)
 ------------------------
 Minimal requirements:
 - This plugin now requires PHP 8.0. This means that support has been dropped for the

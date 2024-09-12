@@ -204,7 +204,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Creator::class, $object);
         $object = $container->getCompletor();
         $this->assertInstanceOf(Completor::class, $object);
-        $object = $container->createInvoiceAddResult('');
+        $object = $container->createInvoiceAddResult('ContainerTest::testInvoiceNamespace()');
         $this->assertInstanceOf(InvoiceAddResult::class, $object);
         $object = $container->getCompletorInvoiceLines();
         $this->assertInstanceOf(CompletorInvoiceLines::class, $object);

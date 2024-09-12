@@ -460,7 +460,7 @@ class Container
      *
      * @param string $trigger
      *   A string indicating the situation that triggered the need to get a new
-     *   instance.
+     *   instance. Typically, the name of the calling method.
      *
      * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   A wrapper object around an Acumulus invoice-add service result.

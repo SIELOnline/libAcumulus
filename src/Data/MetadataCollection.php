@@ -11,7 +11,7 @@ use function array_key_exists;
  */
 class MetadataCollection
 {
-    /** @var MetadataValue[]  */
+    /** @var MetadataValue[] $metadata */
     private array $metadata = [];
 
     public function exists(string $name): bool
@@ -66,9 +66,22 @@ class MetadataCollection
      * @param mixed $value
      *   The value for the metadata field.
      */
-    public function set(string $name, $value): void
+    public function set(string $name, mixed $value): void
     {
         $this->metadata[$name] = new MetadataValue($value);
+    }
+
+    /**
+     * Sets a set of metadata fields.
+     *
+     * @param array $values
+     *   An array keyed by the names of the metadata field to set.
+     */
+    public function setMultiple(array $values): void
+    {
+        foreach ($values as $name => $value) {
+            $this->set($name, $value);
+        }
     }
 
     /**
@@ -85,7 +98,7 @@ class MetadataCollection
      * @param mixed $value
      *   The value to add to (or set for) the metadata field.
      */
-    public function add(string $name, $value): void
+    public function add(string $name, mixed $value): void
     {
         $this->exists($name) ? $this->metadata[$name]->add($value) : $this->set($name, $value);
     }

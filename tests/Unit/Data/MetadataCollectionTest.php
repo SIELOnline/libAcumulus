@@ -17,7 +17,7 @@ use Siel\Acumulus\Data\MetadataValue;
  */
 class MetadataCollectionTest extends TestCase
 {
-    public function testMetadataCollection(): void
+    public function testMetadataCollectionSetAndAdd(): void
     {
         $name1 = 'my_metadata1';
         $name2 = 'my_metadata2';
@@ -77,6 +77,7 @@ class MetadataCollectionTest extends TestCase
         $mdv1 = $mdc->getMetadataValue($name1);
         $this->assertInstanceOf(MetadataValue::class, $mdv1);
     }
+
     public function testMetadataCollectionWithNull(): void
     {
         $name1 = 'my_metadata1';
@@ -125,6 +126,35 @@ class MetadataCollectionTest extends TestCase
         $this->assertFalse($mdc->exists($name2));
         $this->assertNull($mdc->getMetadataValue($name2));
         $this->assertNull($mdc->get($name2));
+    }
+
+    public function testMetadataCollectionSetMultiple(): void
+    {
+        $name1 = 'my_metadata1';
+        $name2 = 'my_metadata2';
+        $value1 = 'value1';
+        $value2 = 2;
+        $set1 = [
+            $name1 => $value1,
+            $name2 => $value2,
+        ];
+
+        // Test setMultiple that creates.
+        $mdc = new MetadataCollection();
+        $mdc->setMultiple($set1);
+        $this->assertTrue($mdc->exists($name1));
+        $this->assertSame($value1, $mdc->get($name1));
+        $this->assertTrue($mdc->exists($name2));
+        $this->assertSame($value2, $mdc->get($name2));
+
+        // Test setMultiple that overwrites.
+        $mdc = new MetadataCollection();
+        $mdc->set($name2, $value1);
+        $mdc->setMultiple($set1);
+        $this->assertTrue($mdc->exists($name1));
+        $this->assertTrue($mdc->exists($name2));
+        $this->assertSame($value1, $mdc->get($name1));
+        $this->assertSame($value2, $mdc->get($name2));
     }
 
     public function testToArray(): void

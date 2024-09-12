@@ -57,6 +57,14 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
+     * See {@see \Siel\Acumulus\Data\MetadataCollection::setMultiple()}.
+     */
+    public function metadataSetMultiple(array $values): void
+    {
+        $this->getMetadata()->setMultiple($values);
+    }
+
+    /**
      * See {@see \Siel\Acumulus\Data\MetadataCollection::add()}.
      */
     public function metadataAdd(string $name, $value): void
@@ -80,7 +88,7 @@ trait AcumulusObjectMetadataTrait
      *
      * @param string|\Siel\Acumulus\Helpers\Message $message
      */
-    public function addWarning($message): void
+    public function addWarning(string|Message $message): void
     {
         assert(is_string($message) || $message instanceof Message);
         $this->metadataAdd(Meta::Warning, $message);

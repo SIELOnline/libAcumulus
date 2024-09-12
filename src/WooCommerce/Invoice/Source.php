@@ -39,10 +39,11 @@ class Source extends BaseSource
      */
     protected function setShopObject(): void
     {
-        $this->shopObject = wc_get_order($this->getId());
-        if (!is_object($this->shopObject)) {
+        $order = wc_get_order($this->getId());
+        if (!$order instanceof WC_Abstract_Order) {
             throw new RuntimeException(sprintf('Not a valid source id (%s %d)', $this->type, $this->id));
         }
+        $this->shopObject = $order;
     }
 
     /**

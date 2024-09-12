@@ -267,13 +267,21 @@ class ShopCapabilities extends ShopCapabilitiesBase
             EmailAsPdfType::Invoice => [
                 Fld::EmailTo => '[source::getOrder()::getSource()::get_billing_email()]',
             ],
+            // Property sources for LineType::Item:
+            // - source: Source
+            // - item: Item,
+            //   - item::getShopObject(): WC_Order_Item_product
+            // - product (or item::getProduct()): Product
+            //   - product::getShopObject(): ?WC_Product
             LineType::Item => [
-                Meta::Id => '[item::get_id()]',
-                Fld::ItemNumber => '[product::get_sku()]',
-                Fld::Product => '[item::get_name()]',
-                Meta::ProductId => '[product::get_id()]',
-                Fld::Quantity => '[item::get_quantity()]',
-                Fld::CostPrice => '[item::get_cost_price()]', // @todo: does this exist?
+                Fld::ItemNumber => '[product::getShopObject()::get_sku()]',
+                Fld::Product => '[item::getShopObject()::get_name()]',
+                // In refunds, the quantity will be negative and prices will be positive,
+                // so no further need for us to correct with sign (unless quantity appears
+                // to be 0).
+                Fld::Quantity => '[item::getShopObject()::get_quantity()|source::getSign()]',
+                Fld::UnitPrice => '[item::getShopObject()::unit_price_tax_excl]',
+                Meta::UnitPriceInc => '[item::getShopObject()::unit_price_tax_incl]',
             ],
         ];
     }

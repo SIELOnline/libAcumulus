@@ -567,7 +567,7 @@ class Creator extends BaseCreator
         // For refunds without any articles (probably just a manual refund) we
         // don't need to know what discounts were applied on the original order.
         // So skip get_used_coupons() on refunds without articles.
-        if ($this->invoiceSource->getType() !== Source::CreditNote || $this->hasItemLines) {
+        if ($this->invoiceSource->getType() !== Source::CreditNote || count($this->invoice->getLines()) > 0) {
             // Add a line for all coupons applied. Coupons are only stored on
             // the order, not on refunds, so use the order.
             /** @var \WC_Order $order */

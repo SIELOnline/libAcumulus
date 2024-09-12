@@ -229,7 +229,10 @@ class CollectorManager
         $items = $source->getItems();
         foreach ($items as $item) {
             $this->addPropertySource('item', $item);
-            $this->addPropertySource('product', $item->getProduct());
+            $product = $item->getProduct();
+            if ($product !== null) {
+                $this->addPropertySource('product', $product);
+            }
             $this->getContainer()->getEvent()->triggerItemLineCollectBefore($item, $this);
             /** @var \Siel\Acumulus\Data\Line $line */
             $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);

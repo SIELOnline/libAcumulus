@@ -99,10 +99,11 @@ class MetadataValue
     /**
      * Converts the metadata value to a representation that fits in an API message.
      *
-     * Scalars are not converted, except boolean values. Boolean and other types are json
-     * encoded. However, to get a "prettier print" in the final message double quotes are
-     * replaced by single quotes to prevent that these quotes would get escaped when the
-     * whole message gets json encoded.
+     * Scalars are not converted, a Datetime is formatted in the ISO format. leaving out
+     * the time part if it is 0, and complex types are json-encoded. However, to get a
+     * "prettier print" in the final message double quotes are replaced by single quotes
+     * to prevent that these quotes would get escaped when the whole message gets
+     * json-encoded.
      */
     public function getApiValue()
     {

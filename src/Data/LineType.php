@@ -13,13 +13,13 @@ namespace Siel\Acumulus\Data;
  */
 interface LineType
 {
-    public const Item = 'Item';
-    public const Shipping = 'Shipping';
-    public const PaymentFee = 'Payment';
-    public const GiftWrapping = 'Gift';
-    public const Manual = 'Manual';
-    public const Discount = 'Discount';
-    public const Voucher = 'Voucher';
-    public const Other = 'Other';
-    public const Corrector = 'MissingAmountCorrector';
+    public const Item = 'ItemLine';
+    public const Shipping = 'ShippingLine';
+    public const PaymentFee = 'PaymentLine';
+    public const GiftWrapping = 'GiftLine';
+    public const Manual = 'ManualLine';
+    public const Discount = 'DiscountLine';
+    public const Voucher = 'VoucherLine';
+    public const Other = 'OtherLine';
+    public const Corrector = 'MissingAmountCorrectorLine';
 }

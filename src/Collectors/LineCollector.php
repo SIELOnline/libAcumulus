@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
@@ -51,6 +52,16 @@ use Siel\Acumulus\Meta;
  */
 class LineCollector extends SubTypedCollector
 {
+    /**
+     * This override changes the {@see \Siel\Acumulus\Data\AcumulusObject} type as
+     * {@see \Siel\Acumulus\Data\Line} has no subclasses (just subtypes) but does have
+     * subtype specific collectors.
+     */
+    protected function getAcumulusObjectType(): string
+    {
+        return DataType::Line;
+    }
+
     /**
      * Adds information about the range in which the vat rate will lie.
      *

@@ -25,7 +25,7 @@ use function function_exists;
 use function is_string;
 
 /**
- * CreatorSupportForOtherPlugins contains support for other plugins.
+ * Collector3rdPartyPluginSupport contains support for features added by other plugins.
  *
  * The WooCommerce market contains many additional plugins that add features
  * to standard WooCommerce. Supporting all these plugins is difficult and
@@ -33,7 +33,7 @@ use function is_string;
  * for these other plugins off into its own containers that react to the
  * Acumulus events (actions).
  */
-class CreatorPluginSupport
+class Collector3rdPartyPluginSupport
 {
     /**
      * See {@see \Siel\Acumulus\Helpers\Event::triggerItemLineCollectBefore()}

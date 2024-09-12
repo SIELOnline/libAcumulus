@@ -173,7 +173,7 @@ class AcumulusEntry
      */
     public function getSourceId(): int
     {
-        return $this->get(static::$keySourceId);
+        return (int) $this->get(static::$keySourceId);
     }
 
     /**

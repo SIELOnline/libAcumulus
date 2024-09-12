@@ -16,11 +16,12 @@ Minimal requirements:
 
 Features:
 - JOO: Native support for Joomla 5, our component and plugins do no longer need the compat
-  plugin. However, please note that VirtueMart still needs that plugin. HikaShop has its 
+  plugin. However, please note that VirtueMart still needs that plugin. HikaShop has its
   own compat layer, so probably does not need that plugin.
 - ALL: improved register message after install.
 
 Bugs:
+- OC: Strict typing error in AcumulusEntry::getSourceId().
 - PS: Settings form: set of order statuses to trigger sending the invoice data to Acumulus
   was not stored or displayed correctly.
 - ALL: mapping for a metadata value may be the constant null but this was rejected when
@@ -43,7 +44,7 @@ Refactorings:
 - ALL: Introduced Item and Product as wrapper/adapter around item lines and product
   objects from the web shop. Extracted common wrapper/adapter code into WrapperTrait.
 - ALL: Started using Line collectors and completors the new way, gradually moving code
-  from the old Creator and Completor to the new Collectors, Mappings, and Completors.  
+  from the old Creator and Completor to the new Collectors, Mappings, and Completors.
 - ALL: Removed the old Creator and Completor code from the Invoice namespace and moved the
   Completors\Legacy namespace "back" to invoice. This lead to many clean-ups of no longer
   used code all over the code base.

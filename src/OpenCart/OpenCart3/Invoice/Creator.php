@@ -8,6 +8,8 @@ use Siel\Acumulus\OpenCart\Invoice\Creator as BaseCreator;
 
 /**
  * OC3 specific invoice Creator code.
+ *
+ * @method \Opencart\Admin\Model\Sale\Order getOrderModel()
  */
 class Creator extends BaseCreator
 {

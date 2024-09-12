@@ -53,7 +53,7 @@ abstract class Item
     /**
      * Returns the Product ordered on this Item.
      *
-     * Overrides can use the parent $source and $this item to retrieve the Product.
+     * Overrides can use the parent \$source and \$this item to retrieve the Product.
      * If the product does no longer exists, null should be returned.
      * Normally, this method will be called only once by the public
      * method {@see getProduct()}, so it is correct to instantiate a new {@see Product}

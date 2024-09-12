@@ -7,8 +7,9 @@ namespace Siel\Acumulus\OpenCart\OpenCart3\Invoice;
 use Siel\Acumulus\OpenCart\Invoice\Source as BaseSource;
 
 /**
- * OC3 specific code for an OpenCart
- * {@see \Siel\Acumulus\OpenCart\Invoice\Source}.
+ * OC3 specific code for an OpenCart {@see \Siel\Acumulus\OpenCart\Invoice\Source}.
+ *
+ * @method \Opencart\Admin\Model\Sale\Order getOrderModel()
  */
 class Source extends BaseSource
 {
@@ -18,5 +19,10 @@ class Source extends BaseSource
             $this->orderTotalLines = $this->getOrderModel()->getOrderTotals($this->shopObject['order_id']);
         }
         return $this->orderTotalLines;
+    }
+
+    protected function getOrderProducts(): array
+    {
+        return $this->getOrderModel()->getOrderProducts($this->getId());
     }
 }

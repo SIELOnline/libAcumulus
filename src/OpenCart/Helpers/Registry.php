@@ -236,6 +236,7 @@ abstract class Registry
      * Returns the order.
      *
      * @return array|false
+     *   May return an empty array when the order cannot be found.
      *
      * @throws \Exception
      */

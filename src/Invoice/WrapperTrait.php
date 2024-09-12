@@ -38,7 +38,6 @@ trait WrapperTrait
         }
     }
 
-
     /**
      * Sets the wrapped shop object based on an id.
      *

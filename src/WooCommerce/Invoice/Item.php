@@ -30,7 +30,7 @@ class Item extends BaseItem
      * This WooCommerce override wraps a {@see WC_Product} in a Product but may return
      * null when the product does no longer exist.
      */
-    protected function getShopProduct(): ?Product
+    protected function createProduct(): ?Product
     {
         $product = $this->shopObject->get_product();
         return $product instanceof WC_Product ? $this->getContainer()->createProduct($this, $product) : null;

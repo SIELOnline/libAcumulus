@@ -45,19 +45,19 @@ abstract class Item
     public function getProduct(): ?Product
     {
         if (!isset($this->product)) {
-            $this->product = $this->getShopProduct();
+            $this->product = $this->createProduct();
         }
         return $this->product;
     }
 
     /**
-     * Returns the Product ordered on this Item.
+     * Creates a Product object representing the product ordered on this Item.
      *
      * Overrides can use the parent \$source and \$this item to retrieve the Product.
      * If the product does no longer exists, null should be returned.
+     *
      * Normally, this method will be called only once by the public
-     * method {@see getProduct()}, so it is correct to instantiate a new {@see Product}
-     * object.
+     * method {@see getProduct()}, so it is correct to create a new instance.
      */
-    abstract protected function getShopProduct(): ?Product;
+    abstract protected function createProduct(): ?Product;
 }

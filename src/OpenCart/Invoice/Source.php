@@ -173,7 +173,7 @@ abstract class Source extends BaseSource
         return $result;
     }
 
-    protected function getShopItems(): array
+    protected function createItems(): array
     {
         $result = [];
         foreach ($this->getOrderProducts() as $orderProduct) {

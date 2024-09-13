@@ -141,7 +141,7 @@ class Source extends BaseSource
         // @todo: override if MyWebShop supports credit notes, otherwise remove.
     }
 
-    protected function getShopItems(): array
+    protected function createItems(): array
     {
         // @todo: implement
     }

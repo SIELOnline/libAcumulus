@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Siel\Acumulus\OpenCart\Invoice;
 
 use RuntimeException;
+use Siel\Acumulus\Invoice\Item as BaseItem;
 use Siel\Acumulus\Invoice\Product;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
  * Item is a wrapper/adapter around OpenCart specific order product lines.
  */
-abstract class Item extends \Siel\Acumulus\Invoice\Item
+abstract class Item extends BaseItem
 {
     protected function setShopObject(): void
     {
@@ -23,7 +24,7 @@ abstract class Item extends \Siel\Acumulus\Invoice\Item
         $this->id = (int) $this->getShopObject()['order_product_id'];
     }
 
-    protected function getShopProduct(): ?Product
+    protected function createProduct(): ?Product
     {
         // $product can be empty if the product has been deleted.
         /** @var \Opencart\Admin\Model\Catalog\Product|\ModelCatalogProduct $model */

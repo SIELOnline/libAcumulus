@@ -33,7 +33,7 @@ class Item extends BaseItem
      * data in the item (an OrderDetail) itself, allowing to retrieve product data as it
      * was at the time of placing the order.
      */
-    protected function getShopProduct(): ?Product
+    protected function createProduct(): ?Product
     {
         return null;
     }

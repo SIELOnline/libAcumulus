@@ -242,7 +242,7 @@ class Source extends BaseSource
      * This WooCommerce override wraps {@see \WC_Order_Item_Product}s in Items,
      * ignoring empty lines, that is, lines with 0 quantity and total ("comment" lines?).
      */
-    protected function getShopItems(): array
+    protected function createItems(): array
     {
         $result = [];
 

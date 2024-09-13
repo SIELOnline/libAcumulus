@@ -75,7 +75,7 @@ class Source extends BaseSource
         return $this->getSource()->id;
     }
 
-    protected function getShopItems(): array
+    protected function createItems(): array
     {
         return [];    }
 }

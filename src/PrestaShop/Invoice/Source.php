@@ -291,7 +291,7 @@ class Source extends BaseSource
         }
     }
 
-    protected function getShopItems(): array
+    protected function createItems(): array
     {
         if ($this->getType() === Source::Order) {
             // @nth: these methods return "raw"  database results, not objects from the

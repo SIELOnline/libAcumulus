@@ -552,22 +552,24 @@ abstract class Source
     public function getItems(): array
     {
         if (!isset($this->items)) {
-            $this->items = $this->getShopItems();
+            $this->items = $this->createItems();
         }
         return $this->items;
     }
 
     /**
-     * Returns the {@see Item}s ordered on this {@see Source}.
+     * Creates the {@see Item}s ordered on this {@see Source}.
      *
-     * Overrides can use the {@see $shopObject} property to retrieve the item lines.
-     * If no item lines exist, highly unlikely, an empty array should be returned.
+     * Overrides can use the {@see getShopObject()} method to get the shop order and
+     * retrieve the item lines. If no item lines exist, which is highly unlikely, an empty
+     * array should be returned.
+     *
      * Normally, this method will be called only once by the public method
-     * {@see getItems()}, so it is correct to instantiate new {@see Item} objects.
+     * {@see getItems()}, so it is correct to create new instances.
      *
      * @return Item[]
      */
-    abstract protected function getShopItems(): array;
+    abstract protected function createItems(): array;
 
     /**
      * Calls a type specific implementation of $method.

@@ -109,22 +109,22 @@ class LineCollector extends SubTypedCollector
         if (Number::isZero($denominator, 0.0001)) {
             // zero amount (and zero vat): we cannot determine the range.
             $line->vatRate = null;
-            $line->metadataAdd(Meta::VatAmount, $numerator);
-            $line->metadataAdd(Meta::VatRateSource, VatRateSource::Completor);
+            $line->metadataSet(Meta::VatAmount, $numerator);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
         } elseif (Number::isZero($numerator, 0.0001)) {
             // zero vat with non-zero amount: rate = 0
             $line->vatRate = 0;
-            $line->metadataAdd(Meta::VatAmount, $numerator);
-            $line->metadataAdd(Meta::VatRateSource, VatRateSource::Exact0);
+            $line->metadataSet(Meta::VatAmount, $numerator);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact0);
         } else {
             $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
             $line->vatRate = 100.0 * $range['calculated'];
-            $line->metadataAdd(Meta::VatRateMin, 100.0 * $range['min']);
-            $line->metadataAdd(Meta::VatRateMax, 100.0 * $range['max']);
-            $line->metadataAdd(Meta::VatAmount, $numerator);
-            $line->metadataAdd(Meta::PrecisionUnitPrice, $denominatorPrecision);
-            $line->metadataAdd(Meta::PrecisionVatAmount, $numeratorPrecision);
-            $line->metadataAdd(Meta::VatRateSource, VatRateSource::Calculated);
+            $line->metadataSet(Meta::VatRateMin, 100.0 * $range['min']);
+            $line->metadataSet(Meta::VatRateMax, 100.0 * $range['max']);
+            $line->metadataSet(Meta::VatAmount, $numerator);
+            $line->metadataSet(Meta::PrecisionUnitPrice, $denominatorPrecision);
+            $line->metadataSet(Meta::PrecisionVatAmount, $numeratorPrecision);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::Calculated);
         }
     }
 

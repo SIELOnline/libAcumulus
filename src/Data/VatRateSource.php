@@ -20,7 +20,7 @@ interface VatRateSource
     public const Parent = 'parent';
     public const Child = 'child';
     public const Creator_Lookup = 'creator-lookup';
-
+    public const Creator_Missing_Amount = 'creator-missing-amount';
     public const Completor_Range = 'completor-range';
     public const Completor_Lookup = 'completor-lookup';
     public const Completor_Range_Lookup = 'completor-range-lookup';

@@ -209,9 +209,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::EmailTo => '[source::getSource()::customer::user_email|source::getSource()::customer::email]',
             ],
             LineType::Item => [
-                // @todo: complete when we start converting lines to using collectors.
-                Fld::ItemNumber => '[product::order_product_code]',
-                Fld::Product => '[item::order_product_name]',
+                Fld::ItemNumber => '[item::getShopObject()::order_product_code]',
+                Fld::Product => '[item::getShopObject()::order_product_name]',
+                Fld::Quantity => '[item::getShopObject()::order_product_quantity]',
             ],
         ];
     }

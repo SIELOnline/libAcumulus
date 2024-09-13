@@ -18,7 +18,7 @@ use TaxManagerFactory;
 use TaxRulesGroup;
 
 /**
- * LineCollector contains the PrestaShop specific logic to collect an item line.
+ * ItemLineCollector contains PrestaShop specific {@see LineType::Item} collecting logic.
  *
  * @noinspection PhpUnused  Instantiated via a factory.
  */
@@ -43,6 +43,7 @@ class ItemLineCollector extends LineCollector
      * - ...
      *
      * @param \Siel\Acumulus\Data\Line $acumulusObject
+     *   An item line with the mapped fields filled in.
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
@@ -56,7 +57,7 @@ class ItemLineCollector extends LineCollector
      *   a neat/correct way!
      *
      * @param Line $line
-     *   An item line with the mapped and logic fields filled in
+     *   An item line with the mapped fields filled in
      */
     protected function getItemLine(Line $line): void
     {

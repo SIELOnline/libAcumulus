@@ -13,7 +13,9 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
- * ItemLineCollector does foo.
+ * ItemLineCollector contains OpenCart specific {@see LineType::Item} collecting logic.
+ *
+ * @noinspection PhpUnused  Instantiated via a factory.
  */
 class ItemLineCollector extends LineCollector
 {
@@ -26,6 +28,7 @@ class ItemLineCollector extends LineCollector
 
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
+     *   An item line with the mapped fields filled in.
      *
      * @throws \Exception
      */
@@ -39,6 +42,9 @@ class ItemLineCollector extends LineCollector
      *
      * This method may return child lines if there are options/variants.
      * These lines will be informative, their price will be 0.
+     *
+     * @param Line $line
+     *   An item line with the mapped fields filled in
      *
      * @throws \Exception
      */

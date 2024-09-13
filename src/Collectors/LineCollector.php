@@ -134,7 +134,7 @@ class LineCollector extends SubTypedCollector
      * @return bool
      *
      * @legacy: remove margin scheme handling from (plugin specific) creators and move it
-     *   to the completor phase. This will aid in simplifying the creators towards raw
+     *   to the completor phase. This will help simplifying the creators towards raw
      *   data collectors.
      *
      * @noinspection PhpDocMissingThrowsInspection JsonException will not be thrown when

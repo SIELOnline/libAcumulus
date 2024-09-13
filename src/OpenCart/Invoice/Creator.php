@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Although we would like to use strict equality, i.e. including type equality,
  * unconditionally changing each comparison in this file will lead to problems
@@ -11,19 +14,14 @@
  * So for now, we will ignore the warnings about non strictly typed comparisons
  * in this code, and we won't use strict_types=1.
  *
- * @noinspection TypeUnsafeComparisonInspection
- * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection PhpMultipleClassDeclarationsInspection OC3 has many double class definitions
- * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
- * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
- * @noinspection DuplicatedCode  This is a copy of the old Creator.
  */
 
 namespace Siel\Acumulus\OpenCart\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
@@ -34,7 +32,7 @@ use Siel\Acumulus\Tag;
  *
  * @property \Siel\Acumulus\OpenCart\Invoice\Source $invoiceSource
  */
-abstract class Creator extends BaseCreator
+class Creator extends BaseCreator
 {
     protected array $order;
     /**
@@ -69,16 +67,6 @@ abstract class Creator extends BaseCreator
     }
 
     /**
-     * Returns the products sold with this order, i.e. the item lines.
-     */
-    abstract protected function getOrderProducts(): array;
-
-    /**
-     * Returns the options for this item line.
-     */
-    abstract protected function getOrderProductOptions(array $item): array;
-
-    /**
      * {@inheritdoc}
      *
      * @throws \Exception
@@ -88,94 +76,7 @@ abstract class Creator extends BaseCreator
      */
     protected function getInvoiceLines(): array
     {
-        $itemLines = $this->getItemLines();
-        $itemLines = $this->addLineType($itemLines, LineType::Item);
-        $totalLines = $this->getTotalLines();
-        return array_merge($itemLines, $totalLines);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Exception
-     *
-     * @noinspection PhpMissingParentCallCommonInspection parent is default
-     *   fall back.
-     */
-    protected function getItemLines(): array
-    {
-        $result = [];
-        $orderProducts = $this->getOrderProducts();
-        foreach ($orderProducts as $line) {
-            $result[] = $this->getItemLine($line);
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the item line for 1 product line.
-     *
-     * This method may return child lines if there are options/variants.
-     * These lines will be informative, their price will be 0.
-     *
-     * @throws \Exception
-     */
-    protected function getItemLine(array $item): array
-    {
-        $result = [];
-
-        // $product can be empty if the product has been deleted.
-        /** @var \Opencart\Admin\Model\Catalog\Product|\ModelCatalogProduct $model */
-        $model = $this->getRegistry()->getModel('catalog/product');
-        $product = $model->getProduct($item['product_id']);
-        if (!empty($product)) {
-            $this->addPropertySource('product', $product);
-        }
-        $this->addPropertySource('item', $item);
-
-        // Get vat range info from item line.
-        $productPriceEx = $item['price'];
-        $productVat = $item['tax'];
-        $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
-
-        // Try to look up the vat rate via product.
-        $vatInfo += $this->getVatRateLookupMetadata($product['tax_class_id']);
-
-        // Check for cost price and margin scheme.
-        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
-            // - But still send the VAT rate to Acumulus.
-            $result[Tag::UnitPrice] = $productPriceEx + $productVat;
-        } else {
-            $result[Tag::UnitPrice] = $productPriceEx;
-            $result[Meta::VatAmount] = $productVat;
-        }
-        $result[Tag::Quantity] = $item['quantity'];
-        $result += $vatInfo;
-
-        // Options (variants).
-        $options = $this->getOrderProductOptions($item);
-        if (!empty($options)) {
-            // Add options as children.
-            $result[Meta::ChildrenLines] = [];
-            $optionsVatInfo = $vatInfo;
-            $optionsVatInfo[Meta::VatAmount] = 0;
-            foreach ($options as $option) {
-                $result[Meta::ChildrenLines][] = [
-                        Tag::Product => "{$option['name']}: {$option['value']}",
-                        Tag::UnitPrice => 0,
-                        // Table order_option does not have a quantity field, so
-                        // composite products with multiple same sub product
-                        // are apparently not covered. Take quantity from parent.
-                        Tag::Quantity => $item['quantity'],
-                    ] + $optionsVatInfo;
-            }
-        }
-        $this->removePropertySource('product');
-        $this->removePropertySource('item');
-
-        return $result;
+        return $this->getTotalLines();
     }
 
     /**
@@ -209,9 +110,9 @@ abstract class Creator extends BaseCreator
 
                 $taxRules = $this->getTaxRules($taxClassId);
                 foreach ($taxRules as $taxRule) {
-                    $taxRate = $this->getTaxRate($taxRule['tax_rate_id']);
+                    $taxRate = $this->getTaxRate((int) $taxRule['tax_rate_id']);
                     if (!empty($taxRate)
-                        && $this->isAddressInGeoZone($this->order, $taxRule['based'], $taxRate['geo_zone_id'])
+                        && $this->isAddressInGeoZone($this->order, $taxRule['based'], (int) $taxRate['geo_zone_id'])
                     ) {
                         $result[Meta::VatRateLookup][] = $taxRate['rate'];
                         $result[Meta::VatRateLookupLabel][] = $taxRate['name'];
@@ -364,7 +265,7 @@ abstract class Creator extends BaseCreator
         $query = $this->getTotalLineTaxClassLookupQuery($code);
         $queryResult = $this->getDb()->query($query);
         if (!empty($queryResult->row)) {
-            $taxClassId = reset($queryResult->row);
+            $taxClassId = (int) reset($queryResult->row);
             $result = $this->getVatRateLookupMetadata($taxClassId);
         }
         return $result;
@@ -390,11 +291,11 @@ abstract class Creator extends BaseCreator
     {
         $fallbackAddressType = $addressType === 'payment' ? 'shipping' : 'payment';
         if (!empty($order["{$addressType}_country_id"])) {
-            $countryId = $order["{$addressType}_country_id"];
-            $zoneId = !empty($order["{$addressType}_zone_id"]) ? $order["{$addressType}_zone_id"] : 0;
+            $countryId = (int) $order["{$addressType}_country_id"];
+            $zoneId = (int) (!empty($order["{$addressType}_zone_id"]) ? $order["{$addressType}_zone_id"] : 0);
         } elseif (!empty($order["{$fallbackAddressType}_country_id"])) {
-            $countryId = $order["{$fallbackAddressType}_country_id"];
-            $zoneId = !empty($order["{$fallbackAddressType}_zone_id"]) ? $order["{$fallbackAddressType}_zone_id"] : 0;
+            $countryId = (int) $order["{$fallbackAddressType}_country_id"];
+            $zoneId = (int) (empty($order["{$fallbackAddressType}_zone_id"]) ? $order["{$fallbackAddressType}_zone_id"] : 0);
         } else {
             $countryId = 0;
             $zoneId = 0;
@@ -403,10 +304,10 @@ abstract class Creator extends BaseCreator
         $zones = $this->getZoneToGeoZones($geoZoneId);
         foreach ($zones as $zone) {
             // Check if this zone definition covers the same country.
-            if ($zone['country_id'] == $countryId) {
+            if ((int) $zone['country_id'] === $countryId) {
                 // Check if the zone definition covers the whole country or if
                 // they are equal.
-                if ($zone['zone_id'] == 0 || $zone['zone_id'] == $zoneId) {
+                if ((int) $zone['zone_id'] === 0 || (int) $zone['zone_id'] === $zoneId) {
                     return true;
                 }
             }
@@ -521,14 +422,6 @@ abstract class Creator extends BaseCreator
             $geoZonesCache[$geo_zone_id] = $query->rows;
         }
         return $geoZonesCache[$geo_zone_id];
-    }
-
-    /**
-     * @return \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order|\ModelCheckoutOrder|\ModelSaleOrder
-     */
-    protected function getOrderModel()
-    {
-        return $this->getRegistry()->getOrderModel();
     }
 
     /**

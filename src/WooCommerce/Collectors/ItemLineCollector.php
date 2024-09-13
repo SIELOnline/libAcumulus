@@ -7,7 +7,6 @@ namespace Siel\Acumulus\WooCommerce\Collectors;
 use Siel\Acumulus\collectors\LineCollector;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
@@ -73,6 +72,7 @@ class ItemLineCollector extends LineCollector
      */
     protected function getItemLine(Line $line): void
     {
+        // Set some often used variables.
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
         $invoice = $this->getPropertySource('invoice');
         /** @var \Siel\Acumulus\Invoice\Item $item */

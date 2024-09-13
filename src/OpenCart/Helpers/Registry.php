@@ -195,7 +195,8 @@ abstract class Registry
      *   proxies a ModelGroup1Group2Model class. This follows the duck typing
      *   principle, thus we cannot define a strong typed return type here
      *
-     * @noinspection ReturnTypeCanBeDeclaredInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection  Actually, this method returns a
+     *   {@see \Opencart\System\Engine\Proxy}, not a model.
      * @noinspection PhpDocMissingThrowsInspection  Will throw an \Exception
      *   when the model class is not found, but that should be considered a
      *   development error.
@@ -211,18 +212,17 @@ abstract class Registry
     /**
      * Returns the order model that can be used to call:
      * - getOrder()
-     * - getOrderProducts()
-     * - getOrderOptions()
-     * - getOrderTotals()
+     * - getProducts()|getOrderProducts()
+     * - getOptions()|getOrderOptions()
+     * - getTotals()|getOrderTotals()
      *
-     * As this model differs depending on whether we are in the Catalog or Admin
+     * As the model returned differs depending on whether we are in the Catalog or Admin
      * section, we cannot use getModel(), so this is a separate method.
      *
      * @return \Opencart\Admin\Model\Sale\Order|\Opencart\Catalog\Model\Checkout\Order|\ModelCheckoutOrder|\ModelSaleOrder
      *
-     * @noinspection ReturnTypeCanBeDeclaredInspection
-     *   Actually, this method returns a {@see \Opencart\System\Engine\Proxy}, not on of
-     *   the Order types.
+     * @noinspection ReturnTypeCanBeDeclaredInspection  Actually, this method returns a
+     *   {@see \Opencart\System\Engine\Proxy}, not one of the Order models.
      */
     public function getOrderModel()
     {

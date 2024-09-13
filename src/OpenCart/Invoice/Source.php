@@ -14,7 +14,6 @@ namespace Siel\Acumulus\OpenCart\Invoice;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Currency;
-use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
@@ -141,12 +140,6 @@ abstract class Source extends BaseSource
         return new Currency($this->shopObject['currency_code'], (float) $this->shopObject['currency_value']);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * This override provides the values meta-invoice-amountinc,
-     * meta-invoice-vatamount and a vat breakdown in meta-invoice-vat.
-     */
     public function getTotals(): Totals
     {
         $vatAmount = 0.0;

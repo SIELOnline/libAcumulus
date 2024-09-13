@@ -47,7 +47,6 @@ class CustomerCollector extends Collector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
-        parent::collectLogicFields($acumulusObject);
         // @todo: in fact, this is not the correct place to retrieve and store this. This
         //   should be either "global" metadata (except in OC) or at the invoice level
         //   where it is used for checking valid vat rates.
@@ -61,7 +60,7 @@ class CustomerCollector extends Collector
      * Returns the value of the setting indicating which address is used for tax
      * calculations.
      *
-     * The base implementations returns the default setting, {@see AddressType::Invoice},
+     * The base implementations returns the default setting ({@see AddressType::Invoice})
      * and is to be overridden by shops that do have a setting that specifies the address
      * to use or that always use the shipping address.
      *

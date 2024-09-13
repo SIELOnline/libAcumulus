@@ -11,33 +11,66 @@ use Siel\Acumulus\OpenCart\Helpers\Registry;
 /**
  * Item is a wrapper/adapter around OpenCart specific order product lines.
  */
-class Item extends \Siel\Acumulus\Invoice\Item
+abstract class Item extends \Siel\Acumulus\Invoice\Item
 {
-    /**
-     * @inheritDoc
-     */
-    protected function getShopProduct(): ?Product
-    {
-        // $product can be empty if the product has been deleted.
-        /** @var \Opencart\Admin\Model\Catalog\Product|\ModelCatalogProduct $model */
-        $model = Registry::getInstance()->getModel('catalog/product');
-        $product = $model->getProduct($this->getShopObject()['product_id']);
-        return !empty($product) ? $this->getContainer()->createProduct($this, $product) : null;
-    }
-
-    /**
-     * @inheritDoc
-     */
     protected function setShopObject(): void
     {
         throw new RuntimeException('This method is not expected to be called in OpenCart');
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function setId(): void
     {
-        $this->id = $this->getShopObject()['order_product_id'];
+        $this->id = (int) $this->getShopObject()['order_product_id'];
+    }
+
+    protected function getShopProduct(): ?Product
+    {
+        // $product can be empty if the product has been deleted.
+        /** @var \Opencart\Admin\Model\Catalog\Product|\ModelCatalogProduct $model */
+        $model = $this->getRegistry()->getModel('catalog/product');
+        $product = $model->getProduct($this->getShopObject()['product_id']);
+        return !empty($product) ? $this->getContainer()->createProduct($this, $product) : null;
+    }
+
+    /**
+     * Returns a list of order_option records.
+     */
+    abstract public function getOrderProductOptions(): array;
+
+    /**
+     * Returns an order model
+     *
+     * @return \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order|\ModelCheckoutOrder|\ModelSaleOrder
+     *
+     * noinspection ReturnTypeCanBeDeclaredInspection
+     * @noinspection PhpReturnDocTypeMismatchInspection Actually, this method returns a
+     *    {@see \Opencart\System\Engine\Proxy}, not the order model.
+     */
+    protected function getOrderModel()
+    {
+        return $this->getRegistry()->getOrderModel();
+    }
+
+    /**
+     * Returns the product model
+     *
+     * @return \Opencart\Admin\Model\Catalog\Product|\ModelCatalogProduct
+     *
+     * noinspection ReturnTypeCanBeDeclaredInspection
+     * @noinspection PhpReturnDocTypeMismatchInspection Actually, this method returns a
+     *    {@see \Opencart\System\Engine\Proxy}, not the product model.
+     */
+    protected function getProductModel()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getRegistry()->getModel('catalog/product');
+    }
+
+    /**
+     * Wrapper method that returns the OpenCart registry class.
+     */
+    protected function getRegistry(): Registry
+    {
+        return Registry::getInstance();
     }
 }

@@ -170,6 +170,11 @@ class CollectorManager
         $customer->setInvoiceAddress($this->collectAddress(AddressType::Invoice));
         $customer->setShippingAddress($this->collectAddress(AddressType::Shipping));
 
+        // @todo: what to do if we have an "empty" address? (see OC examples)
+        //   - When to consider an address as being empty?
+        //   - Copy all fields or copy only empty fields (the latter seems to contradict
+        //     the concept of what an "empty" address constitutes).
+
         return $customer;
     }
 

@@ -291,11 +291,9 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::EmailTo => '[source::getSource()::email]',
             ],
             LineType::Item => [ // item: table order_product; product: table product
-                Meta::Id => '[item::order_product_id]',
                 Fld::ItemNumber => '[product::sku|product::upc|product::ean|product::jan|product::isbn|product::mpn]',
-                Fld::Product => '[item::name+"("&item::model&")"]',
-                Meta::ProductId => '[product::product_id]',
-                Fld::Quantity => '[item::quantity]',
+                Fld::Product => '[item::getShopObject()::name+"("&item::getShopObject()::model&")"]',
+                Fld::Quantity => '[item::getShopObject()::quantity]',
             ],
         ];
     }

@@ -205,8 +205,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             LineType::Item => [
                 // @todo: complete when we start converting lines to using collectors.
-                Fld::ItemNumber => '[product::order_item_sku]',
-                Fld::Product => '[item::order_item_name]',
+                Fld::ItemNumber => '[item::getShopObject()::order_item_sku]',
+                Fld::Product => '[item::getShopObject()::order_item_name]',
+                Meta::ProductId => '[item::getShopObject()::virtuemart_product_id]',
             ],
         ];
     }

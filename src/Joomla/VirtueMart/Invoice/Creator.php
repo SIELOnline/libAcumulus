@@ -94,7 +94,7 @@ class Creator extends BaseCreator
         $this->order = $this->invoiceSource->getSource();
         $this->orderModel = VmModel::getModel('orders');
 
-        // @todo: dow we use the shop invoice?
+        // @todo: do we use the shop invoice?
         /** @var \TableInvoices $invoicesTable */
 //        $invoicesTable = $this->orderModel->getTable('invoices');
 //        if ($invoice = $invoicesTable->load($this->order['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {

@@ -60,7 +60,7 @@ class ItemLineCollector extends LineCollector
         $invoice = $this->getPropertySource('invoice');
         /** @var \Siel\Acumulus\Invoice\Source $source */
         $source = $this->getPropertySource('source');
-        $order = $source->getOrder()->getShopObject();
+        $order = $source->getShopObject();
         /** @var \Siel\Acumulus\Joomla\HikaShop\Invoice\Item $item */
         $item = $this->getPropertySource('item');
         $shopItem = $item->getShopObject();

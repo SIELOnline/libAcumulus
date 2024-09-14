@@ -195,7 +195,7 @@ class Source extends BaseSource
     protected function createItems(): array
     {
         $result = [];
-        foreach ($this->getOrder()->getShopObject()->products as $orderProduct) {
+        foreach ($this->getShopObject()->products as $orderProduct) {
             $result[] = $this->getContainer()->createItem($this, $orderProduct);
         }
         return $result;

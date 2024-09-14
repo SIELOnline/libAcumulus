@@ -212,6 +212,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::ItemNumber => '[item::getShopObject()::order_product_code]',
                 Fld::Product => '[item::getShopObject()::order_product_name]',
                 Fld::Quantity => '[item::getShopObject()::order_product_quantity]',
+                Meta::ProductId => '[item::getShopObject()::product_id]',
             ],
         ];
     }

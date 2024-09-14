@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
-use DOMDocument;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
@@ -14,7 +13,6 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 use stdClass;
-use VirtueMartModelCustomfields;
 use VirtueMartModelOrders;
 use VmModel;
 
@@ -126,105 +124,6 @@ class Creator extends BaseCreator
         $this->propertySources['BT'] = $this->order['details']['BT'];
         $this->propertySources['ST'] = $this->order['details']['ST'];
 //        $this->propertySources['shopInvoice'] = $this->shopInvoice;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @noinspection PhpMissingParentCallCommonInspection
-     */
-    protected function getItemLines(): array
-    {
-        return array_map([$this, 'getItemLine'], $this->order['items']);
-    }
-
-    /**
-     * Returns 1 item line for 1 product line.
-     *
-     * @param stdClass $item
-     *
-     * @return array
-     */
-    protected function getItemLine(stdClass $item): array
-    {
-        $result = [];
-        $this->addPropertySource('item', $item);
-
-        $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
-        $productPriceInc = (float) $item->product_final_price;
-        $productVat = (float) $item->product_tax;
-        $vatInfo = $this->getVatData('VatTax', $productPriceEx, $productVat, (int) $item->virtuemart_order_item_id);
-
-        // Check for cost price and margin scheme.
-        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
-            // - But still send the VAT rate to Acumulus.
-            $result[Tag::UnitPrice] = $productPriceInc;
-        } else {
-            $result += [
-                Tag::UnitPrice => $productPriceEx,
-                Meta::UnitPriceInc => $productPriceInc,
-                Meta::VatAmount => $productVat,
-            ];
-        }
-        $result[Tag::Quantity] = (int) $item->product_quantity;
-        $result += $vatInfo;
-
-        // Add variant info.
-        $children = $this->getVariantLines($item, $result[Tag::Quantity], $vatInfo);
-        if (!empty($children)) {
-            $result[Meta::ChildrenLines] = $children;
-        }
-
-        $this->removePropertySource('item');
-
-        return $result;
-    }
-
-    /**
-     * Returns an array of lines that describes this variant.
-     *
-     * @param stdClass $item
-     * @param int $parentQuantity
-     * @param array $vatRangeTags
-     *
-     * @return array[]
-     *   An array of lines that describes this variant.
-     */
-    protected function getVariantLines(stdClass $item, int $parentQuantity, array $vatRangeTags): array
-    {
-        $result = [];
-
-        // It is not possible (other than by copying a lot of awful code) to get
-        // a list of separate attribute and value pairs. So we stick with
-        // calling some code that prints the attributes on an order and
-        // "disassemble" that code...
-        if (!class_exists('VirtueMartModelCustomfields')) {
-            /** @noinspection PhpIncludeInspection */
-            require(VMPATH_ADMIN . '/models/customfields.php');
-        }
-        $product_attribute = VirtueMartModelCustomfields::CustomsFieldOrderDisplay($item);
-        if (!empty($product_attribute)) {
-            $document = new DOMDocument();
-            $document->loadHTML($product_attribute);
-            $spans = $document->getElementsByTagName('span');
-            /** @var \DOMElement $span */
-            foreach ($spans as $span) {
-                // There tends to be a span around the list of spans containing
-                // the actual text, ignore it and only process the lowest level
-                // spans.
-                if ($span->getElementsByTagName('span')->length === 0) {
-                    $result[] = [
-                            Tag::Product => $span->textContent,
-                            Tag::UnitPrice => 0,
-                            Tag::Quantity => $parentQuantity,
-                        ] + $vatRangeTags;
-                }
-            }
-        }
-
-        return $result;
     }
 
     protected function getShippingLine(): array

@@ -184,7 +184,7 @@ class Creator extends BaseCreator
             // @todo: should we do this here or in the completor?
             $result += [
                 Tag::VatRate => null,
-                Meta::VatRateSource => BaseVatRateSource::Completor,
+                Meta::VatRateSource => VatRateSource::Completor,
                 Meta::VatRateLookup => $vatRate,
                 Meta::VatRateLookupSource => '$item->getTaxPercent()',
             ];

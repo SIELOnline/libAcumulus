@@ -90,6 +90,9 @@ class MetadataValue
      *
      * @param mixed $value
      *   The value to add to this property.
+     *
+     * @todo: add conversion of numeric strings like in FieldExpander. What if an array
+     *   gets passed in: convert recursively?
      */
     public function add($value): void
     {

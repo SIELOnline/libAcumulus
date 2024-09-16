@@ -498,8 +498,8 @@ class CompletorInvoiceLines
         return array_reduce($vatRateInfos, static function ($carry, $matchedVatRate) {
             if ($carry === null) {
                 // 1st item: return its vat rate.
-                return $matchedVatRate[Tag::VatRate];
-            } elseif ($carry == $matchedVatRate[Tag::VatRate]) {
+                return (float) $matchedVatRate[Tag::VatRate];
+            } elseif (Number::floatsAreEqual($carry, $matchedVatRate[Tag::VatRate])) {
                 // Note that in PHP: '21' == '21.0000' returns true. So using ==
                 // works. Vat rate equals all previous vat rates: return that
                 // vat rate.
@@ -642,7 +642,13 @@ class CompletorInvoiceLines
 
         $result = [];
         foreach ($vatRateInfos as $vatRateInfo) {
-            $vatRate = !is_scalar($vatRateInfo) ? $vatRateInfo[Tag::VatRate] : $vatRateInfo;
+            if (is_scalar($vatRateInfo)) {
+                $vatRateInfo = (float) $vatRateInfo;
+                $vatRate = $vatRateInfo;
+            } else {
+                $vatRateInfo[Tag::VatRate] = (float) $vatRateInfo[Tag::VatRate];
+                $vatRate = $vatRateInfo[Tag::VatRate];
+            }
             if ($min <= $vatRate && $vatRate <= $max) {
                 $result[] = $vatRateInfo;
             }

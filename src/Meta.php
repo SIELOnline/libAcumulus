@@ -142,6 +142,8 @@ interface Meta
     /**
      * Instruction: if and what price to recalculate when the exact vat rate is known.
      * Can be 'unitprice' or 'unitpriceinc' or not set.
+     * @todo: change from Tag::UnitPrice to Fld::UnitPrice in setting the field and when
+     *   recalculating.
      */
     public const RecalculatePrice = 'meta-recalculate-price';
     /**
@@ -349,4 +351,19 @@ interface Meta
      * preconditions failed.
      */
     public const CompletorStrategyPreconditionFailed = 'meta-completor-strategy-precondition-failed';
+    /**
+     * Collector: indicates that the AcumulusObject having this metadata value set,
+     * probably an (item) Line, should not be added to its parent.
+     *
+     * Uses: Magento
+     */
+    public const DoNotAddChild = 'meta-child-do-not-add';
+    /**
+     * Collector: indicates that a (single) child line is the ame as the parent, actually,
+     * it is the chosen variant/option: Merge info from both into the parent line, not
+     * waiting for the Completor phase.
+     *
+     * Uses: Magento
+     */
+    public const ChildSameAsParent = 'meta-child-same-as-parent';
 }

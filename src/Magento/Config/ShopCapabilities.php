@@ -517,17 +517,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::EmailTo => '[source::getSource()::getShippingAddress()::getEmail()]', // Address
             ],
             LineType::Item => [
-                // @todo: allow to define a conversion to int when shops return strings
-                //   for int values that are read from the database. (also for productId.)
                 Meta::Id => '[item::getId()]',
-                Fld::ItemNumber => '[item::getSku()]',
-                Fld::Product => '[product::getName()]',
-                Meta::ProductId => '[item::getProductId()]',
-                Meta::ProductType => '[item::getProductType()]',
-                Fld::UnitPrice => '[item::getBasePrice()]',
-                Meta::UnitPriceInc => '[item::getBasePriceInclTax()]',
-                Fld::Quantity => '[item::getQtyOrdered()]',
-                Fld::VatRate => '[item::getTaxPercent()|item::getOrderItem():;getTaxPercent()]'
+                Fld::ItemNumber => '[item::getShopObject()::getSku()]',
+                Fld::Product => '[product::getShopObject()::getName()]',
+// @todo: These become mappings when margin scheme handling has been moved to the completor phase.
+//                Fld::UnitPrice => '[item::getShopObject()::getBasePrice()]',
+//                Meta::UnitPriceInc => '[item::getShopObject()::getBasePriceInclTax()]',
+                Fld::Quantity => '[item::getShopObject()::getQtyOrdered()]',
+                Fld::VatRate => '[item::getShopObject()::getTaxPercent()|item::getShopObject()::getOrderItem():;getTaxPercent()]',
+                Meta::ProductType => '[item::getShopObject()::getProductType()]',
+                Meta::ProductId => '[item::getShopObject()::getProductId()|product::getShopObject()::getId()]',
             ],
         ];
     }

@@ -569,7 +569,10 @@ abstract class Source
      *
      * @return Item[]
      */
-    abstract protected function createItems(): array;
+    protected function createItems(): array
+    {
+        return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
 
     /**
      * Calls a type specific implementation of $method.

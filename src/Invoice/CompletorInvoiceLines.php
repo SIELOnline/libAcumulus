@@ -683,6 +683,7 @@ class CompletorInvoiceLines
             foreach ($vatRates as $vatRateInfo2) {
                 $vatRate2 = !is_scalar($vatRateInfo2) ? $vatRateInfo2[Tag::VatRate] : $vatRateInfo2;
                 if (Number::floatsAreEqual($vatRate, $vatRate2)) {
+                    $vatRateInfo[Tag::VatRate] = (float) $vatRateInfo[Tag::VatRate];
                     $result[] = $vatRateInfo;
                 }
             }

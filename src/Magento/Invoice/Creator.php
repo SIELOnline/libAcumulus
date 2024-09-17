@@ -20,9 +20,7 @@ namespace Siel\Acumulus\Magento\Invoice;
 use Magento\Customer\Model\Customer;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
-use Magento\Tax\Model\ClassModel as TaxClass;
 use Magento\Tax\Model\Config as MagentoTaxConfig;
-use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
@@ -72,82 +70,6 @@ class Creator extends BaseCreator
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $source */
         $source = $this->invoiceSource->getSource();
         $this->propertySources['customer'] = $this->getRegistry()->create(Customer::class)->load($source->getCustomerId());
-    }
-
-    protected function getShippingLineLegacy(): array
-    {
-        $result = [];
-        /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $magentoSource */
-        $magentoSource = $this->invoiceSource->getSource();
-        // Only add a free shipping line on an order, not on a credit note:
-        // free shipping is never refunded...
-        if ($this->invoiceSource->getType() === Source::Order || !Number::isZero($magentoSource->getBaseShippingAmount())) {
-            $result += [
-                Tag::Product => $this->getShippingMethodName(),
-                Tag::Quantity => 1,
-            ];
-
-            // What do the following methods return?
-            // - getBaseShippingAmount(): shipping costs ex VAT ex any discount.
-            // - getBaseShippingInclTax(): shipping costs inc VAT ex any discount.
-            // - getBaseShippingTaxAmount(): VAT on shipping costs inc discount.
-            // - getBaseShippingDiscountAmount(): discount on shipping inc VAT.
-            if (!Number::isZero($magentoSource->getBaseShippingAmount())) {
-                // We have 2 ways of calculating the vat rate: first one is
-                // based on tax amount and normal shipping costs corrected with
-                // any discount (as the tax amount is including any discount):
-                // $vatRate1 = $magentoSource->getBaseShippingTaxAmount() / ($magentoSource->getBaseShippingInclTax()
-                //   - $magentoSource->getBaseShippingDiscountAmount() - $magentoSource->getBaseShippingTaxAmount());
-                // However, we will use the 2nd way as that seems to be more
-                // precise and thus generally leads to a smaller range:
-                // Get range based on normal shipping costs inc and ex VAT.
-                $sign = $this->invoiceSource->getSign();
-                $shippingInc = $sign * $magentoSource->getBaseShippingInclTax();
-                $shippingEx = $sign * $magentoSource->getBaseShippingAmount();
-                $shippingVat = $shippingInc - $shippingEx;
-                $result += [
-                        Tag::UnitPrice => $shippingEx,
-                        Meta::UnitPriceInc => $shippingInc,
-                        Meta::RecalculatePrice => $this->shippingPriceIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
-                    ] + self::getVatRangeTags($shippingVat, $shippingEx, 0.02, $this->shippingPriceIncludeTax() ? 0.02 : 0.01);
-                $result[Meta::FieldsCalculated][] = Meta::VatAmount;
-
-                // Add vat class meta data.
-                $result += $this->getVatClassMetaData($this->getShippingTaxClassId());
-
-                // getBaseShippingDiscountAmount() only exists on Orders.
-                if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getBaseShippingDiscountAmount())) {
-                    $tag = $this->discountIncludesTax() ? Meta::LineDiscountAmountInc : Meta::LineDiscountAmount;
-                    $result[$tag] = -$sign * $magentoSource->getBaseShippingDiscountAmount();
-                } elseif ($this->invoiceSource->getType() === Source::CreditNote
-                    && !Number::floatsAreEqual($shippingVat, $magentoSource->getBaseShippingTaxAmount(), 0.02)) {
-                    // On credit notes, the shipping discount amount is not
-                    // stored but can be deduced via the shipping discount tax
-                    // amount and the shipping vat rate. To get a more precise
-                    // Meta::LineDiscountAmountInc, we compute that in the
-                    // completor when we have corrected the vat rate.
-                    $result[Meta::LineDiscountVatAmount] = $sign * ($shippingVat - $sign * $magentoSource->getBaseShippingTaxAmount());
-                }
-            } else {
-                // Free shipping should get a "normal" tax rate. We leave that
-                // to the completor to determine.
-                $result += [
-                    Tag::UnitPrice => 0,
-                    Tag::VatRate => null,
-                    Meta::VatRateSource => VatRateSource::Completor,
-                ];
-            }
-        }
-        return $result;
-    }
-
-    protected function getShippingMethodName(): string
-    {
-        $name = $this->order->getShippingDescription();
-        if (!empty($name)) {
-            return $name;
-        }
-        return parent::getShippingMethodName();
     }
 
     /**
@@ -215,32 +137,6 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns metadata regarding the tax class.
-     *
-     * @param int|null $taxClassId
-     *   The id of the tax class.
-     *
-     * @return array
-     *   An empty array or an array with keys:
-     *   - Meta::VatClassId
-     *   - Meta::VatClassName
-     */
-    protected function getVatClassMetaData(?int $taxClassId): array
-    {
-        $result = [];
-        if ($taxClassId) {
-            $result[Meta::VatClassId] = $taxClassId;
-            /** @var TaxClass $taxClass */
-            $taxClass = $this->getRegistry()->create(TaxClass::class);
-            $this->getRegistry()->get($taxClass->getResourceName())->load($taxClass, $taxClassId);
-            $result[Meta::VatClassName] = $taxClass->getClassName();
-        } else {
-            $result[Meta::VatClassId] = Config::VatClass_Null;
-        }
-        return $result;
-    }
-
-    /**
      * Returns whether shipping prices include tax.
      *
      * @return bool
@@ -250,40 +146,6 @@ class Creator extends BaseCreator
     protected function productPricesIncludeTax(): bool
     {
         return $this->getTaxConfig()->priceIncludesTax();
-    }
-
-    /**
-     * Returns whether shipping prices include tax.
-     *
-     * @return bool
-     *   true if shipping prices include tax, false otherwise.
-     */
-    protected function shippingPriceIncludeTax(): bool
-    {
-        return $this->getTaxConfig()->shippingPriceIncludesTax();
-    }
-
-    /**
-     * Returns the shipping tax class id.
-     *
-     * @return int
-     *   The id of the tax class used for shipping.
-     */
-    protected function getShippingTaxClassId(): int
-    {
-        return $this->getTaxConfig()->getShippingTaxClass();
-    }
-
-    /**
-     * Returns whether a discount amount includes tax.
-     *
-     * @return bool
-     *   true if a discount is applied on the price including tax, false if a
-     *   discount is applied on the price excluding tax.
-     */
-    protected function discountIncludesTax(): bool
-    {
-        return $this->getTaxConfig()->discountTax();
     }
 
     protected function getTaxConfig(): MagentoTaxConfig

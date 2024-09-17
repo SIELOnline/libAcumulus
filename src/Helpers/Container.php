@@ -21,6 +21,7 @@ use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Collectors\CollectorInterface;
 use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Completors\BaseCompletor;
 use Siel\Acumulus\Completors\CompletorTaskInterface;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ConfigStore;
@@ -29,6 +30,7 @@ use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
 use Siel\Acumulus\Invoice\Creator;
@@ -485,7 +487,7 @@ class Container
      *
      * @return \Siel\Acumulus\Invoice\Completor|\Siel\Acumulus\Completors\BaseCompletor
      */
-    public function getCompletor(string $dataType = '')
+    public function getCompletor(string $dataType = ''): BaseCompletor|Completor
     {
         if ($dataType === '') {
             // @legacy remove when all shops are fully converted to new architecture and
@@ -576,6 +578,7 @@ class Container
         $arguments = array_merge($arguments, [
             $this->getFieldExpander(),
             $this,
+            $this->getTranslator(),
             $this->getLog(),
         ]);
         try {

@@ -9,6 +9,7 @@ use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Meta;
 
@@ -36,6 +37,7 @@ abstract class Collector implements CollectorInterface
 {
     private FieldExpander $fieldExpander;
     private Container $container;
+    private Translator $translator;
     private Log $log;
     /**
      * @var (array|object)[]
@@ -44,10 +46,11 @@ abstract class Collector implements CollectorInterface
      */
     private array $propertySources;
 
-    public function __construct(FieldExpander $fieldExpander, Container $container, Log $log)
+    public function __construct(FieldExpander $fieldExpander, Container $container, Translator $translator, Log $log)
     {
         $this->fieldExpander = $fieldExpander;
         $this->container = $container;
+        $this->translator = $translator;
         $this->log = $log;
     }
 
@@ -65,6 +68,21 @@ abstract class Collector implements CollectorInterface
         $fqClassName = static::class;
         $shortClass = substr($fqClassName, strrpos($fqClassName, '\\') + 1);
         return substr($shortClass, 0, -strlen('Collector'));
+    }
+
+    /**
+     * Helper method to translate strings.
+     *
+     * @param string $key
+     *  The key to get a translation for.
+     *
+     * @return string
+     *   The translation for the given key or the key itself if no translation
+     *   could be found.
+     */
+    protected function t(string $key): string
+    {
+        return $this->translator->get($key);
     }
 
     protected function getLog(): Log
@@ -180,7 +198,7 @@ abstract class Collector implements CollectorInterface
         if ($acumulusObject->isProperty($field)) {
             return $value !== null && $acumulusObject->set($field, $this->expandValue($value), $mode);
         } elseif ($this->isMetadata($field)) {
-            $acumulusObject->metadataAdd($field, $this->expandValue($value));
+            $acumulusObject->metadataSet($field, $this->expandValue($value));
             return true;
         } else {
             $this->getLog()->notice(
@@ -203,7 +221,7 @@ abstract class Collector implements CollectorInterface
      *   The expanded value, or the value itself it was not a field
      *   specification.
      */
-    protected function expandValue(mixed $value)
+    protected function expandValue(mixed $value): mixed
     {
         if (is_string($value)) {
             $value = $this->expand($value);
@@ -221,7 +239,7 @@ abstract class Collector implements CollectorInterface
      *   The expanded field specification, which may be empty if the properties
      *   referred to, do not exist or are empty themselves.
      */
-    protected function expand(string $fieldSpecification)
+    protected function expand(string $fieldSpecification): mixed
     {
         return $this->getFieldExpander()->expand($fieldSpecification, $this->propertySources);
     }

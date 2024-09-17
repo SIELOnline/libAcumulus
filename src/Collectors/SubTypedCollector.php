@@ -8,6 +8,7 @@ use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 
 /**
@@ -15,12 +16,18 @@ use Siel\Acumulus\Meta;
  */
 abstract class SubTypedCollector extends Collector
 {
+    /**
+     * @var string
+     *   The subtype of the data object to collect, one of the constants from
+     *   {@see \Siel\Acumulus\Data\LineType}, {@see \Siel\Acumulus\Data\AddressType}, or
+     *   {@see \Siel\Acumulus\Data\EmailAsPdfType}.
+     */
     protected string $subType;
 
-    public function __construct(string $subType, FieldExpander $fieldExpander, Container $container, Log $log)
+    public function __construct(string $subType, FieldExpander $fieldExpander, Container $container, Translator $translator, Log $log)
     {
         $this->subType = $subType;
-        parent::__construct($fieldExpander, $container, $log);
+        parent::__construct($fieldExpander, $container, $translator, $log);
     }
 
     public function collect(array $propertySources, array $fieldSpecifications): AcumulusObject

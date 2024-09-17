@@ -19,7 +19,6 @@
 namespace Siel\Acumulus\PrestaShop\Invoice;
 
 use Address;
-use Carrier;
 use Configuration;
 use Exception;
 use Order;
@@ -103,35 +102,6 @@ class Creator extends BaseCreator
         $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
         $this->propertySources['address_delivery'] = new Address($this->order->id_address_delivery);
         $this->propertySources['customer'] = $this->order->getCustomer();
-    }
-
-    protected function getShippingLine(): array
-    {
-        if (empty($this->order->id_carrier)) {
-            // No carrier (virtual products) => no shipping line.
-            return [];
-        }
-        $sign = $this->invoiceSource->getSign();
-        $carrier = new Carrier($this->order->id_carrier);
-        // total_shipping_tax_excl is not very precise (rounded to the cent) and
-        // often leads to 1 cent off invoices in Acumulus (assuming that the
-        // amount entered is based on a nicely rounded amount incl tax). So we
-        // recalculate this ourselves.
-        $vatRate = $this->order->carrier_tax_rate;
-        $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
-        $shippingEx = $shippingInc / (100 + $vatRate) * 100;
-        $shippingVat = $shippingInc - $shippingEx;
-
-        return [
-            Tag::Product => !empty($carrier->name) ? $carrier->name : $this->t('shipping_costs'),
-            Tag::UnitPrice => $shippingInc / (100 + $vatRate) * 100,
-            Meta::UnitPriceInc => $shippingInc,
-            Tag::Quantity => 1,
-            Tag::VatRate => $vatRate,
-            Meta::VatAmount => $shippingVat,
-            Meta::VatRateSource => VatRateSource::Exact,
-            Meta::FieldsCalculated => [Tag::UnitPrice, Meta::VatAmount],
-               ] + $this->getVatRateLookupMetadata($this->order->id_address_invoice, $carrier->getIdTaxRulesGroup());
     }
 
     /**

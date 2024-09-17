@@ -29,6 +29,7 @@ use function strlen;
 /**
  * Wraps a PrestaShop order in an invoice source object.
  *
+ * @method Order|OrderSlip getShopObject()
  * @method Order|OrderSlip getSource()
  */
 class Source extends BaseSource

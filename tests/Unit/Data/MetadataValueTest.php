@@ -9,13 +9,19 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Unit\Data;
 
 use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataValue;
+
+use Stringable;
 
 use function is_array;
 
 /**
  * Tests for the {@see MetadataValue} class.
+ *
+ * @todo: add tests for the new features: isList and checking for a __toString() method on
+ *   objects.
  */
 class MetadataValueTest extends TestCase
 {
@@ -25,28 +31,33 @@ class MetadataValueTest extends TestCase
         $this->assertSame(0, $mdv->count());
         $this->assertNull($mdv->get());
         $this->assertNull($mdv->getApiValue());
+
+        $mdv = new MetadataValue(true);
+        $this->assertSame(0, $mdv->count());
+        $this->assertEqualsCanonicalizing([], $mdv->get());
+        $this->assertSame('[]', $mdv->getApiValue());
     }
 
-    public function test1Value(): void
+    public function testSingleValue(): void
     {
-        $value1 = 'value1';
-        $value2 = 2;
+        $value1 = 2;
 
-        $mdv = new MetadataValue($value1);
+        $mdv = (new MetadataValue())->add($value1);
         $this->assertSame(1, $mdv->count());
         $this->assertSame($value1, $mdv->get());
         $this->assertSame($value1, $mdv->getApiValue());
 
-        $mdv = new MetadataValue($value2);
-        $this->assertSame($value2, $mdv->get());
-        $this->assertSame($value2, $mdv->getApiValue());
+        $mdv = (new MetadataValue(true))->add($value1);
+        $this->assertSame(1, $mdv->count());
+        $this->assertSame([$value1], $mdv->get());
+        $this->assertSame("[$value1]", $mdv->getApiValue());
     }
 
     public function testNullValue(): void
     {
         $value1 = null;
 
-        $mdv = new MetadataValue($value1);
+        $mdv = (new MetadataValue())->add($value1);
         $this->assertSame(1, $mdv->count());
         $this->assertNull($mdv->get());
         $this->assertNull($mdv->getApiValue());
@@ -57,28 +68,13 @@ class MetadataValueTest extends TestCase
         $value1 = 'value1';
         $value2 = 2;
 
-        $mdv = new MetadataValue($value1, $value2);
-        $this->assertSame(2, $mdv->count());
-        $this->assertSame([$value1, $value2], $mdv->get());
-        // Note that this might fail depending on pretty print settings of json_encode
-        $this->assertSame("['value1',2]", $mdv->getApiValue());
-    }
-
-    public function testAdd(): void
-    {
-        $value1 = 'value1';
-        $value2 = 2;
-
-        $mdv = new MetadataValue($value1);
-        $mdv->add($value2);
+        $mdv = (new MetadataValue())->add($value1)->add($value2);
         $this->assertSame(2, $mdv->count());
         $this->assertSame([$value1, $value2], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode
         $this->assertSame("['value1',2]", $mdv->getApiValue());
 
-        $mdv = new MetadataValue();
-        $mdv->add($value1);
-        $mdv->add($value2);
+        $mdv = (new MetadataValue(true))->add($value1)->add($value2);
         $this->assertSame(2, $mdv->count());
         $this->assertSame([$value1, $value2], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode
@@ -96,7 +92,7 @@ class MetadataValueTest extends TestCase
             ['test', 'test'],
             [['test1', 'test2'], "['test1','test2']"],
             [new DateTime('2023-05-04'), '2023-05-04'],
-            [new DateTime('2023-05-04 13:14:15'), '2023-05-04 13:14:15'],
+            [new DateTimeImmutable('2023-05-04 13:14:15'), '2023-05-04 13:14:15'],
         ];
     }
 
@@ -114,5 +110,32 @@ class MetadataValueTest extends TestCase
             $mdv->add($value);
         }
         $this->assertSame($expected, $mdv->getApiValue());
+    }
+
+    public function testGetApiValueStringable(): void
+    {
+        $stringableClass = new class (1, 2, 3, 4) implements Stringable {
+            public function __construct(private int $oct1, private int $oct2, private int $oct3, private int $oct4)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return "$this->oct1.$this->oct2.$this->oct3.$this->oct4";
+            }
+        };
+        $notStringableClass = new class (1, 2, 3, 4) {
+            public function __construct(public int $oct1, public int $oct2, private int $oct3, private int $oct4)
+            {
+            }
+        };
+
+        $mdv = new MetadataValue();
+        $mdv->add($stringableClass);
+        $this->assertSame('1.2.3.4', $mdv->getApiValue());
+
+        $mdv = new MetadataValue();
+        $mdv->add($notStringableClass);
+        $this->assertSame("{'oct1':1,'oct2':2}", $mdv->getApiValue());
     }
 }

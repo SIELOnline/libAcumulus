@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
-use DateTime;
+use DateTimeInterface;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Meta;
 
+use Stringable;
+
 use function count;
+use function is_callable;
+use function is_object;
 
 /**
  * MetadataValue represents a metadata value.
@@ -37,16 +41,12 @@ use function count;
  */
 class MetadataValue
 {
+    private bool $isList;
     private array $value = [];
 
-    /**
-     * @param mixed ...$values
-     */
-    public function __construct(... $values)
+    public function __construct(bool $isList = false)
     {
-        foreach ($values as $value) {
-            $this->add($value);
-        }
+        $this->isList = $isList;
     }
 
     public function count(): int
@@ -55,34 +55,30 @@ class MetadataValue
     }
 
     /**
-     * Returns the value of this property.
-     *
-     * Note: this will often be a scalar value, but this may also be a more
-     * complex type, though to be useful, it should be "stringable" or "json
-     * serializable" in that case.
-     *
-     * param int|null $index
-     *   @todo: behavior for all these cases. Add a constructor parameter $isMulti?
+     * Returns the value of this metadata field.
      *
      * @return array|mixed|null
-     *   If
-     *   - $index = null: all values for thisMetadataValue, or  null if it has
-     *     no values (note: thus not an empty array, as null is more logical
-     *     when
+     *   If $$this->isList is:
+     *     - true: a, possibly empty, array with all values for this field.
+     *     - false:
+     *       - Null if no value is set.
+     *       - The value, probably a scalar, if 1 value was added.
+     *       - An array with all values if multiple values were added.
      *
      * @todo: add a parameter ?int $index = null ? in that case also add it to
-     *   {@see \Siel\Acumulus\Data\MetadataCollection::get()}
+     *   {@see \Siel\Acumulus\Data\MetadataCollection::get()}.
+     * param int|null $index
+     *
      */
-    public function get()
+    public function get(): mixed
     {
-        switch ($this->count()) {
-            case 0:
-                return null;
-            case 1:
-                return $this->value[0];
-            default:
-                return $this->value;
-        }
+        return $this->isList
+            ? $this->value
+            : match ($this->count()) {
+                0 => null,
+                1 => $this->value[0],
+                default => $this->value,
+            };
     }
 
     /**
@@ -94,9 +90,10 @@ class MetadataValue
      * @todo: add conversion of numeric strings like in FieldExpander. What if an array
      *   gets passed in: convert recursively?
      */
-    public function add($value): void
+    public function add(mixed $value): static
     {
         $this->value[] = $value;
+        return $this;
     }
 
     /**
@@ -108,19 +105,21 @@ class MetadataValue
      * to prevent that these quotes would get escaped when the whole message gets
      * json-encoded.
      */
-    public function getApiValue()
+    public function getApiValue(): int|float|string|bool|null
     {
         $value = $this->get();
         if (is_scalar($value) || $value === null) {
             $result = $value;
-        } elseif ($value instanceof DateTime) {
+        } elseif ($value instanceof DateTimeInterface) {
             if ($value->format('H:i:s') === '00:00:00') {
                 $result = $value->format(Api::DateFormat_Iso);
             } else {
                 $result = $value->format('Y-m-d H:i:s');
             }
         } else {
-            $result = json_encode($value, Meta::JsonFlags);
+            $result = $value instanceof Stringable
+                ? (string) $value
+                : json_encode($value, Meta::JsonFlags);
             $result = str_replace('"', "'", $result);
         }
         return $result;

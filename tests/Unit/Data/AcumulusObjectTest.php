@@ -146,7 +146,7 @@ class AcumulusObjectTest extends TestCase
     public function testToArray(): void
     {
         $ao = new SimpleTestObject();
-        $ao->metadataAdd('My_Metadata', 'meta');
+        $ao->metadataSet('My_Metadata', 'meta');
         $value1 = 'PRD0001';
         $ao->itemNumber = $value1;
         $value3 = 19.99;

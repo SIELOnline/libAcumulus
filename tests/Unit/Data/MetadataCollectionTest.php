@@ -47,7 +47,7 @@ class MetadataCollectionTest extends TestCase
         $this->assertTrue($mdc->exists($name2));
         $this->assertFalse($mdc->exists($no_name));
         $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name2));
-        $this->assertSame($value2, $mdc->get($name2));
+        $this->assertSame([$value2], $mdc->get($name2));
         $this->assertSame([$name1, $name2], $mdc->getKeys());
 
         // Test set that overwrites.
@@ -93,7 +93,7 @@ class MetadataCollectionTest extends TestCase
 
         // Test add that creates.
         $name2 = 'my_metadata2';
-        $mdc->add($name2, $value1);
+        $mdc->add($name2, $value1, false);
         $this->assertTrue($mdc->exists($name2));
         $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name2));
         $this->assertNull($mdc->get($name2));

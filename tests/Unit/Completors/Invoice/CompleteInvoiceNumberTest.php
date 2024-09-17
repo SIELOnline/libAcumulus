@@ -77,8 +77,8 @@ class CompleteInvoiceNumberTest extends TestCase
         $config->set('invoiceNrSource', $sourceToUse);
         $completor = $this->getContainer()->getCompletorTask('Invoice','InvoiceNumber');
         $invoice = $this->getInvoice();
-        $invoice->metadataAdd(Meta::SourceReference, $orderReference);
-        $invoice->metadataAdd(Meta::ShopInvoiceReference, $invoiceReference);
+        $invoice->metadataSet(Meta::SourceReference, $orderReference);
+        $invoice->metadataSet(Meta::ShopInvoiceReference, $invoiceReference);
         $completor->complete($invoice, $sourceToUse);
         $this->assertSame($expected, $invoice->number);
     }

@@ -84,7 +84,7 @@ class CompleteAccountingInfoTest extends TestCase
         $config->set('paymentMethodAccountNumber', $accountNumberPerPaymentMethod);
         $completor = $this->getContainer()->getCompletorTask('Invoice','AccountingInfo');
         $invoice = $this->getInvoice();
-        $invoice->metadataAdd(Meta::PaymentMethod, $paymentMethod);
+        $invoice->metadataSet(Meta::PaymentMethod, $paymentMethod);
         $completor->complete($invoice);
         $this->assertSame($expectedCostCenter, $invoice->costCenter);
         $this->assertSame($expectedAccountNumber, $invoice->accountNumber);

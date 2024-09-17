@@ -79,7 +79,7 @@ class CompleteByConfigTest extends TestCase
         $completor = $this->getContainer()->getCompletorTask('Address','ByConfig');
         $address = $this->getAddress();
         $address->countryCode = $countryCode;
-        $address->metadataAdd(Meta::ShopCountryName, $shopCountryName);
+        $address->metadataSet(Meta::ShopCountryName, $shopCountryName);
 
         $completor->complete($address);
 

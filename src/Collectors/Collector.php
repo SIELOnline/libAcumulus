@@ -269,6 +269,6 @@ abstract class Collector implements CollectorInterface
      */
     protected function addWarning(AcumulusObject $acumulusObject, string $warning, string $severity = Meta::Warning): void
     {
-        $acumulusObject->metadataAdd($severity, $warning);
+        $acumulusObject->metadataAdd($severity, $warning, false);
     }
 }

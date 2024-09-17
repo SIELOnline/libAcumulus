@@ -212,20 +212,6 @@ abstract class Creator
     }
 
     /**
-     * Returns the item/product lines of the order.
-     *
-     * Override this method or implement both getItemLinesOrder() and
-     * getItemLinesCreditMote().
-     *
-     * @return array[]
-     *   An array of item line arrays.
-     */
-    protected function getItemLines(): array
-    {
-        return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
-    }
-
-    /**
      * Returns all the fee lines for the order.
      *
      * Override this method if it is easier to return all fee lines at once.
@@ -277,7 +263,7 @@ abstract class Creator
     {
         $result = [];
         $line = $this->getShippingLine();
-        if ($line) {
+        if (!empty($line)) {
             $result[] = $line;
         }
         return $result;
@@ -289,10 +275,14 @@ abstract class Creator
      * To be able to produce a packing slip, a shipping line should normally be
      * added, even for free shipping.
      *
-     * @return array
-     *   A line array, empty if there is no shipping fee line.
+     * @return array|null
+     *   A line array, null (or an empty array (legacy)) if there is no shipping fee line
+     *   or code has been moved to a ShippingLineCollector
      */
-    abstract protected function getShippingLine(): array;
+    protected function getShippingLine(): ?array
+    {
+        return null;
+    }
 
     /**
      * Returns the shipment method name.

@@ -7,29 +7,21 @@ namespace Siel\Acumulus\Magento\Collectors;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
-use Magento\Tax\Model\ClassModel as TaxClass;
-use Magento\Tax\Model\Config as MagentoTaxConfig;
-use Siel\Acumulus\Collectors\LineCollector;
-use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
-use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 /**
- * ItemLineCollector contains HikaShop specific {@see LineType::Item} collecting logic.
+ * ItemLineCollector contains Magento specific {@see LineType::Item} collecting logic.
  *
  * @noinspection PhpUnused  Instantiated via a factory.
  */
 class ItemLineCollector extends LineCollector
 {
-    use MagentoRegistryTrait;
-
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   An item line with the mapped fields filled in.
@@ -47,8 +39,6 @@ class ItemLineCollector extends LineCollector
      *
      * @param \Siel\Acumulus\Data\Line $line
      *   An item line with the mapped fields filled in.
-     *
-     * @noinspection PhpMemberCanBePulledUpInspection
      */
     protected function getItemLine(Line $line): void
     {
@@ -71,6 +61,7 @@ class ItemLineCollector extends LineCollector
      * Returns an item line for 1 main product line.
      *
      * @noinspection PhpFunctionCyclomaticComplexityInspection
+     * @noinspection PhpComplexFunctionInspection
      */
     protected function getItemLineOrder(Line $line, OrderItemInterface $shopItem, bool $isChild = false): void
     {
@@ -81,8 +72,6 @@ class ItemLineCollector extends LineCollector
             // @todo: this is a mess:
             //   - we do no collect child lines but have to repeat the mappings here in code
             //   - we pass the shop item and would have to create the Acumulus wrappers for item and product ourselves.
-            /** @var \Siel\Acumulus\Magento\Invoice\Item $item */
-            $item = $this->getPropertySource('item');
             $line->product = $shopItem->getName();
             $line->quantity = $shopItem->getQtyOrdered();
             $line->vatRate = $shopItem->getTaxPercent();
@@ -103,8 +92,8 @@ class ItemLineCollector extends LineCollector
             $line->unitPrice = $productPriceInc;
         } else {
             $line->unitPrice = $productPriceEx; // copied to mappings.
-            $line->metadataAdd(Meta::UnitPriceInc, $productPriceInc); // copied to mappings.
-            $line->metadataAdd(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
+            $line->metadataSet(Meta::UnitPriceInc, $productPriceInc); // copied to mappings.
+            $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
         }
         $line->quantity = $shopItem->getQtyOrdered(); // copied to mappings.
 
@@ -157,7 +146,7 @@ class ItemLineCollector extends LineCollector
             // the parent did have (a copy of) that child under its
             // child items. We bail out by adding the metadata tag DoNotAdd and returning,
             // this will ensure that the parent line is not added but the child line is.
-            $line->metadataSet(Meta::DoNotAddChild, true);
+            $line->metadataSet(Meta::DoNotAdd, true);
             return;
         } else {
             // No 0 VAT, or 0 vat and not a parent product and not a zero price:
@@ -180,7 +169,7 @@ class ItemLineCollector extends LineCollector
                 /** @var Line $childLine */
                 $childLine = $this->createAcumulusObject();
                 $this->getItemLineOrder($childLine, $childItem,true);
-                if (!$childLine->metadataExists(Meta::DoNotAddChild)) {
+                if (!$childLine->metadataGet(Meta::DoNotAdd)) {
                     $line->addChild($childLine);
                 }
             }
@@ -257,8 +246,8 @@ class ItemLineCollector extends LineCollector
         } else {
             // Add price info.
             $line->unitPrice = $productPriceEx;  // copied to mappings.
-            $line->metadataAdd(Meta::UnitPriceInc, $productPriceInc);  // copied to mappings.
-            $line->metadataAdd(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
+            $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);  // copied to mappings.
+            $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
         }
         $line->quantity = $shopItem->getQty();  // copied to mappings (itemNumber, product).
 
@@ -319,27 +308,6 @@ class ItemLineCollector extends LineCollector
     }
 
     /**
-     * Adds metadata regarding the tax class to \$Line.
-     *
-     * The following metadata might be added:
-     * - Meta::VatClassId
-     * - Meta::VatClassName
-     */
-    protected function addVatClassMetaData(Line $line, int|string|null $taxClassId): void
-    {
-        if ($taxClassId) {
-            $taxClassId = (int) $taxClassId;
-            $line->metadataSet(Meta::VatClassId, $taxClassId);
-            /** @var TaxClass $taxClass */
-            $taxClass = $this->getRegistry()->create(TaxClass::class);
-            $this->getRegistry()->get($taxClass->getResourceName())->load($taxClass, $taxClassId);
-            $line->metadataSet(Meta::VatClassName, $taxClass->getClassName());
-        } else {
-            $line->metadataSet(Meta::VatClassId, Config::VatClass_Null);
-        }
-    }
-
-    /**
      * Returns whether a single child line is actually the same as its parent.
      *
      * If:
@@ -366,39 +334,5 @@ class ItemLineCollector extends LineCollector
             }
         }
         return false;
-    }
-
-    /**
-     * Returns whether shipping prices include tax.
-     *
-     * @return bool
-     *   True if the prices for the products are entered with tax, false if the
-     *   prices are entered without tax.
-     */
-    protected function productPricesIncludeTax(): bool
-    {
-        return $this->getTaxConfig()->priceIncludesTax();
-    }
-
-    /**
-     * Returns whether a discount amount includes tax.
-     *
-     * @return bool
-     *   true if a discount is applied on the price including tax, false if a
-     *   discount is applied on the price excluding tax.
-     */
-    protected function discountIncludesTax(): bool
-    {
-        return $this->getTaxConfig()->discountTax();
-    }
-
-    protected function getTaxConfig(): MagentoTaxConfig
-    {
-        return $this->getRegistry()->create(MagentoTaxConfig::class);
-    }
-
-    protected function getRegistry(): Registry
-    {
-        return Registry::getInstance();
     }
 }

@@ -353,11 +353,13 @@ interface Meta
     public const CompletorStrategyPreconditionFailed = 'meta-completor-strategy-precondition-failed';
     /**
      * Collector: indicates that the AcumulusObject having this metadata value set,
-     * probably an (item) Line, should not be added to its parent.
+     * probably an (item) Line, should not be added to the collection of (child) lines.
      *
-     * Uses: Magento
+     * Uses:
+     * - Magento: child lines that also appear on their own as a main item
+     * - LineCollector: shops that are not yet converted to collecting shipping lines.
      */
-    public const DoNotAddChild = 'meta-child-do-not-add';
+    public const DoNotAdd = 'meta-do-not-add';
     /**
      * Collector: indicates that a (single) child line is the ame as the parent, actually,
      * it is the chosen variant/option: Merge info from both into the parent line, not

@@ -63,6 +63,22 @@ class LineCollector extends SubTypedCollector
     }
 
     /**
+     * Returns the shipment method name.
+     *
+     * This method should be overridden by web shops to provide a more detailed
+     * name of the shipping method used.
+     *
+     * This base implementation returns the translated "Shipping costs" string.
+     *
+     * @return string
+     *   The name of the shipping method used for the current order.
+     */
+    protected function getShippingMethodName(): string
+    {
+        return $this->t('shipping_costs');
+    }
+
+    /**
      * Adds information about the range in which the vat rate will lie.
      *
      * If a web shop does not store the vat rates used in the order, we must

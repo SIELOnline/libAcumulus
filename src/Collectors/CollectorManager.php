@@ -18,6 +18,9 @@ use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Meta;
+
+use function get_class;
 
 /**
  * CollectorManager manages the collector phase.
@@ -212,6 +215,8 @@ class CollectorManager
         /** @var Source $source */
         $source = $this->getPropertySources()['source'];
         $this->collectItemLines($invoice, $source);
+        $this->collectShippingLines($invoice, $source);
+
 
         // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
         //   version that is stripped down to these features that have not yet been
@@ -245,6 +250,43 @@ class CollectorManager
             $invoice->addLine($line);
             $this->removePropertySource('product');
             $this->removePropertySource('item');
+        }
+    }
+
+    /**
+     * Collects all shipping lines.
+     *
+     * This base implementation covers the case where there is at most 1 shipping line and
+     * all needed info can be retrieved using the given $$source.
+     *
+     * Override this method if:
+     * - The shop can have multiple shipping lines.
+     * - The shop needs other property sources, so that collecting some of the fields can
+     *   be moved from {@see \Siel\Acumulus\Collectors\Collector::collectLogicFields()}
+     *   to {@see \Siel\Acumulus\Collectors\Collector::collectMappedFields()}.
+     *
+     * @param \Siel\Acumulus\Data\Invoice $invoice
+     * @param \Siel\Acumulus\Invoice\Source $source
+     *
+     * @noinspection PhpUnusedParameterInspection  Might be useful in overrides.
+     */
+    protected function collectShippingLines(Invoice $invoice, Source $source): void
+    {
+        $this->collectShippingLine($invoice);
+    }
+
+    private function collectShippingLine(Invoice $invoice): void
+    {
+        $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Shipping);
+        // If a shop does not have a specialised shipping line collector it means that its
+        // Creator code for shipping lines has not yet been converted: do not collect it.
+        if (str_contains(get_class($lineCollector), 'Shipping')) {
+            $lineMappings = $this->getMappings()->getFor(LineType::Shipping);
+            /** @var \Siel\Acumulus\Data\Line $line */
+            $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);
+            if (!$line->metadataGet(Meta::DoNotAdd)) {
+                $invoice->addLine($line);
+            }
         }
     }
 }

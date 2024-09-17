@@ -1,10 +1,7 @@
 <?php
 namespace Siel\Acumulus\MyWebShop\Invoice;
 
-use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
-use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * Creates a raw version of the Acumulus invoice based on a MyWebShop invoice
@@ -65,81 +62,6 @@ class Creator extends BaseCreator
         $this->propertySources['customer'] = new Customer($this->invoiceSource->getSource()->id_customer);
     }
 
-    protected function getItemLines(): array
-    {
-        // @todo: override or implement both addItemLinesOrder() and addItemLinesCreditNote()
-        $result = [];
-        $lines = $this->invoiceSource->getSource()->getItemLines();
-        foreach ($lines as $line) {
-            $result[] = $this->getItemLine($line);
-        }
-        return $result;
-    }
-
-    /**
-     * Returns 1 item line, be it for an order or credit slip.
-     *
-     * @todo: specify type of this parameter
-     * @param $item
-     *   An OrderDetail line.
-     *
-     * @return array
-     */
-    protected function getItemLine($item): array
-    {
-        $result = [];
-
-        // @todo: add property source(s) for this item line.
-        $this->addPropertySource('item', $item);
-
-        $sign = $this->invoiceSource->getSign();
-
-        // @todo: add other tags and available meta tags (* = required):
-        // * quantity
-        // * unitprice and/or unitpriceinc
-        // * vat related tags:
-        //     * vatrate and/or vatamount
-        //     * vat range tags (call method getVatRangeTags()
-        //     * vat rate source
-        // - meta-unitprice-recalculate: if admin enters product prices inc vat
-        //   (which is normal) then the product price ex vat may be imprecise.
-        //   If the exact vat rate is not yet known, it may be recalculated in
-        //   the Completor phase.
-        // - line totals
-        // Should result in something like this:
-
-        // Check for cost price.
-        $productPriceEx = $sign * $item->priceEx;
-        $precisionEx = 0.01;
-        $productVat = $sign * $item->productTax;
-        $precisionVat = 0.01;
-        $productPriceInc = $sign * $item->priceInc;
-        $quantity = $item->quantity;
-
-        // Check for cost price and margin scheme.
-        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
-            // - But still send the VAT rate to Acumulus.
-            $result[Tag::UnitPrice] = $productPriceInc;
-        } else {
-            $result += [
-                Tag::UnitPrice => $productPriceEx,
-                Meta::UnitPriceInc => $productPriceInc,
-                Meta::RecalculatePrice => $productPricesIncludeTax ? Tag::UnitPrice : Meta::UnitPriceInc,
-            ];
-        }
-        $result[Tag::Quantity] = $quantity;
-
-        // Add tax info.
-        $result += $this->getVatRangeTags($productVat, $productPriceEx, $precisionVat, $precisionEx);
-
-        // @todo: remove property source(s) for this item line.
-        $this->removePropertySource('item');
-
-        return $result;
-    }
-
     protected function getShippingLine(): array
     {
         $result = [];
@@ -152,7 +74,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Looks up and returns vat rate meta data.
+     * Looks up and returns vat rate metadata.
      *
      * @todo: add any necessary parameters, e.g. the product object
      *

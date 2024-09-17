@@ -74,7 +74,7 @@ class Creator extends BaseCreator
         $this->propertySources['customer'] = $this->getRegistry()->create(Customer::class)->load($source->getCustomerId());
     }
 
-    protected function getShippingLine(): array
+    protected function getShippingLineLegacy(): array
     {
         $result = [];
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $magentoSource */

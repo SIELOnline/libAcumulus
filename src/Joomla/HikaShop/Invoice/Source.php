@@ -179,6 +179,12 @@ class Source extends BaseSource
         return $vatBreakdown;
     }
 
+    /**
+     * @todo: can we generalize this with {@see \Siel\Acumulus\OpenCart\Invoice\Source::getOrderTotalLines('shipping')}
+     *   and its handling code in the respective CollectorManagers. The underlying problem
+     *   is that a Collector only collects 1 data object and is not fit for handling cases
+     *   where a line must be split.
+     */
     public function getOrderShippingInfos(): array
     {
         $order = $this->getShopObject();

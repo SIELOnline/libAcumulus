@@ -126,38 +126,6 @@ class Creator extends BaseCreator
 //        $this->propertySources['shopInvoice'] = $this->shopInvoice;
     }
 
-    protected function getShippingLine(): array
-    {
-        $result = [];
-        // We are checking on empty, assuming that a null value will be used to
-        // indicate no shipping at all (downloadable product) and that free
-        // shipping will be represented as the string '0.00' which is not
-        // considered empty.
-        if (!empty($this->order['details']['BT']->order_shipment)) {
-            $shippingEx = (float) $this->order['details']['BT']->order_shipment;
-            $shippingVat = (float) $this->order['details']['BT']->order_shipment_tax;
-            $result = [
-                    Tag::Product => $this->getShippingMethodName(),
-                    Tag::UnitPrice => $shippingEx,
-                    Tag::Quantity => 1,
-                    Meta::VatAmount => $shippingVat,
-                ] + $this->getVatData('shipment', $shippingEx, $shippingVat);
-        }
-        return $result;
-    }
-
-    protected function getShippingMethodName(): string
-    {
-        /** @var \VirtueMartModelShipmentmethod $shipmentMethodsModel */
-        $shipmentMethodsModel = VmModel::getModel('shipmentmethod');
-        /** @var \TableShipmentmethods $shipmentMethod */
-        $shipmentMethod = $shipmentMethodsModel->getShipment($this->order['details']['BT']->virtuemart_shipmentmethod_id);
-        if (!empty($shipmentMethod->shipment_name)) {
-            return $shipmentMethod->shipment_name;
-        }
-        return parent::getShippingMethodName();
-    }
-
     /**
      * {@inheritdoc}
      *

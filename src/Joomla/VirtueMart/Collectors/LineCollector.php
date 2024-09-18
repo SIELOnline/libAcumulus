@@ -1,0 +1,84 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
+
+use Siel\Acumulus\Api;
+use Siel\Acumulus\Collectors\LineCollector as BaseLineCollector;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Meta;
+
+/**
+ * ItemLineCollector contains VirtueMart specific {@see LineType::Item} collecting logic.
+ *
+ * @noinspection PhpUnused  Instantiated via a factory.
+ */
+class LineCollector extends BaseLineCollector
+{
+    /**
+     * Precision of amounts stored in VM. In VM, you can enter either the price
+     * inc or ex vat. The other amount will be calculated and stored with 4
+     * digits precision. So 0.001 is on the pessimistic side.
+     *
+     * @var float
+     */
+    protected float $precision = 0.001;
+
+    /**
+     * Adds vat data and vat lookup metadata to the current (item) line.
+     *
+     * @param string $calcRuleType
+     *   Type of calc rule to search for: 'VatTax', 'shipment' or 'payment'.
+     * @param int $orderItemId
+     *   The order item to search the calc rule for, or search at the order
+     *   level if left empty.
+     */
+    protected function addVatData(Line $line, string $calcRuleType, float $amountEx, float $vatAmount, int $orderItemId = 0): void
+    {
+        $calcRule = $this->getCalcRule($calcRuleType, $orderItemId);
+        if ($calcRule !== null && !empty($calcRule->calc_value)) {
+            $line->vatRate = (float) $calcRule->calc_value;
+            $line->metadataSet(Meta::VatRateSource, Number::isZero($vatAmount) ? VatRateSource::Exact0 : VatRateSource::Exact);
+            $line->metadataSet(Meta::VatClassId, $calcRule->virtuemart_calc_id);
+            $line->metadataSet(Meta::VatClassName, $calcRule->calc_rule_name);
+        } elseif (Number::isZero($vatAmount)) {
+            // No vat class assigned to payment or shipping fee.
+            $line->vatRate = Api::VatFree;
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact0);
+            $line->metadataSet(Meta::VatClassId, Config::VatClass_Null);
+        } else {
+            static::addVatRangeTags($line, $vatAmount, $amountEx, $this->precision);
+        }
+    }
+
+    /**
+     * Returns a calculation rule identified by the given reference
+     *
+     * @param string $calcKind
+     *   The value for the kind of calc rule.
+     * @param int $orderItemId
+     *   The value for the order item id, or 0 for special lines.
+     *
+     * @return null|object
+     *   The (1st) calculation rule for the given reference, or null if none
+     *   found.
+     */
+    protected function getCalcRule(string $calcKind, int $orderItemId = 0): ?object
+    {
+        /** @var \Siel\Acumulus\Invoice\Source $source */
+        $source = $this->getPropertySource('source');
+        $order = $source->getShopObject();
+        foreach ($order['calc_rules'] as $calcRule) {
+            if ($calcRule->calc_kind === $calcKind) {
+                if (empty($orderItemId) || (int) $calcRule->virtuemart_order_item_id === $orderItemId) {
+                    return $calcRule;
+                }
+            }
+        }
+        return null;
+    }
+}

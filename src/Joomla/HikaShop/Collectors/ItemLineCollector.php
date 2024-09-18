@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\HikaShop\Collectors;
 
-use Siel\Acumulus\Collectors\LineCollector;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AddressType;
@@ -25,13 +24,6 @@ use function is_object;
 class ItemLineCollector extends LineCollector
 {
     /**
-     * Precision of amounts stored in HS. In HS you can enter either the price
-     * inc or ex vat. The other amount will be calculated and stored with 5
-     * digits precision. So 0.0001 is on the pessimistic side.
-     */
-    protected float $precision = 0.0002;
-
-    /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   An item line with the mapped fields filled in.
      *
@@ -39,7 +31,7 @@ class ItemLineCollector extends LineCollector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
-        $this->getItemLine($acumulusObject);
+        $this->collectItemLine($acumulusObject);
     }
 
     /**
@@ -53,7 +45,7 @@ class ItemLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function getItemLine(Line $line): void
+    protected function collectItemLine(Line $line): void
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Data\Invoice $invoice */

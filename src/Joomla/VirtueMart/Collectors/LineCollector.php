@@ -13,7 +13,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
 /**
- * ItemLineCollector contains VirtueMart specific {@see LineType::Item} collecting logic.
+ * LineCollector contains common VirtueMart specific line collecting logic.
  *
  * @noinspection PhpUnused  Instantiated via a factory.
  */

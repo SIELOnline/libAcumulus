@@ -83,7 +83,7 @@ trait AcumulusObjectMetadataTrait
     public function addWarning(string|Message $message): void
     {
         assert(is_string($message) || $message instanceof Message);
-        $this->metadataAdd(Meta::Warning, $message);
+        $this->metadataAdd(Meta::Warning, $message, false);
     }
 
     /**

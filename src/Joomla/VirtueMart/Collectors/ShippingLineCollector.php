@@ -10,7 +10,7 @@ use Siel\Acumulus\Meta;
 use VmModel;
 
 /**
- * ShipingLineCollector contains VirtueMart specific {@see LineType::Shipping} collecting logic.
+ * ShippingLineCollector contains VirtueMart specific {@see LineType::Shipping} collecting logic.
  *
  * @noinspection PhpUnused  Instantiated via a factory.
  */

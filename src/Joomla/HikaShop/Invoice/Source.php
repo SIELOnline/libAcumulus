@@ -6,18 +6,20 @@ namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
 use hikashopOrderClass;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 use stdClass;
 
+use function count;
 use function in_array;
 
 /**
  * Wraps a HikaShop order in an invoice source object.
  *
- * @method object getShopObject()
- *   See {@see \hikashopOrderClass}
+ * @method object getShopObject() See {@see \hikashopOrderClass}
+ * @method object getSource()
  * @property object $order See {@see \hikashopOrderClass}
  */
 class Source extends BaseSource
@@ -175,6 +177,26 @@ class Source extends BaseSource
             }
         }
         return $vatBreakdown;
+    }
+
+    public function getOrderShippingInfos(): array
+    {
+        $order = $this->getShopObject();
+        if (Number::isZero($order->order_shipping_price)) {
+            // Free (or no) shipping: do not add on a credit note.
+            $shippingInfos[] = null;
+        } elseif (empty($order->order_shipping_params)
+            || count($order->order_shipping_params->prices) === 0
+        ) {
+            // If the property order_shipping_params is "empty" (no info to
+            // extract from), we use the order_shipping_* properties at the
+            // order level.
+            $shippingInfos[Source::Order] = $order;
+        } else {
+            // For each shipment we are going to add 1 or more shipping lines.
+            $shippingInfos = $order->order_shipping_params->prices;
+        }
+        return $shippingInfos;
     }
 
     /**

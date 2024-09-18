@@ -14,10 +14,23 @@ use TaxManagerFactory;
 use TaxRulesGroup;
 
 /**
- * ItemLineCollector contains PrestaShop specific {@see LineType::Item} collecting logic.
+ * LineCollector contains PrestaShop common Line collecting logic.
  */
 class LineCollector extends BaseLineCollector
 {
+    /**
+     * Precision: 1 of the amounts, probably the prince incl tax, is entered by
+     * the admin and can thus be considered exact. The other is calculated by
+     * the system and not rounded and can thus be considered to have a precision
+     * better than 0.0001.
+     *
+     * However, we have had a support call where the precision, for a credit
+     * note, turned out to be only 0.002. This was, apparently, with a price
+     * entered excl. vat: 34,22; incl: 41,40378; (computed) vat: 7,18378.
+     * The max-vat rate was just below 21%, so no match was made.
+     */
+    protected float $precision = 0.01;
+
     /**
      * Looks up and returns vat rate metadata.
      *

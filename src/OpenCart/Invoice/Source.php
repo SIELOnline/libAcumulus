@@ -30,6 +30,10 @@ use function strlen;
  */
 abstract class Source extends BaseSource
 {
+    public const Vat_Excluded = 'ex-vat';
+    public const Vat_IsVat = 'is-vat';
+    public const Vat_Included = 'inc-vat';
+
     /**
      * @var array[]
      *   List of OpenCart order total records.
@@ -143,11 +147,9 @@ abstract class Source extends BaseSource
     public function getTotals(): Totals
     {
         $vatAmount = 0.0;
-        $orderTotals = $this->getOrderTotalLines();
+        $orderTotals = $this->getOrderTotalLines('tax');
         foreach ($orderTotals as $totalLine) {
-            if ($totalLine['code'] === 'tax') {
-                $vatAmount += $totalLine['value'];
-            }
+            $vatAmount += $totalLine['value'];
         }
         return new Totals((float) $this->shopObject['total'], $vatAmount, null);
     }
@@ -155,11 +157,9 @@ abstract class Source extends BaseSource
     public function getVatBreakdown(): array
     {
         $vatBreakdown = [];
-        $orderTotals = $this->getOrderTotalLines();
+        $orderTotals = $this->getOrderTotalLines('tax');
         foreach ($orderTotals as $totalLine) {
-            if ($totalLine['code'] === 'tax') {
-                $vatBreakdown[$totalLine['title']] = $totalLine['value'];
-            }
+            $vatBreakdown[$totalLine['title']] = $totalLine['value'];
         }
         return $vatBreakdown;
     }
@@ -187,12 +187,42 @@ abstract class Source extends BaseSource
      *
      * These are shipment, other fee, tax, and discount lines.
      *
+     * @param string $code
+     *   Specify the type of order total lines to return, if empty, all are returned.
+     *
      * @return array[]
      *   The set of order total lines for this order. This set is ordered by
      *   sort_order, meaning that lines before the tax line are amounts ex vat
      *   and lines after are inc vat.
+     *   If a $$code is passed, the set is filtered by the given code.
      */
-    abstract public function getOrderTotalLines(): array;
+    public function getOrderTotalLines(string $code = ''): array
+    {
+        if (!isset($this->orderTotalLines)) {
+            $this->orderTotalLines = $this->_getOrderTotalLines();
+            $vat = Source::Vat_Excluded;
+            foreach ($this->orderTotalLines as &$orderTotalLine) {
+                if ($orderTotalLine['code'] === 'tax') {
+                    $vat = Source::Vat_IsVat;
+                } elseif ($vat === Source::Vat_IsVat) {
+                    $vat = Source::Vat_Included;
+                }
+                $orderTotalLine['vat'] = $vat;
+            }
+        }
+        $result = $this->orderTotalLines;
+        if (!empty($code)) {
+            $result = array_filter($this->orderTotalLines, static function ($line) use ($code) {
+                return $line['code'] === $code;
+            });
+        }
+        return $result;
+    }
+
+    /**
+     * Internal and version specific method to retrieve the order total lines.
+     */
+    abstract protected function _getOrderTotalLines(): array;
 
     /**
      * Returns a list of OpenCart order product line records.

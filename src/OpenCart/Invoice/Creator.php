@@ -154,8 +154,10 @@ class Creator extends BaseCreator
                     $line = null;
                     break;
                 case 'shipping':
-                    $line = $this->getTotalLine($totalLine, $exVat);
-                    $line = $this->addLineType($line, LineType::Shipping);
+                    // Shipping lines are now handled via the ShippingLineCollector
+                    $line = null;
+//                    $line = $this->getTotalLine($totalLine, $exVat);
+//                    $line = $this->addLineType($line, LineType::Shipping);
                     break;
                 case 'coupon':
                     $line = $this->getTotalLine($totalLine, $exVat);

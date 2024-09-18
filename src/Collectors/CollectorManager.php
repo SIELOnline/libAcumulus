@@ -254,7 +254,7 @@ class CollectorManager
     }
 
     /**
-     * Collects all shipping lines.
+     * Collects all shipping lines for the current invoice.
      *
      * This base implementation covers the case where there is at most 1 shipping line and
      * all needed info can be retrieved using the given $$source.
@@ -267,15 +267,13 @@ class CollectorManager
      *
      * @param \Siel\Acumulus\Data\Invoice $invoice
      * @param \Siel\Acumulus\Invoice\Source $source
-     *
-     * @noinspection PhpUnusedParameterInspection  Might be useful in overrides.
      */
     protected function collectShippingLines(Invoice $invoice, Source $source): void
     {
         $this->collectShippingLine($invoice);
     }
 
-    private function collectShippingLine(Invoice $invoice): void
+    protected function collectShippingLine(Invoice $invoice): void
     {
         $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Shipping);
         // If a shop does not have a specialised shipping line collector it means that its

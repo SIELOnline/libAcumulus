@@ -11,12 +11,9 @@ use Siel\Acumulus\OpenCart\Invoice\Source as BaseSource;
  */
 class Source extends BaseSource
 {
-    public function getOrderTotalLines(): array
+    protected function _getOrderTotalLines(): array
     {
-        if (!isset($this->orderTotalLines)) {
-            $this->orderTotalLines = $this->getOrderModel()->getTotals($this->shopObject['order_id']);
-        }
-        return $this->orderTotalLines;
+        return $this->getOrderModel()->getTotals($this->shopObject['order_id']);
     }
 
     protected function getOrderProducts(): array

@@ -128,33 +128,21 @@ class MetadataCollectionTest extends TestCase
         $this->assertNull($mdc->get($name2));
     }
 
-    public function testMetadataCollectionSetMultiple(): void
+    public function testMetadataCollectionList(): void
     {
         $name1 = 'my_metadata1';
-        $name2 = 'my_metadata2';
-        $value1 = 'value1';
-        $value2 = 2;
-        $set1 = [
-            $name1 => $value1,
-            $name2 => $value2,
-        ];
 
-        // Test setMultiple that creates.
+        // Test empty set creation by passing null.
         $mdc = new MetadataCollection();
-        $mdc->setMultiple($set1);
+        $mdc->add($name1, null, true);
         $this->assertTrue($mdc->exists($name1));
-        $this->assertSame($value1, $mdc->get($name1));
-        $this->assertTrue($mdc->exists($name2));
-        $this->assertSame($value2, $mdc->get($name2));
+        $this->assertCount(0, $mdc->get($name1));
 
-        // Test setMultiple that overwrites.
+        // Test "not a list" creation with passing null.
         $mdc = new MetadataCollection();
-        $mdc->set($name2, $value1);
-        $mdc->setMultiple($set1);
+        $mdc->add($name1, null, false);
         $this->assertTrue($mdc->exists($name1));
-        $this->assertTrue($mdc->exists($name2));
-        $this->assertSame($value1, $mdc->get($name1));
-        $this->assertSame($value2, $mdc->get($name2));
+        $this->assertNull( $mdc->get($name1));
     }
 
     public function testToArray(): void

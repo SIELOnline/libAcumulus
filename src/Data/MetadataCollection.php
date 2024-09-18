@@ -97,6 +97,8 @@ class MetadataCollection
      *   The name for the metadata field.
      * @param mixed $value
      *   The value to add to (or set for) the metadata field.
+     *   If you can pass null with $$isList = true for a new metadata value, it is assumed
+     *   that you want to create an empty list, not a list with null as first value.
      * @param bool $isList
      *   Whether to handle this metadata field as a list (if it has only 1 value).
      */
@@ -104,6 +106,9 @@ class MetadataCollection
     {
         if (!$this->exists($name)) {
             $this->metadata[$name] = new MetadataValue($isList);
+            if ($isList && $value === null) {
+                return;
+            }
         }
         $this->metadata[$name]->add($value);
     }

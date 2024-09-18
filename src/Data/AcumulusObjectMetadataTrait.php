@@ -57,15 +57,6 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
-     * See {@see \Siel\Acumulus\Data\MetadataCollection::setMultiple()}.
-     * @deprecated
-     */
-    public function metadataSetMultiple(array $values): void
-    {
-        $this->getMetadata()->setMultiple($values);
-    }
-
-    /**
      * See {@see \Siel\Acumulus\Data\MetadataCollection::add()}.
      */
     public function metadataAdd(string $name, $value, bool $isList = true): void

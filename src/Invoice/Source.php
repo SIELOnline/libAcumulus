@@ -575,6 +575,34 @@ abstract class Source
     }
 
     /**
+     * Returns a set of "discount infos".
+     *
+     * A discount info is an "object" that contains information about a discount applied
+     * to this invoice source. What this info looks like is shop dependent, e.g:
+     * - In many shops discount info is stored at the order level, so this source is
+     *   returned as one and only array value, but only if a discount was applied.
+     * - In OpenCart discounts are stored as "total lines", so this method returns an
+     *   array of total lines.
+     *
+     * As the data structures returned are fully shop dependent, so should the processing
+     * code be. However, defining this method allows the managing code to be shop
+     * independent and thus be placed in the base
+     * {@see \Siel\Acumulus\Collectors\CollectorManager}.
+     *
+     * [Note: if possible we could create a wrapper/adapter object, e.g. a DiscountInfo or
+     * DiscountItem like we did for {@see Source}, {@see Item}, and {@see Product}, but
+     * that only makes senses if we could make methods (like getProduct(), getQuantity(),
+     * etc) on them that works for all shops.]
+     *
+     * @return array
+     *   The - possibly empty - set of discount infos.
+     */
+    public function getDiscountInfos(): array
+    {
+        return $this->callTypeSpecificMethod(__FUNCTION__) ?? [];
+    }
+
+    /**
      * Calls a type specific implementation of $method.
      *
      * This allows to separate logic for different source types into different
@@ -594,7 +622,7 @@ abstract class Source
      * @todo: all methods called via this method can be made protected/private.
      *   Is this so? Isn't visibility taken into account?
      */
-    protected function callTypeSpecificMethod(string $method, ...$args)
+    protected function callTypeSpecificMethod(string $method, ...$args): mixed
     {
         $method .= $this->getType();
         if (method_exists($this, $method)) {

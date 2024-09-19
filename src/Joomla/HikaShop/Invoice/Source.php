@@ -18,9 +18,8 @@ use function in_array;
 /**
  * Wraps a HikaShop order in an invoice source object.
  *
- * @method object getShopObject() See {@see \hikashopOrderClass}
+ * @method object getShopObject() See \hikashopOrderClass
  * @method object getSource()
- * @property object $order See {@see \hikashopOrderClass}
  */
 class Source extends BaseSource
 {
@@ -225,6 +224,15 @@ class Source extends BaseSource
         $result = [];
         foreach ($this->getShopObject()->products as $orderProduct) {
             $result[] = $this->getContainer()->createItem($this, $orderProduct);
+        }
+        return $result;
+    }
+
+    public function getDiscountInfos(): array
+    {
+        $result = [];
+        if (!Number::isZero($this->getShopObject()->order_discount_price)) {
+            $result[] = $this;
         }
         return $result;
     }

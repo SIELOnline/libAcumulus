@@ -44,6 +44,7 @@ class ItemLineCollector extends LineCollector
      *   An item line with the mapped fields filled in.
      *
      * @throws \Exception
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
     protected function collectItemLine(Line $line): void
     {

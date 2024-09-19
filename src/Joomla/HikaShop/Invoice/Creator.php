@@ -59,37 +59,6 @@ class Creator extends BaseCreator
         $this->propertySources['customer'] = $this->order->customer;
     }
 
-    protected function getDiscountLines(): array
-    {
-        $result = [];
-
-        if (!Number::isZero($this->order->order_discount_price)) {
-            $discountInc = (float) $this->order->order_discount_price;
-            $discountVat = (float) $this->order->order_discount_tax;
-            $discountEx = $discountInc - $discountVat;
-            $recalculatePrice = Tag::UnitPrice;
-            $vatInfo = $this->getVatRangeTags($discountVat, $discountEx, $this->precision, $this->precision);
-            if ($vatInfo[Tag::VatRate] === null) {
-                $vatInfo[Meta::StrategySplit] = true;
-            }
-            $description = empty($this->order->order_discount_code)
-                ? $this->t('discount')
-                : $this->t('discount_code') . ' ' . $this->order->order_discount_code;
-
-            $result[] = [
-                    Tag::Product => $description,
-                    Tag::Quantity => 1,
-                    Tag::UnitPrice => -$discountEx,
-                    Meta::UnitPriceInc => -$discountInc,
-                    Meta::PrecisionUnitPriceInc => $this->precision,
-                    Meta::RecalculatePrice => $recalculatePrice,
-                    Meta::VatAmount => -$discountVat,
-                ] + $vatInfo;
-        }
-
-        return $result;
-    }
-
     protected function getPaymentFeeLine(): array
     {
         // @todo: check (return on refund?)

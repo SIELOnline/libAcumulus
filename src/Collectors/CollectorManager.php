@@ -216,13 +216,11 @@ class CollectorManager
         $source = $this->getPropertySources()['source'];
         $this->collectItemLines($invoice, $source);
         $this->collectShippingLines($invoice, $source);
+        $this->collectDiscountLines($invoice, $source);
 
-
-        // @legacy: Collecting Lines not yet implemented: fall back to the Creator in a
-        //   version that is stripped down to these features that have not yet been
-        //   converted.
-        $creator = $this->getContainer()->getCreator();
-        $creator->create($source, $invoice);
+        // @legacy: Collecting Lines not yet fully implemented: fall back to the Creator
+        //   for the item types that have not yet been converted.
+        $this->getContainer()->getCreator()->create($source, $invoice);
         // @legacy end
 
         $this->removePropertySource('invoice');
@@ -231,7 +229,7 @@ class CollectorManager
     /**
      * Collects all item lines, that is the lines with the products sold.
      */
-    private function collectItemLines(Invoice $invoice, Source $source): void
+    protected function collectItemLines(Invoice $invoice, Source $source): void
     {
         $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Item);
         $lineMappings = $this->getMappings()->getFor(LineType::Item);
@@ -285,6 +283,28 @@ class CollectorManager
             if (!$line->metadataGet(Meta::DoNotAdd)) {
                 $invoice->addLine($line);
             }
+        }
+    }
+
+    /**
+     * Collects all discount lines, that is the lines with the discounts applied.
+     *
+     * @nth: this code looks a lot like collectItemLines(), and like
+     *   collectShippingLines() when we implement getShippingInfos on Source: generalize
+     *   this, and we have event handlers on all types of lines.
+     */
+    private function collectDiscountLines(Invoice $invoice, Source $source): void
+    {
+        $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Discount);
+        $lineMappings = $this->getMappings()->getFor(LineType::Discount);
+
+        $items = $source->getDiscountInfos();
+        foreach ($items as $item) {
+            $this->addPropertySource('discountInfo', $item);
+            /** @var \Siel\Acumulus\Data\Line $line */
+            $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);
+            $invoice->addLine($line);
+            $this->removePropertySource('discountInfo');
         }
     }
 }

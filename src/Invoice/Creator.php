@@ -254,7 +254,7 @@ abstract class Creator
      */
     protected function getDiscountLines(): array
     {
-        return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+        return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args()) ?? [];
     }
 
     /**

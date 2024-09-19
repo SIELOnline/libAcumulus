@@ -23,7 +23,6 @@ use Configuration;
 use Exception;
 use Order;
 use OrderSlip;
-use PrestaShop\PrestaShop\Core\Domain\Order\VoucherRefundType;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Config\Config;
@@ -188,87 +187,6 @@ class Creator extends BaseCreator
         }
         return parent::getPaymentFeeLine();
     }
-
-
-    /**
-     * In a Prestashop order the discount lines are specified in Order cart
-     * rules.
-     *
-     * @return array[]
-     */
-    protected function getDiscountLinesOrder(): array
-    {
-        $result = [];
-
-        foreach ($this->order->getCartRules() as $line) {
-            $result[] = $this->getDiscountLineOrder($line);
-        }
-
-        return $result;
-    }
-
-    /**
-     * In a Prestashop order the discount lines are specified in Order cart
-     * rules that have, a.o, the following fields:
-     * - value: total amount inc VAT
-     * - value_tax_excl: total amount ex VAT
-     *
-     * @param array $line
-     *   A PrestaShop discount line (ie: an order_cart_rule record).
-     *
-     * @return array
-     *   An Acumulus order item line.
-     */
-    protected function getDiscountLineOrder(array $line): array
-    {
-        $sign = $this->invoiceSource->getSign();
-        $discountInc = -$sign * $line['value'];
-        $discountEx = -$sign * $line['value_tax_excl'];
-        $discountVat = $discountInc - $discountEx;
-        $result = [
-                Tag::ItemNumber => $line['id_cart_rule'],
-                Tag::Product => $this->t('discount_code') . ' ' . $line['name'],
-                Tag::UnitPrice => $discountEx,
-                Meta::UnitPriceInc => $discountInc,
-                Tag::Quantity => 1,
-                // If no match is found, this line may be split.
-                Meta::StrategySplit => true,
-                // Assuming that the fixed discount amount was entered:
-                // - including VAT, the precision would be 0.01, 0.01.
-                // - excluding VAT, the precision would be 0.01, 0
-                // However, for a %, it will be: 0.02, 0.01, so use 0.02.
-                  ] + $this->getVatRangeTags($discountVat, $discountEx, 0.02, 0.01);
-        $result[Meta::FieldsCalculated][] = Meta::VatAmount;
-
-        return $result;
-    }
-
-    /**
-     * In a Prestashop credit slip, the discounts are not directly visible but can be
-     * retrieved by looking at the cart rules form the original order and the field
-     * {@see OrderSlip::$order_slip_type} which indicates if the cart rules from the
-     * original order are to be revoked ({@see VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND})
-     * or remain ({@see VoucherRefundType::PRODUCT_PRICES_REFUND}).
-     *
-     * @return array[]
-     *
-     * @noinspection PhpUnused : Called via getDiscountLines().
-     */
-    protected function getDiscountLinesCreditNote(): array
-    {
-        $result = [];
-
-        /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
-        if ((int) $this->creditSlip->order_slip_type === VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND) {
-            // Vouchers are deducted from the refund amount, add a discount line per
-            // discount applied to the original order. The amounts will be positive as
-            // {@see Creator::getDiscountLineOrder()} takes the 'sign' into account.
-            $result = $this->getDiscountLinesOrder();
-        }
-
-        return $result;
-    }
-
 
     /**
      * Looks up and returns vat rate metadata.

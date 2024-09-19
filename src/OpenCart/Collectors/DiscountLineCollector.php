@@ -22,7 +22,7 @@ class DiscountLineCollector extends LineCollector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
-        $this->collectShippingLine($acumulusObject);
+        $this->collectDiscountLine($acumulusObject);
     }
 
     /**
@@ -33,7 +33,7 @@ class DiscountLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectShippingLine(Line $line): void
+    protected function collectDiscountLine(Line $line): void
     {
         /**
          * @var array $totalLine

@@ -346,4 +346,26 @@ class Source extends BaseSource
         }
         return $result;
     }
+
+    /**
+     * Description.
+     *
+     * A PrestaShop order stores the discounts applied in order cart rules.
+     *
+     * In a Prestashop credit slip, the discounts are not directly visible but can be
+     * retrieved by looking at the cart rules form the original order. However, the field
+     * {@see OrderSlip::$order_slip_type} indicates if the cart rules from that order are
+     * to be revoked ({@see VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND})
+     * or should remain ({@see VoucherRefundType::PRODUCT_PRICES_REFUND}).
+     */
+    public function getDiscountInfos(): array
+    {
+        $result = [];
+        if ($this->getType() === Source::Order
+            || (int) $this->getShopObject()->order_slip_type === VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND
+        ) {
+            $result = $this->getOrder()->getShopObject()->getCartRules();
+        }
+        return $result;
+    }
 }

@@ -8,16 +8,15 @@ use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 
 /**
- * ShippingLineCollector contains OpenCart specific {@see LineType::Shipping} collecting
- * logic.
+ * DiscountLineCollector contains OpenCart specific {@see LineType::Discount} collecting logic.
  *
  * @noinspection PhpUnused  Instantiated via a factory.
  */
-class ShippingLineCollector extends LineCollector
+class DiscountLineCollector extends LineCollector
 {
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
-     *   A shipping line with the mapped fields filled in.
+     *   A discount line with the mapped fields filled in.
      *
      * @throws \Exception
      */
@@ -27,20 +26,20 @@ class ShippingLineCollector extends LineCollector
     }
 
     /**
-     * Collects a shipping line for 1 order total line of type 'shipping'.
-     *
-     * This method may return child lines if there are options/variants.
-     * These lines will be informative, their price will be 0.
+     * Collects a discount line for 1 order total line of type 'discount'.
      *
      * @param Line $line
-     *   An item line with the mapped fields filled in
+     *   A discount line with the mapped fields filled in
      *
      * @throws \Exception
      */
     protected function collectShippingLine(Line $line): void
     {
-        /** @var array $totalLine a record from the order_total table + a vat indication */
-        $totalLine = $this->getPropertySource('totalLine');
+        /**
+         * @var array $totalLine
+         *   A record from the order_total table + an ex/inc vat indication.
+         */
+        $totalLine = $this->getPropertySource('discountInfo');
         $this->collectTotalLine($line, $totalLine, $totalLine['vat']);
     }
 }

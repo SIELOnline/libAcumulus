@@ -54,7 +54,7 @@ class LineCollector extends BaseLineCollector
             // Coupons may have to be split over various taxes.
             $line->vatRate = null;
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Strategy);
-            $line->metadataSet(Meta::StrategySplit, $line['code'] === 'coupon');
+            $line->metadataSet(Meta::StrategySplit, true);
         } else {
             // Try to get a vat rate.
             $this->addVatRateLookupByTotalLineType($line, $totalLine['code']);

@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Invoice;
 
-use RuntimeException;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Data\VatRateSource;
@@ -160,8 +159,10 @@ class Creator extends BaseCreator
 //                    $line = $this->addLineType($line, LineType::Shipping);
                     break;
                 case 'coupon':
-                    $line = $this->getTotalLine($totalLine, $exVat);
-                    $line = $this->addLineType($line, LineType::Discount);
+                    // Discount lines are now handled via the ShippingLineCollector
+                    $line = null;
+//                    $line = $this->getTotalLine($totalLine, $exVat);
+//                    $line = $this->addLineType($line, LineType::Discount);
                     break;
                 case 'tax':
                     // Tax line: added to invoice level

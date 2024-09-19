@@ -13,6 +13,7 @@ namespace Siel\Acumulus\OpenCart\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
@@ -30,6 +31,12 @@ use function strlen;
  */
 abstract class Source extends BaseSource
 {
+    public const LineTypeToCode = [
+        LineType::Shipping => 'shipping',
+        LineType::Discount => 'coupon',
+        LineType::Voucher => 'voucher',
+    ];
+
     public const Vat_Excluded = 'ex-vat';
     public const Vat_IsVat = 'is-vat';
     public const Vat_Included = 'inc-vat';
@@ -231,6 +238,16 @@ abstract class Source extends BaseSource
      *   An array with records from the order_product table.
      */
     abstract protected function getOrderProducts(): array;
+
+    /**
+     * {@inheritdoc}
+     *
+     * In OpenCart discounts are stored as an order total line.
+     */
+    public function getDiscountInfos(): array
+    {
+        return $this->getOrderTotalLines(static::LineTypeToCode[LineType::Discount]);
+    }
 
     /**
      * @return \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order|\ModelCheckoutOrder|\ModelSaleOrder

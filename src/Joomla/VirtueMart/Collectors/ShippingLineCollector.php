@@ -18,7 +18,7 @@ class ShippingLineCollector extends LineCollector
 {
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
-     *   An item line with the mapped fields filled in.
+     *   A shipping line with the mapped fields filled in.
      *
      * @throws \Exception
      */

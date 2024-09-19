@@ -12,11 +12,8 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
-use stdClass;
 use VirtueMartModelOrders;
 use VmModel;
-
-use function in_array;
 
 /**
  * Creates a raw version of the Acumulus invoice from a virtueMart {@see Source}.
@@ -124,93 +121,6 @@ class Creator extends BaseCreator
         $this->propertySources['BT'] = $this->order['details']['BT'];
         $this->propertySources['ST'] = $this->order['details']['ST'];
 //        $this->propertySources['shopInvoice'] = $this->shopInvoice;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @noinspection PhpMissingParentCallCommonInspection
-     */
-    protected function getDiscountLines(): array
-    {
-        $result = [];
-
-        // We do have several discount related fields in the order details:
-        // - order_billDiscountAmount
-        // - order_discountAmount
-        // - coupon_discount
-        // - order_discount
-        // However, these fields seem to be totals based on applied non-tax
-        // calculation rules. So it is better to add a line per calc rule with a
-        // negative amount: this gives us descriptions of the discounts as well.
-        $result = array_merge(
-            $result,
-            array_map([$this, 'getCalcRuleDiscountLine'],
-                array_filter($this->order['calc_rules'], [$this, 'isDiscountCalcRule']))
-        );
-
-        // Coupon codes are not stored in calc rules, so handle them separately.
-        if (!Number::isZero($this->order['details']['BT']->coupon_discount)) {
-            $result[] = $this->getCouponCodeDiscountLine();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns whether the calculation rule is a discount rule.
-     *
-     * @param \stdClass $calcRule
-     *
-     * @return bool
-     *   True if the calculation rule is a discount rule.
-     */
-    protected function isDiscountCalcRule(stdClass $calcRule): bool
-    {
-        return $calcRule->calc_amount < 0.0
-            && !in_array($calcRule->calc_kind, ['VatTax', 'shipment', 'payment']);
-    }
-
-    /**
-     * Returns a discount item line for the discount calculation rule.
-     *
-     * The returned line will only contain a discount amount including tax.
-     * The completor will have to divide this amount over vat rates that are used
-     * in this invoice.
-     *
-     * @return array
-     *   An item line for the invoice.
-     */
-    protected function getCalcRuleDiscountLine(stdClass $calcRule): array
-    {
-        return [
-            Tag::Product => $calcRule->calc_rule_name,
-            Tag::Quantity => 1,
-            Tag::UnitPrice => null,
-            Meta::UnitPriceInc => (float) $calcRule->calc_amount,
-            Tag::VatRate => null,
-            Meta::VatRateSource => VatRateSource::Strategy,
-            Meta::StrategySplit => true,
-        ];
-    }
-
-    /**
-     *  Returns an item line for the coupon code discount on this order.
-     *
-     * @return array
-     *   An item line array.
-     */
-    protected function getCouponCodeDiscountLine(): array
-    {
-        return [
-            Tag::ItemNumber => $this->order['details']['BT']->coupon_code,
-            Tag::Product => $this->t('discount'),
-            Tag::Quantity => 1,
-            Meta::UnitPriceInc => (float) $this->order['details']['BT']->coupon_discount,
-            Tag::VatRate => null,
-            Meta::VatRateSource => VatRateSource::Strategy,
-            Meta::StrategySplit => true,
-        ];
     }
 
     /**

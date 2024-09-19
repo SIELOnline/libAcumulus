@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
@@ -20,7 +21,8 @@ use function in_array;
 /**
  * Wraps a VirtueMart order in an invoice source object.
  *
- * @property array $order
+ * @method array getShopObject() a virtuemart_orders table record.
+ * @property array $shopObject a virtuemart_orders table record.
  */
 class Source extends BaseSource
 {
@@ -199,5 +201,27 @@ class Source extends BaseSource
             $result[] = $this->getContainer()->createItem($this, $shopItem);
         }
         return $result;
+    }
+
+    public function getDiscountInfos(): array
+    {
+        $result = array_filter($this->getShopObject()['calc_rules'], [$this, 'isDiscountCalcRule']);
+        if (!Number::isZero($this->getShopObject()['details']['BT']->coupon_discount)) {
+            $result[] = $this;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns whether the calculation rule is a discount rule.
+     *
+     * @param object $calcRule
+     *
+     * @return bool
+     *   True if the calculation rule is a discount rule.
+     */
+    protected function isDiscountCalcRule(object $calcRule): bool
+    {
+        return $calcRule->calc_amount < 0.0 && !in_array($calcRule->calc_kind, ['VatTax', 'shipment', 'payment']);
     }
 }

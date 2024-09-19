@@ -16,7 +16,7 @@ use function is_string;
 use function strlen;
 
 /**
- * ItemLineCollector contains WooCommerce specific {@see LineType::Item} collecting logic.
+ * ShippingLineCollector contains WooCommerce specific {@see LineType::Shipping} collecting logic.
  *
  * @noinspection PhpUnused  Instantiated via a factory.
  */
@@ -24,13 +24,17 @@ class ShippingLineCollector extends LineCollector
 {
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
-     *   An item line with the mapped fields filled in.
+     *   A shipping line with the mapped fields filled in.
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
         $this->collectShippingLine($acumulusObject);
     }
 
+    /**
+     * @param \Siel\Acumulus\Data\Line $line
+     *   A shipping line with the mapped fields filled in.
+     */
     protected function collectShippingLine(Line $line): void
     {
         /** @var \WC_Order_Item_Shipping $shippingItem */

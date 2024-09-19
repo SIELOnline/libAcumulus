@@ -10,9 +10,11 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 use WC_Abstract_Order;
+use WC_Coupon;
 use WC_Order;
 use WC_Order_Refund;
 
+use function count;
 use function get_class;
 use function gettype;
 use function is_object;
@@ -255,6 +257,33 @@ class Source extends BaseSource
             }
         }
 
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}}
+     *
+     * In WooCommerce, discount amounts are distributed over the applicable item lines, so
+     * we do not have to add discount lines. However, we still do add them for
+     * completeness, but they will get a unit price of 0.
+     *
+     * For refunds without any articles (probably just a manual refund) we don't need to
+     * know what discounts were applied on the original order. So we do not add lines for
+     * them.
+     */
+    public function getDiscountInfos(): array
+    {
+        $result = [];
+
+        if ($this->getType() !== Source::CreditNote || count($this->getItems()) > 0) {
+            // Add a line for all coupons applied. Coupons are only stored on the order,
+            // not on refunds, so use the order.
+            /** @var \WC_Order $order */
+            $order = $this->getOrder()->getShopObject();
+            foreach ($order->get_coupon_codes() as $couponCode) {
+                $result[] = new WC_Coupon($couponCode);
+            }
+        }
         return $result;
     }
 }

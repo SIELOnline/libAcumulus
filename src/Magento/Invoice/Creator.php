@@ -20,13 +20,10 @@ namespace Siel\Acumulus\Magento\Invoice;
 use Magento\Customer\Model\Customer;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
-use Magento\Tax\Model\Config as MagentoTaxConfig;
-use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Magento\Helpers\Registry;
-use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 /**
@@ -73,35 +70,6 @@ class Creator extends BaseCreator
     }
 
     /**
-     * @noinspection PhpMissingParentCallCommonInspection Empty base method.
-     */
-    protected function getDiscountLines(): array
-    {
-        $result = [];
-
-        /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $source */
-        $source = $this->invoiceSource->getSource();
-        if (!Number::isZero($source->getBaseDiscountAmount())) {
-            $line = [
-                Tag::ItemNumber => '',
-                Tag::Product => $this->getDiscountDescription(),
-                Tag::VatRate => null,
-                Meta::VatRateSource => VatRateSource::Strategy,
-                Meta::StrategySplit => true,
-                Tag::Quantity => 1,
-            ];
-            // Product prices incl. VAT => discount amount is also incl. VAT
-            if ($this->productPricesIncludeTax()) {
-                $line[Meta::UnitPriceInc] = $this->invoiceSource->getSign() * $source->getBaseDiscountAmount();
-            } else {
-                $line[Tag::UnitPrice] = $this->invoiceSource->getSign() * $source->getBaseDiscountAmount();
-            }
-            $result[] = $line;
-        }
-        return $result;
-    }
-
-    /**
      * {@inheritdoc}
      *
      * This implementation may return a manual line for a credit memo.
@@ -122,35 +90,6 @@ class Creator extends BaseCreator
             $result[] = $line;
         }
         return $result;
-    }
-
-    protected function getDiscountDescription(): string
-    {
-        if ($this->order->getDiscountDescription()) {
-            $description = $this->t('discount_code') . ' ' . $this->order->getDiscountDescription();
-        } elseif ($this->order->getCouponCode()) {
-            $description = $this->t('discount_code') . ' ' . $this->order->getCouponCode();
-        } else {
-            $description = $this->t('discount');
-        }
-        return $description;
-    }
-
-    /**
-     * Returns whether shipping prices include tax.
-     *
-     * @return bool
-     *   True if the prices for the products are entered with tax, false if the
-     *   prices are entered without tax.
-     */
-    protected function productPricesIncludeTax(): bool
-    {
-        return $this->getTaxConfig()->priceIncludesTax();
-    }
-
-    protected function getTaxConfig(): MagentoTaxConfig
-    {
-        return $this->getRegistry()->create(MagentoTaxConfig::class);
     }
 
     protected function getRegistry(): Registry

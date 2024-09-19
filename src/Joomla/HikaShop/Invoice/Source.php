@@ -230,10 +230,6 @@ class Source extends BaseSource
 
     public function getDiscountInfos(): array
     {
-        $result = [];
-        if (!Number::isZero($this->getShopObject()->order_discount_price)) {
-            $result[] = $this;
-        }
-        return $result;
+        return !Number::isZero($this->getShopObject()->order_discount_price) ? [$this] : [];
     }
 }

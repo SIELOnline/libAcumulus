@@ -354,4 +354,9 @@ class Source extends BaseSource
         }
         return $result;
     }
+
+    public function getDiscountInfos(): array
+    {
+        return !Number::isZero($this->getShopObject()->getBaseDiscountAmount()) ? [$this] : [];
+    }
 }

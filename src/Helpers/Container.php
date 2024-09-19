@@ -535,7 +535,6 @@ class Container
             'Creator',
             'Invoice',
             [
-                $this->getFieldExpander(),
                 $this->getShopCapabilities(),
                 $this,
                 $this->getMappings(),

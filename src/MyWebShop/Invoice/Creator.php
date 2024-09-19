@@ -13,7 +13,6 @@ use Siel\Acumulus\Invoice\Creator as BaseCreator;
  *   refund.
  * - setInvoiceSource(): set the properties from the previous line (if you
  *   defined so).
- * - addPropertySource(): add MyWebShop specific objects related to an order or
  *   refund (e.g. customer, invoice address)
  * - getItemLines: override or implement both getItemLinesOrder() and
  *   getItemLinesCreditNote()
@@ -60,17 +59,6 @@ class Creator extends BaseCreator
         $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
         $this->propertySources['address_delivery'] = new Address($this->order->id_address_delivery);
         $this->propertySources['customer'] = new Customer($this->invoiceSource->getSource()->id_customer);
-    }
-
-    protected function getShippingLine(): array
-    {
-        $result = [];
-
-        $sign = $this->invoiceSource->getSign();
-
-        // @todo: add all needed and available tags to the result.
-
-        return $result;
     }
 
     /**

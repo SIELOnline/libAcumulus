@@ -16,9 +16,4 @@ class Creator extends \Siel\Acumulus\Invoice\Creator
     {
         // For now, we do not implement Legacy features in the test web shop.
     }
-
-    protected function getShippingLine(): array
-    {
-        return [];
-    }
 }

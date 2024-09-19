@@ -15,7 +15,6 @@ use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
@@ -52,7 +51,6 @@ abstract class Creator
     protected Translator $translator;
     protected Source $invoiceSource;
 
-    private FieldExpander $fieldExpander;
     protected ShopCapabilities $shopCapabilities;
     protected Log $log;
     /**
@@ -66,7 +64,6 @@ abstract class Creator
     protected array $propertySources;
 
     public function __construct(
-        FieldExpander $field,
         ShopCapabilities $shopCapabilities,
         Container $container,
         Mappings $mappings,
@@ -75,7 +72,6 @@ abstract class Creator
         Log $log
     ) {
         $this->log = $log;
-        $this->fieldExpander = $field;
         $this->shopCapabilities = $shopCapabilities;
         $this->container = $container;
         $this->mappings = $mappings;
@@ -103,11 +99,6 @@ abstract class Creator
     protected function getContainer(): Container
     {
         return $this->container;
-    }
-
-    protected function getFieldExpander(): FieldExpander
-    {
-        return $this->fieldExpander;
     }
 
     /**
@@ -152,33 +143,6 @@ abstract class Creator
                 $this->propertySources['refundedOrder'] = $this->invoiceSource->getOrder()->getSource();
             }
         }
-    }
-
-    /**
-     * Adds an object as property source.
-     *
-     * The object is added to the start of the array. So, upon token expansion,
-     * it will be searched before other (already added) property sources.
-     *
-     * @param string $name
-     *   The name to use for the source
-     * @param object|array $property
-     *   The source object to add.
-     */
-    public function addPropertySource(string $name, object|array $property): void
-    {
-        $this->propertySources = [$name => $property] + $this->propertySources;
-    }
-
-    /**
-     * Removes an object as property source.
-     *
-     * @param string $name
-     *   The name of the source to remove.
-     */
-    public function removePropertySource(string $name): void
-    {
-        unset($this->propertySources[$name]);
     }
 
     /**
@@ -227,12 +191,6 @@ abstract class Creator
     {
         $result = [];
 
-        $shippingLines = $this->getShippingLines();
-        if ($shippingLines) {
-            $shippingLines = $this->addLineType($shippingLines, LineType::Shipping);
-            $result = array_merge($result, $shippingLines);
-        }
-
         $line = $this->getPaymentFeeLine();
         if ($line) {
             $line = $this->addLineType($line, LineType::PaymentFee);
@@ -246,58 +204,6 @@ abstract class Creator
         }
 
         return $result;
-    }
-
-    /**
-     * Returns the shipping costs lines.
-     *
-     * This default implementation assumes there will be at most one shipping
-     * line and as such calls the getShippingLine() method.
-     *
-     * Override if the shop allows for multiple shipping lines.
-     *
-     * @return array[]
-     *   A, possibly empty, array of shipping line arrays.
-     */
-    protected function getShippingLines(): array
-    {
-        $result = [];
-        $line = $this->getShippingLine();
-        if (!empty($line)) {
-            $result[] = $line;
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the shipping costs line.
-     *
-     * To be able to produce a packing slip, a shipping line should normally be
-     * added, even for free shipping.
-     *
-     * @return array|null
-     *   A line array, null (or an empty array (legacy)) if there is no shipping fee line
-     *   or code has been moved to a ShippingLineCollector
-     */
-    protected function getShippingLine(): ?array
-    {
-        return null;
-    }
-
-    /**
-     * Returns the shipment method name.
-     *
-     * This method should be overridden by web shops to provide a more detailed
-     * name of the shipping method used.
-     *
-     * This base implementation returns the translated "Shipping costs" string.
-     *
-     * @return string
-     *   The name of the shipping method used for the current order.
-     */
-    protected function getShippingMethodName(): string
-    {
-        return $this->t('shipping_costs');
     }
 
     /**
@@ -366,21 +272,6 @@ abstract class Creator
     protected function getManualLines(): array
     {
         return [];
-    }
-
-    /**
-     * Returns whether the margin scheme may be used.
-     *
-     * @return bool
-     *
-     * @todo: remove margin scheme handling from (plugin specific) creators and
-     *   move it to the completor phase. This will aid in simplifying the
-     *   creators towards raw data collectors.
-     */
-    protected function allowMarginScheme(): bool
-    {
-        $shopSettings = $this->config->getShopSettings();
-        return $shopSettings['marginProducts'] !== Config::MarginProducts_No;
     }
 
     /**

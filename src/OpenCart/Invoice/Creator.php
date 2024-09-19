@@ -338,11 +338,6 @@ class Creator extends BaseCreator
         return "SELECT `value` FROM {$prefix}setting where `key` = 'total_{$code}_tax_class_id' OR `key` LIKE '{$code}_%_tax_class_id'";
     }
 
-    protected function getShippingLine(): array
-    {
-        throw new RuntimeException(__METHOD__ . ' should never be called');
-    }
-
     /**
      * Copy of ModelLocalisationTaxClass::getTaxClass().
      * This model cannot be used on the catalog side, so I just copied the code.

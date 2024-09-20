@@ -38,7 +38,7 @@ class ShippingLineCollector extends LineCollector
     protected function collectShippingLine(Line $line): void
     {
         /** @var \WC_Order_Item_Shipping $shippingItem */
-        $shippingItem = $this->getPropertySource('shippingItem');
+        $shippingItem = $this->getPropertySource('shippingLineInfo');
         $taxes = $shippingItem->get_taxes();
         $this->addShippingVatRateLookupMetadata($line, $taxes);
 

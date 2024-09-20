@@ -575,29 +575,50 @@ abstract class Source
     }
 
     /**
-     * Returns a set of "discount infos".
+     * Returns a set of "shipping infos".
      *
-     * A discount info is an "object" that contains information about a discount applied
-     * to this invoice source. What this info looks like is shop dependent, e.g:
-     * - In many shops discount info is stored at the order level, so this source is
-     *   returned as one and only array value, but only if a discount was applied.
-     * - In OpenCart discounts are stored as "total lines", so this method returns an
-     *   array of total lines.
+     * A shipping info is an "object" that contains information about a shipping line for
+     * this invoice source. What this info looks like is shop dependent, e.g:
+     * - In many shops shipping info is stored at the order level, so this source is
+     *   returned as one and only array value, but only if a shipping took place.
+     * - In other shops, shippings may be stored as "total lines", "cart rules", or
+     *   something like that and this method would return an array of those "total lines"
+     *   (or whatever they are called) that represent a shipping.
      *
      * As the data structures returned are fully shop dependent, so should the processing
      * code be. However, defining this method allows the managing code to be shop
      * independent and thus be placed in the base
      * {@see \Siel\Acumulus\Collectors\CollectorManager}.
      *
-     * [Note: if possible we could create a wrapper/adapter object, e.g. a DiscountInfo or
-     * DiscountItem like we did for {@see Source}, {@see Item}, and {@see Product}, but
-     * that only makes senses if we could make methods (like getProduct(), getQuantity(),
-     * etc) on them that works for all shops.]
+     * [Note: a next step would be to create a wrapper/adapter object, e.g. a ShippingItem
+     * like we did for {@see Source}, {@see Item}, and {@see Product}, but that only makes
+     * senses if we could make methods (like getDescription(), getQuantity(),
+     * getUnitPrice(), etc) on them that works for more or less all shops.]
+     *
+     * This base implementation typically return an empty set: no shipping lines.
+     * Override to return the shop specific set of shipping infos or implement both
+     * getShippingLineInfosOrder() and getShippingLineInfosCreditNote().
      *
      * @return array
-     *   The - possibly empty - set of discount infos.
+     *   The - possibly empty - set of shipping infos. The type of the array entries
+     *   differs per shop and may even differ within the list of 1 shop.
      */
-    public function getDiscountInfos(): array
+    public function getShippingLineInfos(): array
+    {
+        return $this->callTypeSpecificMethod(__FUNCTION__) ?? [];
+    }
+
+    /**
+     * Returns a set of "discount infos".
+     *
+     * Comparable with shipping infos, see {@see Source::getShippingLineInfos()} for more
+     * explanation.
+     *
+     * @return array
+     *   The - possibly empty - set of discount infos. The type of the array entries
+     *   differs per shop and may even differ within the list of 1 shop.
+     */
+    public function getDiscountLineInfos(): array
     {
         return $this->callTypeSpecificMethod(__FUNCTION__) ?? [];
     }

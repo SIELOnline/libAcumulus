@@ -20,8 +20,6 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 
-use function get_class;
-
 /**
  * CollectorManager manages the collector phase.
  *
@@ -102,12 +100,12 @@ class CollectorManager
      *
      * @param string $name
      *   The name to use for the source
-     * @param object|array $property
-     *   The source object to add.
+     * @param mixed $property
+     *   The source to add, typically an object or an array, but may be a scalar.
      *
      * @return $this
      */
-    public function addPropertySource(string $name, object|array $property): CollectorManager
+    public function addPropertySource(string $name, mixed $property): CollectorManager
     {
         $this->propertySources = array_merge($this->propertySources, [$name => $property]);
         return $this;
@@ -215,8 +213,8 @@ class CollectorManager
         /** @var Source $source */
         $source = $this->getPropertySources()['source'];
         $this->collectItemLines($invoice, $source);
-        $this->collectShippingLines($invoice, $source);
-        $this->collectDiscountLines($invoice, $source);
+        $this->collectShippingLines($invoice);
+        $this->collectDiscountLines($invoice);
 
         // @legacy: Collecting Lines not yet fully implemented: fall back to the Creator
         //   for the item types that have not yet been converted.
@@ -228,7 +226,11 @@ class CollectorManager
 
     /**
      * Collects all item lines, that is the lines with the products sold.
-     */
+     *
+     * @todo: convert to structure of how other line types are collected, but after event
+     *   triggering has been added to that. Note that child handling then should be
+     *   adapted for item lines.
+ */
     protected function collectItemLines(Invoice $invoice, Source $source): void
     {
         $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Item);
@@ -262,49 +264,60 @@ class CollectorManager
      * - The shop needs other property sources, so that collecting some of the fields can
      *   be moved from {@see \Siel\Acumulus\Collectors\Collector::collectLogicFields()}
      *   to {@see \Siel\Acumulus\Collectors\Collector::collectMappedFields()}.
-     *
-     * @param \Siel\Acumulus\Data\Invoice $invoice
-     * @param \Siel\Acumulus\Invoice\Source $source
      */
-    protected function collectShippingLines(Invoice $invoice, Source $source): void
+    protected function collectShippingLines(Invoice $invoice): void
     {
-        $this->collectShippingLine($invoice);
-    }
-
-    protected function collectShippingLine(Invoice $invoice): void
-    {
-        $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Shipping);
-        // If a shop does not have a specialised shipping line collector it means that its
-        // Creator code for shipping lines has not yet been converted: do not collect it.
-        if (str_contains(get_class($lineCollector), 'Shipping')) {
-            $lineMappings = $this->getMappings()->getFor(LineType::Shipping);
-            /** @var \Siel\Acumulus\Data\Line $line */
-            $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);
-            if (!$line->metadataGet(Meta::DoNotAdd)) {
-                $invoice->addLine($line);
-            }
-        }
+        $this->collectLinesForType($invoice, LineType::Shipping);
     }
 
     /**
      * Collects all discount lines, that is the lines with the discounts applied.
-     *
-     * @nth: this code looks a lot like collectItemLines(), and like
-     *   collectShippingLines() when we implement getShippingInfos on Source: generalize
-     *   this, and we have event handlers on all types of lines.
      */
-    private function collectDiscountLines(Invoice $invoice, Source $source): void
+    protected function collectDiscountLines(Invoice $invoice): void
     {
-        $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Discount);
-        $lineMappings = $this->getMappings()->getFor(LineType::Discount);
+        $this->collectLinesForType($invoice, LineType::Discount);
+    }
 
-        $items = $source->getDiscountInfos();
-        foreach ($items as $item) {
-            $this->addPropertySource('discountInfo', $item);
+    /**
+     * Collects all lines for a given {@see LineType}.
+     *
+     * This method is not meant to be overridden.
+     *
+     * @param \Siel\Acumulus\Data\Invoice $invoice
+     *   The invoice to add the lines to.
+     * @param string $lineType
+     *   The type of line to collect. One of the {@see LineType} constants.
+     *
+     * @todo: add event triggers for all line types, both a general trigger and a line
+     *   type specific trigger.
+     */
+    protected function collectLinesForType(Invoice $invoice, string $lineType): void
+    {
+        /** @var Source $source */
+        $source = $this->getPropertySources()['source'];
+        $getInfosMethod = "get{$lineType}Infos";
+        $propertySourceName = lcfirst($lineType) . 'Info';
+
+        $lineCollector = $this->getContainer()->getCollector(DataType::Line, $lineType);
+        $lineMappings = $this->getMappings()->getFor($lineType);
+
+        $infos = $source->$getInfosMethod();
+        foreach ($infos as $key => $item) {
+            $this->addPropertySource($propertySourceName, $item);
+            $this->addPropertySource('key', $key);
+//            $this->getContainer()->getEvent()->triggerLineCollectBefore($lineType, $item, $this);
             /** @var \Siel\Acumulus\Data\Line $line */
             $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);
-            $invoice->addLine($line);
-            $this->removePropertySource('discountInfo');
+//            $this->getContainer()->getEvent()->triggerLineCollectAfter($lineType, $item, $this);
+            if (!$line->metadataGet(Meta::DoNotAdd)) {
+                $invoice->addLine($line);
+            }
+            // Note: this won't work when we collect Items with this generalised method.
+            foreach ($line->getChildren() as $child) {
+                $invoice->addLine($child);
+            }
+            $line->removeChildren();
+            $this->removePropertySource($propertySourceName);
         }
     }
 }

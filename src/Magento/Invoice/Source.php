@@ -355,7 +355,12 @@ class Source extends BaseSource
         return $result;
     }
 
-    public function getDiscountInfos(): array
+    public function getShippingLineInfos(): array
+    {
+        return  $this->getType() === Source::Order || !Number::isZero($this->getShopObject()->getBaseShippingAmount()) ? [$this] : [];
+    }
+
+    public function getDiscountLineInfos(): array
     {
         return !Number::isZero($this->getShopObject()->getBaseDiscountAmount()) ? [$this] : [];
     }

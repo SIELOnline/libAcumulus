@@ -42,11 +42,6 @@ class ShippingLineCollector extends LineCollector
         $source = $this->getPropertySource('source');
         $sign = $source->getSign();
 
-        if (empty($source->getOrder()->getShopObject()->id_carrier)) {
-            // No carrier => probably virtual products => no shipping line.
-            $line->metadataSet(Meta::DoNotAdd, true);
-            return;
-        }
         $carrier = new Carrier($source->getOrder()->getShopObject()->id_carrier);
         // total_shipping_tax_excl is not very precise (rounded to the cent) and
         // often leads to 1 cent off invoices in Acumulus (assuming that the

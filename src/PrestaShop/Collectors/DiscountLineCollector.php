@@ -41,7 +41,7 @@ class DiscountLineCollector extends LineCollector
         $source = $this->getPropertySource('source');
 
         /** @var array $calcRule A record from the order_cart_rule table. */
-        $calcRule = $this->getPropertySource('discountInfo');
+        $calcRule = $this->getPropertySource('discountLineInfo');
 
         // Amounts in cart rules are always positive, so negate the sign.
         $sign = $source->getSign();

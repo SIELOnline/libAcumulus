@@ -10,7 +10,6 @@ use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Meta;
 
 use function get_class;
@@ -40,9 +39,10 @@ abstract class Collector implements CollectorInterface
     private Translator $translator;
     private Log $log;
     /**
-     * @var (array|object)[]
+     * @var array
      *   String keyed array of "objects" that can provide properties to the
-     *   {@see FieldExpander}.
+     *   {@see FieldExpander} for use in {@see collectMappedFields()} or just pass
+     *   information for use in {@see collectLogicFields()}.
      */
     private array $propertySources;
 
@@ -101,25 +101,14 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * Will throw an {@see \ErrorException} if no InvoiceAddResult is set as property
-     * source under the name 'localResult'.
-     */
-    public function getLocalResult(): InvoiceAddResult
-    {
-        /** @noinspection PhpIncompatibleReturnTypeInspection  might indeed throw. */
-        return $this->getPropertySource('localResult');
-    }
-
-
-    /**
-     * returns the property source with the given name.
+     * Returns the property source with the given name.
      *
      * @param string $property
      *
-     * @return array|object|null
+     * @return mixed
      *   The property source with the given name, or null if not existing.
      */
-    protected function getPropertySource(string $property): array|object|null
+    protected function getPropertySource(string $property): mixed
     {
         return $this->propertySources[$property] ?? null;
     }
@@ -264,8 +253,6 @@ abstract class Collector implements CollectorInterface
      * Warnings are placed in the $array under the key Meta::Warning. If no
      * warning is set, $warning is added as a string, otherwise it becomes an
      * array of warnings to which this $warning is added.
-     *
-     * @todo: deprecate and inline.
      */
     protected function addWarning(AcumulusObject $acumulusObject, string $warning, string $severity = Meta::Warning): void
     {

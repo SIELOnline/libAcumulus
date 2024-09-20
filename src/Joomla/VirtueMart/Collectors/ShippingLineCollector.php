@@ -42,19 +42,13 @@ class ShippingLineCollector extends LineCollector
         $source = $this->getPropertySource('source');
         $order = $source->getShopObject();
 
-        // We are checking on empty, assuming that a null value will be used to
-        // indicate no shipping at all (downloadable product) and that free
-        // shipping will be represented as the string '0.00' which is not
-        // considered empty.
-        if (!empty($order['details']['BT']->order_shipment)) {
-            $shippingEx = (float) $order['details']['BT']->order_shipment;
-            $shippingVat = (float) $order['details']['BT']->order_shipment_tax;
-            $line->product = $this->getShippingMethodName();
-            $line->unitPrice = $shippingEx;
-            $line->quantity = 1;
-            $line->metadataSet(Meta::VatAmount, $shippingVat);
-            $this->addVatData($line, 'shipment', $shippingEx, $shippingVat);
-        }
+        $shippingEx = (float) $order['details']['BT']->order_shipment;
+        $shippingVat = (float) $order['details']['BT']->order_shipment_tax;
+        $line->product = $this->getShippingMethodName();
+        $line->unitPrice = $shippingEx;
+        $line->quantity = 1;
+        $line->metadataSet(Meta::VatAmount, $shippingVat);
+        $this->addVatData($line, 'shipment', $shippingEx, $shippingVat);
     }
 
     protected function getShippingMethodName(): string

@@ -39,7 +39,7 @@ class DiscountLineCollector extends LineCollector
          * @var array $totalLine
          *   A record from the order_total table + an ex/inc vat indication.
          */
-        $totalLine = $this->getPropertySource('discountInfo');
+        $totalLine = $this->getPropertySource('discountLineInfo');
         $this->collectTotalLine($line, $totalLine, $totalLine['vat']);
     }
 }

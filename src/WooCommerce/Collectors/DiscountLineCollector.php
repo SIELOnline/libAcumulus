@@ -39,7 +39,7 @@ class DiscountLineCollector extends LineCollector
         /**
          * @var \WC_Coupon $coupon
          */
-        $coupon = $this->getPropertySource('discountInfo');
+        $coupon = $this->getPropertySource('discountLineInfo');
         $this->CollectCouponDiscountLine($line, $coupon);
     }
 

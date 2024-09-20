@@ -203,7 +203,17 @@ class Source extends BaseSource
         return $result;
     }
 
-    public function getDiscountInfos(): array
+    /**
+     * We are checking on empty, assuming that a null value will be used to indicate no
+     * shipping at all (downloadable product) and that free shipping will be represented
+     * as the string '0.00' which is not considered empty.
+     */
+    public function getShippingLineInfos(): array
+    {
+        return !empty($this->getShopObject()['details']['BT']->order_shipment) ? [$this] : [];
+    }
+
+    public function getDiscountLineInfos(): array
     {
         $result = array_filter($this->getShopObject()['calc_rules'], [$this, 'isDiscountCalcRule']);
         if (!Number::isZero($this->getShopObject()['details']['BT']->coupon_discount)) {

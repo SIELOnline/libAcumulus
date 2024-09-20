@@ -84,16 +84,16 @@ class ShippingLineCollector extends LineCollector
         /** @var \Siel\Acumulus\Invoice\Source $source */
         $source = $this->getPropertySource('source');
         $order = $source->getShopObject();
-        $keyedShippingInfo = $this->getPropertySource('shippingInfo');
-        $shippingInfo = reset($keyedShippingInfo);
-        $key = key($keyedShippingInfo);
+        /** @var object $shippingInfo */
+        $shippingInfo = $this->getPropertySource('shippingLineInfo');
+        /** @var string $key */
+        $key = $this->getPropertySource('key');
 
         if ($shippingInfo === null) {
             $this->getFreeShippingLine($line);
         } elseif ($key === Source::Order) {
             $this->getOrderLevelShippingLine($line, $order);
         } else {
-            /** @noinspection PhpParamsInspection  reset did NOT return false */
             $this->getOrderShippingParamLevelShippingLine($line, $order, $key, $shippingInfo);
         }
     }

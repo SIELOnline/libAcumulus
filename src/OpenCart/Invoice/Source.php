@@ -242,9 +242,19 @@ abstract class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
+     * In OpenCart shipping info is stored as (an) order total line(s).
+     */
+    public function getShippingLineInfos(): array
+    {
+        return $this->getOrderTotalLines(static::LineTypeToCode[LineType::Shipping]);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * In OpenCart discounts are stored as an order total line.
      */
-    public function getDiscountInfos(): array
+    public function getDiscountLineInfos(): array
     {
         return $this->getOrderTotalLines(static::LineTypeToCode[LineType::Discount]);
     }

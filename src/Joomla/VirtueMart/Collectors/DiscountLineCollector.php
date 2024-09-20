@@ -52,7 +52,7 @@ class DiscountLineCollector extends LineCollector
          * @var Source|object $discountInfo
          *   Either a source (coupon) or a calc_rule record in a stdClass
          */
-        $discountInfo = $this->getPropertySource('discountInfo');
+        $discountInfo = $this->getPropertySource('discountLineInfo');
 
         // Coupon codes are not stored in calc rules, so handle them separately.
         if ($discountInfo instanceof Source) {

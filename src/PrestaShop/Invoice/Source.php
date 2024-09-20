@@ -347,6 +347,11 @@ class Source extends BaseSource
         return $result;
     }
 
+    public function getShippingLineInfos(): array
+    {
+        return !empty($this->getOrder()->getShopObject()->id_carrier) ? [$this] : [];
+    }
+
     /**
      * Description.
      *
@@ -358,7 +363,7 @@ class Source extends BaseSource
      * to be revoked ({@see VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND})
      * or should remain ({@see VoucherRefundType::PRODUCT_PRICES_REFUND}).
      */
-    public function getDiscountInfos(): array
+    public function getDiscountLineInfos(): array
     {
         $result = [];
         if ($this->getType() === Source::Order

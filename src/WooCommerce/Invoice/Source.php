@@ -17,7 +17,6 @@ use WC_Order_Refund;
 use function count;
 use function get_class;
 use function gettype;
-use function is_object;
 use function strlen;
 
 /**
@@ -260,6 +259,11 @@ class Source extends BaseSource
         return $result;
     }
 
+    public function getShippingLineInfos(): array
+    {
+        return $this->getShopObject()->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+    }
+
     /**
      * {@inheritdoc}}
      *
@@ -271,7 +275,7 @@ class Source extends BaseSource
      * know what discounts were applied on the original order. So we do not add lines for
      * them.
      */
-    public function getDiscountInfos(): array
+    public function getDiscountLineInfos(): array
     {
         $result = [];
 

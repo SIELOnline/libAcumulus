@@ -179,32 +179,6 @@ class Source extends BaseSource
     }
 
     /**
-     * @todo: can we generalize this with {@see \Siel\Acumulus\OpenCart\Invoice\Source::getOrderTotalLines('shipping')}
-     *   and its handling code in the respective CollectorManagers. The underlying problem
-     *   is that a Collector only collects 1 data object and is not fit for handling cases
-     *   where a line must be split.
-     */
-    public function getOrderShippingInfos(): array
-    {
-        $order = $this->getShopObject();
-        if (Number::isZero($order->order_shipping_price)) {
-            // Free (or no) shipping: do not add on a credit note.
-            $shippingInfos[] = null;
-        } elseif (empty($order->order_shipping_params)
-            || count($order->order_shipping_params->prices) === 0
-        ) {
-            // If the property order_shipping_params is "empty" (no info to
-            // extract from), we use the order_shipping_* properties at the
-            // order level.
-            $shippingInfos[Source::Order] = $order;
-        } else {
-            // For each shipment we are going to add 1 or more shipping lines.
-            $shippingInfos = $order->order_shipping_params->prices;
-        }
-        return $shippingInfos;
-    }
-
-    /**
      * @noinspection PhpMissingDocCommentInspection should be solved when we start using union return types throughout the inheritance tree.
      */
     public function getInvoiceReference()
@@ -228,7 +202,27 @@ class Source extends BaseSource
         return $result;
     }
 
-    public function getDiscountInfos(): array
+    public function getShippingLineInfos(): array
+    {
+        $order = $this->getShopObject();
+        if (Number::isZero($order->order_shipping_price)) {
+            // Free (or no) shipping: do not add on a credit note.
+            $shippingInfos[] = null;
+        } elseif (empty($order->order_shipping_params)
+            || count($order->order_shipping_params->prices) === 0
+        ) {
+            // If the property order_shipping_params is "empty" (no info to
+            // extract from), we use the order_shipping_* properties at the
+            // order level.
+            $shippingInfos[Source::Order] = $order;
+        } else {
+            // For each shipment we are going to add 1 or more shipping lines.
+            $shippingInfos = $order->order_shipping_params->prices;
+        }
+        return $shippingInfos;
+    }
+
+    public function getDiscountLineInfos(): array
     {
         return !Number::isZero($this->getShopObject()->order_discount_price) ? [$this] : [];
     }

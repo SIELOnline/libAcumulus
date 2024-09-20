@@ -602,10 +602,40 @@ abstract class Source
      * @return array
      *   The - possibly empty - set of shipping infos. The type of the array entries
      *   differs per shop and may even differ within the list of 1 shop.
+     *
+     * @noinspection PhpUnused  called via
+     *    {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
      */
     public function getShippingLineInfos(): array
     {
         return $this->callTypeSpecificMethod(__FUNCTION__) ?? [];
+    }
+
+    /**
+     * @noinspection PhpUnused  called via
+     *   {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     */
+    public function getGiftWrappingFeeLineInfos(): array
+    {
+        return [];
+    }
+
+    /**
+     * @noinspection PhpUnused  called via
+     *   {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     */
+    public function getPaymentFeeLineInfos(): array
+    {
+        return [];
+    }
+
+    /**
+     * @noinspection PhpUnused  called via
+     *   {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     */
+    public function getOtherLineInfos(): array
+    {
+        return [];
     }
 
     /**
@@ -617,10 +647,50 @@ abstract class Source
      * @return array
      *   The - possibly empty - set of discount infos. The type of the array entries
      *   differs per shop and may even differ within the list of 1 shop.
+     *
+     * @noinspection PhpUnused  called via
+     *    {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
      */
     public function getDiscountLineInfos(): array
     {
         return $this->callTypeSpecificMethod(__FUNCTION__) ?? [];
+    }
+
+    /**
+     * Manual lines are lines that were entered manually. This may occur especially on
+     * refunds, e.g. when a certain product or fee is only partially refunded, or if a
+     * shop has no way to refund certain (non-product) lines from an order.
+     *
+     * Manual lines may appear on credit notes to overrule amounts as calculated by the
+     * system. E.g.
+     * - A product retour after the guaranteed free retour period is over is only
+     *   partially refunded.
+     * - Discounts applied to a selection of items should only be refunded partially (the
+     *   part that is returned.
+     * - Shipping costs may be returned except for the handling costs.
+     * - Etc.
+     *
+     * This base implementation assumes that no manual lines are possible in a shop and
+     * thus returns an empty array.
+     *
+     * @return array
+     *   Description.
+     *
+     * @noinspection PhpUnused  called via
+     *    {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     */
+    public function getManualLineInfos(): array
+    {
+        return [];
+    }
+
+    /**
+     * @noinspection PhpUnused  called via
+     *   {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     */
+    public function getVoucherLineInfos(): array
+    {
+        return [];
     }
 
     /**

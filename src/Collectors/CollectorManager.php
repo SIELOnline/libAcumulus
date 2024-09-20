@@ -19,6 +19,7 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
+use Throwable;
 
 /**
  * CollectorManager manages the collector phase.
@@ -214,11 +215,20 @@ class CollectorManager
         $source = $this->getPropertySources()['source'];
         $this->collectItemLines($invoice, $source);
         $this->collectShippingLines($invoice);
+        $this->collectGiftWrappingLines($invoice);
+        $this->collectPaymentFeeLines($invoice);
+        $this->collectOtherLines($invoice);
         $this->collectDiscountLines($invoice);
+        $this->collectManualLines($invoice);
+        $this->collectVoucherLines($invoice);
 
         // @legacy: Collecting Lines not yet fully implemented: fall back to the Creator
         //   for the item types that have not yet been converted.
+        try {
         $this->getContainer()->getCreator()->create($source, $invoice);
+        } catch (Throwable) {
+            // Creator has been converted and removed from the shop.
+        }
         // @legacy end
 
         $this->removePropertySource('invoice');
@@ -271,11 +281,52 @@ class CollectorManager
     }
 
     /**
-     * Collects all discount lines, that is the lines with the discounts applied.
+     * Collects fee lines for payment fees applied.
+     */
+    protected function collectGiftWrappingLines(Invoice $invoice): void
+    {
+        $this->collectLinesForType($invoice, LineType::GiftWrapping);
+    }
+
+    /**
+     * Collects fee lines for payment fees applied.
+     */
+    protected function collectPaymentFeeLines(Invoice $invoice): void
+    {
+        $this->collectLinesForType($invoice, LineType::PaymentFee);
+    }
+
+    /**
+     * Collects lines for other line types, most likely non-categorised fees.
+     */
+    protected function collectOtherLines(Invoice $invoice): void
+    {
+        $this->collectLinesForType($invoice, LineType::Other);
+    }
+
+    /**
+     * Collects discount lines for all discounts applied.
      */
     protected function collectDiscountLines(Invoice $invoice): void
     {
         $this->collectLinesForType($invoice, LineType::Discount);
+    }
+
+    /**
+     * Collects manually entered (refund) lines.
+     */
+    protected function collectManualLines(Invoice $invoice): void
+    {
+        $this->collectLinesForType($invoice, LineType::Manual);
+    }
+
+    /**
+     * Collects voucher lines. Voucher are seen as partial payments and will, as such, not
+     * have vat.
+     */
+    protected function collectVoucherLines(Invoice $invoice): void
+    {
+        $this->collectLinesForType($invoice, LineType::Voucher);
     }
 
     /**

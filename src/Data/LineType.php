@@ -15,11 +15,11 @@ interface LineType
 {
     public const Item = 'ItemLine';
     public const Shipping = 'ShippingLine';
-    public const PaymentFee = 'PaymentLine';
-    public const GiftWrapping = 'GiftLine';
-    public const Manual = 'ManualLine';
-    public const Discount = 'DiscountLine';
-    public const Voucher = 'VoucherLine';
+    public const GiftWrapping = 'GiftWrappingFeeLine';
+    public const PaymentFee = 'PaymentFeeLine';
     public const Other = 'OtherLine';
+    public const Discount = 'DiscountLine';
+    public const Manual = 'ManualLine';
+    public const Voucher = 'VoucherLine';
     public const Corrector = 'MissingAmountCorrectorLine';
 }

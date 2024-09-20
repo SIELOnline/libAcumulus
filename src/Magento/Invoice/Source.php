@@ -364,4 +364,9 @@ class Source extends BaseSource
     {
         return !Number::isZero($this->getShopObject()->getBaseDiscountAmount()) ? [$this] : [];
     }
+
+    public function getManualLineInfos(): array
+    {
+        return $this->getType() === Source::CreditNote && !Number::isZero($this->getShopObject()->getBaseAdjustment()) ? [$this] : [];
+    }
 }

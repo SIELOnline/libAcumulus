@@ -259,10 +259,25 @@ class Source extends BaseSource
         return $result;
     }
 
+    /**
+     * @return \WC_Order_Item_Shipping[]
+     */
     public function getShippingLineInfos(): array
     {
-        return $this->getShopObject()->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+        return $this->getShopObject()->get_shipping_methods();
     }
+
+    /**
+     * WooCommerce has general fee lines, so we override this method to add all fees at
+     * once. As the type is unknown to us, it might include payment fees().
+     *
+     * @return \WC_Order_Item_Fee[]
+     */
+    public function getOtherLineInfos(): array
+    {
+        return $this->getSource()->get_fees();
+    }
+
 
     /**
      * {@inheritdoc}}

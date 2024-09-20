@@ -9,7 +9,6 @@ use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Item;
-use Siel\Acumulus\Invoice\Product;
 use Siel\Acumulus\Invoice\Source;
 
 /**

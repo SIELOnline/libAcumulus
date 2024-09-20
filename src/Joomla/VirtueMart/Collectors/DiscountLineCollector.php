@@ -39,7 +39,7 @@ class DiscountLineCollector extends LineCollector
     }
 
     /**
-     * Collects the shipping line for the invoice.
+     * Collects a discount line for the invoice.
      *
      * @param \Siel\Acumulus\Data\Line $line
      *   A discount line with the mapped fields filled in.

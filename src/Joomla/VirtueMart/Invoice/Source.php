@@ -22,7 +22,35 @@ use function in_array;
  * Wraps a VirtueMart order in an invoice source object.
  *
  * @method array getShopObject() a virtuemart_orders table record.
- * @property array $shopObject a virtuemart_orders table record.
+ * @property array $shopObject
+ *   A virtuemart_orders table record.
+ *
+ *   Array with keys:
+ *   [details]
+ *     [BT]: stdClass (BillTo details)
+ *     [ST]: stdClass (ShipTo details) (if available, copy of BT otherwise)
+ *   [history]
+ *     [0]: stdClass (virtuemart_order_histories table record)
+ *     ...
+ *   [items]
+ *     [0]: stdClass (virtuemart_order_items table record)
+ *     ...
+ *   [calc_rules]
+ *     [0]: stdClass (virtuemart_order_calc_rules table record)
+ *     ...
+ *
+ * We might use the invoice:
+ * @var \TableInvoices $invoicesTable
+ * $invoicesTable = $this->orderModel->getTable('invoices');
+ * if ($invoice = $invoicesTable->load($this->order['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
+ *     $this->shopInvoice = $invoice->getProperties();
+ * }
+ * This results in an array with fields from the virtuemart_invoices table:
+ *  - virtuemart_invoice_id
+ *  - invoice_number
+ *  - order_status
+ *  - xhtml
+ *  - + others
  */
 class Source extends BaseSource
 {
@@ -211,6 +239,18 @@ class Source extends BaseSource
     public function getShippingLineInfos(): array
     {
         return !empty($this->getShopObject()['details']['BT']->order_shipment) ? [$this] : [];
+    }
+
+    public function getPaymentFeeLineInfos(): array
+    {
+        $result = [];
+        if (!empty($this->getShopObject()['details']['BT']->order_payment)) {
+            $paymentEx = (float) $this->getShopObject()['details']['BT']->order_payment;
+            if (!Number::isZero($paymentEx)) {
+                $result[] = $this;
+            }
+        }
+        return $result;
     }
 
     public function getDiscountLineInfos(): array

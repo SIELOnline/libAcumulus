@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Language\LanguageFactoryInterface;
 use Siel\Acumulus\Collectors\AddressCollector as BaseAddressCollector;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Meta;
+use vmLanguage;
 use VmModel;
 
 /**
@@ -37,7 +37,7 @@ class AddressCollector extends BaseAddressCollector
                 $acumulusObject->countryCode = $country->country_2_code;
             }
             if (!empty($country->country_name)) {
-                \vmLanguage::loadJLang('com_virtuemart_countries');
+                vmLanguage::loadJLang('com_virtuemart_countries');
                 $key = "COM_VIRTUEMART_COUNTRY_$country->country_3_code";
                 $language = Factory::getApplication()->getLanguage();
                 $name = $language->hasKey($key) ? $language->_($key) : $country->country_name;

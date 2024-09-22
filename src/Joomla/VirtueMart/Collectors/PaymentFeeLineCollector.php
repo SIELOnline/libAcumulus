@@ -6,11 +6,9 @@ namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * PaymentFeeLineCollector contains VirtueMart specific {@see LineType::PaymentFee}
@@ -41,10 +39,7 @@ class PaymentFeeLineCollector extends LineCollector
      */
     protected function collectPaymentFeeLine(Line $line): void
     {
-        /**
-         * @var Source $source
-         *   Either a source (coupon) or a calc_rule record in a stdClass
-         */
+        /** @var Source $source */
         $source = $this->getPropertySource('source');
 
         $paymentEx = (float) $source->getShopObject()['details']['BT']->order_payment;

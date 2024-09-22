@@ -20,6 +20,17 @@ use Siel\Acumulus\Tag;
  *   tax-rate, which will be used instead of automatic tax rate selection.
  * - You could say that coupons after taxes are vouchers, because no vat is registered.
  *
+ * Notes (comments copied over from the old Creator):
+ * - HikaShop knows discounts in the form of coupons or unrestricted discounts.
+ *   Coupons can be without vat (to be seen as partial payment, which was
+ *   probably not meant, thus incorrect) or with a fixed vat rate, independent
+ *   of the products in the cart, thus also incorrect.
+ * - When a cart with a coupon contains products with another vat rate, the
+ *   shown vat amount breakdown is incorrect. The Acumulus invoice will be
+ *   correct, but may differ from the shop invoice, though the overall amount
+ *   tends to be equal. It is the metadata in the invoice (as sent to Acumulus)
+ *   that shows the differences.
+ *
  * @noinspection PhpUnused  Instantiated via a factory.
  */
 class DiscountLineCollector extends LineCollector

@@ -222,6 +222,11 @@ class Source extends BaseSource
         return $shippingInfos;
     }
 
+    public function getPaymentFeeLineInfos(): array
+    {
+        return !Number::isZero($this->getShopObject()->order_payment_price) ? [$this] : [];
+    }
+
     public function getDiscountLineInfos(): array
     {
         return !Number::isZero($this->getShopObject()->order_discount_price) ? [$this] : [];

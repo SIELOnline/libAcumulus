@@ -42,6 +42,7 @@ class ModelCatalogProduct
 {
 }
 
+// remove, because it interferes with prestaShop's Db
 class DB
 {
 }

@@ -33,7 +33,6 @@ use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
-use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Item;
@@ -514,35 +513,23 @@ class Container
 
     public function getCompletorInvoiceLines(): CompletorInvoiceLines
     {
+        // @legacy remove when all shops are fully converted to new architecture and
+        //   the old Completor has been removed.
         return $this->getInstance('CompletorInvoiceLines', 'invoice', [$this->getFlattenerInvoiceLines(), $this->getConfig()]);
     }
 
     public function getFlattenerInvoiceLines(): FlattenerInvoiceLines
     {
+        // @legacy remove when all shops are fully converted to new architecture and
+        //   the old Completor has been removed.
         return $this->getInstance('FlattenerInvoiceLines', 'Invoice', [$this->getConfig()]);
     }
 
     public function getCompletorStrategyLines(): CompletorStrategyLines
     {
-        return $this->getInstance('CompletorStrategyLines', 'Invoice', [$this->getConfig(), $this->getTranslator()]);
-    }
-
-    public function getCreator(): Creator
-    {
         // @legacy remove when all shops are fully converted to new architecture and
-        //   the old Creator has been removed.
-        return $this->getInstance(
-            'Creator',
-            'Invoice',
-            [
-                $this->getShopCapabilities(),
-                $this,
-                $this->getMappings(),
-                $this->getConfig(),
-                $this->getTranslator(),
-                $this->getLog(),
-            ]
-        );
+        //   the old Completor has been removed.
+        return $this->getInstance('CompletorStrategyLines', 'Invoice', [$this->getConfig(), $this->getTranslator()]);
     }
 
     public function getCollectorManager(): CollectorManager

@@ -21,6 +21,7 @@ use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 use function in_array;
 use function is_array;
+use function is_string;
 use function strlen;
 
 /**
@@ -31,8 +32,14 @@ use function strlen;
  */
 abstract class Source extends BaseSource
 {
+    // Known codes:
+    // - fees: shipping, handling, low_order_fee
+    // - "totals" (ignored): sub_total, tax, total
+    // - "discounts":  coupon, voucher
+    // - other (ignored): credit, reward (reward points)
     public const LineTypeToCode = [
         LineType::Shipping => 'shipping',
+        LineType::Other => ['handling', 'low_order_fee'],
         LineType::Discount => 'coupon',
         LineType::Voucher => 'voucher',
     ];
@@ -194,8 +201,8 @@ abstract class Source extends BaseSource
      *
      * These are shipment, other fee, tax, and discount lines.
      *
-     * @param string $code
-     *   Specify the type of order total lines to return, if empty, all are returned.
+     * @param string|array $code
+     *   Specifies the type(s) of order total lines to return. If empty, all are returned.
      *
      * @return array[]
      *   The set of order total lines for this order. This set is ordered by
@@ -203,7 +210,7 @@ abstract class Source extends BaseSource
      *   and lines after are inc vat.
      *   If a $$code is passed, the set is filtered by the given code.
      */
-    public function getOrderTotalLines(string $code = ''): array
+    public function getOrderTotalLines(string|array $code = ''): array
     {
         if (!isset($this->orderTotalLines)) {
             $this->orderTotalLines = $this->_getOrderTotalLines();
@@ -220,7 +227,7 @@ abstract class Source extends BaseSource
         $result = $this->orderTotalLines;
         if (!empty($code)) {
             $result = array_filter($this->orderTotalLines, static function ($line) use ($code) {
-                return $line['code'] === $code;
+                return is_string($code) ? $line['code'] === $code : in_array($line['code'], $code, true);
             });
         }
         return $result;
@@ -252,11 +259,31 @@ abstract class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
+     * In OpenCart fees are stored as order total lines (with code 'handling' or 'low_order_fee'.
+     */
+    public function getOtherLineInfos(): array
+    {
+        return $this->getOrderTotalLines(static::LineTypeToCode[LineType::Other]);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * In OpenCart discounts are stored as an order total line.
      */
     public function getDiscountLineInfos(): array
     {
         return $this->getOrderTotalLines(static::LineTypeToCode[LineType::Discount]);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * In OpenCart vouchers are stored as an order total line.
+     */
+    public function getVoucherLineInfos(): array
+    {
+        return $this->getOrderTotalLines(static::LineTypeToCode[LineType::Voucher]);
     }
 
     /**

@@ -50,7 +50,7 @@ class Totals
         $this->calculated = [$calculated] ?? [];
     }
 
-    public function add(?float $amountInc, ?float $amountVat, ?float $amountEx = null):void
+    public function add(?float $amountInc, ?float $amountVat, ?float $amountEx = null): void
     {
         if (!isset($amountEx)) {
             $amountEx = $amountInc - $amountVat;

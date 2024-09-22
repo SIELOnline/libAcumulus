@@ -39,7 +39,6 @@ use Siel\Acumulus\Helpers\FormMapper;
 use Siel\Acumulus\Helpers\FormRenderer;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
-use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
@@ -200,8 +199,6 @@ class ContainerTest extends TestCase
         $container = new Container('TestWebShop');
         $object = $container->createSource(Source::Order, 1);
         $this->assertInstanceOf(Source::class, $object);
-        $object = $container->getCreator();
-        $this->assertInstanceOf(Creator::class, $object);
         $object = $container->getCompletor();
         $this->assertInstanceOf(Completor::class, $object);
         $object = $container->createInvoiceAddResult('ContainerTest::testInvoiceNamespace()');

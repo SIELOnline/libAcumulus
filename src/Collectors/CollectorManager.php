@@ -222,15 +222,6 @@ class CollectorManager
         $this->collectManualLines($invoice);
         $this->collectVoucherLines($invoice);
 
-        // @legacy: Collecting Lines not yet fully implemented: fall back to the Creator
-        //   for the item types that have not yet been converted.
-        try {
-        $this->getContainer()->getCreator()->create($source, $invoice);
-        } catch (Throwable) {
-            // Creator has been converted and removed from the shop.
-        }
-        // @legacy end
-
         $this->removePropertySource('invoice');
     }
 

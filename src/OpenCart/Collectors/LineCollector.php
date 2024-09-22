@@ -27,7 +27,8 @@ class LineCollector extends BaseLineCollector
     /**
      * Collects a total line based on an order_total record.
      *
-     * Note that 'voucher' and 'coupon' lines get some special handling.
+     * Note that amounts on 'voucher' and 'coupon' lines are negative but these lines
+     * still need some special handling.
      *
      * @param array $totalLine
      *   The total line record.
@@ -129,7 +130,7 @@ class LineCollector extends BaseLineCollector
     {
         $query = $this->getTotalLineTaxClassLookupQuery($code);
         $queryResult = $this->getDb()->query($query);
-        if (!empty($queryResult->row)) {
+        if ($queryResult->num_rows === 1) {
             $taxClassId = (int) reset($queryResult->row);
             $this->addVatRateLookupMetadata($line, $taxClassId);
         }
@@ -269,20 +270,19 @@ class LineCollector extends BaseLineCollector
      *   total_low_order_fee_tax_class_id.
      * - key = '{$code}_{module}_tax_class_id', e.g. shipping_flat_tax_class_id
      *   or shipping_weight_tax_class_id.
+     * @todo: What about OC4?
      *
      * @param string $code
      *   The type of total line, e.g. shipping, handling or low_order_fee.
      *
      * @return string
      *   The query to execute.
-     * @todo: What about OC4?
-     *
      */
     protected function getTotalLineTaxClassLookupQuery(string $code): string
     {
         $prefix = DB_PREFIX;
         $code = $this->getDb()->escape($code);
-        return "SELECT `value` FROM {$prefix}setting where `key` = 'total_{$code}_tax_class_id' OR `key` LIKE '{$code}_%_tax_class_id'";
+        return "select distinct `value` from {$prefix}setting where `key` = 'total_{$code}_tax_class_id' or `key` like '{$code}_%_tax_class_id'";
     }
 
     /**

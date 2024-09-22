@@ -17,6 +17,7 @@ use PrestaShop\PrestaShop\Core\Version;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Currency as AcumulusCurrency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
@@ -176,13 +177,13 @@ class Source extends BaseSource
             /** @var Order $order */
             $order = $this->getSource();
             $amountEx = $order->getTotalProductsWithoutTaxes()
-                      + $order->total_shipping_tax_excl
-                      + $order->total_wrapping_tax_excl
-                      - $order->total_discounts_tax_excl;
+                + $order->total_shipping_tax_excl
+                + $order->total_wrapping_tax_excl
+                - $order->total_discounts_tax_excl;
             $amountInc = $order->getTotalProductsWithTaxes()
-                         + $order->total_shipping_tax_incl
-                         + $order->total_wrapping_tax_incl
-                         - $order->total_discounts_tax_incl;
+                + $order->total_shipping_tax_incl
+                + $order->total_wrapping_tax_incl
+                - $order->total_discounts_tax_incl;
         } else {
             // On credit notes with order_slip_type = VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND:
             // - The amount incl. VAT will not have been corrected for discounts that are
@@ -201,9 +202,9 @@ class Source extends BaseSource
             /** @var OrderSlip $creditNote */
             $creditNote = $this->getSource();
             $amountEx = $creditNote->total_products_tax_excl
-                      + $creditNote->total_shipping_tax_excl;
+                + $creditNote->total_shipping_tax_excl;
             $amountInc = $creditNote->total_products_tax_incl
-                         + $creditNote->total_shipping_tax_incl;
+                + $creditNote->total_shipping_tax_incl;
             /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
             if ((int) $creditNote->order_slip_type !== VoucherRefundType::PRODUCT_PRICES_REFUND) {
                 /** @var Order $order */
@@ -233,7 +234,10 @@ class Source extends BaseSource
     public function getInvoiceReferenceOrder(): ?string
     {
         return !empty($this->getSource()->invoice_number)
-            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getSource()->id_lang, null, $this->getSource()->id_shop) . sprintf('%06d', $this->getSource()->invoice_number)
+            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getSource()->id_lang, null, $this->getSource()->id_shop) . sprintf(
+                '%06d',
+                $this->getSource()->invoice_number
+            )
             : null;
     }
 
@@ -279,8 +283,14 @@ class Source extends BaseSource
     protected function addProperties(): void
     {
         if (version_compare(Version::VERSION, '1.7.5', '<')) {
-            $row = Db::getInstance()->executeS(sprintf('SELECT * FROM `%s` WHERE `%s` = %u',
-                _DB_PREFIX_ . OrderSlip::$definition['table'], OrderSlip::$definition['primary'], $this->getId()));
+            $row = Db::getInstance()->executeS(
+                sprintf(
+                    'SELECT * FROM `%s` WHERE `%s` = %u',
+                    _DB_PREFIX_ . OrderSlip::$definition['table'],
+                    OrderSlip::$definition['primary'],
+                    $this->getId()
+                )
+            );
             if (is_array($row)) {
                 // Get 1st (and only) result if no error
                 $row = reset($row);
@@ -335,12 +345,14 @@ class Source extends BaseSource
                 $result[$taxLine['id_order_detail']] += $taxLine;
             } else {
                 // We have a tax line for a non product item line ([SIEL #200452]).
-                Container::getContainer()->getLog()->notice(sprintf(
-                    '%s: Tax detail found for order item line %d (of order %d) without product info',
-                    __METHOD__,
-                    $taxLine['id_order_detail'],
-                    $this->getId()
-                ));
+                Container::getContainer()->getLog()->notice(
+                    sprintf(
+                        '%s: Tax detail found for order item line %d (of order %d) without product info',
+                        __METHOD__,
+                        $taxLine['id_order_detail'],
+                        $this->getId()
+                    )
+                );
                 $result[$taxLine['id_order_detail']] = $taxLine;
             }
         }
@@ -350,6 +362,36 @@ class Source extends BaseSource
     public function getShippingLineInfos(): array
     {
         return !empty($this->getOrder()->getShopObject()->id_carrier) ? [$this] : [];
+    }
+
+    public function getGiftWrappingFeeLineInfos(): array
+    {
+        return $this->getType() === Source::Order && $this->getShopObject()->gift
+               && !Number::isZero($this->getShopObject()->total_wrapping_tax_incl)
+            ? [$this]
+            : [];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override checks if the fields 'payment_fee' and 'payment_fee_rate'
+     * are set and, if so, uses them to add a payment fee line.
+     *
+     * These fields are set by the PayPal with a fee module but seem generic
+     * enough to also be used by other modules that allow for payment fees.
+     *
+     * For now, only orders can have a payment fee, so $sign is superfluous,
+     * but if in future versions payment fees can appear on order slips as well
+     * the code can already handle that.
+     */
+    public function getPaymentFeeLineInfos(): array
+    {
+        /**
+         * @noinspection MissingIssetImplementationInspection These fields are set by the
+         *   PayPal with a fee module.
+         */
+        return isset($this->getShopObject()->payment_fee, $this->getShopObject()->payment_fee_rate) && (float) $this->getShopObject()->payment_fee !== 0.0 ? [$this] : [];
     }
 
     /**

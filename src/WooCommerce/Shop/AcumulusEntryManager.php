@@ -94,7 +94,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $result = null;
         /** @var \WC_Order|\WC_Order_Refund $source */
-        $source = $invoiceSource->getSource();
+        $source = $invoiceSource->getShopObject();
         // [SIEL #123927]: EntryId may be null and that can lead to an
         // incorrect "not found" result: use a key that will never
         // contain a null value.
@@ -111,7 +111,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $now = $this->sqlNow();
         /** @var \WC_Abstract_Order $source */
-        $source = $invoiceSource->getSource();
+        $source = $invoiceSource->getShopObject();
         // Add meta data.
         $source->add_meta_data(static::$keyCreated, $now, true);
         $source->add_meta_data(static::$keyEntryId, $entryId, true);
@@ -124,7 +124,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
     {
         /** @var \WC_Abstract_Order $source */
-        $source = $invoiceSource !== null ? $invoiceSource->getSource() : wc_get_order($entry->getSourceId());
+        $source = $invoiceSource !== null ? $invoiceSource->getShopObject() : wc_get_order($entry->getSourceId());
         $source->update_meta_data(static::$keyEntryId, $entryId);
         $source->update_meta_data(static::$keyToken, $token);
         $source->update_meta_data(static::$keyUpdated, $updated);
@@ -138,7 +138,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
         /** @var \WC_Abstract_Order $source */
-        $source = $invoiceSource !== null ? $invoiceSource->getSource() : wc_get_order($entry->getSourceId());
+        $source = $invoiceSource !== null ? $invoiceSource->getShopObject() : wc_get_order($entry->getSourceId());
         $source->delete_meta_data(static::$keyEntryId);
         $source->delete_meta_data(static::$keyToken);
         $source->delete_meta_data(static::$keyCreated);

@@ -73,20 +73,23 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = $this->getSource()['details']['BT']->virtuemart_order_id;
+        $this->id = $this->getShopObject()['details']['BT']->virtuemart_order_id;
     }
 
     /**
-     * @noinspection PhpMissingDocCommentInspection should be solved when we start using union return types throughout the inheritance tree.
+     * {@inheritdoc}
+     *
+     * @return string
+     *   A combination of letters and digits.
      */
-    public function getReference()
+    public function getReference(): string
     {
-        return $this->getSource()['details']['BT']->order_number;
+        return $this->getShopObject()['details']['BT']->order_number;
     }
 
     public function getDate(): string
     {
-        return date(Api::DateFormat_Iso, strtotime($this->getSource()['details']['BT']->created_on));
+        return date(Api::DateFormat_Iso, strtotime($this->getShopObject()['details']['BT']->created_on));
     }
 
     /**
@@ -97,22 +100,24 @@ class Source extends BaseSource
      */
     public function getStatus(): string
     {
-        return $this->getSource()['details']['BT']->order_status;
+        return $this->getShopObject()['details']['BT']->order_status;
     }
 
     /**
      * {@inheritdoc}
      *
-     * This override returns the 'virtuemart_paymentmethod_id'.
+     * @return ?int
+     *   The id of the payment method or null if not set (does not happen in our test
+     *   orders)
      */
-    public function getPaymentMethod()
+    public function getPaymentMethod(): ?int
     {
-        return $this->getSource()['details']['BT']->virtuemart_paymentmethod_id ?? parent::getPaymentMethod();
+        return $this->getShopObject()['details']['BT']->virtuemart_paymentmethod_id ?? parent::getPaymentMethod();
     }
 
     public function getPaymentStatus(): int
     {
-        return in_array($this->getSource()['details']['BT']->order_status, $this->getPaidStatuses(), false)
+        return in_array($this->getShopObject()['details']['BT']->order_status, $this->getPaidStatuses(), false)
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -121,7 +126,7 @@ class Source extends BaseSource
     {
         $date = null;
         $previousStatus = '';
-        foreach ($this->getSource()['history'] as $orderHistory) {
+        foreach ($this->getShopObject()['history'] as $orderHistory) {
             if (in_array($orderHistory->order_status_code, $this->getPaidStatuses(), false)
                 && !in_array($previousStatus, $this->getPaidStatuses(), false)
             ) {
@@ -145,10 +150,10 @@ class Source extends BaseSource
 
     public function getCountryCode(): string
     {
-        if (!empty($this->getSource()['details']['BT']->virtuemart_country_id)) {
+        if (!empty($this->getShopObject()['details']['BT']->virtuemart_country_id)) {
             /** @var \VirtueMartModelCountry $countryModel */
             $countryModel = VmModel::getModel('country');
-            $country = $countryModel->getData($this->getSource()['details']['BT']->virtuemart_country_id);
+            $country = $countryModel->getData($this->getShopObject()['details']['BT']->virtuemart_country_id);
             return $country->country_2_code;
         }
         return '';
@@ -171,8 +176,8 @@ class Source extends BaseSource
         /** @var \VirtueMartModelCurrency $currency_model */
         $currency_model = VmModel::getModel('currency');
         /** @var \TableCurrencies $currency */
-        $currency = $currency_model->getCurrency($this->getSource()['details']['BT']->user_currency_id);
-        return new Currency($currency->currency_code_3, (float) $this->getSource()['details']['BT']->user_currency_rate);
+        $currency = $currency_model->getCurrency($this->getShopObject()['details']['BT']->user_currency_id);
+        return new Currency($currency->currency_code_3, (float) $this->getShopObject()['details']['BT']->user_currency_rate);
     }
 
     /**
@@ -184,8 +189,8 @@ class Source extends BaseSource
     public function getTotals(): Totals
     {
         return new Totals(
-            (float) $this->getSource()['details']['BT']->order_total,
-            (float) $this->getSource()['details']['BT']->order_billTaxAmount,
+            (float) $this->getShopObject()['details']['BT']->order_total,
+            (float) $this->getShopObject()['details']['BT']->order_billTaxAmount,
         );
     }
 
@@ -197,7 +202,7 @@ class Source extends BaseSource
         $orderModel = VmModel::getModel('orders');
         /** @var \TableInvoices $invoicesTable */
         $invoicesTable = $orderModel->getTable('invoices');
-        if ($invoice = $invoicesTable->load($this->getSource()['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
+        if ($invoice = $invoicesTable->load($this->getShopObject()['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
             $this->invoice = $invoice->getProperties();
         }
     }

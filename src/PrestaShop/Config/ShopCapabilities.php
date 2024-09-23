@@ -251,16 +251,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             DataType::Customer => [
                 // Customer defaults.
-                Fld::ContactYourId => '[source::getSource()::id_customer]', // Order|OrderSlip
+                Fld::ContactYourId => '[source::getShopObject()::id_customer]', // Order|OrderSlip
                 Fld::VatNumber => '[address_invoice::vat_number' // Address
                     . '|address_shipping::vat_number]', // Address
                 Fld::Telephone => '[address_invoice::phone|address_invoice::phone_mobile'
                     . '|address_shipping::phone|address_shipping::phone_mobile]', // Address
                 Fld::Telephone2 => '[address_shipping::phone|address_shipping::phone_mobile'
                     . '|address_invoice::phone|address_invoice::phone_mobile]', // Address
-                Fld::Email => '[source::getOrder()::getSource()::getCustomer()::email]', // Customer
-                Fld::Website => '[source::getOrder()::getSource()::getCustomer()::website]', // Customer
-                Fld::Mark => '[source::getOrder()::getSource()::getCustomer()::note]', // Customer (but not used?)
+                Fld::Email => '[source::getOrder()::getShopObject()::getCustomer()::email]', // Customer
+                Fld::Website => '[source::getOrder()::getShopObject()::getCustomer()::website]', // Customer
+                Fld::Mark => '[source::getOrder()::getShopObject()::getCustomer()::note]', // Customer (but not used?)
             ],
             AddressType::Invoice => [ // address_invoice instanceof Address
                 Fld::CompanyName1 => '[address_invoice::company]',
@@ -281,7 +281,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Meta::ShopCountryId => '[address_shipping::id_country]',
             ],
             EmailAsPdfType::Invoice => [
-                Fld::EmailTo => '[source::getOrder()::getSource()::getCustomer()::email]',
+                Fld::EmailTo => '[source::getOrder()::getShopObject()::getCustomer()::email]',
             ],
             LineType::Item => [ // item instanceof Item
                 Meta::ProductId => '[item::getShopObject()::product_id]',

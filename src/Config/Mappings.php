@@ -99,6 +99,8 @@ class Mappings
      *
      * @return bool
      *   Success.
+     *
+     * @throws \JsonException
      */
     public function save(array $mappings): bool
     {

@@ -19,7 +19,7 @@ class CollectorManager extends BaseCollectorManager
         parent::setPropertySourcesForSource($source);
 
         /** @var \Order $order */
-        $order = $source->getOrder()->getSource();
+        $order = $source->getOrder()->getShopObject();
         $this->addPropertySource('address_invoice', new Address($order->id_address_invoice));
         $this->addPropertySource('address_shipping', new Address($order->id_address_delivery));
 

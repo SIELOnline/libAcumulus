@@ -31,7 +31,6 @@ use function strlen;
  * Wraps a PrestaShop order in an invoice source object.
  *
  * @method Order|OrderSlip getShopObject()
- * @method Order|OrderSlip getSource()
  */
 class Source extends BaseSource
 {
@@ -56,13 +55,15 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * This override returns the order reference or order slip id.
+     * @return string
+     *   This override returns the order reference, a sequence of characters, or the order
+     *   slip reference, a configurable prefix plus the id with padding 0s.
      */
-    public function getReference()
+    public function getReference(): string
     {
         return $this->getType() === Source::Order
-            ? $this->getSource()->reference
-            : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf('%06d', $this->getSource()->id);
+            ? $this->getShopObject()->reference
+            : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf('%06d', $this->getShopObject()->id);
     }
 
     /**
@@ -72,7 +73,7 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = $this->getSource()->id;
+        $this->id = $this->getShopObject()->id;
         if ($this->getType() === Source::CreditNote) {
             $this->addProperties();
         }
@@ -80,7 +81,7 @@ class Source extends BaseSource
 
     public function getDate(): string
     {
-        return substr($this->getSource()->date_add, 0, strlen('2000-01-01'));
+        return substr($this->getShopObject()->date_add, 0, strlen('2000-01-01'));
     }
 
     /**
@@ -91,7 +92,7 @@ class Source extends BaseSource
      */
     protected function getStatusOrder(): int
     {
-        return (int) $this->getSource()->current_state;
+        return (int) $this->getShopObject()->current_state;
     }
 
     /**
@@ -108,9 +109,10 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * This override returns the name of the payment module.
+     * @return ?string
+     *   This override returns the name of the payment module.
      */
-    public function getPaymentMethod()
+    public function getPaymentMethod(): ?string
     {
         /** @var \Order $order */
         $order = $this->getOrder()->shopObject;
@@ -120,7 +122,7 @@ class Source extends BaseSource
     public function getPaymentStatus(): int
     {
         // Assumption: credit slips are always in a paid status.
-        return ($this->getType() === Source::Order && $this->getSource()->hasBeenPaid()) || $this->getType() === Source::CreditNote
+        return ($this->getType() === Source::Order && $this->getShopObject()->hasBeenPaid()) || $this->getType() === Source::CreditNote
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -139,7 +141,7 @@ class Source extends BaseSource
             }
         } else {
             // Assumption: last modified date is date of actual reimbursement.
-            $paymentDate = $this->getSource()->date_upd;
+            $paymentDate = $this->getShopObject()->date_upd;
         }
 
         return $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
@@ -161,7 +163,7 @@ class Source extends BaseSource
     {
         $currency = Currency::getCurrencyInstance($this->getOrder()->shopObject->id_currency);
         /** @noinspection PhpCastIsUnnecessaryInspection  conversion_rate contains the string representation of a float */
-        return new AcumulusCurrency($currency->iso_code, (float) 1.0 / $this->getSource()->conversion_rate, true);
+        return new AcumulusCurrency($currency->iso_code, (float) 1.0 / $this->getShopObject()->conversion_rate, true);
     }
 
     /**
@@ -175,7 +177,7 @@ class Source extends BaseSource
         $sign = $this->getSign();
         if ($this->getType() === Source::Order) {
             /** @var Order $order */
-            $order = $this->getSource();
+            $order = $this->getShopObject();
             $amountEx = $order->getTotalProductsWithoutTaxes()
                 + $order->total_shipping_tax_excl
                 + $order->total_wrapping_tax_excl
@@ -200,7 +202,7 @@ class Source extends BaseSource
             //
             // Use the cart rules to correct these errors.
             /** @var OrderSlip $creditNote */
-            $creditNote = $this->getSource();
+            $creditNote = $this->getShopObject();
             $amountEx = $creditNote->total_products_tax_excl
                 + $creditNote->total_shipping_tax_excl;
             $amountInc = $creditNote->total_products_tax_incl
@@ -208,7 +210,7 @@ class Source extends BaseSource
             /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
             if ((int) $creditNote->order_slip_type !== VoucherRefundType::PRODUCT_PRICES_REFUND) {
                 /** @var Order $order */
-                $order = $this->getOrder()->getSource();
+                $order = $this->getOrder()->getShopObject();
                 /** @var \OrderCartRule[] $cartRules */
                 $cartRules = $order->getCartRules();
                 foreach ($cartRules as $cartRule) {
@@ -233,10 +235,10 @@ class Source extends BaseSource
      */
     public function getInvoiceReferenceOrder(): ?string
     {
-        return !empty($this->getSource()->invoice_number)
-            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getSource()->id_lang, null, $this->getSource()->id_shop) . sprintf(
+        return !empty($this->getShopObject()->invoice_number)
+            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getShopObject()->id_lang, null, $this->getShopObject()->id_shop) . sprintf(
                 '%06d',
-                $this->getSource()->invoice_number
+                $this->getShopObject()->invoice_number
             )
             : null;
     }
@@ -248,8 +250,8 @@ class Source extends BaseSource
      */
     public function getInvoiceDateOrder(): ?string
     {
-        return !empty($this->getSource()->invoice_number)
-            ? substr($this->getSource()->invoice_date, 0, strlen('2000-01-01'))
+        return !empty($this->getShopObject()->invoice_number)
+            ? substr($this->getShopObject()->invoice_date, 0, strlen('2000-01-01'))
             : null;
     }
 
@@ -296,7 +298,7 @@ class Source extends BaseSource
                 $row = reset($row);
                 foreach ($row as $key => $value) {
                     /** @noinspection PhpVariableVariableInspection */
-                    $this->getSource()->$key ??= $value;
+                    $this->getShopObject()->$key ??= $value;
                 }
             }
         }
@@ -307,9 +309,9 @@ class Source extends BaseSource
         if ($this->getType() === Source::Order) {
             // @nth: these methods return "raw"  database results, not objects from the
             //   PrestaShop datamodel. Do we want this?
-            $orderDetails = $this->mergeProductLines($this->getSource()->getProductsDetail(), $this->getSource()->getOrderDetailTaxes());
+            $orderDetails = $this->mergeProductLines($this->getShopObject()->getProductsDetail(), $this->getShopObject()->getOrderDetailTaxes());
         } else {
-            $orderDetails = OrderSlip::getOrdersSlipProducts($this->getId(), $this->getOrder()->getSource());
+            $orderDetails = OrderSlip::getOrdersSlipProducts($this->getId(), $this->getOrder()->getShopObject());
         }
         $items = [];
         foreach ($orderDetails as $orderDetail) {

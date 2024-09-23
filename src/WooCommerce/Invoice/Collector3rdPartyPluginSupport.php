@@ -123,7 +123,7 @@ class Collector3rdPartyPluginSupport
     protected function supportBundleProducts(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         /** @var \WC_Abstract_Order $shopSource */
-        $shopSource = $invoiceSource->getSource();
+        $shopSource = $invoiceSource->getShopObject();
         /** @var WC_Order_Item_Product[] $items */
         $items = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
@@ -241,7 +241,7 @@ class Collector3rdPartyPluginSupport
     protected function supportTMExtraProductOptions(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         /** @var \WC_Abstract_Order $shopSource */
-        $shopSource = $invoiceSource->getSource();
+        $shopSource = $invoiceSource->getShopObject();
         /** @var WC_Order_Item_Product[] $items */
         $items = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {

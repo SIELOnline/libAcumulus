@@ -83,6 +83,7 @@ abstract class Source extends BaseSource
      * {@inheritdoc}
      *
      * @return int
+     *   The id of the status.
      */
     public function getStatus(): int
     {
@@ -103,7 +104,8 @@ abstract class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * This override returns the code of the selected payment method.
+     * @return ?string
+     *   This override returns the code of the selected payment method.
      */
     public function getPaymentMethod(): ?string
     {
@@ -178,6 +180,12 @@ abstract class Source extends BaseSource
         return $vatBreakdown;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return ?string
+     *   A prefix followed by the invoice number, or null if not (yet) set.
+     */
     public function getInvoiceReference(): ?string
     {
         $result = null;

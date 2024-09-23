@@ -166,47 +166,47 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             DataType::Customer => [
                 // Customer defaults.
-                Fld::ContactYourId => '[source::getSource()::order_user_id]',
-                Fld::VatNumber => '[source::getSource()::billing_address::address_vat|source::getSource()::shipping_address::address_vat]',
+                Fld::ContactYourId => '[source::getShopObject()::order_user_id]',
+                Fld::VatNumber => '[source::getShopObject()::billing_address::address_vat|source::getShopObject()::shipping_address::address_vat]',
                 Fld::Telephone =>
-                    '[source::getSource()::billing_address::address_telephone|source::getSource()::shipping_address::address_telephone]',
+                    '[source::getShopObject()::billing_address::address_telephone|source::getShopObject()::shipping_address::address_telephone]',
                 Fld::Telephone2 =>
-                    '[source::getSource()::billing_address::address_telephone2' .
-                    '|source::getSource()::shipping_address::address_telephone2' .
-                    '|source::getSource()::shipping_address::address_telephone]',
-                Fld::Fax => '[source::getSource()::billing_address::address_fax|source::getSource()::shipping_address::address_fax]',
-                Fld::Email => '[source::getSource()::customer::user_email|source::getSource()::customer::email]',
+                    '[source::getShopObject()::billing_address::address_telephone2' .
+                    '|source::getShopObject()::shipping_address::address_telephone2' .
+                    '|source::getShopObject()::shipping_address::address_telephone]',
+                Fld::Fax => '[source::getShopObject()::billing_address::address_fax|source::getShopObject()::shipping_address::address_fax]',
+                Fld::Email => '[source::getShopObject()::customer::user_email|source::getShopObject()::customer::email]',
             ],
             AddressType::Invoice => [
-                Fld::CompanyName1 => '[source::getSource()::billing_address::address_company]',
+                Fld::CompanyName1 => '[source::getShopObject()::billing_address::address_company]',
                 Fld::FullName =>
-                    '[source::getSource()::billing_address::address_firstname' .
-                    '+source::getSource()::billing_address::address_middle_name' .
-                    '+source::getSource()::billing_address::address_lastname' .
-                    '|source::getSource()::customer::name]',
-                Fld::Address1 => '[source::getSource()::billing_address::address_street1]',
-                Fld::Address2 => '[source::getSource()::billing_address::address_street2]',
-                Fld::PostalCode => '[source::getSource()::billing_address::address_postcode]',
-                Fld::City => '[source::getSource()::billing_address::address_city]',
-                Fld::CountryCode => '[source::getSource()::billing_address::address_country_code_2]',
-                Meta::ShopCountryName => '[source::getSource()::billing_address::address_country_name]',
+                    '[source::getShopObject()::billing_address::address_firstname' .
+                    '+source::getShopObject()::billing_address::address_middle_name' .
+                    '+source::getShopObject()::billing_address::address_lastname' .
+                    '|source::getShopObject()::customer::name]',
+                Fld::Address1 => '[source::getShopObject()::billing_address::address_street1]',
+                Fld::Address2 => '[source::getShopObject()::billing_address::address_street2]',
+                Fld::PostalCode => '[source::getShopObject()::billing_address::address_postcode]',
+                Fld::City => '[source::getShopObject()::billing_address::address_city]',
+                Fld::CountryCode => '[source::getShopObject()::billing_address::address_country_code_2]',
+                Meta::ShopCountryName => '[source::getShopObject()::billing_address::address_country_name]',
             ],
             AddressType::Shipping => [
-                Fld::CompanyName1 => '[source::getSource()::shipping_address::address_company]',
+                Fld::CompanyName1 => '[source::getShopObject()::shipping_address::address_company]',
                 Fld::FullName =>
-                    '[source::getSource()::shipping_address::address_firstname' .
-                    '+source::getSource()::shipping_address::address_middle_name' .
-                    '+source::getSource()::shipping_address::address_lastname' .
-                    '|source::getSource()::customer::name]',
-                Fld::Address1 => '[source::getSource()::shipping_address::address_street1]',
-                Fld::Address2 => '[source::getSource()::shipping_address::address_street2]',
-                Fld::PostalCode => '[source::getSource()::shipping_address::address_postcode]',
-                Fld::City => '[source::getSource()::shipping_address::address_city]',
-                Fld::CountryCode => '[source::getSource()::shipping_address::address_country_code_2]',
-                Meta::ShopCountryName => '[source::getSource()::shipping_address::address_country_name_english]',
+                    '[source::getShopObject()::shipping_address::address_firstname' .
+                    '+source::getShopObject()::shipping_address::address_middle_name' .
+                    '+source::getShopObject()::shipping_address::address_lastname' .
+                    '|source::getShopObject()::customer::name]',
+                Fld::Address1 => '[source::getShopObject()::shipping_address::address_street1]',
+                Fld::Address2 => '[source::getShopObject()::shipping_address::address_street2]',
+                Fld::PostalCode => '[source::getShopObject()::shipping_address::address_postcode]',
+                Fld::City => '[source::getShopObject()::shipping_address::address_city]',
+                Fld::CountryCode => '[source::getShopObject()::shipping_address::address_country_code_2]',
+                Meta::ShopCountryName => '[source::getShopObject()::shipping_address::address_country_name_english]',
             ],
             EmailAsPdfType::Invoice => [
-                Fld::EmailTo => '[source::getSource()::customer::user_email|source::getSource()::customer::email]',
+                Fld::EmailTo => '[source::getShopObject()::customer::user_email|source::getShopObject()::customer::email]',
             ],
             LineType::Item => [
                 Fld::ItemNumber => '[item::getShopObject()::order_product_code]',

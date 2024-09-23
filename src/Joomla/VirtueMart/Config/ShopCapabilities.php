@@ -169,39 +169,39 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             DataType::Customer => [
                 // Customer defaults.
-                Fld::ContactYourId => '[source::getSource()::details::BT::virtuemart_user_id]',
-                Fld::VatNumber => '[source::getSource()::details::BT::tax_exemption_number]',
-                Fld::Telephone => '[source::getSource()::details::BT::phone_1|source::getSource()::details::ST::phone_1]',
-                Fld::Telephone2 => '[source::getSource()::details::BT::phone_2|source::getSource()::details::ST::phone_2]',
-                Fld::Fax => '[source::getSource()::details::BT::fax|source::getSource()::details::ST::fax]',
-                Fld::Email => '[source::getSource()::details::BT::email|source::getSource()::details::ST::email]',
+                Fld::ContactYourId => '[source::getShopObject()::details::BT::virtuemart_user_id]',
+                Fld::VatNumber => '[source::getShopObject()::details::BT::tax_exemption_number]',
+                Fld::Telephone => '[source::getShopObject()::details::BT::phone_1|source::getShopObject()::details::ST::phone_1]',
+                Fld::Telephone2 => '[source::getShopObject()::details::BT::phone_2|source::getShopObject()::details::ST::phone_2]',
+                Fld::Fax => '[source::getShopObject()::details::BT::fax|source::getShopObject()::details::ST::fax]',
+                Fld::Email => '[source::getShopObject()::details::BT::email|source::getShopObject()::details::ST::email]',
             ],
             AddressType::Invoice => [
-                Fld::CompanyName1 => '[source::getSource()::details::BT::company]',
+                Fld::CompanyName1 => '[source::getShopObject()::details::BT::company]',
                 Fld::FullName =>
-                    '[source::getSource()::details::BT::first_name' .
-                    '+source::getSource()::details::BT::middle_name' .
-                    '+source::getSource()::details::BT::last_name]',
-                Fld::Address1 => '[source::getSource()::details::BT::address_1]',
-                Fld::Address2 => '[source::getSource()::details::BT::address_2]',
-                Fld::PostalCode => '[source::getSource()::details::BT::zip]',
-                Fld::City => '[source::getSource()::details::BT::city]',
-                Meta::ShopCountryId => '[source::getSource()::details::BT::virtuemart_country_id]',
+                    '[source::getShopObject()::details::BT::first_name' .
+                    '+source::getShopObject()::details::BT::middle_name' .
+                    '+source::getShopObject()::details::BT::last_name]',
+                Fld::Address1 => '[source::getShopObject()::details::BT::address_1]',
+                Fld::Address2 => '[source::getShopObject()::details::BT::address_2]',
+                Fld::PostalCode => '[source::getShopObject()::details::BT::zip]',
+                Fld::City => '[source::getShopObject()::details::BT::city]',
+                Meta::ShopCountryId => '[source::getShopObject()::details::BT::virtuemart_country_id]',
             ],
             AddressType::Shipping => [
-                Fld::CompanyName1 => '[source::getSource()::details::ST::company]',
+                Fld::CompanyName1 => '[source::getShopObject()::details::ST::company]',
                 Fld::FullName =>
-                    '[source::getSource()::details::ST::first_name' .
-                    '+source::getSource()::details::ST::middle_name' .
-                    '+source::getSource()::details::ST::last_name]',
-                Fld::Address1 => '[source::getSource()::details::ST::address_1]',
-                Fld::Address2 => '[source::getSource()::details::ST::address_2]',
-                Fld::PostalCode => '[source::getSource()::details::ST::zip]',
-                Fld::City => '[source::getSource()::details::ST::city]',
-                Meta::ShopCountryId => '[source::getSource()::details::ST::virtuemart_country_id]',
+                    '[source::getShopObject()::details::ST::first_name' .
+                    '+source::getShopObject()::details::ST::middle_name' .
+                    '+source::getShopObject()::details::ST::last_name]',
+                Fld::Address1 => '[source::getShopObject()::details::ST::address_1]',
+                Fld::Address2 => '[source::getShopObject()::details::ST::address_2]',
+                Fld::PostalCode => '[source::getShopObject()::details::ST::zip]',
+                Fld::City => '[source::getShopObject()::details::ST::city]',
+                Meta::ShopCountryId => '[source::getShopObject()::details::ST::virtuemart_country_id]',
             ],
             EmailAsPdfType::Invoice => [
-                Fld::EmailTo => '[source::getSource()::details::BT::email|source::getSource()::details::ST::email]',
+                Fld::EmailTo => '[source::getShopObject()::details::BT::email|source::getShopObject()::details::ST::email]',
             ],
             LineType::Item => [
                 // @todo: complete when we start converting lines to using collectors.

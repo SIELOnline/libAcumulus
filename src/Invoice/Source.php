@@ -96,15 +96,9 @@ abstract class Source
     }
 
     /**
-     * Returns the web shop specific source for an invoice.
-     *
-     * @return array|object
-     *   The web shop specific source for an invoice.
-     *
-     * @legacy: wrapper around the newer, more generic, getShopObject.
-     * @todo: deprecate this method? Check all mappings!!!
+     * @deprecated: use getShopObject(), Check all mappings!
      */
-    public function getSource()
+    public function getSource(): object|array
     {
         return $this->getShopObject();
     }
@@ -118,7 +112,7 @@ abstract class Source
      *   The user facing id for the web shop's invoice source. This is not
      *   necessarily the internal id.
      */
-    public function getReference()
+    public function getReference(): string|int
     {
         return $this->getId();
     }
@@ -161,7 +155,7 @@ abstract class Source
      * @return int|string
      *   The status for this invoice source.
      */
-    public function getStatus()
+    public function getStatus(): int|string
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -175,7 +169,7 @@ abstract class Source
      * @return int|string|null
      *   A value identifying the payment method or null if unknown.
      */
-    public function getPaymentMethod()
+    public function getPaymentMethod(): int|string|null
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -192,7 +186,7 @@ abstract class Source
      *
      * @noinspection PhpUnused  Called via callTypeSpecificMethod().
      */
-    public function getPaymentMethodCreditNote()
+    public function getPaymentMethodCreditNote(): int|string|null
     {
         return $this->getOrder()->getPaymentMethod();
     }
@@ -205,7 +199,7 @@ abstract class Source
      * @return int|string|null
      *   A value identifying the payment method or null if unknown.
      */
-    public function getPaymentMethodOrder()
+    public function getPaymentMethodOrder(): int|string|null
     {
         throw new RuntimeException('Source::getPaymentMethodOrder() not implemented for ' . get_class($this));
     }
@@ -311,7 +305,7 @@ abstract class Source
      *   The web shop invoice linked to this source, or null if no (separate)
      *   invoice is linked to this source.
      */
-    protected function getInvoice()
+    protected function getInvoice(): object|array|null
     {
         // Lazy loading.
         if (!isset($this->invoice)) {
@@ -354,7 +348,7 @@ abstract class Source
      *   The reference of the (web shop) invoice linked to this source, or null
      *   if no invoice is linked to this source.
      */
-    public function getInvoiceReference()
+    public function getInvoiceReference(): int|string|null
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -364,7 +358,7 @@ abstract class Source
      *
      * @noinspection PhpUnused  Called via callTypeSpecificMethod().
      */
-    public function getInvoiceReferenceCreditNote()
+    public function getInvoiceReferenceCreditNote(): int|string
     {
         // A credit note is to be considered an invoice on its own.
         return $this->getReference();
@@ -475,7 +469,7 @@ abstract class Source
      *   The original order itself, if readily available, or the id of the
      *   original order for this credit note.
      */
-    protected function getShopOrderOrId()
+    protected function getShopOrderOrId(): object|array|int
     {
         throw new RuntimeException('Source::getShopOrderOrId() not implemented for ' . get_class($this));
     }
@@ -538,10 +532,10 @@ abstract class Source
      *
      * @noinspection PhpUnused  Can be used in mappings.
      */
-    public function getCreditNote(int $index = 0)
+    public function getCreditNote(int $index = 0): object|array|null
     {
         $creditNotes = $this->getCreditNotes();
-        return $index < count($creditNotes) ? $creditNotes[$index]->getSource() : null;
+        return $index < count($creditNotes) ? $creditNotes[$index]->getShopObject() : null;
     }
 
     /**
@@ -581,7 +575,7 @@ abstract class Source
      * this invoice source. What this info looks like is shop dependent, e.g:
      * - In many shops shipping info is stored at the order level, so this source is
      *   returned as one and only array value, but only if a shipping took place.
-     * - In other shops, shippings may be stored as "total lines", "cart rules", or
+     * - In other shops, shipments may be stored as "total lines", "cart rules", or
      *   something like that and this method would return an array of those "total lines"
      *   (or whatever they are called) that represent a shipping.
      *
@@ -666,7 +660,7 @@ abstract class Source
      * - A product retour after the guaranteed free retour period is over is only
      *   partially refunded.
      * - Discounts applied to a selection of items should only be refunded partially (the
-     *   part that is returned.
+     *   part that is returned).
      * - Shipping costs may be returned except for the handling costs.
      * - Etc.
      *

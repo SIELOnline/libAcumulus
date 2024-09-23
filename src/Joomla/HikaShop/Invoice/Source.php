@@ -19,7 +19,6 @@ use function in_array;
  * Wraps a HikaShop order in an invoice source object.
  *
  * @method object getShopObject() See \hikashopOrderClass
- * @method object getSource()
  */
 class Source extends BaseSource
 {
@@ -42,40 +41,46 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = $this->getSource()->order_id;
-    }
-
-    /**
-     * @noinspection PhpMissingDocCommentInspection should be solved when we start using union return types throughout the inheritance tree.
-     */
-    public function getReference()
-    {
-        return $this->getSource()->order_number;
-    }
-
-    public function getDate(): string
-    {
-        return date(Api::DateFormat_Iso, $this->getSource()->order_created);
+        $this->id = $this->getShopObject()->order_id;
     }
 
     /**
      * {@inheritdoc}
      *
      * @return string
+     *   A combination of letters and digits.
      */
-    public function getStatus(): string
+    public function getReference(): string
     {
-        return $this->getSource()->order_status;
+        return $this->getShopObject()->order_number;
+    }
+
+    public function getDate(): string
+    {
+        return date(Api::DateFormat_Iso, $this->getShopObject()->order_created);
     }
 
     /**
      * {@inheritdoc}
      *
-     * This override returns the name of the payment module.
+     * @return string
+     *   The english name of the status.
      */
-    public function getPaymentMethod()
+    public function getStatus(): string
     {
-        return $this->getSource()->order_payment_id ?? parent::getPaymentMethod();
+        return $this->getShopObject()->order_status;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return ?int
+     *   The id of the payment module or null if not set (does not happen in our test
+     *   orders)
+     */
+    public function getPaymentMethod(): ?int
+    {
+        return $this->getShopObject()->order_payment_id ?? parent::getPaymentMethod();
     }
 
     public function getPaymentStatus(): int
@@ -83,7 +88,7 @@ class Source extends BaseSource
         /** @var \hikashopConfigClass $config */
         $config = hikashop_config();
         $unpaidStatuses = explode(',', $config->get('order_unpaid_statuses', 'created'));
-        return in_array($this->getSource()->order_status, $unpaidStatuses, true)
+        return in_array($this->getShopObject()->order_status, $unpaidStatuses, true)
             ? Api::PaymentStatus_Due
             : Api::PaymentStatus_Paid;
     }
@@ -94,7 +99,7 @@ class Source extends BaseSource
         // 'history_payment_id'. The order of this array is by 'history_created'
         //  DESC, we take the one that is the furthest away in time.
         $date = null;
-        foreach ($this->getSource()->history as $history) {
+        foreach ($this->getShopObject()->history as $history) {
             if (!empty($history->history_payment_id)) {
                 $date = $history->history_created;
             }
@@ -105,7 +110,7 @@ class Source extends BaseSource
             /** @var \hikashopConfigClass $config */
             $config = hikashop_config();
             $unpaidStatuses = explode(',', $config->get('order_unpaid_statuses', 'created'));
-            foreach ($this->getSource()->history as $history) {
+            foreach ($this->getShopObject()->history as $history) {
                 if (!empty($history->history_new_status)
                     && !in_array($history->history_new_status, $unpaidStatuses, true)
                 ) {
@@ -118,8 +123,8 @@ class Source extends BaseSource
 
     public function getCountryCode(): string
     {
-        return !empty($this->getSource()->billing_address->address_country_code_2)
-            ? $this->getSource()->billing_address->address_country_code_2
+        return !empty($this->getShopObject()->billing_address->address_country_code_2)
+            ? $this->getShopObject()->billing_address->address_country_code_2
             : '';
     }
 
@@ -135,8 +140,8 @@ class Source extends BaseSource
      */
     public function getCurrency(): Currency
     {
-        if (!empty($this->getSource()->order_currency_info)) {
-            $currency = unserialize($this->getSource()->order_currency_info, ['allowed_classes' => [stdClass::class]]);
+        if (!empty($this->getShopObject()->order_currency_info)) {
+            $currency = unserialize($this->getShopObject()->order_currency_info, ['allowed_classes' => [stdClass::class]]);
             $result = new Currency($currency->currency_code, (float) $currency->currency_rate, true);
         } else {
             $result = new Currency();
@@ -154,22 +159,22 @@ class Source extends BaseSource
     {
         // No order_tax_info => no tax (?) => vat amount = 0.
         $vatAmount = 0.0;
-        if (!empty($this->getSource()->order_tax_info)) {
-            foreach ($this->getSource()->order_tax_info as $taxInfo) {
+        if (!empty($this->getShopObject()->order_tax_info)) {
+            foreach ($this->getShopObject()->order_tax_info as $taxInfo) {
                 if (!empty($taxInfo->tax_amount)) {
                     $vatAmount += $taxInfo->tax_amount;
                 }
             }
         }
-        return new Totals((float) $this->getSource()->order_full_price, $vatAmount, null);
+        return new Totals((float) $this->getShopObject()->order_full_price, $vatAmount, null);
     }
 
     public function getVatBreakdown(): array
     {
         // No order_tax_info => no tax (?) => no vat breakdown
         $vatBreakdown = [];
-        if (!empty($this->getSource()->order_tax_info)) {
-            foreach ($this->getSource()->order_tax_info as $taxInfo) {
+        if (!empty($this->getShopObject()->order_tax_info)) {
+            foreach ($this->getShopObject()->order_tax_info as $taxInfo) {
                 if (!empty($taxInfo->tax_amount)) {
                     $vatBreakdown[$taxInfo->tax_namekey] = $taxInfo->tax_amount;
                 }
@@ -179,17 +184,20 @@ class Source extends BaseSource
     }
 
     /**
-     * @noinspection PhpMissingDocCommentInspection should be solved when we start using union return types throughout the inheritance tree.
+     * {@inheritdoc}
+     *
+     * @return ?string
+     *   A combination of letters and digits, or null if not (yet) set.
      */
-    public function getInvoiceReference()
+    public function getInvoiceReference(): ?string
     {
-        return !empty($this->getSource()->order_invoice_number) ? $this->getSource()->order_invoice_number : parent::getInvoiceReference();
+        return !empty($this->getShopObject()->order_invoice_number) ? $this->getShopObject()->order_invoice_number : parent::getInvoiceReference();
     }
 
     public function getInvoiceDate(): ?string
     {
-        return !empty($this->getSource()->order_invoice_created)
-            ? date(Api::DateFormat_Iso, (int) $this->getSource()->order_invoice_created)
+        return !empty($this->getShopObject()->order_invoice_created)
+            ? date(Api::DateFormat_Iso, (int) $this->getShopObject()->order_invoice_created)
             : parent::getInvoiceDate();
     }
 

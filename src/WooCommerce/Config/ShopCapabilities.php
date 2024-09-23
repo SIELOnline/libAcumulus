@@ -234,38 +234,38 @@ class ShopCapabilities extends ShopCapabilitiesBase
             DataType::Customer => [
                 // Customer defaults.
                 //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
-                Fld::ContactYourId => '[source::getOrder()::getSource()::get_customer_id()]',
-                Fld::VatNumber => '[source::getOrder()::getSource()::get_meta(_billing_eu_vat_number)' // eu-vat-for-woocommerce
-                    . '|source::getOrder()::getSource()::get_meta(_billing_vat_number)' // @todo: which plugin?
-                    . '|source::getOrder()::getSource()::get_meta(_vat_number)' // @todo: which plugin?
-                    . '|source::getOrder()::getSource()::get_meta(vat_number)' // EU Vat Assistant
-                    . '|source::getOrder()::getSource()::get_meta(VAT Number)]',  // WooCommerce EU/UK VAT Compliance
-                Fld::Telephone => '[source::getOrder()::getSource()::get_billing_phone()]',
-                Fld::Telephone2 => '[source::getOrder()::getSource()::get_shipping_phone()]',
-                Fld::Email => '[source::getOrder()::getSource()::get_billing_email()]',
+                Fld::ContactYourId => '[source::getOrder()::getShopObject()::get_customer_id()]',
+                Fld::VatNumber => '[source::getOrder()::getShopObject()::get_meta(_billing_eu_vat_number)' // eu-vat-for-woocommerce
+                    . '|source::getOrder()::getShopObject()::get_meta(_billing_vat_number)' // @todo: which plugin?
+                    . '|source::getOrder()::getShopObject()::get_meta(_vat_number)' // @todo: which plugin?
+                    . '|source::getOrder()::getShopObject()::get_meta(vat_number)' // EU Vat Assistant
+                    . '|source::getOrder()::getShopObject()::get_meta(VAT Number)]',  // WooCommerce EU/UK VAT Compliance
+                Fld::Telephone => '[source::getOrder()::getShopObject()::get_billing_phone()]',
+                Fld::Telephone2 => '[source::getOrder()::getShopObject()::get_shipping_phone()]',
+                Fld::Email => '[source::getOrder()::getShopObject()::get_billing_email()]',
             ],
             AddressType::Invoice => [
-                Fld::CompanyName1 => '[source::getOrder()::getSource()::get_billing_company()]',
+                Fld::CompanyName1 => '[source::getOrder()::getShopObject()::get_billing_company()]',
                 Fld::FullName =>
-                    '[source::getOrder()::getSource()::get_billing_first_name()+source::getOrder()::getSource()::get_billing_last_name()]',
-                Fld::Address1 => '[source::getOrder()::getSource()::get_billing_address_1()]',
-                Fld::Address2 => '[source::getOrder()::getSource()::get_billing_address_2()]',
-                Fld::PostalCode => '[source::getOrder()::getSource()::get_billing_postcode()]',
-                Fld::City => '[source::getOrder()::getSource()::get_billing_city()]',
-                Fld::CountryCode => '[source::getOrder()::getSource()::get_billing_country()]',
+                    '[source::getOrder()::getShopObject()::get_billing_first_name()+source::getOrder()::getShopObject()::get_billing_last_name()]',
+                Fld::Address1 => '[source::getOrder()::getShopObject()::get_billing_address_1()]',
+                Fld::Address2 => '[source::getOrder()::getShopObject()::get_billing_address_2()]',
+                Fld::PostalCode => '[source::getOrder()::getShopObject()::get_billing_postcode()]',
+                Fld::City => '[source::getOrder()::getShopObject()::get_billing_city()]',
+                Fld::CountryCode => '[source::getOrder()::getShopObject()::get_billing_country()]',
             ],
             AddressType::Shipping => [
-                Fld::CompanyName1 => '[source::getOrder()::getSource()::get_shipping_company()]',
+                Fld::CompanyName1 => '[source::getOrder()::getShopObject()::get_shipping_company()]',
                 Fld::FullName =>
-                    '[source::getOrder()::getSource()::get_shipping_first_name()+source::getOrder()::getSource()::get_shipping_last_name()]',
-                Fld::Address1 => '[source::getOrder()::getSource()::get_shipping_address_1()]',
-                Fld::Address2 => '[source::getOrder()::getSource()::get_shipping_address_2()]',
-                Fld::PostalCode => '[source::getOrder()::getSource()::get_shipping_postcode()]',
-                Fld::City => '[source::getOrder()::getSource()::get_shipping_city()]',
-                Fld::CountryCode => '[source::getOrder()::getSource()::get_shipping_country()]',
+                    '[source::getOrder()::getShopObject()::get_shipping_first_name()+source::getOrder()::getShopObject()::get_shipping_last_name()]',
+                Fld::Address1 => '[source::getOrder()::getShopObject()::get_shipping_address_1()]',
+                Fld::Address2 => '[source::getOrder()::getShopObject()::get_shipping_address_2()]',
+                Fld::PostalCode => '[source::getOrder()::getShopObject()::get_shipping_postcode()]',
+                Fld::City => '[source::getOrder()::getShopObject()::get_shipping_city()]',
+                Fld::CountryCode => '[source::getOrder()::getShopObject()::get_shipping_country()]',
             ],
             EmailAsPdfType::Invoice => [
-                Fld::EmailTo => '[source::getOrder()::getSource()::get_billing_email()]',
+                Fld::EmailTo => '[source::getOrder()::getShopObject()::get_billing_email()]',
             ],
             // Property sources for LineType::Item:
             // - source: Source

@@ -307,7 +307,6 @@ class Config
      */
     public function getShowRatePluginMessage(): int
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->get('showRatePluginMessage');
     }
 
@@ -319,7 +318,6 @@ class Config
      */
     public function getPluginV8Message(): int
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->get('showPluginV8Message');
     }
 
@@ -347,10 +345,8 @@ class Config
      *   The value of the given configuration value or null if not defined. This
      *   will be a simple type (string, int, bool) or a keyed array with simple
      *   values.
-     *
-     * @throws \JsonException
      */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         $this->load();
         return $this->values[$key] ?? null;
@@ -368,10 +364,8 @@ class Config
      *
      * @return mixed
      *   The old value, or null if it was not yet set.
-     *
-     * @throws \JsonException
      */
-    public function set(string $key, $value)
+    public function set(string $key, mixed $value): mixed
     {
         $this->load();
         $oldValue = $this->values[$key] ?? null;
@@ -547,15 +541,12 @@ class Config
      *
      * @return array
      *   An array with all settings belonging to the given group.
-     *
-     * @noinspection PhpDocMissingThrowsInspection
      */
     protected function getSettingsByGroup(string $group): array
     {
         $result = [];
         foreach ($this->getKeyInfo() as $key => $keyInfo) {
             if ($keyInfo['group'] === $group) {
-                /** @noinspection PhpUnhandledExceptionInspection */
                 $result[$key] = $this->get($key);
             }
         }

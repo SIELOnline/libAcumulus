@@ -128,7 +128,7 @@ class ConfigUpgrade
         // Let's start with a Requirements check and fail if not all are met.
         $messages = $this->getRequirements()->check();
         foreach ($messages as $key => $message) {
-            $severity = strpos($key, 'warning') !== false ? Severity::Warning : Severity::Error;
+            $severity = str_contains($key, 'warning') ? Severity::Warning : Severity::Error;
             $this->getLog()->log($severity, "Requirement check warning: $message");
             if ($severity === Severity::Warning) {
                 unset($messages[$key]);
@@ -302,7 +302,7 @@ class ConfigUpgrade
         $result = true;
         $newSettings = [];
 
-        if ($this->getConfig()->get('salutation') && strpos($this->getConfig()->get('salutation'), '[#') !== false) {
+        if ($this->getConfig()->get('salutation') && str_contains($this->getConfig()->get('salutation'), '[#')) {
             $newSettings['salutation'] = str_replace('[#', '[', $this->getConfig()->get('salutation'));
         }
 
@@ -322,7 +322,7 @@ class ConfigUpgrade
         $result = true;
         $newSettings = [];
 
-        if ($this->getConfig()->get('subject') && strpos($this->getConfig()->get('subject'), '[#') !== false) {
+        if ($this->getConfig()->get('subject') && str_contains($this->getConfig()->get('subject'), '[#')) {
             $newSettings['subject'] = str_replace(['[#b]', '#f'],
                 ['[invoiceSource::reference]', '[invoiceSource::invoiceNumber]'],
                 $this->getConfig()->get('subject'));
@@ -374,7 +374,7 @@ class ConfigUpgrade
         $doSave = false;
         $values = $this->getConfig()->getAll();
         array_walk_recursive($values, static function(&$value) use (&$doSave) {
-            if (is_string($value) && strpos($value, 'originalInvoiceSource::') !== false) {
+            if (is_string($value) && str_contains($value, 'originalInvoiceSource::')) {
                 $value = str_replace('originalInvoiceSource::', 'order::', $value);
                 $doSave = true;
             }
@@ -398,7 +398,7 @@ class ConfigUpgrade
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
         array_walk_recursive($values, static function(&$value) use (&$doSave) {
-            if (is_string($value) && strpos($value, 'paymentState') !== false) {
+            if (is_string($value) && str_contains($value, 'paymentState')) {
                 $value = str_replace('paymentState', 'paymentStatus', $value);
                 $doSave = true;
             }
@@ -610,7 +610,7 @@ class ConfigUpgrade
             // - Does the new mapping somehow already has a value? do not overwrite.
             if (isset($values[$key]) && !isset($mappings[$group][$property])) {
                 // Chances are it won't work anymore, as you now probably have to start
-                // with 'Source::getSource()::{method on shop Order}'. So we should issue
+                // with 'Source::getShopObject()::{method on shop Order}'. So we should issue
                 // a warning.
                 $mappings[$group] = $mappings[$group] ?? [];
                 $mappings[$group][$property] = $values[$key];
@@ -621,6 +621,24 @@ class ConfigUpgrade
             // This is to warn the user.
             $values['showPluginV8MessageOverriddenMappings'] = $this->getOverriddenMappings($mappings);
             $result = $configStore->save($values);
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a list of mappings that are overridden.
+     *
+     * @param string[][] $mappings
+     *
+     * @return string[]
+     */
+    private function getOverriddenMappings(array $mappings): array
+    {
+        $result = [];
+        foreach ($mappings as $object => $objectMappings) {
+            foreach ($objectMappings as $property => $mapping) {
+                $result[] = "$object::$property (was $mapping)";
+            }
         }
         return $result;
     }
@@ -660,30 +678,21 @@ class ConfigUpgrade
     /**
      * 8.3.0 upgrade.
      *
-     * - removed all settings that are now a mapping: just save the config to remove these
+     * - Removed all settings that are now a mapping: just save the config to remove these
      *   settings.
+     * - Renamed Source::getSource() to Source::getShopObject(): update Config::Mappings
+     *   config value and save it (this takes care of the first update as well).
      */
     protected function upgrade830(): bool
     {
-        $newSettings = [];
-        return $this->getConfig()->save($newSettings);
-    }
-
-    /**
-     * Returns a list of mappings that are overridden.
-     *
-     * @param string[][] $mappings
-     *
-     * @return string[]
-     */
-    private function getOverriddenMappings(array $mappings): array
-    {
-        $result = [];
-        foreach ($mappings as $object => $objectMappings) {
-            foreach ($objectMappings as $property => $mapping) {
-                $result[] = "$object::$property (was $mapping)";
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+        $mappings = $values[Config::Mappings] ?? [];
+        array_walk_recursive($mappings, static function (&$value) {
+            if (is_string($value) && str_contains($value, '::getSource()::')) {
+                $value = str_replace('::getSource()::', '::getShopObject()::', $value);
             }
-        }
-        return $result;
+        });
+        return $configStore->save([Config::Mappings => $mappings]);
     }
 }

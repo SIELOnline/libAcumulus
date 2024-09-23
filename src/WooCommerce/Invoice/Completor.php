@@ -46,7 +46,7 @@ class Completor extends BaseCompletor
         // and if that did not result in a vat type try the WC specific guesses.
         if (empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
             /** @var \WC_Order $order */
-            $order = $this->source->getOrder()->getSource();
+            $order = $this->source->getOrder()->getShopObject();
             if (in_array(Api::VatType_EuReversed, $possibleVatTypes, true)
                 && apply_filters('woocommerce_order_is_vat_exempt', $order->get_meta('is_vat_exempt') === 'yes', $order))
             {

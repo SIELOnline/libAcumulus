@@ -259,36 +259,36 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             ],
             DataType::Customer => [
                 // Customer defaults.
-                Fld::ContactYourId => '[source::getSource()::customer_id]', // Order
+                Fld::ContactYourId => '[source::getShopObject()::customer_id]', // Order
                 //Fld::VatNumber => '', // OpenCart core does not provide a vat number field.
                 // @todo: we had this as default (in OC3): 'vatNumber' => '[payment_tax_id]', // Order
                 //   where did this come from?
-                Fld::Telephone => '[source::getSource()::telephone]', // Order
-                Fld::Fax => '[source::getSource()::fax]', // Order in OC3
-                Fld::Email => '[source::getSource()::email]', // Order
+                Fld::Telephone => '[source::getShopObject()::telephone]', // Order
+                Fld::Fax => '[source::getShopObject()::fax]', // Order in OC3
+                Fld::Email => '[source::getShopObject()::email]', // Order
             ],
             AddressType::Invoice => [ // address_invoice instanceof Address, comes from Order object
-                Fld::CompanyName1 => '[source::getSource()::payment_company]',
-                Fld::FullName => '[source::getSource()::payment_firstname+source::getSource()::payment_lastname|source::getSource()::firstname+source::getSource()::lastname]',
-                Fld::Address1 => '[source::getSource()::payment_address_1]',
-                Fld::Address2 => '[source::getSource()::payment_address_2]',
-                Fld::PostalCode => '[source::getSource()::payment_postcode]',
-                Fld::City => '[source::getSource()::payment_city]',
-                Meta::ShopCountryId => '[source::getSource()::payment_country_id]',
-                Meta::ShopCountryName => '[source::getSource()::payment_country]',
+                Fld::CompanyName1 => '[source::getShopObject()::payment_company]',
+                Fld::FullName => '[source::getShopObject()::payment_firstname+source::getShopObject()::payment_lastname|source::getShopObject()::firstname+source::getShopObject()::lastname]',
+                Fld::Address1 => '[source::getShopObject()::payment_address_1]',
+                Fld::Address2 => '[source::getShopObject()::payment_address_2]',
+                Fld::PostalCode => '[source::getShopObject()::payment_postcode]',
+                Fld::City => '[source::getShopObject()::payment_city]',
+                Meta::ShopCountryId => '[source::getShopObject()::payment_country_id]',
+                Meta::ShopCountryName => '[source::getShopObject()::payment_country]',
             ],
             AddressType::Shipping => [ // address_shipping instanceof Address, comes from Order object
-                Fld::CompanyName1 => '[source::getSource()::shipping_company]',
-                Fld::FullName => '[source::getSource()::shipping_firstname+source::getSource()::shipping_lastname|source::getSource()::firstname+source::getSource()::lastname]',
-                Fld::Address1 => '[source::getSource()::shipping_address_1]',
-                Fld::Address2 => '[source::getSource()::shipping_address_2]',
-                Fld::PostalCode => '[source::getSource()::shipping_postcode]',
-                Fld::City => '[source::getSource()::shipping_city]',
-                Meta::ShopCountryId => '[source::getSource()::shipping_country_id]',
-                Meta::ShopCountryName => '[source::getSource()::shipping_country]',
+                Fld::CompanyName1 => '[source::getShopObject()::shipping_company]',
+                Fld::FullName => '[source::getShopObject()::shipping_firstname+source::getShopObject()::shipping_lastname|source::getShopObject()::firstname+source::getShopObject()::lastname]',
+                Fld::Address1 => '[source::getShopObject()::shipping_address_1]',
+                Fld::Address2 => '[source::getShopObject()::shipping_address_2]',
+                Fld::PostalCode => '[source::getShopObject()::shipping_postcode]',
+                Fld::City => '[source::getShopObject()::shipping_city]',
+                Meta::ShopCountryId => '[source::getShopObject()::shipping_country_id]',
+                Meta::ShopCountryName => '[source::getShopObject()::shipping_country]',
             ],
             EmailAsPdfType::Invoice => [
-                Fld::EmailTo => '[source::getSource()::email]',
+                Fld::EmailTo => '[source::getShopObject()::email]',
             ],
             LineType::Item => [ // item: table order_product; product: table product
                 Fld::ItemNumber => '[product::sku|product::upc|product::ean|product::jan|product::isbn|product::mpn]',

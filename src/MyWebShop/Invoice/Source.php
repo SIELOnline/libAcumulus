@@ -54,10 +54,10 @@ class Source extends BaseSource
     protected function setId(): void
     {
         // @todo: set the id, given a loaded source.
-        $this->id = (int) $this->getSource()->id;
+        $this->id = (int) $this->getShopObject()->id;
     }
 
-    public function getReference()
+    public function getReference(): string|int
     {
         // @todo: override if MyWebShop assigns a separate reference number or string to its orders or credit notes, otherwise remove.
     }
@@ -67,12 +67,12 @@ class Source extends BaseSource
         // @todo: override or implement both getDateOrder() and getDateCreditNote()
     }
 
-    public function getStatus()
+    public function getStatus(): int|string
     {
         // @todo: override or implement both getStatusOrder() and getStatusCreditNote()
     }
 
-    public function getPaymentMethod()
+    public function getPaymentMethod(): int|string|null
     {
         // @todo: override if MyWebShop supports credit notes and stores a separate payment method for them, otherwise remove.
     }
@@ -86,7 +86,7 @@ class Source extends BaseSource
     {
         // @todo: override or implement both getPaymentStatusOrder() and getPaymentStatusCreditNote()
         // Assumption: credit slips are always in a paid status.
-        if (($this->getType() === Source::Order && $this->getSource()->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
+        if (($this->getType() === Source::Order && $this->getShopObject()->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
             $result = Api::PaymentStatus_Paid;
         } else {
             $result = Api::PaymentStatus_Due;
@@ -113,7 +113,7 @@ class Source extends BaseSource
     public function getCurrency(): Currency
     {
         // @todo: provide implementation.
-        return new Currency($this->getSource()->currency_code, (float) $this->getSource()->conversion_rate, true);
+        return new Currency($this->getShopObject()->currency_code, (float) $this->getShopObject()->conversion_rate, true);
     }
 
     public function getTotals(): Totals

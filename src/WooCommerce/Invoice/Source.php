@@ -27,7 +27,6 @@ use function strlen;
  * 'shop_order' and 'shop_order_refund'. The base class for all these types of
  * orders is WC_Abstract_Order
  *
- * @method WC_Order|WC_Order_Refund|WC_Abstract_Order getSource()
  * @method WC_Order|WC_Order_Refund|WC_Abstract_Order getShopObject()
  */
 class Source extends BaseSource
@@ -64,7 +63,7 @@ class Source extends BaseSource
             throw new RuntimeException("$type is not a WC_Abstract_Order");
         }
         /** @noinspection PhpUndefinedMethodInspection */
-        $this->id = $this->getSource()->get_id();
+        $this->id = $this->getShopObject()->get_id();
     }
 
     /**
@@ -80,7 +79,7 @@ class Source extends BaseSource
      *   The user facing id for the web shop's invoice source. This is not
      *   necessarily the internal id.
      */
-    public function getReference()
+    public function getReference(): string|int
     {
         if ($this->getType() === Source::Order) {
             /** @var \WC_Order $order */
@@ -96,22 +95,26 @@ class Source extends BaseSource
     public function getDate(): string
     {
         // get_date_created() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->getSource()->get_date_created(), 0, strlen('2000-01-01'));
+        return substr((string) $this->getShopObject()->get_date_created(), 0, strlen('2000-01-01'));
     }
 
     /**
      * @inheritDoc
+     *
+     * @return string
+     *   The slug of the status (e.g. wc-completed).
      */
     public function getStatus(): string
     {
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        return $this->getSource()->get_status();
+        return $this->getShopObject()->get_status();
     }
 
     /**
      * {@inheritdoc}
      *
-     * This override returns the id of a WC_Payment_Gateway.
+     * @return ?string
+     *   This override returns the slug/id of a WC_Payment_Gateway.
      */
     public function getPaymentMethod(): ?string
     {
@@ -133,7 +136,7 @@ class Source extends BaseSource
      */
     protected function getPaymentStatusOrder(): int
     {
-        return $this->getSource()->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
+        return $this->getShopObject()->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     /**
@@ -164,7 +167,7 @@ class Source extends BaseSource
     {
         // get_date_paid() returns a WC_DateTime which has a _toString() method.
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        return substr((string) $this->getSource()->get_date_paid(), 0, strlen('2000-01-01'));
+        return substr((string) $this->getShopObject()->get_date_paid(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -179,7 +182,7 @@ class Source extends BaseSource
     protected function getPaymentDateCreditNote(): string
     {
         // get_date_modified() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->getSource()->get_date_modified(), 0, strlen('2000-01-01'));
+        return substr((string) $this->getShopObject()->get_date_modified(), 0, strlen('2000-01-01'));
     }
 
     public function getCountryCode(): string
@@ -212,7 +215,7 @@ class Source extends BaseSource
      */
     public function getTotals(): Totals
     {
-        return new Totals((float) $this->getSource()->get_total(), (float) $this->getSource()->get_total_tax());
+        return new Totals((float) $this->getShopObject()->get_total(), (float) $this->getShopObject()->get_total_tax());
     }
 
     /**
@@ -224,7 +227,7 @@ class Source extends BaseSource
     {
         /** @var \WC_Order_Refund $refund */
         $refund = $this->shopObject;
-        return $refund->get_parent_id();
+        return (int) $refund->get_parent_id();
     }
 
     /**
@@ -275,7 +278,7 @@ class Source extends BaseSource
      */
     public function getOtherLineInfos(): array
     {
-        return $this->getSource()->get_fees();
+        return $this->getShopObject()->get_fees();
     }
 
 

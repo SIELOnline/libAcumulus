@@ -19,7 +19,7 @@ class HttpRequestResponseTest extends TestCase
 {
     public function testGet(): void
     {
-        $httpRequest = new HttpRequest();
+        $httpRequest = new HttpRequest([CURLOPT_HTTPHEADER => ['Cache-Control: no-cache']]);
         $uri = 'http://localhost/lib-acumulus/readme.md';
         $response = $httpRequest->get($uri);
 

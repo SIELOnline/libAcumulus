@@ -19,39 +19,39 @@ class Source extends BaseSource
     protected function setShopObject(): void
     {
         $this->shopObject = new stdClass();
-        $this->getSource()->type = $this->getType();
-        $this->getSource()->id = $this->id;
+        $this->getShopObject()->type = $this->getType();
+        $this->getShopObject()->id = $this->id;
     }
 
     protected function setId(): void
     {
-        $this->id = (int) $this->getSource()->id;
+        $this->id = (int) $this->getShopObject()->id;
     }
 
     public function getDate(): string
     {
-        return $this->getSource()->date;
+        return $this->getShopObject()->date;
     }
 
-    public function getStatus(): string
+    public function getStatus(): int|string
     {
         return 'pending';
     }
 
-    public function getPaymentMethod(): ?string
+    public function getPaymentMethod(): int|string|null
     {
-        return $this->getSource()->payment->provider;
+        return $this->getShopObject()->payment->provider;
     }
 
     public function getPaymentStatus(): int
     {
-        return $this->getSource()->paid ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
+        return $this->getShopObject()->paid ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     public function getPaymentDate(): ?string
     {
         try {
-            $timestamp = $this->getSource()->payment->timestamp;
+            $timestamp = $this->getShopObject()->payment->timestamp;
             $date = new DateTime($timestamp);
             $result = $date->format('Y-m-d');
         } catch (Exception) {
@@ -67,12 +67,12 @@ class Source extends BaseSource
 
     public function getTotals(): Totals
     {
-        return new Totals($this->getSource()->amount, $this->getSource()->amount_vat);
+        return new Totals($this->getShopObject()->amount, $this->getShopObject()->amount_vat);
     }
 
     protected function getShopOrderOrId(): int
     {
-        return $this->getSource()->id;
+        return $this->getShopObject()->id;
     }
 
     protected function createItems(): array

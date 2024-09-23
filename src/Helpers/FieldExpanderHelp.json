@@ -19,7 +19,7 @@
             "amountInc": "",
             "amountVat": ""
         },
-        "getSource()": "The webshop order or credit note for this Source. See the PHP code from the webshop to find out what properties and methods are available",
+        "getShopObject()": "The webshop order or credit note for this Source. See the PHP code from the webshop to find out what properties and methods are available",
         "getOrder()": "If this Source object wraps an order, this Source object itself, otherwise the Source wrapper for the originating Order of this credit note.",
         "getParent()": "The Source wrapper around the originating Order for this credit note, or null if this Source wraps an Order. Can be used if you only want a value from the originating order for credit notes.",
         "getCreditNote(index)": "The credit note (type = Source) for this order, if this source is an order and has a credit note; this Source object itself it this source is a credit note, null otherwise.",

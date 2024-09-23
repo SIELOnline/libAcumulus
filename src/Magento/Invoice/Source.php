@@ -31,13 +31,12 @@ use function strlen;
  *
  * @property Order|Creditmemo shopObject
  * @method Order|Creditmemo getShopObject()
- * @method Order|Creditmemo getSource()
  */
 class Source extends BaseSource
 {
     protected function setId(): void
     {
-        $this->id = (int) $this->getSource()->getId();
+        $this->id = (int) $this->getShopObject()->getId();
     }
 
     protected function setShopObject(): void
@@ -87,29 +86,29 @@ class Source extends BaseSource
     }
 
     /**
-     * Returns the order reference.
+     * Returns the order reference (something like 00000123).
      *
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getReferenceOrder(): string
     {
-        return $this->getSource()->getIncrementId();
+        return $this->getShopObject()->getIncrementId();
     }
 
     /**
-     * Returns the credit note reference.
+     * Returns the credit note reference (something like CM00000123).
      *
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getReferenceCreditNote(): string
     {
-        return 'CM' . $this->getSource()->getIncrementId();
+        return 'CM' . $this->getShopObject()->getIncrementId();
     }
 
     public function getDate(): string
     {
         // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
-        return substr($this->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+        return substr($this->getShopObject()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
 
     /**
@@ -119,7 +118,7 @@ class Source extends BaseSource
      */
     protected function getStatusOrder(): string
     {
-        return $this->getSource()->getStatus();
+        return $this->getShopObject()->getStatus();
     }
 
     /**
@@ -135,22 +134,22 @@ class Source extends BaseSource
      */
     protected function getStatusCreditNote(): int
     {
-        return (int) $this->getSource()->getState();
+        return (int) $this->getShopObject()->getState();
     }
 
     /**
      * {@inheritdoc}
      *
-     * This override returns the internal method name of the chosen payment
-     * method.
+     * @return ?int
+     *   This override returns the internal method name of the chosen payment method.
      *
      * @noinspection BadExceptionsProcessingInspection
      */
-    public function getPaymentMethod()
+    public function getPaymentMethod(): ?string
     {
         try {
             return $this->getOrder()->getShopObject()->getPayment()->getMethod();
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return parent::getPaymentMethod();
         }
     }
@@ -166,7 +165,7 @@ class Source extends BaseSource
      */
     protected function getPaymentStatusOrder(): int
     {
-        return Number::isZero($this->getSource()->getBaseTotalDue())
+        return Number::isZero($this->getShopObject()->getBaseTotalDue())
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -183,7 +182,7 @@ class Source extends BaseSource
     protected function getPaymentStatusCreditNote(): int
     {
         // @todo: how and when does a credit note get the state refunded?
-        return (int) $this->getSource()->getState() === Creditmemo::STATE_REFUNDED
+        return (int) $this->getShopObject()->getState() === Creditmemo::STATE_REFUNDED
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -213,7 +212,7 @@ class Source extends BaseSource
         // Take date of last payment as payment date.
         $paymentDate = null;
         // @error: the history collection is largely empty in our test database??!
-        $statusHistoryCollection = $this->getSource()->getStatusHistoryCollection();
+        $statusHistoryCollection = $this->getShopObject()->getStatusHistoryCollection();
         foreach ($statusHistoryCollection as $statusChange) {
             /** @var \Magento\Sales\Model\Order\Status\History $statusChange */
             if (!$paymentDate || $this->isPaidStatus($statusChange->getStatus())) {
@@ -239,14 +238,14 @@ class Source extends BaseSource
     {
         // @todo: how and when does a credit note get the state refunded? when we know,
         //   createdAt will probably no longer be correct.
-        return (int) $this->getSource()->getState() === Creditmemo::STATE_REFUNDED
-            ? substr($this->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'))
+        return (int) $this->getShopObject()->getState() === Creditmemo::STATE_REFUNDED
+            ? substr($this->getShopObject()->getCreatedAt(), 0, strlen('yyyy-mm-dd'))
             : null;
     }
 
     public function getCurrency(): Currency
     {
-        return new Currency($this->getSource()->getOrderCurrencyCode(), (float) $this->getSource()->getBaseToOrderRate());
+        return new Currency($this->getShopObject()->getOrderCurrencyCode(), (float) $this->getShopObject()->getBaseToOrderRate());
     }
 
     /**
@@ -258,14 +257,14 @@ class Source extends BaseSource
     public function getTotals(): Totals
     {
         $sign = $this->getSign();
-        return new Totals($sign * $this->getSource()->getBaseGrandTotal(), $sign * $this->getSource()->getBaseTaxAmount());
+        return new Totals($sign * $this->getShopObject()->getBaseGrandTotal(), $sign * $this->getShopObject()->getBaseTaxAmount());
     }
 
     protected function setInvoice(): void
     {
         parent::setInvoice();
         if ($this->getType() === Source::Order) {
-            $shopInvoices = $this->getSource()->getInvoiceCollection();
+            $shopInvoices = $this->getShopObject()->getInvoiceCollection();
             if (count($shopInvoices) > 0) {
                 $this->invoice = $shopInvoices->getFirstItem();
             }
@@ -285,11 +284,12 @@ class Source extends BaseSource
     /**
      * {@see Source::getInvoiceReference()}
      *
+     * @return string|null
+     *   The increment id (with padding 0's, thus a string) or null if not yet set
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
     public function getInvoiceReferenceOrder(): ?string
     {
-        // A credit note is to be considered an invoice on its own.
         return $this->getInvoice() !== null ? $this->getInvoice()->getIncrementId() : null;
     }
 
@@ -323,7 +323,7 @@ class Source extends BaseSource
 
     public function getCountryCode(): string
     {
-        return $this->getSource()->getBillingAddress()->getCountryId();
+        return $this->getShopObject()->getBillingAddress()->getCountryId();
     }
 
     /**
@@ -333,7 +333,7 @@ class Source extends BaseSource
     {
         $result = [];
         // Items may be composed, so start with all "visible" items.
-        foreach ($this->getSource()->getAllVisibleItems() as $item) {
+        foreach ($this->getShopObject()->getAllVisibleItems() as $item) {
             $result[] = $this->getContainer()->createItem($this, $item);
         }
         return $result;
@@ -346,7 +346,7 @@ class Source extends BaseSource
     {
         $result = [];
         // A CreditMemo does not have the method getAllVisibleItems().
-        foreach ($this->getSource()->getAllItems() as $item) {
+        foreach ($this->getShopObject()->getAllItems() as $item) {
             // Only items for which row total is set, are refunded.
             if (!Number::isZero($item->getRowTotal())) {
                 $result[] = $this->getContainer()->createItem($this, $item);

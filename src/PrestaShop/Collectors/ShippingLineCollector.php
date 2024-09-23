@@ -65,8 +65,8 @@ class ShippingLineCollector extends LineCollector
         /** @noinspection NullPointerExceptionInspection */
         $vatBasedOn = $invoice->getCustomer()->getMainAddressType();
         $addressId = $vatBasedOn === AddressType::Invoice
-            ? $source->getOrder()->getSource()->id_address_invoice
-            : $source->getOrder()->getSource()->id_address_delivery;
+            ? $source->getOrder()->getShopObject()->id_address_invoice
+            : $source->getOrder()->getShopObject()->id_address_delivery;
         $this->addVatRateLookupMetadata($line, $addressId, $carrier->getIdTaxRulesGroup());
     }
 }

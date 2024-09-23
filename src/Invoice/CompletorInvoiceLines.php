@@ -18,6 +18,7 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Collectors\LineCollector;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
@@ -462,10 +463,7 @@ class CompletorInvoiceLines
                     if (!empty($line[Meta::ChildrenLines])) {
                         $precision *= count($line[Meta::ChildrenLines]);
                     }
-                    $vatRangeTags = Creator::getVatRangeTags($line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision);
-                    foreach ($vatRangeTags as $key => $value) {
-                        $line[$key] = $value;
-                    }
+                    LineCollector::addVatRangeTags($line, $line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision);
 
                     $fieldsCalculated[] = Tag::VatRate;
                 }
@@ -583,7 +581,7 @@ class CompletorInvoiceLines
         // Get the highest appearing vat rate. We could get the most often
         // appearing vat rate, but IMO the highest vat rate will be more likely
         // to be correct.
-        $maxVatRate = $this->getMaxAppearingVatRate($lines);
+        $maxVatRate = self::getMaxAppearingVatRate($lines);
 
         foreach ($lines as &$line) {
             $price = $line[Tag::UnitPrice] ?? $line[Meta::UnitPriceInc];

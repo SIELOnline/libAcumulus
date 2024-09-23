@@ -23,10 +23,13 @@ namespace Siel\Acumulus\Invoice;
 use ArrayAccess;
 use DateTime;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Collectors\LineCollector;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Message;
@@ -692,17 +695,16 @@ class Completor
                 $product = $this->t('fee_adjustment');
             }
 
-            $line = [
-                Tag::Product => $product,
-                Tag::Quantity => 1,
-                Tag::UnitPrice => $missingAmount,
-            ];
-            $line += Creator::getVatRangeTags($missingVatAmount, $missingAmount, $countLines * 0.02, $countLines * 0.02);
-            $line[Meta::SubType] = LineType::Corrector;
+            /** @var \Siel\Acumulus\Data\Line $line */
+            $line = Container::getContainer()->createAcumulusObject(DataType::Line);
+            $line->product = $product;
+            $line->quantity = 1;
+            $line->unitPrice = $missingAmount;
+            LineCollector::addVatRangeTags($line, $missingVatAmount, $missingAmount, $countLines * 0.02, $countLines * 0.02);
+            $line->metadataSet(Meta::SubType, LineType::Corrector);
             // Correct and add this line (round of correcting has already been
             // executed).
-            $line = Converter::getLineFromArray($line);
-            if ($line[Meta::VatRateSource] === VatRateSource::Calculated) {
+            if ($line->metadataGet(Meta::VatRateSource) === VatRateSource::Calculated) {
                 $this->LineCompletor->correctVatRateByRange($line);
             }
             $invoice[Tag::Line][] = $line;

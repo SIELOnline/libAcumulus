@@ -186,7 +186,7 @@ abstract class Source
      *
      * @noinspection PhpUnused  Called via callTypeSpecificMethod().
      */
-    public function getPaymentMethodCreditNote(): int|string|null
+    protected function getPaymentMethodCreditNote(): int|string|null
     {
         return $this->getOrder()->getPaymentMethod();
     }
@@ -199,7 +199,7 @@ abstract class Source
      * @return int|string|null
      *   A value identifying the payment method or null if unknown.
      */
-    public function getPaymentMethodOrder(): int|string|null
+    protected function getPaymentMethodOrder(): int|string|null
     {
         throw new RuntimeException('Source::getPaymentMethodOrder() not implemented for ' . get_class($this));
     }
@@ -335,7 +335,7 @@ abstract class Source
      *
      * @noinspection PhpUnused  Called via callTypeSpecificMethod().
      */
-    public function getInvoiceIdCreditNote(): ?int
+    protected function getInvoiceIdCreditNote(): ?int
     {
         // A credit note is to be considered an invoice on its own.
         return $this->getId();
@@ -358,7 +358,7 @@ abstract class Source
      *
      * @noinspection PhpUnused  Called via callTypeSpecificMethod().
      */
-    public function getInvoiceReferenceCreditNote(): int|string
+    protected function getInvoiceReferenceCreditNote(): int|string
     {
         // A credit note is to be considered an invoice on its own.
         return $this->getReference();
@@ -370,6 +370,8 @@ abstract class Source
      * @return string|null
      *   Date of the (web shop) invoice linked to this source: yyyy-mm-dd, or
      *   null if no web shop invoice is linked to this source.
+     *
+     * @todo: convert to type DateTime
      */
     public function getInvoiceDate(): ?string
     {
@@ -383,7 +385,7 @@ abstract class Source
      *
      * @todo: convert to type DateTime
      */
-    public function getInvoiceDateCreditNote(): ?string
+    protected function getInvoiceDateCreditNote(): ?string
     {
         // A credit note is to be considered an invoice on its own.
         return $this->getDate();
@@ -703,9 +705,6 @@ abstract class Source
      * @return mixed
      *   The return value of that method call, or null if the method does not
      *   exist.
-     *
-     * @todo: all methods called via this method can be made protected/private.
-     *   Is this so? Isn't visibility taken into account?
      */
     protected function callTypeSpecificMethod(string $method, ...$args): mixed
     {

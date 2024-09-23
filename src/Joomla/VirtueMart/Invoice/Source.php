@@ -212,7 +212,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused
      */
-    public function getInvoiceReferenceOrder()
+    protected function getInvoiceReferenceOrder()
     {
         return !empty($this->invoice['invoice_number']) ? $this->invoice['invoice_number'] : null;
     }
@@ -222,7 +222,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via {@see callTypeSpecificMethod()}.
      */
-    public function getInvoiceDateOrder(): ?string
+    protected function getInvoiceDateOrder(): ?string
     {
         return !empty($this->invoice['created_on']) ? date(Api::DateFormat_Iso, strtotime($this->invoice['created_on'])) : null;
     }

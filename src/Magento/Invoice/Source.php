@@ -1,9 +1,4 @@
 <?php
-/**
- * @noinspection PhpMissingParentCallCommonInspection  Base class contains a lot of
- *   fallback implementations that are not useful to call.
- * @noinspection PhpClassConstantAccessedViaChildClassInspection
- */
 
 declare(strict_types=1);
 
@@ -19,7 +14,6 @@ use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\Magento\Helpers\Registry;
-
 use Throwable;
 
 use function count;
@@ -276,7 +270,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
-    public function getInvoiceIdOrder(): ?int
+    protected function getInvoiceIdOrder(): ?int
     {
         return $this->getInvoice() !== null ? (int) $this->getInvoice()->getId() : null;
     }
@@ -288,7 +282,7 @@ class Source extends BaseSource
      *   The increment id (with padding 0's, thus a string) or null if not yet set
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
-    public function getInvoiceReferenceOrder(): ?string
+    protected function getInvoiceReferenceOrder(): ?string
     {
         return $this->getInvoice() !== null ? $this->getInvoice()->getIncrementId() : null;
     }
@@ -298,7 +292,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
-    public function getInvoiceDateOrder(): ?string
+    protected function getInvoiceDateOrder(): ?string
     {
         return $this->getInvoice() !== null ? substr($this->getInvoice()->getCreatedAt(), 0, strlen('2000-01-01')) : null;
     }

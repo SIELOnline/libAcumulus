@@ -233,7 +233,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via getInvoiceReference().
      */
-    public function getInvoiceReferenceOrder(): ?string
+    protected function getInvoiceReferenceOrder(): ?string
     {
         return !empty($this->getShopObject()->invoice_number)
             ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getShopObject()->id_lang, null, $this->getShopObject()->id_shop) . sprintf(
@@ -248,7 +248,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via getInvoiceDate().
      */
-    public function getInvoiceDateOrder(): ?string
+    protected function getInvoiceDateOrder(): ?string
     {
         return !empty($this->getShopObject()->invoice_number)
             ? substr($this->getShopObject()->invoice_date, 0, strlen('2000-01-01'))

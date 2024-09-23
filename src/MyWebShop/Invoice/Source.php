@@ -77,7 +77,7 @@ class Source extends BaseSource
         // @todo: override if MyWebShop supports credit notes and stores a separate payment method for them, otherwise remove.
     }
 
-    public function getPaymentMethodOrder()
+    protected function getPaymentMethodOrder(): int|string|null
     {
         // @todo: implement if MyWebShop does not support credit notes or does not store a separate payment method for them, otherwise remove.
     }
@@ -121,17 +121,17 @@ class Source extends BaseSource
         // @todo: provide implementation.
     }
 
-    public function getInvoiceReferenceOrder()
+    protected function getInvoiceReferenceOrder(): string|int|null
     {
         // @todo: implement if MyWebShop has separate Invoice numbers and references,, otherwise remove.
     }
 
-    public function getInvoiceDateOrder()
+    protected function getInvoiceDateOrder(): ?string
     {
         // @todo: implement if MyWebShop has separate Invoice dates, otherwise remove.
     }
 
-    protected function getShopOrderOrId()
+    protected function getShopOrderOrId(): object|array|int
     {
         // @todo: override if MyWebShop supports credit notes, otherwise remove.
     }

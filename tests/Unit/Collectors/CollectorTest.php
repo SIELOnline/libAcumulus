@@ -46,7 +46,7 @@ class CollectorTest extends TestCase
     public function testCollectAllEmpty(): void
     {
         $collector = $this->getCollector();
-        $propertySources = [];
+        $propertySources = $this->container->createPropertySources();
         $fieldMappings = [];
         $simpleTestObject = $collector->collect($propertySources, $fieldMappings);
         $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
@@ -61,13 +61,11 @@ class CollectorTest extends TestCase
         $nature = Api::Nature_Product;
         $unitPrice = '4.99';
 
-        $propertySources = [
-            'line' => [
-                'field_item_number' => $itemNumber,
-                'field_nature' => $nature,
-                'field_unit_price' => $unitPrice,
-            ],
-        ];
+        $propertySources = $this->container->createPropertySources()->add('line', [
+            'field_item_number' => $itemNumber,
+            'field_nature' => $nature,
+            'field_unit_price' => $unitPrice,
+        ]);
 
         $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->fieldMappings);
@@ -83,13 +81,11 @@ class CollectorTest extends TestCase
         $nature = Api::Nature_Product;
         $unitPrice = '4.99';
 
-        $propertySources = [
-            'line' => [
-                'field_item_number' => $itemNumber,
-                'field_nature' => $nature,
-                'field_unit_price' => $unitPrice,
-            ],
-        ];
+        $propertySources = $this->container->createPropertySources()->add('line', [
+            'field_item_number' => $itemNumber,
+            'field_nature' => $nature,
+            'field_unit_price' => $unitPrice,
+        ]);
 
         $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->nullFieldMappings);
@@ -105,23 +101,22 @@ class CollectorTest extends TestCase
         $nature = Api::Nature_Product;
         $unitPrice = '4.99';
 
-        $propertySources = [
-            'line' => [
+        $propertySources = $this->container->createPropertySources()
+            ->add('line', [
                 'field_item_number' => $itemNumber,
                 'field_nature' => $nature,
                 'field_unit_price' => $unitPrice,
-            ],
-            'customer' => [
+            ])
+            ->add('customer', [
                 'reduction' => 0.05,
-            ]
-        ];
+            ]);
 
         $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->fieldMappings);
         $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
         $this->assertSame((string) $itemNumber, $simpleTestObject->getItemNumber());
         $this->assertSame($nature, $simpleTestObject->getNature());
-        $reductionPrice = (1 - $propertySources['customer']['reduction']) * $propertySources['line']['field_unit_price'];
+        $reductionPrice = (1 - $propertySources->get('customer')['reduction']) * $propertySources->get('line')['field_unit_price'];
         $this->assertEqualsWithDelta((float) $reductionPrice, $simpleTestObject->getUnitPrice(), 0.000001);
     }
 }

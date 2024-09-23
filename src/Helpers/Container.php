@@ -21,6 +21,7 @@ use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Collectors\CollectorInterface;
 use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Completors\BaseCompletor;
 use Siel\Acumulus\Completors\CompletorTaskInterface;
 use Siel\Acumulus\Config\Config;
@@ -530,6 +531,11 @@ class Container
         // @legacy remove when all shops are fully converted to new architecture and
         //   the old Completor has been removed.
         return $this->getInstance('CompletorStrategyLines', 'Invoice', [$this->getConfig(), $this->getTranslator()]);
+    }
+
+    public function createPropertySources(): PropertySources
+    {
+        return $this->getInstance('PropertySources', 'Collectors', [], true);
     }
 
     public function getCollectorManager(): CollectorManager

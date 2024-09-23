@@ -39,12 +39,12 @@ abstract class Collector implements CollectorInterface
     private Translator $translator;
     private Log $log;
     /**
-     * @var array
-     *   String keyed array of "objects" that can provide properties to the
+     * @var \Siel\Acumulus\Collectors\PropertySources
+     *   String keyed set of "objects" that can provide properties to the
      *   {@see FieldExpander} for use in {@see collectMappedFields()} or just pass
      *   information for use in {@see collectLogicFields()}.
      */
-    private array $propertySources;
+    private PropertySources $propertySources;
 
     public function __construct(FieldExpander $fieldExpander, Container $container, Translator $translator, Log $log)
     {
@@ -110,7 +110,7 @@ abstract class Collector implements CollectorInterface
      */
     protected function getPropertySource(string $property): mixed
     {
-        return $this->propertySources[$property] ?? null;
+        return $this->propertySources->get($property);
     }
 
     /**
@@ -130,7 +130,7 @@ abstract class Collector implements CollectorInterface
      *   and data models of the host environment to get the (missing) values for
      *   the fields of the target {@see \Siel\Acumulus\Data\AcumulusObject}.
      */
-    public function collect(array $propertySources, array $fieldSpecifications): AcumulusObject
+    public function collect(PropertySources $propertySources, array $fieldSpecifications): AcumulusObject
     {
         $this->propertySources = $propertySources;
         $acumulusObject = $this->createAcumulusObject();

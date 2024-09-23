@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Helpers;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Helpers\Container;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\FieldExpander;
@@ -31,6 +32,11 @@ class FieldExpanderTest extends TestCase
         return self::$container;
     }
 
+    private function createPropertySources(): PropertySources
+    {
+        return $this->getContainer()->createPropertySources();
+    }
+
     public function getFieldExpander(): FieldExpander
     {
         return $this->getContainer()->getFieldExpander();
@@ -39,10 +45,14 @@ class FieldExpanderTest extends TestCase
     /**
      * Returns a few "objects" to test{@see  FieldExpander::expand()} with.
      */
-    private function getObjects(): array
+    private function getTestDataPropertySources(): PropertySources
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return (array) (new GetTestData())->get();
+        $testData = (new GetTestData())->get();
+        $result = $this->createPropertySources();
+        foreach ($testData as $name => $data) {
+            $result->add($name, $data);
+        }
+        return $result;
     }
 
     public function fieldsNoFieldsProvider(): array
@@ -61,7 +71,7 @@ class FieldExpanderTest extends TestCase
     public function testExpandNoVariableFields(string $fieldDefinition, string $expected): void
     {
         $field = $this->getFieldExpander();
-        $result = $field->expand($fieldDefinition, $this->getObjects());
+        $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
         $this->assertSame($expected, $result);
     }
 
@@ -78,7 +88,7 @@ class FieldExpanderTest extends TestCase
     public function testExpandNoObjects(string $fieldDefinition, string $expected): void
     {
         $field = $this->getFieldExpander();
-        $result = $field->expand($fieldDefinition, []);
+        $result = $field->expand($fieldDefinition, $this->createPropertySources());
         $this->assertSame($expected, $result);
     }
 
@@ -104,7 +114,7 @@ class FieldExpanderTest extends TestCase
     public function testExpand1Property(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
-        $result = $field->expand($fieldDefinition, $this->getObjects());
+        $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
         $this->assertSame($expected, $result);
     }
 
@@ -127,7 +137,7 @@ class FieldExpanderTest extends TestCase
     public function testExpandAlternatives(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
-        $result = $field->expand($fieldDefinition, $this->getObjects());
+        $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
         $this->assertSame($expected, $result);
     }
 
@@ -147,7 +157,7 @@ class FieldExpanderTest extends TestCase
     public function testExpandSpaceConcatenatedProperties(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
-        $result = $field->expand($fieldDefinition, $this->getObjects());
+        $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
         $this->assertSame($expected, $result);
     }
 
@@ -167,7 +177,7 @@ class FieldExpanderTest extends TestCase
     public function testExpandConcatenatedProperties(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
-        $result = $field->expand($fieldDefinition, $this->getObjects());
+        $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
         $this->assertSame($expected, $result);
     }
 
@@ -192,7 +202,7 @@ class FieldExpanderTest extends TestCase
     public function testExpandWithLiterals(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
-        $result = $field->expand($fieldDefinition, $this->getObjects());
+        $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
         $this->assertSame($expected, $result);
     }
 
@@ -211,7 +221,7 @@ class FieldExpanderTest extends TestCase
     public function testExpandComplexFields(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
-        $result = $field->expand($fieldDefinition, $this->getObjects());
+        $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
         $this->assertSame($expected, $result);
     }
 
@@ -232,7 +242,7 @@ class FieldExpanderTest extends TestCase
      */
     public function testObjects(string $fieldDefinition, $expected): void
     {
-        $objects = ['container' => $this->getContainer()];
+        $objects = $this->createPropertySources()->add('container', $this->getContainer());
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $objects);
         $this->assertSame($expected, $result);
@@ -257,14 +267,15 @@ class FieldExpanderTest extends TestCase
      */
     public function testObjectWithNumericArray(string $fieldDefinition, $expected): void
     {
-        $objects = $this->getObjects() + [
-                'source' => new class {
-                    public function getSign(): int
-                    {
-                        return 1;
-                    }
-                },
-            ];
+        $objects = $this->getTestDataPropertySources()->add(
+            'source',
+            new class {
+                public function getSign(): int
+                {
+                    return 1;
+                }
+            }
+        );
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $objects);
         $this->assertSame($expected, $result);
@@ -275,7 +286,7 @@ class FieldExpanderTest extends TestCase
      */
     public function testParameterPassing(): void
     {
-        $objects = ['container' => $this->getContainer()];
+        $objects = $this->createPropertySources()->add('container', $this->getContainer());
         $field = $this->getFieldExpander();
         $result1 = $field->expand('[container::getFormRenderer(true)]', $objects);
         $this->assertInstanceOf(FormRenderer::class, $result1);
@@ -292,14 +303,15 @@ class FieldExpanderTest extends TestCase
      */
     public function testSign(): void
     {
-        $objects = $this->getObjects() + [
-            'source' => new class {
+        $objects = $this->getTestDataPropertySources()->add(
+            'source',
+            new class {
                 public function getSign(): int
                 {
                     return 1;
                 }
-            },
-        ];
+            }
+        );
         $field = $this->getFieldExpander();
         $result1 = $field->expand('[order::amount]', $objects);
         $result2 = $field->expand('[sign*order::amount]', $objects);
@@ -308,14 +320,15 @@ class FieldExpanderTest extends TestCase
         $result4 = $field->expand('[sign*order::amount1|order::amount]', $objects);
         $this->assertSame($result3, $result4);
 
-        $objects = $this->getObjects() + [
-            'source' => new class {
+        $objects = $this->getTestDataPropertySources()->add(
+            'source',
+            new class {
                 public function getSign(): int
                 {
                     return -1;
                 }
-            },
-        ];
+            }
+        );
         $field = $this->getFieldExpander();
         $result1 = $field->expand('[order::amount]', $objects);
         $result2 = $field->expand('[sign*order::amount]', $objects);

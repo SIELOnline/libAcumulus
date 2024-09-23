@@ -6,7 +6,6 @@ namespace Siel\Acumulus\PrestaShop\Collectors;
 
 use Address;
 use Siel\Acumulus\Collectors\CollectorManager as BaseCollectorManager;
-use Siel\Acumulus\Invoice\Source;
 
 /**
  * CollectorManager contains a PrestaShop specific override for
@@ -14,15 +13,11 @@ use Siel\Acumulus\Invoice\Source;
  */
 class CollectorManager extends BaseCollectorManager
 {
-    public function setPropertySourcesForSource(Source $source): BaseCollectorManager
+    public function addShopPropertySources(): void
     {
-        parent::setPropertySourcesForSource($source);
-
         /** @var \Order $order */
-        $order = $source->getOrder()->getShopObject();
-        $this->addPropertySource('address_invoice', new Address($order->id_address_invoice));
-        $this->addPropertySource('address_shipping', new Address($order->id_address_delivery));
-
-        return $this;
+        $order = $this->getPropertySources()->get('source')->getOrder()->getShopObject();
+        $this->getPropertySources()->add('address_invoice', new Address($order->id_address_invoice));
+        $this->getPropertySources()->add('address_shipping', new Address($order->id_address_delivery));
     }
 }

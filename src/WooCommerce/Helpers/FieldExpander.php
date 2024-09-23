@@ -24,7 +24,7 @@ class FieldExpander extends BaseFieldExpander
      * @return mixed|string|null
      *   Description.
      */
-    protected function getPropertyFromObjectByGetterMethod(object $variable, string $property, array $args)
+    protected function getPropertyFromObjectByGetterMethod(object $variable, string $property, array $args): mixed
     {
         if ($variable instanceof WC_Data) {
             $method1 = $property;
@@ -65,7 +65,7 @@ class FieldExpander extends BaseFieldExpander
      * @noinspection OffsetOperationsInspection
      *   explode can return false but won't.
      */
-    protected function getDataValue(array $data, string $property)
+    protected function getDataValue(array $data, string $property): mixed
     {
         $value = null;
         if (array_key_exists($property, $data)) {
@@ -107,7 +107,7 @@ class FieldExpander extends BaseFieldExpander
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
      */
-    protected function getMetaDataValue(array $metaData, string $property)
+    protected function getMetaDataValue(array $metaData, string $property): mixed
     {
         $property = ltrim($property, '_');
         $value = null;

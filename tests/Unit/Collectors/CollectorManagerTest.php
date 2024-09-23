@@ -27,7 +27,6 @@ class CollectorManagerTest extends TestCase
 
     private function getInvoiceSource(): Source
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $objects = (new GetTestData())->get();
         $order = $objects->order;
         return $this->getContainer()->createSource(Source::Order, $order);
@@ -96,9 +95,9 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectCustomer(): void
     {
-        $customer = $this->getContainer()->getCollectorManager()
-            ->setPropertySourcesForSource($this->getInvoiceSource())
-            ->collectCustomer();
+        $collectorManager = $this->getContainer()->getCollectorManager();
+        $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
+        $customer = $collectorManager->collectCustomer();
 
         $this->assertNull($customer->contactId);
         $this->assertNull($customer->type);
@@ -125,9 +124,9 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectAddress(): void
     {
-        $invoiceAddress = $this->getContainer()->getCollectorManager()
-            ->setPropertySourcesForSource($this->getInvoiceSource())
-            ->collectAddress(AddressType::Invoice);
+        $collectorManager = $this->getContainer()->getCollectorManager();
+        $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
+        $invoiceAddress = $collectorManager->collectAddress(AddressType::Invoice);
 
         $this->assertSame('Buro RaDer', $invoiceAddress->companyName1);
         $this->assertNull($invoiceAddress->companyName2);
@@ -156,9 +155,9 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectEmailAsPdf(): void
     {
-        $invoiceEmailAsPdf = $this->getContainer()->getCollectorManager()
-            ->setPropertySourcesForSource($this->getInvoiceSource())
-            ->collectEmailAsPdf(EmailAsPdfType::Invoice);
+        $collectorManager = $this->getContainer()->getCollectorManager();
+        $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
+        $invoiceEmailAsPdf = $collectorManager->collectEmailAsPdf(EmailAsPdfType::Invoice);
 
         $this->assertNull($invoiceEmailAsPdf->emailFrom);
         $this->assertSame('customer@example.com', $invoiceEmailAsPdf->emailTo);

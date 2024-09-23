@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\TestWebShop\TestDoubles\Helpers\FieldExpander;
 
@@ -23,6 +24,11 @@ use Siel\Acumulus\TestWebShop\TestDoubles\Helpers\FieldExpander;
 class FieldParsingTest extends TestCase
 {
     private static Container $container;
+
+    private function createPropertySources(): PropertySources
+    {
+        return self::$container->createPropertySources();
+    }
 
     public static function setUpBeforeClass(): void
     {
@@ -47,7 +53,7 @@ class FieldParsingTest extends TestCase
         $log = self::$container->getLog();
         $stopAt = 'expandSpecification';
         $vf = new FieldExpander($log, $stopAt);
-        $result = $vf->expand($field, []);
+        $result = $vf->expand($field, $this->createPropertySources());
         $this->assertSame($field, $result);
         $this->assertEmpty($vf->trace);
     }
@@ -71,7 +77,7 @@ class FieldParsingTest extends TestCase
         $stopAt = 'expandSpecification';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $result = $vf->expand($field, []);
+        $result = $vf->expand($field, $this->createPropertySources());
         $this->assertCount(1, $vf->trace[$stopAt]);
         $this->assertSame($match, reset($vf->trace[$stopAt]));
     }
@@ -95,7 +101,7 @@ class FieldParsingTest extends TestCase
         $stopAt = 'expandSpecification';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $result = $vf->expand($field, []);
+        $result = $vf->expand($field, $this->createPropertySources());
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
     }
 
@@ -116,7 +122,7 @@ class FieldParsingTest extends TestCase
         $stopAt = 'expandAlternative';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $result = $vf->expand($field, []);
+        $result = $vf->expand($field, $this->createPropertySources());
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
     }
 
@@ -138,7 +144,7 @@ class FieldParsingTest extends TestCase
         $stopAt = 'expandSpaceConcatenatedProperty';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $result = $vf->expand($field, []);
+        $result = $vf->expand($field, $this->createPropertySources());
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
     }
 
@@ -160,7 +166,7 @@ class FieldParsingTest extends TestCase
         $stopAt = 'expandSingleProperty';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $result = $vf->expand($field, []);
+        $result = $vf->expand($field, $this->createPropertySources());
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
         $logEntry = 'expandSpaceConcatenatedProperty';
         $this->assertEqualsCanonicalizing($spaceConcatenatedProperties, $vf->trace[$logEntry]);
@@ -184,7 +190,7 @@ class FieldParsingTest extends TestCase
         $stopAt = '';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $result = $vf->expand($field, []);
+        $result = $vf->expand($field, $this->createPropertySources());
         $this->assertEqualsCanonicalizing($propertiesInObject, $vf->trace['expandPropertyInObject']);
         $this->assertEqualsCanonicalizing($properties, $vf->trace['expandProperty']);
         $this->assertEqualsCanonicalizing($literals, $vf->trace['getLiteral']);

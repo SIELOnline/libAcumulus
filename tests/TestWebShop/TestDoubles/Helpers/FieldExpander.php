@@ -36,7 +36,7 @@ class FieldExpander extends BaseFieldExpander
         return parent::expansionSpecificationMatch($matches);
     }
 
-    protected function expandSpecification(string $expansionSpecification)
+    protected function expandSpecification(string $expansionSpecification): mixed
     {
         $this->trace[__FUNCTION__] ??= [];
         $this->trace[__FUNCTION__][] = func_get_arg(0);
@@ -46,7 +46,7 @@ class FieldExpander extends BaseFieldExpander
         return parent::expandSpecification($expansionSpecification);
     }
 
-    protected function expandAlternative(string $propertyAlternative)
+    protected function expandAlternative(string $propertyAlternative): mixed
     {
         $this->trace[__FUNCTION__] ??= [];
         $this->trace[__FUNCTION__][] = func_get_arg(0);
@@ -86,7 +86,7 @@ class FieldExpander extends BaseFieldExpander
         return parent::getLiteral($singleProperty);
     }
 
-    protected function expandPropertyInObject(string $propertyInObject)
+    protected function expandPropertyInObject(string $propertyInObject): mixed
     {
         $this->trace[__FUNCTION__] ??= [];
         $this->trace[__FUNCTION__][] = func_get_arg(0);
@@ -96,7 +96,7 @@ class FieldExpander extends BaseFieldExpander
         return parent::expandPropertyInObject($propertyInObject);
     }
 
-    protected function expandProperty(string $propertyName)
+    protected function expandProperty(string $propertyName): mixed
     {
         $this->trace[__FUNCTION__] ??= [];
         $this->trace[__FUNCTION__][] = func_get_arg(0);

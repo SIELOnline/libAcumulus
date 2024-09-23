@@ -19,20 +19,18 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Throwable;
 
 /**
  * CollectorManager manages the collector phase.
  *
  * Why this CollectorManager?
  * {@see \Siel\Acumulus\Data\AcumulusObject AcumulusObjects} and
- * {@see \Siel\Acumulus\Data\AcumulusProperty AcumulusProperties} are data
- * objects. {@see \Siel\Acumulus\Collectors\Collector Collectors} are the most
- * shop dependent classes and, to facilitate supporting a new shop, should
- * therefore be dumb, dumber, and dumbest. So Collectors should not have to know
- * where mappings and sources come from, they should be passed in and the
- * Collector should do its work: extracting values from the sources and place
- * them into the {@see AcumulusObject} to be returned.
+ * {@see \Siel\Acumulus\Data\AcumulusProperty AcumulusProperties} are data objects.
+ * {@see \Siel\Acumulus\Collectors\Collector Collectors} are the most shop dependent
+ * classes and should therefore be as dumb as possible. So Collectors should not have to
+ * know where mappings and sources come from, they should be passed in and the Collector
+ * should do its work: extracting values from the sources and place them into the
+ * {@see AcumulusObject} to be returned.
  *
  * Enter the CollectorManager that, like a controller:
  * - Creates the required {@see Collector Collectors}.
@@ -48,8 +46,7 @@ class CollectorManager
     private Container $container;
     private Mappings $mappings;
     private Log $log;
-
-    private array $propertySources;
+    private PropertySources $propertySources;
 
     public function __construct(FieldExpander $fieldExpander, Mappings $mappings, Container $container, Log $log)
     {
@@ -57,7 +54,6 @@ class CollectorManager
         $this->container = $container;
         $this->mappings = $mappings;
         $this->log = $log;
-        $this->propertySources = [];
     }
 
     protected function getContainer(): Container
@@ -75,64 +71,20 @@ class CollectorManager
         return $this->log;
     }
 
-    protected function getPropertySources(): array
+    public function getPropertySources(): PropertySources
     {
+        if (!isset($this->propertySources)) {
+            $this->propertySources = $this->getContainer()->createPropertySources();
+        }
         return $this->propertySources;
     }
 
     /**
-     * Clears the list of sources to search for a property when expanding fields.
-     *
-     * @return $this
+     * Allows shops tos et shop specific property sources for the already added
+     * {@see \Siel\Acumulus\Invoice\Source}.
      */
-    public function clearPropertySources(): CollectorManager
+    public function addShopPropertySources(): void
     {
-        $this->propertySources = [];
-        return $this;
-    }
-
-    /**
-     * Adds an object as property source.
-     *
-     * The object is added to the start of the array. Thus, upon token expansion
-     * it will be searched before other (already added) property sources.
-     * If an object already exists under that name, the existing one will be
-     * removed from the array.
-     *
-     * @param string $name
-     *   The name to use for the source
-     * @param mixed $property
-     *   The source to add, typically an object or an array, but may be a scalar.
-     *
-     * @return $this
-     */
-    public function addPropertySource(string $name, mixed $property): CollectorManager
-    {
-        $this->propertySources = array_merge($this->propertySources, [$name => $property]);
-        return $this;
-    }
-
-    /**
-     * Removes an object as property source.
-     *
-     * @param string $name
-     *   The name of the source to remove.
-     *
-     * @return $this
-     */
-    public function removePropertySource(string $name): CollectorManager
-    {
-        unset($this->propertySources[$name]);
-        return $this;
-    }
-
-    /**
-     * Sets the property sources for the given {@see \Siel\Acumulus\Invoice\Source}.
-     */
-    public function setPropertySourcesForSource(Source $source): CollectorManager
-    {
-        $this->addPropertySource('source', $source);
-        return $this;
     }
 
     /**
@@ -140,10 +92,12 @@ class CollectorManager
      */
     public function collectInvoiceForSource(Source $source, InvoiceAddResult $localResult): Invoice
     {
-        return $this->clearPropertySources()
-            ->addPropertySource('localResult', $localResult)
-            ->setPropertySourcesForSource($source)
-            ->collectInvoice();
+        $this->getPropertySources()
+            ->clear()
+            ->add('localResult', $localResult)
+            ->add('source', $source);
+        $this->addShopPropertySources();
+        return $this->collectInvoice();
     }
 
     public function collectInvoice(): Invoice
@@ -209,10 +163,10 @@ class CollectorManager
      */
     private function collectLines(Invoice $invoice): void
     {
-        $this->addPropertySource('invoice', $invoice);
+        $this->getPropertySources()->add('invoice', $invoice);
 
         /** @var Source $source */
-        $source = $this->getPropertySources()['source'];
+        $source = $this->getPropertySources()->get('source');
         $this->collectItemLines($invoice, $source);
         $this->collectShippingLines($invoice);
         $this->collectGiftWrappingLines($invoice);
@@ -222,7 +176,7 @@ class CollectorManager
         $this->collectManualLines($invoice);
         $this->collectVoucherLines($invoice);
 
-        $this->removePropertySource('invoice');
+        $this->getPropertySources()->remove('invoice');
     }
 
     /**
@@ -231,7 +185,7 @@ class CollectorManager
      * @todo: convert to structure of how other line types are collected, but after event
      *   triggering has been added to that. Note that child handling then should be
      *   adapted for item lines.
- */
+     */
     protected function collectItemLines(Invoice $invoice, Source $source): void
     {
         $lineCollector = $this->getContainer()->getCollector(DataType::Line, LineType::Item);
@@ -239,18 +193,18 @@ class CollectorManager
 
         $items = $source->getItems();
         foreach ($items as $item) {
-            $this->addPropertySource('item', $item);
+            $this->getPropertySources()->add('item', $item);
             $product = $item->getProduct();
             if ($product !== null) {
-                $this->addPropertySource('product', $product);
+                $this->getPropertySources()->add('product', $product);
             }
             $this->getContainer()->getEvent()->triggerItemLineCollectBefore($item, $this);
             /** @var \Siel\Acumulus\Data\Line $line */
             $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);
             $this->getContainer()->getEvent()->triggerItemLineCollectAfter($line, $item, $this);
             $invoice->addLine($line);
-            $this->removePropertySource('product');
-            $this->removePropertySource('item');
+            $this->getPropertySources()->remove('product');
+            $this->getPropertySources()->remove('item');
         }
     }
 
@@ -336,7 +290,7 @@ class CollectorManager
     protected function collectLinesForType(Invoice $invoice, string $lineType): void
     {
         /** @var Source $source */
-        $source = $this->getPropertySources()['source'];
+        $source = $this->getPropertySources()->get('source');
         $getInfosMethod = "get{$lineType}Infos";
         $propertySourceName = lcfirst($lineType) . 'Info';
 
@@ -345,8 +299,8 @@ class CollectorManager
 
         $infos = $source->$getInfosMethod();
         foreach ($infos as $key => $item) {
-            $this->addPropertySource($propertySourceName, $item);
-            $this->addPropertySource('key', $key);
+            $this->getPropertySources()->add($propertySourceName, $item);
+            $this->getPropertySources()->add('key', $key);
 //            $this->getContainer()->getEvent()->triggerLineCollectBefore($lineType, $item, $this);
             /** @var \Siel\Acumulus\Data\Line $line */
             $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);
@@ -359,7 +313,8 @@ class CollectorManager
                 $invoice->addLine($child);
             }
             $line->removeChildren();
-            $this->removePropertySource($propertySourceName);
+            $this->getPropertySources()->remove('key');
+            $this->getPropertySources()->remove($propertySourceName);
         }
     }
 }

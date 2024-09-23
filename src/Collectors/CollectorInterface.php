@@ -41,7 +41,7 @@ interface CollectorInterface
      *   internal country id, or getting a tax rate based on tax class id of the
      *   product and address data from the customer.
      *
-     * @param array[] $propertySources
+     * @param \Siel\Acumulus\Collectors\PropertySources $propertySources
      *   The objects that serve as a source for property extraction. Note that
      *    the {@see \Siel\Acumulus\Helpers\FieldExpander} class can also call
      *    (parameterless) methods on the property sources.
@@ -55,5 +55,5 @@ interface CollectorInterface
      *   $propertySources, the $fieldDefinitions, and the logic of a class
      *   implementing this interface.
      */
-    public function collect(array $propertySources, array $fieldSpecifications): AcumulusObject;
+    public function collect(PropertySources $propertySources, array $fieldSpecifications): AcumulusObject;
 }

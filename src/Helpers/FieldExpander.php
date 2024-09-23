@@ -10,6 +10,7 @@ namespace Siel\Acumulus\Helpers;
 
 use Exception;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Meta;
 
 use function array_key_exists;
@@ -31,9 +32,9 @@ use function strlen;
  * - Logic: further split into "simple" mapping logic or "complex" computational
  *   logic:
  *   - Mappings: e.g. 'city' comes from the field 'city' from the customer's
- *     address, or 'fullname' is the concatenation of 'first_name' and
- *     'last_name' from the customer object.
- *   - Complex logic: often involving navigating relations in a database, with
+ *     address, or 'full_name' is the concatenation of 'first_name' and
+ *      'last_name' from the customer object.
+ *    - Complex logic: often involving navigating relations in a database, with
  *     edge case handling, fallback values, and such.
  * - Combination from settings and logic: e.g. based on the setting "invoice
  *   number source", the invoice number is either defined by Acumulus, or comes
@@ -141,11 +142,14 @@ use function strlen;
  * Example 3:
  * <pre>
  *   objects = [
- *     'order => (id = 3, date_created = 2016-02-03, ...),
- *     'customer' => (id = 5, date_created = 2016-01-01, name = 'Doe',
- *       address => (street = 'Kalverstraat', number = '7', city = 'Amsterdam', ...),
+ *     'order = {id = 3, date_created = 2016-02-03, ...},
+ *     'customer' = {
+ *       id = 5,
+ *       date_created = 2016-01-01,
+ *       name = 'Doe',
+ *       address = {street = 'Kalverstraat', number = '7', city = 'Amsterdam', ...},
  *       ...
- *     ),
+ *     },
  *    ];
  *   $pattern1 = '[id] [date_created] [name]'
  *   $pattern2 = '[customer::id] [customer::date_created] [name]'
@@ -218,7 +222,7 @@ class FieldExpander
      *
      * @param string $fieldSpecification
      *   The field expansion specification.
-     * @param array $objects
+     * @param PropertySources $propertySources
      *   The "objects" to search for the properties that are referenced in the
      *   variable field parts. The key indicates the name of the "object",
      *   typically the class name (with a lower cased 1st character) or the
@@ -234,9 +238,9 @@ class FieldExpander
      *       the first and only ']' is at the end.
      *     - string otherwise.
      */
-    public function expand(string $fieldSpecification, array $objects)
+    public function expand(string $fieldSpecification, PropertySources $propertySources): mixed
     {
-        $this->objects = $objects;
+        $this->objects = $propertySources->toArray();
         // If the specification contains exactly 1 field expansion specification
         // we return the direct result of {@see extractField()} so that the type
         // of that property is retained.
@@ -275,7 +279,7 @@ class FieldExpander
     /**
      * Expands a single "expansion-specification".
      *
-     * - expansion-specification = property-alternative('|'property-alternative)*
+     * - expansion-specification = property-alternative("|"property-alternative)*
      *
      * The first alternative resulting in a non-empty value is returned.
      *
@@ -286,7 +290,7 @@ class FieldExpander
      *   The expanded value of the specification. This may result in null or the
      *   empty string if the referenced property(ies) is (are all) empty.
      */
-    protected function expandSpecification(string $expansionSpecification)
+    protected function expandSpecification(string $expansionSpecification): mixed
     {
         $value = null;
         if (str_starts_with($expansionSpecification, 'sign*')) {
@@ -318,11 +322,9 @@ class FieldExpander
     /**
      * Expands a Property alternative.
      *
-     * - property-alternative = space-concatenated-property('+'space-concatenated-property)*
-     *
-     * @return mixed
+     * - property-alternative = space-concatenated-property("+"space-concatenated-property)*
      */
-    protected function expandAlternative(string $propertyAlternative)
+    protected function expandAlternative(string $propertyAlternative): mixed
     {
         $spaceConcatenatedProperties = explode('+', $propertyAlternative);
         $spaceConcatenatedValues = [];
@@ -418,7 +420,7 @@ class FieldExpander
      * @return mixed
      *   The value 'implied' by the constant, for now a bool or null.
      */
-    protected function getConstant(string $singleProperty)
+    protected function getConstant(string $singleProperty): mixed
     {
         return static::Constants[$singleProperty];
     }
@@ -438,7 +440,7 @@ class FieldExpander
      *   the value of the property, or the empty string or null if the property
      *   was not found (or equals null or the empty string).
      */
-    protected function expandPropertyInObject(string $propertyInObject)
+    protected function expandPropertyInObject(string $propertyInObject): mixed
     {
         // Start searching in the "super object".
         $property = $this->objects;
@@ -464,7 +466,7 @@ class FieldExpander
      * @return mixed
      *   the value of the property, or null if the property was not found.
      */
-    protected function expandProperty(string $propertyName)
+    protected function expandProperty(string $propertyName): mixed
     {
         foreach ($this->objects as $object) {
             $property = $this->getProperty($propertyName, $object);
@@ -500,7 +502,7 @@ class FieldExpander
      *   The value for the property of the given name, or null or the empty
      *   string if not available.
      */
-    protected function getProperty(string $property, object|array $object)
+    protected function getProperty(string $property, object|array $object): mixed
     {
         $value = null;
 
@@ -563,7 +565,7 @@ class FieldExpander
      *
      * @noinspection PhpUsageOfSilenceOperatorInspection
      */
-    protected function getPropertyFromObjectByGetterMethod(object $variable, string $property, array $args)
+    protected function getPropertyFromObjectByGetterMethod(object $variable, string $property, array $args): mixed
     {
         $value = null;
         $method1 = $property;

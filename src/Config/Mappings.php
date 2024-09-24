@@ -11,6 +11,7 @@ use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
 
+use function array_key_exists;
 use function in_array;
 use function is_array;
 use function is_string;
@@ -250,22 +251,34 @@ class Mappings
     }
 
     /**
-     * Returns only the values that do differ from the defaults.
+     * Returns only the values that do differ from the existing values.
      */
     protected function getOverriddenValues(array $mappings, array $existingMappings): array
     {
         $result = [];
         foreach ($mappings as $key => $value) {
-            $existingValue = $existingMappings[$key] ?? '';
-            if (is_array($value)) {
-                $result[$key] = $this->getOverriddenValues($value, $existingValue);
+            if (array_key_exists($key, $existingMappings)) {
+                $existingValue = $existingMappings[$key];
+                if (is_array($value)) {
+                    if (is_array($existingValue)) {
+                        // new and existing values are arrays: recursively get only the
+                        //  differing ones.
+                        $result[$key] = $this->getOverriddenValues($value, $existingValue);
+                    } else {
+                        // existing value is not an array: value differs.
+                        $result[$key] = $value;
+                    }
+                } else {
+                    if (!is_string($existingValue)) {
+                        $existingValue = json_encode($existingValue, Meta::JsonFlags);
+                    }
+                    if ($value !== $existingValue) {
+                        $result[$key] = $value;
+                    }
+                }
             } else {
-                if (!is_string($existingValue)) {
-                    $existingValue = json_encode($existingValue, Meta::JsonFlags);
-                }
-                if ($value !== $existingValue) {
-                    $result[$key] = $value;
-                }
+                // New value: certainly differs from non-existing
+                $result[$key] = $value;
             }
         }
         return $result;

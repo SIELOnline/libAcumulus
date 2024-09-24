@@ -573,20 +573,25 @@ class Container
             $this->getTranslator(),
             $this->getLog(),
         ]);
-        try {
-            if ($subType !== null) {
+        $result = null;
+        // A subtype specific Collector may exist: try to get it.
+        if ($subType !== null) {
+            try {
                 // If a collector exists specific for the $subType, the constructor
                 // arguments will be the same for each instance creation of that $subType
                 // collector, so no need to create multiple instances.
-                return $this->getInstance("{$subType}Collector", 'Collectors', $arguments);
+                $result = $this->getInstance("{$subType}Collector", 'Collectors', $arguments);
+            } catch (InvalidArgumentException) {
             }
-        } catch (InvalidArgumentException) {
         }
         // We need separate instances if $subType is part of the constructor arguments but
         // not of the class name.
         // (We would need only 1 instance per subtype, but for now the caching keys cannot
         // take this into account, so we create a new instance with every call.)
-        return $this->getInstance("{$type}Collector", 'Collectors', $arguments, $subType !== null);
+        if ($result === null) {
+            $result = $this->getInstance("{$type}Collector", 'Collectors', $arguments, $subType !== null);
+        }
+        return $result;
     }
 
     /**

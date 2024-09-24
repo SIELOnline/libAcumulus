@@ -21,6 +21,7 @@ use Siel\Acumulus\Completors\CustomerCompletor;
 use Siel\Acumulus\Completors\InvoiceCompletor;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ConfigUpgrade;
+use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Customer;
@@ -31,6 +32,7 @@ use Siel\Acumulus\Data\EmailPackingSlipAsPdf;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\CrashReporter;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\FieldExpanderHelp;
@@ -41,7 +43,10 @@ use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\Item;
+use Siel\Acumulus\Invoice\Product;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\WooCommerce\Collectors\ItemLineCollector;
 use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager;
 use Siel\Acumulus\Shop\BatchForm;
@@ -61,6 +66,9 @@ use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Util;
 
+use Siel\Acumulus\WooCommerce\Collectors\OtherLineCollector;
+use Siel\Acumulus\WooCommerce\Collectors\ShippingLineCollector;
+
 use function get_class;
 
 /**
@@ -78,11 +86,17 @@ class ContainerTest extends TestCase
      */
     public function testHelpersNamespace1(): void
     {
-        $container = new Container('WooCommerce');
+        $container = new Container('TestWebShop');
+        $object = Container::getContainer();
+        $this->assertInstanceOf(Container::class, $object);
         $object = $container->getLog();
         $this->assertInstanceOf(Log::class, $object);
         $object = $container->getTranslator();
         $this->assertInstanceOf(Translator::class, $object);
+        $object = $container->getUtil();
+        $this->assertInstanceOf(Util::class, $object);
+        $object = $container->getCheckAccount();
+        $this->assertInstanceOf(CheckAccount::class, $object);
         $object = $container->getRequirements();
         $this->assertInstanceOf(Requirements::class, $object);
         $object = $container->getUtil();
@@ -108,6 +122,8 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ConfigUpgrade::class, $object);
         $object = $container->getConfig();
         $this->assertInstanceOf(Config::class, $object);
+        $object = $container->getMappings();
+        $this->assertInstanceOf(Mappings::class, $object);
     }
 
     public function testApiClientNamespace(): void
@@ -121,43 +137,54 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(AcumulusRequest::class, $object);
     }
 
-    public function testDataNameSpace(): void
+    public function dataNameSpaceDataProvider(): array
     {
-        $container = new Container('TestWebShop');
-        $dataTypes = [
-            DataType::Address => Address::class,
-            DataType::Customer => Customer::class,
-            DataType::EmailInvoiceAsPdf => EmailInvoiceAsPdf::class,
-            DataType::EmailPackingSlipAsPdf => EmailPackingSlipAsPdf::class,
-            DataType::Invoice => Invoice::class,
-            DataType::Line => Line::class,
+        return [
+            [DataType::Address, Address::class,],
+            [DataType::Customer, Customer::class,],
+            [DataType::EmailInvoiceAsPdf, EmailInvoiceAsPdf::class,],
+            [DataType::EmailPackingSlipAsPdf, EmailPackingSlipAsPdf::class,],
+            [DataType::Invoice, Invoice::class,],
+            [DataType::Line, Line::class,],
         ];
-        foreach ($dataTypes as $dataType => $dataClass) {
-            $object = $container->createAcumulusObject($dataType);
-            /** @noinspection UnnecessaryAssertionInspection */
-            $this->assertInstanceOf($dataClass, $object);
-        }
     }
 
-    public function testCollectorsNameSpace(): void
+    /**
+     * @dataProvider dataNameSpaceDataProvider
+     */
+    public function testDataNameSpace(string $dataType, string $dataClass): void
     {
         $container = new Container('TestWebShop');
-        $collectorTypes = [
-            DataType::Address => [AddressCollector::class, AddressType::Invoice],
-            DataType::Customer => [CustomerCollector::class, null],
-            DataType::EmailAsPdf => [EmailAsPdfCollector::class, EmailAsPdfType::Invoice],
-            DataType::Invoice => [InvoiceCollector::class, null],
-            DataType::Line => [LineCollector::class, LineType::Item],
+        $object = $container->createAcumulusObject($dataType);
+        /** @noinspection UnnecessaryAssertionInspection */
+        $this->assertInstanceOf($dataClass, $object);
+    }
+
+    public function collectorNameSpaceDataProvider(): array
+    {
+        return [
+            [DataType::Address, AddressType::Invoice, AddressCollector::class,],
+            [DataType::Address, AddressType::Shipping, AddressCollector::class,],
+            [DataType::Customer, null, CustomerCollector::class,],
+            [DataType::EmailAsPdf, EmailAsPdfType::Invoice, EmailAsPdfCollector::class,],
+            [DataType::EmailAsPdf, EmailAsPdfType::PackingSlip, EmailAsPdfCollector::class,],
+            [DataType::Invoice, null, InvoiceCollector::class,],
+            [DataType::Line, LineType::Item , ItemLineCollector::class,],
+            [DataType::Line, LineType::Shipping , ShippingLineCollector::class,],
+            [DataType::Line, LineType::Other , OtherLineCollector::class,],
+            [DataType::Line, LineType::PaymentFee , LineCollector::class,],
         ];
-        foreach ($collectorTypes as $dataType => $collectorInfo) {
-            $collectorClass = reset($collectorInfo);
-            $collectorSubType = end($collectorInfo);
-            /** @noinspection PhpStrictTypeCheckingInspection false positive */
-            $object = $container->getCollector($dataType, $collectorSubType);
-            $this->assertInstanceOf($collectorClass, $object);
-        }
-        $object = $container->getCollectorManager();
-        $this->assertInstanceOf(CollectorManager::class, $object);
+    }
+
+    /**
+     * @dataProvider collectorNameSpaceDataProvider
+     */
+    public function testCollectorsNameSpace(string $dataType, ?string $subType, string $collectorClass): void
+    {
+        $container = new Container('WooCommerce');
+        $object = $container->getCollector($dataType, $subType);
+        /** @noinspection UnnecessaryAssertionInspection  we check for a subtype of the specified return type */
+        $this->assertInstanceOf($collectorClass, $object);
     }
 
     /**
@@ -199,6 +226,10 @@ class ContainerTest extends TestCase
         $container = new Container('TestWebShop');
         $object = $container->createSource(Source::Order, 1);
         $this->assertInstanceOf(Source::class, $object);
+        $object = $container->createItem($object, 1);
+        $this->assertInstanceOf(Item::class, $object);
+        $object = $container->createProduct($object, 1);
+        $this->assertInstanceOf(Product::class, $object);
         $object = $container->getCompletor();
         $this->assertInstanceOf(Completor::class, $object);
         $object = $container->createInvoiceAddResult('ContainerTest::testInvoiceNamespace()');

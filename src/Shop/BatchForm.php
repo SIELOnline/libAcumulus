@@ -223,7 +223,6 @@ class BatchForm extends Form
             $sendMode = $this->getFormValue('send_mode');
             if ($sendMode === 'send_test_mode') {
                 // Overrule debug setting for (the rest of) this run.
-                /** @noinspection PhpUnhandledExceptionInspection */
                 $this->acumulusConfig->set('debug', Config::Send_TestMode);
             }
             // Do the sending (and some info/debug logging).

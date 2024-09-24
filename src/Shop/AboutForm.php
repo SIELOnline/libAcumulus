@@ -325,17 +325,25 @@ class AboutForm
                 // 1 item: make it an array with 1 item
                 $mySupportItems = [$mySupportItems];
             }
-            usort($mySupportItems, static function ($a, $b) {
-                return [$a['startdate'], $a['location']] <=> [$b['startdate'], $b['location']];
+
+            $mySupportItems = array_filter($mySupportItems, static function ($mySupportItem) {
+                return $mySupportItem['enddate'] >= '2024-09-24';
             });
-            foreach ($mySupportItems as $mySupportItem) {
-                $proSupportList[] = sprintf(
-                    $this->t('pro_support_line'),
-                    $mySupportItem['description'],
-                    $mySupportItem['location'],
-                    $mySupportItem['startdate'],
-                    $mySupportItem['enddate']
-                );
+            if (count($mySupportItems) === 0) {
+                $proSupportList[] = $this->t('no_more_pro_support');
+            } else {
+                usort($mySupportItems, static function ($a, $b) {
+                    return [$a['startdate'], $a['location']] <=> [$b['startdate'], $b['location']];
+                });
+                foreach ($mySupportItems as $mySupportItem) {
+                    $proSupportList[] = sprintf(
+                        $this->t('pro_support_line'),
+                        $mySupportItem['description'],
+                        $mySupportItem['location'],
+                        $mySupportItem['startdate'],
+                        $mySupportItem['enddate']
+                    );
+                }
             }
         }
         return $proSupportList;

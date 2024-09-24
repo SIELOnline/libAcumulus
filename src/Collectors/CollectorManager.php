@@ -292,12 +292,14 @@ class CollectorManager
         /** @var Source $source */
         $source = $this->getPropertySources()->get('source');
         $getInfosMethod = "get{$lineType}Infos";
-        $propertySourceName = lcfirst($lineType) . 'Info';
+        $infos = $source->$getInfosMethod();
+        if (count($infos) === 0) {
+            return;
+        }
 
         $lineCollector = $this->getContainer()->getCollector(DataType::Line, $lineType);
         $lineMappings = $this->getMappings()->getFor($lineType);
-
-        $infos = $source->$getInfosMethod();
+        $propertySourceName = lcfirst($lineType) . 'Info';
         foreach ($infos as $key => $item) {
             $this->getPropertySources()->add($propertySourceName, $item);
             $this->getPropertySources()->add('key', $key);

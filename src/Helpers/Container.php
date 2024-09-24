@@ -576,19 +576,16 @@ class Container
         $result = null;
         // A subtype specific Collector may exist: try to get it.
         if ($subType !== null) {
-            try {
-                // If a collector exists specific for the $subType, the constructor
-                // arguments will be the same for each instance creation of that $subType
-                // collector, so no need to create multiple instances.
-                $result = $this->getInstance("{$subType}Collector", 'Collectors', $arguments);
-            } catch (InvalidArgumentException) {
-            }
+            // If a collector exists specifically for the $subType, the constructor
+            // arguments will be the same for each instance creation of that $subType
+            // collector, so no need to create multiple instances.
+            $result = $this->getInstance("{$subType}Collector", 'Collectors', $arguments);
         }
-        // We need separate instances if $subType is part of the constructor arguments but
-        // not of the class name.
-        // (We would need only 1 instance per subtype, but for now the caching keys cannot
-        // take this into account, so we create a new instance with every call.)
         if ($result === null) {
+            // We need separate instances if $subType is part of the constructor arguments
+            // but not of the class name. (We would need only 1 instance per subtype, but
+            // for now the caching keys cannot take this into account, so we create a new
+            // instance with every call.)
             $result = $this->getInstance("{$type}Collector", 'Collectors', $arguments, $subType !== null);
         }
         return $result;
@@ -794,7 +791,7 @@ class Container
     }
 
     /**
-     * Returns an instance of the given class.
+     * Returns an instance of the given class or null if the class could not be found
      *
      * This method should normally be avoided, use the get{Class}() methods as
      * they know (and hide) what arguments to inject into the constructor.
@@ -817,15 +814,13 @@ class Container
      * @param bool $newInstance
      *   Whether to create a new instance (true) or reuse an already existing
      *   instance (false, default)
-     *
-     * @throws \InvalidArgumentException
      */
     public function getInstance(
         string $class,
         string $subNamespace,
         array $constructorArgs = [],
         bool $newInstance = false
-    ): object {
+    ): ?object {
         $instanceKey = "$subNamespace\\$class";
         if (!isset($this->instances[$instanceKey]) || $newInstance) {
             $fqClass = null;
@@ -851,7 +846,7 @@ class Container
             }
 
             if ($fqClass === null) {
-                throw new InvalidArgumentException("Class $class not found in namespace $subNamespace");
+                return null;
             }
 
             // Create a new instance.

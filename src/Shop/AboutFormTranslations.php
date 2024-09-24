@@ -34,7 +34,8 @@ class AboutFormTranslations extends TranslationCollection
 
         // Pro-support
         'pro_support_list_header' => 'Door u aangeschafte (en nog geldige) <span class="acumulus-blue">Pro-</span>support',
-        'no_pro_support' => 'Nog niet aangeschaft of geen geldige <span class="acumulus-blue">Pro-</span>support meer.',
+        'no_pro_support' => 'Nog niet aangeschaft.',
+        'no_more_pro_support' => 'Geen geldige <span class="acumulus-blue">Pro-</span>support meer.',
         'pro_support_line' => '"%1$s" voor %2$s van %3$s tot %4$s.',
 
         // About your webshop.
@@ -97,7 +98,8 @@ LONGSTRING
 
         // Pro-support
         'pro_support_list_header' => '(Still valid) <span class="acumulus-blue">Pro-</span>support bought by you',
-        'no_pro_support' => 'Not yet bought or no longer valid <span class="acumulus-blue">Pro-</span>support',
+        'no_pro_support' => 'Not yet bought',
+        'no_more_pro_support' => 'No longer valid <span class="acumulus-blue">Pro-</span>support anymore.',
         'pro_support_line' => '"%1$s" for %2$s from %3$s to %4$s.',
 
         // About your webshop.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
@@ -25,22 +26,22 @@ class DiscountLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   A discount line with the mapped fields filled in.
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectDiscountLine($acumulusObject);
+        $this->collectDiscountLine($acumulusObject, $propertySources);
     }
 
     /**
      * @param \Siel\Acumulus\Data\Line $line
      *   A discount line with the mapped fields filled in.
      */
-    protected function collectDiscountLine(Line $line): void
+    protected function collectDiscountLine(Line $line, PropertySources $propertySources): void
     {
         /**
          * @var \WC_Coupon $coupon
          */
-        $coupon = $this->getPropertySource('discountLineInfo');
-        $this->CollectCouponDiscountLine($line, $coupon);
+        $coupon = $propertySources->get('discountLineInfo');
+        $this->CollectCouponDiscountLine($line, $coupon, $propertySources);
     }
 
     /**
@@ -54,10 +55,10 @@ class DiscountLineCollector extends LineCollector
      * Discounts are already applied, we just add a descriptive line with 0 amount. The
      * VAT rate to categorize this line under should be determined by the completor.
      */
-    protected function CollectCouponDiscountLine(Line $line, WC_Coupon $coupon): void
+    protected function CollectCouponDiscountLine(Line $line, WC_Coupon $coupon, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\WooCommerce\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
 
         // Get a description for the value of this coupon. Entered discount
         // amounts follow the productPricesIncludeTax() setting. Use that info

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
@@ -27,9 +28,9 @@ class ItemLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   An item line with the mapped fields filled in.
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->getItemLine($acumulusObject);
+        $this->getItemLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -45,24 +46,18 @@ class ItemLineCollector extends LineCollector
      *   thus may result in qty = 0 but line total != 0 or just item price not
      *   being equal to line total divided by the qty.
      *
-     * @legacy: This is a copy of old Creator code: to be integrated in this collector in
-     *   a neat/correct way!
-     *
      * @param Line $line
      *   An item line with the mapped fields filled in
      */
-    protected function getItemLine(Line $line): void
+    protected function getItemLine(Line $line, PropertySources $propertySources): void
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $this->getPropertySource('invoice');
-        /** @var \Siel\Acumulus\Invoice\Item $item */
-        $item = $this->getPropertySource('item');
-        /** @var WC_Order_Item_Product $shopItem */
-        $shopItem = $item->getShopObject();
-        /** @var \Siel\Acumulus\Invoice\Product $product */
+        $invoice = $propertySources->get('invoice');
+        /** @var \Siel\Acumulus\WooCommerce\Invoice\Item $item */
+        $item = $propertySources->get('itemInfo');
         $product = $item->getProduct();
-        /** @var WC_Product|null $shopProduct */
+        $shopItem = $item->getShopObject();
         $shopProduct = $product?->getShopObject();
 
         // Return if this "really" is an empty line, not when this is a line
@@ -142,7 +137,7 @@ class ItemLineCollector extends LineCollector
      *
      * @todo: Can $item->get_formatted_meta_data(''); be used to get this info?
      */
-    protected function addVariantLines(Line $line, WC_Order_Item_Product $item, WC_Product $product): void
+    protected function addVariantLines(Line $line, WC_Order_Item_Product $item, WC_Product $shopProduct): void
     {
         /**
          * An array of objects with properties id, key, and value.
@@ -197,9 +192,9 @@ class ItemLineCollector extends LineCollector
                 } else {
                     $variantLabel = apply_filters(
                         'woocommerce_attribute_label',
-                        wc_attribute_label($meta->key, $product),
+                        wc_attribute_label($meta->key, $shopProduct),
                         $meta->key,
-                        $product
+                        $shopProduct
                     );
                     $variantValue = $meta->value;
                 }

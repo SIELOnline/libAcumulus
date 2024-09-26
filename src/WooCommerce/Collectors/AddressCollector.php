@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\WooCommerce\Collectors;
 
 use Siel\Acumulus\Collectors\AddressCollector as BaseAddressCollector;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Meta;
 
@@ -16,9 +17,8 @@ class AddressCollector extends BaseAddressCollector
     /**
      * @param \Siel\Acumulus\Data\Address $acumulusObject
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        parent::collectLogicFields($acumulusObject);
         if (!empty($acumulusObject->countryCode)) {
             /** @var \WooCommerce $woocommerce */
             global $woocommerce;

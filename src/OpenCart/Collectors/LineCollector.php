@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Siel\Acumulus\OpenCart\Collectors;
 
 use Siel\Acumulus\Collectors\LineCollector as BaseLineCollector;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Meta;
@@ -23,6 +25,13 @@ class LineCollector extends BaseLineCollector
      * digits precision. So 0.001 is on the pessimistic side.
      */
     protected float $precision = 0.001;
+    private array $order;
+
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
+    {
+        parent::collectBefore($acumulusObject, $propertySources, $fieldSpecifications);
+        $this->order = $propertySources->get('source')->getShopObject();
+    }
 
     /**
      * Collects a total line based on an order_total record.
@@ -80,9 +89,7 @@ class LineCollector extends BaseLineCollector
      */
     protected function addVatRateLookupMetadata(Line $line, ?int $taxClassId): void
     {
-        /** @var \Siel\Acumulus\OpenCart\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
-        $order = $source->getOrder()->getShopObject();
+        $order = $this->order;
 
         if ($taxClassId > 0) {
             $taxClass = $this->getTaxClass($taxClassId);

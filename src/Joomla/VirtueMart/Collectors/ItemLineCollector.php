@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 
 use DOMDocument;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
@@ -24,9 +25,9 @@ class ItemLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->getItemLine($acumulusObject);
+        $this->getItemLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -40,11 +41,11 @@ class ItemLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function getItemLine(Line $line): void
+    protected function getItemLine(Line $line, PropertySources $propertySources): void
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Joomla\HikaShop\Invoice\Item $shopItem */
-        $item = $this->getPropertySource('item');
+        $item = $propertySources->get('itemInfo');
         $shopItem = $item->getShopObject();
 
         $productPriceEx = (float) $shopItem->product_discountedPriceWithoutTax;

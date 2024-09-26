@@ -30,10 +30,8 @@ abstract class SubTypedCollector extends Collector
         parent::__construct($fieldExpander, $container, $translator, $log);
     }
 
-    protected function createAcumulusObject(): AcumulusObject
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
     {
-        $acumulusObject = parent::createAcumulusObject();
         $acumulusObject->metadataSet(Meta::SubType, $this->subType);
-        return $acumulusObject;
     }
 }

@@ -7,12 +7,8 @@ namespace Siel\Acumulus\PrestaShop\Collectors;
 use Context;
 use Country;
 use Siel\Acumulus\Collectors\AddressCollector as BaseAddressCollector;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\AddressType;
-use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Data\VatRateSource;
-use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
 use function is_array;
@@ -31,9 +27,8 @@ class AddressCollector extends BaseAddressCollector
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        parent::collectLogicFields($acumulusObject);
         $shopCountryId = $acumulusObject->metadataGet(Meta::ShopCountryId);
         if (!empty($shopCountryId)) {
             $country = new Country($shopCountryId);

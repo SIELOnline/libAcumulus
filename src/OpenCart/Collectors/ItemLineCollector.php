@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Meta;
+
+use function count;
 
 /**
  * ItemLineCollector contains OpenCart specific {@see LineType::Item} collecting logic.
@@ -22,9 +25,9 @@ class ItemLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->getItemLine($acumulusObject);
+        $this->getItemLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -38,15 +41,13 @@ class ItemLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function getItemLine(Line $line): void
+    protected function getItemLine(Line $line, PropertySources $propertySources): void
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\OpenCart\Invoice\Item $item */
-        $item = $this->getPropertySource('item');
-        /** @var array $shopItem */
-        $shopItem = $item->getShopObject();
-        /** @var \Siel\Acumulus\Invoice\Product $product */
+        $item = $propertySources->get('itemInfo');
         $product = $item->getProduct();
+        $shopItem = $item->getShopObject();
         /** @var array|null $shopProduct */
         $shopProduct = $product?->getShopObject();
 
@@ -71,7 +72,7 @@ class ItemLineCollector extends LineCollector
 
         // Options (variants).
         $options = $item->getOrderProductOptions();
-        if (!empty($options)) {
+        if (count($options) !== 0) {
             // Add options as children.
             // In the old Creator we added all kinds of vat rate related metadata, but as
             // options do not have a price, this seems unnecessary. Just add the

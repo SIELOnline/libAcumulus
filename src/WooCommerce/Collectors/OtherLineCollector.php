@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Meta;
@@ -20,9 +21,9 @@ class OtherLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   A fee line with the mapped fields filled in.
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectFeeLine($acumulusObject);
+        $this->collectFeeLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -32,12 +33,12 @@ class OtherLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $line
      *   A fee line with the mapped fields filled in.
      */
-    protected function collectFeeLine(Line $line): void
+    protected function collectFeeLine(Line $line, PropertySources $propertySources): void
     {
         /**
          * @var \WC_Order_Item_Fee $fee
          */
-        $fee = $this->getPropertySource('otherLineInfo');
+        $fee = $propertySources->get('otherLineInfo');
 
         $quantity = $fee->get_quantity();
         $feeEx = $fee->get_total() / $quantity;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Number;
@@ -26,21 +27,21 @@ class ShippingLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   A shipping line with the mapped fields filled in.
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectShippingLine($acumulusObject);
+        $this->collectShippingLine($acumulusObject, $propertySources);
     }
 
     /**
      * @param \Siel\Acumulus\Data\Line $line
      *   A shipping line with the mapped fields filled in.
      */
-    protected function collectShippingLine(Line $line): void
+    protected function collectShippingLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \WC_Order_Item_Shipping $shippingItem */
-        $shippingItem = $this->getPropertySource('shippingLineInfo');
+        $shippingItem = $propertySources->get('shippingLineInfo');
         $taxes = $shippingItem->get_taxes();
-        $this->addShippingVatRateLookupMetadata($line, $taxes);
+        $this->addShippingVatRateLookupMetadata($line, $taxes, $propertySources);
 
         // Note: this info is WC3+ specific.
         // Precision: shipping costs are entered ex VAT, so that may be very
@@ -108,7 +109,7 @@ class ShippingLineCollector extends LineCollector
      * getVatRateLookupMetadataByTaxClass()). Anyway, this method will only
      * return metadata if only 1 rate was found.
      */
-    protected function addShippingVatRateLookupMetadata(Line $line, ?array $taxes): void
+    protected function addShippingVatRateLookupMetadata(Line $line, ?array $taxes, PropertySources $propertySources): void
     {
         $taxRateFound = false;
         if (is_array($taxes)) {
@@ -148,9 +149,9 @@ class ShippingLineCollector extends LineCollector
             $shippingTaxClass = get_option('woocommerce_shipping_tax_class');
             if (is_string($shippingTaxClass)) {
                 /** @var \Siel\Acumulus\Data\Invoice $invoice */
-                $invoice = $this->getPropertySource('invoice');
+                $invoice = $propertySources->get('invoice');
                 /** @var \Siel\Acumulus\WooCommerce\Invoice\Source $source */
-                $source = $this->getPropertySource('source');
+                $source = $propertySources->get('source');
                 /** @var \WC_Order $order */
                 $order = $source->getOrder()->getShopObject();
 

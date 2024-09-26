@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\HikaShop\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Meta;
@@ -36,14 +37,15 @@ use Siel\Acumulus\Tag;
 class DiscountLineCollector extends LineCollector
 {
     /**
+     * A discount line with the mapped fields filled in.
+     *
      * @param \Siel\Acumulus\Data\Line $acumulusObject
-     *   A discount line with the mapped fields filled in.
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectDiscountLine($acumulusObject);
+        $this->collectDiscountLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -54,18 +56,18 @@ class DiscountLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectDiscountLine(Line $line): void
+    protected function collectDiscountLine(Line $line, PropertySources $propertySources): void
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
         $order = $source->getShopObject();
 
         $discountInc = (float) $order->order_discount_price;
         $discountVat = (float) $order->order_discount_tax;
         $discountEx = $discountInc - $discountVat;
         $recalculatePrice = Tag::UnitPrice;
-        $this->addVatRangeTags($line, $discountVat, $discountEx, $this->precision, $this->precision);
+        static::addVatRangeTags($line, $discountVat, $discountEx, $this->precision, $this->precision);
         if ($line->vatRate === null) {
             $line->metadataSet(Meta::StrategySplit, true);
         }

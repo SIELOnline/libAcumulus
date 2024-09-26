@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Number;
@@ -24,9 +25,9 @@ class PaymentFeeLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectPaymentFeeLine($acumulusObject);
+        $this->collectPaymentFeeLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -37,10 +38,10 @@ class PaymentFeeLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectPaymentFeeLine(Line $line): void
+    protected function collectPaymentFeeLine(Line $line, PropertySources $propertySources): void
     {
         /** @var Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
 
         $paymentEx = (float) $source->getShopObject()['details']['BT']->order_payment;
         if (!Number::isZero($paymentEx)) {

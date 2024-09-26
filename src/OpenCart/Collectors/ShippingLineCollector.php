@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 
@@ -21,9 +22,9 @@ class ShippingLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectShippingLine($acumulusObject);
+        $this->collectShippingLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -37,10 +38,10 @@ class ShippingLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectShippingLine(Line $line): void
+    protected function collectShippingLine(Line $line, PropertySources $propertySources): void
     {
         /** @var array $totalLine a record from the order_total table + a vat indication */
-        $totalLine = $this->getPropertySource('shippingLineInfo');
+        $totalLine = $propertySources->get('shippingLineInfo');
         $this->collectTotalLine($line, $totalLine, $totalLine['vat']);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
@@ -63,17 +64,37 @@ class LineCollector extends SubTypedCollector
     }
 
     /**
+     * @param \Siel\Acumulus\Data\Line $acumulusObject
+     */
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
+    {
+        $acumulusObject->setType($this->subType);
+        $this->getContainer()->getEvent()->triggerLineCollectBefore($acumulusObject, $propertySources);
+    }
+
+    /**
+     * @param \Siel\Acumulus\Data\Line $acumulusObject
+     */
+    protected function collectAfter(AcumulusObject $acumulusObject, PropertySources $propertySources): void
+    {
+        $this->getContainer()->getEvent()->triggerLineCollectAfter($acumulusObject, $propertySources);
+    }
+
+    /**
      * Returns the shipment method name.
      *
-     * This method should be overridden by web shops to provide a more detailed
+     * This base implementation returns the translated "Shipping costs" string.
+     *
+     * This base method should be overridden by web shops to provide a more detailed
      * name of the shipping method used.
      *
-     * This base implementation returns the translated "Shipping costs" string.
+     * @param mixed ...$args
+     *  Any arguments that may be needed by an override.
      *
      * @return string
      *   The name of the shipping method used for the current order.
      */
-    protected function getShippingMethodName(): string
+    protected function getShippingMethodName(mixed ...$args): string
     {
         return $this->t('shipping_costs');
     }
@@ -152,13 +173,9 @@ class LineCollector extends SubTypedCollector
      * @legacy: remove margin scheme handling from (plugin specific) creators and move it
      *   to the completor phase. This will help simplifying the creators towards raw
      *   data collectors.
-     *
-     * @noinspection PhpDocMissingThrowsInspection JsonException will not be thrown when
-     *    we arrived here.
      */
     protected function allowMarginScheme(): bool
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->getContainer()->getConfig()->get('marginProducts') !== Config::MarginProducts_No;
     }
 }

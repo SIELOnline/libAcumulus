@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\HikaShop\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AddressType;
@@ -24,14 +25,15 @@ use function is_object;
 class ItemLineCollector extends LineCollector
 {
     /**
+     * An item line with the mapped fields filled in.
+     *
      * @param \Siel\Acumulus\Data\Line $acumulusObject
-     *   An item line with the mapped fields filled in.
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectItemLine($acumulusObject);
+        $this->collectItemLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -46,16 +48,16 @@ class ItemLineCollector extends LineCollector
      * @throws \Exception
      * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
-    protected function collectItemLine(Line $line): void
+    protected function collectItemLine(Line $line, PropertySources $propertySources): void
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $this->getPropertySource('invoice');
+        $invoice = $propertySources->get('invoice');
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
         $order = $source->getShopObject();
         /** @var \Siel\Acumulus\Joomla\HikaShop\Invoice\Item $item */
-        $item = $this->getPropertySource('item');
+        $item = $propertySources->get('itemInfo');
         $shopItem = $item->getShopObject();
 
         // Remove html with variant info from product name, we'll add that later
@@ -100,7 +102,7 @@ class ItemLineCollector extends LineCollector
             $line->metadataSet(Meta::VatAmount, $productVat);
             $line->metadataSet(Meta::VatRateSource, Number::isZero($productVat) ? VatRateSource::Exact0 : VatRateSource::Exact);
         } else {
-            $this->addVatRangeTags($line, $productVat, $productPriceEx, $this->precision, $this->precision);
+            static::addVatRangeTags($line, $productVat, $productPriceEx, $this->precision, $this->precision);
         }
 
         // Add vat class meta data.

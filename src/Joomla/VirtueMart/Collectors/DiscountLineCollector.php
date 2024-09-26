@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
@@ -33,9 +34,9 @@ class DiscountLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectDiscountLine($acumulusObject);
+        $this->collectDiscountLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -46,13 +47,13 @@ class DiscountLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectDiscountLine(Line $line): void
+    protected function collectDiscountLine(Line $line, PropertySources $propertySources): void
     {
         /**
          * @var Source|object $discountInfo
-         *   Either a source (coupon) or a calc_rule record in a stdClass
+         *   Either a source (coupon) or a calc_rule record in a stdClass.
          */
-        $discountInfo = $this->getPropertySource('discountLineInfo');
+        $discountInfo = $propertySources->get('discountLineInfo');
 
         // Coupon codes are not stored in calc rules, so handle them separately.
         if ($discountInfo instanceof Source) {

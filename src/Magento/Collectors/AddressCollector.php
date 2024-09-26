@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Magento\Collectors;
 
 use Siel\Acumulus\Collectors\AddressCollector as BaseAddressCollector;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Meta;
 
@@ -20,9 +21,8 @@ class AddressCollector extends BaseAddressCollector
      *
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        parent::collectLogicFields($acumulusObject);
         if (!empty($acumulusObject->countryCode)) {
             $country = $this->getCountryInformation();
             $countryInfo = $country->getCountryInfo($acumulusObject->countryCode);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Meta;
@@ -22,9 +23,9 @@ class DiscountLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectDiscountLine($acumulusObject);
+        $this->collectDiscountLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -35,13 +36,13 @@ class DiscountLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectDiscountLine(Line $line): void
+    protected function collectDiscountLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
 
         /** @var array $calcRule A record from the order_cart_rule table. */
-        $calcRule = $this->getPropertySource('discountLineInfo');
+        $calcRule = $propertySources->get('discountLineInfo');
 
         // Amounts in cart rules are always positive, so negate the sign.
         $sign = $source->getSign();

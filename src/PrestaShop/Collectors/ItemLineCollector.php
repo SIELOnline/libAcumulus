@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Line;
@@ -26,9 +27,9 @@ class ItemLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   An item line with the mapped fields filled in.
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->getItemLine($acumulusObject);
+        $this->getItemLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -40,15 +41,15 @@ class ItemLineCollector extends LineCollector
      * @param Line $line
      *   An item line with the mapped fields filled in
      */
-    protected function getItemLine(Line $line): void
+    protected function getItemLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $this->getPropertySource('invoice');
+        $invoice = $propertySources->get('invoice');
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
         $sign = $source->getSign();
         /** @var \Siel\Acumulus\Invoice\Item $item */
-        $item = $this->getPropertySource('item');
+        $item = $propertySources->get('itemInfo');
         /** @var array $shopItem */
         $shopItem = $item->getShopObject();
 

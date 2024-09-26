@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
@@ -24,9 +25,9 @@ class ShippingLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   A shipping line with the mapped fields filled in.
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->getShippingLine($acumulusObject);
+        $this->getShippingLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -35,14 +36,14 @@ class ShippingLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $line
      *   A shipping line with the mapped fields filled in.
      */
-    protected function getShippingLine(Line $line): void
+    protected function getShippingLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $shopSource */
         $shopSource = $source->getShopObject();
 
-        $line->product = $this->getShippingMethodName();
+        $line->product = $this->getShippingMethodName($source);
         $line->quantity = 1;
         // What do the following methods return?
         // - getBaseShippingAmount(): shipping costs ex VAT ex any discount.
@@ -94,10 +95,10 @@ class ShippingLineCollector extends LineCollector
         }
     }
 
-    protected function getShippingMethodName(): string
+    protected function getShippingMethodName(mixed ...$args): string
     {
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        [$source] = $args;
         $name = $source->getOrder()->getShopObject()->getShippingDescription();
         return !empty($name) ? $name : parent::getShippingMethodName();
     }

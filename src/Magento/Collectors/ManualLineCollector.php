@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Data\VatRateSource;
-use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * ManualLineCollector contains Magento specific {@see LineType::Manual} collecting
@@ -26,9 +24,9 @@ class ManualLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectManualLine($acumulusObject);
+        $this->collectManualLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -39,10 +37,10 @@ class ManualLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectManualLine(Line $line): void
+    protected function collectManualLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
 
         $line->product = $this->t('refund_adjustment');
         $line->unitPrice = $source->getShopObject()->getBaseAdjustment();

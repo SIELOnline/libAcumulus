@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\HikaShop\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Invoice\Source;
@@ -24,9 +25,9 @@ class PaymentFeeLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectPaymentFeeLine($acumulusObject);
+        $this->collectPaymentFeeLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -37,16 +38,16 @@ class PaymentFeeLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectPaymentFeeLine(Line $line): void
+    protected function collectPaymentFeeLine(Line $line, PropertySources $propertySources): void
     {
         /** @var Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
 
         $paymentInc = (float) $source->getShopObject()->order_payment_price;
         $paymentVat = (float) $source->getShopObject()->order_payment_tax;
         $paymentEx = $paymentInc - $paymentVat;
         $recalculatePrice = Tag::UnitPrice;
-        $this->addVatRangeTags($line, $paymentVat, $paymentEx, $this->precision, $this->precision);
+        static::addVatRangeTags($line, $paymentVat, $paymentEx, $this->precision, $this->precision);
         $description = $this->t('payment_costs');
 
         // Add vat lookup meta data.

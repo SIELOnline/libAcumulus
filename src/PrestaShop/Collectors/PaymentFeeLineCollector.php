@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
@@ -26,9 +27,9 @@ class PaymentFeeLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectPaymentFeeLine($acumulusObject);
+        $this->collectPaymentFeeLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -39,12 +40,12 @@ class PaymentFeeLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectPaymentFeeLine(Line $line): void
+    protected function collectPaymentFeeLine(Line $line, PropertySources $propertySources): void
     {
         /** @var Invoice $invoice */
-        $invoice = $this->getPropertySource('source');
+        $invoice = $propertySources->get('source');
         /** @var Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
         $sign = $source->getSign();
 
         /** @noinspection PhpUndefinedFieldInspection These fields are set by the PayPal with a fee module. */

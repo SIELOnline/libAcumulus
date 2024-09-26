@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Joomla\HikaShop\Collectors;
 
 use Siel\Acumulus\Collectors\LineCollector;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\DataType;
@@ -16,7 +17,6 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 
 use function count;
-use function func_num_args;
 
 /**
  * ShippingLineCollector contains HikaShop specific {@see LineType::Shipping} collecting logic.
@@ -65,9 +65,9 @@ class ShippingLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectShippingLine($acumulusObject);
+        $this->collectShippingLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -78,19 +78,19 @@ class ShippingLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectShippingLine(Line $line): void
+    protected function collectShippingLine(Line $line, PropertySources $propertySources): void
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
         $order = $source->getShopObject();
         /** @var object $shippingInfo */
-        $shippingInfo = $this->getPropertySource('shippingLineInfo');
+        $shippingInfo = $propertySources->get('shippingLineInfo');
         /** @var string $key */
-        $key = $this->getPropertySource('key');
+        $key = $propertySources->get('key');
 
         if ($shippingInfo === null) {
-            $this->getFreeShippingLine($line);
+            $this->getFreeShippingLine($line, $propertySources);
         } elseif ($key === Source::Order) {
             $this->getOrderLevelShippingLine($line, $order);
         } else {
@@ -98,11 +98,11 @@ class ShippingLineCollector extends LineCollector
         }
     }
 
-    protected function getFreeShippingLine(Line $line): void
+    protected function getFreeShippingLine(Line $line, PropertySources $propertySources): void
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
 
         if ($source->getType() === Source::CreditNote) {
             // Free (or no) shipping: do not add on a credit note.
@@ -216,6 +216,7 @@ class ShippingLineCollector extends LineCollector
             if (!Number::floatsAreEqual($shippingMethodAmountIncTotal, $shippingInfo->price_with_tax)) {
                 // @todo: fill in the missing amount if we had a vat free
                 //   rate (indicated so by the product having no tax class).
+                /** @var Line $shippingLine */
                 $shippingLine = $this->getContainer()->createAcumulusObject(DataType::Line);
                 $shippingLine->metadataSet(Meta::SubType, LineType::Shipping);
                 $shippingLine->product = "$product (?)";
@@ -263,17 +264,13 @@ class ShippingLineCollector extends LineCollector
      *
      * This override may get 1 parameter: a shipping_id, identifying a shipping method.
      */
-    protected function getShippingMethodName(): string
+    protected function getShippingMethodName(mixed ...$args): string
     {
-        /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
-        $order = $source->getShopObject();
-
-        $shipping_id = func_num_args() > 0 ? func_get_arg(0) : $order->order_shipping_id;
+        [$shippingId] = $args;
 
         /** @var \hikashopShippingClass $class */
         $class = hikashop_get('class.shipping');
-        $shipping = $class->get($shipping_id);
+        $shipping = $class->get($shippingId);
         if (!empty($shipping->shipping_name)) {
             return $shipping->shipping_name;
         }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\PrestaShop\Collectors;
 
 use Configuration;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Number;
@@ -26,9 +27,9 @@ class GiftWrappingFeeLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectGiftWrappingFeeLine($acumulusObject);
+        $this->collectGiftWrappingFeeLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -46,10 +47,10 @@ class GiftWrappingFeeLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectGiftWrappingFeeLine(Line $line): void
+    protected function collectGiftWrappingFeeLine(Line $line, PropertySources $propertySources): void
     {
         /** @var Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
 
         $wrappingEx = $source->getShopObject()->total_wrapping_tax_excl;
         $wrappingExLookedUp = (float) Configuration::get('PS_GIFT_WRAPPING_PRICE');

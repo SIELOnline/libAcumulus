@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 
 use Joomla\CMS\Factory;
 use Siel\Acumulus\Collectors\AddressCollector as BaseAddressCollector;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Meta;
 use vmLanguage;
@@ -24,7 +25,7 @@ class AddressCollector extends BaseAddressCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
         // Country code lookup:
         /** @var \Siel\Acumulus\Invoice\Source $source */
@@ -44,6 +45,6 @@ class AddressCollector extends BaseAddressCollector
                 $acumulusObject->metadataSet(Meta::ShopCountryName, $name);
             }
         }
-        parent::collectLogicFields($acumulusObject);
+        parent::collectLogicFields($acumulusObject, $propertySources);
     }
 }

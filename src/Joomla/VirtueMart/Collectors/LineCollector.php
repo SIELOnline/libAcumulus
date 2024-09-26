@@ -6,7 +6,9 @@ namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Collectors\LineCollector as BaseLineCollector;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
@@ -27,6 +29,13 @@ class LineCollector extends BaseLineCollector
      * @var float
      */
     protected float $precision = 0.001;
+    private array $order;
+
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
+    {
+        parent::collectBefore($acumulusObject, $propertySources, $fieldSpecifications);
+        $this->order = $propertySources->get('source')->getShopObject();
+    }
 
     /**
      * Adds vat data and vat lookup metadata to the current (item) line.
@@ -69,9 +78,7 @@ class LineCollector extends BaseLineCollector
      */
     protected function getCalcRule(string $calcKind, int $orderItemId = 0): ?object
     {
-        /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
-        $order = $source->getShopObject();
+        $order = $this->order;
         foreach ($order['calc_rules'] as $calcRule) {
             if ($calcRule->calc_kind === $calcKind) {
                 if (empty($orderItemId) || (int) $calcRule->virtuemart_order_item_id === $orderItemId) {

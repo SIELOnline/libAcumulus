@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Magento\Collectors;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
@@ -14,6 +15,8 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
+
+use function count;
 
 /**
  * ItemLineCollector contains Magento specific {@see LineType::Item} collecting logic.
@@ -26,9 +29,9 @@ class ItemLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   An item line with the mapped fields filled in.
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->getItemLine($acumulusObject);
+        $this->getItemLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -40,13 +43,13 @@ class ItemLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $line
      *   An item line with the mapped fields filled in.
      */
-    protected function getItemLine(Line $line): void
+    protected function getItemLine(Line $line, PropertySources $propertySources): void
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
         /** @var \Siel\Acumulus\Magento\Invoice\Item $item */
-        $item = $this->getPropertySource('item');
+        $item = $propertySources->get('itemInfo');
         /** @var OrderItemInterface|CreditmemoItemInterface $shopItem */
         $shopItem = $item->getShopObject();
 
@@ -156,10 +159,10 @@ class ItemLineCollector extends LineCollector
         }
 
         // Add vat metadata.
-        $product = $shopItem->getProduct();
-        if ($product) {
+        $shopProduct = $shopItem->getProduct();
+        if ($shopProduct) {
             /** @noinspection PhpUndefinedMethodInspection  handled by __call*/
-            $taxClassId = $product->getTaxClassId();
+            $taxClassId = $shopProduct->getTaxClassId();
             $this->addVatClassMetaData($line, $taxClassId);
         }
 
@@ -293,12 +296,12 @@ class ItemLineCollector extends LineCollector
         }
 
         // Add vat meta data.
-        /** @var \Magento\Catalog\Model\Product $product */
-        $product = $this->getRegistry()->create(MagentoProduct::class);
-        $this->getRegistry()->get($product->getResourceName())->load($product, $shopItem->getProductId());
-        if ($product->getId()) {
+        /** @var \Magento\Catalog\Model\Product $shopProduct */
+        $shopProduct = $this->getRegistry()->create(MagentoProduct::class);
+        $this->getRegistry()->get($shopProduct->getResourceName())->load($shopProduct, $shopItem->getProductId());
+        if ($shopProduct->getId()) {
             /** @noinspection PhpUndefinedMethodInspection */
-            $taxClassId = $product->getTaxClassId();
+            $taxClassId = $shopProduct->getTaxClassId();
             $this->addVatClassMetaData($line, $taxClassId);
         }
 

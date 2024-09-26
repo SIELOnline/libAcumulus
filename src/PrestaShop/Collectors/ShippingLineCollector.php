@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\PrestaShop\Collectors;
 
 use Carrier;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Line;
@@ -23,9 +24,9 @@ class ShippingLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   A shipping line with the mapped fields filled in.
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->getShippingLine($acumulusObject);
+        $this->getShippingLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -34,12 +35,12 @@ class ShippingLineCollector extends LineCollector
      * @param Line $line
      *   A shipping line with the mapped fields filled in
      */
-    protected function getShippingLine(Line $line): void
+    protected function getShippingLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $this->getPropertySource('invoice');
+        $invoice = $propertySources->get('invoice');
         /** @var \Siel\Acumulus\PrestaShop\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
         $sign = $source->getSign();
 
         $carrier = new Carrier($source->getOrder()->getShopObject()->id_carrier);

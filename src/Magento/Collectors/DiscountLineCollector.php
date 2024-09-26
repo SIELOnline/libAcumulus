@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Collectors;
 
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Magento\Invoice\Source;
 use Siel\Acumulus\Meta;
 
 /**
@@ -26,9 +28,9 @@ class DiscountLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectDiscountLine($acumulusObject);
+        $this->collectDiscountLine($acumulusObject, $propertySources);
     }
 
     /**
@@ -39,13 +41,13 @@ class DiscountLineCollector extends LineCollector
      *
      * @throws \Exception
      */
-    protected function collectDiscountLine(Line $line): void
+    protected function collectDiscountLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
+        $source = $propertySources->get('source');
 
         $line->itemNumber = '';
-        $line->product = $this->getDiscountDescription();
+        $line->product = $this->getDiscountDescription($source);
         // Product prices incl. VAT => discount amount is also incl. VAT
         if ($this->productPricesIncludeTax()) {
             $line->metadataSet(Meta::UnitPriceInc, $source->getSign() * $source->getShopObject()->getBaseDiscountAmount());
@@ -58,11 +60,8 @@ class DiscountLineCollector extends LineCollector
         $line->quantity = 1;
     }
 
-    protected function getDiscountDescription(): string
+    protected function getDiscountDescription(Source $source): string
     {
-        /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $this->getPropertySource('source');
-
         /** @var \Magento\Sales\Model\Order $order */
         $order = $source->getOrder()->getShopObject();
 

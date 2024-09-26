@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\ApiBehaviour\ApiClient;
 
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
@@ -120,7 +121,7 @@ class AcumulusTest extends TestCase
                     ['vattype' => 'reduced', 'vatrate' => '-1.0000', 'countryregion' => '2'],
                 ],
             ],
-            'eu' => [['be', \DateTime::createFromFormat(Api::DateFormat_Iso, '2015-12-01')],
+            'eu' => [['be', DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, '2015-12-01')],
                 [
                     ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '2'],
                     ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => '2'],

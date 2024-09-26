@@ -76,7 +76,7 @@ class Address extends AcumulusObject
     /**
      * @inheritdoc
      */
-    public function set(string $name, float|DateTimeInterface|int|string|null $value, int $mode = PropertySet::Always): bool
+    public function set(string $name, mixed $value, int $mode = PropertySet::Always): bool
     {
         if (($name === Fld::CountryCode) && is_string($value)) {
             $value = strtoupper($value);

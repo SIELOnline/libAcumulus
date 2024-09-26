@@ -15,7 +15,7 @@ namespace Siel\Acumulus;
 interface Api
 {
     /**
-     * Formats to use with date() and DateTime formatting methods when dates or
+     * Formats to use with date() and DateTimeInterface formatting methods when dates or
      * times are expected in the API.
      *
      * @var string

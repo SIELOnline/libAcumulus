@@ -139,7 +139,7 @@ class AcumulusProperty
     /**
      * Assigns a value to the property.
      *
-     * @param float|\DateTimeInterface|int|string|null $value
+     * @param int|float|string|bool|\DateTimeInterface|null $value
      *   The value to assign to this property, null and 'null' are valid values
      *   and will "unset" this property (it will not appear in the Acumulus API
      *   message).
@@ -155,7 +155,7 @@ class AcumulusProperty
      * @noinspection CallableParameterUseCaseInTypeContextInspection yes, we are juggling
      *   with types.
      */
-    public function setValue(float|DateTimeInterface|int|string|null $value, int $mode = PropertySet::Always): bool
+    public function setValue(mixed $value, int $mode = PropertySet::Always): bool
     {
         if (in_array($value, [null, 'null', ''], true)) {
             $value = null;
@@ -195,8 +195,7 @@ class AcumulusProperty
                     if ($date === false) {
                         throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
-                    $date->setTime(0, 0, 0);
-                    $value = $date;
+                    $value = $date->setTime(0, 0, 0);
                     break;
                 case 'bool':
                     if (!is_bool($value)) {

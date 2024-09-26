@@ -458,10 +458,10 @@ abstract class InvoiceManager
     }
 
     /**
-     * Returns the given DateTime in a format that the actual database layer
+     * Returns the given DateTimeInterface in a format that the actual database layer
      * accepts for comparison in a SELECT query.
      *
-     * This default implementation returns the DateTime as a string in ISO format
+     * This default implementation returns the DateTimeInterface as a string in ISO format
      * (yyyy-mm-dd hh:mm:ss).
      */
     protected function getSqlDate(DateTimeInterface $date): string

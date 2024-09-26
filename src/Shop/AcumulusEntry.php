@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Shop;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
 use Siel\Acumulus\Api;
 
@@ -180,8 +181,8 @@ class AcumulusEntry
      * Returns the time when this record was created.
      *
      * @param bool $raw
-     *   Whether to return the raw value as stored in the database, or a
-     *   DateTime object. The raw value will differ per web shop.
+     *   Whether to return the raw value as stored in the database, or a DateTimeInterface
+     *   object. The raw value will differ per web shop.
      *
      * @return string|int|\DateTimeInterface
      *   The timestamp when this record was created.
@@ -201,8 +202,8 @@ class AcumulusEntry
      * Returns the time when this record was last updated.
      *
      * @param bool $raw
-     *   Whether to return the raw value as stored in the database, or a
-     *   Datetime object. The raw value will differ per web shop.
+     *   Whether to return the raw value as stored in the database, or a DatetimeInterface
+     *   object. The raw value will differ per web shop.
      *
      * @return string|int|\DateTimeInterface
      *   The timestamp when this record was last updated.
@@ -224,7 +225,7 @@ class AcumulusEntry
     }
 
     /**
-     * Returns a DateTime object based on the timestamp in database format.
+     * Returns a DateTimeInterface object based on the timestamp in database format.
      *
      * @param int|string $timestamp
      *
@@ -232,12 +233,11 @@ class AcumulusEntry
      *
      * @throws \Exception
      */
-    protected function toDateTime($timestamp)
+    protected function toDateTime($timestamp): DateTimeInterface|bool
     {
         if (is_numeric($timestamp)) {
             // Unix timestamp.
-            $result = new DateTimeImmutable();
-            $result = $result->setTimestamp((int) $timestamp);
+            $result = DateTimeImmutable::createFromFormat('U.u', (string) $timestamp);
         } else {
             // Formatted timestamp, e.g. yyyy-mm-dd hh:mm:ss. Is assumed to be in the
             // timezone of the webshop if no timezone is specified in the string to parse.

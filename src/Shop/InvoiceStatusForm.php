@@ -1267,7 +1267,7 @@ class InvoiceStatusForm extends Form
      *
      * So we sanitise the values in the struct itself before using them:
      * - Int, float, and bool fields are cast to their proper type.
-     * - Date strings are parsed to a DateTime(Immutable) and formatted back to a date
+     * - Date strings are parsed to a DateTimeInterface and formatted back to a date
      *   string.
      * - Strings that can only contain a restricted set of values are checked
      *   against that set and emptied if not part of it.
@@ -1348,7 +1348,7 @@ class InvoiceStatusForm extends Form
      *
      * So we sanitise the values in the struct itself before using them:
      * - Int, float, and bool fields are cast to their proper type.
-     * - Date strings are parsed to a DateTime and formatted back to a date
+     * - Date strings are parsed to a DateTimeInterface and formatted back to a date
      *   string.
      * - Strings that can only contain a restricted set of values are checked
      *   against that set and emptied if not part of it.

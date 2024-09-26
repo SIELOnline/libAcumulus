@@ -195,13 +195,11 @@ class BatchForm extends Form
             }
         } else {
             // Retrieve by order date.
-            $from = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_from'));
+            $from = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_from'))->setTime(0, 0, 0);
             /** @noinspection PhpRedundantOptionalArgumentInspection */
-            $from->setTime(0, 0, 0);
             $to = $this->getFormValue('date_to')
-                ? DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_to'))
+                ? DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_to'))->setTime(23, 59, 59)
                 : clone $from;
-            $to->setTime(23, 59, 59);
             $this->screenLog['range'] = sprintf(
                 $this->t('message_form_range_date'),
                 $this->t("plural_$type"),

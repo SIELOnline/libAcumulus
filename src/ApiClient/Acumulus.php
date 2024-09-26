@@ -7,11 +7,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\ApiClient;
 
-use DateTime;
+use DateTimeInterface;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Environment;
-use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\EmailAsPdf;
+use Siel\Acumulus\Data\EmailInvoiceAsPdf;
+use Siel\Acumulus\Data\EmailPackingSlipAsPdf;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
@@ -265,20 +265,20 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function getPicklistProducts($filter = null, $productTagId = null, $offset = null, $rowcount = null)
+    public function getPicklistProducts(?string $filter = null, ?int $productTagId = null, ?int $offset = null, ?int $rowcount = null): AcumulusResult
     {
         $filters = [];
         if ($filter !== null) {
-            $filters['filter'] = (string) $filter;
+            $filters['filter'] = $filter;
         }
         if ($productTagId !== null) {
-            $filters['producttagid'] = (int) $productTagId;
+            $filters['producttagid'] = $productTagId;
         }
         if ($offset !== null) {
-            $filters['offset'] = (int) $offset;
+            $filters['offset'] = $offset;
         }
         if ($rowcount !== null) {
-            $filters['rowcount'] = (int) $rowcount;
+            $filters['rowcount'] = $rowcount;
         }
         return $this->getPicklist('products', $filters);
     }
@@ -320,9 +320,9 @@ class Acumulus
      *
      * @param string $countryCode
      *   Country code of the country to retrieve the VAT info for.
-     * @param string|\DateTime|null $date
-     *   DateTime object or ISO date string (yyyy-mm-dd) for the date to retrieve the VAT
-     *   info for.
+     * @param \DateTimeInterface|string|null $date
+     *   DateTimeInterface object or ISO date string (yyyy-mm-dd) for the date to retrieve
+     *   the VAT info for.
      *
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -336,9 +336,9 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function getVatInfo(string $countryCode, $date = null): AcumulusResult
+    public function getVatInfo(string $countryCode, DateTimeInterface|string $date = null): AcumulusResult
     {
-        if ($date instanceof DateTime) {
+        if ($date instanceof DateTimeInterface) {
             $date = $date->format(Api::DateFormat_Iso);
         } elseif (empty($date)) {
             $date = date(Api::DateFormat_Iso);
@@ -386,7 +386,7 @@ class Acumulus
      *
      * See {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/}
      *
-     * @param \Siel\Acumulus\Data\Invoice
+     * @param \Siel\Acumulus\Data\Invoice $invoice
      *   The invoice to send.
      *
      * @return AcumulusResult
@@ -590,7 +590,7 @@ class Acumulus
         $message = [
             'token' => $token,
             'paymentstatus' => $paymentStatus,
-            'paymentdate' => (string) $paymentDate,
+            'paymentdate' => $paymentDate,
         ];
         return $this->callApiFunction('invoices/invoice_paymentstatus_set', $message)->setMainAcumulusResponseKey('invoice');
     }
@@ -776,7 +776,7 @@ class Acumulus
      *
      * @param string $token
      *   The token for the invoice.
-     * @param array $emailAsPdf
+     * @param EmailInvoiceAsPdf $emailAsPdf
      *   An array with the fields:
      * - 'emailto'
      * - 'emailbcc'
@@ -813,7 +813,7 @@ class Acumulus
      */
     public function emailInvoiceAsPdf(
         string $token,
-        EmailAsPdf $emailAsPdf,
+        EmailInvoiceAsPdf $emailAsPdf,
         ?int $invoiceType = null,
         string $invoiceNotes = '',
         ?bool $applyGraphics = null
@@ -866,7 +866,7 @@ class Acumulus
      *
      * @param string $token
      *   The token for the invoice.
-     * @param array $emailAsPdf
+     * @param EmailPackingSlipAsPdf $emailAsPdf
      *   An array with the fields:
      *   - 'emailto'
      *   - 'emailbcc'
@@ -893,7 +893,7 @@ class Acumulus
      */
     public function emailPackingSlipAsPdf(
         string $token,
-        EmailAsPdf $emailAsPdf,
+        EmailPackingSlipAsPdf $emailAsPdf,
         string $deliveryNotes = '',
         ?bool $applyGraphics = null
     ): AcumulusResult {

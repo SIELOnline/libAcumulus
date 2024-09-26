@@ -8,8 +8,10 @@
 
 namespace Siel\Acumulus\Helpers;
 
+use DateTimeInterface;
 use Exception;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Meta;
 
@@ -708,6 +710,13 @@ class FieldExpander
                     }
                 }
                 $value = $result !== '' ? $result : null;
+            } elseif ($value instanceof DateTimeInterface) {
+                // Date(Time).
+                if ($value->format('H:i:s') === '00:00:00') {
+                    $value = $value->format(Api::DateFormat_Iso);
+                } else {
+                    $value = $value->format(Api::Format_TimeStamp);
+                }
             } elseif (!is_object($value) || method_exists($value, '__toString')) {
                 // object with a _toString() method, null, or a resource.
                 $value = (string) $value;

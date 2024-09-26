@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\TestWebShop\Helpers;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Log as BaseLog;
 
 /**
@@ -17,7 +18,7 @@ class Log extends BaseLog
 {
     protected function write(string $message, int $severity): void
     {
-        $message = sprintf('%s Acumulus %s: %s - %s', date('Y-m-d H:i:s'), $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
+        $message = sprintf('%s Acumulus %s: %s - %s', date(Api::Format_TimeStamp), $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
         file_put_contents(__DIR__ . '/../../../../logs/test.log', $message . "\n", FILE_APPEND);
     }
 }

@@ -68,7 +68,7 @@ class Invoice extends AcumulusObject
     protected ?Customer $customer = null;
     /** @var Line[] */
     protected array $lines = [];
-    protected ?EmailAsPdf $emailAsPdf = null;
+    protected ?EmailInvoiceAsPdf $emailAsPdf = null;
 
     protected function getPropertyDefinitions(): array
     {

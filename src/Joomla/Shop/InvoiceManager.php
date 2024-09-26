@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\Shop;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeZone;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
@@ -66,12 +66,12 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *   Date in yyyy-mm-dd format.
      *
      * @return string
-     *   The date string SQL datetime format.
+     *   The date string in SQL datetime format.
      *
      * @throws \Exception
      */
     protected function toSql(string $dateStr): string
     {
-        return (new DateTime($dateStr, new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
+        return (new DateTimeImmutable($dateStr, new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 }

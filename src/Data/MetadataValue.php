@@ -99,10 +99,10 @@ class MetadataValue
     /**
      * Converts the metadata value to a representation that fits in an API message.
      *
-     * Scalars are not converted, a Datetime is formatted in the ISO format. leaving out
-     * the time part if it is 0, and complex types are json-encoded. However, to get a
-     * "prettier print" in the final message double quotes are replaced by single quotes
-     * to prevent that these quotes would get escaped when the whole message gets
+     * Scalars are not converted, a DatetimeInterface is formatted in the ISO format,
+     * leaving out the time part if it is 0, and complex types are json-encoded. However,
+     * to get a "prettier print" in the final message double quotes are replaced by single
+     * quotes to prevent that these quotes would get escaped when the whole message gets
      * json-encoded.
      */
     public function getApiValue(): int|float|string|bool|null
@@ -114,7 +114,7 @@ class MetadataValue
             if ($value->format('H:i:s') === '00:00:00') {
                 $result = $value->format(Api::DateFormat_Iso);
             } else {
-                $result = $value->format('Y-m-d H:i:s');
+                $result = $value->format(Api::Format_TimeStamp);
             }
         } else {
             $result = $value instanceof Stringable

@@ -55,7 +55,7 @@ class ItemLineCollector extends LineCollector
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
         $invoice = $propertySources->get('invoice');
         /** @var \Siel\Acumulus\WooCommerce\Invoice\Item $item */
-        $item = $propertySources->get('itemInfo');
+        $item = $propertySources->get('item');
         $product = $item->getProduct();
         $shopItem = $item->getShopObject();
         $shopProduct = $product?->getShopObject();

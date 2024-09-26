@@ -49,7 +49,7 @@ class ItemLineCollector extends LineCollector
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
         $source = $propertySources->get('source');
         /** @var \Siel\Acumulus\Magento\Invoice\Item $item */
-        $item = $propertySources->get('itemInfo');
+        $item = $propertySources->get('item');
         /** @var OrderItemInterface|CreditmemoItemInterface $shopItem */
         $shopItem = $item->getShopObject();
 

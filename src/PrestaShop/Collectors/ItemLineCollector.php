@@ -49,7 +49,7 @@ class ItemLineCollector extends LineCollector
         $source = $propertySources->get('source');
         $sign = $source->getSign();
         /** @var \Siel\Acumulus\Invoice\Item $item */
-        $item = $propertySources->get('itemInfo');
+        $item = $propertySources->get('item');
         /** @var array $shopItem */
         $shopItem = $item->getShopObject();
 

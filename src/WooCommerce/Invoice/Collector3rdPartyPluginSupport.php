@@ -74,7 +74,7 @@ class Collector3rdPartyPluginSupport
     public function itemLineCollectBeforeBookings(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\WooCommerce\Invoice\Item $item */
-        $item = $propertySources->get('itemInfo');
+        $item = $propertySources->get('item');
         if (($item->getProduct() !== null) && function_exists('is_wc_booking_product')) {
             $product = $item->getProduct()->getShopObject();
             if (is_wc_booking_product($product)) {

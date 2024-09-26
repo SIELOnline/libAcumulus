@@ -57,7 +57,7 @@ class ItemLineCollector extends LineCollector
         $source = $propertySources->get('source');
         $order = $source->getShopObject();
         /** @var \Siel\Acumulus\Joomla\HikaShop\Invoice\Item $item */
-        $item = $propertySources->get('itemInfo');
+        $item = $propertySources->get('item');
         $shopItem = $item->getShopObject();
 
         // Remove html with variant info from product name, we'll add that later

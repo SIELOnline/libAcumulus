@@ -55,10 +55,13 @@ class PropertySources
     /**
      * Adds an object as property source.
      *
-     * The object is added to the start of the array. Thus, upon token expansion
-     * it will be searched before other (already added) property sources.
+     * The object is added to the start of the array. Thus, upon token expansion where a
+     * token is used that refers directly to a property (instead of referring to its
+     * parent first) it will be searched before other (already added) property sources.
      * If an object already exists under that name, the existing one will be
      * overwritten.
+     * NOTE: This is a deprecated way of token specification: do not rely on it: specify
+     *   the full path!
      *
      * @param string $name
      *   The name to use for the source
@@ -69,6 +72,7 @@ class PropertySources
      */
     public function add(string $name, mixed $property): static
     {
+        // Add in front.
         $this->propertySources = [$name => $property] + $this->propertySources;
         return $this;
     }

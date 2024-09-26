@@ -10,6 +10,7 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Meta;
 
 /**
@@ -69,6 +70,13 @@ class LineCollector extends SubTypedCollector
     protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
     {
         $acumulusObject->setType($this->subType);
+        // @nth: This should be in the collectBefore() of ItemLineCollectors, but that
+        //   would mean to duplicate it 6 times. Can we do this better?
+        if ($propertySources->get('item') instanceof Item) {
+            /** @var Item $item */
+            $item = $propertySources->get('item');
+            $propertySources->add('product', $item->getProduct());
+        }
         $this->getContainer()->getEvent()->triggerLineCollectBefore($acumulusObject, $propertySources);
     }
 
@@ -78,6 +86,7 @@ class LineCollector extends SubTypedCollector
     protected function collectAfter(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
         $this->getContainer()->getEvent()->triggerLineCollectAfter($acumulusObject, $propertySources);
+        $propertySources->remove('product');
     }
 
     /**

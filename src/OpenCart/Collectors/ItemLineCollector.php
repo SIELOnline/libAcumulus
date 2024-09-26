@@ -45,7 +45,7 @@ class ItemLineCollector extends LineCollector
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\OpenCart\Invoice\Item $item */
-        $item = $propertySources->get('itemInfo');
+        $item = $propertySources->get('item');
         $product = $item->getProduct();
         $shopItem = $item->getShopObject();
         /** @var array|null $shopProduct */

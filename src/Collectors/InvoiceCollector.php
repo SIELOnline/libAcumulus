@@ -15,6 +15,7 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 
 use function count;
+use function strlen;
 
 /**
  * Collects information to construct an Acumulus invoice.
@@ -200,11 +201,19 @@ class InvoiceCollector extends Collector
             return;
         }
 
+        /** @var \Siel\Acumulus\Collectors\LineCollector $lineCollector */
         $lineCollector = $this->getContainer()->getCollector(DataType::Line, $lineType);
         $lineMappings = $this->getMappings()->getFor($lineType);
-        $propertySourceName = lcfirst($lineType) . 'Info';
-        foreach ($infos as $key => $item) {
-            $propertySources->add($propertySourceName, $item);
+        $propertySourceName = $getInfosMethod;
+        if (str_starts_with($propertySourceName, 'get')) {
+            $propertySourceName = substr($propertySourceName, strlen('get'));
+        }
+        if (str_ends_with($propertySourceName, 's')) {
+            $propertySourceName = substr($propertySourceName, 0, -strlen('s'));
+        }
+        $propertySourceName = lcfirst($propertySourceName);
+        foreach ($infos as $key => $lineInfo) {
+            $propertySources->add($propertySourceName, $lineInfo);
             $propertySources->add('key', $key);
             /** @var \Siel\Acumulus\Data\Line $line */
             $line = $lineCollector->collect($propertySources, $lineMappings);

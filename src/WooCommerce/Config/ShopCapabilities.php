@@ -270,9 +270,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // Property sources for LineType::Item:
             // - source: Source
             // - item: Item,
-            //   - item::getShopObject(): WC_Order_Item_product
+            // - item::getShopObject(): WC_Order_Item_product
             // - product (or item::getProduct()): Product
-            //   - product::getShopObject(): ?WC_Product
+            // - product::getShopObject(): ?WC_Product
             LineType::Item => [
                 Fld::ItemNumber => '[product::getShopObject()::get_sku()]',
                 Fld::Product => '[item::getShopObject()::get_name()]',

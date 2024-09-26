@@ -45,7 +45,7 @@ class ItemLineCollector extends LineCollector
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Joomla\HikaShop\Invoice\Item $shopItem */
-        $item = $propertySources->get('itemInfo');
+        $item = $propertySources->get('item');
         $shopItem = $item->getShopObject();
 
         $productPriceEx = (float) $shopItem->product_discountedPriceWithoutTax;

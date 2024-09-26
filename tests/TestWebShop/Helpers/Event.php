@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\TestWebShop\Helpers;
 
-use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 
 /**
- * Event does foo.
+ * Event implements the {@see \Siel\Acumulus\Helpers\Event} interface for the test webshop.
  */
 class Event implements \Siel\Acumulus\Helpers\Event
 {
@@ -23,11 +22,11 @@ class Event implements \Siel\Acumulus\Helpers\Event
     {
     }
 
-    public function triggerItemLineCollectBefore(Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
     {
     }
 
-    public function triggerItemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
     {
     }
 

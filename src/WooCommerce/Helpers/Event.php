@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
-use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Event as EventInterface;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 
 /**
- * Event implements the Event interface for WooCommerce.
+ * Event implements the {@see \Siel\Acumulus\Helpers\Event} interface for WooCommerce.
  */
 class Event implements EventInterface
 {
@@ -22,14 +21,14 @@ class Event implements EventInterface
         do_action('acumulus_invoice_create_before', $invoiceSource, $localResult);
     }
 
-    public function triggerItemLineCollectBefore(Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
     {
-        do_action('acumulus_item_line_collect_before', $item, $collectorManager);
+        do_action('acumulus_line_collect_before', $line, $propertySources);
     }
 
-    public function triggerItemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
     {
-        do_action('acumulus_item_line_collect_after', $line, $item, $collectorManager);
+        do_action('acumulus_line_collect_after', $line, $propertySources);
     }
 
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void

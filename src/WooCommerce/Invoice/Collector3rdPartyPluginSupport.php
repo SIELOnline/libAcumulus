@@ -8,9 +8,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
-use Siel\Acumulus\Collectors\CollectorManager;
+use ArrayAccess;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
@@ -19,7 +21,6 @@ use Siel\Acumulus\Tag;
 use WC_Booking;
 use WC_Booking_Data_Store;
 use WC_Order_Item_Product;
-use WC_Product;
 
 use function function_exists;
 use function is_string;
@@ -36,19 +37,23 @@ use function is_string;
 class Collector3rdPartyPluginSupport
 {
     /**
-     * See {@see \Siel\Acumulus\Helpers\Event::triggerItemLineCollectBefore()}
+     * See {@see \Siel\Acumulus\Helpers\Event::triggerLineCollectBefore()}
      */
-    public function itemLineCollectBefore(Item $item, CollectorManager $collectorManager): void
+    public function lineCollectBefore(Line $line, PropertySources $propertySources): void
     {
-        $this->itemLineCollectBeforeBookings($item, $collectorManager);
+        if ($line->getType() === LineType::Item) {
+            $this->itemLineCollectBeforeBookings($line, $propertySources);
+        }
     }
 
     /**
-     * See {@see \Siel\Acumulus\Helpers\Event::triggerItemLineCollectAfter()}
+     * See {@see \Siel\Acumulus\Helpers\Event::triggerLineCollectAfter()}
      */
-    public function itemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void
+    public function lineCollectAfter(Line $line, PropertySources $propertySources): void
     {
-        $this->itemLineCollectAfterBookings($line, $item, $collectorManager);
+        if ($line->getType() === LineType::Item) {
+            $this->itemLineCollectAfterBookings($line, $propertySources);
+        }
     }
 
     /**
@@ -66,10 +71,11 @@ class Collector3rdPartyPluginSupport
      * Bookings are stored in a separate entity, we add that as a separate property
      * source, so its properties can be used.
      */
-    public function itemLineCollectBeforeBookings(Item $item, CollectorManager $collectorManager): void
+    public function itemLineCollectBeforeBookings(Line $line, PropertySources $propertySources): void
     {
+        /** @var \Siel\Acumulus\WooCommerce\Invoice\Item $item */
+        $item = $propertySources->get('itemInfo');
         if (($item->getProduct() !== null) && function_exists('is_wc_booking_product')) {
-            /** @var WC_Product $product */
             $product = $item->getProduct()->getShopObject();
             if (is_wc_booking_product($product)) {
                 $booking_ids = WC_Booking_Data_Store::get_booking_ids_from_order_item_id($item->getId());
@@ -78,10 +84,10 @@ class Collector3rdPartyPluginSupport
                     // order line, but if that occurs, only the 1st booking will
                     // be added as a property source.
                     $booking = new WC_Booking(reset($booking_ids));
-                    $collectorManager->addPropertySource('booking', $booking);
+                    $propertySources->add('booking', $booking);
                     $resource = $booking->get_resource();
                     if ($resource) {
-                        $collectorManager->addPropertySource('resource', $resource);
+                        $propertySources->add('resource', $resource);
                     }
                 }
             }
@@ -93,10 +99,10 @@ class Collector3rdPartyPluginSupport
      *
      * Removes the property sources.
      */
-    public function itemLineCollectAfterBookings(Line $line, Item $item, CollectorManager $collectorManager): void
+    public function itemLineCollectAfterBookings(Line $line, PropertySources $propertySources): void
     {
-        $collectorManager->removePropertySource('resource');
-        $collectorManager->removePropertySource('booking');
+        $propertySources->remove('resource');
+        $propertySources->remove('booking');
     }
 
     /**
@@ -272,15 +278,15 @@ class Collector3rdPartyPluginSupport
     /**
      * Returns an array of lines that describes this variant.
      *
-     * @param array|\ArrayAccess $item
-     *   The item line
+     * @param \ArrayAccess|array $item
+     *   The item line.
      * @param array $commonTags
      *   An array of tags from the parent product to add to the child lines.
      *
      * @return array[]
      *   An array of lines that describes this variant.
      */
-    protected function getExtraProductOptionsLines($item, array $commonTags): array
+    protected function getExtraProductOptionsLines(ArrayAccess|array $item, array $commonTags): array
     {
         $result = [];
 

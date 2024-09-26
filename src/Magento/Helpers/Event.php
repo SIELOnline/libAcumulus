@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Magento\Framework\Event\ManagerInterface;
-use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Event as EventInterface;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 
 /**
- * Event implements the Event interface for Magento.
+ * Event implements the {@see \Siel\Acumulus\Helpers\Event} interface for Magento.
  */
 class Event implements EventInterface
 {
@@ -23,14 +22,14 @@ class Event implements EventInterface
         $this->getEventManager()->dispatch('acumulus_invoice_create_before', compact('invoiceSource', 'localResult'));
     }
 
-    public function triggerItemLineCollectBefore(Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
     {
-        $this->getEventManager()->dispatch('acumulus_item_line_collect_before', compact('item', 'collectorManager'));
+        $this->getEventManager()->dispatch('acumulus_item_line_collect_before', compact('line', 'propertySources'));
     }
 
-    public function triggerItemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
     {
-        $this->getEventManager()->dispatch('acumulus_item_line_collect_after', compact('line', 'item', 'collectorManager'));
+        $this->getEventManager()->dispatch('acumulus_item_line_collect_after', compact('line', 'line', 'propertySources'));
     }
 
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void

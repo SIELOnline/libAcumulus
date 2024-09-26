@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Helpers;
 
-use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Event as EventInterface;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 
 /**
- * Event implements the Event interface for OpenCart.
+ * Event implements the {@see \Siel\Acumulus\Helpers\Event} interface for OpenCart.
  */
 class Event implements EventInterface
 {
@@ -24,17 +23,17 @@ class Event implements EventInterface
         $this->getEvent()->trigger($route, $args);
     }
 
-    public function triggerItemLineCollectBefore(Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
     {
         $route = Registry::getInstance()->getAcumulusTrigger('itemLineCollect', 'before');
-        $args = compact('item', 'collectorManager');
+        $args = compact('line', 'propertySources');
         $this->getEvent()->trigger($route, $args);
     }
 
-    public function triggerItemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
     {
         $route = Registry::getInstance()->getAcumulusTrigger('itemLineCollect', 'after');
-        $args = compact('line', 'item', 'collectorManager');
+        $args = compact('line', 'propertySources');
         $this->getEvent()->trigger($route, $args);
     }
 

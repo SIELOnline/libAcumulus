@@ -8,65 +8,49 @@ use Joomla\CMS\Application\CMSApplicationInterface;
 use Joomla\CMS\Event\AbstractEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
-use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Event as EventInterface;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Joomla\Component\Acumulus\Administrator\Extension\AcumulusComponent;
 
 /**
- * Event implements the Event interface for Joomla.
+ * Event implements the {@see \Siel\Acumulus\Helpers\Event} interface for Joomla.
  */
 class Event implements EventInterface
 {
-    /**
-     * @throws \Exception
-     */
     public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $this->triggerEvent('onAcumulusInvoiceCreateBefore', compact('invoiceSource', 'localResult'));
     }
 
-    public function triggerItemLineCollectBefore(Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
     {
-        $this->triggerEvent('onAcumulusItemLineCollectBefore', compact('item', 'collectorManager'));
+        $this->triggerEvent('onAcumulusLineCollectBefore', compact('line', 'propertySources'));
     }
 
-    public function triggerItemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void
+    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
     {
-        $this->triggerEvent('onAcumulusItemLineCollectAfter', compact('line', 'item', 'collectorManager'));
+        $this->triggerEvent('onAcumulusLineCollectAfter', compact('line', 'propertySources'));
     }
 
-    /**
-     * @throws \Exception
-     */
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $this->triggerEvent('onAcumulusInvoiceCollectAfter', compact('invoice', 'invoiceSource', 'localResult'));
     }
 
-    /**
-     * @throws \Exception
-     */
     public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
     {
         $this->triggerEvent('onAcumulusInvoiceSendBefore', compact('invoice', 'localResult'));
     }
 
-    /**
-     * @throws \Exception
-     */
     public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         $this->triggerEvent('onAcumulusInvoiceSendAfter', compact('invoice', 'invoiceSource', 'result'));
     }
 
-    /**
-     * @throws \Exception
-     */
     private function triggerEvent(string $eventName, array $params): void
     {
         PluginHelper::importPlugin('acumulus');
@@ -76,18 +60,12 @@ class Event implements EventInterface
         $this->getCMSApplication()->getDispatcher()->dispatch($eventName, $event);
     }
 
-    /**
-     * @throws \Exception
-     */
     private function getAcumulusComponent(): AcumulusComponent
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getCMSApplication()->bootComponent('acumulus');
     }
 
-    /**
-     * @throws \Exception
-     */
     private function getCMSApplication(): CMSApplicationInterface
     {
         return Factory::getApplication();

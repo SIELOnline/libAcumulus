@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 
 /**
- * Event does foo.
+ * Event defines the events that our library triggers.
+ *
+ * Implementing classes should convert these events into shop specific event triggers
  */
 interface Event
 {
@@ -35,39 +36,53 @@ interface Event
     public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void;
 
     /**
-     * Triggers an event that an item line is to be "collected".
+     * Triggers an event that a line is to be "collected".
      *
      * This event allows you to:
      * - Add property sources to the $collectorManager.
+     * - directly set some values or metadata on the line.
      * - Inject custom behaviour before an item line is collected, but before it is
      *   completed and sent.
+     * - Prevent a line being collected and added to the invoice by setting the metadata
+     *   value {@see \Siel\Acumulus\Meta::DoNotAdd} to true.
      *
-     * @param \Siel\Acumulus\Invoice\Item $item
-     *   The item (line) for which this item line has been collected. The product sold (or
-     *   refunded) on the item (line) can be retrieved with $item->getProduct().
-     * @param \Siel\Acumulus\Collectors\CollectorManager $collectorManager
-     *   The manager to add property sources to.
+     * @param \Siel\Acumulus\Data\Line $line
+     *   The line to store the collected values in.
+     * @param \Siel\Acumulus\Collectors\PropertySources $propertySources
+     *   The set of "objects" that can be used to collect data from. Available will be:
+     *   - 'invoice': The {@see \Siel\Acumulus\Data\Invoice} being collected. The invoice,
+     *     customer, both addresses, and emailAsPdf parts will already have been
+     *     collected.
+     *   - 'source': The {@see \Siel\Acumulus\Invoice\Source} for which the invoice is
+     *     being collected.
+     *   - '{lineType}LineInfo': the main "object" that results in 1 line. E.g. a product
+     *     order item record. Each record should result in 1 line, whereas the above
+     *     "objects" (invoice and source) are the same for every line being collected.
+     *     {lineType} is the {@see \lcfirst()} value of the
+     *     {@see \Siel\Acumulus\Data\LineType} constant name (not its value).
+     *   - 'key': The key with which the above "lineInfo" object was passed to the
+     *     collector. Most of the time not needed, but there are cases where it contains
+     *     valuable information (OC: shipping tax lines).
      */
-    public function triggerItemLineCollectBefore(Item $item, CollectorManager $collectorManager): void;
+    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void;
 
     /**
      * Triggers an event that an item line has been "collected".
      *
      * This event allows you to:
-     * - Remove property sources added during the {@see triggerItemLineCollectBefore}
+     * - Remove property sources added during the {@see triggerLineCollectBefore}
      *   event.
      * - Inject custom behaviour after an item line has been collected, but before it is
      *   completed and sent.
      *
      * @param \Siel\Acumulus\Data\Line $line
      *    The collected item line.
-     * @param \Siel\Acumulus\Invoice\Item $item
      *   The item (line) for which this item line has been collected.The product sold (or
      *   refunded) on the item (line) can be retrieved with $item->getProduct().
-     * @param \Siel\Acumulus\Collectors\CollectorManager $collectorManager
-     *   The manager to remove property sources from.
+     * @param \Siel\Acumulus\Collectors\PropertySources $propertySources
+     *   The set of "objects" that can be used to collect data from.
      */
-    public function triggerItemLineCollectAfter(Line $line, Item $item, CollectorManager $collectorManager): void;
+    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void;
 
     /**
      * Triggers an event that an invoice for Acumulus has been "collected" and

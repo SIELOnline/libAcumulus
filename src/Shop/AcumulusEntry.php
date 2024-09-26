@@ -227,7 +227,7 @@ class AcumulusEntry
     /**
      * Returns a DateTimeInterface object based on the timestamp in database format.
      *
-     * @param int|string $timestamp
+     * @param int|float|string $timestamp
      *
      * @return bool|\DateTimeInterface
      *
@@ -235,9 +235,13 @@ class AcumulusEntry
      */
     protected function toDateTime($timestamp): DateTimeInterface|bool
     {
-        if (is_numeric($timestamp)) {
+        $timestamp = (string) $timestamp;
+        if (ctype_digit($timestamp)) {
             // Unix timestamp.
-            $result = DateTimeImmutable::createFromFormat('U.u', (string) $timestamp);
+            $result = DateTimeImmutable::createFromFormat('U', $timestamp);
+        } elseif (is_numeric($timestamp)) {
+            // Unix timestamp.
+            $result = DateTimeImmutable::createFromFormat('U.u', $timestamp);
         } else {
             // Formatted timestamp, e.g. yyyy-mm-dd hh:mm:ss. Is assumed to be in the
             // timezone of the webshop if no timezone is specified in the string to parse.

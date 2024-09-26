@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '8.2.0';
+const Version = '8.3.0';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -568,6 +568,7 @@ class Container
     {
         $arguments = $subType !== null ? [$subType] : [];
         $arguments = array_merge($arguments, [
+            $this->getMappings(),
             $this->getFieldExpander(),
             $this,
             $this->getTranslator(),

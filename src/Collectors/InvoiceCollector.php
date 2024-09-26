@@ -4,7 +4,17 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\Customer;
+use Siel\Acumulus\Data\DataType;
+use Siel\Acumulus\Data\EmailAsPdfType;
+use Siel\Acumulus\Data\EmailInvoiceAsPdf;
+use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Meta;
+
+use function count;
 
 /**
  * Collects information to construct an Acumulus invoice.
@@ -17,7 +27,7 @@ use Siel\Acumulus\Invoice\Source;
  * Properties that are computed using logic (the logic may be put in a method
  * of {@see Source}, making it a mapping for the Collector):
  * - int $paymentStatus (typically based on recorded order status history).
- * - \DateTime $paymentDate (typically based on recorded order status history).
+ * - \DateTimeInterface $paymentDate (typically based on recorded order status history).
  *
  * Properties that are based on configuration and, optionally, metadata and
  * Completor findings, and thus are not set here:
@@ -26,7 +36,7 @@ use Siel\Acumulus\Invoice\Source;
  * - int $number (metadata regarding order and, if available, invoice number
  *   will be added)
  * - int $vatType
- * - \DateTime $issueDate (metadata regarding order and, if available, invoice
+ * - \DateTimeInterface $issueDate (metadata regarding order and, if available, invoice
  *   date will be added)
  * - int $costCenter (Completor phase: based on config and metadata about
  *   payment method)
@@ -118,4 +128,100 @@ use Siel\Acumulus\Invoice\Source;
  */
 class InvoiceCollector extends Collector
 {
+    /**
+     * This override collects the fields of an {@see \Siel\Acumulus\Data\Invoice} object,
+     * as well as of its child properties: {@see \Siel\Acumulus\Data\Customer},
+     * {@see \Siel\Acumulus\Data\EmailInvoiceAsPdf} and all its
+     * {@see \Siel\Acumulus\Data\Line}s.
+     *
+     * @return \Siel\Acumulus\Data\Invoice
+     */
+    public function collect(PropertySources $propertySources, ?array $fieldSpecifications): AcumulusObject
+    {
+        /** @var Invoice $invoice */
+        $invoice = parent::collect($propertySources, $fieldSpecifications);
+
+        $propertySources->add('invoice', $invoice);
+        $invoice->setCustomer($this->collectCustomer($propertySources));
+        $invoice->setEmailAsPdf($this->collectEmailAsPdf(EmailAsPdfType::Invoice, $propertySources));
+        $this->collectLines($invoice, $propertySources);
+
+        return $invoice;
+    }
+
+    protected function collectCustomer(PropertySources $propertySources): Customer
+    {
+        /** @var \Siel\Acumulus\Data\Customer $customer */
+        $customer = $this->getContainer()->getCollector(DataType::Customer)->collect($propertySources, null);
+        return $customer;
+    }
+
+    protected function collectEmailAsPdf(string $subType, PropertySources $propertySources): EmailInvoiceAsPdf
+    {
+        /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $emailAsPdf */
+        $emailAsPdf = $this->getContainer()->getCollector(DataType::EmailAsPdf, $subType)->collect($propertySources, null);
+        return $emailAsPdf;
+    }
+
+    /**
+     * Collects the invoice lines.
+     */
+    protected function collectLines(Invoice $invoice, PropertySources $propertySources): void
+    {
+        $this->collectLinesForType($invoice, LineType::Item, $propertySources, false, 'getItems');
+        $this->collectLinesForType($invoice, LineType::Shipping, $propertySources);
+        $this->collectLinesForType($invoice, LineType::GiftWrapping, $propertySources);
+        $this->collectLinesForType($invoice, LineType::PaymentFee, $propertySources);
+        $this->collectLinesForType($invoice, LineType::Other, $propertySources);
+        $this->collectLinesForType($invoice, LineType::Discount, $propertySources);
+        $this->collectLinesForType($invoice, LineType::Manual, $propertySources);
+        $this->collectLinesForType($invoice, LineType::Voucher, $propertySources);
+    }
+
+    /**
+     * Collects all lines for a given {@see LineType}.
+     *
+     * This method is not meant to be overridden.
+     *
+     * @param \Siel\Acumulus\Data\Invoice $invoice
+     *   The invoice to add the lines to.
+     * @param string $lineType
+     *   The type of line to collect. One of the {@see LineType} constants.
+     */
+    protected function collectLinesForType(Invoice $invoice, string $lineType, PropertySources $propertySources, bool $flattenChildren = true, ?string $getInfosMethod = null): void
+    {
+        /** @var Source $source */
+        $source = $propertySources->get('source');
+        if ($getInfosMethod === null) {
+            $getInfosMethod = "get{$lineType}Infos";
+        }
+        $infos = $source->$getInfosMethod();
+        if (count($infos) === 0) {
+            return;
+        }
+
+        $lineCollector = $this->getContainer()->getCollector(DataType::Line, $lineType);
+        $lineMappings = $this->getMappings()->getFor($lineType);
+        $propertySourceName = lcfirst($lineType) . 'Info';
+        foreach ($infos as $key => $item) {
+            $propertySources->add($propertySourceName, $item);
+            $propertySources->add('key', $key);
+            /** @var \Siel\Acumulus\Data\Line $line */
+            $line = $lineCollector->collect($propertySources, $lineMappings);
+            if (!$line->metadataGet(Meta::DoNotAdd)) {
+                $invoice->addLine($line);
+            }
+            // Note: item lines should normally not be flattened. However, for other line
+            // types we do not expect children, so if there are, it i because the info
+            // "object" lead to multiple lines anyway (perhaps for different tax rates).
+            if ($flattenChildren) {
+                foreach ($line->getChildren() as $child) {
+                    $invoice->addLine($child);
+                }
+                $line->removeChildren();
+            }
+            $propertySources->remove('key');
+            $propertySources->remove($propertySourceName);
+        }
+    }
 }

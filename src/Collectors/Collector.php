@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
@@ -34,13 +35,19 @@ use function strlen;
  */
 abstract class Collector implements CollectorInterface
 {
+    /**
+     * @var \Siel\Acumulus\Config\Mappings
+     *   Description.
+     */
+    private Mappings $mappings;
     private FieldExpander $fieldExpander;
     private Container $container;
     private Translator $translator;
     private Log $log;
 
-    public function __construct(FieldExpander $fieldExpander, Container $container, Translator $translator, Log $log)
+    public function __construct(Mappings $mappings, FieldExpander $fieldExpander, Container $container, Translator $translator, Log $log)
     {
+        $this->mappings = $mappings;
         $this->fieldExpander = $fieldExpander;
         $this->container = $container;
         $this->translator = $translator;
@@ -48,19 +55,28 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * Returns the type of {@see \Siel\Acumulus\Data\AcumulusObject} that gets
-     * collected.
+     * Returns the type of the {@see \Siel\Acumulus\Data\AcumulusObject} to be collected.
      *
      * @return string
-     *   The class name of the child clas of {@see AcumulusObject} this
-     *   Collector is meant to operate on: a {@see \Siel\Acumulus\Data\DataType}
-     *   constant.
+     *   A {@see \Siel\Acumulus\Data\DataType} constant.
      */
     protected function getAcumulusObjectType(): string
     {
         $fqClassName = static::class;
         $shortClass = substr($fqClassName, strrpos($fqClassName, '\\') + 1);
         return substr($shortClass, 0, -strlen('Collector'));
+    }
+
+    /**
+     * Returns which set of mappings should be used.
+     *
+     * @return string
+     *   The key for the set of mappings to be used, (the $$forType parameter to
+     *   {@see \Siel\Acumulus\Config\Mappings::getFor()}.
+     */
+    protected function getMappingsGetForKey(): string
+    {
+        return $this->getAcumulusObjectType();
     }
 
     /**
@@ -88,9 +104,28 @@ abstract class Collector implements CollectorInterface
         return $this->container;
     }
 
+    public function getMappings(): Mappings
+    {
+        return $this->mappings;
+    }
+
     protected function getFieldExpander(): FieldExpander
     {
         return $this->fieldExpander;
+    }
+
+    /**
+     * Returns the field specifications to use.
+     *
+     * @return array
+     *   See return value of {@see \Siel\Acumulus\Config\Mappings::getFor()}.
+     */
+    protected function getFieldSpecifications(?array $fieldSpecifications): array
+    {
+        if ($fieldSpecifications === null) {
+            $fieldSpecifications = $this->getMappings()->getFor($this->getMappingsGetForKey());
+        }
+        return $fieldSpecifications;
     }
 
     /**
@@ -121,14 +156,15 @@ abstract class Collector implements CollectorInterface
      *   String keyed set of "objects" that can provide properties to the
      *   {@see FieldExpander} for use in {@see collectMappedFields()} or just pass
      *   information for use in {@see collectLogicFields()}.
-     * @param string[] $fieldSpecifications
+     * @param string[]|null $fieldSpecifications
      *   A set of field specifications keyed by the target field name (property or
      *   metadata field in the target {@see AcumulusObject}.
      *
      * @return \Siel\Acumulus\Data\AcumulusObject
      */
-    public function collect(PropertySources $propertySources, array $fieldSpecifications): AcumulusObject
+    public function collect(PropertySources $propertySources, ?array $fieldSpecifications): AcumulusObject
     {
+        $fieldSpecifications = $this->getFieldSpecifications($fieldSpecifications);
         $acumulusObject = $this->createAcumulusObject();
         $this->collectBefore($acumulusObject, $propertySources, $fieldSpecifications);
         $this->collectMappedFields($acumulusObject, $propertySources, $fieldSpecifications);

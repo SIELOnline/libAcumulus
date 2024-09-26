@@ -6,21 +6,15 @@ namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\Address;
-use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdf;
-use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Meta;
-
-use function count;
 
 /**
  * CollectorManager manages the collector phase.
@@ -110,10 +104,6 @@ class CollectorManager
         $invoice = $invoiceCollector->collect($this->getPropertySources(), $invoiceMappings);
         $this->getPropertySources()->add('invoice', $invoice);
 
-        $invoice->setCustomer($this->collectCustomer());
-        $invoice->setEmailAsPdf($this->collectEmailAsPdf(EmailAsPdfType::Invoice));
-        $this->collectLines($invoice);
-
         return $invoice;
     }
 
@@ -124,15 +114,6 @@ class CollectorManager
 
         /** @var \Siel\Acumulus\Data\Customer $customer */
         $customer = $customerCollector->collect($this->getPropertySources(), $customerMappings);
-
-        $customer->setInvoiceAddress($this->collectAddress(AddressType::Invoice));
-        $customer->setShippingAddress($this->collectAddress(AddressType::Shipping));
-
-        // @todo: what to do if we have an "empty" address? (see OC examples)
-        //   - When to consider an address as being empty?
-        //   - Copy all fields or copy only empty fields (the latter seems to contradict
-        //     the concept of what an "empty" address constitutes).
-
         return $customer;
     }
 
@@ -158,67 +139,5 @@ class CollectorManager
         /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */
         $emailAsPdf = $emailAsPdfCollector->collect($this->getPropertySources(), $emailAsPdfMappings);
         return $emailAsPdf;
-    }
-
-    /**
-     * Collects the invoice lines.
-     */
-    private function collectLines(Invoice $invoice): void
-    {
-        $this->collectLinesForType($invoice, LineType::Item, false, 'getItems');
-        $this->collectLinesForType($invoice, LineType::Shipping);
-        $this->collectLinesForType($invoice, LineType::GiftWrapping);
-        $this->collectLinesForType($invoice, LineType::PaymentFee);
-        $this->collectLinesForType($invoice, LineType::Other);
-        $this->collectLinesForType($invoice, LineType::Discount);
-        $this->collectLinesForType($invoice, LineType::Manual);
-        $this->collectLinesForType($invoice, LineType::Voucher);
-    }
-
-    /**
-     * Collects all lines for a given {@see LineType}.
-     *
-     * This method is not meant to be overridden.
-     *
-     * @param \Siel\Acumulus\Data\Invoice $invoice
-     *   The invoice to add the lines to.
-     * @param string $lineType
-     *   The type of line to collect. One of the {@see LineType} constants.
-     */
-    protected function collectLinesForType(Invoice $invoice, string $lineType, bool $flattenChildren = true, ?string $getInfosMethod = null): void
-    {
-        /** @var Source $source */
-        $source = $this->getPropertySources()->get('source');
-        if ($getInfosMethod === null) {
-            $getInfosMethod = "get{$lineType}Infos";
-        }
-        $infos = $source->$getInfosMethod();
-        if (count($infos) === 0) {
-            return;
-        }
-
-        $lineCollector = $this->getContainer()->getCollector(DataType::Line, $lineType);
-        $lineMappings = $this->getMappings()->getFor($lineType);
-        $propertySourceName = lcfirst($lineType) . 'Info';
-        foreach ($infos as $key => $item) {
-            $this->getPropertySources()->add($propertySourceName, $item);
-            $this->getPropertySources()->add('key', $key);
-            /** @var \Siel\Acumulus\Data\Line $line */
-            $line = $lineCollector->collect($this->getPropertySources(), $lineMappings);
-            if (!$line->metadataGet(Meta::DoNotAdd)) {
-                $invoice->addLine($line);
-            }
-            // Note: item lines should normally not be flattened. However, for other line
-            // types we do not expect children, so if there are, it i because the info
-            // "object" lead to multiple lines anyway (perhaps for different tax rates).
-            if ($flattenChildren) {
-                foreach ($line->getChildren() as $child) {
-                    $invoice->addLine($child);
-                }
-                $line->removeChildren();
-            }
-            $this->getPropertySources()->remove('key');
-            $this->getPropertySources()->remove($propertySourceName);
-        }
     }
 }

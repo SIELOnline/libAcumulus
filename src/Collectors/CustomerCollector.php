@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\Customer;
+use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Meta;
 
 /**
@@ -43,9 +46,44 @@ use Siel\Acumulus\Meta;
 class CustomerCollector extends Collector
 {
     /**
+     * This override collects the fields of a {@see \Siel\Acumulus\Data\Customer} object,
+     * as well as of its 2 {@see \Siel\Acumulus\Data\Address} child properties.
+     *
+     * @return \Siel\Acumulus\Data\Customer
+     */
+    public function collect(PropertySources $propertySources, ?array $fieldSpecifications): AcumulusObject
+    {
+        /** @var Customer $customer */
+        $customer = parent::collect($propertySources, $fieldSpecifications);
+
+        $propertySources->add('customer', $customer);
+        $customer->setInvoiceAddress($this->collectAddress(AddressType::Invoice, $propertySources));
+        $customer->setShippingAddress($this->collectAddress(AddressType::Shipping, $propertySources));
+
+        // @todo: what to do if we have an "empty" address? (see OC examples)
+        //   - When to consider an address as being empty?
+        //   - Copy all fields or copy only empty fields (the latter seems to contradict
+        //     the concept of what an "empty" address constitutes).
+
+        return $customer;
+    }
+
+    /**
+     * @param string $subType
+     *   One of the {@see AddressType} constants Invoice or Shipping.
+     */
+    public function collectAddress(string $subType, PropertySources $propertySources): Address
+    {
+        /** @var \Siel\Acumulus\Data\Address $address */
+        $address = $this->getContainer()->getCollector(DataType::Address, $subType)->collect($propertySources, null);
+        return $address;
+    }
+
+
+    /**
      * @param \Siel\Acumulus\Data\Customer $acumulusObject
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
         // @todo: in fact, this is not the correct place to retrieve and store this. This
         //   should be either "global" metadata (except in OC) or at the invoice level

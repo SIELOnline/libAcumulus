@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
@@ -24,10 +25,20 @@ abstract class SubTypedCollector extends Collector
      */
     protected string $subType;
 
-    public function __construct(string $subType, FieldExpander $fieldExpander, Container $container, Translator $translator, Log $log)
+    public function __construct(string $subType, Mappings $mappings, FieldExpander $fieldExpander, Container $container, Translator $translator,
+        Log $log)
     {
         $this->subType = $subType;
-        parent::__construct($fieldExpander, $container, $translator, $log);
+        parent::__construct($mappings, $fieldExpander, $container, $translator, $log);
+    }
+
+    /**
+     * This override returns the subtype, a {@see \Siel\Acumulus\Data\LineType} constant
+     * as mappings differ per subtype (address type, line type, emailAsPdf type).
+     */
+    protected function getMappingsGetForKey(): string
+    {
+        return $this->subType;
     }
 
     protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void

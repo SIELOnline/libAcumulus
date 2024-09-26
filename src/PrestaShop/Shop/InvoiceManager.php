@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Shop;
 
-use DateTime;
+use DateTimeInterface;
 use Db;
 use Hook;
 use Order;
@@ -12,7 +12,6 @@ use OrderSlip;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
 
 /**
  * Implements the PrestaShop specific parts of the invoice manager.
@@ -91,7 +90,7 @@ class InvoiceManager extends BaseInvoiceManager
         return [];
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         $dateFromStr = $dateFrom->format('c');
         $dateToStr = $dateTo->format('c');

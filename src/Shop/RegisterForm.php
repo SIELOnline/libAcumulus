@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
-use DateTime;
+use DateTimeImmutable;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
@@ -439,7 +439,7 @@ class RegisterForm extends Form
                 'legend' => $this->t('congratulationsHeader'),
                 'description' => sprintf(
                     $this->t('congratulationsDesc'),
-                    DateTime::createFromFormat(Api::DateFormat_Iso, $this->signUpResponse['contractenddate'])
+                    DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->signUpResponse['contractenddate'])
                         ->format('d-m-Y')
                 ),
                 'fields' => [],

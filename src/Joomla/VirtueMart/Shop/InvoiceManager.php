@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
 
-use DateTime;
+use DateTimeInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
 
@@ -68,7 +68,7 @@ class InvoiceManager extends BaseInvoiceManager
         return [];
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             /** @noinspection PhpUnhandledExceptionInspection */

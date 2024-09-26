@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Shop;
 
-use DateTime;
+use DateTimeInterface;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoCollection;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
@@ -44,7 +43,7 @@ class InvoiceManager extends BaseInvoiceManager
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         $field = 'updated_at';
         $condition = [

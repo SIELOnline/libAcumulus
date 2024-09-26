@@ -90,18 +90,21 @@ class Source extends BaseSource
      * @noinspection PhpUnused
      *   Called via getStatus().
      */
-    protected function getStatusOrder(): int
+    protected function getStatusOrder(): int|null
     {
-        return (int) $this->getShopObject()->current_state;
+        return isset($this->getShopObject()->current_state) ? (int) $this->getShopObject()->current_state : null;
     }
 
     /**
      * Returns the status of this credit note.
      *
+     * @return null
+     *   A credit note in PrestaShop does not have a state.
+     *
+     * @todo: PHP8.2: standalone null is allowed
      * @noinspection PhpUnused  Called via getStatus().
-     * @noinspection ReturnTypeCanBeDeclaredInspection  null !== void
      */
-    protected function getStatusCreditNote()
+    protected function getStatusCreditNote(): int|null
     {
         return null;
     }

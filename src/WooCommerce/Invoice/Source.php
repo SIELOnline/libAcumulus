@@ -101,10 +101,10 @@ class Source extends BaseSource
     /**
      * @inheritDoc
      *
-     * @return string
+     * @return string|null
      *   The slug of the status (e.g. wc-completed).
      */
-    public function getStatus(): string
+    public function getStatus(): string|null
     {
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         return $this->getShopObject()->get_status();

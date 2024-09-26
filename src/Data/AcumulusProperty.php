@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
-use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use DomainException;
 use UnexpectedValueException;
 use Siel\Acumulus\Api;
@@ -57,7 +58,7 @@ class AcumulusProperty
     protected string $type;
     protected array $allowedValues;
     /** @var mixed|null */
-    protected $value;
+    protected mixed $value;
 
     /**
      * Creates a property based on the passed-in definition.
@@ -130,7 +131,7 @@ class AcumulusProperty
      *
      * @legacy: the return by reference is to make the ArrayAccess working.
      */
-    public function &getValue()
+    public function &getValue(): mixed
     {
         return $this->value;
     }
@@ -138,7 +139,7 @@ class AcumulusProperty
     /**
      * Assigns a value to the property.
      *
-     * @param string|int|float|\DateTime|null $value
+     * @param float|\DateTimeInterface|int|string|null $value
      *   The value to assign to this property, null and 'null' are valid values
      *   and will "unset" this property (it will not appear in the Acumulus API
      *   message).
@@ -154,7 +155,7 @@ class AcumulusProperty
      * @noinspection CallableParameterUseCaseInTypeContextInspection yes, we are juggling
      *   with types.
      */
-    public function setValue($value, int $mode = PropertySet::Always): bool
+    public function setValue(float|DateTimeInterface|int|string|null $value, int $mode = PropertySet::Always): bool
     {
         if (in_array($value, [null, 'null', ''], true)) {
             $value = null;
@@ -183,12 +184,12 @@ class AcumulusProperty
                 case 'date':
                     $date = false;
                     if (is_string($value)) {
-                        $date = DateTime::createFromFormat(Api::DateFormat_Iso, substr($value, 0, strlen('2000-01-01')));
+                        $date = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, substr($value, 0, strlen('2000-01-01')));
                     } elseif (is_int($value)) {
-                        $date = DateTime::createFromFormat('U', (string) $value);
+                        $date = DateTimeImmutable::createFromFormat('U', (string) $value);
                     } elseif (is_float($value)) {
-                        $date = DateTime::createFromFormat('U.u', (string) $value);
-                    } elseif ($value instanceof DateTime) {
+                        $date = DateTimeImmutable::createFromFormat('U.u', (string) $value);
+                    } elseif ($value instanceof DateTimeInterface) {
                         $date = $value;
                     }
                     if ($date === false) {
@@ -230,7 +231,7 @@ class AcumulusProperty
      *   of its allowed values. A date is converted to its ISO representation
      *   (yyyy-mm-dd). Any other type is returned as is.
      */
-    public function getApiValue()
+    public function getApiValue(): float|int|string
     {
         $result = '';
         if ($this->value !== null) {
@@ -242,7 +243,7 @@ class AcumulusProperty
                     $result = $this->value;
                     break;
                 case 'date':
-                    /** @var DateTime $date */
+                    /** @var DateTimeInterface $date */
                     $date = $this->value;
                     $result = $date->format(Api::DateFormat_Iso);
                     break;

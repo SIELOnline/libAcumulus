@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\TestWebShop\Invoice;
 
-use DateTime;
+use DateTimeImmutable;
 use Exception;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
@@ -33,7 +33,7 @@ class Source extends BaseSource
         return $this->getShopObject()->date;
     }
 
-    public function getStatus(): int|string
+    public function getStatus(): int|string|null
     {
         return 'pending';
     }
@@ -52,7 +52,7 @@ class Source extends BaseSource
     {
         try {
             $timestamp = $this->getShopObject()->payment->timestamp;
-            $date = new DateTime($timestamp);
+            $date = new DateTimeImmutable($timestamp);
             $result = $date->format('Y-m-d');
         } catch (Exception) {
             $result = null;

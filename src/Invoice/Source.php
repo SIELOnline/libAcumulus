@@ -96,14 +96,6 @@ abstract class Source
     }
 
     /**
-     * @deprecated: use getShopObject(), Check all mappings!
-     */
-    public function getSource(): object|array
-    {
-        return $this->getShopObject();
-    }
-
-    /**
      * Returns the user facing reference for the web shop's invoice source.
      *
      * Should be overridden when this is not the internal id.
@@ -152,10 +144,10 @@ abstract class Source
      * Should either be overridden or both getStatusOrder() and
      * getStatusCreditNote() should be implemented.
      *
-     * @return int|string
-     *   The status for this invoice source.
+     * @return int|string|null
+     *   The status for this invoice source, null if no status is known
      */
-    public function getStatus(): int|string
+    public function getStatus(): int|string|null
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -591,7 +583,7 @@ abstract class Source
      * senses if we could make methods (like getDescription(), getQuantity(),
      * getUnitPrice(), etc) on them that works for more or less all shops.]
      *
-     * This base implementation typically return an empty set: no shipping lines.
+     * This base implementation typically returns an empty set: no shipping lines.
      * Override to return the shop specific set of shipping infos or implement both
      * getShippingLineInfosOrder() and getShippingLineInfosCreditNote().
      *
@@ -604,7 +596,7 @@ abstract class Source
      */
     public function getShippingLineInfos(): array
     {
-        return $this->callTypeSpecificMethod(__FUNCTION__) ?? [];
+        return [];
     }
 
     /**
@@ -649,7 +641,7 @@ abstract class Source
      */
     public function getDiscountLineInfos(): array
     {
-        return $this->callTypeSpecificMethod(__FUNCTION__) ?? [];
+        return [];
     }
 
     /**

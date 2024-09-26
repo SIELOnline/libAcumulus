@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
-use DateTime;
+use DateTimeInterface;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -180,8 +180,8 @@ abstract class InvoiceManager
      */
     abstract public function getInvoiceSourcesByDateRange(
         string $invoiceSourceType,
-        DateTime $dateFrom,
-        DateTime $dateTo
+        DateTimeInterface $dateFrom,
+        DateTimeInterface $dateTo
     ): array;
 
     /**
@@ -464,7 +464,7 @@ abstract class InvoiceManager
      * This default implementation returns the DateTime as a string in ISO format
      * (yyyy-mm-dd hh:mm:ss).
      */
-    protected function getSqlDate(DateTime $date): string
+    protected function getSqlDate(DateTimeInterface $date): string
     {
         return $date->format(Api::Format_TimeStamp);
     }

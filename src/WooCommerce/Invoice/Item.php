@@ -13,6 +13,8 @@ use WC_Product;
  * Item is the WooCommerce specific class to wrap an order/refund item.
  *
  * @property \WC_Order_Item_Product $shopObject
+ * @method \WC_Order_Item_Product getShopObject()
+ * @method \Siel\Acumulus\WooCommerce\Invoice\Product getProduct()
  */
 class Item extends BaseItem
 {

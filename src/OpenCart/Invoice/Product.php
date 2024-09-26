@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Siel\Acumulus\OpenCart\Invoice;
 
 use RuntimeException;
+use Siel\Acumulus\Invoice\Product as BaseProduct;
 
 /**
- * Product does foo.
+ * Product is a wrapper/adapter around an OpenCart specific product (appearing on an Item).
+ *
+ * @property array $shopObject
+ * @method array getShopObject()
  */
-class Product extends \Siel\Acumulus\Invoice\Product
+class Product extends BaseProduct
 {
     protected function setShopObject(): void
     {

@@ -67,7 +67,7 @@ class Source extends BaseSource
         // @todo: override or implement both getDateOrder() and getDateCreditNote()
     }
 
-    public function getStatus(): int|string
+    public function getStatus(): int|string|null
     {
         // @todo: override or implement both getStatusOrder() and getStatusCreditNote()
     }

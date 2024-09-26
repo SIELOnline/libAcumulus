@@ -4,11 +4,10 @@ declare(strict_types=1);
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use Automattic\WooCommerce\Utilities\OrderUtil;
-use DateTime;
+use DateTimeInterface;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
 
 use function strlen;
 
@@ -176,7 +175,7 @@ class InvoiceManager extends BaseInvoiceManager
             : parent::getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo);
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         $args = [
             'date_modified' => sprintf('%d...%d', $dateFrom->getTimestamp(), $dateTo->getTimestamp()),

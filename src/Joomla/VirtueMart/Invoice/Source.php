@@ -95,10 +95,10 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return string|null
      *   A single character indicating the order status.
      */
-    public function getStatus(): string
+    public function getStatus(): string|null
     {
         return $this->getShopObject()['details']['BT']->order_status;
     }

@@ -8,9 +8,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Shop;
 
-use DateTime;
+use DateTimeInterface;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
@@ -64,7 +63,7 @@ class InvoiceManager extends BaseInvoiceManager
         return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($result->rows, $key));
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         $key = $this->tableInfo[$invoiceSourceType]['key'];
         /** @var \stdClass $result (documentation error in class DB) */

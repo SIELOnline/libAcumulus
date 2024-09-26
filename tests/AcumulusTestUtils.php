@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use PHPUnit\Framework\ExpectationFailedException;
 use Siel\Acumulus\Fld;
@@ -64,13 +64,13 @@ trait AcumulusTestUtils
      */
     protected static function getTime(): string
     {
-        return (new DateTime())->format('H:i:s.u');
+        return (new DateTimeImmutable())->format('H:i:s.u');
     }
 
     protected function getDiffInSeconds(DateTimeInterface $time1, DateTimeInterface $time2): int
     {
         $interval = $time1->diff($time2);
-        return (int) (new DateTime('@0'))->add($interval)->format('U');
+        return (int) (new DateTimeImmutable('@0'))->add($interval)->format('U');
     }
 
     /**
@@ -169,7 +169,7 @@ trait AcumulusTestUtils
      *
      * @throws \JsonException
      */
-    protected function getTestSource(string $path, string $type, int $id)
+    protected function getTestSource(string $path, string $type, int $id): mixed
     {
         $filename = "$path/$type$id.json";
         if (!is_readable($filename)) {
@@ -185,7 +185,7 @@ trait AcumulusTestUtils
      * @param mixed $data
      *   The data to be saved (in json format).
      */
-    protected function saveTestSource(string $path, string $type, int $id, bool $isNew, $data): void
+    protected function saveTestSource(string $path, string $type, int $id, bool $isNew, mixed $data): void
     {
         $append = $isNew ? '' : '.latest';
         $filename = "$path/$type$id$append.json";

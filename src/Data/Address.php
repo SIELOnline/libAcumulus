@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use DateTimeInterface;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
 
@@ -75,7 +76,7 @@ class Address extends AcumulusObject
     /**
      * @inheritdoc
      */
-    public function set(string $name, $value, int $mode = PropertySet::Always): bool
+    public function set(string $name, float|DateTimeInterface|int|string|null $value, int $mode = PropertySet::Always): bool
     {
         if (($name === Fld::CountryCode) && is_string($value)) {
             $value = strtoupper($value);

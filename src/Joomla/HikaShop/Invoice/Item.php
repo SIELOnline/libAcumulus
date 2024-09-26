@@ -9,11 +9,11 @@ use Siel\Acumulus\Invoice\Item as BaseItem;
 use Siel\Acumulus\Invoice\Product;
 
 /**
- * Item is a wrapper/adapter around OpenCart specific order product lines.
+ * Item is the HikaShop specific class to wrap an order/refund item.
  *
  * @method object getShopObject()
- *   See {@see \hikashopOrder_productClass}
  * @property object $shopObject See {@see \hikashopOrder_productClass}
+ * @method null getProduct()
  */
 class Item extends BaseItem
 {

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\TestWebShop\Shop;
 
-use DateTime;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Source;
+use DateTimeInterface;
 
 /**
  * invoiceManager does foo.
@@ -18,7 +16,7 @@ class invoiceManager extends \Siel\Acumulus\Shop\InvoiceManager
         return [];
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         return [];
     }

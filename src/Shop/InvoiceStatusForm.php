@@ -10,7 +10,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
-use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
@@ -25,7 +26,6 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
-use Siel\Acumulus\Meta;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -197,21 +197,12 @@ class InvoiceStatusForm extends Form
      */
     public function getStatusClass(int $status): string
     {
-        switch ($status) {
-            case static::Status_Success:
-                $result = 'success';
-                break;
-            case static::Status_Info:
-                $result = 'info';
-                break;
-            case static::Status_Warning:
-                $result = 'warning';
-                break;
-            case static::Status_Error:
-            default:
-                $result = 'error';
-                break;
-        }
+        $result = match ($status) {
+            static::Status_Success => 'success',
+            static::Status_Info => 'info',
+            static::Status_Warning => 'warning',
+            default => 'error',
+        };
         return $result;
     }
 
@@ -223,21 +214,11 @@ class InvoiceStatusForm extends Form
      */
     protected function getStatusIcon(int $status): string
     {
-        switch ($status) {
-            case static::Status_Success:
-                // Heavy check mark: json_decode('"\u2714"')
-                $result = '✔';
-                break;
-            case static::Status_Info:
-            case static::Status_Warning:
-                $result = '!';
-                break;
-            case static::Status_Error:
-            default:
-                // Heavy multiplication: \u2716
-                $result = '✖';
-                break;
-        }
+        $result = match ($status) {
+            static::Status_Success => '✔',
+            static::Status_Info, static::Status_Warning => '!',
+            default => '✖',
+        };
         return $result;
     }
 
@@ -368,7 +349,7 @@ class InvoiceStatusForm extends Form
                 $idPrefix = $this->getIdPrefix($source);
                 if ((int) $this->getSubmittedValue($idPrefix . 'payment_status_new') === Api::PaymentStatus_Paid) {
                     $dateFieldName = $idPrefix . 'payment_date';
-                    if (!DateTime::createFromFormat(Api::DateFormat_Iso, $this->getSubmittedValue($dateFieldName))) {
+                    if (!DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->getSubmittedValue($dateFieldName))) {
                         // Date is not a valid date.
                         $this->addFormMessage(sprintf($this->t('message_validate_batch_bad_payment_date'), $this->t('date_format')),
                             Severity::Error,
@@ -478,6 +459,8 @@ class InvoiceStatusForm extends Form
     /**
      * {@inheritdoc}
      * @noinspection InvertedIfElseConstructsInspection
+     *
+     * @throws \Exception
      */
     protected function getFieldDefinitions(): array
     {
@@ -527,7 +510,6 @@ class InvoiceStatusForm extends Form
         return $fields;
     }
 
-
     /**
      * Returns the overview for 1 source.
      *
@@ -536,6 +518,8 @@ class InvoiceStatusForm extends Form
      *
      * @return array[]
      *   The fields that describe the status for 1 source.
+     *
+     * @throws \Exception
      */
     protected function getFields1Source(Source $source, ?AcumulusEntry $localEntry): array
     {
@@ -556,38 +540,21 @@ class InvoiceStatusForm extends Form
         $entry = $invoiceInfo['entry'];
 
         // Create and add additional fields based on invoice status.
-        switch ($invoiceStatus) {
-            case static::Invoice_NotSent:
-                $additionalFields = $this->getNotSentFields();
-                break;
-            case static::Invoice_SentConcept:
-            case static::Invoice_SentConceptNoInvoice:
-                $additionalFields = $this->getConceptFields();
-                break;
-            case static::Invoice_CommunicationError:
-                $additionalFields = $this->getCommunicationErrorFields($result);
-                break;
-            case static::Invoice_NonExisting:
-                $additionalFields = $this->getNonExistingFields();
-                break;
-            case static::Invoice_Deleted:
-                $additionalFields = $this->getDeletedFields();
-                break;
-            case static::Invoice_Sent:
-                $additionalFields = $this->getEntryFields($source, $entry);
-                break;
-            case static::Invoice_LocalError:
-                $additionalFields = [];
-                break;
-            default:
-                $additionalFields = [
-                    'unknown' => [
-                        'type' => 'markup',
-                        'value' => sprintf($this->t('invoice_status_unknown'), $invoiceStatus),
-                    ]
-                ];
-                break;
-        }
+        $additionalFields = match ($invoiceStatus) {
+            static::Invoice_NotSent => $this->getNotSentFields(),
+            static::Invoice_SentConcept, static::Invoice_SentConceptNoInvoice => $this->getConceptFields(),
+            static::Invoice_CommunicationError => $this->getCommunicationErrorFields($result),
+            static::Invoice_NonExisting => $this->getNonExistingFields(),
+            static::Invoice_Deleted => $this->getDeletedFields(),
+            static::Invoice_Sent => $this->getEntryFields($source, $entry),
+            static::Invoice_LocalError => [],
+            default => [
+                'unknown' => [
+                    'type' => 'markup',
+                    'value' => sprintf($this->t('invoice_status_unknown'), $invoiceStatus),
+                ]
+            ],
+        };
 
         // Create main status field after we have the other fields, so we can
         // use the results in rendering the overall status.
@@ -620,6 +587,9 @@ class InvoiceStatusForm extends Form
      *   - 'result' (\Siel\Acumulus\ApiClient\Result?): result of the getEntry API call.
      *   - 'entry' (array?): the (main) response part of the getEntry API call.
      *   - 'statusField' (array): a form field array representing the status.
+     *
+     * @throws \Exception
+     *
      * @noinspection InvertedIfElseConstructsInspection
      */
     protected function getInvoiceInfo(Source $source, ?AcumulusEntry &$localEntry): array
@@ -716,7 +686,7 @@ class InvoiceStatusForm extends Form
                 $result = $this->acumulusApiClient->getEntry($localEntry->getEntryId());
                 if (!$result->hasError()) {
                     $entry = $this->sanitiseEntry($result->getMainAcumulusResponse());
-                    if ($entry['deleted'] instanceof DateTime) {
+                    if ($entry['deleted'] instanceof DateTimeInterface) {
                         // Entry has status "deleted".
                         $invoiceStatus = static::Invoice_Deleted;
                         $statusSeverity = static::Status_Warning;
@@ -1233,10 +1203,10 @@ class InvoiceStatusForm extends Form
     /**
      * Returns a hidden field.
      *
-     * @param string|int $value
+     * @param int|string $value
      *   The value for the hidden field.
      */
-    protected function getHiddenField($value): array
+    protected function getHiddenField(int|string $value): array
     {
         return [
             'type' => 'hidden',
@@ -1247,7 +1217,7 @@ class InvoiceStatusForm extends Form
     /**
      * Returns a formatted date.
      */
-    protected function getDate(DateTime $date): string
+    protected function getDate(DateTimeInterface $date): string
     {
         return $date->format(Api::DateFormat_Iso);
     }
@@ -1297,7 +1267,7 @@ class InvoiceStatusForm extends Form
      *
      * So we sanitise the values in the struct itself before using them:
      * - Int, float, and bool fields are cast to their proper type.
-     * - Date strings are parsed to a DateTime and formatted back to a date
+     * - Date strings are parsed to a DateTime(Immutable) and formatted back to a date
      *   string.
      * - Strings that can only contain a restricted set of values are checked
      *   against that set and emptied if not part of it.
@@ -1423,7 +1393,7 @@ class InvoiceStatusForm extends Form
      *   The html safe version of the value under this key or the empty string
      *   if not set.
      */
-    protected function sanitiseStringValue(array $entry, string $key, $additionalRestriction = null): string
+    protected function sanitiseStringValue(array $entry, string $key, array|string|null $additionalRestriction = null): string
     {
         $result = '';
         if (!empty($entry[$key])) {
@@ -1450,7 +1420,7 @@ class InvoiceStatusForm extends Form
      *   The int value of the value under this key or 0 if not provided. If
      *   $allowArray is set, an empty array is returned, if no value is set.
      */
-    protected function sanitiseIntValue(array $entry, string $key, bool $allowArray = false)
+    protected function sanitiseIntValue(array $entry, string $key, bool $allowArray = false): array|int
     {
         if (isset($entry[$key])) {
             if ($allowArray && is_array($entry[$key])) {
@@ -1502,8 +1472,8 @@ class InvoiceStatusForm extends Form
     {
         $date = '';
         if (!empty($entry[$key])) {
-            $date = DateTime::createFromFormat(Api::DateFormat_Iso, $entry[$key]);
-            if ($date instanceof DateTime) {
+            $date = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $entry[$key]);
+            if ($date instanceof DateTimeInterface) {
                 $date = $date->format(Api::DateFormat_Iso);
             } else {
                 $date = '';
@@ -1515,18 +1485,18 @@ class InvoiceStatusForm extends Form
     /**
      * Returns a sanitised date time value of an entry record.
      *
-     * @return DateTime|null
+     * @return DateTimeInterface|null
      *   The date time value of the value under this key or null if the string
      *   is not in the valid date-time format (yyyy-mm-dd hh:mm:ss).
      *   Note that the API might return 0000-00-00 00:00:00 which should not be
      *   accepted (recognised by a negative timestamp).
      */
-    protected function sanitiseDateTimeValue(array $entry, string $key): ?DateTime
+    protected function sanitiseDateTimeValue(array $entry, string $key): ?DateTimeInterface
     {
         $timeStamp = null;
         if (!empty($entry[$key])) {
-            $timeStamp = DateTime::createFromFormat(Api::Format_TimeStamp, $entry[$key]);
-            if (!$timeStamp instanceof DateTime || $timeStamp->getTimestamp() < 0) {
+            $timeStamp = DateTimeImmutable::createFromFormat(Api::Format_TimeStamp, $entry[$key]);
+            if (!$timeStamp instanceof DateTimeInterface || $timeStamp->getTimestamp() < 0) {
                 $timeStamp = null;
             }
         }

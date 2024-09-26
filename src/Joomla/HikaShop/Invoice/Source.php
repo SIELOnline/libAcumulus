@@ -63,10 +63,10 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return string|null
      *   The english name of the status.
      */
-    public function getStatus(): string
+    public function getStatus(): string|null
     {
         return $this->getShopObject()->order_status;
     }
@@ -80,7 +80,9 @@ class Source extends BaseSource
      */
     public function getPaymentMethod(): ?int
     {
-        return $this->getShopObject()->order_payment_id ?? parent::getPaymentMethod();
+        return isset($this->getShopObject()->order_payment_id)
+            ? (int) $this->getShopObject()->order_payment_id
+            : parent::getPaymentMethod();
     }
 
     public function getPaymentStatus(): int
@@ -191,7 +193,9 @@ class Source extends BaseSource
      */
     public function getInvoiceReference(): ?string
     {
-        return !empty($this->getShopObject()->order_invoice_number) ? $this->getShopObject()->order_invoice_number : parent::getInvoiceReference();
+        return !empty($this->getShopObject()->order_invoice_number)
+            ? $this->getShopObject()->order_invoice_number
+            : parent::getInvoiceReference();
     }
 
     public function getInvoiceDate(): ?string

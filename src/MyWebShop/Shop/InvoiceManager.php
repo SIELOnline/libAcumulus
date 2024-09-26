@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\MyWebShop\Shop;
 
-use DateTime;
+use DateTimeInterface;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
 
 /**
  * Implements the MyWebShop specific parts of the invoice manager.
@@ -59,7 +57,7 @@ class InvoiceManager extends BaseInvoiceManager
         //   method.
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         // @todo: provide implementation.
     }

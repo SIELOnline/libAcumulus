@@ -9,11 +9,11 @@ use Siel\Acumulus\Invoice\Item as BaseItem;
 use Siel\Acumulus\Invoice\Product;
 
 /**
- * Item is a wrapper/adapter around OpenCart specific order product lines.
+ * Item is the VirtueMart specific class to wrap an order/refund item.
  *
- * @method object getShopObject()
- *   See {@see \hikashopOrder_productClass}
- * @property object $shopObject See {@see \hikashopOrder_productClass}
+ * @method object getShopObject() $shopObject
+ * @property object $shopObject A virtuemart_order_items table record
+ * @method null getProduct()
  */
 class Item extends BaseItem
 {

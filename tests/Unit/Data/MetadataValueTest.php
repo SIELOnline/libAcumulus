@@ -81,6 +81,9 @@ class MetadataValueTest extends TestCase
         $this->assertSame("['value1',2]", $mdv->getApiValue());
     }
 
+    /**
+     * Note that we test with both DateTime and DateTimeImmutable.
+     */
     public function getApiValueDataProvider(): array
     {
         return [
@@ -125,6 +128,7 @@ class MetadataValueTest extends TestCase
             }
         };
         $notStringableClass = new class (1, 2, 3, 4) {
+            /** @noinspection PhpPropertyOnlyWrittenInspection */
             public function __construct(public int $oct1, public int $oct2, private int $oct3, private int $oct4)
             {
             }

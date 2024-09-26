@@ -7,7 +7,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 
-use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
@@ -49,8 +50,8 @@ class CompleteIssueDateTest extends TestCase
     {
         $date20220203 = '2022-02-03';
         $date20230405 = '2023-04-05';
-        $dateTime20220203 = DateTime::createFromFormat('Y-m-d', $date20220203)->setTime(0, 0, 0);
-        $dateTime20230405 = DateTime::createFromFormat('Y-m-d', $date20230405)->setTime(0, 0, 0);
+        $dateTime20220203 = DateTimeImmutable::createFromFormat('Y-m-d', $date20220203)->setTime(0, 0, 0);
+        $dateTime20230405 = DateTimeImmutable::createFromFormat('Y-m-d', $date20230405)->setTime(0, 0, 0);
         return [
             [Config::IssueDateSource_Transfer, $date20220203, $date20230405, null],
             [Config::IssueDateSource_OrderCreate, $date20220203, $date20230405, $dateTime20220203],
@@ -67,9 +68,9 @@ class CompleteIssueDateTest extends TestCase
      * @param int $issueDateSource
      * @param string|null $orderDate
      * @param string|null $invoiceDate
-     * @param \DateTime|null $expected
+     * @param DateTimeInterface|null $expected
      */
-    public function testComplete(int $issueDateSource, ?string $orderDate, ?string $invoiceDate, ?DateTime $expected): void
+    public function testComplete(int $issueDateSource, ?string $orderDate, ?string $invoiceDate, ?DateTimeInterface $expected): void
     {
         $config = $this->getContainer()->getConfig();
         $config->set('dateToUse', $issueDateSource);

@@ -11,6 +11,10 @@ use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
  * Item is a wrapper/adapter around OpenCart specific order product lines.
+ *
+ * @property array $shopObject
+ * @method array getShopObject()
+ * @method \Siel\Acumulus\OpenCart\Invoice\Product|null getProduct()
  */
 abstract class Item extends BaseItem
 {

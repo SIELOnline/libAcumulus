@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Data;
 
 use ArrayAccess;
 use BadMethodCallException;
+use DateTimeInterface;
 use ReflectionClass;
 use RuntimeException;
 
@@ -200,7 +201,7 @@ abstract class AcumulusObject implements ArrayAccess
      *
      * @param string $name
      *   The name of the property to set.
-     * @param string|int|float|\DateTime|null $value
+     * @param float|\DateTimeInterface|int|string|null $value
      *   The value to assign to this property, null is a valid value and will
      *   "unset" this property (it will not appear in the Acumulus API message).
      * @param int $mode
@@ -214,7 +215,7 @@ abstract class AcumulusObject implements ArrayAccess
      * @throws \RuntimeException
      *   $name is not an existing name of an {@see AcumulusProperty}.
      */
-    public function set(string $name, $value, int $mode = PropertySet::Always): bool
+    public function set(string $name, float|DateTimeInterface|int|string|null $value, int $mode = PropertySet::Always): bool
     {
         $this->checkIsProperty($name);
         return $this->data[$name]->setValue($value, $mode);

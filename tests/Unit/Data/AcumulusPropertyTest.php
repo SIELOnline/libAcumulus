@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Data;
 
-use DateTime;
+use DateTimeImmutable;
 use DomainException;
 use Siel\Acumulus\Data\AcumulusProperty;
 use PHPUnit\Framework\TestCase;
@@ -121,9 +121,9 @@ class AcumulusPropertyTest extends TestCase
         $now = time();
         $floatNow = ((float) $now) + 0.5;
         return [
-            'date-string' => ['date', '2022-09-01', DateTime::createFromFormat('Y-m-d', '2022-09-01')->setTime(0, 0, 0)],
-            'date-int' => ['date', $now, DateTime::createFromFormat('U', (string) $now)->setTime(0, 0, 0)],
-            'date-float' => ['date', $floatNow, DateTime::createFromFormat('U.u', (string) $floatNow)->setTime(0, 0, 0)],
+            'date-string' => ['date', '2022-09-01', DateTimeImmutable::createFromFormat('Y-m-d', '2022-09-01')->setTime(0, 0, 0)],
+            'date-int' => ['date', $now, DateTimeImmutable::createFromFormat('U', (string) $now)->setTime(0, 0, 0)],
+            'date-float' => ['date', $floatNow, DateTimeImmutable::createFromFormat('U.u', (string) $floatNow)->setTime(0, 0, 0)],
         ];
     }
 

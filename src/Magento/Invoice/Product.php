@@ -8,7 +8,7 @@ use RuntimeException;
 use Siel\Acumulus\Invoice\Product as BaseProduct;
 
 /**
- * Item is the Magento specific class to wrap an order/refund item line product.
+ * Product is a wrapper/adapter around a Magento specific product (appearing on an Item).
  *
  * @property \Magento\Catalog\Model\Product $shopObject
  * @method \Magento\Catalog\Model\Product getShopObject()

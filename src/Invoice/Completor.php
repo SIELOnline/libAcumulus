@@ -21,7 +21,8 @@
 namespace Siel\Acumulus\Invoice;
 
 use ArrayAccess;
-use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Collectors\LineCollector;
 use Siel\Acumulus\Config\Config;
@@ -1508,11 +1509,11 @@ class Completor
     /**
      * Returns the invoice date.
      */
-    protected function getInvoiceDate(): DateTime
+    protected function getInvoiceDate(): DateTimeInterface
     {
         return !empty($this->invoice[Tag::IssueDate])
             ? $this->invoice[Tag::IssueDate]
-            : new DateTime();
+            : new DateTimeImmutable();
     }
 
     /**

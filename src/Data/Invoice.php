@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
-use DateTime;
+use DateTimeInterface;
 use Error;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
@@ -35,11 +35,11 @@ use Siel\Acumulus\Meta;
  * @property ?string $conceptType
  * @property ?int $number
  * @property ?int $vatType
- * @property ?\DateTime $issueDate
+ * @property ?DateTimeInterface $issueDate
  * @property ?int $costCenter
  * @property ?int $accountNumber
  * @property ?int $paymentStatus
- * @property ?\DateTime $paymentDate
+ * @property ?DateTimeInterface $paymentDate
  * @property ?string $description
  * @property ?string $descriptionText
  * @property ?int $template
@@ -49,11 +49,11 @@ use Siel\Acumulus\Meta;
  * @method bool setConceptType(?string $value, int $mode = PropertySet::Always)
  * @method bool setNumber(?int $value, int $mode = PropertySet::Always)
  * @method bool setVatType(?int $value, int $mode = PropertySet::Always)
- * @method bool setIssueDate(?DateTime $value, int $mode = PropertySet::Always)
+ * @method bool setIssueDate(?DateTimeInterface $value, int $mode = PropertySet::Always)
  * @method bool setCostCenter(?int $value, int $mode = PropertySet::Always)
  * @method bool setAccountNumber(?int $value, int $mode = PropertySet::Always)
  * @method bool setPaymentStatus(?int $value, int $mode = PropertySet::Always)
- * @method bool setPaymentDate(?DateTime $value, int $mode = PropertySet::Always)
+ * @method bool setPaymentDate(?DateTimeInterface $value, int $mode = PropertySet::Always)
  * @method bool setDescription(?string $value, int $mode = PropertySet::Always)
  * @method bool setDescriptionText(?string $value, int $mode = PropertySet::Always)
  * @method bool setTemplate(?int $value, int $mode = PropertySet::Always)

@@ -12,6 +12,8 @@ use Siel\Acumulus\Invoice\Product;
  * Item is the PrestaShop specific class to wrap an order/refund item.
  *
  * @property array $shopObject Combination of OrderDetail and order detail taxes.
+ * @method array getShopObject()
+ * @method null getProduct()
  *
  * @todo: do we get PrestaShop\PrestaShop\Core\Domain\Order\ValueObject\OrderDetailRefund
  *   objects with order slips?

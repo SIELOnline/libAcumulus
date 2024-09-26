@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
-use DateTime;
+use DateTimeImmutable;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
@@ -145,7 +145,7 @@ class BatchForm extends Form
         } else /*if ($this->submittedValues['date_to'] !== '') */ {
             // Range of dates has been filled in.
             // We ignore any order # to value.
-            if (!DateTime::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_from'])) {
+            if (!DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_from'])) {
                 // Date from not a valid date.
                 $this->addFormMessage(
                     sprintf($this->t('message_validate_batch_bad_date_from'), $this->t('date_format')),
@@ -154,7 +154,7 @@ class BatchForm extends Form
                 );
             }
             if ($this->submittedValues['date_to']) {
-                if (!DateTime::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_to'])) {
+                if (!DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_to'])) {
                     // Date to not a valid date.
                     $this->addFormMessage(
                         sprintf($this->t('message_validate_batch_bad_date_to'), $this->t('date_format')),
@@ -195,11 +195,11 @@ class BatchForm extends Form
             }
         } else {
             // Retrieve by order date.
-            $from = DateTime::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_from'));
+            $from = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_from'));
             /** @noinspection PhpRedundantOptionalArgumentInspection */
             $from->setTime(0, 0, 0);
             $to = $this->getFormValue('date_to')
-                ? DateTime::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_to'))
+                ? DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_to'))
                 : clone $from;
             $to->setTime(23, 59, 59);
             $this->screenLog['range'] = sprintf(

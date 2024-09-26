@@ -82,12 +82,12 @@ abstract class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * @return int
+     * @return int|null
      *   The id of the status.
      */
-    public function getStatus(): int
+    public function getStatus(): int|null
     {
-        return (int) $this->shopObject['order_status_id'];
+        return isset($this->shopObject['order_status_id']) ? (int) $this->shopObject['order_status_id'] : null;
     }
 
     public function getCountryCode(): string

@@ -8,9 +8,10 @@ use RuntimeException;
 use Siel\Acumulus\Invoice\Product as BaseProduct;
 
 /**
- * Item is the WooCommerce specific class to wrap an order/refund item line product.
+ * Product is a wrapper/adapter around a WooCommerce specific product (appearing on an Item).
  *
  * @property \WC_Product $shopObject
+ * @method \WC_Product getShopObject()
  */
 class Product extends BaseProduct
 {

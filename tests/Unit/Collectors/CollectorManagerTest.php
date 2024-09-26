@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Collectors;
 
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
@@ -61,7 +61,7 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($invoice->accountNumber);
         $this->assertNull($invoice->template);
         $this->assertSame(Api::PaymentStatus_Paid, $invoice->paymentStatus);
-        $this->assertEquals(new DateTime('2022-12-02'), $invoice->paymentDate);
+        $this->assertEquals(new DateTimeImmutable('2022-12-02'), $invoice->paymentDate);
         $this->assertSame('Bestelling 3', $invoice->description);
         $this->assertNull($invoice->descriptionText);
         $this->assertNull($invoice->invoiceNotes);
@@ -157,6 +157,7 @@ class CollectorManagerTest extends TestCase
     {
         $collectorManager = $this->getContainer()->getCollectorManager();
         $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
+        /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $invoiceEmailAsPdf */
         $invoiceEmailAsPdf = $collectorManager->collectEmailAsPdf(EmailAsPdfType::Invoice);
 
         $this->assertNull($invoiceEmailAsPdf->emailFrom);

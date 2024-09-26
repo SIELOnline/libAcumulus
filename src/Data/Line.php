@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
+use Siel\Acumulus\Meta;
 
 /**
  * Represents an invoice line object of an Acumulus API invoice object.
@@ -48,6 +49,28 @@ class Line extends AcumulusObject
 
     /** @var \Siel\Acumulus\Data\Line[] */
     protected array $children = [];
+
+    /**
+     * Returns the type of this line.
+     *
+     * @return string
+     *   One of the {@see LineType} constants.
+     */
+    public function getType(): string
+    {
+        return $this->metadataGet(Meta::SubType);
+    }
+
+    /**
+     * Sets the type of this line
+     *
+     * @param string $type
+     *   One of the {@see LineType} constants.
+     */
+    public function setType(string $type): void
+    {
+        $this->metadataSet(Meta::SubType, $type);
+    }
 
     /**
      * @return \Siel\Acumulus\Data\Line[]

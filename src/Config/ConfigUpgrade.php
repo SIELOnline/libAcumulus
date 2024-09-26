@@ -79,7 +79,7 @@ class ConfigUpgrade
      *   everybody running on 6.0.1 when updating at once to 6.4.1(release date
      *   2020-08-06) or later. If updating from an older version, some config
      *   values may be 'corrupted'.
-
+     *
      * @param string $currentVersion
      *   The current version of the config data. This will be replaced by the
      *   config value 'VersionKey'. But as long as that key is not set, this
@@ -644,7 +644,7 @@ class ConfigUpgrade
     }
 
     /**
-     * 8.0.0 upgrade.
+     * 8.0.2 upgrade.
      *
      * - Move salutation from (invoice) address to customer.
      */
@@ -685,14 +685,27 @@ class ConfigUpgrade
      */
     protected function upgrade830(): bool
     {
+        // Was never called.
+        $result = $this->upgrade802();
+
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
         $mappings = $values[Config::Mappings] ?? [];
-        array_walk_recursive($mappings, static function (&$value) {
-            if (is_string($value) && str_contains($value, '::getSource()::')) {
-                $value = str_replace('::getSource()::', '::getShopObject()::', $value);
+        $replacements = [
+            'invoiceSource::' => 'source::',
+            '::getSource()::' => '::getShopObject()::',
+            'invoiceSourceType::label' => 'source::getTypeLabel(2)',
+            'order::' => 'source::getOrder()::',
+            'refundedOrder::' => 'source::getParent()::',
+            'refund::' => 'source::isCreditNote()::',
+        ];
+        array_walk_recursive($mappings, static function(&$value) use ($replacements) {
+            foreach ($replacements as $search => $replace) {
+                if (is_string($value)) {
+                    $value = str_replace($search, $replace, $value);
+                }
             }
         });
-        return $configStore->save([Config::Mappings => $mappings]);
+        return $configStore->save([Config::Mappings => $mappings]) && $result;
     }
 }

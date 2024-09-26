@@ -3,7 +3,7 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.3.0 (2024-09-??) (ALL)
+8.3.0 (2024-09-26) (ALL)
 ------------------------
 Minimal requirements:
 - This plugin now requires PHP 8.0. This means that support has been dropped for the
@@ -14,7 +14,25 @@ Minimal requirements:
   Note that PHP 8.0 already reached end of life and will no longer receive security
   updates. So, in the near future we will upgrade our minimal requirements to PHP 8.1.
 
-Features:
+Incompatibilities:
+- Mappings: For those who have custom mappings: lots of "objects" were renamed. If, in the
+  past, you have defined mappings for order item lines in the mappings form, you MUST
+  check and probably adapt those settings. The following properties are no longer
+  available. Note that we try to update most of them automatically:
+  - invoiceSource::...: use source::...
+  - invoiceSource::getSource()::...: use source::getShopObject()::...
+  - invoiceSourceType::label: use source:getTypeLabel(2)
+  - originalInvoiceSource: ...
+  - originalInvoiceSourceType: ...
+  - refund: use source::isCreditNote()::...
+  - order or refundedOrder: use source::getOrder() resp. source::getParent().
+  - refundedInvoiceSource: ...
+  - refundedInvoiceSourceType: ...
+- Events: For those that have custom code on top of our library: events have been renamed
+  and parameters have changed. The customise_acumulus_invoice example plugins that we
+  publish have not ye been updated and will thus no longer work.
+
+- Features:
 - JOO: Native support for Joomla 5, our component and plugins do no longer need the compat
   plugin. However, please note that VirtueMart still needs that plugin. HikaShop has its
   own compat layer, so probably does not need that plugin.
@@ -26,21 +44,12 @@ Bugs:
   was not stored or displayed correctly.
 - ALL: mapping for a metadata value may be the constant null but this was rejected when
   expanding mappings (as fields may not set to null).
+- ALL: Only still valid Pro-support should be listed in the About section on our forms.
 - ALL (minor): Comparison of codes of Messages changed due to changes in how PHP8 compares
   strings and numbers.
 
 Refactorings:
-- ALL: Incompatibilities: If, in the past, you have defined mappings for order item lines
-  (in the advanced settings form), you MUST check and probably redo those settings in the
-  mappings form. The following properties are no longer available:
-  - invoiceSource: use source::
-  - invoiceSourceType::label: use source:getTypeLabel(2)
-  - originalInvoiceSource: ...
-  - originalInvoiceSourceType: ...
-  - refund: use source::isCreditNote()::...
-  - order or refundedOrder: use source::getOrder() resp. source::getParent().
-  - refundedInvoiceSource: ...
-  - refundedInvoiceSourceType: ...
+- ALL: Removed Creator class(replaced by Collectors)
 - ALL: Introduced Item and Product as wrapper/adapter around item lines and product
   objects from the web shop. Extracted common wrapper/adapter code into WrapperTrait.
 - ALL: Started using Line collectors and completors the new way, gradually moving code
@@ -50,7 +59,7 @@ Refactorings:
   used code all over the code base.
 - ALL: Removed vat breakdown from Totals. Totals now merely represents an amount (broken
   down in a price inc, price ex, and vat amount).
-- ALL: Started using DateTimeImmutable and, as a consequence, DateTimeInterface for type
+- ALL: Moved to using DateTimeImmutable and, as a consequence, DateTimeInterface for type
   hinting.
 
 

@@ -601,8 +601,7 @@ class ConfigUpgrade
             'packingSlipConfirmReading' => [EmailAsPdfType::PackingSlip, Fld::ConfirmReading],
         ];
         $result = true;
-        $configStore = $this->getConfigStore();
-        $values = $configStore->load();
+        $values = $this->getConfigStore()->load();
         $mappings = $values[Config::Mappings] ?? [];
         foreach ($mappingKeys as $key => [$group, $property]) {
             // - Was the old key being overridden by the user? That is, is there a value,
@@ -620,7 +619,7 @@ class ConfigUpgrade
             $values[Config::Mappings] = $mappings;
             // This is to warn the user.
             $values['showPluginV8MessageOverriddenMappings'] = $this->getOverriddenMappings($mappings);
-            $result = $configStore->save($values);
+            $result = $this->getConfig()->save($values);
         }
         return $result;
     }
@@ -651,8 +650,7 @@ class ConfigUpgrade
     protected function upgrade802(): bool
     {
         $result = true;
-        $configStore = $this->getConfigStore();
-        $values = $configStore->load();
+        $values = $this->getConfigStore()->load();
         $mappings = $values[Config::Mappings] ?? [];
         $doSave = false;
         if (isset($mappings[AddressType::Invoice][Fld::Salutation])) {
@@ -670,7 +668,7 @@ class ConfigUpgrade
             $doSave = true;
         }
         if ($doSave) {
-            $result = $configStore->save([Config::Mappings => $mappings]);
+            $result = $this->getConfig()->save([Config::Mappings => $mappings]);
         }
         return $result;
     }
@@ -688,8 +686,7 @@ class ConfigUpgrade
         // Was never called.
         $result = $this->upgrade802();
 
-        $configStore = $this->getConfigStore();
-        $values = $configStore->load();
+        $values = $this->getConfigStore()->load();
         $mappings = $values[Config::Mappings] ?? [];
         $replacements = [
             'invoiceSource::' => 'source::',
@@ -706,6 +703,6 @@ class ConfigUpgrade
                 }
             }
         });
-        return $configStore->save([Config::Mappings => $mappings]) && $result;
+        return $this->getConfig()->save([Config::Mappings => $mappings]) && $result;
     }
 }

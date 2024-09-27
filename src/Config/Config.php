@@ -197,7 +197,7 @@ class Config
         if (!empty($copy[Tag::Password])) {
             $copy[Tag::Password] = 'REMOVED FOR SECURITY';
         }
-        $this->log->notice('ConfigStore::save(): saving %s', json_encode($copy, Meta::JsonFlags));
+        $this->log->notice('Config::save(): saving %s', json_encode($copy, Meta::JsonFlags));
 
         // Remove password if not sent along. We have had some reports that
         // passwords were gone missing, perhaps some shops do not send the value

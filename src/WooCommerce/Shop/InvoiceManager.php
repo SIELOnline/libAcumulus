@@ -194,11 +194,6 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function query2Sources(array $args, string $invoiceSourceType, bool $sort = true): array
     {
-        /** @noinspection JsonEncodingApiUsageInspection */
-        $this->getLog()->info(
-            'WooCommerce\InvoiceManager::query2Sources: args = %s',
-            str_replace(["\r", "\n"], '', json_encode($args, Log::JsonFlags))
-        );
         // Add default arguments.
         $args += [
             'type' => $this->sourceTypeToShopType($invoiceSourceType),

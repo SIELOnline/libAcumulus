@@ -69,17 +69,9 @@ class ItemLineCollector extends LineCollector
         $productPriceEx = (float) $shopItem->order_product_price;
         $productVat = (float) $shopItem->order_product_tax;
 
-        // Check for cost price and margin scheme.
-        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
-            // - But still send the VAT rate to Acumulus.
-            $line->unitPrice = $productPriceEx + $productVat;
-        } else {
-            $line->unitPrice = $productPriceEx;
-            $line->metadataSet(Meta::LineAmount, $shopItem->order_product_total_price_no_vat);
-            $line->metadataSet(Meta::LineAmountInc, $shopItem->order_product_total_price);
-        }
+        $line->unitPrice = $productPriceEx;
+        $line->metadataSet(Meta::LineAmount, $shopItem->order_product_total_price_no_vat);
+        $line->metadataSet(Meta::LineAmountInc, $shopItem->order_product_total_price);
 
         // Try to get the exact vat rate from the order-product info.
         // Note that this info remains correct when rates are changed as this

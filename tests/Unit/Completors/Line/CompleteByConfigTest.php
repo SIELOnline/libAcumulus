@@ -10,7 +10,6 @@ namespace Siel\Acumulus\Tests\Unit\Completors\Line;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;

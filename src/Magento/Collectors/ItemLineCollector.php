@@ -87,17 +87,9 @@ class ItemLineCollector extends LineCollector
         $productPriceEx = (float) $shopItem->getBasePrice(); // copied to mappings.
         $productPriceInc = (float) $shopItem->getBasePriceInclTax(); // copied to mappings.
 
-        // Check for cost price and margin scheme.
-        if (!empty($line->costPrice) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unit price'.
-            // - But still send the VAT rate to Acumulus.
-            $line->unitPrice = $productPriceInc;
-        } else {
-            $line->unitPrice = $productPriceEx; // copied to mappings.
-            $line->metadataSet(Meta::UnitPriceInc, $productPriceInc); // copied to mappings.
-            $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
-        }
+        $line->unitPrice = $productPriceEx; // copied to mappings.
+        $line->metadataSet(Meta::UnitPriceInc, $productPriceInc); // copied to mappings.
+        $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
         $line->quantity = $shopItem->getQtyOrdered(); // copied to mappings.
 
         // Get vat and discount information
@@ -241,17 +233,10 @@ class ItemLineCollector extends LineCollector
         $productPriceInc = -$shopItem->getBasePriceInclTax();
 
         // Check for cost price and margin scheme.
-        if (!empty($line->costPrice) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unit price'.
-            // - But still send the VAT rate to Acumulus.
-            $line->unitPrice = $productPriceInc;
-        } else {
-            // Add price info.
-            $line->unitPrice = $productPriceEx;  // copied to mappings.
-            $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);  // copied to mappings.
-            $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
-        }
+        // Add price info.
+        $line->unitPrice = $productPriceEx;  // copied to mappings.
+        $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);  // copied to mappings.
+        $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
         $line->quantity = $shopItem->getQty();  // copied to mappings (itemNumber, product).
 
         // Get vat and discount information (also see above getItemLineOrder()):

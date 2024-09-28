@@ -10,7 +10,6 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
-use Siel\Acumulus\Meta;
 
 /**
  * CompleteByConfig adds configuration based values to item lines.
@@ -35,7 +34,7 @@ class CompleteByConfig extends BaseCompletorTask
         // @todo: for now only item lines are handled as this is a straight "copy" of code
         //    from the legacy Creator. Probably another completor exists for "other" lines
         //    which eventually might be merged here.
-        if (empty($line->nature) && ($line->metadataGet(Meta::SubType) === LineType::Item)) {
+        if (empty($line->nature) && ($line->getType() === LineType::Item)) {
             switch ($this->configGet('nature_shop')) {
                 case Config::Nature_Products:
                     $line->nature = Api::Nature_Product;

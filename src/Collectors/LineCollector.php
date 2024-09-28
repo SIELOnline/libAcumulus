@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
-use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
@@ -172,19 +171,5 @@ class LineCollector extends SubTypedCollector
             $line->metadataSet(Meta::PrecisionVatAmount, $numeratorPrecision);
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Calculated);
         }
-    }
-
-    /**
-     * Returns whether the margin scheme may be used.
-     *
-     * @return bool
-     *
-     * @legacy: remove margin scheme handling from (plugin specific) creators and move it
-     *   to the completor phase. This will help simplifying the creators towards raw
-     *   data collectors.
-     */
-    protected function allowMarginScheme(): bool
-    {
-        return $this->getContainer()->getConfig()->get('marginProducts') !== Config::MarginProducts_No;
     }
 }

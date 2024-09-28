@@ -307,11 +307,16 @@ class Source extends BaseSource
         }
     }
 
+    /**
+     * Returns records from the:
+     * - Source::Order: order detail table + order_detail_tax.
+     * - Source::CreditNote: order_slip_detail + order_detail.
+     */
     protected function createItems(): array
     {
         if ($this->getType() === Source::Order) {
-            // @nth: these methods return "raw"  database results, not objects from the
-            //   PrestaShop datamodel. Do we want this?
+            // Note: these methods return "raw" (and merged) database results, not objects
+            //   from the PrestaShop datamodel.
             $orderDetails = $this->mergeProductLines($this->getShopObject()->getProductsDetail(), $this->getShopObject()->getOrderDetailTaxes());
         } else {
             $orderDetails = OrderSlip::getOrdersSlipProducts($this->getId(), $this->getOrder()->getShopObject());
@@ -339,15 +344,28 @@ class Source extends BaseSource
      */
     protected function mergeProductLines(array $productLines, array $taxLines): array
     {
-        // Key the product lines on id_order_detail, so we can easily add the
-        // tax lines in the 2nd loop.
+        // Re-index the product lines on id_order_detail, so we can easily add the tax
+        // lines.
         $result = array_column($productLines, null, 'id_order_detail');
-
+        $alreadyAdded= [];
         // Add the tax lines without overwriting existing entries (though in a
         // consistent db the same keys should contain the same values).
         foreach ($taxLines as $taxLine) {
             if (isset($result[$taxLine['id_order_detail']])) {
-                $result[$taxLine['id_order_detail']] += $taxLine;
+                if (isset($alreadyAdded[$taxLine['id_order_detail']])) {
+                    // A 2nd tax line for a product line: not common in the Netherlands
+                    Container::getContainer()->getLog()->notice(
+                        sprintf(
+                            '%s: Another tax detail found for order item line %d (of order %d)',
+                            __METHOD__,
+                            $taxLine['id_order_detail'],
+                            $this->getId()
+                        )
+                    );
+                } else {
+                    $result[$taxLine['id_order_detail']] += $taxLine;
+                    $alreadyAdded[$taxLine['id_order_detail']] = true;
+                }
             } else {
                 // We have a tax line for a non product item line ([SIEL #200452]).
                 Container::getContainer()->getLog()->notice(

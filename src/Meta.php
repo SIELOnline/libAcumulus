@@ -188,6 +188,13 @@ interface Meta
      */
     public const VatClassName = 'meta-vatclass-name';
 
+    /**
+     * Support: whether this is or may be a margin product.
+     * true|false|null (unknown)
+     */
+    public const MarginLine = 'meta-margin-line';
+    public const MarginLineOldUnitPrice = 'meta-margin-line-old-unitprice';
+
     // Line: Line amounts related meta tags.
     /**
      * Support: line amount ex vat, equals quantity * unitprice, but can have a

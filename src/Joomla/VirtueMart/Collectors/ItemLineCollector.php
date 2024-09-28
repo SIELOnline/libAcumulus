@@ -53,17 +53,9 @@ class ItemLineCollector extends LineCollector
         $productVat = (float) $shopItem->product_tax;
         $this->addVatData($line, 'VatTax', $productPriceEx, $productVat, (int) $shopItem->virtuemart_order_item_id);
 
-        // Check for cost price and margin scheme.
-        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
-            // - But still send the VAT rate to Acumulus.
-            $line->unitPrice = $productPriceInc;
-        } else {
-            $line->unitPrice = $productPriceEx;
-            $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);
-            $line->metadataSet(Meta::VatAmount, $productVat);
-        }
+        $line->unitPrice = $productPriceEx;
+        $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);
+        $line->metadataSet(Meta::VatAmount, $productVat);
         $line->quantity = (int) $shopItem->product_quantity;
 
         // Add variant info.

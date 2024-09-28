@@ -53,23 +53,15 @@ class ItemLineCollector extends LineCollector
         /** @var array $shopItem */
         $shopItem = $item->getShopObject();
 
-        // Check for cost price and margin scheme.
-        if (!empty($line->costPrice) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
-            // - But still send the VAT rate to Acumulus.
-            $line->unitPrice = $sign * $shopItem['unit_price_tax_incl'];
-        } else {
-            // 'unit_amount' (table order_detail_tax) is not always set: assume
-            // no discount if not set, so not necessary to add the value.
-            if (isset($shopItem['unit_amount']) &&
-                !Number::floatsAreEqual($shopItem['unit_amount'], $line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice)
-            ) {
-                $line->metadataSet(
-                    Meta::LineDiscountVatAmount,
-                    $shopItem['unit_amount'] - ($line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice)
-                );
-            }
+        // 'unit_amount' (table order_detail_tax) is not always set: assume
+        // no discount if not set, so not necessary to add the value.
+        if (isset($shopItem['unit_amount']) &&
+            !Number::floatsAreEqual($shopItem['unit_amount'], $line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice)
+        ) {
+            $line->metadataSet(
+                Meta::LineDiscountVatAmount,
+                $shopItem['unit_amount'] - ($line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice)
+            );
         }
 
         // Try to get the vat rate:

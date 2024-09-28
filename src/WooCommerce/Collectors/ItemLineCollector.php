@@ -102,19 +102,10 @@ class ItemLineCollector extends LineCollector
         // base_precision * quantity) ...
         $precisionVat = max(abs($this->precision / $quantity), 0.001);
 
-        // Check for cost price and margin scheme.
-        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
-            // - But still send the VAT rate to Acumulus.
-            $line->unitPrice = $productPriceInc;
-            $precisionEx = $precisionInc;
-        } else {
-            $line->unitPrice = $productPriceEx;
-            $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);
-            $line->metadataSet(Meta::PrecisionUnitPriceInc, $precisionInc);
-            $line->metadataSet(Meta::RecalculatePrice, $recalculatePrice);
-        }
+        $line->unitPrice = $productPriceEx;
+        $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);
+        $line->metadataSet(Meta::PrecisionUnitPriceInc, $precisionInc);
+        $line->metadataSet(Meta::RecalculatePrice, $recalculatePrice);
 
         // Add tax info.
         self::addVatRangeTags($line, $productVat, $productPriceEx, $precisionVat, $precisionEx);

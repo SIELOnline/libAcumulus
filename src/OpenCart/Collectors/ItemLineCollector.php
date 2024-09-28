@@ -59,16 +59,8 @@ class ItemLineCollector extends LineCollector
         // Try to look up the vat rate via product.
         $this->addVatRateLookupMetadata($line, (int) $shopProduct['tax_class_id']);
 
-        // Check for cost price and margin scheme.
-        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
-            // - But still send the VAT rate to Acumulus.
-            $line->unitPrice = $productPriceEx + $productVat;
-        } else {
-            $line->unitPrice = $productPriceEx;
-            $line->metadataSet(Meta::VatAmount, $productVat);
-        }
+        $line->unitPrice = $productPriceEx;
+        $line->metadataSet(Meta::VatAmount, $productVat);
 
         // Options (variants).
         $options = $item->getOrderProductOptions();

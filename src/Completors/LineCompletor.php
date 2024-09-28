@@ -40,5 +40,6 @@ class LineCompletor extends BaseCompletor
         $this->line = $acumulusObject;
 
         $this->getContainer()->getCompletorTask(DataType::Line, 'ByConfig')->complete($this->line);
+        $this->getContainer()->getCompletorTask(DataType::Line, 'MarginProducts')->complete($this->line);
     }
 }

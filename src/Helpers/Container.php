@@ -48,6 +48,8 @@ use Siel\Acumulus\Shop\InvoiceSend;
 
 use function count;
 
+use function strlen;
+
 use const Siel\Acumulus\Version;
 
 /**
@@ -218,6 +220,11 @@ class Container
         $this->shopNamespace .= '\\' . $shopNamespace;
         $this->setLanguage($language);
         static::$instance = $this;
+    }
+
+    public function getShopNamespace(): string
+    {
+        return substr($this->shopNamespace, strlen(static::baseNamespace) + 1);
     }
 
     public function getLanguage(): string

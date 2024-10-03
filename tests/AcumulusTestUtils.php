@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -28,6 +25,14 @@ trait AcumulusTestUtils
      * Returns an Acumulus Container instance.
      */
     abstract protected static function getAcumulusContainer(): Container;
+
+    abstract protected function getTestsPath(): string;
+
+    protected function getDataPath(): string
+    {
+        $shopNamespace = self::getAcumulusContainer()->getShopNamespace();
+        return $this->getTestsPath() . "/Integration/$shopNamespace/Data";
+    }
 
     /**
      * @beforeClass Adds translations that are not added by default when the Translator is
@@ -90,12 +95,12 @@ trait AcumulusTestUtils
         if ($expected !== null) {
             // Save order to Order{id}.latest.json, so we can compare differences ourselves.
             $this->saveTestSource($dataPath, $type, $id, false, $result);
-            $this->assertCount(1, $result);
-            $this->assertArrayHasKey(Fld::Customer, $result);
+            static::assertCount(1, $result);
+            static::assertArrayHasKey(Fld::Customer, $result);
             $messages = [];
             $this->compareAcumulusObjects($expected[Fld::Customer], $result[Fld::Customer], Fld::Customer, $excludeFields, $messages);
             /** @noinspection JsonEncodingApiUsageInspection  false positive */
-            $this->assertCount(0, $messages, json_encode($messages, Log::JsonFlags));
+            static::assertCount(0, $messages, json_encode($messages, Log::JsonFlags));
         } else {
             // File does not yet exist: first time for a new test order: save order to Order{id}.json.
             // Will raise a warning that no asserts have been executed.
@@ -128,7 +133,7 @@ trait AcumulusTestUtils
         foreach ($expected as $field => $value) {
             try {
                 if (!in_array($field, $excludeFields, true)) {
-                    $this->assertArrayHasKey($field, $object, $objectName);
+                    static::assertArrayHasKey($field, $object, $objectName);
                     switch ($field) {
                         case 'invoice':
                         case 'emailAsPdf':
@@ -136,7 +141,7 @@ trait AcumulusTestUtils
                             break;
                         case 'line':
                             foreach ($value as $index => $line) {
-                                $this->assertArrayHasKey($index, $object[$field], "$objectName::{$field}[$index]");
+                                static::assertArrayHasKey($index, $object[$field], "$objectName::{$field}[$index]");
                                 $this->compareAcumulusObjects(
                                     $line,
                                     $object[$field][$index],
@@ -148,9 +153,9 @@ trait AcumulusTestUtils
                             break;
                         default:
                             if (is_float($value)) {
-                                $this->assertEqualsWithDelta($value, $object[$field], 0.005, "$objectName::$field");
+                                static::assertEqualsWithDelta($value, $object[$field], 0.005, "$objectName::$field");
                             } else {
-                                $this->assertSame($value, $object[$field], "$objectName::$field");
+                                static::assertSame($value, $object[$field], "$objectName::$field");
                             }
                             break;
                     }
@@ -191,6 +196,19 @@ trait AcumulusTestUtils
         $filename = "$path/$type$id$append.json";
         /** @noinspection JsonEncodingApiUsageInspection  false positive */
         file_put_contents($filename, json_encode($data, Log::JsonFlags) . "\n");
+    }
+
+    public function copyLatestTestSources(): void
+    {
+        $path = $this->getDataPath();
+        $files = glob("$path/*.latest.json");
+        foreach ($files as $file) {
+            $fileName = pathinfo($file, PATHINFO_FILENAME);
+            preg_match('/([A-Za-z]+)(\d+)/', $fileName, $matches);
+            $type = $matches[1];
+            $id = (int) $matches[2];
+            $this->copyLatestTestSource($path, $type, $id);
+        }
     }
 
     /**

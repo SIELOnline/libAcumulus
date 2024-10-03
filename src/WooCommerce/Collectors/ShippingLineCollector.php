@@ -89,7 +89,9 @@ class ShippingLineCollector extends LineCollector
         $line->unitPrice = $shippingEx;
         $line->quantity = $quantity;
         $line->metadataSet(Meta::Id, $shippingItem->get_id());
-        self::addVatRangeTags($line, $shippingVat, $shippingEx, $precisionVat, $precisionShippingEx);
+        $line->metadataSet(Meta::VatAmount, $shippingVat);
+        $line->metadataSet(Meta::PrecisionUnitPrice, $precisionShippingEx);
+        $line->metadataSet(Meta::PrecisionVatAmount, $precisionVat);
     }
 
     /**

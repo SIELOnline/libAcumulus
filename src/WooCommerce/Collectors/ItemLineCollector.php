@@ -103,12 +103,14 @@ class ItemLineCollector extends LineCollector
         $precisionVat = max(abs($this->precision / $quantity), 0.001);
 
         $line->unitPrice = $productPriceEx;
+        $line->metadataSet(Meta::PrecisionUnitPrice, $precisionEx);
+        $line->metadataSet(Meta::VatAmount, $productVat);
+        $line->metadataSet(Meta::PrecisionVatAmount, $precisionVat);
         $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);
         $line->metadataSet(Meta::PrecisionUnitPriceInc, $precisionInc);
         $line->metadataSet(Meta::RecalculatePrice, $recalculatePrice);
 
-        // Add tax info.
-        self::addVatRangeTags($line, $productVat, $productPriceEx, $precisionVat, $precisionEx);
+        // Add tax lookup info.
         if ($shopProduct !== null) {
             // get_tax_status() returns 'taxable', 'shipping', or 'none'.
             $taxClass = $shopProduct->get_tax_status() === 'taxable' ? $shopProduct->get_tax_class() : null;

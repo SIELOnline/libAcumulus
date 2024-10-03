@@ -49,6 +49,15 @@ class PaymentFeeLineCollector extends LineCollector
         $recalculatePrice = Tag::UnitPrice;
         static::addVatRangeTags($line, $paymentVat, $paymentEx, $this->precision, $this->precision);
         $description = $this->t('payment_costs');
+        $line->product = $description;
+        $line->quantity = 1;
+        $line->unitPrice = $paymentEx;
+        $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
+        $line->metadataSet(Meta::VatAmount, $paymentVat);
+        $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
+        $line->metadataSet(Meta::UnitPriceInc, $paymentInc);
+        $line->metadataSet(Meta::PrecisionUnitPriceInc, $this->precision);
+        $line->metadataSet(Meta::RecalculatePrice, $recalculatePrice);
 
         // Add vat lookup meta data.
         if (!empty($source->getShopObject()->order_payment_id)) {
@@ -67,14 +76,6 @@ class PaymentFeeLineCollector extends LineCollector
                 }
             }
         }
-
-        $line->product = $description;
-        $line->quantity = 1;
-        $line->unitPrice = $paymentEx;
-        $line->metadataSet(Meta::UnitPriceInc, $paymentInc);
-        $line->metadataSet(Meta::PrecisionUnitPriceInc, $this->precision);
-        $line->metadataSet(Meta::RecalculatePrice, $recalculatePrice);
-        $line->metadataSet(Meta::VatAmount, $paymentVat);
     }
 }
 

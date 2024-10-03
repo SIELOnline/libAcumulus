@@ -41,5 +41,6 @@ class LineCompletor extends BaseCompletor
 
         $this->getContainer()->getCompletorTask(DataType::Line, 'ByConfig')->complete($this->line);
         $this->getContainer()->getCompletorTask(DataType::Line, 'MarginProducts')->complete($this->line);
+        $this->getContainer()->getCompletorTask(DataType::Line, 'VatRange')->complete($this->line);
     }
 }

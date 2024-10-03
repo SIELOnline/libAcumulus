@@ -94,7 +94,9 @@ class ItemLineCollector extends LineCollector
             $line->metadataSet(Meta::VatAmount, $productVat);
             $line->metadataSet(Meta::VatRateSource, Number::isZero($productVat) ? VatRateSource::Exact0 : VatRateSource::Exact);
         } else {
-            static::addVatRangeTags($line, $productVat, $productPriceEx, $this->precision, $this->precision);
+            $line->metadataSet(Meta::VatAmount, $productVat);
+            $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
+            $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
         }
 
         // Add vat class meta data.

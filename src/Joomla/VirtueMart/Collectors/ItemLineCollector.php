@@ -51,12 +51,12 @@ class ItemLineCollector extends LineCollector
         $productPriceEx = (float) $shopItem->product_discountedPriceWithoutTax;
         $productPriceInc = (float) $shopItem->product_final_price;
         $productVat = (float) $shopItem->product_tax;
-        $this->addVatData($line, 'VatTax', $productPriceEx, $productVat, (int) $shopItem->virtuemart_order_item_id);
 
         $line->unitPrice = $productPriceEx;
         $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);
         $line->metadataSet(Meta::VatAmount, $productVat);
         $line->quantity = (int) $shopItem->product_quantity;
+        $this->addVatData($line, 'VatTax', $productPriceEx, $productVat, (int) $shopItem->virtuemart_order_item_id);
 
         // Add variant info.
         $this->addVariantLines($line, $shopItem);

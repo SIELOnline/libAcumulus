@@ -48,6 +48,8 @@ class OtherLineCollector extends LineCollector
         $line->unitPrice = $feeEx;
         $line->quantity = $fee->get_quantity();
         $line->metadataSet(Meta::Id, $fee->get_id());
-        self::addVatRangeTags($line, $feeVat, $feeEx, $this->precision, $this->precision);
+        $line->metadataSet(Meta::VatAmount, $feeVat);
+        $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
+        $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
     }
 }

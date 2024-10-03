@@ -44,16 +44,12 @@ class PaymentFeeLineCollector extends LineCollector
         $source = $propertySources->get('source');
 
         $paymentEx = (float) $source->getShopObject()['details']['BT']->order_payment;
-        if (!Number::isZero($paymentEx)) {
-            $paymentVat = (float) $source->getShopObject()['details']['BT']->order_payment_tax;
-            $line->product = $this->t('payment_costs');
-            $line->unitPrice = $paymentEx;
-            $line->quantity = 1;
-            $line->metadataSet(Meta::VatAmount, $paymentVat);
-            $this->addVatData($line, 'payment', $paymentEx, $paymentVat);
-        } else {
-            $line->metadataSet(Meta::DoNotAdd, true);
-        }
+        $paymentVat = (float) $source->getShopObject()['details']['BT']->order_payment_tax;
+        $line->product = $this->t('payment_costs');
+        $line->unitPrice = $paymentEx;
+        $line->quantity = 1;
+        $line->metadataSet(Meta::VatAmount, $paymentVat);
+        $this->addVatData($line, 'payment', $paymentEx, $paymentVat);
     }
 }
 

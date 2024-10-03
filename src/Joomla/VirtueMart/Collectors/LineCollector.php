@@ -60,7 +60,8 @@ class LineCollector extends BaseLineCollector
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact0);
             $line->metadataSet(Meta::VatClassId, Config::VatClass_Null);
         } else {
-            static::addVatRangeTags($line, $vatAmount, $amountEx, $this->precision);
+            $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);
+            $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
         }
     }
 

@@ -67,10 +67,7 @@ class DiscountLineCollector extends LineCollector
         $discountVat = (float) $order->order_discount_tax;
         $discountEx = $discountInc - $discountVat;
         $recalculatePrice = Tag::UnitPrice;
-        static::addVatRangeTags($line, $discountVat, $discountEx, $this->precision, $this->precision);
-        if ($line->vatRate === null) {
-            $line->metadataSet(Meta::StrategySplit, true);
-        }
+
         $description = empty($order->order_discount_code)
             ? $this->t('discount')
             : $this->t('discount_code') . ' ' . $order->order_discount_code;
@@ -78,9 +75,13 @@ class DiscountLineCollector extends LineCollector
         $line->product = $description;
         $line->quantity = 1;
         $line->unitPrice = -$discountEx;
+
+        $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
+        $line->metadataSet(Meta::VatAmount, -$discountVat);
+        $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
         $line->metadataSet(Meta::UnitPriceInc, -$discountInc);
         $line->metadataSet(Meta::PrecisionUnitPriceInc, $this->precision);
         $line->metadataSet(Meta::RecalculatePrice, $recalculatePrice);
-        $line->metadataSet(Meta::VatAmount, -$discountVat);
+        $line->metadataSet(Meta::StrategySplit, true);
     }
 }

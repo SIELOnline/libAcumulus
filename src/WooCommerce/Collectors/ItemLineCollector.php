@@ -85,7 +85,7 @@ class ItemLineCollector extends LineCollector
             $precisionEx = $this->precision;
             $reason = $this->isPriceIncRealistic($productPriceInc, $taxes, $shopProduct);
             if ($reason !== '') {
-                $this->addWarning($line, "Price inc is realistic: $reason", Meta::Info);
+                $this->addMessage($line, "Price inc is realistic: $reason", Meta::Info);
                 $precisionInc = 0.001;
                 $recalculatePrice = Tag::UnitPrice;
             } else {

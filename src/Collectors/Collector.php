@@ -324,14 +324,14 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * Helper method to add a warning to an InvoiceAddResult.
+     * Helper method to add a message to an InvoiceAddResult.
      *
-     * Warnings are placed in the $array under the key Meta::Warning. If no
-     * warning is set, $warning is added as a string, otherwise it becomes an
-     * array of warnings to which this $warning is added.
+     * The \$message is placed under the meta key passed as \$severity. If no message is
+     * set yet, \$message is added as a string, otherwise it becomes an array of messages
+     * to which \$message is added.
      */
-    protected function addWarning(AcumulusObject $acumulusObject, string $warning, string $severity = Meta::Warning): void
+    protected function addMessage(AcumulusObject $acumulusObject, string $message, string $severity = Meta::Warning): void
     {
-        $acumulusObject->metadataAdd($severity, $warning, false);
+        $acumulusObject->metadataAdd($severity, $message, false);
     }
 }

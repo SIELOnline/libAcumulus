@@ -192,4 +192,22 @@ trait AcumulusTestUtils
         /** @noinspection JsonEncodingApiUsageInspection  false positive */
         file_put_contents($filename, json_encode($data, Log::JsonFlags) . "\n");
     }
+
+    /**
+     * Copies latest test data to test data to check against.
+     *
+     * Refactorings should not alter the resulting array contents but may alter the order
+     * after converting to json. To be able to show real differences not just line order
+     * changes, it may come handy to copy the .latest file to the file to check against,
+     * BUT ONLY IF THE TESTS PASSED!
+     */
+    protected function copyLatestTestSource(string $path, string $type, int $id): void
+    {
+
+        $append = '.latest';
+        $sourceFilename = "$path/$type$id$append.json";
+        $targetFilename = "$path/$type$id.json";
+        /** @noinspection JsonEncodingApiUsageInspection  false positive */
+        file_put_contents($targetFilename, file_get_contents($sourceFilename));
+    }
 }

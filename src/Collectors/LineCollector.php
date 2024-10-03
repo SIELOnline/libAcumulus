@@ -141,8 +141,7 @@ class LineCollector extends SubTypedCollector
      *   The precision used when rounding the number. This means that the
      *   original denominator will not differ more than half of this.
      *
-     * @legacy: Move this from the (plugin specific) creators to the completor phase.
-     *   This would aid in simplifying the creators towards raw data collectors.
+     * @todo: Move this from the collector to the completor phase.
      */
     public static function addVatRangeTags(
         Line $line,
@@ -152,12 +151,12 @@ class LineCollector extends SubTypedCollector
         float $denominatorPrecision = 0.01
     ): void {
         if (Number::isZero($denominator, 0.0001)) {
-            // zero amount (and zero vat): we cannot determine the range.
+            // zero amount (and zero VAT I hope): we cannot determine the range.
             $line->vatRate = null;
             $line->metadataSet(Meta::VatAmount, $numerator);
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
         } elseif (Number::isZero($numerator, 0.0001)) {
-            // zero vat with non-zero amount: rate = 0
+            // zero VAT with non-zero amount: rate = 0
             $line->vatRate = 0;
             $line->metadataSet(Meta::VatAmount, $numerator);
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact0);

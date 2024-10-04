@@ -64,9 +64,11 @@ class ShippingLineCollector extends LineCollector
             $shippingEx = $sign * $shopSource->getBaseShippingAmount();
             $shippingVat = $shippingInc - $shippingEx;
             $line->unitPrice = $shippingEx;
+            $line->metadataSet(Meta::VatAmount, $shippingVat);
+            $line->metadataSet(Meta::PrecisionUnitPrice, $this->shippingPriceIncludeTax() ? 0.02 : 0.01);
+            $line->metadataSet(Meta::PrecisionVatAmount, 0.02);
             $line->metadataSet(Meta::UnitPriceInc, $shippingInc);
             $line->metadataSet(Meta::RecalculatePrice, $this->shippingPriceIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
-            self::addVatRangeTags($line, $shippingVat, $shippingEx, 0.02, $this->shippingPriceIncludeTax() ? 0.02 : 0.01);
             $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
 
             // Add vat class meta data.

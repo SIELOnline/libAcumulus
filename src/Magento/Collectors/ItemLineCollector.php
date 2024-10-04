@@ -153,7 +153,6 @@ class ItemLineCollector extends LineCollector
         // Add vat metadata.
         $shopProduct = $shopItem->getProduct();
         if ($shopProduct) {
-            /** @noinspection PhpUndefinedMethodInspection  handled by __call*/
             $taxClassId = $shopProduct->getTaxClassId();
             $this->addVatClassMetaData($line, $taxClassId);
         }
@@ -267,25 +266,24 @@ class ItemLineCollector extends LineCollector
             $line->vatRate = $vat_rate;  // copied to mappings.
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact);
         } elseif (isset($lineVat)) {
-            self::addVatRangeTags(
-                $line,
-                $lineVat / $line->quantity,
-                $productPriceEx,
-                0.02 / min($line->quantity, 2),
-                0.01
-            );
+            $line->unitPrice = $productPriceEx;
+            $line->metadataSet(Meta::VatAmount, $lineVat / $line->quantity);
+            $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);
+            $line->metadataSet(Meta::PrecisionVatAmount, 0.02 / min($line->quantity, 2));
         } else {
             // No exact vat rate and no line vat: just use price inc - price ex.
-            self::addVatRangeTags($line, $productPriceInc - $productPriceEx, $productPriceEx, 0.02, 0.01);
+            $line->unitPrice = $productPriceEx;
+            $line->metadataSet(Meta::VatAmount, $productPriceInc - $productPriceEx);
+            $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);
+            $line->metadataSet(Meta::PrecisionVatAmount, 0.02);
             $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
         }
 
-        // Add vat meta data.
+        // Add vat metadata.
         /** @var \Magento\Catalog\Model\Product $shopProduct */
         $shopProduct = $this->getRegistry()->create(MagentoProduct::class);
         $this->getRegistry()->get($shopProduct->getResourceName())->load($shopProduct, $shopItem->getProductId());
         if ($shopProduct->getId()) {
-            /** @noinspection PhpUndefinedMethodInspection */
             $taxClassId = $shopProduct->getTaxClassId();
             $this->addVatClassMetaData($line, $taxClassId);
         }

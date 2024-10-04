@@ -51,16 +51,18 @@ class DiscountLineCollector extends LineCollector
         $discountVat = $discountInc - $discountEx;
         $line->itemNumber = $calcRule['id_cart_rule'];
         $line->product = $this->t('discount_code') . ' ' . $calcRule['name'];
-        $line->unitPrice = $discountEx;
-        $line->metadataSet(Meta::UnitPriceInc, $discountInc);
         $line->quantity = 1;
+        $line->unitPrice = $discountEx;
+        $line->metadataSet(Meta::VatAmount, $discountVat);
+        $line->metadataSet(Meta::UnitPriceInc, $discountInc);
+        $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);
+        $line->metadataSet(Meta::PrecisionVatAmount, 0.02);
         // If no match is found, this line may be split.
         $line->metadataSet(Meta::StrategySplit, true);
         // Assuming that the fixed discount amount was entered:
         // - including VAT, the precision would be 0.01, 0.01.
         // - excluding VAT, the precision would be 0.01, 0
         // However, for a %, it will be: 0.02, 0.01, so use 0.02.
-        self::addVatRangeTags($line, $discountVat, $discountEx, 0.02, 0.01);
         $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
     }
 }

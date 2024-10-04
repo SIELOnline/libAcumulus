@@ -18,7 +18,6 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Collectors\LineCollector;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
@@ -463,8 +462,9 @@ class CompletorInvoiceLines
                     if (!empty($line[Meta::ChildrenLines])) {
                         $precision *= count($line[Meta::ChildrenLines]);
                     }
-                    LineCollector::addVatRangeTags($line, $line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision);
-
+                    $line->metadataSet(Meta::PrecisionUnitPrice, $precision);
+                    $line->metadataSet(Meta::PrecisionVatAmount, $precision);
+                    $this->completor->getCompletorTask('Line', 'VatRange')->complete($line);
                     $fieldsCalculated[] = Tag::VatRate;
                 }
             }

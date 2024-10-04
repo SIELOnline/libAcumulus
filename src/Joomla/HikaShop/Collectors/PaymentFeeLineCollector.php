@@ -47,13 +47,12 @@ class PaymentFeeLineCollector extends LineCollector
         $paymentVat = (float) $source->getShopObject()->order_payment_tax;
         $paymentEx = $paymentInc - $paymentVat;
         $recalculatePrice = Tag::UnitPrice;
-        static::addVatRangeTags($line, $paymentVat, $paymentEx, $this->precision, $this->precision);
         $description = $this->t('payment_costs');
         $line->product = $description;
         $line->quantity = 1;
         $line->unitPrice = $paymentEx;
-        $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
         $line->metadataSet(Meta::VatAmount, $paymentVat);
+        $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
         $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
         $line->metadataSet(Meta::UnitPriceInc, $paymentInc);
         $line->metadataSet(Meta::PrecisionUnitPriceInc, $this->precision);

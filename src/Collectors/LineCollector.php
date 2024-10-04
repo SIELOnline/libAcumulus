@@ -141,7 +141,7 @@ class LineCollector extends SubTypedCollector
      *   The precision used when rounding the number. This means that the
      *   original denominator will not differ more than half of this.
      *
-     * @todo: Move this from the collector to the completor phase.
+     * @deprecated : Move this from the collector to the completor phase: DONE leave for reference
      */
     public static function addVatRangeTags(
         Line $line,

@@ -54,13 +54,13 @@ class ItemLineCollector extends LineCollector
         // Get vat range info from item line.
         $productPriceEx = (float) $shopItem['price'];
         $productVat = (float) $shopItem['tax'];
-        self::addVatRangeTags($line, $productVat, $productPriceEx, $this->precision, $this->precision);
+        $line->unitPrice = $productPriceEx;
+        $line->metadataSet(Meta::VatAmount, $productVat);
+        $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
+        $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
 
         // Try to look up the vat rate via product.
         $this->addVatRateLookupMetadata($line, (int) $shopProduct['tax_class_id']);
-
-        $line->unitPrice = $productPriceEx;
-        $line->metadataSet(Meta::VatAmount, $productVat);
 
         // Options (variants).
         $options = $item->getOrderProductOptions();

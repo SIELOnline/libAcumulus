@@ -24,7 +24,6 @@ use ArrayAccess;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Collectors\LineCollector;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
@@ -164,6 +163,11 @@ class Completor
     protected function t(string $key): string
     {
         return $this->translator->get($key);
+    }
+
+    public function getCompletorTask($dataType, $task)
+    {
+        return Container::getContainer()->getCompletorTask($dataType, $task);
     }
 
     /**
@@ -701,7 +705,10 @@ class Completor
             $line->product = $product;
             $line->quantity = 1;
             $line->unitPrice = $missingAmount;
-            LineCollector::addVatRangeTags($line, $missingVatAmount, $missingAmount, $countLines * 0.02, $countLines * 0.02);
+            $line->metadataSet(Meta::VatAmount, $missingVatAmount);
+            $line->metadataSet(Meta::PrecisionUnitPrice, $countLines * 0.02);
+            $line->metadataSet(Meta::PrecisionVatAmount, $countLines * 0.02);
+            $this->getCompletorTask('Line', 'VatRange')->complete($line);
             $line->metadataSet(Meta::SubType, LineType::Corrector);
             // Correct and add this line (round of correcting has already been
             // executed).

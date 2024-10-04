@@ -65,23 +65,20 @@ class ItemLineCollector extends LineCollector
         }
 
         // Try to get the vat rate:
-        // The field 'rate' comes from order->getOrderDetailTaxes() and is thus
-        // only available for orders and was not filled before PS1.6.1.1. So,
-        // check if the field is available.
-        // The fields 'unit_amount' and 'total_amount' (also from table
-        // order_detail_tax) are based on the discounted product price and thus
-        // cannot be used to get the vat rate.
+        // The field 'rate' comes from order->getOrderDetailTaxes() and is thus only
+        // available for orders and was not filled before PS1.6.1.1. So, check if the
+        // field is available.
+        // The fields 'unit_amount' and 'total_amount' (also from table order_detail_tax)
+        // are based on the discounted product price and thus cannot be used to get the
+        // vat rate.
         if (isset($shopItem['rate'])) {
             $line->vatRate = $shopItem['rate'];
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact);
         } else {
-            static::addVatRangeTags(
-                $line,
-                $sign * ($shopItem['unit_price_tax_incl'] - $shopItem['unit_price_tax_excl']),
-                $sign * $shopItem['unit_price_tax_excl'],
-                $this->precision,
-                $this->precision
-            );
+            $line->unitPrice = $sign * $shopItem['unit_price_tax_excl'];
+            $line->metadataSet(Meta::VatAmount, $sign * ($shopItem['unit_price_tax_incl'] - $shopItem['unit_price_tax_excl']));
+            $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
+            $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
         }
         $taxRulesGroupId = isset($shopItem['id_tax_rules_group']) ? (int) $shopItem['id_tax_rules_group'] : 0;
         // VAT lookup metadata should be based on the address used for VAT calculations.

@@ -72,10 +72,12 @@ class GiftWrappingFeeLineCollector extends LineCollector
             (int) Configuration::get('PS_GIFT_WRAPPING_TAX_RULES_GROUP')
         );
         $line->product = $this->t('gift_wrapping');
-        $line->unitPrice = $wrappingEx;
-        $line->metadataSet(Meta::UnitPriceInc, $wrappingInc);
         $line->quantity = 1;
-        self::addVatRangeTags($line, $wrappingVat, $wrappingEx, 0.01 + $precision, $precision);
+        $line->unitPrice = $wrappingEx;
+        $line->metadataSet(Meta::VatAmount, $wrappingVat);
+        $line->metadataSet(Meta::UnitPriceInc, $wrappingInc);
+        $line->metadataSet(Meta::PrecisionUnitPrice, $precision);
+        $line->metadataSet(Meta::PrecisionVatAmount, 0.01 + $precision);
     }
 }
 

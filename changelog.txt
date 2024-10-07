@@ -5,6 +5,10 @@ This file contains a historical overview of changes in our own code.
 
 8.3.1 (2024-10-??)
 ------------------------
+Bugs:
+- ALL: Help text for (your) phone number on register form was not use but overruled by the
+  help text for the field phone number on the mappings form.
+
 Refactorings:
 - ALL: Moved margin scheme handling from the ItemLineCollectors to CompleteMarginScheme.
 - ALL: Moved adding vat range from the Line Collector phase to the Completor phase.
@@ -19,7 +23,7 @@ Minimal requirements:
     * PrestaShop 1.7
     * VirtueMart 3
   Note that PHP 8.0 already reached end of life and will no longer receive security
-  updates. So, in the near future we will upgrade our minimal requirements to PHP 8.1.
+  updates. So, in the NEAR future we will upgrade our minimal requirements to PHP 8.1.
 
 Incompatibilities:
 - Mappings: For those who have custom mappings: lots of "objects" were renamed. If, in the
@@ -39,7 +43,7 @@ Incompatibilities:
   and parameters have changed. The customise_acumulus_invoice example plugins that we
   publish have not ye been updated and will thus no longer work.
 
-- Features:
+Features:
 - JOO: Native support for Joomla 5, our component and plugins do no longer need the compat
   plugin. However, please note that VirtueMart still needs that plugin. HikaShop has its
   own compat layer, so probably does not need that plugin.

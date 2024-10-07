@@ -384,8 +384,8 @@ class RegisterForm extends Form
             ],
             Tag::Telephone => [
                 'type' => 'text',
-                'label' => $this->t('field_telephone'),
-                'description' => $this->t('desc_telephone'),
+                'label' => $this->t('field_telephoneRegistration'),
+                'description' => $this->t('desc_telephoneRegistration'),
                 'attributes' => [
                     'size' => 12,
                 ],

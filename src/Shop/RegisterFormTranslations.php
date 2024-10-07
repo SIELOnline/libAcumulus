@@ -54,8 +54,8 @@ class RegisterFormTranslations extends TranslationCollection
         'desc_emailRegistration' => 'Uw e-mailadres. Dit wordt gebruikt om u een bevestiging te sturen met de details van het proefaccount en voor verdere communicatie vanuit Acumulus naar u toe.
            Het zal ook ingesteld worden als e-mailadres waar deze %s foutberichten naar toe stuurt.',
 
-        'field_telephone' => 'Telefoon',
-        'desc_telephone' => 'Uw telefoonnummer. Als u dit invult kunnen wij u eventueel bellen als u ondersteuning wenst.',
+        'field_telephoneRegistration' => 'Telefoon',
+        'desc_telephoneRegistration' => 'Uw telefoonnummer. Als u dit invult kunnen wij u eventueel bellen als u ondersteuning wenst.',
 
         'field_bankAccount' => 'Rekeningnummer',
         'desc_bankAccount' => 'Het bankrekeningnummer (IBAN) van uw bedrijfsrekening. Dit wordt alleen gebruikt voor het aanmaken van een factuursjabloon voor uw bedrijf, er zal GEEN automatische incasso plaatsvinden voordat u dit contract definitief heeft gemaakt en u toestemming voor een automatische incasso heeft gegeven.',
@@ -134,8 +134,8 @@ class RegisterFormTranslations extends TranslationCollection
         'desc_emailRegistration' => 'Your e-mail address. This will be used to send you a confirmation with the details of the trial account and for further communication from Acumulus to you.
            It will also be set up as the email address to which this %s will send any error messages.',
 
-        'field_telephone' => 'Phone',
-        'desc_telephone' => 'Your phone number. If you fill this out, we can call you if you need support.',
+        'field_telephoneRegistration' => 'Phone',
+        'desc_telephoneRegistration' => 'Your phone number. If you fill this out, we can call you if you need support.',
 
         'field_bankAccount' => 'Bank account number',
         'desc_bankAccount' => 'The bank account number (IBAN) of your company bank account. This will only be used to create an invoice template for your company, no direct debit will take place before you have made this contract final and have given your consent for a direct debit.',

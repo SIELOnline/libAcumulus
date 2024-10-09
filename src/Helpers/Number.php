@@ -6,6 +6,8 @@ namespace Siel\Acumulus\Helpers;
 
 use InvalidArgumentException;
 
+use Stringable;
+
 use function is_string;
 use function strlen;
 
@@ -110,19 +112,24 @@ class Number
      * Converts a value into a float.
      *
      * Values passed to {@see floatsAreEqual()} are not necessarily floats, but
-     * may be a numeric string or an empty value indicating 0. Known examples:
+     * may be any type that somehow can be converted to floats. Known examples:
      * - Magento: getBaseDiscountAmount(), and many other getters, may return
      *   null for 0 amounts.
      * - WooCommerce: A 0 amount may be stored as an empty string in the
      *   database. Non 0 amounts may be stored as their string representation.
+     * - {@see SimpleXMLElement}s can contain numeric values, the conversion is
+     *   done via a string as all xml values are strings.
      *
      * @param mixed $f
      *  A value to be converted into a float
      *
      * @throws \InvalidArgumentException
      */
-    protected static function turnIntoFloat($f): float
+    protected static function turnIntoFloat(mixed $f): float
     {
+        if ($f instanceof Stringable) {
+            $f = (string) $f;
+        }
         if ($f !== null && $f !== '' && !is_numeric($f)) {
             /** @noinspection JsonEncodingApiUsageInspection */
             throw new InvalidArgumentException(sprintf(
@@ -148,8 +155,11 @@ class Number
      *   true if $f is a number that appears to be rounded to the given
      *   precision, false otherwise.
      */
-    public static function isRounded($f, int $precision): bool
+    public static function isRounded(mixed $f, int $precision): bool
     {
+        if ($f instanceof Stringable) {
+            $f = (string) $f;
+        }
         if (is_string($f)) {
             // If $f is a string, we look at the number of digits after the
             // decimal point (ignoring trailing 0's).

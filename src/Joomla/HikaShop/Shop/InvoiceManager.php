@@ -27,15 +27,15 @@ use function count;
  */
 class InvoiceManager extends BaseInvoiceManager
 {
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $sourceType, int $idFrom, int $idTo): array
     {
-        if ($invoiceSourceType === Source::Order) {
+        if ($sourceType === Source::Order) {
             $query = sprintf(
                 'select order_id from #__hikashop_order where order_id between %d and %d',
-                $invoiceSourceIdFrom,
-                $invoiceSourceIdTo
+                $idFrom,
+                $idTo
             );
-            return $this->getSourcesByQuery($invoiceSourceType, $query);
+            return $this->getSourcesByQuery($sourceType, $query);
         }
         return [];
     }
@@ -49,19 +49,29 @@ class InvoiceManager extends BaseInvoiceManager
      * adapted.
      *
      * @noinspection NullPointerExceptionInspection
+     * @noinspection PhpUndefinedMethodInspection {@See \Joomla\Database\DatabaseInterface::escape()}
      */
-    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
-    {
+    public function getInvoiceSourcesByReferenceRange(
+        string $sourceType,
+        string $referenceFrom,
+        string $referenceTo,
+        bool $fallbackToId
+    ): array {
         $result = [];
         if ($sourceType === Source::Order) {
             $query = sprintf(
                 "select order_id from #__hikashop_order where order_number between '%s' and '%s'",
-                $this->getDb()->escape($from),
-                $this->getDb()->escape($to)
+                $this->getDb()->escape($referenceFrom),
+                $this->getDb()->escape($referenceTo)
             );
             $result = $this->getSourcesByQuery($sourceType, $query);
         }
-        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange(
+            $sourceType,
+            $referenceFrom,
+            $referenceTo,
+            $fallbackToId
+        );
     }
 
     public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array

@@ -23,15 +23,15 @@ use function count;
  */
 class InvoiceManager extends BaseInvoiceManager
 {
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $sourceType, int $idFrom, int $idTo): array
     {
-        if ($invoiceSourceType === Source::Order) {
+        if ($sourceType === Source::Order) {
             $query = sprintf(
                 'select virtuemart_order_id from #__virtuemart_orders where virtuemart_order_id between %d and %d',
-                $invoiceSourceIdFrom,
-                $invoiceSourceIdTo
+                $idFrom,
+                $idTo
             );
-            return $this->getSourcesByQuery($invoiceSourceType, $query);
+            return $this->getSourcesByQuery($sourceType, $query);
         }
         return [];
     }
@@ -44,25 +44,25 @@ class InvoiceManager extends BaseInvoiceManager
      * introduce sequential order numbers, E.g:
      * http://extensions.joomla.org/profile/extension/extension-specific/virtuemart-extensions/human-readable-order-numbers
      */
-    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $referenceFrom, string $referenceTo, bool $fallbackToId): array
     {
         $result = [];
         if ($sourceType === Source::Order) {
-            if (ctype_digit($from) && ctype_digit($to)) {
-                $from = sprintf('%d', $from);
-                $to = sprintf('%d', $to);
+            if (ctype_digit($referenceFrom) && ctype_digit($referenceTo)) {
+                $referenceFrom = sprintf('%d', $referenceFrom);
+                $referenceTo = sprintf('%d', $referenceTo);
             } else {
-                $from = sprintf("'%s'", $this->getDb()->escape($from));
-                $to = sprintf("'%s'", $this->getDb()->escape($to));
+                $referenceFrom = sprintf("'%s'", $this->getDb()->escape($referenceFrom));
+                $referenceTo = sprintf("'%s'", $this->getDb()->escape($referenceTo));
             }
             $query = sprintf(
                 'select virtuemart_order_id from #__virtuemart_orders where order_number between %s and %s',
-                $from,
-                $to
+                $referenceFrom,
+                $referenceTo
             );
             $result = $this->getSourcesByQuery($sourceType, $query);
         }
-        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $referenceFrom, $referenceTo, $fallbackToId);
     }
 
     public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array

@@ -284,7 +284,7 @@ abstract class Form extends MessageCollection
      * @return string|int|float|bool|array|null
      *   The value for this form field or the empty string if not set.
      */
-    protected function getFormValue(string $name)
+    protected function getFormValue(string $name): float|int|bool|array|string|null
     {
         $this->setFormValues();
         return $this->formValues[$name] ?? '';

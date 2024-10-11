@@ -128,8 +128,8 @@ class ShippingLineCollector extends LineCollector
         // order level.
         $line->product = $this->getShippingMethodName($order->order_shipping_id);
         $line->quantity = 1;
-        $line->metadataSet(Meta::UnitPriceInc, $order->order_shipping_price);
-        $line->metadataSet(Meta::VatAmount, $order->order_shipping_tax);
+        $line->metadataSet(Meta::UnitPriceInc, (float) $order->order_shipping_price);
+        $line->metadataSet(Meta::VatAmount, (float) $order->order_shipping_tax);
         $line->vatRate = null;
         $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
     }
@@ -164,8 +164,8 @@ class ShippingLineCollector extends LineCollector
             // Empty or no tax breakdown, probably because there's no tax.
             $line->product = $product;
             $line->quantity = $quantity;
-            $line->metadataSet(Meta::UnitPriceInc, $shippingInfo->price_with_tax);
-            $line->metadataSet(Meta::VatAmount, $shippingInfo->tax);
+            $line->metadataSet(Meta::UnitPriceInc, (float) $shippingInfo->price_with_tax);
+            $line->metadataSet(Meta::VatAmount, (float) $shippingInfo->tax);
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
             $shippingAmountIncTotal += $shippingInfo->price_with_tax;
             $shippingVatTotal += $shippingInfo->tax;
@@ -176,6 +176,7 @@ class ShippingLineCollector extends LineCollector
             $addMissingAmountIndex = null;
             $isFirst = true;
             foreach ($shippingInfo->taxes as $taxNameKey => $shippingVat) {
+                $shippingVat = (float) $shippingVat;
                 $shippingLine = $isFirst ? $line : $this->getContainer()->createAcumulusObject(DataType::Line);
                 $shippingLine->metadataSet(Meta::SubType, LineType::Shipping);
                 $isFirst = false;

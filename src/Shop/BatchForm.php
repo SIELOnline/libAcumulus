@@ -102,6 +102,9 @@ class BatchForm extends Form
         $this->submittedValues['reference_to'] = trim($this->submittedValues['reference_to']);
         $this->submittedValues['date_from'] = trim($this->submittedValues['date_from']);
         $this->submittedValues['date_to'] = trim($this->submittedValues['date_to']);
+        if (!isset($this->submittedValues['order_statuses'])) {
+            $this->submittedValues['order_statuses'] = ['0'];
+        }
     }
 
     protected function validate(): void
@@ -230,6 +233,7 @@ class BatchForm extends Form
             }
         }
 
+        // @todo: can we indicate whether we filtered on references or ids? if so, use this in messages and logging.
         $invoiceSources = $this->invoiceManager->getInvoiceSourcesByFilters($type, $filters);
 
         if (count($invoiceSources) === 0) {
@@ -405,11 +409,11 @@ class BatchForm extends Form
         return $fields;
     }
 
-    protected function getInvoiceSourceReferenceList(array $invoiceSources): string
+    protected function getInvoiceSourceReferenceList(array $sources): string
     {
         $result = array_map(static function ($invoiceSource) {
             return $invoiceSource->getReference();
-        }, $invoiceSources);
+        }, $sources);
         return implode(', ', $result);
     }
 

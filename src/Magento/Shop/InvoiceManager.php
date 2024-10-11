@@ -25,25 +25,25 @@ use function count;
  */
 class InvoiceManager extends BaseInvoiceManager
 {
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $sourceType, int $idFrom, int $idTo): array
     {
         $field = 'entity_id';
         $condition = [
-            'from' => $invoiceSourceIdFrom,
-            'to' => $invoiceSourceIdTo,
+            'from' => $idFrom,
+            'to' => $idTo,
         ];
-        return $this->getByCondition($invoiceSourceType, $field, $condition);
+        return $this->getByCondition($sourceType, $field, $condition);
     }
 
-    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $referenceFrom, string $referenceTo, bool $fallbackToId): array
     {
         $field = 'increment_id';
         $condition = [
-            'from' => $from,
-            'to' => $to,
+            'from' => $referenceFrom,
+            'to' => $referenceTo,
         ];
         $result = $this->getByCondition($sourceType, $field, $condition);
-        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $referenceFrom, $referenceTo, $fallbackToId);
     }
 
     public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array

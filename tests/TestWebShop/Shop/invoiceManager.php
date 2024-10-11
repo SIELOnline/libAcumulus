@@ -11,7 +11,7 @@ use DateTimeInterface;
  */
 class invoiceManager extends \Siel\Acumulus\Shop\InvoiceManager
 {
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $sourceType, int $idFrom, int $idTo): array
     {
         return [];
     }

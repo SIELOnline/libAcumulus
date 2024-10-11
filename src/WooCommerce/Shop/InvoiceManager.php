@@ -43,7 +43,7 @@ class InvoiceManager extends BaseInvoiceManager
         }
     }
 
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $sourceType, int $idFrom, int $idTo): array
     {
         if (OrderUtil::custom_orders_table_usage_is_enabled()) {
             // HPOS usage is enabled.
@@ -53,8 +53,8 @@ class InvoiceManager extends BaseInvoiceManager
                         'field' => 'id',
                         'compare' => 'BETWEEN',
                         'value' => [
-                            $invoiceSourceIdFrom,
-                            $invoiceSourceIdTo,
+                            $idFrom,
+                            $idTo,
                         ],
                     ],
                 ],
@@ -63,10 +63,10 @@ class InvoiceManager extends BaseInvoiceManager
             // Traditional CPT-based orders are in use. So far for compatibility:
             // searching on a range of ids differs in WP_Query.
             $args = [
-                'post__in' => range($invoiceSourceIdFrom, $invoiceSourceIdTo),
+                'post__in' => range($idFrom, $idTo),
             ];
         }
-        return $this->query2Sources($args, $invoiceSourceType);
+        return $this->query2Sources($args, $sourceType);
     }
 
     /**
@@ -95,7 +95,7 @@ class InvoiceManager extends BaseInvoiceManager
      * - WC Sequential Order Numbers: _order_number or _order_number_formatted.
      * - Custom Order Numbers for WooCommerce (Pro): _alg_wc_custom_order_number.
      */
-    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $referenceFrom, string $referenceTo, bool $fallbackToId): array
     {
         $args = null;
         // All only work with orders, not refunds.
@@ -107,8 +107,8 @@ class InvoiceManager extends BaseInvoiceManager
                         [
                             'key' => '_order_number',
                             'value' => [
-                                $from,
-                                $to,
+                                $referenceFrom,
+                                $referenceTo,
                             ],
                             'compare' => 'BETWEEN',
                             'type' => 'UNSIGNED',
@@ -122,8 +122,8 @@ class InvoiceManager extends BaseInvoiceManager
                 // these plugins allow for text prefixes and suffixes.
                 // Therefore, we allow for a lexicographical or a purely numeric
                 // comparison.
-                if (ctype_digit($from) && ctype_digit($to)) {
-                    if (strlen($from) < 6 && strlen($to) < 6) {
+                if (ctype_digit($referenceFrom) && ctype_digit($referenceTo)) {
+                    if (strlen($referenceFrom) < 6 && strlen($referenceTo) < 6) {
                         // We assume non formatted search arguments.
                         $key = '_order_number';
                     } else {
@@ -141,8 +141,8 @@ class InvoiceManager extends BaseInvoiceManager
                             'key' => $key,
                             'compare' => 'BETWEEN',
                             'value' => [
-                                $from,
-                                $to,
+                                $referenceFrom,
+                                $referenceTo,
                             ],
                             'type' => $sourceType,
                         ],
@@ -158,8 +158,8 @@ class InvoiceManager extends BaseInvoiceManager
                             'key' => '_alg_wc_custom_order_number',
                             'compare' => 'BETWEEN',
                             'value' => [
-                                $from,
-                                $to,
+                                $referenceFrom,
+                                $referenceTo,
                             ],
                             'type' => 'UNSIGNED',
                         ],
@@ -168,7 +168,7 @@ class InvoiceManager extends BaseInvoiceManager
             }
         }
         $result = isset($args) ? $this->query2Sources($args, $sourceType) : [];
-        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $referenceFrom, $referenceTo, $fallbackToId);
     }
 
     public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array

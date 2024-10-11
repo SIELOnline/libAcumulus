@@ -46,21 +46,21 @@ class InvoiceManager extends BaseInvoiceManager
         ];
     }
 
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $sourceType, int $idFrom, int $idTo): array
     {
-        $key = $this->tableInfo[$invoiceSourceType]['key'];
+        $key = $this->tableInfo[$sourceType]['key'];
         /** @var \stdClass $result (documentation error in DB) */
         $result = $this->getDb()->query(
             sprintf(
                 'SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u',
                 $key,
-                $this->tableInfo[$invoiceSourceType]['table'],
+                $this->tableInfo[$sourceType]['table'],
                 $key,
-                $invoiceSourceIdFrom,
-                $invoiceSourceIdTo
+                $idFrom,
+                $idTo
             )
         );
-        return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($result->rows, $key));
+        return $this->getSourcesByIdsOrSources($sourceType, array_column($result->rows, $key));
     }
 
     public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array

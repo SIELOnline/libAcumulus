@@ -41,12 +41,12 @@ class InvoiceManager extends BaseInvoiceManager
         // @todo: Define the connection between this library and MyWebShop's database (e.g. OpenCart, PrestaShop) or model architecture (e.g. Magento).
     }
 
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $sourceType, int $idFrom, int $idTo): array
     {
         // @todo: provide implementation.
     }
 
-    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $referenceFrom, string $referenceTo, bool $fallbackToId): array
     {
         // @todo: implement if MyWebShop has order/refund references (external
         //   facing) that differ from the (internal) ID. Otherwise remove this

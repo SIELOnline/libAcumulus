@@ -41,9 +41,9 @@ class InvoiceManager extends BaseInvoiceManager
         $this->orderSlipTableName = _DB_PREFIX_ . OrderSlip::$definition['table'];
     }
 
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $sourceType, int $idFrom, int $idTo): array
     {
-        switch ($invoiceSourceType) {
+        switch ($sourceType) {
             case Source::Order:
                 $key = pSQL(Order::$definition['primary']);
                 /** @noinspection PhpUnhandledExceptionInspection */
@@ -53,11 +53,11 @@ class InvoiceManager extends BaseInvoiceManager
                         $key,
                         pSQL($this->orderTableName),
                         $key,
-                        $invoiceSourceIdFrom,
-                        $invoiceSourceIdTo
+                        $idFrom,
+                        $idTo
                     )
                 );
-                return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
+                return $this->getSourcesByIdsOrSources($sourceType, array_column($ids, $key));
             case Source::CreditNote:
                 $key = pSQL(OrderSlip::$definition['primary']);
                 /** @noinspection PhpUnhandledExceptionInspection */
@@ -67,16 +67,16 @@ class InvoiceManager extends BaseInvoiceManager
                         $key,
                         pSQL($this->orderSlipTableName),
                         $key,
-                        $invoiceSourceIdFrom,
-                        $invoiceSourceIdTo
+                        $idFrom,
+                        $idTo
                     )
                 );
-                return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
+                return $this->getSourcesByIdsOrSources($sourceType, array_column($ids, $key));
         }
         return [];
     }
 
-    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $referenceFrom, string $referenceTo, bool $fallbackToId): array
     {
         switch ($sourceType) {
             case Source::Order:
@@ -88,19 +88,19 @@ class InvoiceManager extends BaseInvoiceManager
                         pSQL($key),
                         $this->orderTableName,
                         'reference',
-                        pSQL($from),
-                        pSQL($to)
+                        pSQL($referenceFrom),
+                        pSQL($referenceTo)
                     )
                 );
                 $result = $this->getSourcesByIdsOrSources($sourceType, array_column($ids, $key));
                 break;
             case Source::CreditNote:
-                $result = $this->getInvoiceSourcesByIdRange($sourceType, (int) $from, (int) $to);
+                $result = $this->getInvoiceSourcesByIdRange($sourceType, (int) $referenceFrom, (int) $referenceTo);
                 break;
             default:
                 throw new RuntimeException('Unknown invoice source type');
         }
-        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $referenceFrom, $referenceTo, $fallbackToId);
     }
 
     public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array

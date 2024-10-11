@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\Shop;
 
-use DateTimeImmutable;
 use DateTimeZone;
+use Joomla\CMS\Date\Date;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\Database\DatabaseInterface;
-use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
-
-use function count;
 
 /**
  * This override provides Joomla specific db helper methods and defines
@@ -25,16 +20,16 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * Helper method that executes a query to retrieve a list of invoice source
      * ids and returns a list of invoice sources for these ids.
      *
-     * @param string $invoiceSourceType
+     * @param string $sourceType
      * @param string $query
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non keyed array with invoice Sources.
      */
-    protected function getSourcesByQuery(string $invoiceSourceType, string $query): array
+    protected function getSourcesByQuery(string $sourceType, string $query): array
     {
         $sourceIds = $this->loadColumn($query);
-        return $this->getSourcesByIdsOrSources($invoiceSourceType, $sourceIds);
+        return $this->getSourcesByIdsOrSources($sourceType, $sourceIds);
     }
 
     /**
@@ -48,6 +43,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function loadColumn(string $query): array
     {
+        /** @noinspection PhpUndefinedMethodInspection {@see DatabaseInterface::setQuery()} */
         return $this->getDb()->setQuery($query)->loadColumn();
     }
 
@@ -72,6 +68,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function toSql(string $dateStr): string
     {
-        return (new DateTimeImmutable($dateStr, new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
+        /** @noinspection PhpUndefinedMethodInspection  {@see \Joomla\Application\ConfigurationAwareApplicationInterface::get()} */
+        return (new Date($dateStr, new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 }

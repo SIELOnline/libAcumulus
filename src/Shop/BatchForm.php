@@ -16,10 +16,12 @@ use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 
 use function array_key_exists;
 use function count;
+use function in_array;
 
 /**
  * Provides batch form handling.
@@ -31,7 +33,6 @@ use function count;
  * And may optionally (have to) override:
  * - setSubmittedValues()
  *
- * @todo: an additional filter (AND with other filters) on status is absolutely necessary
  * @nth: to prevent problems, add an additional confirmation step, including a list of
  *   sources that will be sent (with check boxes?).
  */
@@ -84,6 +85,7 @@ class BatchForm extends Form
     protected function getDefaultFormValues(): array
     {
         $result = parent::getDefaultFormValues();
+        $result['order_statuses'] = $this->acumulusConfig->get('triggerOrderStatus');
         $result['send_mode'] = 'send_normal';
         if (count($this->screenLog) !== 0) {
             $result['log'] = implode("\n", $this->screenLog);
@@ -96,8 +98,8 @@ class BatchForm extends Form
         parent::setSubmittedValues();
         // Trim the from-to fields, can e.g. be copied from the order list,
         // and therefore contain spaces or tabs before or after the value.
-        $this->submittedValues['invoice_source_reference_from'] = trim($this->submittedValues['invoice_source_reference_from']);
-        $this->submittedValues['invoice_source_reference_to'] = trim($this->submittedValues['invoice_source_reference_to']);
+        $this->submittedValues['reference_from'] = trim($this->submittedValues['reference_from']);
+        $this->submittedValues['reference_to'] = trim($this->submittedValues['reference_to']);
         $this->submittedValues['date_from'] = trim($this->submittedValues['date_from']);
         $this->submittedValues['date_to'] = trim($this->submittedValues['date_to']);
     }
@@ -105,46 +107,35 @@ class BatchForm extends Form
     protected function validate(): void
     {
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
-        if (empty($this->submittedValues['invoice_source_type'])) {
-            $this->addFormMessage($this->t('message_validate_batch_source_type_required'), Severity::Error, 'invoice_source_type');
-        } elseif (!array_key_exists($this->submittedValues['invoice_source_type'], $invoiceSourceTypes)) {
-            $this->addFormMessage($this->t('message_validate_batch_source_type_invalid'), Severity::Error, 'invoice_source_type');
+        if (empty($this->submittedValues['source_type'])) {
+            $this->addFormMessage($this->t('message_validate_batch_source_type_required'), Severity::Error, 'source_type');
+        } elseif (!array_key_exists($this->submittedValues['source_type'], $invoiceSourceTypes)) {
+            $this->addFormMessage($this->t('message_validate_batch_source_type_invalid'), Severity::Error, 'source_type');
         }
 
-        if ($this->submittedValues['invoice_source_reference_from'] === '' && $this->submittedValues['date_from'] === '') {
+        if ($this->submittedValues['reference_from'] === '' && $this->submittedValues['date_from'] === '') {
             // Either a range of order id's or a range of dates should be entered.
+            $message = count($invoiceSourceTypes) === 1
+                ? 'message_validate_batch_reference_or_date_1'
+                : 'message_validate_batch_reference_or_date_2';
             $this->addFormMessage(
-                $this->t(
-                    count($invoiceSourceTypes) === 1
-                        ? 'message_validate_batch_reference_or_date_1'
-                        : 'message_validate_batch_reference_or_date_2'
-                ),
+                $this->t($message),
                 Severity::Error,
-                'invoice_source_reference_from'
+                'reference_from'
             );
-        } elseif ($this->submittedValues['invoice_source_reference_from'] !== '' && $this->submittedValues['date_from'] !== '') {
-            // Not both ranges should be entered.
-            $this->addFormMessage(
-                $this->t(
-                    count($invoiceSourceTypes) === 1
-                        ? 'message_validate_batch_reference_and_date_1'
-                        : 'message_validate_batch_reference_and_date_2'
-                ),
-                Severity::Error,
-                'date_from'
-            );
-        } elseif ($this->submittedValues['invoice_source_reference_from'] !== '') {
-            // Date from is empty, we go for a range of order ids.
-            // (We ignore any date to value.)
+        }
+
+        if ($this->submittedValues['reference_from'] !== '') {
             // Single id or range of ids?
-            if ($this->submittedValues['invoice_source_reference_to'] !== ''
-                && $this->submittedValues['invoice_source_reference_to'] < $this->submittedValues['invoice_source_reference_from']) {
-                // "order id to" is smaller than "order id from".
-                $this->addFormMessage($this->t('message_validate_batch_bad_order_range'), Severity::Error, 'invoice_source_reference_to');
+            if ($this->submittedValues['reference_to'] !== ''
+                && $this->submittedValues['reference_to'] < $this->submittedValues['reference_from']) {
+                // "order id to" is smaller than "order id from": we could swap the values
+                // ourselves, but this may be a typing error: do not accept it.
+                $this->addFormMessage($this->t('message_validate_batch_bad_order_range'), Severity::Error, 'reference_to');
             }
-        } else /*if ($this->submittedValues['date_to'] !== '') */ {
-            // Range of dates has been filled in.
-            // We ignore any order # to value.
+        }
+
+        if ($this->submittedValues['date_from'] !== '') {
             if (!DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_from'])) {
                 // Date from not a valid date.
                 $this->addFormMessage(
@@ -153,7 +144,9 @@ class BatchForm extends Form
                     'date_from'
                 );
             }
-            if ($this->submittedValues['date_to']) {
+            // Single date or range of dates?
+            if ($this->submittedValues['date_to'] !== '') {
+                // Range of dates has been filled in.
                 if (!DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_to'])) {
                     // Date to not a valid date.
                     $this->addFormMessage(
@@ -162,12 +155,32 @@ class BatchForm extends Form
                         'date_to'
                     );
                 } elseif ($this->submittedValues['date_to'] < $this->submittedValues['date_from']) {
-                    // date to is smaller than date from
-                    $this->addFormMessage(
-                        $this->t('message_validate_batch_bad_date_range'),
-                        Severity::Error,
-                        'date_to'
-                    );
+                    // date to is smaller than date from: we could swap the values
+                    // ourselves, but this may be a typing error: do not accept it.
+                    $this->addFormMessage($this->t('message_validate_batch_bad_date_range'), Severity::Error, 'date_to');
+                }
+            }
+        }
+
+        if (count($this->submittedValues['order_statuses']) > 0) {
+            //  '0' option may not be combined with others
+            if (in_array('0', $this->submittedValues['order_statuses'], true) && count($this->submittedValues['order_statuses']) >= 2) {
+                // the "0" option ("do not filter on order status") is combined with other
+                // real order statuses: do not accept it.
+                $this->addFormMessage(
+                    sprintf($this->t('message_validate_batch_order_status_0_not_alone'), $this->t('option_empty_order_statuses')),
+                    Severity::Error,
+                    'order_status'
+                );
+            }
+            if (!in_array('0', $this->submittedValues['order_statuses'], true)) {
+                $existing = array_intersect_key(
+                    $this->submittedValues['order_statuses'],
+                    array_keys($this->shopCapabilities->getShopOrderStatuses())
+                );
+                if (count($existing) !== count($this->submittedValues['order_statuses'])) {
+                    // tampering:
+                    $this->addFormMessage($this->t('message_validate_batch_order_status_existing'), Severity::Error, 'order_status');
                 }
             }
         }
@@ -180,41 +193,51 @@ class BatchForm extends Form
      */
     protected function execute(): bool
     {
-        $type = (string) $this->getFormValue('invoice_source_type');
-        if ($this->getFormValue('invoice_source_reference_from') !== '') {
+        $type = (string) $this->getFormValue('source_type');
+        $filters = [];
+        $this->screenLog['filters'] = [];
+        $this->screenLog['filters'][] = sprintf($this->t('message_form_filter_type'), $this->t("plural_$type"));
+        if ($this->getFormValue('reference_from') !== '') {
             // Retrieve by order/refund reference range.
-            $from = $this->getFormValue('invoice_source_reference_from');
-            $to = $this->getFormValue('invoice_source_reference_to') ?: $from;
-            $this->screenLog['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_ref"), $from, $to);
-            $invoiceSources = $this->invoiceManager->getInvoiceSourcesByReferenceRange($type, $from, $to);
-            if (count($invoiceSources) === 0) {
-                // Empty set when searching on references: retrieve by order/
-                // refund id range.
-                $invoiceSources = $this->invoiceManager->getInvoiceSourcesByIdRange($type, (int) $from, (int) $to);
-                $this->screenLog['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_id"), $from, $to);
-            }
-        } else {
+            $from = $this->getFormValue('reference_from');
+            $to = $this->getFormValue('reference_to') ?: $from;
+            $filters[] = ['reference_from' => $from, 'reference_to' => $to];
+            $this->screenLog['filters'][] = sprintf($this->t('message_form_filter_reference'), $from, $to);
+        }
+        if ($this->getFormValue('date_from') !== '') {
             // Retrieve by order date.
             $from = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_from'))->setTime(0, 0, 0);
-            /** @noinspection PhpRedundantOptionalArgumentInspection */
             $to = $this->getFormValue('date_to')
                 ? DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_to'))->setTime(23, 59, 59)
                 : clone $from;
-            $this->screenLog['range'] = sprintf(
-                $this->t('message_form_range_date'),
-                $this->t("plural_$type"),
+            $filters[] = ['date_from' => $from, 'date_to' => $to];
+            $this->screenLog['filters'][] = sprintf(
+                $this->t('message_form_filter_date'),
                 $from->format((Api::DateFormat_Iso)),
                 $to->format(Api::DateFormat_Iso)
             );
-            $invoiceSources = $this->invoiceManager->getInvoiceSourcesByDateRange($type, $from, $to);
         }
+
+        if ($type === Source::Order) {
+            $statuses = array_intersect_key(
+                $this->getOrderStatusesList('option_empty_order_statuses'),
+                array_fill_keys($this->getFormValue('order_statuses'), true)
+            );
+            unset($statuses['0']);
+            if (count($statuses) > 0) {
+                $filters[] = ['statuses' => $statuses];
+                $this->screenLog['filters'][] = sprintf($this->t('message_form_filter_status'), implode("', '", $statuses));
+            }
+        }
+
+        $invoiceSources = $this->invoiceManager->getInvoiceSourcesByFilters($type, $filters);
 
         if (count($invoiceSources) === 0) {
             $rangeList = sprintf($this->t('message_form_range_empty'), $this->t($type));
             $this->screenLog[$type] = $rangeList;
-            $this->addFormMessage($rangeList, Severity::Warning, 'invoice_source_reference_from');
+            $this->addFormMessage($rangeList, Severity::Warning, 'reference_from');
             $this->setFormValue('result', $this->screenLog[$type]);
-            $this->log->info('BatchForm::execute(): ' . $this->screenLog['range'] . $rangeList);
+            $this->log->info('BatchForm::execute(): ' . $this->getFiltersMessage() . $rangeList);
             $result = true;
         } else {
             $rangeList = sprintf($this->t('message_form_range_list'), $this->getInvoiceSourceReferenceList($invoiceSources));
@@ -224,7 +247,7 @@ class BatchForm extends Form
                 $this->acumulusConfig->set('debug', Config::Send_TestMode);
             }
             // Do the sending (and some info/debug logging).
-            $this->log->info('BatchForm::execute(): ' . $this->screenLog['range'] . ' ' . $rangeList);
+            $this->log->info('BatchForm::execute(): ' . $this->getFiltersMessage() . ' ' . $rangeList);
             $result = $this->invoiceManager->sendMultiple(
                 $invoiceSources,
                 $sendMode === 'send_force',
@@ -239,7 +262,7 @@ class BatchForm extends Form
         }
 
         // Set formValue for log in case form values are already queried.
-        $logText = implode("\n", $this->screenLog);
+        $logText = $this->screenLogToString();
         $this->setFormValue('log', $logText);
         return $result;
     }
@@ -266,16 +289,18 @@ class BatchForm extends Form
             ];
         }
         // 1st fieldset: Batch options.
+        $orderStatusesList = $this->getOrderStatusesList('option_empty_order_statuses');
+
         $fields['batchFields'] = [
             'type' => 'fieldset',
             'legend' => $this->t('batchFieldsHeader'),
             'fields' => [
-                'invoice_source_type' => $invoiceSourceTypeField,
-                'invoice_source_reference_from' => [
+                'source_type' => $invoiceSourceTypeField,
+                'reference_from' => [
                     'type' => 'text',
                     'label' => $this->t('field_invoice_source_reference_from'),
                 ],
-                'invoice_source_reference_to' => [
+                'reference_to' => [
                     'type' => 'text',
                     'label' => $this->t('field_invoice_source_reference_to'),
                     'description' => count($invoiceSourceTypes) === 1 ? $this->t('desc_invoice_source_reference_from_to_1') : $this->t(
@@ -297,6 +322,17 @@ class BatchForm extends Form
                         'placeholder' => $this->t('date_format'),
                     ],
                     'description' => $this->t('desc_date_from_to'),
+                ],
+                'order_statuses' => [
+                    'name' => 'order_statuses[]',
+                    'type' => 'select',
+                    'label' => $this->t('field_order_statuses'),
+                    'description' => $this->t('desc_order_statuses'),
+                    'options' => $orderStatusesList,
+                    'attributes' => [
+                        'multiple' => true,
+                        'size' => min(count($orderStatusesList), 8),
+                    ],
                 ],
                 'send_mode' => [
                     'type' => 'radio',
@@ -333,14 +369,14 @@ class BatchForm extends Form
                         'type' => 'textarea',
                         'attributes' => [
                             'readonly' => true,
-                            'rows' => max(5, min(15, count($this->screenLog))),
+                            'rows' => max(5, min(15, count($this->screenLog) + 1)),
                             'style' => 'box-sizing: border-box; width: 100%; min-width: 48em;',
                         ],
                     ],
                 ],
             ];
-            if (count($this->screenLog) !== 0) {
-                $logText = implode("\n", $this->screenLog);
+            if (count($this->screenLog) > 0) {
+                $logText = $this->screenLogToString();
                 $this->formValues['log'] = $logText;
                 $fields['batchLog']['fields']['log']['value'] = $logText;
             }
@@ -369,20 +405,30 @@ class BatchForm extends Form
         return $fields;
     }
 
-    /**
-     * Returns a formatted string with the list of ids of the given sources.
-     *
-     * @param \Siel\Acumulus\Invoice\Source[] $invoiceSources
-     *
-     * @return string
-     *   A loggable (formatted) string with a list of ids of the sources.
-     */
     protected function getInvoiceSourceReferenceList(array $invoiceSources): string
     {
-        $result = [];
-        foreach ($invoiceSources as $invoiceSource) {
-            $result[] = $invoiceSource->getReference();
-        }
-        return '{' . implode(',', $result) . '}';
+        $result = array_map(static function ($invoiceSource) {
+            return $invoiceSource->getReference();
+        }, $invoiceSources);
+        return implode(', ', $result);
+    }
+
+    private function getFiltersMessage(bool $inline = true): string
+    {
+        $separatorHeader = $inline ? ' ' : "\n • ";
+        $separatorLine = $inline ? ', ' : "\n • ";
+        $header = $this->t('message_form_filter');
+        $lines = implode($separatorLine, $this->screenLog['filters']);
+        return "$header$separatorHeader$lines";
+    }
+
+    private function screenLogToString(): string
+    {
+        $result = $this->getFiltersMessage(false) . "\n";
+        $filters = $this->screenLog['filters'];
+        unset($this->screenLog['filters']);
+        $result .= implode("\n", $this->screenLog);
+        array_unshift($this->screenLog, $filters);
+        return $result;
     }
 }

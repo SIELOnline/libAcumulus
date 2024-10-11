@@ -46,18 +46,14 @@ class InvoiceManager extends BaseInvoiceManager
         // @todo: provide implementation.
     }
 
-    public function getInvoiceSourcesByReferenceRange(
-        string $invoiceSourceType,
-        string $invoiceSourceReferenceFrom,
-        string $invoiceSourceReferenceTo
-    ): array
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
     {
         // @todo: implement if MyWebShop has order/refund references (external
         //   facing) that differ from the (internal) ID. Otherwise remove this
         //   method.
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         // @todo: provide implementation.
     }

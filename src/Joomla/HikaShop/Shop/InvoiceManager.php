@@ -12,6 +12,8 @@ use DateTimeInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
 
+use function count;
+
 /**
  * This override provides HikaShop specific queries.
  *
@@ -48,32 +50,29 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * @noinspection NullPointerExceptionInspection
      */
-    public function getInvoiceSourcesByReferenceRange(
-        string $invoiceSourceType,
-        string $invoiceSourceReferenceFrom,
-        string $invoiceSourceReferenceTo
-    ): array
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
     {
-        if ($invoiceSourceType === Source::Order) {
+        $result = [];
+        if ($sourceType === Source::Order) {
             $query = sprintf(
                 "select order_id from #__hikashop_order where order_number between '%s' and '%s'",
-                $this->getDb()->escape($invoiceSourceReferenceFrom),
-                $this->getDb()->escape($invoiceSourceReferenceTo)
+                $this->getDb()->escape($from),
+                $this->getDb()->escape($to)
             );
-            return $this->getSourcesByQuery($invoiceSourceType, $query);
+            $result = $this->getSourcesByQuery($sourceType, $query);
         }
-        return [];
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
-        if ($invoiceSourceType === Source::Order) {
+        if ($sourceType === Source::Order) {
             $query = sprintf(
                 'select order_id from #__hikashop_order where order_modified between %u and %u',
                 $dateFrom->getTimestamp(),
                 $dateTo->getTimestamp()
             );
-            return $this->getSourcesByQuery($invoiceSourceType, $query);
+            return $this->getSourcesByQuery($sourceType, $query);
         }
         return [];
     }

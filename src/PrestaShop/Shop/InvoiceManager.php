@@ -9,9 +9,12 @@ use Db;
 use Hook;
 use Order;
 use OrderSlip;
+use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
+
+use function count;
 
 /**
  * Implements the PrestaShop specific parts of the invoice manager.
@@ -44,63 +47,73 @@ class InvoiceManager extends BaseInvoiceManager
             case Source::Order:
                 $key = pSQL(Order::$definition['primary']);
                 /** @noinspection PhpUnhandledExceptionInspection */
-                $ids = Db::getInstance()->executeS(sprintf(
-                    'SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u',
-                    $key,
-                    pSQL($this->orderTableName),
-                    $key,
-                    $invoiceSourceIdFrom,
-                    $invoiceSourceIdTo
-                ));
-                return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
-            case Source::CreditNote:
-                $key = pSQL(OrderSlip::$definition['primary']);
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $ids = Db::getInstance()->executeS(sprintf(
-                'SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u',
-                    $key,
-                    pSQL($this->orderSlipTableName),
-                    $key,
-                    $invoiceSourceIdFrom,
-                    $invoiceSourceIdTo
-                ));
-                return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
-        }
-        return [];
-    }
-
-    public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
-    {
-        switch ($invoiceSourceType) {
-            case Source::Order:
-                $key = Order::$definition['primary'];
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $ids = Db::getInstance()->executeS(sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN '%s' AND '%s'",
-                        pSQL($key),
-                        $this->orderTableName,
-                        'reference',
-                        pSQL($invoiceSourceReferenceFrom),
-                        pSQL($invoiceSourceReferenceTo)
+                $ids = Db::getInstance()->executeS(
+                    sprintf(
+                        'SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u',
+                        $key,
+                        pSQL($this->orderTableName),
+                        $key,
+                        $invoiceSourceIdFrom,
+                        $invoiceSourceIdTo
                     )
                 );
                 return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
             case Source::CreditNote:
-                return $this->getInvoiceSourcesByIdRange($invoiceSourceType, (int) $invoiceSourceReferenceFrom, (int) $invoiceSourceReferenceTo);
+                $key = pSQL(OrderSlip::$definition['primary']);
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $ids = Db::getInstance()->executeS(
+                    sprintf(
+                        'SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u',
+                        $key,
+                        pSQL($this->orderSlipTableName),
+                        $key,
+                        $invoiceSourceIdFrom,
+                        $invoiceSourceIdTo
+                    )
+                );
+                return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
         }
         return [];
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
+    {
+        switch ($sourceType) {
+            case Source::Order:
+                $key = Order::$definition['primary'];
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $ids = Db::getInstance()->executeS(
+                    sprintf(
+                        "SELECT `%s` FROM `%s` WHERE `%s` BETWEEN '%s' AND '%s'",
+                        pSQL($key),
+                        $this->orderTableName,
+                        'reference',
+                        pSQL($from),
+                        pSQL($to)
+                    )
+                );
+                $result = $this->getSourcesByIdsOrSources($sourceType, array_column($ids, $key));
+                break;
+            case Source::CreditNote:
+                $result = $this->getInvoiceSourcesByIdRange($sourceType, (int) $from, (int) $to);
+                break;
+            default:
+                throw new RuntimeException('Unknown invoice source type');
+        }
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
+    }
+
+    public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         $dateFromStr = $dateFrom->format('c');
         $dateToStr = $dateTo->format('c');
-        switch ($invoiceSourceType) {
+        switch ($sourceType) {
             case Source::Order:
                 $ids = Order::getOrdersIdByDate($dateFromStr, $dateToStr);
-                return $this->getSourcesByIdsOrSources($invoiceSourceType, $ids);
+                return $this->getSourcesByIdsOrSources($sourceType, $ids);
             case Source::CreditNote:
                 $ids = OrderSlip::getSlipsIdByDate($dateFrom, $dateTo);
-                return $this->getSourcesByIdsOrSources($invoiceSourceType, $ids);
+                return $this->getSourcesByIdsOrSources($sourceType, $ids);
         }
         return [];
     }

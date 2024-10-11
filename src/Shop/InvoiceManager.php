@@ -28,6 +28,7 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 
+use function array_key_exists;
 use function in_array;
 
 /**
@@ -102,17 +103,15 @@ abstract class InvoiceManager
 
     /**
      * Returns a new Source instance.
-     *
-     * @param int|object|array $idOrSource
      */
-    protected function getSource(string $invoiceSourceType, $idOrSource): Source
+    protected function getSource(string $invoiceSourceType, object|int|array $idOrSource): Source
     {
         return $this->container->createSource($invoiceSourceType, $idOrSource);
     }
 
     protected function getInvoiceCreate(): InvoiceCreate
     {
-       return $this->container->getInvoiceCreate();
+        return $this->container->getInvoiceCreate();
     }
 
     protected function getInvoiceSend(): InvoiceSend
@@ -151,11 +150,7 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\Source[]
      *   An array of invoice sources of the given source type.
      */
-    abstract public function getInvoiceSourcesByIdRange(
-        string $invoiceSourceType,
-        int $invoiceSourceIdFrom,
-        int $invoiceSourceIdTo
-    ): array;
+    abstract public function getInvoiceSourcesByIdRange(string $invoiceSourceType, int $invoiceSourceIdFrom, int $invoiceSourceIdTo): array;
 
     /**
      * Returns a list of existing invoice sources for the given reference range.
@@ -164,12 +159,9 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\Source[]
      *   An array of invoice sources of the given source type.
      */
-    public function getInvoiceSourcesByReferenceRange(
-        string $invoiceSourceType,
-        string $invoiceSourceReferenceFrom,
-        string $invoiceSourceReferenceTo
-    ): array {
-        return $this->getInvoiceSourcesByIdRange($invoiceSourceType, (int) $invoiceSourceReferenceFrom, (int) $invoiceSourceReferenceTo);
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
+    {
+        return $fallbackToId ? $this->getInvoiceSourcesByIdRange($sourceType, (int) $from, (int) $to) : [];
     }
 
     /**
@@ -179,26 +171,61 @@ abstract class InvoiceManager
      *   An array of invoice sources of the given source type.
      */
     abstract public function getInvoiceSourcesByDateRange(
-        string $invoiceSourceType,
+        string $sourceType,
         DateTimeInterface $dateFrom,
         DateTimeInterface $dateTo
     ): array;
 
     /**
+     * Returns a list of existing invoice sources for the given filters.
+     *
+     * @return \Siel\Acumulus\Invoice\Source[]
+     *   An array of invoice sources of the given source type.
+     */
+    public function getInvoiceSourcesByFilters(string $sourceType, array $filters): array
+    {
+        $lists = [];
+        /** @var array $filter */
+        foreach ($filters as $filter) {
+            if (array_key_exists('date_from', $filter)) {
+                $lists[] = $this->getInvoiceSourcesByDateRange($sourceType, $filter['date_from'], $filter['date_to']);
+            }
+            if (array_key_exists('reference_from', $filter)) {
+                $lists[] = $this->getInvoiceSourcesByReferenceRange(
+                    $sourceType,
+                    $filter['reference_from'],
+                    $filter['reference_to'],
+                    true
+                );
+            }
+            if (array_key_exists('statuses', $filter)) {
+                $statuses = $filter['statuses'];
+            }
+        }
+        $list = array_intersect(...$lists);
+        if (isset($statuses)) {
+            $list = array_filter($list, static function (Source $item) use ($statuses) {
+                return array_key_exists($item->getStatus(), $statuses);
+            });
+        }
+        return $list;
+    }
+
+    /**
      * Creates a set of Invoice Sources given their ids or shop specific sources.
      *
-     * @param string $invoiceSourceType
+     * @param string $sourceType
      * @param array $idsOrSources
      *   An array with shop specific orders or credit notes or just their ids.
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non keyed array with invoice Sources.
      */
-    public function getSourcesByIdsOrSources(string $invoiceSourceType, array $idsOrSources): array
+    public function getSourcesByIdsOrSources(string $sourceType, array $idsOrSources): array
     {
         $results = [];
         foreach ($idsOrSources as $sourceId) {
-            $results[] = $this->getSourceByIdOrSource($invoiceSourceType, $sourceId);
+            $results[] = $this->getSourceByIdOrSource($sourceType, $sourceId);
         }
         return $results;
     }
@@ -206,15 +233,15 @@ abstract class InvoiceManager
     /**
      * Creates a source given its type and id.
      *
-     * @param int|array|object $idOrSource
+     * @param object|int|array $idOrSource
      *   A shop specific order or credit note or just its ids.
      *
      * @return \Siel\Acumulus\Invoice\Source
      *   An invoice Source.
      */
-    protected function getSourceByIdOrSource(string $invoiceSourceType, $idOrSource): Source
+    protected function getSourceByIdOrSource(string $sourceType, object|int|array $idOrSource): Source
     {
-        return $this->getSource($invoiceSourceType, $idOrSource);
+        return $this->getSource($sourceType, $idOrSource);
     }
 
     /**
@@ -253,7 +280,7 @@ abstract class InvoiceManager
             $result = $this->createAndSend($invoiceSource, $result, $forceSend, $dryRun);
             $success = $success && !$result->hasError();
             $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
-            $log[$invoiceSource->getId()] = $this->getSendResultLogText($invoiceSource, $result,InvoiceAddResult::AddReqResp_Never);
+            $log[$invoiceSource->getId()] = $this->getSendResultLogText($invoiceSource, $result, InvoiceAddResult::AddReqResp_Never);
         }
         return $success;
     }
@@ -372,8 +399,7 @@ abstract class InvoiceManager
         InvoiceAddResult $result,
         bool $forceSend = false,
         bool $dryRun = false
-    ): InvoiceAddResult
-    {
+    ): InvoiceAddResult {
         $this->getInvoiceSend()->setBasicSendStatus($invoiceSource, $result, $forceSend);
         $invoice = $this->getInvoiceCreate()->create($invoiceSource, $result);
         if ($invoice !== null && !$result->isSendingPrevented()) {
@@ -404,6 +430,7 @@ abstract class InvoiceManager
         if ($token === null) {
             throw new RuntimeException('No Acumulus token for $invoiceSource');
         }
+        /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $emailAsPdf */
         $emailAsPdf = $this->createEmailAsPdf($invoiceSource);
         return $this->getAcumulusApiClient()->emailInvoiceAsPdf($token, $emailAsPdf);
     }
@@ -431,7 +458,7 @@ abstract class InvoiceManager
             throw new RuntimeException('No Acumulus token for $invoiceSource');
         }
 
-
+        /** @var \Siel\Acumulus\Data\EmailPackingSlipAsPdf $emailAsPdf */
         $emailAsPdf = $this->createEmailAsPdf($invoiceSource, false);
         return $this->getAcumulusApiClient()->emailPackingSlipAsPdf($token, $emailAsPdf);
     }
@@ -439,7 +466,9 @@ abstract class InvoiceManager
     protected function createEmailAsPdf(Source $invoiceSource, bool $forInvoice = true): EmailAsPdf
     {
         $type = $forInvoice ? EmailAsPdfType::Invoice : EmailAsPdfType::PackingSlip;
-        $emailAsPdf = $this->container->getCollectorManager()->setPropertySourcesForSource($invoiceSource)->collectEmailAsPdf($type);
+        $collectorManager = $this->container->getCollectorManager();
+        $collectorManager->getPropertySources()->add('source', $invoiceSource);
+        $emailAsPdf = $collectorManager->collectEmailAsPdf($type);
         /** @var \Siel\Acumulus\Completors\EmailInvoiceAsPdfCompletor $completor */
         $completor = $this->container->getCompletor(DataType::EmailAsPdf);
         $completor->complete($emailAsPdf, new MessageCollection($this->container->getTranslator()));

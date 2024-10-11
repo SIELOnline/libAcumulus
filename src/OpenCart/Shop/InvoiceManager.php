@@ -63,20 +63,20 @@ class InvoiceManager extends BaseInvoiceManager
         return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($result->rows, $key));
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
-        $key = $this->tableInfo[$invoiceSourceType]['key'];
+        $key = $this->tableInfo[$sourceType]['key'];
         /** @var \stdClass $result (documentation error in class DB) */
         $result = $this->getDb()->query(
             sprintf(
                 "SELECT `%s` FROM `%s` WHERE `date_modified` BETWEEN '%s' AND '%s'",
                 $key,
-                $this->tableInfo[$invoiceSourceType]['table'],
+                $this->tableInfo[$sourceType]['table'],
                 $this->getSqlDate($dateFrom),
                 $this->getSqlDate($dateTo)
             )
         );
-        return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($result->rows, $key));
+        return $this->getSourcesByIdsOrSources($sourceType, array_column($result->rows, $key));
     }
 
     /**

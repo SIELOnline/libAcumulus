@@ -8,6 +8,8 @@ use DateTimeInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
 
+use function count;
+
 /**
  * This override provides the VirtueMart specific queries.
  *
@@ -41,43 +43,38 @@ class InvoiceManager extends BaseInvoiceManager
      * So getting a range is not logical. However, extensions exists that do
      * introduce sequential order numbers, E.g:
      * http://extensions.joomla.org/profile/extension/extension-specific/virtuemart-extensions/human-readable-order-numbers
-     *
-     * @noinspection PhpMissingParentCallCommonInspection
-     *   Parent is a fallback implementation.
      */
-    public function getInvoiceSourcesByReferenceRange(
-        string $invoiceSourceType,
-        string $invoiceSourceReferenceFrom,
-        string $invoiceSourceReferenceTo
-    ): array {
-        if ($invoiceSourceType === Source::Order) {
-            if (ctype_digit($invoiceSourceReferenceFrom) && ctype_digit($invoiceSourceReferenceTo)) {
-                $from = sprintf('%d', $invoiceSourceReferenceFrom);
-                $to = sprintf('%d', $invoiceSourceReferenceTo);
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
+    {
+        $result = [];
+        if ($sourceType === Source::Order) {
+            if (ctype_digit($from) && ctype_digit($to)) {
+                $from = sprintf('%d', $from);
+                $to = sprintf('%d', $to);
             } else {
-                $from = sprintf("'%s'", $this->getDb()->escape($invoiceSourceReferenceFrom));
-                $to = sprintf("'%s'", $this->getDb()->escape($invoiceSourceReferenceTo));
+                $from = sprintf("'%s'", $this->getDb()->escape($from));
+                $to = sprintf("'%s'", $this->getDb()->escape($to));
             }
             $query = sprintf(
                 'select virtuemart_order_id from #__virtuemart_orders where order_number between %s and %s',
                 $from,
                 $to
             );
-            return $this->getSourcesByQuery($invoiceSourceType, $query);
+            $result = $this->getSourcesByQuery($sourceType, $query);
         }
-        return [];
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
-        if ($invoiceSourceType === Source::Order) {
+        if ($sourceType === Source::Order) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $query = sprintf(
                 "select virtuemart_order_id from #__virtuemart_orders where modified_on between '%s' and '%s'",
                 $this->toSql($this->getSqlDate($dateFrom)),
                 $this->toSql($this->getSqlDate($dateTo))
             );
-            return $this->getSourcesByQuery($invoiceSourceType, $query);
+            return $this->getSourcesByQuery($sourceType, $query);
         }
         return [];
     }

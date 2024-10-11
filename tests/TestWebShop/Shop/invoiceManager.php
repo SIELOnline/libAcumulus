@@ -16,7 +16,7 @@ class invoiceManager extends \Siel\Acumulus\Shop\InvoiceManager
         return [];
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         return [];
     }

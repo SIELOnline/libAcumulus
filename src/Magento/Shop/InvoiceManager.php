@@ -13,6 +13,8 @@ use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Magento\Framework\Event\ManagerInterface;
 
+use function count;
+
 /**
  * Implements the Magento specific invoice manager.
  *
@@ -33,24 +35,25 @@ class InvoiceManager extends BaseInvoiceManager
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
-    public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
     {
         $field = 'increment_id';
         $condition = [
-            'from' => $invoiceSourceReferenceFrom,
-            'to' => $invoiceSourceReferenceTo,
+            'from' => $from,
+            'to' => $to,
         ];
-        return $this->getByCondition($invoiceSourceType, $field, $condition);
+        $result = $this->getByCondition($sourceType, $field, $condition);
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         $field = 'updated_at';
         $condition = [
             'from' => $this->getSqlDate($dateFrom),
             'to' => $this->getSqlDate($dateTo)
         ];
-        return $this->getByCondition($invoiceSourceType, $field, $condition);
+        return $this->getByCondition($sourceType, $field, $condition);
     }
 
     /**

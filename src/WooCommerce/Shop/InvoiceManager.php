@@ -1,14 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use Automattic\WooCommerce\Utilities\OrderUtil;
 use DateTimeInterface;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
+use function count;
 use function strlen;
 
 /**
@@ -93,63 +94,59 @@ class InvoiceManager extends BaseInvoiceManager
      * - WooCommerce Sequential Order Numbers Pro: _order_number or _order_number_formatted.
      * - WC Sequential Order Numbers: _order_number or _order_number_formatted.
      * - Custom Order Numbers for WooCommerce (Pro): _alg_wc_custom_order_number.
- */
-    public function getInvoiceSourcesByReferenceRange(
-        string $invoiceSourceType,
-        string $invoiceSourceReferenceFrom,
-        string $invoiceSourceReferenceTo
-    ): array
+     */
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $from, string $to, bool $fallbackToId): array
     {
         $args = null;
         // All only work with orders, not refunds.
-        if ($invoiceSourceType === Source::Order) {
+        if ($sourceType === Source::Order) {
             if (is_plugin_active('woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php')) {
                 // Search by the order number assigned by this plugin.
                 $args = [
-                  'meta_query' => [
-                    [
-                      'key' => '_order_number',
-                      'value' => [
-                        $invoiceSourceReferenceFrom,
-                        $invoiceSourceReferenceTo,
-                      ],
-                      'compare' => 'BETWEEN',
-                      'type' => 'UNSIGNED',
+                    'meta_query' => [
+                        [
+                            'key' => '_order_number',
+                            'value' => [
+                                $from,
+                                $to,
+                            ],
+                            'compare' => 'BETWEEN',
+                            'type' => 'UNSIGNED',
+                        ],
                     ],
-                  ],
                 ];
             } elseif (is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php')
-              || is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php')
+                || is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php')
             ) {
                 // Search by the order number assigned by this plugin. Note that
                 // these plugins allow for text prefixes and suffixes.
                 // Therefore, we allow for a lexicographical or a purely numeric
                 // comparison.
-                if (ctype_digit($invoiceSourceReferenceFrom) && ctype_digit($invoiceSourceReferenceTo)) {
-                    if (strlen($invoiceSourceReferenceFrom) < 6 && strlen($invoiceSourceReferenceTo) < 6) {
+                if (ctype_digit($from) && ctype_digit($to)) {
+                    if (strlen($from) < 6 && strlen($to) < 6) {
                         // We assume non formatted search arguments.
                         $key = '_order_number';
                     } else {
                         // Formatted numeric search arguments: e.g. 'yyyynnnn'.
                         $key = '_order_number_formatted';
                     }
-                    $type = 'UNSIGNED';
+                    $sourceType = 'UNSIGNED';
                 } else {
                     $key = '_order_number_formatted';
-                    $type = 'CHAR';
+                    $sourceType = 'CHAR';
                 }
                 $args = [
-                  'meta_query' => [
-                    [
-                      'key' => $key,
-                      'compare' => 'BETWEEN',
-                      'value' => [
-                        $invoiceSourceReferenceFrom,
-                        $invoiceSourceReferenceTo,
-                      ],
-                      'type' => $type,
+                    'meta_query' => [
+                        [
+                            'key' => $key,
+                            'compare' => 'BETWEEN',
+                            'value' => [
+                                $from,
+                                $to,
+                            ],
+                            'type' => $sourceType,
+                        ],
                     ],
-                  ],
                 ];
             } elseif (is_plugin_active('custom-order-numbers-for-woocommerce-pro/custom-order-numbers-for-woocommerce-pro.php')
                 || is_plugin_active('custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php')
@@ -161,8 +158,8 @@ class InvoiceManager extends BaseInvoiceManager
                             'key' => '_alg_wc_custom_order_number',
                             'compare' => 'BETWEEN',
                             'value' => [
-                                $invoiceSourceReferenceFrom,
-                                $invoiceSourceReferenceTo,
+                                $from,
+                                $to,
                             ],
                             'type' => 'UNSIGNED',
                         ],
@@ -170,17 +167,16 @@ class InvoiceManager extends BaseInvoiceManager
                 ];
             }
         }
-        return isset($args)
-            ? $this->query2Sources($args, $invoiceSourceType)
-            : parent::getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo);
+        $result = isset($args) ? $this->query2Sources($args, $sourceType) : [];
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $from, $to, $fallbackToId);
     }
 
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
         $args = [
             'date_modified' => sprintf('%d...%d', $dateFrom->getTimestamp(), $dateTo->getTimestamp()),
         ];
-        return $this->query2Sources($args, $invoiceSourceType);
+        return $this->query2Sources($args, $sourceType);
     }
 
     /**

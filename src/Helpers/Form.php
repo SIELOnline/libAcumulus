@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection EfferentObjectCouplingInspection
- */
 
 declare(strict_types=1);
 
@@ -73,6 +70,8 @@ use function is_array;
  *   // and rendering it.
  *   $shopForm->render()
  * </code>
+ *
+ * @noinspection EfferentObjectCouplingInspection
  */
 abstract class Form extends MessageCollection
 {
@@ -80,8 +79,8 @@ abstract class Form extends MessageCollection
      * @var string
      *   The type of this form, the class could also be used to determine so,
      *   but as a simple type string is already used on creation, that is used.
-     *   Should be one of: register, config, advanced, settings, mappings, activate,
-     *   batch, invoice, rate.
+     *   Should be one of: 'register', 'settings', 'mappings', 'register', 'activate',
+     *   'batch', 'invoice', 'message', 'rate'.
      */
     protected string $type;
     protected Log $log;
@@ -92,7 +91,7 @@ abstract class Form extends MessageCollection
     protected Config $acumulusConfig;
     protected Environment $environment;
     protected ?Acumulus $acumulusApiClient;
-    /** @var array[] */
+    /** @var array[] The form field definitions */
     protected array $fields;
     protected bool $formValuesSet;
     /**
@@ -582,8 +581,6 @@ abstract class Form extends MessageCollection
      *   The value to check.
      * @param bool $multi
      *   Whether to allow multiple e-mail addresses separated by a ',' or ';'.
-     *
-     * @return bool
      */
     public function isEmailAddress(string $submittedValue, bool $multi = false): bool
     {
@@ -592,6 +589,24 @@ abstract class Form extends MessageCollection
         $regexpMulti = '/^' . $regexpEmail . '([,;]' . $regexpEmail . ')*$/';
         $regex = $multi ? $regexpMulti : $regexpSingle;
         return (bool) preg_match($regex, $submittedValue);
+    }
+
+    /**
+     * Returns an option list of all order statuses including an empty choice.
+     *
+     * @return array
+     *   An options array of all order statuses.
+     */
+    protected function getOrderStatusesList(string $emptyOption): array
+    {
+        $result = [];
+
+        // Because many users won't know how to deselect a single option in a
+        // multiple select element, an empty option is added.
+        $result['0'] = $this->t($emptyOption);
+        $result += $this->shopCapabilities->getShopOrderStatuses();
+
+        return $result;
     }
 
     /**
@@ -606,14 +621,12 @@ abstract class Form extends MessageCollection
      *
      * @param \Siel\Acumulus\ApiClient\AcumulusResult $picklist
      *   The picklist result structure.
-     * @param string|int|null $emptyValue
+     * @param int|string|null $emptyValue
      *   The value to use for an empty selection.
      * @param string|null $emptyText
      *   The label to use for an empty selection.
-     *
-     * @return array
      */
-    protected function picklistToOptions(AcumulusResult $picklist, $emptyValue = null, ?string $emptyText = null): array
+    protected function picklistToOptions(AcumulusResult $picklist, int|string|null $emptyValue = null, ?string $emptyText = null): array
     {
         $result = [];
 
@@ -677,8 +690,6 @@ abstract class Form extends MessageCollection
 
     /**
      * Returns the url to the logo.
-     *
-     * @return string
      */
     protected function getLogoUrl(): string
     {
@@ -743,19 +754,11 @@ abstract class Form extends MessageCollection
             throw new RuntimeException('About block not available');
         }
 
-        switch ($this->getType()) {
-            case 'register':
-            case 'activate':
-            case 'batch':
-                $wrapperType = 'details';
-                break;
-            case 'settings':
-            case 'mappings':
-                $wrapperType = in_array($accountStatus, [null, false], true) ? 'details' : 'fieldset';
-                break;
-            default:
-                throw new RuntimeException('Unexpected form type ' . $this->getType());
-        }
+        $wrapperType = match ($this->getType()) {
+            'register', 'activate', 'batch' => 'details',
+            'settings', 'mappings' => in_array($accountStatus, [null, false], true) ? 'details' : 'fieldset',
+            default => throw new RuntimeException('Unexpected form type ' . $this->getType()),
+        };
         return $this->aboutForm->getAboutBlock($accountStatus, $wrapperType);
     }
 }

@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
+use Stringable;
 
 use function count;
 use function function_exists;
@@ -20,7 +21,7 @@ use function get_class;
  *
  * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
-abstract class Source
+abstract class Source implements Stringable
 {
     use WrapperTrait;
 
@@ -55,6 +56,11 @@ abstract class Source
     public function getType(): string
     {
         return $this->type;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getType() . $this->getId();
     }
 
     /**

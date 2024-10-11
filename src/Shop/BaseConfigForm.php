@@ -176,22 +176,4 @@ abstract class BaseConfigForm extends Form
         }
         return $field;
     }
-
-    /**
-     * Returns an option list of all order statuses including an empty choice.
-     *
-     * @return array
-     *   An options array of all order statuses.
-     */
-    protected function getOrderStatusesList(): array
-    {
-        $result = [];
-
-        // Because many users won't know how to deselect a single option in a
-        // multiple select element, an empty option is added.
-        $result['0'] = $this->t('option_empty_triggerOrderStatus');
-        $result += $this->shopCapabilities->getShopOrderStatuses();
-
-        return $result;
-    }
 }

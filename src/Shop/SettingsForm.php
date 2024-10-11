@@ -456,7 +456,7 @@ class SettingsForm extends BaseConfigForm
      */
     protected function getTriggerFields(): array
     {
-        $orderStatusesList = $this->getOrderStatusesList();
+        $orderStatusesList = $this->getOrderStatusesList('option_empty_triggerOrderStatus');
 
         return [
             'triggerOrderStatus' => [

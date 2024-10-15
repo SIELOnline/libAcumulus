@@ -22,6 +22,7 @@ use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use function array_key_exists;
 use function count;
 use function in_array;
+use function sprintf;
 
 /**
  * Provides batch form handling.

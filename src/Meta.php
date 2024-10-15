@@ -45,13 +45,13 @@ interface Meta
      * Messages can be added at any level and are placed at the level it applies to
      * (order, order line, ...). It tells that the code discovered a problem (warning) or
      * just gives some more info on what it did or how it obtained some value (info or
-     * notice). Warnings are often the result of a failing sanity check (a check that
-     * should result in true but didn't).
+     * notice). Warnings are often the result of a failing sanity check.
      */
     public const Error = 'meta-error';
     public const Warning = 'meta-warning';
     public const Notice = 'meta-notice';
     public const Info = 'meta-info';
+    public const Debug = 'meta-debug';
 
     // Customer + addresses:
     public const MainAddressType = 'meta-main-address-type';

@@ -9,6 +9,7 @@ use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 use WC_Tax;
 
 use function count;
@@ -40,20 +41,29 @@ class ShippingLineCollector extends LineCollector
     {
         /** @var \WC_Order_Item_Shipping $shippingItem */
         $shippingItem = $propertySources->get('shippingLineInfo');
-        $taxes = $shippingItem->get_taxes();
-        $this->addShippingVatRateLookupMetadata($line, $taxes, $propertySources);
+        $line->metadataSet(Meta::Id, $shippingItem->get_id());
+
+        $line->product = $shippingItem->get_name();
+        $line->quantity = (float) $shippingItem->get_quantity();
 
         // Note: this info is WC3+ specific.
         // Precision: shipping costs are entered ex VAT, so that may be very
-        // precise, but it will be rounded to the cent by WC. The VAT is also
-        // rounded to the cent.
+        // precise. However, in the order item metadata, get_total() will be rounded to
+        // the cent by WC. The VAT in get_total_tax() is also rounded to the cent. So, we
+        // should ty to get more precise amounts:
+        // - shipping ex: look up in the shipping method data.
+        // - vat amount: look up in the get_taxes() data.
         $shippingEx = (float) $shippingItem->get_total();
+        $shippingEx /= $line->quantity;
         $precisionShippingEx = 0.01;
+        $shippingVat = ((float) $shippingItem->get_total_tax()) / $line->quantity;
+        $precisionVat = 0.01;
+        $shippingInc = $shippingEx + $shippingVat;
 
-        // To avoid rounding errors, we try to get the non-formatted amount.
-        // Due to changes in how WC configures shipping methods (now based on
-        // zones), storage of order item metadata has changed. Therefore, we
-        // have to try several option names.
+        // To avoid rounding errors, we try to get the more precise non-formatted amount
+        // for $shippingEx. Due to changes in how WC configures shipping methods (now
+        // based on zones), storage of order item metadata has changed. Therefore, we have
+        // to try several option names.
         $methodId = $shippingItem->get_method_id();
         if (str_starts_with($methodId, 'legacy_')) {
             $methodId = substr($methodId, strlen('legacy_'));
@@ -66,11 +76,11 @@ class ShippingLineCollector extends LineCollector
         $option = get_option($optionName);
 
         if (!empty($option['cost'])) {
-            // Note that "Cost" may contain a formula or use commas: 'Vul een bedrag(excl.
-            // btw) in of een berekening zoals 10.00 * [qty]. Gebruik [qty] voor het
-            // aantal artikelen, [cost] voor de totale prijs van alle artikelen, en
-            // [fee percent="10" min_fee="20" max_fee=""] voor prijzen gebaseerd op
-            // percentage.'
+            // Note that "Cost" may contain a formula or use commas. Dutch help text: 'Vul
+            // een bedrag(excl. btw) in of een berekening zoals 10.00 * [qty]. Gebruik
+            // [qty] voor het aantal artikelen, [cost] voor de totale prijs van alle
+            // artikelen, en [fee percent="10" max_fee=""min_fee="20"] voor prijzen
+            // gebaseerd op percentage.'
             $cost = str_replace(',', '.', $option['cost']);
             if (is_numeric($cost)) {
                 $cost = (float) $cost;
@@ -80,38 +90,51 @@ class ShippingLineCollector extends LineCollector
                 }
             }
         }
-        $quantity = $shippingItem->get_quantity();
-        $shippingEx /= $quantity;
-        $shippingVat = $shippingItem->get_total_tax() / $quantity;
-        $precisionVat = 0.01;
 
-        $line->product = $shippingItem->get_name();
+        // Also to avoid rounding errors, we try to get a more precise vat amount. Besides
+        // a "total_tax" order item metadata record, WC also stores a "taxes" metadata
+        // record which contains the non-rounded tax amounts. For shipping this is
+        // normally just 1 amount.
+        $taxes = $shippingItem->get_taxes();
+        $this->addShippingVatRateDataBasedOnTaxes($line, $taxes, $propertySources);
+
         $line->unitPrice = $shippingEx;
-        $line->quantity = $quantity;
-        $line->metadataSet(Meta::Id, $shippingItem->get_id());
-        $line->metadataSet(Meta::VatAmount, $shippingVat);
         $line->metadataSet(Meta::PrecisionUnitPrice, $precisionShippingEx);
-        $line->metadataSet(Meta::PrecisionVatAmount, $precisionVat);
+        // Vat amount may already have been set in addShippingVatRateDataBasedOnTaxes().
+        if (!$line->metadataExists(Meta::VatAmount)) {
+            $line->metadataSet(Meta::VatAmount, $shippingVat);
+            $line->metadataSet(Meta::PrecisionVatAmount, $precisionVat);
+        }
+
+        if ($line->metadataGet(Meta::PrecisionUnitPrice) < 0.009 && $line->metadataGet(Meta::PrecisionVatAmount) < 0.009) {
+            // We have a more precise unit price and vat amount, but as this line will be
+            // rounded in the end anyway, we should add the rounded inc price and
+            // recalculate the unit price later ...
+            $line->metadataSet(Meta::UnitPriceInc, $shippingInc);
+            $line->metadataSet(Meta::PrecisionUnitPriceInc, 0.01);
+            $line->metadataAdd(Meta::FieldsCalculated, Meta::UnitPriceInc);
+            $line->metadataSet(Meta::RecalculatePrice, Tag::UnitPrice);
+        }
     }
 
     /**
-     * Looks up and returns vat rate metadata for shipping lines.
-     * In WooCommerce, a shipping line can have multiple taxes. I am not sure if
-     * that is possible for Dutch web shops, but if a shipping line does have
-     * multiple taxes we fall back to the tax class setting for shipping
-     * methods, that can have multiple tax rates itself (@param array|array[]|null $taxes
-     *   The taxes applied to a shipping line.
+     * Looks up and returns vat rate (lookup) metadata for shipping lines.
      *
-     *   An empty array or an array with keys:
-     *   - Meta::VatClassId
-     *   - Meta::VatRateLookup (*)
-     *   - Meta::VatRateLookupLabel (*)
-     *   - Meta::VatRateLookupSource (*)
-     * @see
-     * getVatRateLookupMetadataByTaxClass()). Anyway, this method will only
-     * return metadata if only 1 rate was found.
+     * In WooCommerce, a shipping line can have multiple taxes. I am not sure if that is
+     * possible for Dutch web shops, but if a shipping line does have multiple taxes we
+     * fall back to the tax class setting for shipping methods.
+     *
+     * This method may add the following metadata:
+     * - Meta::VatAmount
+     * - Meta::VatClassId
+     * - Meta::VatRateLookup (*)
+     * - Meta::VatRateLookupLabel (*)
+     * - Meta::VatRateLookupSource (*)
+     *
+     * @param array|array[]|null $taxes
+     *   The taxes applied to a shipping line.
      */
-    protected function addShippingVatRateLookupMetadata(Line $line, ?array $taxes, PropertySources $propertySources): void
+    protected function addShippingVatRateDataBasedOnTaxes(Line $line, ?array $taxes, PropertySources $propertySources): void
     {
         $taxRateFound = false;
         if (is_array($taxes)) {
@@ -126,17 +149,22 @@ class ShippingLineCollector extends LineCollector
                         $taxRate = WC_Tax::_get_tax_rate($taxRateId, OBJECT);
                         if ($taxRate) {
                             if (!$taxRateFound) {
-                                $line->metadataAdd(Meta::VatRateLookup, null,true);
+                                $line->metadataSet(Meta::VatAmount, ((float) $amount) / $line->quantity);
+                                $line->metadataSet(Meta::PrecisionVatAmount, 0.001);
+                                $line->metadataAdd(Meta::VatRateLookup, null, true);
                                 $line->metadataAdd(Meta::VatRateLookupLabel, null, true);
-                                $line->metadataSet(Meta::VatClassId, $taxRate->tax_rate_class !== '' ? $taxRate->tax_rate_class : 'standard');
+                                $line->metadataSet(
+                                    Meta::VatClassId,
+                                    $taxRate->tax_rate_class !== '' ? $taxRate->tax_rate_class : 'standard'
+                                );
                                 // Vat class name is the non-sanitized version of the id
                                 // and thus does not convey more information: don't add.
                                 $line->metadataSet(Meta::VatRateLookupSource, 'shipping line taxes');
                                 $taxRateFound = true;
                             }
-                            // get_rate_percent() contains a % at the end of the
-                            // string: remove it.
-                            $line->metadataAdd(Meta::VatRateLookup, substr(WC_Tax::get_rate_percent($taxRateId), 0, -1),true);
+                            // get_rate_percent() contains a % at the end of the string:
+                            // remove it.
+                            $line->metadataAdd(Meta::VatRateLookup, substr(WC_Tax::get_rate_percent($taxRateId), 0, -1), true);
                             $line->metadataAdd(Meta::VatRateLookupLabel, WC_Tax::get_rate_label($taxRate), true);
                         }
                     }

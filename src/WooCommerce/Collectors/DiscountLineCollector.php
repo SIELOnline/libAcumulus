@@ -13,6 +13,7 @@ use Siel\Acumulus\Meta;
 use WC_Coupon;
 
 use function in_array;
+use function sprintf;
 
 /**
  * DiscountLineCollector contains WooCommerce specific {@see LineType::Discount}
@@ -96,11 +97,11 @@ class DiscountLineCollector extends LineCollector
         }
         $line->itemNumber = $coupon->get_code();
         $line->product = $description;
-        $line->unitPrice = 0;
-        $line->metadataSet(Meta::UnitPriceInc, 0);
+        $line->unitPrice = 0.0;
+        $line->metadataSet(Meta::UnitPriceInc, 0.0);
         $line->quantity = 1;
         $line->vatRate = null;
-        $line->metadataSet(Meta::VatAmount, 0);
+        $line->metadataSet(Meta::VatAmount, 0.0);
         $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
         $line->metadataSet(Meta::Id, $couponId);
     }

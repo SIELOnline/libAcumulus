@@ -3,11 +3,15 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-8.3.1 (2024-10-??)
-------------------------
+8.3.1 (2024-10-18) (WC)
+-----------------------
+Features:
+- ALL: Extended batch form features by allowing combined filters and a filter on status.
+- WC: Tried to improve accuracy of shipping lines to prevent rounding errors on the total.
+
 Bugs:
-- ALL: Help text for (your) phone number on register form was not use but overruled by the
-  help text for the field phone number on the mappings form.
+- ALL: Help text for (your) phone number on register form was not used but overruled by
+  the help text for the field phone number on the mappings form.
 
 Refactorings:
 - ALL: Moved margin scheme handling from the ItemLineCollectors to CompleteMarginScheme.

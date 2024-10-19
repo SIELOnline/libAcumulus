@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Collectors;
 
-use Siel\Acumulus\collectors\LineCollector as BaseLineCollector;
+use Siel\Acumulus\Collectors\LineCollector as BaseLineCollector;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;

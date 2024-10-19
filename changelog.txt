@@ -3,6 +3,12 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.3.2 (2024-10-19) (WC)
+-----------------------
+Bugs:
+- WC: Error: Class "Siel\Acumulus\collectors\LineCollector" not found in
+  WooCommerce/Collectors/LineCollector.php:21.
+
 8.3.1 (2024-10-18) (WC)
 -----------------------
 Features:

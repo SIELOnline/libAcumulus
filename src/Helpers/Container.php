@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '8.3.2';
+const Version = '8.3.3';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -523,7 +523,7 @@ class Container
     {
         // @legacy remove when all shops are fully converted to new architecture and
         //   the old Completor has been removed.
-        return $this->getInstance('CompletorInvoiceLines', 'invoice', [$this->getFlattenerInvoiceLines(), $this->getConfig()]);
+        return $this->getInstance('CompletorInvoiceLines', 'Invoice', [$this->getFlattenerInvoiceLines(), $this->getConfig()]);
     }
 
     public function getFlattenerInvoiceLines(): FlattenerInvoiceLines

@@ -552,27 +552,17 @@ abstract class Form extends MessageCollection
     }
 
     /**
-     * Checks the account settings for correctness and sufficient authorization.
+     * Returns the Account fields status
      *
-     * This is done by calling the 'About' API call and checking the result.
-     *
-     * @return string
-     *   Message to show in the form. Empty if successful.
+     * @return null|bool|string
+     *   - null: (some) credentials are empty
+     *   - true: credentials are correct
+     *   - false: credentials are incorrect and $returnMessage = false
+     *   - string: credentials are incorrect and $returnMessage = true
      */
-    protected function checkAccountSettings(): string
+    protected function getAccountStatus(bool $returnMessage = false): null|bool|string
     {
-        return $this->checkAccount->doCheck();
-    }
-
-    /**
-     * Returns whether (at least one of) the credentials are (is) empty.
-     *
-     * @return bool
-     *   True, if the credentials are empty, false if they are all filled in.
-     */
-    protected function emptyCredentials(): bool
-    {
-        return $this->checkAccountSettings() === 'message_auth_unknown';
+        return $this->checkAccount->getAccountStatus($returnMessage);
     }
 
     /**

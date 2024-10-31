@@ -168,8 +168,7 @@ class MappingsForm extends Form
      */
     protected function getFieldDefinitions(): array
     {
-        $message = $this->checkAccountSettings();
-        $accountStatus = $this->emptyCredentials() ? null : empty($message);
+        $accountStatus = $this->getAccountStatus();
 
         return [
             'configHeader' => [

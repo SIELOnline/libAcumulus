@@ -185,8 +185,6 @@ class Config
      *
      * @return bool
      *   Success.
-     *
-     * @throws \JsonException
      */
     public function save(
         #[SensitiveParameter]
@@ -299,6 +297,16 @@ class Config
         return $result;
     }
 
+    public function getAccountMessage(): ?string
+    {
+        $result = $this->get('cachedAccountMessage');
+        // Cannot handle nullable strings in the config, use the string 'null' for that.
+        if ($result === 'null') {
+            $result = null;
+        }
+        return $result;
+    }
+
     /**
      * Returns the ShowRatePluginMessage config setting.
      *
@@ -326,8 +334,6 @@ class Config
      *
      * @return array
      *   An array with all configuration values keyed by their name.
-     *
-     * @throws \JsonException
      */
     public function getAll(): array
     {
@@ -908,6 +914,11 @@ class Config
                     'group' => 'other',
                     'type' => 'array',
                     'default' => [],
+                ],
+                'cachedAccountMessage' => [
+                    'group' => 'other',
+                    'type' => 'string',
+                    'default' => 'null',
                 ],
                 Config::Mappings => [
                     'group' => 'other',

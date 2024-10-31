@@ -403,8 +403,7 @@ class BatchForm extends Form
         ];
 
         // 4th fieldset: More Acumulus.
-        $message = $this->checkAccountSettings();
-        $accountStatus = $this->emptyCredentials() ? null : empty($message);
+        $accountStatus = $this->getAccountStatus();
         $fields['versionInformation'] = $this->getAboutBlock($accountStatus);
 
         return $fields;

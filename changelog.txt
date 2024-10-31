@@ -3,6 +3,15 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.3.4 (2024-11-01) (ALL)
+------------------------
+- ALL: Uncaught RuntimeException: "curl_exec(): 28 - Connection timed out ..." lead to
+  a WSOD on all admin pages (and client-side pages where Acumulus API calls are made). The
+  solution is to fail silently, letting the (admin) page render but without Acumulus
+  plugin features.
+- ALL: minor: the mail that was sent in those situations did not contain a header.
+
+
 8.3.3 (2024-10-19) (WC)
 -----------------------
 Bugs:

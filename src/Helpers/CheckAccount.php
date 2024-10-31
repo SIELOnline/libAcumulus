@@ -11,19 +11,25 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 
 /**
- * CheckAccount does foo.
+ * CheckAccount checks the account fields for being empty, incorrect, or correct
  */
 class CheckAccount extends MessageCollection
 {
     protected Acumulus $acumulusApiClient;
     protected Config $acumulusConfig;
-    protected string $message;
+    protected ?string $message;
 
     public function __construct(Acumulus $acumulusApiClient, Config $config, Translator $translator)
     {
         parent::__construct($translator);
         $this->acumulusApiClient = $acumulusApiClient;
         $this->acumulusConfig = $config;
+        $this->message = null;
+    }
+
+    public function getMessage(): ?string
+    {
+        return $this->message;
     }
 
     /**
@@ -32,20 +38,22 @@ class CheckAccount extends MessageCollection
      * This is done by calling the 'About' API call and checking the result.
      *
      * @return string
-     *   Message to show in the form. Empty if successful.
+     *   Message (translation key) to show in the form. Empty if successful.
      */
-    public function doCheck(bool $force = false): string
+    public function doCheck(bool $useCache = true): string
     {
-        if (!isset($this->message) || $force) {
-            unset($this->message);
+        if ($useCache) {
+            $this->message ??= $this->acumulusConfig->getAccountMessage();
+        }
+        if ($this->message === null) {
             $this->messages = [];
-            // Check if we can retrieve a picklist. This indicates if the account settings are
-            // correct.
             if ($this->emptyCredentials()) {
                 // First fill in your account details.
                 $this->message = 'message_auth_unknown';
             } else {
                 try {
+                    // Check if we can retrieve the about-info. This indicates if the account
+                    // settings are correct.
                     $about = $this->acumulusApiClient->getAbout();
                     if ($about->getByCode(403) !== null) {
                         $this->message = 'message_error_auth';
@@ -79,8 +87,37 @@ class CheckAccount extends MessageCollection
                     $this->addException($e);
                 }
             }
+            // Store in cache.
+            $this->acumulusConfig->save(['cachedAccountMessage' => $this->message]);
         }
         return $this->message;
+    }
+
+    /**
+     * Returns the Account fields status
+     *
+     * @return null|bool|string
+     *   - null: (some) credentials are empty
+     *   - true: credentials are correct
+     *   - false: credentials are incorrect and $returnMessage = false
+     *   - string: credentials are incorrect and $returnMessage = true
+     *
+     * @throws \JsonException
+     */
+    public function getAccountStatus(bool $returnMessage = false): null|bool|string
+    {
+        // (Current usage of) $returnMessage happens to coincide with a parameter that
+        // could be named $forceRecheck (and is thus the opposite of a parameter that
+        // could be named $useCache): abuse and use for the other meanings.
+        if ($returnMessage) {
+            $this->message = null;
+        }
+        $message = $this->doCheck(!$returnMessage);
+        return match ($message) {
+            'message_auth_unknown' => null,
+            '' => true,
+            default => $returnMessage ? $message : false,
+        };
     }
 
     /**

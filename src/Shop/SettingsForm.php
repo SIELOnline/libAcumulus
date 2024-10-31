@@ -15,6 +15,7 @@ use Siel\Acumulus\Tag;
 
 use function count;
 use function in_array;
+use function is_string;
 use function sprintf;
 
 /**
@@ -173,30 +174,29 @@ class SettingsForm extends BaseConfigForm
     {
         $fields = [];
 
-        $message = $this->checkAccountSettings();
-        $accountStatus = $this->emptyCredentials() ? null : empty($message);
+        $accountStatus = $this->getAccountStatus(true);
 
         //  Acumulus account settings.
         $fields['accountSettings'] = [
             'type' => 'fieldset',
             'legend' => $this->t('accountSettingsHeader'),
-            'fields' => $this->getAccountFields($accountStatus, $message),
+            'fields' => $this->getAccountFields($accountStatus),
         ];
 
-        if ($accountStatus === false) {
+        if (is_string($accountStatus)) {
             $fields['accountSettingsMessage'] = [
                 'type' => 'fieldset',
                 'legend' => $this->t('message_error_header'),
                 'fields' => [
                     'invoiceMessage' => [
                         'type' => 'markup',
-                        'value' => $this->translateAccountMessage($message),
+                        'value' => $this->translateAccountMessage($accountStatus),
                     ],
                 ],
             ];
         }
 
-        if ($accountStatus) {
+        if ($accountStatus === true) {
             $fields += [
                 'shopSettings' => [
                     'type' => 'fieldset',
@@ -289,17 +289,16 @@ class SettingsForm extends BaseConfigForm
      * - 'password'
      * - 'emailonerror'
      *
-     * @param bool|null $accountStatus
+     * @param null|bool|string $accountStatus
      *   null: no account settings filled in yet.
      *   true: account settings OK.
-     *   false: authentication error using the given account settings.
-     * @param string $message
-     *   The message code, only filled when $accountStatus = false.
+     *   string: message describing the authentication error that occurred using the given
+     *     account settings.
      *
      * @return array[]
      *   The set of account related fields.
      */
-    protected function getAccountFields(?bool $accountStatus, string $message): array
+    protected function getAccountFields(null|bool|string $accountStatus): array
     {
         $desc2 = '';
         if ($accountStatus === null) {
@@ -308,7 +307,7 @@ class SettingsForm extends BaseConfigForm
             $description = 'desc_accountSettings_T';
         } else {
             $description = 'desc_accountSettings_F';
-            if ($message === 'message_error_auth') {
+            if ($accountStatus === 'message_error_auth') {
                 $desc2 = 'desc_accountSettings_auth';
             }
         }

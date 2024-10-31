@@ -195,10 +195,11 @@ class AboutForm
         $support = $environment['supportEmail'];
         $subject = sprintf($this->t('support_subject'), $environment['shopName'], $this->t('module'));
         $body = sprintf(
-            "%s:\n%s%s%s%s:\n%s%s\n%s\n%s\n",
+            "%s:\n%s%s%s%s%s:\n%s%s\n%s\n%s\n",
             $this->t('contract'),
             $contractMsg,
             $this->arrayToList($contract, false),
+            $this->t('pro_support_list_header'),
             $this->arrayToList($proSupportList, false),
             $this->t('about_environment'),
             $this->arrayToList($environmentLines, false),

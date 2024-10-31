@@ -21,7 +21,6 @@ use Throwable;
 
 use function count;
 use function in_array;
-use function strlen;
 
 use const Siel\Acumulus\Version;
 
@@ -43,6 +42,11 @@ abstract class OcHelper
     /**
      * @param \Opencart\System\Engine\Registry|\Registry $registry
      * @param \Siel\Acumulus\Helpers\Container $acumulusContainer
+     *
+     * @noinspection PhpMissingParamTypeInspection Types differ per version and don't
+     *    exist in the other version. Moreover, OpenCart uses the
+     *    {@see \Opencart\System\Engine\Proxy} class everywhere to replace objects, so
+     *    the actual type of the object passed is Proxy.
      */
     public function __construct($registry, Container $acumulusContainer)
     {
@@ -65,24 +69,12 @@ abstract class OcHelper
     protected function addMessages(array $messages): void
     {
         foreach ($messages as $message) {
-            switch ($message->getSeverity()) {
-                case Severity::Log:
-                case Severity::Success:
-                case Severity::Info:
-                case Severity::Notice:
-                    $dataKey = 'success_messages';
-                    break;
-                case Severity::Warning:
-                    $dataKey = 'warning_messages';
-                    break;
-                case Severity::Error:
-                case Severity::Exception:
-                    $dataKey = 'error_messages';
-                    break;
-                default:
-                    $dataKey = '';
-                    break;
-            }
+            $dataKey = match ($message->getSeverity()) {
+                Severity::Log, Severity::Success, Severity::Info, Severity::Notice => 'success_messages',
+                Severity::Warning => 'warning_messages',
+                Severity::Error, Severity::Exception => 'error_messages',
+                default => '',
+            };
             if (!empty($dataKey)) {
                 $this->data[$dataKey][] = $message->format(Message::Format_PlainWithSeverity);
             }
@@ -92,14 +84,14 @@ abstract class OcHelper
     /**
      * Helper method to translate strings.
      *
-     * @param string|int $key
+     * @param int|string $key
      *  The key to get a translation for.
      *
      * @return string
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key): string
+    protected function t(int|string $key): string
     {
         return $this->acumulusContainer->getTranslator()->get($key);
     }
@@ -462,7 +454,7 @@ abstract class OcHelper
     public function extractOrderId(array $args): int
     {
         [$route, $event_args, $output] = $args;
-        $order_id = substr($route, -strlen('/addOrder')) === '/addOrder' ? $output : $event_args[0];
+        $order_id = str_ends_with($route, '/addOrder') ? $output : $event_args[0];
         return (int) $order_id;
     }
 
@@ -488,8 +480,8 @@ abstract class OcHelper
         foreach ($menus as &$menu) {
             if ($menu['id'] === 'menu-sale') {
                 $items = ['batch', 'settings', 'mappings', 'activate'];
-                $message = $this->acumulusContainer->getCheckAccount()->doCheck();
-                if (!empty($message)) {
+                $accountStatus = $this->acumulusContainer->getCheckAccount()->getAccountStatus();
+                if ($accountStatus !== true) {
                     $items[] = 'register';
                 }
                 $acumulusMenuItems = [];
@@ -530,8 +522,6 @@ abstract class OcHelper
      *
      * @return bool
      *   Success.
-     *
-     * @throws \JsonException
      */
     protected function doInstall(): bool
     {
@@ -539,7 +529,7 @@ abstract class OcHelper
         $messages = $requirements->check();
         foreach ($messages as $key => $message) {
             $this->addMessages([Message::create($message, Severity::Error)]);
-            if (strpos($key, 'warning') !== false) {
+            if (str_contains($key, 'warning')) {
                 $this->acumulusContainer->getLog()->warning($message);
                 unset($messages[$key]);
             } else {
@@ -605,7 +595,7 @@ abstract class OcHelper
      * @return bool
      *   Whether the upgrade was successful.
      *
-     * @throws \JsonException
+     * @throws \Exception
      */
     protected function doUpgrade(): bool
     {
@@ -633,7 +623,7 @@ abstract class OcHelper
             $requirements = $this->acumulusContainer->getRequirements();
             $messages = $requirements->check();
             foreach ($messages as $key => $message) {
-                $severity = strpos($key, 'warning') !== false ? Severity::Warning : Severity::Error;
+                $severity = str_contains($key, 'warning') ? Severity::Warning : Severity::Error;
                 $this->addMessages([Message::create($message, $severity)]);
                 $this->acumulusContainer->getLog()->log($severity, $message);
             }

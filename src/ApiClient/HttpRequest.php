@@ -35,7 +35,7 @@ class HttpRequest
     protected ?string $method = null;
     protected ?string $uri = null;
     protected array $options = [];
-    protected string|array|null $body;
+    protected string|array|null $body = null;
     protected ?HttpResponse $httpResponse = null;
 
     /**
@@ -83,7 +83,7 @@ class HttpRequest
      * @return array|string|null
      *   The contents of the body, null if empty or not yet set.
      */
-    public function getBody()
+    public function getBody(): array|string|null
     {
         return $this->body;
     }

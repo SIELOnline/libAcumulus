@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '8.3.3';
+const Version = '8.3.4';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -724,6 +724,7 @@ class Container
             $this->getShopCapabilities(),
             $this->getConfig(),
             $this->getEnvironment(),
+            $this->getUtil(),
             $this->getTranslator(),
         ]);
     }

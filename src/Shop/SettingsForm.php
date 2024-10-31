@@ -15,6 +15,7 @@ use Siel\Acumulus\Tag;
 
 use function count;
 use function in_array;
+use function sprintf;
 
 /**
  * Provides the settings form handling.

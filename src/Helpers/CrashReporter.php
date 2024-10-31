@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Helpers;
 
+use Closure;
 use Siel\Acumulus\Config\Environment;
 use Throwable;
 
 use function function_exists;
-use function is_string;
+use function sprintf;
 use function strlen;
 
 /**
@@ -30,13 +31,15 @@ use function strlen;
 class CrashReporter
 {
     protected Translator $translator;
+    protected Util $util;
     protected Log $log;
     protected Environment $environment;
     protected Mailer $mailer;
 
-    public function __construct(Mailer $mailer, Environment $environment, Translator $translator, Log $log)
+    public function __construct(Mailer $mailer, Environment $environment, Util $util, Translator $translator, Log $log)
     {
         $this->translator = $translator;
+        $this->util = $util;
         $this->log = $log;
         $this->environment = $environment;
         $this->mailer = $mailer;
@@ -129,22 +132,6 @@ class CrashReporter
 
     protected function arrayToList(array $list, bool $isHtml): string
     {
-        /** @noinspection DuplicatedCode  comes from Form::arrayToList() */
-        $result = '';
-        if (!empty($list)) {
-            foreach ($list as $key => $line) {
-                if (is_string($key) && !ctype_digit($key)) {
-                    $key = $this->t($key);
-                    $line = "$key: $line";
-                }
-                $result .= $isHtml ? "<li>$line</li>" : "• $line";
-                $result .= "\n";
-            }
-            if ($isHtml) {
-                $result = "<ul>$result</ul>";
-            }
-            $result .= "\n";
-        }
-        return $result;
+        return $this->util->arrayToList($list, $isHtml, Closure::fromCallable([$this, 't']));
     }
 }

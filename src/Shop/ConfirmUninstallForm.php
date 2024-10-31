@@ -8,6 +8,7 @@ use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
@@ -21,13 +22,14 @@ class ConfirmUninstallForm extends Form
     public function __construct(
         Acumulus $acumulusApiClient,
         FormHelper $formHelper,
+        CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
         Config $config,
         Environment $environment,
         Translator $translator,
         Log $log
     ) {
-        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $environment,$translator, $log);
+        parent::__construct($acumulusApiClient, $formHelper, $checkAccount, $shopCapabilities, $config, $environment,$translator, $log);
 
         $translations = new ConfirmUninstallFormTranslations();
         $this->translator->add($translations);

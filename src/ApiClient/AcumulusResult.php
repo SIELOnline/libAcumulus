@@ -17,6 +17,7 @@ use function array_key_exists;
 use function count;
 use function in_array;
 use function is_array;
+use function sprintf;
 
 /**
  * Class AcumulusResult processes and wraps an Acumulus web service result.
@@ -106,8 +107,8 @@ use function is_array;
  * - A properly formatted Acumulus API response will be found in the body, whose
  *   basic response will contain:
  *     - 'status' = 1 (errors).
- *     - Non-empty 'errors' with at least one 'error' with its 'code' being
- *      something like '400 {Bad Request}' (may be translated?).
+ *     - Non-empty 'errors' tag with at least one 'error' tag with its 'code' tag being
+ *      something like '400 {Bad Request}' (text possibly translated).
  * - It may contain additional properties that specify which of the values that
  *   were sent caused the error (validation error, not found/existing error).
  *
@@ -225,24 +226,16 @@ class AcumulusResult extends MessageCollection
      */
     public function getStatusText(): string
     {
-        switch ($this->getStatus()) {
-            case Severity::Unknown:
-                return $this->t('request_not_yet_sent');
-            case Severity::Success:
-                return $this->t('message_response_success');
-            case Severity::Info:
-                return $this->t('message_response_info');
-            case Severity::Notice:
-                return $this->t('message_response_notice');
-            case Severity::Warning:
-                return $this->t('message_response_warning');
-            case Severity::Error:
-                return $this->t('message_response_error');
-            case Severity::Exception:
-                return $this->t('message_response_exception');
-            default:
-                return sprintf($this->t('severity_unknown'), $this->getSeverity());
-        }
+        return match ($this->getStatus()) {
+            Severity::Unknown => $this->t('request_not_yet_sent'),
+            Severity::Success => $this->t('message_response_success'),
+            Severity::Info => $this->t('message_response_info'),
+            Severity::Notice => $this->t('message_response_notice'),
+            Severity::Warning => $this->t('message_response_warning'),
+            Severity::Error => $this->t('message_response_error'),
+            Severity::Exception => $this->t('message_response_exception'),
+            default => sprintf($this->t('severity_unknown'), $this->getSeverity()),
+        };
     }
 
     /**
@@ -269,18 +262,13 @@ class AcumulusResult extends MessageCollection
         if ($apiStatus === null) {
             return Severity::Unknown;
         }
-        switch ($apiStatus) {
-            case Api::Status_Success:
-                return Severity::Success;
-            case Api::Status_Errors:
-                return Severity::Error;
-            case Api::Status_Warnings:
-                return Severity::Warning;
-            case Api::Status_Exception:
-                return Severity::Exception;
-            default:
-                throw new RuntimeException(sprintf('Unknown api status %d', $apiStatus));
-        }
+        return match ($apiStatus) {
+            Api::Status_Success => Severity::Success,
+            Api::Status_Errors => Severity::Error,
+            Api::Status_Warnings => Severity::Warning,
+            Api::Status_Exception => Severity::Exception,
+            default => throw new RuntimeException(sprintf('Unknown api status %d', $apiStatus)),
+        };
     }
 
     public function getAcumulusRequest(): AcumulusRequest
@@ -303,6 +291,7 @@ class AcumulusResult extends MessageCollection
     {
         $code = $this->getHttpResponse()->getHttpStatusCode();
         $body = $this->util->maskArray($this->fullAcumulusResponse);
+        /** @noinspection JsonEncodingApiUsageInspection */
         return sprintf("Response: status=%d\nbody=%s", $code, json_encode($body, Log::JsonFlags));
     }
 
@@ -417,7 +406,7 @@ class AcumulusResult extends MessageCollection
      *   response to add the http body to the message.
      * @throws AcumulusResponseException
      *   Errors during converting the http response to an AcumulusResponse,
-     *   with access to the http response, so the http body cold be added to the
+     *   with access to the http response, so the http body could be added to the
      *   message.
      */
     protected function convertHttpBodyToFullAcumulusResponse(): void

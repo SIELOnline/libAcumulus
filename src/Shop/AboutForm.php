@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
+use Closure;
 use DateTimeImmutable;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -13,9 +14,11 @@ use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Helpers\Util;
 
 use function count;
 use function is_string;
+use function sprintf;
 
 /**
  * Provides the About block that is shown on most of our forms.
@@ -23,6 +26,7 @@ use function is_string;
 class AboutForm
 {
     protected Translator $translator;
+    protected Util $util;
     protected ShopCapabilities $shopCapabilities;
     protected Config $acumulusConfig;
     protected Environment $environment;
@@ -33,12 +37,14 @@ class AboutForm
         ShopCapabilities $shopCapabilities,
         Config $acumulusConfig,
         Environment $environment,
+        Util $util,
         Translator $translator
     ) {
         $this->acumulusApiClient = $acumulusApiClient;
         $this->shopCapabilities = $shopCapabilities;
         $this->acumulusConfig = $acumulusConfig;
         $this->environment = $environment;
+        $this->util = $util;
         $this->translator = $translator;
     }
 
@@ -361,6 +367,7 @@ class AboutForm
      */
     protected function getEuCommerceInfo(?bool $accountStatus): array
     {
+        $euCommerceMessage = '';
         $warningPercentage = $this->getAcumulusConfig()->getInvoiceSettings()['euCommerceThresholdPercentage'];
         $percentage = '0';
         if ($warningPercentage !== '') {
@@ -387,7 +394,7 @@ class AboutForm
                         $status = 'warning';
                     } else {
                         $message = $this->t('info_block_eu_commerce_threshold_ok');
-                        $status = 'ok';
+                        $status = 'OK';
                     }
                     $percentage = (string) (int) round($percentage);
                     $euCommerceProgressBar = $this->addProgressBar($nlTaxed, $threshold, $percentage, $status);
@@ -402,7 +409,7 @@ class AboutForm
                 }
             }
         }
-        return [$euCommerceProgressBar ?? '', $euCommerceMessage ?? ''];
+        return [$euCommerceProgressBar ?? '', $euCommerceMessage];
     }
 
     /**
@@ -418,13 +425,13 @@ class AboutForm
      *   The ratio of $nlTaxed / $threshold, as a whole number (between 0 and
      *   100), or 'unknown'.
      * @param string $status
-     *   'ok', 'warning', or 'error'.
+     *   'OK', 'warning', or 'error'.
      *
      * @return string
      */
     protected function addProgressBar(string $nlTaxed, string $threshold, string $percentage, string $status): string
     {
-        return "<span class='acumulus-progressbar'><span class='acumulus-progress acumulus-$status' style='min-width:$percentage%'>"
+        return "<span class='acumulus-progressbar'><span class='acumulus-progress acumulus-$status' style='min-width:$percentage%;'>"
             . "$nlTaxed €</span></span><span class='acumulus-threshold'>$threshold €</span>";
     }
 
@@ -439,23 +446,7 @@ class AboutForm
      */
     protected function arrayToList(array $list, bool $isHtml): string
     {
-        /** @noinspection DuplicatedCode  also used in CrashReporter::arrayToList */
-        $result = '';
-        if (count($list) !== 0) {
-            foreach ($list as $key => $line) {
-                if (is_string($key) && !ctype_digit($key)) {
-                    $key = $this->t($key);
-                    $line = "$key: $line";
-                }
-                $result .= $isHtml ? "<li>$line</li>" : "• $line";
-                $result .= "\n";
-            }
-            if ($isHtml) {
-                $result = "<ul>$result</ul>";
-            }
-            $result .= "\n";
-        }
-        return $result;
+        return $this->util->arrayToList($list, $isHtml, Closure::fromCallable([$this, 't']));
     }
 
     /**

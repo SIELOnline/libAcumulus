@@ -24,8 +24,9 @@ use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
-
 use Siel\Acumulus\Helpers\Translator;
+
+use function sprintf;
 
 /**
  * Provides form handling for the mappings.
@@ -103,7 +104,7 @@ class MappingsForm extends Form
     {
         // Check for valid email address if no token syntax is used.
         if (!empty($this->submittedValues['emailTo'])
-            && strpos($this->submittedValues['emailTo'], '[') === false
+            && !str_contains($this->submittedValues['emailTo'], '[')
             && !$this->isEmailAddress($this->submittedValues['emailTo'], true)
         ) {
             $this->addFormMessage($this->t('message_validate_email_5'), Severity::Error, 'emailTo');
@@ -111,7 +112,7 @@ class MappingsForm extends Form
 
         // Check for valid email addresses if no token syntax is used.
         if (!empty($this->submittedValues['emailBcc'])
-            && strpos($this->submittedValues['emailBcc'], '[') === false
+            && !str_contains($this->submittedValues['emailBcc'], '[')
             && !$this->isEmailAddress($this->submittedValues['emailBcc'], true)
         ) {
             $this->addFormMessage($this->t('message_validate_email_3'), Severity::Error, 'emailBcc');
@@ -119,7 +120,7 @@ class MappingsForm extends Form
 
         // Check for valid email address if no token syntax is used.
         if (!empty($this->submittedValues['emailFrom'])
-            && strpos($this->submittedValues['emailFrom'], '[') === false
+            && !str_contains($this->submittedValues['emailFrom'], '[')
             && !$this->isEmailAddress($this->submittedValues['emailFrom'])
         ) {
             $this->addFormMessage($this->t('message_validate_email_4'), Severity::Error, 'emailFrom');
@@ -133,7 +134,7 @@ class MappingsForm extends Form
     {
         // Check that a valid mail address has been filled in.
         if (!empty($this->submittedValues['packingSlipEmailTo'])
-            && strpos($this->submittedValues['packingSlipEmailTo'], '[') === false
+            && !str_contains($this->submittedValues['packingSlipEmailTo'], '[')
             && !$this->isEmailAddress($this->submittedValues['packingSlipEmailTo'], true)
         ) {
             $this->addFormMessage($this->t('message_validate_packing_slip_email_1'), Severity::Error, 'packingSlipEmailTo');
@@ -141,7 +142,7 @@ class MappingsForm extends Form
 
         // Check that valid bcc mail addresses have been filled in.
         if (!empty($this->submittedValues['packingSlipEmailBcc'])
-            && strpos($this->submittedValues['packingSlipEmailBcc'], '[') === false
+            && !str_contains($this->submittedValues['packingSlipEmailBcc'], '[')
             && !$this->isEmailAddress($this->submittedValues['packingSlipEmailBcc'], true)
         ) {
             $this->addFormMessage($this->t('message_validate_packing_slip_email_2'), Severity::Error, 'packingSlipEmailBcc');
@@ -149,7 +150,7 @@ class MappingsForm extends Form
 
         // Check for valid email address if no token syntax is used.
         if (!empty($this->submittedValues['packingSlipEmailFrom'])
-            && strpos($this->submittedValues['packingSlipEmailFrom'], '[') === false
+            && !str_contains($this->submittedValues['packingSlipEmailFrom'], '[')
             && !$this->isEmailAddress($this->submittedValues['packingSlipEmailFrom'])
         ) {
             $this->addFormMessage($this->t('message_validate_email_4'), Severity::Error, 'packingSlipEmailFrom');

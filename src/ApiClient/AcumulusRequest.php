@@ -13,6 +13,7 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Util;
 
 use function assert;
+use function sprintf;
 
 /**
  * AcumulusRequest turns a call to {@see Acumulus} into an {@see HttpRequest}.
@@ -90,6 +91,7 @@ class AcumulusRequest
         if ($submit !== null) {
             $submit = $this->util->maskArray($this->getSubmit());
         }
+        /** @noinspection JsonEncodingApiUsageInspection  False positive */
         return sprintf("Request: uri=%s\nsubmit=%s", $uri ?? 'null', json_encode($submit, Log::JsonFlags));
     }
 

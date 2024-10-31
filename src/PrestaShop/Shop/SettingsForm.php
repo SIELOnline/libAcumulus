@@ -10,7 +10,9 @@ use Siel\Acumulus\Tag;
 use function array_key_exists;
 
 /**
- * Provides PrestaShop specific handling for the Settings form.
+ * SettingsForm provides PrestaShop specific handling for the Settings form.
+ *
+ * @noinspection PhpUnused
  */
 class SettingsForm extends BaseSettingsForm
 {

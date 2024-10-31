@@ -18,6 +18,8 @@ use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 
+use function sprintf;
+
 /**
  * Class RegisterForm implements a registration form to register for a
  * temporary free Acumulus account (which can be converted to a full account).

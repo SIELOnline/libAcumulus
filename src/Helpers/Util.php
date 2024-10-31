@@ -17,11 +17,12 @@ use Siel\Acumulus\ApiClient\AcumulusException;
 
 use Siel\Acumulus\Meta;
 
+use function count;
 use function is_array;
 use function is_bool;
 use function is_int;
-use function is_object;
 use function is_string;
+use function sprintf;
 use function strlen;
 
 /**
@@ -93,7 +94,7 @@ class Util
      *
      * @throws \DOMException
      */
-    protected function convertToDom($values, $element)
+    protected function convertToDom(mixed $values, DOMDocument|DOMElement $element)
     {
         /** @var DOMDocument $document */
         static $document = null;
@@ -168,22 +169,17 @@ class Util
      * @return string
      *   The JSON representation for the given object or array.
      *
-     * @throws \Siel\Acumulus\ApiClient\AcumulusException
+     * throws \Siel\Acumulus\ApiClient\AcumulusException|\JsonException
+     * @throws \JsonException
      *   The parameter is not an object or array or an error occurred during
      *   conversion.
      *
-     * @todo: extract Json class with stricter error handling and common flags.
+     * @todo: extract Json class with stricter error handling and common flags and that
+     *   throws AcumulusException??.
      */
-    public function convertToJson($objectOrArray): string
+    public function convertToJson(object|array $objectOrArray): string
     {
-        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-            throw new AcumulusException('Not an object or array');
-        }
-        $result = json_encode($objectOrArray, Meta::JsonFlags);
-        if (!$result) {
-            $this->raiseJsonError();
-        }
-        return $result;
+        return json_encode($objectOrArray, Meta::JsonFlags);
     }
 
     /**
@@ -195,19 +191,20 @@ class Util
      * @return array
      *  An (associative) array representation of the JSON string.
      *
-     * @throws \Siel\Acumulus\ApiClient\AcumulusException
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\JsonException
      *   Either:
      *   - The $json string is not valid JSON.
      *   - The $json string could not be converted to an (associative) array
      *     because it is either not an object, or it is too deep.
+     *
+     * @todo: extract Json class with stricter error handling and common flags and that
+     *    throws AcumulusException??.
      */
     public function convertJsonToArray(string $json): array
     {
-        $result = json_decode($json, true);
-        if ($result === null) {
-            $this->raiseJsonError();
-        } elseif (!is_array($result)) {
-            throw new AcumulusException('Not a JSON structure');
+        $result = json_decode($json, true, 512, Meta::JsonFlags);
+        if (!is_array($result)) {
+            throw new AcumulusException('Not a JSON array');
         }
         return $result;
     }
@@ -256,14 +253,45 @@ class Util
     }
 
     /**
+     * Converts an array with texts to a(n HTML) list.
+     *
+     * @param string[] $list
+     *   List of strings, if the key is s a string, it serves as a
+     *   (translatable) label.
+     * @param bool $isHtml
+     *   Return HTML or plain text.
+     * @param callable $t
+     *   Translate function.
+     *
+     * @return string
+     */
+    public function arrayToList(array $list, bool $isHtml, callable $t): string
+    {
+        $result = '';
+        if (count($list) !== 0) {
+            foreach ($list as $key => $line) {
+                if (is_string($key) && !ctype_digit($key)) {
+                    $key = $t($key);
+                    $line = "$key: $line";
+                }
+                $result .= $isHtml ? "<li>$line</li>" : "• $line";
+                $result .= "\n";
+            }
+            if ($isHtml) {
+                $result = "<ul>$result</ul>";
+            }
+            $result .= "\n";
+        }
+        return $result;
+    }
+
+    /**
      * Recursively masks passwords in an array.
      *
      * Acumulus API specific: passwords fields contain 'password' in their name.
      */
-    public function maskArray(
-        #[SensitiveParameter]
-        array $subject
-    ): array {
+    public function maskArray(#[SensitiveParameter] array $subject): array
+    {
         array_walk_recursive($subject, static function (&$value, $key) {
             if (is_string($key) && stripos($key, 'password') !== false) {
                 $value = 'REMOVED FOR SECURITY';
@@ -344,45 +372,5 @@ class Util
             );
         }
         throw new AcumulusException(implode("\n", $messages));
-    }
-
-    /**
-     * Throws an exception with an error message based on the last json error.
-     *
-     * @throws \Siel\Acumulus\ApiClient\AcumulusException
-     *   Always.
-     *
-     * @deprecated We now throw on error: look at usages and see if we have to
-     *   replace that with a try-catch.
-     */
-    public function raiseJsonError(): void
-    {
-        $code = json_last_error();
-        switch ($code) {
-            case JSON_ERROR_NONE:
-                $message = 'No error';
-                break;
-            case JSON_ERROR_DEPTH:
-                $message = 'Maximum stack depth exceeded';
-                break;
-            case JSON_ERROR_STATE_MISMATCH:
-                $message = 'Underflow or the modes mismatch';
-                break;
-            case JSON_ERROR_CTRL_CHAR:
-                $message = 'Unexpected control character found';
-                break;
-            case JSON_ERROR_SYNTAX:
-                $message = 'Syntax error, malformed JSON';
-                break;
-            case JSON_ERROR_UTF8:
-                $message = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-                break;
-            default:
-                $code = 705;
-                $message = 'Unknown error';
-                break;
-        }
-        $message = sprintf('json (%s): %d - %s', phpversion('json'), $code, $message);
-        throw new AcumulusException($message);
     }
 }

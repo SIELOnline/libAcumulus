@@ -8,7 +8,7 @@ use Throwable;
 
 /**
  * Class AcumulusResponseException represents errors based on inspecting the
- * response on an Acumulus API request.
+ * response of an Acumulus API request.
  *
  * The message will be constructed based on the $body; HTTP status $code; and,
  * if passed, the $additionalInfo.
@@ -26,10 +26,7 @@ class AcumulusResponseException extends AcumulusException
         parent::__construct($message, $code, $additionalInfo instanceof Throwable ? $additionalInfo : null);
     }
 
-    /**
-     * @param string|Throwable $additionalInfo
-     */
-    private function getAdditionalInfo($additionalInfo): string
+    private function getAdditionalInfo(Throwable|string $additionalInfo): string
     {
         $result = '';
         if ($additionalInfo instanceof Throwable) {

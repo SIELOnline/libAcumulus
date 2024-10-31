@@ -15,6 +15,7 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\ApiClient\Acumulus;
 
 use function count;
+use function sprintf;
 
 /**
  * Provides basic config form (settings and mappings) handling.

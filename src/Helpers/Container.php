@@ -346,6 +346,7 @@ class Container
         return $this->getInstance('CrashReporter', 'Helpers', [
             $this->getMailer(),
             $this->getEnvironment(),
+            $this->getUtil(),
             $this->getTranslator(),
             $this->getLog(),
         ]);

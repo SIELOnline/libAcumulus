@@ -15,6 +15,8 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
+use function sprintf;
+
 /**
  * Provides the "Activate pro support" form.
  *

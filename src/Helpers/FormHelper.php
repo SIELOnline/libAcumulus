@@ -9,7 +9,6 @@ use stdClass;
 
 use function is_array;
 use function is_object;
-use function strlen;
 
 /**
  * Provides basic form helper features.
@@ -74,6 +73,7 @@ class FormHelper
     protected function getMeta(): array
     {
         if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
+            /** @noinspection JsonEncodingApiUsageInspection  Fail silently: tampering  */
             $meta = json_decode($_POST[static::Meta], false);
             if (is_object($meta) || is_array($meta)) {
                 $this->setMeta($meta);
@@ -85,7 +85,7 @@ class FormHelper
     /**
      * @param object|object[]|null $meta
      */
-    protected function setMeta($meta): void
+    protected function setMeta(object|array|null $meta): void
     {
         // json must change an associative array into an object, we reverse that
         // here.
@@ -107,7 +107,7 @@ class FormHelper
      * Adds the meta field to the form fields.
      *
      * To prevent problems with rendering (css using + or ~ selector) or with
-     * PrestaShop that only allows fieldsets at the top, the meta field is added
+     * PrestaShop that only allows <fieldset>s at the top, the meta field is added
      * to the first fieldset or details element, or placed at the end.
      *
      * @param array[] $fields
@@ -201,7 +201,7 @@ class FormHelper
     public function isArray(string $key): bool
     {
         $fieldMeta = $this->getMeta();
-        return isset($fieldMeta[$key]) && substr($fieldMeta[$key]->name, -strlen('[]')) === '[]';
+        return isset($fieldMeta[$key]) && str_ends_with($fieldMeta[$key]->name, '[]');
     }
 
     /**
@@ -296,21 +296,14 @@ class FormHelper
      */
     protected function severityToCssClass(int $severity): string
     {
-        switch ($severity) {
-            case Severity::Exception:
-            case Severity::Error:
-                return 'error';
-            case Severity::Warning:
-                return 'warning';
-            case Severity::Notice:
-                return 'notice';
-            case Severity::Info:
-                return 'info';
-            case Severity::Success:
-                return 'success';
-            default:
-                return '';
-        }
+        return match ($severity) {
+            Severity::Exception, Severity::Error => 'error',
+            Severity::Warning => 'warning',
+            Severity::Notice => 'notice',
+            Severity::Info => 'info',
+            Severity::Success => 'success',
+            default => '',
+        };
     }
 
     /**

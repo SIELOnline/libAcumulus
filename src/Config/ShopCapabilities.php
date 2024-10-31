@@ -299,8 +299,8 @@ abstract class ShopCapabilities
      * @return string[]
      *   An array of all credit note related events, with the key being the ID
      *   for the dropdown item, 1 of the {@see \Siel\Acumulus\Config}
-     *   TriggerCreditNoteEvent_... constants, and the value being the label for
-     *   the dropdown item.
+     *   TriggerCreditNoteEvent_... constants, and the value being the translated label
+     *   for the dropdown item.
      *
      * @noinspection PhpUnused Called via method name construction in
      *   BaseConfigForm::getOptionsOrHiddenField().

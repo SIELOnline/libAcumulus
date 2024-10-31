@@ -14,6 +14,8 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
+use function sprintf;
+
 /**
  * Defines a message that asks the user to rate the Acumulus plugin on the web
  * shop specific marketplace.
@@ -100,28 +102,21 @@ class RatePluginForm extends Form
 
     protected function getFieldDefinitions(): array
     {
-        switch ($this->action) {
-            case 'done':
-                $fields = [
-                    'done' => [
-                        'type' => 'markup',
-                        'value' => sprintf($this->t('done_thanks'), $this->t('module')),
-                    ],
-                ];
-                break;
-            case 'later':
-                $fields = [
-                    'later' => [
-                        'type' => 'markup',
-                        'value' => $this->t('no_problem'),
-                    ],
-                ];
-                break;
-            default:
-                $fields = $this->getFieldDefinitionsFull();
-                break;
-        }
-        return $fields;
+        return match ($this->action) {
+            'done' => [
+                'done' => [
+                    'type' => 'markup',
+                    'value' => sprintf($this->t('done_thanks'), $this->t('module')),
+                ],
+            ],
+            'later' => [
+                'later' => [
+                    'type' => 'markup',
+                    'value' => $this->t('no_problem'),
+                ],
+            ],
+            default => $this->getFieldDefinitionsFull(),
+        };
     }
 
     /**

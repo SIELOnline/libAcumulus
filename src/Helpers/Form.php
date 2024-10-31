@@ -17,6 +17,7 @@ use function count;
 use function get_class;
 use function in_array;
 use function is_array;
+use function sprintf;
 
 /**
  * Provides basic form handling.

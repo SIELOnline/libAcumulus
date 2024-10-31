@@ -14,6 +14,9 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
+use function count;
+use function sprintf;
+
 /**
  * Shows a plugin version specific message that informs the user about changes in the new
  * Acumulus plugin version.
@@ -84,7 +87,7 @@ class MessageForm extends Form
         $this->action = $this->getSubmittedValue('service');
         switch ($this->action) {
             case 'later':
-                $result = $this->acumulusConfig->save(['showPluginV8Message' => time() + 1 * 24 * 60 * 60]);
+                $result = $this->acumulusConfig->save(['showPluginV8Message' => time() + 7 * 24 * 60 * 60]);
                 break;
             case 'hide':
                 $result = $this->acumulusConfig->save(['showPluginV8Message' => PHP_INT_MAX]);
@@ -99,21 +102,15 @@ class MessageForm extends Form
 
     protected function getFieldDefinitions(): array
     {
-        switch ($this->action) {
-            case 'later':
-            case 'hide':
-                $fields = [
-                    $this->action => [
-                        'type' => 'markup',
-                        'value' => $this->t('no_problem'),
-                    ],
-                ];
-                break;
-            default:
-                $fields = $this->getFieldDefinitionsFull();
-                break;
-        }
-        return $fields;
+        return match ($this->action) {
+            'later', 'hide' => [
+                $this->action => [
+                    'type' => 'markup',
+                    'value' => $this->t('no_problem'),
+                ],
+            ],
+            default => $this->getFieldDefinitionsFull(),
+        };
     }
 
     /**

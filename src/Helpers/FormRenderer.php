@@ -46,65 +46,63 @@ class FormRenderer
     protected bool $html5 = true;
    protected string $elementWrapperTag = 'div';
     /** @var string|string[] */
-    protected $elementWrapperClass = 'form-element';
+    protected string|array $elementWrapperClass = 'form-element';
     protected string $fieldsetWrapperTag = 'fieldset';
     /** @var string|string[] */
-    protected $fieldsetWrapperClass = '';
+    protected string|array $fieldsetWrapperClass = '';
     protected string $detailsWrapperTag = 'details';
     /** @var string|string[] */
-    protected $detailsWrapperClass = '';
+    protected string|array $detailsWrapperClass = '';
     protected string $legendWrapperTag = 'legend';
     /** @var string|string[] */
-    protected $legendWrapperClass = '';
+    protected string|array $legendWrapperClass = '';
     protected string $summaryWrapperTag = 'summary';
     /** @var string|string[] */
-    protected $summaryWrapperClass = '';
+    protected string|array $summaryWrapperClass = '';
     protected string $fieldsetDescriptionWrapperTag = 'div';
     /** @var string|string[] */
-    protected $fieldsetDescriptionWrapperClass = 'fieldset-description';
-    /**
-     *   Also used for details content.
-     */
+    protected string|array $fieldsetDescriptionWrapperClass = 'fieldset-description';
+    /** Also used for details content. */
     protected string $fieldsetContentWrapperTag = '';
     /**
      * @var string|string[]
      *   Also used for details content.
      */
-    protected $fieldsetContentWrapperClass = 'fieldset-content';
+    protected string|array $fieldsetContentWrapperClass = 'fieldset-content';
     protected string $labelWrapperTag = '';
     /** @var string|string[] */
-    protected $labelWrapperClass = '';
+    protected string|array $labelWrapperClass = '';
     protected string $markupWrapperTag = 'div';
     /** @var string|string[] */
-    protected $markupWrapperClass = 'message';
+    protected string|array $markupWrapperClass = 'message';
     protected string $inputDescriptionWrapperTag = '';
     /** @var string|string[] */
-    protected $inputDescriptionWrapperClass = '';
+    protected string|array $inputDescriptionWrapperClass = '';
     protected string $inputWrapperTag = '';
     /** @var string|string[] */
-    protected $inputWrapperClass = '';
+    protected string|array $inputWrapperClass = '';
     protected string $radioWrapperTag = 'div';
     /** @var string|string[] */
-    protected $radioWrapperClass = 'radio';
+    protected string|array $radioWrapperClass = 'radio';
     protected string $radio1WrapperTag = '';
     /** @var string|string[] */
-    protected $radio1WrapperClass = '';
+    protected string|array $radio1WrapperClass = '';
     protected string $checkboxWrapperTag = 'div';
     /** @var string|string[] */
-    protected $checkboxWrapperClass = 'checkbox';
+    protected string|array $checkboxWrapperClass = 'checkbox';
     protected string $checkbox1WrapperTag = '';
     /** @var string|string[] */
-    protected $checkbox1WrapperClass = '';
+    protected string|array $checkbox1WrapperClass = '';
     protected bool $renderEmptyLabel = true;
     protected string $labelTag = 'label';
     protected string $multiLabelTag = 'label';
     /** @var string|string[] */
-    protected $labelClass = '';
+    protected string|array $labelClass = '';
     /** @var string|string[] */
-    protected $multiLabelClass = '';
+    protected string|array $multiLabelClass = '';
     protected string $descriptionWrapperTag = 'div';
     /** @var string|string[] */
-    protected $descriptionWrapperClass = 'description';
+    protected string|array $descriptionWrapperClass = 'description';
     protected bool $radioInputInLabel = false;
     protected bool $checkboxInputInLabel = false;
     protected string $requiredMarkup = self::RequiredMarkup;
@@ -275,17 +273,10 @@ class FormRenderer
     protected function renderElement($field): string
     {
         $type = $field['type'];
-        switch ($type) {
-            case 'textarea':
-            case 'markup':
-            case 'select':
-            case 'radio':
-            case 'checkbox':
-            case 'collection':
-                return $this->$type($field);
-            default:
-                return $this->input($field);
-        }
+        return match ($type) {
+            'textarea', 'markup', 'select', 'radio', 'checkbox', 'collection' => $this->$type($field),
+            default => $this->input($field),
+        };
     }
 
     /**
@@ -709,7 +700,7 @@ class FormRenderer
      *   The array of attributes to add the value to.
      * @param string $attribute
      *   The name of the attribute to set.
-     * @param string|string[] $value
+     * @param bool|string|string[]|null $value
      *   The value(s) of the attribute to add or set.
      * @param bool|null $multiple
      *   Allow multiple values for the given attribute. By default, (null) this
@@ -718,7 +709,7 @@ class FormRenderer
      * @return array
      *   The set of attributes with the value added.
      */
-    protected function addAttribute(array $attributes, string $attribute, $value, ?bool $multiple = null): array
+    protected function addAttribute(array $attributes, string $attribute, array|bool|string|null $value, ?bool $multiple = null): array
     {
         // Do add false and 0, but not an empty string, empty array or null.
         if ($value !== null && $value !== '' && $value !== []) {
@@ -777,10 +768,8 @@ class FormRenderer
 
     /**
      * Returns a set of attributes for a single radio button.
-     *
-     * @param string|int $value
      */
-    protected function getRadioAttributes(string $id, string $name, $value): array
+    protected function getRadioAttributes(string $id, string $name, int|string $value): array
     {
         return [
             'type' => 'radio',
@@ -793,15 +782,15 @@ class FormRenderer
     /**
      * Returns whether an option is part of a set of selected values.
      *
-     * @param string|int|array $selectedValues
+     * @param int|string|array $selectedValues
      *   The set of selected values, may be just 1 scalar value.
-     * @param string|int $option
+     * @param int|string $option
      *   The option to search for in the set of selected values.
      *
      * @return bool
      *   If this option is part of the selected values.
      */
-    protected function isOptionSelected($selectedValues, $option): bool
+    protected function isOptionSelected(int|string|array $selectedValues, int|string $option): bool
     {
         return is_array($selectedValues) ? in_array((string) $option, $selectedValues,false) : (string) $option === (string) $selectedValues;
     }

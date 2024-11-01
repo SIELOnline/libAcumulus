@@ -700,8 +700,11 @@ class FormRenderer
      *   The array of attributes to add the value to.
      * @param string $attribute
      *   The name of the attribute to set.
-     * @param bool|string|string[]|null $value
-     *   The value(s) of the attribute to add or set.
+     * @param bool|string|string[]|int|null $value
+     *   The value(s) of the attribute to add or set. If null, the attribute value will
+     *   be ignored (no-op). Other types must be convertable to a string because that is
+     *   how an attribute value eventually will end. For array and bool we do some
+     *   handling our own, for other types we expect that a cast to string suffices.
      * @param bool|null $multiple
      *   Allow multiple values for the given attribute. By default, (null) this
      *   is only allowed for the class attribute.
@@ -709,7 +712,7 @@ class FormRenderer
      * @return array
      *   The set of attributes with the value added.
      */
-    protected function addAttribute(array $attributes, string $attribute, array|bool|string|null $value, ?bool $multiple = null): array
+    protected function addAttribute(array $attributes, string $attribute, mixed $value, ?bool $multiple = null): array
     {
         // Do add false and 0, but not an empty string, empty array or null.
         if ($value !== null && $value !== '' && $value !== []) {

@@ -3,8 +3,17 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.3.5 (2024-11-01) (WC) (actually: all shops that use our own form renderer)
+-----------------------
+Bugs:
+- WC: TypeError: Siel\Acumulus\Helpers\FormRenderer::addAttribute(): Argument #3 ($value)
+  must be of type array|string|bool|null, int given, called in Helpers/FormRenderer.php
+  on line 427 and defined in Helpers/FormRenderer.php:712.
+
+
 8.3.4 (2024-11-01) (ALL)
 ------------------------
+Bugs:
 - ALL: Uncaught RuntimeException: "curl_exec(): 28 - Connection timed out ..." lead to
   a WSOD on all admin pages (and client-side pages where Acumulus API calls are made). The
   solution is to fail silently, letting the (admin) page render but without Acumulus

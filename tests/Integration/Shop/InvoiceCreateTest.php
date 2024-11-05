@@ -34,7 +34,6 @@ class InvoiceCreateTest extends TestCase
 
     private function getInvoiceSource(): Source
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $objects = (new GetTestData())->get();
         $order = $objects->order;
         return $this->getContainer()->createSource(Source::Order, $order);

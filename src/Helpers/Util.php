@@ -94,7 +94,7 @@ class Util
      *
      * @throws \DOMException
      */
-    protected function convertToDom(mixed $values, DOMDocument|DOMElement $element)
+    protected function convertToDom(mixed $values, DOMDocument|DOMElement $element): DOMDocument|DOMElement
     {
         /** @var DOMDocument $document */
         static $document = null;
@@ -346,6 +346,24 @@ class Util
         return preg_replace(
             '!"([a-z]*)password"(\s*):(\s*)"(((\\\\.)|[^\\\\"])*)"!',
             '"$1password"$2:$3"REMOVED FOR SECURITY"',
+            $subject
+        );
+    }
+
+    /**
+     * Masks passwords in an XML string
+     *
+     * Acumulus API specific: passwords fields end with 'password'.
+     */
+    public function maskHtml(
+        #[SensitiveParameter]
+        string $subject
+    ): string {
+        // Mask all "value"s of input elements of type ='password'.
+        // @todo: use back reference in closing tag, but test it (is this still used, is it tested?)
+        return preg_replace(
+            '|name="password" value="[^"]*"|',
+            'name="password" value="REMOVED FOR SECURITY"',
             $subject
         );
     }

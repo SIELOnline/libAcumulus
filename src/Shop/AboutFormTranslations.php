@@ -39,7 +39,7 @@ class AboutFormTranslations extends TranslationCollection
         'pro_support_line' => '"%1$s" voor %2$s van %3$s tot %4$s.',
 
         // About your webshop.
-        'desc_environmentInformation' => 'Vermeld aub deze gegevens bij een supportverzoek.',
+        'desc_environmentInformation' => 'Vermeld a.u.b. deze gegevens bij een supportverzoek.',
 
         // About your EU sales.
         'euCommerce' => 'EU verkopen',

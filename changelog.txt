@@ -3,6 +3,22 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+
+8.3.6 (2024-1?-??)
+------------------
+Bugs:
+- Form rendering: we encountered some:
+  - Violations against the HTML specifications
+  - Missing id attributes on <fieldset>s, <summary>s, and on the wrapper around radio
+    buttons and checkboxes. By adding these attributes, they can be individually addressed
+    by CSS.
+  - Typos.
+
+Testing:
+- Added integration tests for our forms (creation, field definitions and rendering). This
+  should help preventing bugs like [SIEL #235459].
+
+
 8.3.5 (2024-11-01) (WC) (actually: all shops that use our own form renderer)
 -----------------------
 Bugs:

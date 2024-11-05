@@ -1,11 +1,4 @@
 <?php
-/**
- * @noinspection PhpLackOfCohesionInspection
- * @noinspection PhpRedundantOptionalArgumentInspection
- * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
- * @noinspection PhpUnused
- *   Many properties are used via property name construction.
- */
 
 declare(strict_types=1);
 
@@ -173,9 +166,7 @@ class FormRenderer
      */
     protected function renderField(array $field): string
     {
-        $output = '';
-        $output .= $this->isFieldset($field) ? $this->renderFieldset($field) : $this->renderSimpleField($field);
-        return $output;
+        return $this->isFieldset($field) ? $this->renderFieldset($field) : $this->renderSimpleField($field);
     }
 
     /**
@@ -183,8 +174,7 @@ class FormRenderer
      */
     protected function renderFieldset(array $field): string
     {
-        $output = '';
-        $output .= $this->fieldsetBegin($field);
+        $output = $this->fieldsetBegin($field);
         $output .= $this->renderFields($field['fields']);
         $output .= $this->fieldsetEnd($field);
         return $output;
@@ -201,8 +191,8 @@ class FormRenderer
      */
     protected function fieldsetBegin(array $field): string
     {
-        $output = '';
-        $output .= $this->getWrapper($field['type'], $field['attributes']);
+        $wrapperAttributes = $field['attributes'] + ['id' => $field['id']];
+        $output = $this->getWrapper($field['type'], $wrapperAttributes);
         $titleTag = $field['type'] === 'fieldset' ? 'legend' : 'summary';
         if (!empty($field[$titleTag])) {
             $output .= $this->getWrapper($titleTag, $field['attributes']);
@@ -225,8 +215,7 @@ class FormRenderer
      */
     protected function fieldsetEnd(array $field): string
     {
-        $output = '';
-        $output .= $this->getWrapperEnd('fieldsetContent');
+        $output = $this->getWrapperEnd('fieldsetContent');
         $output .= $this->getWrapperEnd($field['type']);
         return $output;
     }
@@ -379,8 +368,12 @@ class FormRenderer
                 $wrapperAttributes = $attributes['wrapper'];
                 unset($attributes['wrapper']);
             }
-            if (!empty($attributes['required'])) {
+            $required = false;
+            if (isset($attributes['required'])) {
                 $wrapperAttributes['required'] = $attributes['required'];
+                $required = (bool) $attributes['required'];
+                // Required is not an allowed attribute for a label, remove it as attribute.
+                unset($attributes['required']);
             }
 
             // Tag around main labels.
@@ -392,7 +385,7 @@ class FormRenderer
             $allowHtml = !empty($attributes['html']);
             unset($attributes['html']);
             $attributes = $this->addLabelAttributes($attributes, $id);
-            $postfix .= !empty($attributes['required']) ? $this->requiredMarkup : '';
+            $postfix .= $required ? $this->requiredMarkup : '';
             $tag = empty($id) ? $this->multiLabelTag : $this->labelTag;
             $output .= $this->getOpenTag($tag, $attributes);
             $output .= $prefix;
@@ -526,7 +519,7 @@ class FormRenderer
 
         // Tag(s) around radio buttons.
         $output .= $this->getWrapper('input', $attributes);
-        $output .= $this->getWrapper('radio', $attributes);
+        $output .= $this->getWrapper('radio', $attributes + ['id' => $field['id']]);
 
         // Radio buttons.
         foreach ($field['options'] as $value => $text) {
@@ -566,7 +559,7 @@ class FormRenderer
 //?        unset($attributes['required']);
 
         $output .= $this->getWrapper('input', $attributes);
-        $output .= $this->getWrapper('checkbox', $attributes);
+        $output .= $this->getWrapper('checkbox', $attributes + ['id' => $field['id']]);
 
         // Checkboxes.
         foreach ($field['options'] as $value => $text) {
@@ -606,6 +599,10 @@ class FormRenderer
             if (!empty($this->$class)) {
                 $attributes = $this->addAttribute($attributes, 'class', $this->$class);
             }
+            if (isset($attributes['required'])) {
+                // Required is not an allowed attribute for a wrapper, remove it as attribute.
+                unset($attributes['required']);
+            }
             $output .= $this->getOpenTag($this->$tag, $attributes);
         }
         return $output;
@@ -642,7 +639,12 @@ class FormRenderer
      */
     protected function getOpenTag(string $tag, array $attributes = [], bool $selfClosing = false): string
     {
-        return '<' . htmlspecialchars($tag, ENT_QUOTES, 'ISO-8859-1') . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
+        if (in_array($tag, ['div', 'span'])) {
+            // A <div> or <span> should not get a name attribute.
+            unset($attributes['name']);
+        }
+        return '<' . htmlspecialchars($tag, ENT_QUOTES, 'UTF-8') . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ?
+                '/' : '') . '>';
     }
 
     /**

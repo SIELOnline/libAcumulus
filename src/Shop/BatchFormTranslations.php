@@ -36,10 +36,10 @@ class BatchFormTranslations extends TranslationCollection
         'option_send_force' => 'Altijd verzenden, als de factuur al is verzonden wordt de bestaande factuur verwijderd in Acumulus',
         'option_send_test_mode' => 'Verzend in testmodus',
         'desc_send_mode' => 'Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Dit is de 1e optie. Door de 2e optie te selecteren forceert u het nogmaals versturen van deze facturen. Indien nog aanwezig, wordt de oude boeking in Acumulus naar de prullenbak verplaatst. Let op: dit kan tot gaten in uw reeks van factuurnummers leiden.<br><br>
-                                 Met de 3e optie worden de facturen in testmodus naar Acumulus verstuurd. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan, zodat uw administratie niet in de war raakt. U ontvangt alijd een mail met de resultaten. Deze optie is gelijk aan de optie "Testmodus" van de instelling "Factuur verzendmodus" van het instellingenformulier, maar geldt alleen voor deze batchverzending. Gebruik deze optie om de mail die u ontvangt mee te kunnen sturen met een supportverzoek.',
+                                 Met de 3e optie worden de facturen in testmodus naar Acumulus verstuurd. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan, zodat uw administratie niet in de war raakt. U ontvangt altijd een mail met de resultaten. Deze optie is gelijk aan de optie "Testmodus" van de instelling "Factuur verzendmodus" van het instellingenformulier, maar geldt alleen voor deze batchverzending. Gebruik deze optie om de mail die u ontvangt mee te kunnen sturen met een supportverzoek.',
         'field_dry_run' => 'Dry run',
         'option_dry_run' => 'Laat alleen de lijst van facturen zien die verstuurd zouden worden, zonder daadwerkelijk te versturen.',
-        'desc_dry_run' => 'De filters die u hierboven heeft opgegeven kunnen in bepaalde gevallen voor verrassingen zorgen. Door deze optie aan te vinken krijgt u in het resultatenoverzicht een lijst te zien van facturen die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',
+        'desc_dry_run' => '<p>De filters die u hierboven heeft opgegeven kunnen in bepaalde gevallen voor verrassingen zorgen. Door deze optie aan te vinken krijgt u in het resultatenoverzicht een lijst te zien van facturen die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',
         'batchLogHeader' => 'Resultaten',
         'batchInfoHeader' => 'Uitgebreide toelichting op dit formulier',
         'batch_info' => <<<LONGSTRING
@@ -63,7 +63,7 @@ deze Acumulus module gedefinieerde events (of hook of actie) worden voor alle
 facturen die verzonden gaan worden uitgevoerd.</li>
 </ul>
 <p>Dit formulier werkt in zijn huidige vorm, maar er zijn vast nog wel
-verbeteringen aan te brengen. Dus als u ideeën heeft, laat het ons weten..</p>
+verbeteringen aan te brengen. Dus als u ideeën heeft, laat het ons weten.</p>
 LONGSTRING
     ,
 
@@ -85,7 +85,7 @@ LONGSTRING
         'message_form_filter' => 'Toegepaste filters:',
         'message_form_filter_type' => 'Facturen voor %1$s',
         'message_form_filter_reference' => 'Nummer van %1$s tot %2$s',
-        'message_form_filter_date' => 'Datum (laatste wizjiging) tussen %1$s en %2$s',
+        'message_form_filter_date' => 'Datum (laatste wijziging) tussen %1$s en %2$s',
         'message_form_filter_status' => "Bestelstatus één van {'%1s'}",
         'message_form_range_empty' => 'De door u opgegeven reeks bevat geen enkele %1$s.',
         'message_form_range_list' => 'Gevonden {%1$s}.',
@@ -123,7 +123,7 @@ LONGSTRING
                              <p>With the 3rd option, invoices will be sent to Acumulus using the test mode. Acumulus will only check the input for errors and warnings but not store the invoice, so your administration will not be polluted. You will always receive a mail with the results. This option overrules the setting "Invoice send mode" on the configuration form. Use this option so you can forward the mail you receive with a support request.</p>',
         'field_dry_run' => 'Dry run',
         'option_dry_run' => 'Dry run',
-        'desc_dry_run' => 'In some cases, the filters you defined here can lead to surprises. By checking this option you will get a list of invoices that would be sent, without actually being sent.</p>',
+        'desc_dry_run' => '<p>In some cases, the filters you defined here can lead to surprises. By checking this option you will get a list of invoices that would be sent, without actually being sent.</p>',
         'batchLogHeader' => 'Results',
         'batchInfoHeader' => 'Additional explanations about this form',
         'batch_info' => <<<LONGSTRING

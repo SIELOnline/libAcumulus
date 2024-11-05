@@ -21,6 +21,23 @@ use function is_float;
  */
 trait AcumulusTestUtils
 {
+    protected static string $htmlStart = <<<LONGSTRING
+<!DOCTYPE html>
+<!--suppress GrazieInspection, HtmlUnknownTarget -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+LONGSTRING;
+    protected static string $htmlEnd = <<<LONGSTRING
+
+</body>
+</html>
+LONGSTRING;
+
     /**
      * Returns an Acumulus Container instance.
      */
@@ -227,5 +244,22 @@ trait AcumulusTestUtils
         $targetFilename = "$path/$type$id.json";
         /** @noinspection JsonEncodingApiUsageInspection  false positive */
         file_put_contents($targetFilename, file_get_contents($sourceFilename));
+    }
+
+    /**
+     * Saves test data, typically a created and completed invoice converted to an array.
+     *
+     * @param mixed $data
+     *   The data to be saved (in json format).
+     */
+    protected function saveTestHtmlData(string $path, string $name, mixed $data): void
+    {
+        $append = 'latest';
+        $filename = "$path/$name.html";
+        if (file_exists($filename)) {
+            $filename = "$path/$name.$append.html";
+        }
+        $data = static::getAcumulusContainer()->getUtil()->maskHtml($data);
+        file_put_contents($filename, static::$htmlStart . $data . static::$htmlEnd);
     }
 }

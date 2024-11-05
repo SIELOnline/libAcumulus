@@ -41,7 +41,6 @@ class ConfigFormTranslations extends TranslationCollection
         'button_submit_advanced'=> 'Instellingen opslaan',
         'button_submit_settings'=> 'Instellingen opslaan',
         'button_submit_mappings'=> 'Veldverwijzingen opslaan',
-        'button_link' => '<a href="%2$s">%1$s</a>',
         'button_cancel' => 'Terug',
 
         'message_form_config_success' => 'De instellingen zijn opgeslagen.',
@@ -69,7 +68,7 @@ class ConfigFormTranslations extends TranslationCollection
         'message_error_arg1_advanced' => 'geavanceerde',
         'message_error_arg1_settings' => 'overige',
         'message_error_arg2_config' => 'hier',
-        'message_error_arg2_advanced' => 'in het "Acumulus basisinstellingenformulier"',
+        'message_error_arg2_advanced' => 'in het "Acumulus instellingenformulier"',
         'message_error_role_deprecated' => 'U gebruikt accountgegevens met een gebruikerstype dat binnenkort niet meer gebruikt kan worden om de Acumulus API mee te benaderen. Voeg een andere gebruiker toe met gebruikerstype API-Gebruiker of verander het gebruikerstype van de huidige gebruiker.',
         'message_warning_role_insufficient' => 'U gebruikt een account met het gebruikerstype API-Invoerder. Dit gebruikerstype heeft niet alle rechten die deze plugin gebruikt. Verander het gebruikerstype van de huidige gebruiker naar API-Gebruiker of voeg een andere gebruiker toe.',
         'message_warning_role_overkill' => 'U gebruikt een account met het gebruikerstype API-Beheerder. Dit gebruikerstype heeft meer rechten dan deze plugin nodig heeft. Wij raden u aan om het gebruikerstype te veranderen naar API-Gebruiker.',
@@ -143,7 +142,7 @@ Het gaat dus niet zozeer om de actuele instelling, want deze waarde wordt ook ge
         'desc_vatFreeClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst btw-vrij is.<br>
 • Kies de 1e optie ("%2$s") als u geen btw-vrije producten of diensten aanbiedt.<br>
 • Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten het veld %1$s leeg laat.<br>
-• LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR</a> heeft gekozen, of een btw-vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
+• LET OP: het gaat erom of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank">KOR</a> heeft gekozen, of een btw-vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
 Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
         'field_zeroVatClass' => 'Welke %1$s definieert het 0%% btw-tarief?',
@@ -175,9 +174,9 @@ Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met na
         'tokenHelpHeader' => 'Uitleg over veldverwijzingen',
         'desc_tokens' => '<p>Op deze pagina staan een aantal velden die "veldverwijzingen" mogen bevatten.
 Dit wil zeggen dat ze naast vrije tekst ook gegevens van de bestelling, de klant of een klantadres kunnen bevatten.
-Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. "[" en "]", te plaatsen.</p>
+Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, d.w.z. "[" en "]", te plaatsen.</p>
 <p>Om speciale situaties aan te kunnen, mogen veldverwijzingen op verschillende manieren samengevoegd worden:</p>
-<ol class="property-list">
+<dl class="property-list">
 <dt>[property]:</dt><dd>Eenvoudigste vorm, vervang door de waarde van deze eigenschap. Er wordt in alle beschikbare objecten gezocht.</dd>
 <dt>[property(arguments)]:</dt><dd>Vervang door de waarde die de method property teruggeeft. Als property een method is, wordt "arguments" (een komma-gescheiden reeks van argumenten zonder aanhalingstekens om tekenreeksen heen) meegegeven bij het aanroepen van de method.</dd>
 <dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bijv. id).</dd>
@@ -186,7 +185,7 @@ Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelli
 <dt>[property<i>1</i>+property<i>2</i>+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn. Bijv.: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
 <dt>[property<i>1</i>&property<i>2</i>&...]:</dt><dd>Vervang door de waarde van property1 en die van property2 maar plaats geen spatie tussen de properties.</dd>
 <dt>["letterlijke tekst"]:</dt><dd>Vervang door de letterlijke tekst (zonder aanhalingstekens) maar alleen als het samengevoegd wordt, middels een + of &, met een andere eigenschap die niet leeg is.</dd>
-</ol>
+</dl>
 <p><strong>Let op:</strong> in de meeste situaties zal de standaardwaarde goed zijn. Pas deze velden alleen aan in speciale omstandigheden en als u weet wat u doet.</p>
 ',
         'msg_token' => 'Dit veld mag veldverwijzingen bevatten.',
@@ -223,10 +222,10 @@ Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelli
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relatiebeheer',
-        'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren. De meeste velden hieronder kunnen opgenomen worden in uw factuursjablonen. Daarom is het handig om hier controle te hebben over wat er in die velden komt te staan.',
+        'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd wordt, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren. De meeste velden hieronder kunnen opgenomen worden in uw factuursjablonen. Daarom is het handig om hier controle te hebben over wat er in die velden komt te staan.',
 
         'relationMappingsHeader' => 'Brongegevens voor de klantgegevens',
-        'desc_relationMappingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen waar deze gegevens vandaan komen.',
+        'desc_relationMappingsHeader' => 'Met elke factuur die naar Acumulus verstuurd wordt, worden ook de klantgegevens meegestuurd. Hier kunt u instellen waar deze gegevens vandaan komen.',
         'invoiceAddressMappingsHeader' => 'Brongegevens voor het factuuradres',
         'desc_invoiceAddressMappingsHeader' => 'Deze velden dien te verwijzen naar wat de webwinkel als het factuuradres beschouwt, ongeacht of dit het hoofd of alternatieve adres in Acumulus is.',
         'shippingAddressMappingsHeader' => 'Brongegevens voor het verzendadres',
@@ -309,7 +308,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         AddressType::Shipping => 'verzendadres',
 
         'field_countryAutoName' => 'Landnaam',
-        'desc_countryAutoName' => 'Geef aan wanneer en hoe de landnaam aan dde factuur toegevoegd moet worden. De land code wordt altijd naar Acumulus verzonden, maar het versturen en tonen van de landnaam is flexibeler. De landnaam kan van Acumulus komen (gebaseerd op de landcode) of van de naam zoals die in de webwinkel is ingevuld kan gebruikt worden. De 2e en 3e opties zijn de aanbevolen opties.',
+        'desc_countryAutoName' => 'Geef aan wanneer en hoe de landnaam aan dde factuur toegevoegd moet worden. De landcode wordt altijd naar Acumulus verzonden, maar het versturen en tonen van de landnaam is flexibeler. De landnaam kan van Acumulus komen (gebaseerd op de landcode) of van de naam zoals die in de webwinkel is ingevuld kan gebruikt worden. De 2e en 3e opties zijn de aanbevolen opties.',
         'option_countryAutoName_No' => 'Voeg geen landnaam toe aan de factuur.',
         'option_countryAutoName_Yes' => 'Laat Acumulus altijd de (Nederlandstalige) landnaam toevoegen (aanbevolen).',
         'option_countryAutoName_OnlyForeign' => 'Laat Acumulus alleen aan buitenlandse adressen de (Nederlandstalige) landnaam toevoegen (aanbevolen).',
@@ -339,7 +338,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_defaultInvoiceTemplate' => 'Factuur-sjabloon (niet betaald)',
         'field_defaultInvoicePaidTemplate' => 'Factuur-sjabloon (betaald)',
         'option_same_template' => 'Zelfde sjabloon als voor niet betaald',
-        'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifieke factuur-sjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
+        'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifiek factuur-sjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
 
         'field_concept' => 'Concept',
         'desc_concept' => 'Geef aan hoe de factuur verstuurd moet worden. De 1e optie zal normaal gesproken voldoen. Echter, als u uw facturen altijd als concept wil versturen, kies dan de 3e optie. De 2e optie zou eigenlijk niet gekozen moeten worden, tenzij de waarschuwingen altijd onterecht blijken.',
@@ -547,7 +546,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_error_arg1_advanced' => 'advanced',
         'message_error_arg1_settings' => 'other',
         'message_error_arg2_config' => 'here',
-        'message_error_arg2_advanced' => 'in the "Acumulus basic settings form"',
+        'message_error_arg2_advanced' => 'in the "Acumulus settings form"',
         'message_error_role_deprecated' => 'You are using a deprecated user role to connect to the Acumulus API. Please add another user with an API-compliant role or change the role for the current user.',
         'message_warning_role_insufficient' => 'You are using the user role API-Creator. This role does not have all permissions this plugin needs. Change the role of the current user to API-User or create a new user.',
         'message_warning_role_overkill' => 'You are using the user role API-Manager. This role has more permissions than this plugin needs. We advice you to change the role to API-User.',
@@ -621,7 +620,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'desc_vatFreeClass' => 'Indicate which %1$s you use to indicate that a product or service is VAT free.<br>
 • Select the 1st option ("%2$s") if you do not sell VAT free goods or services.<br>
 • Select the 2nd option ("%3$s") if you leave the field %1$s empty on VAT free products.<br>
-• NOTE: this setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.
+• NOTE: this setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.
 • Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
 
         'field_zeroVatClass' => 'Which %1$s defines the 0%% vat rate?',
@@ -655,7 +654,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 This means that besides free literal text, these fields can contain data from the order, customer or customer address(es).
 Field references are denoted by placing the name of the property between square brackets, i.e. [ and ].</p>
 <p>To handle some special situations, field references can be combined as follows:</p>
-<ol class="property-list">
+<dl class="property-list">
 <dt>[property]:</dt><dd>Simplest form, replace by the value of the property or method (without arguments). All available objects are searched for the given property.</dd>
 <dt>[property(arguments)]:</dt><dd>Replace by the return value of the method. "arguments" is a comma-separated list of arguments to pass to the method. Do not use quotes around strings.</dd>
 <dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the given object (see list below). Use this to get the value from the correct object if multiple objects have a property with the same name (e.g. id).</dd>
@@ -664,7 +663,7 @@ Field references are denoted by placing the name of the property between square 
 <dt>[property<i>1</i>+property<i>2</i>+...]:</dt><dd>Replace by the value of property1 and that of property2 with 1 space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
 <dt>[property<i>1</i>&property<i>2</i>&...]:</dt><dd>Replace by the value of property1 and that of property2 but with no space between it.</dd>
 <dt>["literal text"]:</dt><dd>Replace by the literal text (without quotes) but only if it is combined, using + or &, with another non-empty property.</dd>
-</ol>
+</dl>
 <p><strong>Attention:</strong> in most situations the default value will do fine! Only change these fields in special situations and when you know what you are doing.</p>
 ',
         'msg_token' => 'This field may contain field references.',

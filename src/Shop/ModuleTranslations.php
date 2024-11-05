@@ -62,7 +62,7 @@ class ModuleTranslations extends TranslationCollection
 
         // @todo: start using these 3 parameters, for now this text is
         //   overridden in all shops with only 2 parameters.
-        'button_link' => '<a href="%2$s" class="%3$s">%1$s</a>',
+        'button_link' => '<a href="%2$s">%1$s</a>',
         'button_class' => 'button',
         'message_config_saved' => 'De instellingen zijn opgeslagen.',
         'message_update_failed' => 'De interne upgrade naar versie %s is mislukt. Als deze melding terug blijft komen, neem dan contact op met support.',

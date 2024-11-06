@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
-use DateTimeInterface;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
 

@@ -38,15 +38,21 @@ class MetadataCollection
      * distinguish these 2 situations. For these cases, use
      * {@see MetadataValue::count()}.
      *
+     * @param string $name
+     *   The name of the metadata value to return.
+     * @param int|null $index
+     *   The index of the value to return (if it is list).
+     *
      * @return array|mixed|null
-     *   The value for the given metadata name, or null if not set.
+     *   The value for the given metadata name at the given index, or null if not set or
+     *   the index does not exist.
      *
      * @legacy: the return by reference is to make the ArrayAccess working.
      */
-    public function &get(string $name)
+    public function &get(string $name, ?int $index = null): mixed
     {
         /** @noinspection NullPointerExceptionInspection */
-        $result = $this->exists($name) ? $this->getMetadataValue($name)->get() : null;
+        $result = $this->exists($name) ? $this->getMetadataValue($name)->get($index) : null;
         return $result;
     }
 

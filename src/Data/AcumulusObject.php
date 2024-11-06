@@ -6,7 +6,6 @@ namespace Siel\Acumulus\Data;
 
 use ArrayAccess;
 use BadMethodCallException;
-use DateTimeInterface;
 use ReflectionClass;
 use RuntimeException;
 
@@ -14,6 +13,7 @@ use Siel\Acumulus\Meta;
 
 use function array_key_exists;
 use function count;
+use function sprintf;
 use function strlen;
 
 /**
@@ -205,7 +205,7 @@ abstract class AcumulusObject implements ArrayAccess
      *   The value to assign to this property, null is a valid value and will
      *   "unset" this property (it will not appear in the Acumulus API message).
      * @param int $mode
-     *   One of the PropertySet::... constants that can be used to
+     *   One of the {@see PropertySet}::... constants that can be used to
      *   prevent setting an empty value and/or overwriting an already set value.
      *   Default is to unconditionally set the value.
      *

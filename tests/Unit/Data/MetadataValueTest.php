@@ -19,9 +19,6 @@ use function is_array;
 
 /**
  * Tests for the {@see MetadataValue} class.
- *
- * @todo: add tests for the new features: isList and checking for a __toString() method on
- *   objects.
  */
 class MetadataValueTest extends TestCase
 {
@@ -45,11 +42,15 @@ class MetadataValueTest extends TestCase
         $mdv = (new MetadataValue())->add($value1);
         $this->assertSame(1, $mdv->count());
         $this->assertSame($value1, $mdv->get());
+        $this->assertSame($value1, $mdv->get(0));
+        $this->assertNull($mdv->get(1));
         $this->assertSame($value1, $mdv->getApiValue());
 
         $mdv = (new MetadataValue(true))->add($value1);
         $this->assertSame(1, $mdv->count());
         $this->assertSame([$value1], $mdv->get());
+        $this->assertSame($value1, $mdv->get(0));
+        $this->assertNull($mdv->get(1));
         $this->assertSame("[$value1]", $mdv->getApiValue());
     }
 
@@ -60,6 +61,8 @@ class MetadataValueTest extends TestCase
         $mdv = (new MetadataValue())->add($value1);
         $this->assertSame(1, $mdv->count());
         $this->assertNull($mdv->get());
+        $this->assertNull($mdv->get(0));
+        $this->assertNull($mdv->get(1));
         $this->assertNull($mdv->getApiValue());
     }
 
@@ -71,13 +74,17 @@ class MetadataValueTest extends TestCase
         $mdv = (new MetadataValue())->add($value1)->add($value2);
         $this->assertSame(2, $mdv->count());
         $this->assertSame([$value1, $value2], $mdv->get());
-        // Note that this might fail depending on pretty print settings of json_encode
+        // Note that this might fail depending on pretty print settings of json_encode().
+        $this->assertSame(2, $mdv->get(1));
+        $this->assertNull($mdv->get(2));
         $this->assertSame("['value1',2]", $mdv->getApiValue());
 
         $mdv = (new MetadataValue(true))->add($value1)->add($value2);
         $this->assertSame(2, $mdv->count());
         $this->assertSame([$value1, $value2], $mdv->get());
-        // Note that this might fail depending on pretty print settings of json_encode
+        // Note that this might fail depending on pretty print settings of json_encode().
+        $this->assertSame(2, $mdv->get(1));
+        $this->assertNull($mdv->get(2));
         $this->assertSame("['value1',2]", $mdv->getApiValue());
     }
 

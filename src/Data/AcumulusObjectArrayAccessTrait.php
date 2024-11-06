@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
-use ReturnTypeWillChange;
 use RuntimeException;
 
 use function array_key_exists;
@@ -27,6 +26,9 @@ use function is_array;
  *
  * Note: as the old Acumulus arrays are already strict string key based arrays,
  * we don't allow numeric or null offsets.
+ *
+ * @legacy: ArrayAccess is implemented on {@See \Siel\Acumulus\Data\AcumulusObject} to
+ *   allow legacy code to access the objects like arrays.
  */
 trait AcumulusObjectArrayAccessTrait
 {
@@ -71,7 +73,7 @@ trait AcumulusObjectArrayAccessTrait
      *   found in another object: the first element being the object, the 2nd being the
      *   name of the property in that object.
      */
-    private function mapOffset(string $offset)
+    private function mapOffset(string $offset): array|string
     {
         if (!$this->isProperty($offset) && !property_exists($this, $offset)) {
             $propertyMappings = $this->getOffsetMappings();
@@ -85,10 +87,9 @@ trait AcumulusObjectArrayAccessTrait
     /**
      * @inheritdoc
      *
-     * @noinspection PhpLanguageLevelInspection
+     * Note: the return by reference is to make the ArrayAccess working.
      */
-    #[ReturnTypeWillChange]
-    public function &offsetGet($offset)
+    public function &offsetGet(mixed $offset): mixed
     {
         $this->checkOffset($offset);
         $offset = $this->mapOffset($offset);
@@ -115,7 +116,7 @@ trait AcumulusObjectArrayAccessTrait
      * - A "normal" object property (if one exists).
      * - A metadata key (all other cases).
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->checkOffset($offset);
         $offset = $this->mapOffset($offset);
@@ -135,7 +136,7 @@ trait AcumulusObjectArrayAccessTrait
     /**
      * @inheritdoc
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         $this->checkOffset($offset);
         $offset = $this->mapOffset($offset);
@@ -156,7 +157,7 @@ trait AcumulusObjectArrayAccessTrait
     /**
      * @inheritdoc
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         $this->checkOffset($offset);
         $offset = $this->mapOffset($offset);
@@ -180,7 +181,7 @@ trait AcumulusObjectArrayAccessTrait
      *
      * @throws \RuntimeException
      */
-    private function checkOffset($offset): void
+    private function checkOffset(mixed $offset): void
     {
         if ($offset === null) {
             throw new RuntimeException('Offset cannot be null');

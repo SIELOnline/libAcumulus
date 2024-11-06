@@ -11,14 +11,13 @@ use Siel\Acumulus\Meta;
 use Stringable;
 
 use function count;
-use function is_callable;
-use function is_object;
+use function is_scalar;
 
 /**
  * MetadataValue represents a metadata value.
  *
  * The Acumulus API will ignore any additional properties that are sent as part
- * of the message structure that it does not know. We use this to add additional
+ * of the message structure and thus does not know. We use this to add additional
  * information, metadata, to these structures for the following reasons:
  * - Processing: {@see \Siel\Acumulus\Collectors\Collector Collectors} collect
  *   all information from the webshop that is needed to create a complete and
@@ -36,11 +35,16 @@ use function is_object;
  *   given Acumulus value.
  *
  * Metadata values are typically scalar values, but null, (small) objects, keyed
- * arrays, and numeric arrays of similar values are accepted as well. Non string
+ * arrays, and numeric arrays of similar values are accepted as well. Non stringable
  * values will be rendered in json notation.
  */
 class MetadataValue
 {
+    /**
+     * @var bool
+     *   Indicates whether the value is to be seen as a list. This influences what is
+     *   returned with {@see get()} when we have 0 or 1 values.
+     */
     private bool $isList;
     private array $value = [];
 
@@ -65,20 +69,22 @@ class MetadataValue
      *       - The value, probably a scalar, if 1 value was added.
      *       - An array with all values if multiple values were added.
      *
-     * @todo: add a parameter ?int $index = null ? in that case also add it to
-     *   {@see \Siel\Acumulus\Data\MetadataCollection::get()}.
-     * param int|null $index
-     *
+     * @param int|null $index
+     *   The index of the value to return. If the index does not exist, null is returned.
      */
-    public function get(): mixed
+    public function get(?int $index = null): mixed
     {
-        return $this->isList
-            ? $this->value
-            : match ($this->count()) {
-                0 => null,
-                1 => $this->value[0],
-                default => $this->value,
-            };
+        if ($index === null) {
+            return $this->isList
+                ? $this->value
+                : match ($this->count()) {
+                    0 => null,
+                    1 => $this->value[0],
+                    default => $this->value,
+                };
+        } else {
+            return $this->value[$index] ?? null;
+        }
     }
 
     /**

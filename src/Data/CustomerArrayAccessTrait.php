@@ -11,6 +11,8 @@ namespace Siel\Acumulus\Data;
  * This trait overrides
  * {@see \Siel\Acumulus\Data\AcumulusObjectArrayAccessTrait::getOffsetMappings()}.
  *
+ * @legacy: ArrayAccess is implemented on all {@See \Siel\Acumulus\Data\AcumulusObject}s
+ *   to allow legacy code to access the objects like arrays.
  */
 trait CustomerArrayAccessTrait
 {

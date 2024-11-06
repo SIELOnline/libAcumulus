@@ -79,8 +79,8 @@ class AcumulusRequest
     /**
      * Returns the uri and submit structure as a loggable string.
      *
-     * - We use json_encode() to turn submit into a string, so we may use it,
-     *   e.g, to create test input.
+     * - We use json_encode() to turn submit into a string, so we may use it to create
+     *   test input.
      * - We mask all values that have 'password' in their key, so we can safely
      *   log it.
      */

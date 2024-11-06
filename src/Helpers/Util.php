@@ -23,7 +23,6 @@ use function is_bool;
 use function is_int;
 use function is_string;
 use function sprintf;
-use function strlen;
 
 /**
  * Class Util offers some utility functions:
@@ -173,13 +172,14 @@ class Util
      * @throws \JsonException
      *   The parameter is not an object or array or an error occurred during
      *   conversion.
-     *
-     * @todo: extract Json class with stricter error handling and common flags and that
-     *   throws AcumulusException??.
      */
     public function convertToJson(object|array $objectOrArray): string
     {
-        return json_encode($objectOrArray, Meta::JsonFlags);
+        try {
+            return json_encode($objectOrArray, Meta::JsonFlags);
+        } catch (\JsonException $e) {
+            throw new AcumulusException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -196,9 +196,6 @@ class Util
      *   - The $json string is not valid JSON.
      *   - The $json string could not be converted to an (associative) array
      *     because it is either not an object, or it is too deep.
-     *
-     * @todo: extract Json class with stricter error handling and common flags and that
-     *    throws AcumulusException??.
      */
     public function convertJsonToArray(string $json): array
     {
@@ -207,25 +204,6 @@ class Util
             throw new AcumulusException('Not a JSON array');
         }
         return $result;
-    }
-
-    /**
-     * Checks if a string, typically an HTTP response, is an HTML string.
-     *
-     * @param string $response
-     *
-     * @return bool
-     *   True if the response is HTML, false otherwise.
-     *
-     * @noinspection PhpUnused @todo: is this indeed no longer used?
-     */
-    public function isHtmlResponse(string $response): bool
-    {
-        // @todo: PHP 8 str_starts_with()
-        /** @noinspection SubStrUsedAsStrPosInspection */
-        return strtolower(substr($response, 0, strlen('<!doctype html'))) === '<!doctype html'
-            || strtolower(substr($response, 0, strlen('<html'))) === '<html'
-            || strtolower(substr($response, 0, strlen('<body'))) === '<body';
     }
 
     /**
@@ -327,7 +305,7 @@ class Util
         // Mask all values that have 'password' in their tag.
         // @todo: use back reference in closing tag, but test it (is this still used, is it tested?)
         return preg_replace(
-            '|<([a-z]*)password>.*</[a-z]*password>|s',
+            '|<([a-z]*)password>.*</\1password>|s',
             '<$1password>REMOVED FOR SECURITY</$1password>',
             $subject
         );

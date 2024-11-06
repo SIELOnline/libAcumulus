@@ -13,7 +13,7 @@ use Siel\Acumulus\Helpers\Container;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\FormRenderer;
-use Siel\Acumulus\Tests\Unit\GetTestData;
+use Siel\Acumulus\Tests\Data\GetTestData;
 
 /**
  * Tests for the {@see FieldExpander} class.
@@ -47,7 +47,7 @@ class FieldExpanderTest extends TestCase
      */
     private function getTestDataPropertySources(): PropertySources
     {
-        $testData = (new GetTestData())->get();
+        $testData = (new GetTestData())->getJson();
         $result = $this->createPropertySources();
         foreach ($testData as $name => $data) {
             $result->add($name, $data);

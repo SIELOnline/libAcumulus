@@ -540,9 +540,6 @@ class AcumulusResult extends MessageCollection
     }
 
     /**
-     * @param string $mainResponseKey
-     * @param bool $isList
-     *
      * @return $this
      */
     public function setMainAcumulusResponseKey(string $mainResponseKey, bool $isList = false): AcumulusResult
@@ -582,8 +579,6 @@ class AcumulusResult extends MessageCollection
             // Not set: probably an error occurred. This object offers ways
             // to discover so. Therefore, we return an empty list if it
             // should have been a list.
-            // @todo: we loose access to any additional error information...
-            /** @noinspection NestedPositiveIfStatementsInspection */
             if ($this->isList) {
                 $response = [];
             }
@@ -600,7 +595,7 @@ class AcumulusResult extends MessageCollection
      *   - An array of API messages.
      *
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity}::... constants.
      */
     protected function addApiMessages(array $apiMessages, int $severity): void
     {
@@ -621,42 +616,23 @@ class AcumulusResult extends MessageCollection
      */
     public function isNotFound(): bool
     {
-        // This is ugly, but the alternative is to spread this code knowledge
-        // over the calling code, which is inevitable for other errors, but the
-        // "not found" is the most common error and should be easy to recognise
-        // on the calling side.
+        // This is a bit ugly, but the alternative is to spread this code knowledge over
+        // the calling code, which is inevitable for other errors, but the "not found" is
+        // the most common error, and in some cases it is not an error in the first place,
+        // and should be easy to recognise on the calling side.
         $result = false;
         if ($this->hasError())
         {
             if ($this->getHttpResponse()->getHttpStatusCode() === 404) {
                 $result = true;
             } elseif ($this->getHttpResponse()->getHttpStatusCode() === 400) {
-                switch ($this->mainAcumulusResponseKey) {
-                    case 'entry':
-                        // Get entry, set delete status.
-                        // Search is on entry id.
-                        $result = $this->getByCodeTag('BK07TG65N') !== null;
-                        break;
-                    case 'invoice':
-                        // Email as PDF, get/set payment status
-                        // Search is on token.
-                        $result = $this->getByCodeTag('7CFBA8K') !== null || $this->getByCodeTag('AAB6C3AA') !== null;
-                        break;
-                    case 'concept':
-                        // Concept info
-                        // Search is on concept id.
-                        $result = $this->getByCodeTag('FGY040XX') !== null;
-                        break;
-                    case 'stock':
-                        // Stock add
-                        // Search is on product id.
-                        // @todo: get the tag for this case
-                        $result = $this->getByCodeTag('@todo') !== null;
-                        break;
-                    case '':
-                    default:
-                        // Unknown, not yet set: we don't know: return false;
-                }
+                $result = match ($this->mainAcumulusResponseKey) {
+                    'entry' => $this->getByCodeTag('BK07TG65N') !== null,
+                    'invoice' => $this->getByCodeTag('7CFBA8K') !== null || $this->getByCodeTag('AAB6C3AA') !== null,
+                    'concept' => $this->getByCodeTag('FGY040XX') !== null,
+                    'stock' => $this->getByCodeTag('@todo') !== null,
+                    default => false,
+                };
             }
         }
         return $result;

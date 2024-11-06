@@ -15,7 +15,7 @@ use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tests\Unit\GetTestData;
+use Siel\Acumulus\Tests\Data\GetTestData;
 
 /**
  * CollectorManagerTest test the CollectorManager and the various collectors
@@ -27,7 +27,7 @@ class CollectorManagerTest extends TestCase
 
     private function getInvoiceSource(): Source
     {
-        $objects = (new GetTestData())->get();
+        $objects = (new GetTestData())->getJson();
         $order = $objects->order;
         return $this->getContainer()->createSource(Source::Order, $order);
     }

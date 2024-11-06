@@ -19,7 +19,7 @@ use Siel\Acumulus\Shop\RegisterForm;
 use Siel\Acumulus\Shop\SettingsForm;
 use Siel\Acumulus\Tests\AcumulusTestUtils;
 
-use Siel\Acumulus\Tests\Unit\GetTestData;
+use Siel\Acumulus\Tests\Data\GetTestData;
 
 use function dirname;
 
@@ -49,7 +49,7 @@ class FormTest extends TestCase
 
     private function getInvoiceSource(): Source
     {
-        $objects = (new GetTestData())->get();
+        $objects = (new GetTestData())->getJson();
         $order = $objects->order;
         return $this->getAcumulusContainer()->createSource(Source::Order, $order);
     }

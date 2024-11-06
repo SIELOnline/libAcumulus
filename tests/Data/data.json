@@ -51,23 +51,23 @@
         "last_name": "Derksen",
         "email": "customer@example.com",
         "telephone": "0123456789",
-        "mobile": "+33612345978"
-    },
-    "invoice_address": {
-        "id": 4,
-        "street": "Lindelaan 4",
-        "street2": "Achter de Linden",
-        "postal_code": "1234 AB",
-        "city": "Utrecht",
-        "country_code": "NL"
-    },
-    "shipping_address": {
-        "id": 5,
-        "street": "Lindelaan 5",
-        "street2": "Achter den Linden",
-        "postal_code": "1234 AB",
-        "city": "Utrecht",
-        "country_code": "NL"
+        "mobile": "+33612345978",
+        "invoice_address": {
+            "id": 4,
+            "street": "Lindelaan 4",
+            "street2": "Achter de Linden",
+            "postal_code": "1234 AB",
+            "city": "Utrecht",
+            "country_code": "NL"
+        },
+        "shipping_address": {
+            "id": 5,
+            "street": "Lindelaan 5",
+            "street2": "Achter den Linden",
+            "postal_code": "1234 AB",
+            "city": "Utrecht",
+            "country_code": "NL"
+        }
     },
     "address": {
         "id": 5,

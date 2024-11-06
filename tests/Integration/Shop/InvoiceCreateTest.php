@@ -11,7 +11,7 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Tests\Unit\GetTestData;
+use Siel\Acumulus\Tests\Data\GetTestData;
 
 /**
  * SendInvoiceTest tests the process of creation and sending process.
@@ -34,7 +34,7 @@ class InvoiceCreateTest extends TestCase
 
     private function getInvoiceSource(): Source
     {
-        $objects = (new GetTestData())->get();
+        $objects = (new GetTestData())->getJson();
         $order = $objects->order;
         return $this->getContainer()->createSource(Source::Order, $order);
     }

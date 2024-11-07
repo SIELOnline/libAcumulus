@@ -265,7 +265,7 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function getPicklistProducts(?string $filter = null, ?int $productTagId = null, ?int $offset = null, ?int $rowcount = null): AcumulusResult
+    public function getPicklistProducts(?string $filter = null, ?int $offset = null, ?int $rowcount = null, ?int $productTagId = null): AcumulusResult
     {
         $filters = [];
         if ($filter !== null) {
@@ -701,7 +701,7 @@ class Acumulus
      * @param float $quantity
      *   The quantity to update the actual stock with. Use a positive number for
      *   an increase in stock (typically with a return), a negative number for a
-     *   decrease of stock (typically with an order).
+     *   decrease of stock (typically with an order). Allows for 2 digits.
      * @param string $description
      *   The description to store with the stock update. Ideally, this field
      *   should identify the system and transaction that triggered the update
@@ -713,13 +713,13 @@ class Acumulus
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "stock" array, being a keyed array with keys:
-     * - 'productid'
+     *   - 'productid'
      *   - stockamount (the new stock level for this product)
      *   Possible errors:
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function stockAdd(int $productId, float $quantity, string $description, string $date = null): AcumulusResult
+    public function stockMutation(int $productId, float $quantity, string $description, string $date = null): AcumulusResult
     {
         if (empty($date)) {
             $date = date(Api::DateFormat_Iso);

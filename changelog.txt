@@ -18,6 +18,8 @@ Testing:
 - Added integration tests for our forms (creation, field definitions and rendering). This
   should help preventing bugs like [SIEL #235459].
 
+Refactorings:
+- Basic submit structure now created and collected as an AcumulusObject.
 
 8.3.5 (2024-11-01) (WC) (actually: all shops that use our own form renderer)
 -----------------------

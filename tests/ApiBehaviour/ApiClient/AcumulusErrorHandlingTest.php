@@ -197,6 +197,17 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
     }
 
+    public function testProductNotfound(): void
+    {
+        $result = $this->acumulusClient->stockMutation(123, -2, 'Bestelling 123');
+        $this->assertTrue($result->hasError());
+        $this->assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
+        $this->assertNotNull($result->getByCode(404));
+        $this->assertCount(2, $this->log->getLoggedMessages());
+        $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
+        $this->assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
+    }
+
     public function testEmptyPicklistProducts(): void
     {
         $result = $this->acumulusClient->getPicklistProducts('This will not match any product');

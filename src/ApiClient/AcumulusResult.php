@@ -630,7 +630,7 @@ class AcumulusResult extends MessageCollection
                     'entry' => $this->getByCodeTag('BK07TG65N') !== null,
                     'invoice' => $this->getByCodeTag('7CFBA8K') !== null || $this->getByCodeTag('AAB6C3AA') !== null,
                     'concept' => $this->getByCodeTag('FGY040XX') !== null,
-                    'stock' => $this->getByCodeTag('@todo') !== null,
+                    //'stock' => $this->getByCodeTag('AA5B85AA') !== null, // Stock error returns a 404
                     default => false,
                 };
             }

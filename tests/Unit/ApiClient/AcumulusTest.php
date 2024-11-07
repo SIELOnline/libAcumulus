@@ -63,8 +63,8 @@ class AcumulusTest extends TestCase
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], 'picklists/picklist_invoicetemplates', true, []],
             'Products' => ['getPicklistProducts', [], 'picklists/picklist_products', true, []],
             'ProductsFilter' => ['getPicklistProducts', ['test'], 'picklists/picklist_products', true, ['filter' => 'test']],
-            'ProductsTag' => ['getPicklistProducts', [null, 0], 'picklists/picklist_products', true, ['producttagid' => 0]],
-            'ProductsSegment' => ['getPicklistProducts', [null, null, 40, 10], 'picklists/picklist_products', true, ['offset' => 40, 'rowcount' => 10]],
+            'ProductsTag' => ['getPicklistProducts', [null, null, null, 0], 'picklists/picklist_products', true, ['producttagid' => 0]],
+            'ProductsSegment' => ['getPicklistProducts', [null, 40, 10], 'picklists/picklist_products', true, ['offset' => 40, 'rowcount' => 10]],
             'VatInfo' => ['getVatInfo', ['nl'], 'lookups/lookup_vatinfo', true, ['vatcountry' => 'nl', 'vatdate' => date(Api::DateFormat_Iso)]],
             'EuThreshold' => ['reportThresholdEuCommerce', [], 'reports/report_threshold_eu_ecommerce', true, []],
             'EuThresholdYear' => ['reportThresholdEuCommerce', [2021], 'reports/report_threshold_eu_ecommerce', true, ['year' => 2021]],
@@ -80,7 +80,7 @@ class AcumulusTest extends TestCase
             'emailInvoiceNotes' => ['emailInvoiceAsPdf', ['TOKEN', $emailInvoiceAsPdf, null, 'my notes'], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailTo' => 'test@example.com'], 'invoicenotes' => 'my notes']],
             'emailPackingSlip' => ['emailPackingSlipAsPdf', ['TOKEN', $emailPackingslipAsPdf], 'delivery/packing_slip_mail_pdf', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailTo' => 'test@example.com']]],
             'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, ['signup' => ['companyname' => 'BR']]],
-            'stockAdd' => ['stockAdd', [12345, 1, 'description', '2022-02-02'], 'stock/stock_add', true, ['stock' => ['productid' => 12345, 'stockamount' => 1, 'stockdescription' => 'description', 'stockdate' => '2022-02-02']]],
+            'stockMutation' => ['stockMutation', [12345, 1, 'description', '2022-02-02'], 'stock/stock_add', true, ['stock' => ['productid' => 12345, 'stockamount' => 1, 'stockdescription' => 'description', 'stockdate' => '2022-02-02']]],
         ];
     }
 

@@ -222,7 +222,7 @@ class AcumulusTest extends TestCase
         $this->assertEquals(10000, $threshold);
     }
 
-    public function stockAddProvider(): array
+    public function stockMutationProvider(): array
     {
         $productId = 1833636;
         return [ // $productId, $quantity, $description, $date
@@ -232,11 +232,11 @@ class AcumulusTest extends TestCase
     }
 
     /**
-     * @dataProvider stockAddProvider
+     * @dataProvider stockMutationProvider
      */
-    public function testStockAdd(array $args, array $expected): void
+    public function testStockMutation(array $args, array $expected): void
     {
-        $result = $this->acumulusClient->stockAdd(... $args);
+        $result = $this->acumulusClient->stockMutation(... $args);
 
         $this->assertSame(Severity::Success, $result->getStatus());
         $actual = $result->getMainAcumulusResponse();

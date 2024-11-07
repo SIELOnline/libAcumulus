@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\Address;
+use Siel\Acumulus\Data\BasicSubmit;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdf;
@@ -139,5 +140,19 @@ class CollectorManager
         /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */
         $emailAsPdf = $emailAsPdfCollector->collect($this->getPropertySources(), $emailAsPdfMappings);
         return $emailAsPdf;
+    }
+
+    public function collectBasicSubmit(): BasicSubmit
+    {
+        $this->getPropertySources()
+            ->add('config', $this->getContainer()->getConfig())
+            ->add('environment', $this->getContainer()->getEnvironment()->get());
+        /** @var \Siel\Acumulus\Collectors\BasicSubmitCollector $basicSubmitCollector */
+        $basicSubmitCollector = $this->getContainer()->getCollector(DataType::BasicSubmit);
+        $basicSubmitMappings = $this->getMappings()->getFor(DataType::BasicSubmit);
+        /** @var \Siel\Acumulus\Data\BasicSubmit $basicSubmit */
+        $basicSubmit = $basicSubmitCollector->collect($this->getPropertySources(), $basicSubmitMappings);
+        $this->getPropertySources()->remove('environment')->remove('config');
+        return $basicSubmit;
     }
 }

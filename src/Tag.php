@@ -13,6 +13,16 @@ namespace Siel\Acumulus;
  * Tag defines string constants for the tags used in the Acumulus API messages.
  *
  * Mainly the tags used in the invoice-add and signup api call are added here.
+ *
+ * @legacy: replace by {@see Fld}. Usages:
+ *   - Legacy code: as array keys
+ *   - Config groups (easy to change)
+ *   - Config keys (relatively easy to change: needs upgrade and change to Config::get())
+ *     and thus forms (register and setting)
+ *   - Metadata (Meta::RecalculatePrice), Meta::FieldsCalculated
+ *   - Tests (including testdata)
+ *   - ...  other uses
+ *   - Currently 476 uses (442 static member access; 34 imports)
  */
 interface Tag
 {

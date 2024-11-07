@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Siel\Acumulus\ApiClient;
 
 use RuntimeException;
-use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
+use Siel\Acumulus\Data\BasicSubmit;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Util;
@@ -33,7 +32,6 @@ use function sprintf;
 class AcumulusRequest
 {
     protected Container $container;
-    protected Config $config;
     protected Environment $environment;
     protected Util $util;
     protected string $userLanguage;
@@ -41,10 +39,9 @@ class AcumulusRequest
     protected ?array $submit = null;
     protected ?HttpRequest $httpRequest = null;
 
-    public function __construct(Container $container, Config $config, Environment $environment, Util $util, string $userLanguage)
+    public function __construct(Container $container, Environment $environment, Util $util, string $userLanguage)
     {
         $this->container = $container;
-        $this->config = $config;
         $this->environment = $environment;
         $this->util = $util;
         $this->userLanguage = $userLanguage;
@@ -228,8 +225,9 @@ class AcumulusRequest
      */
     protected function constructFullSubmit(array $submit, bool $needContract): array
     {
-        $basicSubmit = $this->getBasicSubmit($needContract);
-        return array_merge($basicSubmit, $submit);
+        $basicSubmit = $this->getBasicSubmit();
+        $basicSubmit->needContract = $needContract;
+        return array_merge($basicSubmit->toArray(), $submit);
     }
 
     /**
@@ -237,57 +235,9 @@ class AcumulusRequest
      *
      * The basic submit part is defined at
      * {@link https://www.siel.nl/acumulus/API/Basic_Submit/}
-     * and consists of the following tags:
-     * - 'contract' (optional): authentication and authorisation credentials. It
-     *   will have the following child tags:
-     *   - 'contractcode'
-     *   - 'user'
-     *   - 'password'
-     *   - 'emailonerror' : 'plugins@siel.nl'     (the server won't send e-mails
-     *   - 'emailonwarning' : 'plugins@siel.nl'    on error or warnings)
-     * - 'format': 'json' or 'xml'.
-     * - 'testmode': 0 (real) or 1 (test mode).
-     * - 'lang': Language for error and warning in responses.
-     * - 'inodes' (ignored): List of ";"-separated XML-node identifiers which
-     *   should be included in the response. Defaults to full response when left
-     *   out or empty.
-     * - 'connector': information about the client software.
-     *
-     * @param bool $needContract
-     *   Indicates whether this api function needs the contract details. Most
-     *   API functions do, so the default is true, but for some general listing
-     *   functions, like vat info, it is optional, and for sign-up it is even
-     *   not allowed.
-     *
-     * @return array
-     *   The basic submit part of an API message.
-     *
-     * @todo: convert basic submit to (Acumulus)Object.
      */
-    protected function getBasicSubmit(bool $needContract): array
+    protected function getBasicSubmit(): BasicSubmit
     {
-        $environment = $this->environment->get();
-        $pluginSettings = $this->config->getPluginSettings();
-
-        $result = [];
-        if ($needContract) {
-            $result['contract'] = ['emailonerror' => 'plugins@siel.nl', 'emailonwarning' => 'plugins@siel.nl']
-                + $this->config->getCredentials();
-        }
-        $result += [
-            'format' => $pluginSettings['outputFormat'],
-            'testmode' => $pluginSettings['debug'] === Config::Send_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
-            'lang' => $this->userLanguage,
-            'connector' => [
-                'application' => "{$environment['shopName']} {$environment['shopVersion']}" .
-                    (!empty($environment['cmsName']) ? " {$environment['cmsName']} {$environment['cmsVersion']}" : ''),
-                'webkoppel' => "Acumulus {$environment['moduleVersion']}",
-                'development' => 'SIEL - Buro RaDer',
-                'remark' => "Library {$environment['libraryVersion']} - PHP {$environment['phpVersion']}",
-                'sourceuri' => 'https://github.com/SIELOnline/libAcumulus',
-            ],
-        ];
-
-        return $result;
+        return $this->container->getCollectorManager()->collectBasicSubmit();
     }
 }

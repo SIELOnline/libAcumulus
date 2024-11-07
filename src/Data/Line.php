@@ -11,11 +11,6 @@ use Siel\Acumulus\Meta;
 /**
  * Represents an invoice line object of an Acumulus API invoice object.
  *
- * Field names are copied from the API, though capitals are introduced for
- * readability and to prevent PhpStorm typo inspections.
- *
- * Metadata can be added via the {@see MetadataCollection} methods.
- *
  * @property ?string $itemNumber
  * @property ?string $product
  * @property ?string $nature

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Config;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
@@ -246,6 +247,26 @@ class Mappings
 //                Meta::VatClassName => '[product::getVatClassName()]',
                 Meta::Id => '[item::getId()]',
                 Meta::ProductId => '[product::getId()]',
+            ],
+            DataType::BasicSubmit => [
+                Fld::Format => Api::Format_Json,
+                Fld::Lang => '[environment::language]',
+            ],
+            DataType::Contract => [
+                Fld::ContractCode => '[config::get(' . Fld::ContractCode . ')]',
+                Fld::UserName => '[config::get(' . Fld::UserName . ')]',
+                Fld::Password => '[config::get(' . Fld::Password . ')]',
+                // We don't let Acumulus send e-mails anymore, we do that ourselves.
+                //Fld::EmailOnError => '[config::get(' . Fld::EmailOnError . ')]',
+                Fld::EmailOnError => 'plugins@siel.nl',
+                Fld::EmailOnWarning => 'plugins@siel.nl',
+            ],
+            DataType::Connector => [
+                Fld::Application => '[environment::shopName+environment::shopVersion+"("&environment::cmsName+environment::cmsName&")"]',
+                Fld::WebKoppel => '["Acumulus"+environment::moduleVersion]',
+                Fld::Development => 'SIEL - Buro RaDer',
+                Fld::Remark => '["Library"+environment::libraryVersion+"- PHP"+environment::phpVersion]',
+                Fld::SourceUri => 'https://github.com/SIELOnline/libAcumulus',
             ],
         ];
     }

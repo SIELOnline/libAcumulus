@@ -53,6 +53,11 @@ use function strlen;
  * - The (magic) setters and the {@see set()} method accept an optional flag
  *   that defines how to handle overwriting already set values and if to set
  *   empty values.
+ *
+ * Field names on the child classes are copied from the API, though capitals are
+ * introduced for readability and to prevent PhpStorm typo inspections.
+ *
+ * Metadata can be added via the {@see MetadataCollection} methods.
  */
 abstract class AcumulusObject implements ArrayAccess
 {

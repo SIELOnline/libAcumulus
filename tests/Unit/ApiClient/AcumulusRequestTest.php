@@ -57,7 +57,7 @@ class AcumulusRequestTest extends TestCase
         $this->assertSame($uri, $this->acumulusRequest->getUri());
         $fullSubmit = $this->acumulusRequest->getSubmit();
         $this->assertArrayHasKey('format', $fullSubmit);
-        $this->assertArrayHasKey('testmode', $fullSubmit);
+        $this->assertArrayHasKey('testMode', $fullSubmit);
         $this->assertArrayHasKey('lang', $fullSubmit);
         $this->assertArrayHasKey('connector', $fullSubmit);
         $this->assertEqualsCanonicalizing(

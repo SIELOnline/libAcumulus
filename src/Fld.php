@@ -16,6 +16,7 @@ namespace Siel\Acumulus;
  */
 interface Fld
 {
+    public const Connector = 'connector';
     public const Contract = 'contract';
     public const Customer = 'customer';
     public const Invoice = 'invoice';
@@ -26,6 +27,17 @@ interface Fld
     public const Password = 'password';
     public const EmailOnError = 'emailOnError';
     public const EmailOnWarning = 'emailOnWarning';
+    public const Application = 'application';
+    public const Format = 'format';
+    public const TestMode = 'testMode';
+    public const Lang = 'lang';
+    public const INodes = 'iNodes';
+    public const ONodes = 'oNodes';
+    public const Order = 'order';
+    public const WebKoppel = 'webKoppel';
+    public const Development = 'development';
+    public const Remark = 'remark';
+    public const SourceUri = 'sourceUri';
 
     public const Type = 'type';
     public const VatTypeId = 'vatTypeId';

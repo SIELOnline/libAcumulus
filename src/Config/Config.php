@@ -26,7 +26,6 @@ use function is_float;
 use function is_int;
 use function is_string;
 
-
 use const Siel\Acumulus\Version;
 
 /**
@@ -38,6 +37,10 @@ use const Siel\Acumulus\Version;
  * @todo: New settings:
  *   - EmailAsPdf: gfx
  *   - Invoice: concept type???
+ * @error: update Tag::... to Fld::...
+ *   - Usage in the code
+ *   - Update function in ConfigUpgrade
+ *   - Quick win for now: Let get check for lowercase version as well
  *
  * @noinspection PhpLackOfCohesionInspection
  */
@@ -345,17 +348,19 @@ class Config
      * Returns the value of the specified configuration value.
      *
      * @param string $key
-     *   The requested configuration value
+     *   The requested configuration value. Due to the conversion from {@see Tag}::...
+     *   constants to {@see Fld}::... constants, existence of the key is also checked in
+     *   its all-lowercase version.
      *
      * @return mixed
      *   The value of the given configuration value or null if not defined. This
-     *   will be a simple type (string, int, bool) or a keyed array with simple
+     *   will be a scalar type (string, int, bool) or a keyed array with scalar
      *   values.
      */
     public function get(string $key): mixed
     {
         $this->load();
-        return $this->values[$key] ?? null;
+        return $this->values[$key] ?? $this->values[strtolower($key)] ?? null;
     }
 
     /**
@@ -654,6 +659,7 @@ class Config
                     'type' => 'int',
                     'default' => Severity::Notice,
                 ],
+                /** @deprecated  */
                 'outputFormat' => [
                     'group' => 'plugin',
                     'type' => 'string',

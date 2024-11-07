@@ -43,9 +43,17 @@ interface Api
     public const baseUri = 'https://api.sielsystems.nl/acumulus';
     public const apiVersion = 'stable';
     public const apiVersionTest = 'dev';
+    /** @deprecated use Api::Format_Json */
     public const outputFormat = 'json';
 
     // API related constants.
+    public const Format_Json = 'json';
+    public const Format_Xml = 'xml';
+    public const Lang_EN = 'en';
+    public const Lang_NL = 'nl';
+    public const INodes_None = 'NONE';
+    public const Order_Default = 'def';
+    public const Order_Inverted = 'inv';
     public const TestMode_Normal = 0;
     public const TestMode_Test = 1;
 

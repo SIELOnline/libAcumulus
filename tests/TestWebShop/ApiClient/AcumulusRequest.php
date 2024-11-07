@@ -5,20 +5,21 @@ declare(strict_types=1);
 namespace Siel\Acumulus\TestWebShop\ApiClient;
 
 use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
+use Siel\Acumulus\Data\BasicSubmit;
 
 /**
  * AcumulusRequest extends the real AcumulusRequest with testing functionality.
  */
 class AcumulusRequest extends BaseAcumulusRequest
 {
-    protected function getBasicSubmit(bool $needContract): array
+    protected function getBasicSubmit(): BasicSubmit
     {
-        $result = parent::getBasicSubmit($needContract);
-        if (strpos($this->uri, 'entry/noemailonerror') !== false) {
+        $result = parent::getBasicSubmit();
+        if (str_contains($this->uri, 'entry/noemailonerror')) {
             $this->uri = str_replace('entry/noemailonerror', 'entry/entry_info', $this->uri);
             unset($result['contract']['emailonerror'], $result['contract']['emailonwarning']);
         }
-        if (strpos($this->uri, 'entry/noemailonwarning') !== false) {
+        if (str_contains($this->uri, 'entry/noemailonwarning')) {
             $this->uri = str_replace('entry/noemailonwarning', 'entry/entry_info', $this->uri);
             unset($result['contract']['emailonwarning']);
         }
@@ -28,7 +29,7 @@ class AcumulusRequest extends BaseAcumulusRequest
     protected function getCurlOptions(): array
     {
         $options =  parent::getCurlOptions();
-        if (strpos($this->uri, 'entry/timeout') !== false) {
+        if (str_contains($this->uri, 'entry/timeout')) {
             $this->uri = str_replace('entry/timeout', 'entry/entry_info', $this->uri);
             $options[CURLOPT_CONNECTTIMEOUT_MS] = 1;
             $options[CURLOPT_TIMEOUT_MS] = 1;

@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
+use Siel\Acumulus\Data\BasicSubmit;
+use Siel\Acumulus\Data\Connector;
+use Siel\Acumulus\Data\Contract;
 use Siel\Acumulus\Tag;
 
 /**
@@ -15,36 +18,36 @@ use Siel\Acumulus\Tag;
  */
 class ApiRequestResponseExamples
 {
-    private function getContract(): array
+    private function getContract(): Contract
     {
-        return [
-            'contract' => [
-                'contractcode' => '288252',
-                'username' => 'APIGebruiker12345',
-                'password' => 'mysecret',
-                'emailonerror' => 'erwin@burorader.com',
-                'emailonwarning' => 'erwin@burorader.com',
-            ],
-        ];
+        $contract = new Contract();
+        $contract->contractCode = '123456';
+        $contract->userName = 'User123456';
+        $contract->password = 'mysecret';
+        $contract->emailOnError = 'test@example.com';
+        $contract->emailOnWarning = 'test@example.com';
+        return $contract;
     }
 
-    public function getBasicSubmit(bool $needContract): array
+    private function getConnector(): Connector
     {
-        $submit = [
-            'format' => 'json',
-            'testmode' => '0',
-            'lang' => 'nl',
-            'connector' => [
-                'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
-                'webkoppel' => 'Acumulus 5.9.0',
-                'development' => 'SIEL - Buro RaDer',
-                'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
-                'sourceuri' => 'https://www.siel.nl/',
-            ],
-        ];
-        if ($needContract) {
-            $submit = $this->getContract() + $submit;
-        }
+        $connector = new Connector();
+        $connector->application = 'WooCommerce 4.0.1 (WordPress: 5.4)';
+        $connector->webKoppel = 'Acumulus 5.9.0';
+        $connector->development = 'SIEL - Buro RaDer';
+        $connector->remark = 'Library 5.10.0-alpha1 - PHP 7.1.33';
+        $connector->sourceUri = 'https://www.siel.nl/';
+        return $connector;
+    }
+
+    public function getBasicSubmit(): BasicSubmit
+    {
+        $submit = new BasicSubmit();
+        $submit->format = 'json';
+        $submit->testMode = '0';
+        $submit->lang = 'nl';
+        $submit->setContract($this->getContract());
+        $submit->setConnector($this->getConnector());
         return $submit;
     }
 

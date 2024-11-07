@@ -390,7 +390,7 @@ class Container
         return $this->getInstance(
             'AcumulusRequest',
             'ApiClient',
-            [$this, $this->getConfig(), $this->getEnvironment(), $this->getUtil(), $this->getLanguage()],
+            [$this, $this->getEnvironment(), $this->getUtil(), $this->getLanguage()],
             true
         );
     }
@@ -637,7 +637,7 @@ class Container
 
     public function getEnvironment(): Environment
     {
-        return $this->getInstance('Environment', 'Config', [$this->shopNamespace]);
+        return $this->getInstance('Environment', 'Config', [$this->getShopNamespace(), $this->getLanguage()]);
     }
 
     public function getConfig(): Config

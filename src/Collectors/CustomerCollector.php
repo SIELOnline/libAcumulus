@@ -79,7 +79,6 @@ class CustomerCollector extends Collector
         return $address;
     }
 
-
     /**
      * @param \Siel\Acumulus\Data\Customer $acumulusObject
      */

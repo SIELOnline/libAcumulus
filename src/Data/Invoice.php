@@ -26,10 +26,6 @@ use Siel\Acumulus\Meta;
  *   of the 2nd address being prefixed with 'alt'. In decoupling this in the
  *   collector phase, we allow users to relate the 1st and 2 nd address to the
  *   invoice or shipping address as they like.
- * - Field names are copied from the API, though capitals are introduced for
- *   readability and to prevent PhpStorm typo inspections.
- *
- * Metadata can be added via the {@see MetadataCollection} methods.
  *
  * @property ?bool $concept
  * @property ?string $conceptType

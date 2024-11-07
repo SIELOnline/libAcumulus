@@ -6,3 +6,6 @@
 composer.lock
 /vendor/
 /zremoved/
+
+# Test data are committed, but not the *.latest.html files
+/tests/Data/*.latest.*

@@ -24,10 +24,12 @@ abstract class Environment
 
     protected array $data = [];
     protected string $shopNamespace;
+    protected string $language;
 
-    public function __construct(string $shopNamespace)
+    public function __construct(string $shopNamespace, string $language)
     {
         $this->shopNamespace = $shopNamespace;
+        $this->language = $language;
     }
 
     /**
@@ -60,6 +62,8 @@ abstract class Environment
         $this->data['cmsName'] = '';
         $this->data['cmsVersion'] = '';
         $this->data['supportEmail'] = strtolower(rtrim($this->data['shopName'], '0123456789')) . '@acumulus.nl';
+        $this->data['language'] = $this->language;
+        $this->setShopEnvironment();
         $this->setShopEnvironment();
     }
 

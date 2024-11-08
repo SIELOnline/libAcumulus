@@ -8,6 +8,7 @@ use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 use WC_Order_Item_Product;
@@ -64,6 +65,13 @@ class ItemLineCollector extends LineCollector
         // with free products or an amount but without a quantity.
         $quantity = (float) $shopItem->get_quantity();
         $total = (float) $shopItem->get_total();
+        if (Number::isZero($quantity) && Number::isZero($total)) {
+            $line->metadataSet(Meta::DoNotAdd, true);
+            return;
+        }
+        if (Number::isZero($quantity)) {
+            $quantity = 1.0;
+        }
 
         // Add price info. get_total() and get_taxes() return line totals after
         // discount. get_taxes() returns non-rounded tax amounts per tax class

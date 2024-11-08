@@ -7,6 +7,10 @@ This file contains a historical overview of changes in our own code.
 8.3.6 (2024-1?-??)
 ------------------
 Bugs:
+- WC: Division by zero in WooCommerce/Collectors/ItemLineCollector.php:72
+- ALL: TypeError: Siel\Acumulus\Helpers\FormRenderer::addAttribute(): Argument #3 ($value)
+  must be of type array|string|bool|null, int given, called in Helpers/FormRenderer.php on
+  line 427 and defined in Helpers/FormRenderer.php:712.
 - Form rendering: we encountered some:
   - Violations against the HTML specifications
   - Missing id attributes on <fieldset>s, <summary>s, and on the wrapper around radio
@@ -16,7 +20,7 @@ Bugs:
 
 Testing:
 - Added integration tests for our forms (creation, field definitions and rendering). This
-  should help preventing bugs like [SIEL #235459].
+  should help preventing bugs like the TypeError in the FormRenderer (see above).
 
 Refactorings:
 - Basic submit structure now created and collected as an AcumulusObject.

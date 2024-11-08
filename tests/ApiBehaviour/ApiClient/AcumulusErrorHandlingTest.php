@@ -13,6 +13,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusException;
 use Siel\Acumulus\ApiClient\AcumulusResponseException;
+use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Data\EmailInvoiceAsPdf;
 use Siel\Acumulus\Helpers\Container;
@@ -182,6 +183,16 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
+    }
+
+    public function testGetInvoicePdfInvalidToken(): void
+    {
+        $uri = $this->acumulusClient->getInvoicePdfUri(static::InvalidToken);
+        $httpRequest = new HttpRequest([CURLOPT_HTTPHEADER => ['Cache-Control: no-cache']]);
+        $response = $httpRequest->get($uri);
+
+        $this->assertSame(400, $response->getHttpStatusCode());
+        $this->assertStringContainsString('AA69CBAA', $response->getBody());
     }
 
     public function testEmailAsPdfInvalidToken(): void

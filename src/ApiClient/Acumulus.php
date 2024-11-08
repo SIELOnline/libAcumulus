@@ -751,10 +751,14 @@ class Acumulus
      *
      * @return string
      *   The uri to download the invoice PDF.
-     *   Possible errors (in download from the retunned uri, not in this
-     *   method's return value):
-     *   - PDFATNF04: Requested invoice for $token not found: $token does not
-     *     exist. @todo: check code tag.
+     *   Errors (in download from the retunned uri, not in this method's return value):
+     *   ```
+     *   <response><token>$$token</token>
+     *   <errors>
+     *       <error><code>400 Bad Request</code><codetag>AA69CBAA</codetag><message>Invalid token.</message></error>
+     *       <count_errors>1</count_errors>
+     *   </errors>
+     *   ```
      */
     public function getInvoicePdfUri(string $token, ?bool $reminder = null, ?bool $applyGraphics = null): string
     {

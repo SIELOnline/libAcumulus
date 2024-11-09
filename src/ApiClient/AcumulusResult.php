@@ -306,7 +306,7 @@ class AcumulusResult extends MessageCollection
     /**
      * Returns the format the contents should be in.
      *
-     * Expect one of the following values ot be returned:
+     * Expect one of the following values to be returned:
      * - 'json': If the 'format' tag was set to 'json' and we have a (domain
      *   level) response from the API server.
      * - 'xml': If 'format' was set to 'xml' and we have a (domain level)
@@ -318,8 +318,10 @@ class AcumulusResult extends MessageCollection
      */
     protected function getContentFormat(): string
     {
+        // Content type will look like "Content-Type: text/html; charset=utf-8" or just
+        // "Content-Type: text/html"
         $contentType = $this->getHttpContentType();
-        return preg_match('|[^/]+(/([^ ;]*))?|', $contentType, $matches) ? strtolower($matches[2]) : '';
+        return preg_match('|/([^ ;]*)|', $contentType, $matches) ? strtolower($matches[1]) : '';
     }
 
     /**

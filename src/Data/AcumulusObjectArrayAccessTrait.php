@@ -11,6 +11,8 @@ use RuntimeException;
 
 use function array_key_exists;
 use function is_array;
+use function is_string;
+use function sprintf;
 
 /**
  * Allows access to AcumulusObjects with array bracket syntax and Acumulus tags (all lower
@@ -183,11 +185,8 @@ trait AcumulusObjectArrayAccessTrait
      */
     private function checkOffset(mixed $offset): void
     {
-        if ($offset === null) {
-            throw new RuntimeException('Offset cannot be null');
-        }
-        if (is_numeric($offset)) {
-            throw new RuntimeException('Offset cannot be numeric');
+        if (!is_string($offset)) {
+            throw new RuntimeException(sprintf('Offset must be a string: %s given', get_debug_type($offset)));
         }
     }
 }

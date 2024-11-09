@@ -249,6 +249,7 @@ class Mappings
                 Meta::ProductId => '[product::getId()]',
             ],
             DataType::BasicSubmit => [
+                // This was in Config but was never configurable.
                 Fld::Format => Api::Format_Json,
                 Fld::Lang => '[environment::language]',
             ],

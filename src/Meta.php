@@ -19,9 +19,9 @@ namespace Siel\Acumulus;
  * though perhaps only under certain conditions,  e.g. when a vat rate is
  * missing.
  *
- * Meta tags start with 'meta-', except the tags 'unitpriceinc' and 'vatamount',
+ * Meta tags start with 'meta-', except the tags 'unitPriceInc' and 'vatAmount',
  * for which one could imagine that one day the Acumulus API would accept these
- * instead of 'unitprice' and 'vatrate'. With either choice, Acumulus can
+ * instead of 'unitPrice' and 'vatRate'. With either choice, Acumulus can
  * correctly process the invoice line.
  */
 interface Meta
@@ -113,17 +113,17 @@ interface Meta
      * Creator -> Completor/Strategy: Unit price inc vat (in addition to
      * unitpriceinc).
      */
-    public const UnitPriceInc = 'unitpriceinc';
+    public const UnitPriceInc = 'unitPriceInc';
     /**
      * Creator -> Completor/Strategy: Amount of vat (per unit) (in addition to
      * vatrate).
      */
-    public const VatAmount = 'vatamount';
+    public const VatAmount = 'vatAmount';
     /**
-     * Creator -> Completor/Strategy: How we got the vatrate (which source, or
+     * Creator -> Completor/Strategy: How we got the vat rate (which source, or
      * how we computed it).
      */
-    public const VatRateSource = 'meta-vatrate-source';
+    public const VatRateSource = 'meta-vat-rate-source';
     /**
      * The minimum vat rate in case we have to compute it using 2 non-exact
      * amounts.
@@ -141,17 +141,15 @@ interface Meta
     public const FieldsCalculated = 'meta-fields-calculated';
     /**
      * Instruction: if and what price to recalculate when the exact vat rate is known.
-     * Can be 'unitprice' or 'unitpriceinc' or not set.
-     * @todo: change from Tag::UnitPrice to Fld::UnitPrice in setting the field and when
-     *   recalculating.
+     * Can be 'unitprice' or 'unitPriceInc' or not set.
      */
     public const RecalculatePrice = 'meta-recalculate-price';
     /**
-     * Support: whether the unitprice(inc) has been recalculated.
+     * Support: whether the unit price(inc) has been recalculated.
      */
     public const RecalculatedPrice = 'meta-did-recalculate';
     /**
-     * Support: unitprice(inc) as it was before being recalculated.
+     * Support: unit price(inc) as it was before being recalculated.
      */
     public const RecalculateOldPrice = 'meta-recalculate-old-price';
     /**
@@ -197,17 +195,17 @@ interface Meta
 
     // Line: Line amounts related meta tags.
     /**
-     * Support: line amount ex vat, equals quantity * unitprice, but can have a
+     * Support: line amount ex vat, equals quantity * unit price, but can have a
      * higher precision.
      */
     public const LineAmount = 'meta-line-amount';
     /**
-     * Support: line amount inc vat, equals quantity * unitpriceinc, but can
+     * Support: line amount inc vat, equals quantity * unit price inc, but can
      * have a higher precision.
      */
     public const LineAmountInc = 'meta-line-amountinc';
     /**
-     * Support: line vat amount, equals quantity * vatamount, but can have a
+     * Support: line vat amount, equals quantity * vat amount, but can have a
      * higher precision.
      */
     public const LineVatAmount = 'meta-line-vatamount';

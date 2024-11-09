@@ -7,9 +7,9 @@ namespace Siel\Acumulus\WooCommerce\Collectors;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 use WC_Tax;
 
 use function count;
@@ -113,7 +113,7 @@ class ShippingLineCollector extends LineCollector
             $line->metadataSet(Meta::UnitPriceInc, $shippingInc);
             $line->metadataSet(Meta::PrecisionUnitPriceInc, 0.01);
             $line->metadataAdd(Meta::FieldsCalculated, Meta::UnitPriceInc);
-            $line->metadataSet(Meta::RecalculatePrice, Tag::UnitPrice);
+            $line->metadataSet(Meta::RecalculatePrice, Fld::UnitPrice);
         }
     }
 

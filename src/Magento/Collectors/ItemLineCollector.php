@@ -11,10 +11,10 @@ use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 use function count;
 
@@ -89,7 +89,7 @@ class ItemLineCollector extends LineCollector
 
         $line->unitPrice = $productPriceEx; // copied to mappings.
         $line->metadataSet(Meta::UnitPriceInc, $productPriceInc); // copied to mappings.
-        $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
+        $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Fld::UnitPrice : Meta::UnitPriceInc);
         $line->quantity = $shopItem->getQtyOrdered(); // copied to mappings.
 
         // Get vat and discount information
@@ -235,7 +235,7 @@ class ItemLineCollector extends LineCollector
         // Add price info.
         $line->unitPrice = $productPriceEx;  // copied to mappings.
         $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);  // copied to mappings.
-        $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
+        $line->metadataSet(Meta::RecalculatePrice, $this->productPricesIncludeTax() ? Fld::UnitPrice : Meta::UnitPriceInc);
         $line->quantity = $shopItem->getQty();  // copied to mappings (itemNumber, product).
 
         // Get vat and discount information (also see above getItemLineOrder()):

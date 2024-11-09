@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * Class SplitKnownDiscountLine implements a vat completor strategy by using the
@@ -82,11 +82,11 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
             $this->discountsPerVatRate = [];
             $this->knownDiscountAmountInc = 0.0;
             $this->knownDiscountVatAmount = 0.0;
-            foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
+            foreach ($this->invoice[Fld::Customer][Fld::Invoice][Fld::Line] as $line) {
                 if (isset($line[Meta::LineDiscountAmountInc]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
                     $this->knownDiscountAmountInc += $line[Meta::LineDiscountAmountInc];
-                    $this->knownDiscountVatAmount += $line[Meta::LineDiscountAmountInc] / (100.0 + $line[Tag::VatRate]) * $line[Tag::VatRate];
-                    $vatRate = sprintf('%.3f', $line[Tag::VatRate]);
+                    $this->knownDiscountVatAmount += $line[Meta::LineDiscountAmountInc] / (100.0 + $line[Fld::VatRate]) * $line[Fld::VatRate];
+                    $vatRate = sprintf('%.3f', $line[Fld::VatRate]);
                     if (isset($this->discountsPerVatRate[$vatRate])) {
                         $this->discountsPerVatRate[$vatRate] += $line[Meta::LineDiscountAmountInc];
                     } else {
@@ -104,7 +104,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     {
         $result = false;
         if ($this->splitLineCount === 1) {
-            if ((isset($this->splitLine[Tag::UnitPrice]) && Number::floatsAreEqual($this->splitLine[Tag::UnitPrice], $this->knownDiscountAmountInc - $this->knownDiscountVatAmount))
+            if ((isset($this->splitLine[Fld::UnitPrice]) && Number::floatsAreEqual($this->splitLine[Fld::UnitPrice], $this->knownDiscountAmountInc - $this->knownDiscountVatAmount))
                 || (isset($this->splitLine[Meta::UnitPriceInc]) && Number::floatsAreEqual($this->splitLine[Meta::UnitPriceInc], $this->knownDiscountAmountInc))
             ) {
                 $result = true;
@@ -128,10 +128,10 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
             if (count($this->discountsPerVatRate) > 1) {
                 $vatName = $this->t('vat');
                 $vatRateStripped = rtrim($vatRate, '.0');
-                $line[Tag::Product] = "{$line[Tag::Product]} ($vatRateStripped% $vatName)";
+                $line[Fld::Product] = "{$line[Fld::Product]} ($vatRateStripped% $vatName)";
             }
             $line[Meta::UnitPriceInc] = $discountAmountInc;
-            unset($line[Tag::UnitPrice]);
+            unset($line[Fld::UnitPrice]);
             $this->completeLine($line, (float) $vatRate);
         }
         return true;

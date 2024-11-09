@@ -9,9 +9,9 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Tag;
 
 use function count;
 use function in_array;
@@ -58,34 +58,34 @@ class SettingsForm extends BaseConfigForm
      */
     protected function validateAccountFields(): void
     {
-        if (empty($this->submittedValues[Tag::ContractCode])) {
-            $this->addFormMessage($this->t('message_validate_contractcode_0'), Severity::Error, Tag::ContractCode);
-        } elseif (!ctype_digit($this->submittedValues[Tag::ContractCode])) {
-            $this->addFormMessage($this->t('message_validate_contractcode_1'), Severity::Error, Tag::ContractCode);
+        if (empty($this->submittedValues[Fld::ContractCode])) {
+            $this->addFormMessage($this->t('message_validate_contractcode_0'), Severity::Error, Fld::ContractCode);
+        } elseif (!ctype_digit($this->submittedValues[Fld::ContractCode])) {
+            $this->addFormMessage($this->t('message_validate_contractcode_1'), Severity::Error, Fld::ContractCode);
         } else {
             // Prevent errors where a copy & paste of the contract code from the
             // welcome mail includes spaces or tabs before or after the code.
-            $this->submittedValues[Tag::ContractCode] = trim($this->submittedValues[Tag::ContractCode]);
+            $this->submittedValues[Fld::ContractCode] = trim($this->submittedValues[Fld::ContractCode]);
         }
 
-        if (empty($this->submittedValues[Tag::UserName])) {
-            $this->addFormMessage($this->t('message_validate_username_0'), Severity::Error, Tag::UserName);
-        } elseif ($this->submittedValues[Tag::UserName] !== trim($this->submittedValues[Tag::UserName])) {
-            $this->addFormMessage($this->t('message_validate_username_1'), Severity::Warning, Tag::UserName);
+        if (empty($this->submittedValues[Fld::UserName])) {
+            $this->addFormMessage($this->t('message_validate_username_0'), Severity::Error, Fld::UserName);
+        } elseif ($this->submittedValues[Fld::UserName] !== trim($this->submittedValues[Fld::UserName])) {
+            $this->addFormMessage($this->t('message_validate_username_1'), Severity::Warning, Fld::UserName);
         }
 
-        if (empty($this->submittedValues[Tag::Password])) {
-            $this->addFormMessage($this->t('message_validate_password_0'), Severity::Error, Tag::Password);
-        } elseif ($this->submittedValues[Tag::Password] !== trim($this->submittedValues[Tag::Password])) {
-            $this->addFormMessage($this->t('message_validate_password_1'), Severity::Warning, Tag::Password);
-        } elseif (strpbrk($this->submittedValues[Tag::Password], '`\'"#%&;<>\\') !== false) {
-            $this->addFormMessage($this->t('message_validate_password_2'), Severity::Warning, Tag::Password);
+        if (empty($this->submittedValues[Fld::Password])) {
+            $this->addFormMessage($this->t('message_validate_password_0'), Severity::Error, Fld::Password);
+        } elseif ($this->submittedValues[Fld::Password] !== trim($this->submittedValues[Fld::Password])) {
+            $this->addFormMessage($this->t('message_validate_password_1'), Severity::Warning, Fld::Password);
+        } elseif (strpbrk($this->submittedValues[Fld::Password], '`\'"#%&;<>\\') !== false) {
+            $this->addFormMessage($this->t('message_validate_password_2'), Severity::Warning, Fld::Password);
         }
 
-        if (empty($this->submittedValues[Tag::EmailOnError])) {
-            $this->addFormMessage($this->t('message_validate_email_1'), Severity::Error, Tag::EmailOnError);
-        } elseif (!$this->isEmailAddress($this->submittedValues[Tag::EmailOnError])) {
-            $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Tag::EmailOnError);
+        if (empty($this->submittedValues[Fld::EmailOnError])) {
+            $this->addFormMessage($this->t('message_validate_email_1'), Severity::Error, Fld::EmailOnError);
+        } elseif (!$this->isEmailAddress($this->submittedValues[Fld::EmailOnError])) {
+            $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Fld::EmailOnError);
         }
     }
 
@@ -326,7 +326,7 @@ class SettingsForm extends BaseConfigForm
                 'type' => 'markup',
                 'value' => $description,
             ],
-            Tag::ContractCode => [
+            Fld::ContractCode => [
                 'type' => 'text',
                 'label' => $this->t('field_code'),
                 'attributes' => [
@@ -334,7 +334,7 @@ class SettingsForm extends BaseConfigForm
                     'size' => 10,
                 ],
             ],
-            Tag::UserName => [
+            Fld::UserName => [
                 'type' => 'text',
                 'label' => $this->t('field_username'),
                 'description' => $this->t('desc_username'),
@@ -343,7 +343,7 @@ class SettingsForm extends BaseConfigForm
                     'size' => 20,
                 ],
             ],
-            Tag::Password => [
+            Fld::Password => [
                 'type' => 'password',
                 'label' => $this->t('field_password'),
                 'attributes' => [
@@ -351,7 +351,7 @@ class SettingsForm extends BaseConfigForm
                     'size' => 20,
                 ],
             ],
-            Tag::EmailOnError => [
+            Fld::EmailOnError => [
                 'type' => 'email',
                 'label' => $this->t('field_emailonerror'),
                 'description' => $this->t('desc_emailonerror'),

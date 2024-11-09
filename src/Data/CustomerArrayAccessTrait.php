@@ -38,6 +38,7 @@ trait CustomerArrayAccessTrait
         if (isset($address)) {
             $addressPropertyDefinitions = $address->getPropertyDefinitions();
             foreach ($addressPropertyDefinitions as $addressPropertyDefinition) {
+                $result[$addressPropertyDefinition['name']] = [$address, $addressPropertyDefinition['name']];
                 $result[strtolower($addressPropertyDefinition['name'])] = [$address, $addressPropertyDefinition['name']];
             }
         }

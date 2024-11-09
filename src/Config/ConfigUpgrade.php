@@ -17,6 +17,8 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Helpers\Severity;
 
+use Siel\Acumulus\Tag;
+
 use function count;
 use function is_string;
 
@@ -205,6 +207,10 @@ class ConfigUpgrade
             $result = $this->upgrade830() && $result;
         }
 
+        if (version_compare($currentVersion, '8.3.6', '<')) {
+            $result = $this->upgrade836() && $result;
+        }
+
         $this->getLog()->notice('Config: finished upgrading to %s (%s)', Version, $result ? 'success' : 'failure');
         return $result;
     }
@@ -226,15 +232,17 @@ class ConfigUpgrade
 
         // 1) Log level.
         switch ($this->getConfig()->get('logLevel')) {
-            case 1 /*Log::Error*/:
-            case 2 /*Log::Warning*/:
+            case 1 /*Log::Error*/ :
+            case 2 /*Log::Warning*/ :
                 // This is often not giving enough information, so we set it
                 // to Notice by default.
-                $newSettings['logLevel'] = 3 /*Log::Notice*/;
+                $newSettings['logLevel'] = 3 /*Log::Notice*/
+                ;
                 break;
-            case 4 /*Log::Info*/:
+            case 4 /*Log::Info*/ :
                 // Info was inserted, so this is the former debug level.
-                $newSettings['logLevel'] = 5 /*Log::Debug*/;
+                $newSettings['logLevel'] = 5 /*Log::Debug*/
+                ;
                 break;
         }
 
@@ -295,7 +303,8 @@ class ConfigUpgrade
      * 4.7.0 upgrade.
      *
      * - salutation could already use token, but with old syntax: remove '#' after '['.
-     *   @noinspection GrazieInspection
+     *
+     * @noinspection GrazieInspection
      */
     protected function upgrade470(): bool
     {
@@ -373,7 +382,7 @@ class ConfigUpgrade
         $result = true;
         $doSave = false;
         $values = $this->getConfig()->getAll();
-        array_walk_recursive($values, static function(&$value) use (&$doSave) {
+        array_walk_recursive($values, static function (&$value) use (&$doSave) {
             if (is_string($value) && str_contains($value, 'originalInvoiceSource::')) {
                 $value = str_replace('originalInvoiceSource::', 'order::', $value);
                 $doSave = true;
@@ -397,7 +406,7 @@ class ConfigUpgrade
         $doSave = false;
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
-        array_walk_recursive($values, static function(&$value) use (&$doSave) {
+        array_walk_recursive($values, static function (&$value) use (&$doSave) {
             if (is_string($value) && str_contains($value, 'paymentState')) {
                 $value = str_replace('paymentState', 'paymentStatus', $value);
                 $doSave = true;
@@ -696,7 +705,7 @@ class ConfigUpgrade
             'refundedOrder::' => 'source::getParent()::',
             'refund::' => 'source::isCreditNote()::',
         ];
-        array_walk_recursive($mappings, static function(&$value) use ($replacements) {
+        array_walk_recursive($mappings, static function (&$value) use ($replacements) {
             foreach ($replacements as $search => $replace) {
                 if (is_string($value)) {
                     $value = str_replace($search, $replace, $value);
@@ -704,5 +713,28 @@ class ConfigUpgrade
             }
         });
         return $this->getConfig()->save([Config::Mappings => $mappings]) && $result;
+    }
+
+    /**
+     * 8.3.6 upgrade.
+     *
+     * - Removed setting 'outputFormat'.
+     * - Changed case of a number of keys.
+     */
+    protected function upgrade836(): bool
+    {
+        $values = $this->getConfigStore()->load();
+        unset($values['outputFormat']);
+        $replacements = [
+            Tag::ContractCode => Fld::ContractCode,
+            Tag::UserName => Fld::UserName,
+            Tag::EmailOnError => Fld::EmailOnError,
+        ];
+        $camelCasedKeys = [];
+        foreach ($values as $key => $value) {
+            $newKey = $replacements[$key] ?? $key;
+            $camelCasedKeys[$newKey] = $value;
+        }
+        return $this->getConfig()->save($camelCasedKeys);
     }
 }

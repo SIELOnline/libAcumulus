@@ -6,10 +6,9 @@ namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
-use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 use function count;
 
@@ -99,14 +98,14 @@ class SplitLine extends CompletorStrategyBase
                 $this->splitLines[] = $line2Complete;
             } else {
                 $this->otherLines[] = $line2Complete;
-                $this->otherLinesAmount += $line2Complete[Tag::UnitPrice] * $line2Complete[Tag::Quantity];
+                $this->otherLinesAmount += $line2Complete[Fld::UnitPrice] * $line2Complete[Fld::Quantity];
             }
         }
 
         $this->nonStrategyAmount = 0.0;
-        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
+        foreach ($this->invoice[Fld::Customer][Fld::Invoice][Fld::Line] as $line) {
             if ($line[Meta::VatRateSource] !== VatRateSource::Strategy) {
-                $this->nonStrategyAmount += $line[Tag::UnitPrice] * $line[Tag::Quantity];
+                $this->nonStrategyAmount += $line[Fld::UnitPrice] * $line[Fld::Quantity];
             }
         }
         $this->splitLinesAmount = $this->invoiceAmount - $this->nonStrategyAmount - $this->otherLinesAmount;
@@ -123,10 +122,10 @@ class SplitLine extends CompletorStrategyBase
 
     protected function execute(): bool
     {
-        if ($this->tryVatRate($this->maxVatRate[Tag::VatRate])) {
+        if ($this->tryVatRate($this->maxVatRate[Fld::VatRate])) {
             return true;
         }
-        if (($this->maxVatRate !== $this->keyComponent) && $this->tryVatRate($this->keyComponent[Tag::VatRate])) {
+        if (($this->maxVatRate !== $this->keyComponent) && $this->tryVatRate($this->keyComponent[Fld::VatRate])) {
             return true;
         }
 
@@ -137,15 +136,15 @@ class SplitLine extends CompletorStrategyBase
 
     protected function tryVatRate(float $vatRateForOtherLines): bool
     {
-        $this->description = "SplitLine($vatRateForOtherLines, {$this->minVatRate[Tag::VatRate]}, {$this->maxVatRate[Tag::VatRate]})";
+        $this->description = "SplitLine($vatRateForOtherLines, {$this->minVatRate[Fld::VatRate]}, {$this->maxVatRate[Fld::VatRate]})";
         $this->replacingLines = [];
         $otherVatAmount = 0.0;
         foreach ($this->otherLines as $otherLine2Complete) {
             $otherVatAmount += $this->completeLine($otherLine2Complete, $vatRateForOtherLines);
         }
         return $this->divideAmountOver2VatRates($this->vat2Divide - $otherVatAmount,
-            (float) $this->minVatRate[Tag::VatRate],
-            (float) $this->maxVatRate[Tag::VatRate]);
+            (float) $this->minVatRate[Fld::VatRate],
+            (float) $this->maxVatRate[Fld::VatRate]);
     }
 
     /**
@@ -196,9 +195,9 @@ class SplitLine extends CompletorStrategyBase
             $lowPercentage = $lowAmount / $this->splitLinesAmount;
             foreach ($this->splitLines as $line) {
                 $splitLine = $line;
-                $splitLine[Tag::Product] .= ' ' . $highVatRate . '% ' . $this->t('vat');
-                if (isset($splitLine[Tag::UnitPrice])) {
-                    $splitLine[Tag::UnitPrice] = $highPercentage * $splitLine[Tag::UnitPrice];
+                $splitLine[Fld::Product] .= ' ' . $highVatRate . '% ' . $this->t('vat');
+                if (isset($splitLine[Fld::UnitPrice])) {
+                    $splitLine[Fld::UnitPrice] = $highPercentage * $splitLine[Fld::UnitPrice];
                 }
                 if (isset($splitLine[Meta::UnitPriceInc])) {
                     $splitLine[Meta::UnitPriceInc] = $highPercentage * $splitLine[Meta::UnitPriceInc];
@@ -206,9 +205,9 @@ class SplitLine extends CompletorStrategyBase
                 $this->completeLine($splitLine, $highVatRate);
 
                 $splitLine = $line;
-                $splitLine[Tag::Product] .= ' ' . $lowVatRate . '% ' . $this->t('vat');
-                if (isset($splitLine[Tag::UnitPrice])) {
-                    $splitLine[Tag::UnitPrice] = $lowPercentage * $splitLine[Tag::UnitPrice];
+                $splitLine[Fld::Product] .= ' ' . $lowVatRate . '% ' . $this->t('vat');
+                if (isset($splitLine[Fld::UnitPrice])) {
+                    $splitLine[Fld::UnitPrice] = $lowPercentage * $splitLine[Fld::UnitPrice];
                 }
                 if (isset($splitLine[Meta::UnitPriceInc])) {
                     $splitLine[Meta::UnitPriceInc] = $lowPercentage * $splitLine[Meta::UnitPriceInc];

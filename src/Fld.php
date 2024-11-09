@@ -47,6 +47,7 @@ interface Fld
     public const CompanyName = 'companyName';
     public const CompanyName1 = 'companyName1';
     public const CompanyName2 = 'companyName2';
+    public const CompanyTypeId = 'companyTypeId';
     public const FullName = 'fullName';
     public const Salutation = 'salutation';
     public const Address = 'address';

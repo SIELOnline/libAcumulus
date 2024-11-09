@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 use function count;
 
@@ -59,8 +59,8 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
     {
         $this->vatRates = [];
         foreach ($this->possibleVatRates as $vatRate) {
-            if ($vatRate[Tag::VatType] === $vatType) {
-                $this->vatRates[] = $vatRate[Tag::VatRate];
+            if ($vatRate[Fld::VatType] === $vatType) {
+                $this->vatRates[] = $vatRate[Fld::VatRate];
             }
         }
         if ($include0) {
@@ -98,7 +98,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
             $i++;
         }
 
-        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategy . $this->getName()] = sprintf(
+        $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategy . $this->getName()] = sprintf(
             'try1Permutation([%s]): %f',
             implode(', ', $permutation),
             $vatAmount

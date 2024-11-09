@@ -18,9 +18,9 @@
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\Completor as BaseCompletor;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 use function count;
 use function in_array;
@@ -44,14 +44,14 @@ class Completor extends BaseCompletor
         // First try the base guesses,
         parent::guessVatType($possibleVatTypes);
         // and if that did not result in a vat type try the WC specific guesses.
-        if (empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
+        if (empty($this->invoice[Fld::Customer][Fld::Invoice][Fld::VatType])) {
             /** @var \WC_Order $order */
             $order = $this->source->getOrder()->getShopObject();
             if (in_array(Api::VatType_EuReversed, $possibleVatTypes, true)
                 && apply_filters('woocommerce_order_is_vat_exempt', $order->get_meta('is_vat_exempt') === 'yes', $order))
             {
-                $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_EuReversed;
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource]
+                $this->invoice[Fld::Customer][Fld::Invoice][Fld::VatType] = Api::VatType_EuReversed;
+                $this->invoice[Fld::Customer][Fld::Invoice][Meta::VatTypeSource]
                     = 'WooCommerce\Completor::guessVatType: order is vat exempt';
             }
 
@@ -64,10 +64,10 @@ class Completor extends BaseCompletor
                     if (isset($vatPaid['by_rates']) && count($vatPaid['by_rates']) === 1) {
                         $vat = reset($vatPaid['by_rates']);
                         if (isset($vat['is_variable_eu_vat'])) {
-                            $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = $vat['is_variable_eu_vat']
+                            $this->invoice[Fld::Customer][Fld::Invoice][Fld::VatType] = $vat['is_variable_eu_vat']
                                 ? Api::VatType_EuVat
                                 : Api::VatType_National;
-                            $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource]
+                            $this->invoice[Fld::Customer][Fld::Invoice][Meta::VatTypeSource]
                                 = 'WooCommerce\Completor::guessVatType: is_variable_eu_vat';
                         }
                     }

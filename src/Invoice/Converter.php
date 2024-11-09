@@ -44,7 +44,7 @@ class Converter
         /** @var \Siel\Acumulus\Data\Line $line */
         $line = Container::getContainer()->createAcumulusObject(DataType::Line);
         foreach ($lineArray as $key => $value) {
-            $propertyName = static::getProperty($key);
+            $propertyName = $key;
             if ($propertyName === Meta::ChildrenLines) {
                 foreach ($value as $child) {
                     $line->addChild(static::getLineFromArray($child));
@@ -55,19 +55,4 @@ class Converter
         }
         return $line;
     }
-
-    private static function getProperty(string $key): string
-    {
-        $properties = [
-            Tag::ItemNumber => Fld::ItemNumber,
-            Tag::Product => Fld::Product,
-            Tag::Nature => Fld::Nature,
-            Tag::UnitPrice => Fld::UnitPrice,
-            Tag::VatRate => Fld::VatRate,
-            Tag::Quantity => Fld::Quantity,
-            Tag::CostPrice => Fld::CostPrice,
-        ];
-        return array_key_exists($key, $properties) ? $properties[$key] : $key;
-    }
-
 }

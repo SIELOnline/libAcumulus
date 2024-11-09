@@ -21,6 +21,7 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
@@ -194,7 +195,7 @@ abstract class CompletorStrategyBase
      */
     protected function initAmounts(): void
     {
-        $invoicePart = &$this->invoice[Tag::Customer][Tag::Invoice];
+        $invoicePart = &$this->invoice[Fld::Customer][Fld::Invoice];
         /** @var \Siel\Acumulus\Invoice\Totals $totals */
         $totals = $invoicePart[Meta::Totals];
         $this->vatAmount = $totals->amountVat;
@@ -203,16 +204,16 @@ abstract class CompletorStrategyBase
         // The vat amount to divide over the non completed lines is the total vat
         // amount of the invoice minus all known vat amounts per line.
         $this->vat2Divide = (float) $this->vatAmount;
-        foreach ($invoicePart[Tag::Line] as $line) {
+        foreach ($invoicePart[Fld::Line] as $line) {
             if ($line[Meta::VatRateSource] !== VatRateSource::Strategy) {
                 // Deduct the vat amount from this line: if set, deduct it directly,
                 // otherwise calculate the vat amount using the vat rate and unit price.
                 if (isset($line[Meta::VatAmount])) {
-                    $this->vat2Divide -= $line[Meta::VatAmount] * $line[Tag::Quantity];
+                    $this->vat2Divide -= $line[Meta::VatAmount] * $line[Fld::Quantity];
                 } else {
-                    $this->vat2Divide -= $this->isNoVat($line[Tag::VatRate])
+                    $this->vat2Divide -= $this->isNoVat($line[Fld::VatRate])
                         ? 0.0
-                        : ($line[Tag::VatRate] / 100.0) * $line[Tag::UnitPrice] * $line[Tag::Quantity];
+                        : ($line[Fld::VatRate] / 100.0) * $line[Fld::UnitPrice] * $line[Fld::Quantity];
                 }
             }
         }
@@ -225,7 +226,7 @@ abstract class CompletorStrategyBase
     {
         $this->linesCompleted = [];
         $this->lines2Complete = [];
-        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $key => $line) {
+        foreach ($this->invoice[Fld::Customer][Fld::Invoice][Fld::Line] as $key => $line) {
             if ($line[Meta::VatRateSource] === VatRateSource::Strategy) {
                 $this->linesCompleted[] = $key;
                 $this->lines2Complete[$key] = $line;
@@ -246,7 +247,7 @@ abstract class CompletorStrategyBase
             $vatRate = sprintf('%.3f', $possibleVatRate[Tag::VatRate]);
             if (!isset($this->vatBreakdown[$vatRate])) {
                 $this->vatBreakdown[$vatRate] = [
-                    Tag::VatRate => (float) $vatRate,
+                    Fld::VatRate => (float) $vatRate,
                     Meta::VatAmount => 0.0,
                     'amount' => 0.0,
                     'count' => 0,
@@ -255,13 +256,13 @@ abstract class CompletorStrategyBase
         }
 
         // Add amounts and count for appearing vat rates.
-        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
-            if ($line[Meta::VatRateSource] !== VatRateSource::Strategy && isset($line[Tag::VatRate])) {
-                $amount = $line[Tag::UnitPrice] * $line[Tag::Quantity];
-                $vatAmount = $this->isNoVat($line[Tag::VatRate])
+        foreach ($this->invoice[Fld::Customer][Fld::Invoice][Fld::Line] as $line) {
+            if ($line[Meta::VatRateSource] !== VatRateSource::Strategy && isset($line[Fld::VatRate])) {
+                $amount = $line[Fld::UnitPrice] * $line[Fld::Quantity];
+                $vatAmount = $this->isNoVat($line[Fld::VatRate])
                     ? 0.0
-                    : $line[Tag::VatRate] / 100.0 * $amount;
-                $vatRate = sprintf('%.3f', $line[Tag::VatRate]);
+                    : $line[Fld::VatRate] / 100.0 * $amount;
+                $vatRate = sprintf('%.3f', $line[Fld::VatRate]);
                 // Add amount to existing vat rate line or create a new line.
                 if (isset($this->vatBreakdown[$vatRate])) {
                     $this->vatBreakdown[$vatRate][Meta::VatAmount] += $vatAmount;
@@ -286,9 +287,9 @@ abstract class CompletorStrategyBase
      */
     protected function getVatBreakDownMinRate(): array
     {
-        $result = [Tag::VatRate => PHP_INT_MAX];
+        $result = [Fld::VatRate => PHP_INT_MAX];
         foreach ($this->getVatBreakdown() as $breakDown) {
-            if ($breakDown[Tag::VatRate] < $result[Tag::VatRate]) {
+            if ($breakDown[Fld::VatRate] < $result[Fld::VatRate]) {
                 $result = $breakDown;
             }
         }
@@ -304,9 +305,9 @@ abstract class CompletorStrategyBase
      */
     protected function getVatBreakDownMaxRate(): array
     {
-        $result = [Tag::VatRate => -PHP_INT_MAX];
+        $result = [Fld::VatRate => -PHP_INT_MAX];
         foreach ($this->getVatBreakdown() as $breakDown) {
-            if ($breakDown[Tag::VatRate] > $result[Tag::VatRate]) {
+            if ($breakDown[Fld::VatRate] > $result[Fld::VatRate]) {
                 $result = $breakDown;
             }
         }
@@ -344,12 +345,12 @@ abstract class CompletorStrategyBase
         if ($this->checkPreconditions()) {
             return $this->execute();
         } else {
-            if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyPreconditionFailed])) {
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyPreconditionFailed] .= ', ';
+            if (!empty($this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyPreconditionFailed])) {
+                $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyPreconditionFailed] .= ', ';
             } else {
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyPreconditionFailed] = '';
+                $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyPreconditionFailed] = '';
             }
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyPreconditionFailed] .= $this->getName();
+            $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyPreconditionFailed] .= $this->getName();
             return false;
         }
     }
@@ -409,22 +410,22 @@ abstract class CompletorStrategyBase
      */
     protected function completeLine($line2Complete, float $vatRate): float
     {
-        if (!isset($line2Complete[Tag::Quantity])) {
-            $line2Complete[Tag::Quantity] = 1;
+        if (!isset($line2Complete[Fld::Quantity])) {
+            $line2Complete[Fld::Quantity] = 1;
         }
-        $line2Complete[Tag::VatRate] = $vatRate;
-        if (isset($line2Complete[Tag::UnitPrice])) {
-            $line2Complete[Meta::VatAmount] = $this->isNoVat($line2Complete[Tag::VatRate])
+        $line2Complete[Fld::VatRate] = $vatRate;
+        if (isset($line2Complete[Fld::UnitPrice])) {
+            $line2Complete[Meta::VatAmount] = $this->isNoVat($line2Complete[Fld::VatRate])
                 ? 0.0
-                : ($line2Complete[Tag::VatRate] / 100.0) * $line2Complete[Tag::UnitPrice];
+                : ($line2Complete[Fld::VatRate] / 100.0) * $line2Complete[Fld::UnitPrice];
         } else { // isset($line2Complete[Meta::UnitPriceInc])
-            $line2Complete[Meta::VatAmount] = $this->isNoVat($line2Complete[Tag::VatRate])
+            $line2Complete[Meta::VatAmount] = $this->isNoVat($line2Complete[Fld::VatRate])
                 ? 0.0
-                : ($line2Complete[Tag::VatRate] / (100.0 + $line2Complete[Tag::VatRate])) * $line2Complete[Meta::UnitPriceInc];
-            $line2Complete[Tag::UnitPrice] = $line2Complete[Meta::UnitPriceInc] - $line2Complete[Meta::VatAmount];
+                : ($line2Complete[Fld::VatRate] / (100.0 + $line2Complete[Fld::VatRate])) * $line2Complete[Meta::UnitPriceInc];
+            $line2Complete[Fld::UnitPrice] = $line2Complete[Meta::UnitPriceInc] - $line2Complete[Meta::VatAmount];
         }
         $this->replacingLines[] = $line2Complete;
-        return $line2Complete[Meta::VatAmount] * $line2Complete[Tag::Quantity];
+        return $line2Complete[Meta::VatAmount] * $line2Complete[Fld::Quantity];
     }
 
     /**

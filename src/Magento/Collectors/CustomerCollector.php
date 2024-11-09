@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Magento\Collectors;
 
 use Magento\Store\Model\ScopeInterface;
-use Magento\Tax\Model\Config as MagentoTaxConfig;
 use Siel\Acumulus\Collectors\CustomerCollector as BaseCustomerCollector;
 use Siel\Acumulus\Data\AddressType;
 

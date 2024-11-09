@@ -14,10 +14,10 @@ use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 use WC_Booking;
 use WC_Booking_Data_Store;
 use WC_Order_Item_Product;
@@ -136,7 +136,7 @@ class Collector3rdPartyPluginSupport
             $bundleId = $item->get_meta('_bundle_cart_key');
             $bundledBy = $item->get_meta('_bundled_by');
             if (!empty($bundleId) || !empty($bundledBy)) {
-                $line = &$this->getLineByMetaId($invoice[Tag::Customer][Tag::Invoice][Tag::Line], $item->get_id());
+                $line = &$this->getLineByMetaId($invoice[Fld::Customer][Fld::Invoice][Fld::Line], $item->get_id());
                 if ($line !== null) {
                     // Add bundle meta data.
                     if (!empty($bundleId)) {
@@ -152,7 +152,7 @@ class Collector3rdPartyPluginSupport
             }
         }
 
-        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->groupBundles($invoice[Tag::Customer][Tag::Invoice][Tag::Line]);
+        $invoice[Fld::Customer][Fld::Invoice][Fld::Line] = $this->groupBundles($invoice[Fld::Customer][Fld::Invoice][Fld::Line]);
     }
 
     protected function &getLineByMetaId(array &$lines, int $id): ?array
@@ -257,10 +257,10 @@ class Collector3rdPartyPluginSupport
             // do not have to check for the plugin being active, just for the
             // data being there.
             if (!empty($item['tmcartepo_data'])) {
-                $line = &$this->getLineByMetaId($invoice[Tag::Customer][Tag::Invoice][Tag::Line], $item->get_id());
+                $line = &$this->getLineByMetaId($invoice[Fld::Customer][Fld::Invoice][Fld::Line], $item->get_id());
                 if ($line !== null) {
                     $commonTags = [
-                        Tag::Quantity => $line[Tag::Quantity],
+                        Fld::Quantity => $line[Fld::Quantity],
                         Meta::VatRateSource => VatRateSource::Parent,
                     ];
                     if (!isset($line[Meta::ChildrenLines])) {
@@ -311,8 +311,8 @@ class Collector3rdPartyPluginSupport
             $label = $option['name'];
             $choice = $option['value'];
             $result[] = [
-                    Tag::Product => $label . ': ' . $choice,
-                    Tag::UnitPrice => 0,
+                    Fld::Product => $label . ': ' . $choice,
+                    Fld::UnitPrice => 0,
                 ] + $commonTags;
         }
 

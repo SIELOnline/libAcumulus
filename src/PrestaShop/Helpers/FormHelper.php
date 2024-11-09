@@ -98,7 +98,7 @@ class FormHelper extends BaseFormHelper
 
         // Password fields are rendered (and may remain) empty to indicate no
         // change.
-        if ($key === Tag::Password) {
+        if ($key === Fld::Password) {
             $field['attributes']['required'] = false;
         }
 

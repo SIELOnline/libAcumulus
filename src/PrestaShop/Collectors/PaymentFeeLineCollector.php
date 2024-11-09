@@ -9,9 +9,9 @@ use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\PrestaShop\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * PaymentFeeLineCollector contains PrestaShop specific {@see LineType::PaymentFee}
@@ -61,7 +61,7 @@ class PaymentFeeLineCollector extends LineCollector
         $line->vatRate = $paymentVatRate;
         $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact);
         $line->metadataSet(Meta::VatAmount, $paymentVat);
-        $line->metadataAdd(Meta::FieldsCalculated, Tag::UnitPrice);
+        $line->metadataAdd(Meta::FieldsCalculated, Fld::UnitPrice);
         $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
 
         /** @var \Siel\Acumulus\Invoice\Totals $totals */

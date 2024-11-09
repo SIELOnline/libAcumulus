@@ -8,10 +8,10 @@ use Configuration;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\PrestaShop\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * GiftWrappingFeeLineCollector contains PrestaShop specific {@see LineType::PaymentFee}
@@ -57,7 +57,7 @@ class GiftWrappingFeeLineCollector extends LineCollector
         // Increase precision if possible.
         if (Number::floatsAreEqual($wrappingEx, $wrappingExLookedUp, 0.005)) {
             $wrappingEx = $wrappingExLookedUp;
-            $line->metadataAdd(Meta::FieldsCalculated, Tag::UnitPrice);
+            $line->metadataAdd(Meta::FieldsCalculated, Fld::UnitPrice);
             $precision = $this->precision;
         } else {
             $precision = 0.01;

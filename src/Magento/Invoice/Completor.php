@@ -17,11 +17,11 @@
 namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor as BaseCompletor;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * Class Completor
@@ -48,7 +48,7 @@ class Completor extends BaseCompletor
             $discountAmountInc = 0.0;
             $discountLineAmountInc = 0.0;
 
-            $invoiceLines = $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line];
+            $invoiceLines = $this->invoice[Fld::Customer][Fld::Invoice][Fld::Line];
             foreach ($invoiceLines as $line) {
                 if (isset($line[Meta::LineDiscountAmountInc])) {
                     $discountAmountInc += $line[Meta::LineDiscountAmountInc];
@@ -58,7 +58,7 @@ class Completor extends BaseCompletor
                     if (isset($line[Meta::LineAmountInc])) {
                         $discountLineAmountInc += $line[Meta::LineAmountInc];
                     } elseif (isset($line[Meta::UnitPriceInc])) {
-                        $discountLineAmountInc += $line[Tag::Quantity] * $line[Meta::UnitPriceInc];
+                        $discountLineAmountInc += $line[Fld::Quantity] * $line[Meta::UnitPriceInc];
                     }
                 }
             }

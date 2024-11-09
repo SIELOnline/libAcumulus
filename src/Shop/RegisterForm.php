@@ -10,13 +10,13 @@ use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Tag;
 
 use function sprintf;
 
@@ -69,46 +69,46 @@ class RegisterForm extends Form
      */
     protected function validate(): void
     {
-        if (empty($this->submittedValues[Tag::Gender])) {
-            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_gender')), Severity::Error, Tag::Gender);
+        if (empty($this->submittedValues[Fld::Gender])) {
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_gender')), Severity::Error, Fld::Gender);
         }
 
-        if (empty($this->submittedValues[Tag::FullName])) {
-            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_fullName')), Severity::Error, Tag::FullName);
+        if (empty($this->submittedValues[Fld::FullName])) {
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_fullName')), Severity::Error, Fld::FullName);
         }
 
-        if (empty($this->submittedValues[Tag::LoginName])) {
-            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
-        } elseif (mb_strlen($this->submittedValues[Tag::LoginName]) < 6) {
-            $this->addFormMessage(sprintf($this->t('message_validate_loginname_0'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
+        if (empty($this->submittedValues[Fld::LoginName])) {
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_loginName')), Severity::Error, Fld::LoginName);
+        } elseif (mb_strlen($this->submittedValues[Fld::LoginName]) < 6) {
+            $this->addFormMessage(sprintf($this->t('message_validate_loginname_0'), $this->t('field_loginName')), Severity::Error, Fld::LoginName);
         }
 
-        if (empty($this->submittedValues[Tag::CompanyTypeId]) && $this->submittedValues[Tag::CompanyTypeId] !== 0) {
-            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyTypeId')), Severity::Error, Tag::CompanyTypeId);
+        if (empty($this->submittedValues[Fld::CompanyTypeId]) && $this->submittedValues[Fld::CompanyTypeId] !== 0) {
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyTypeId')), Severity::Error, Fld::CompanyTypeId);
         }
 
-        if (empty($this->submittedValues[Tag::CompanyName])) {
-            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyName')), Severity::Error, Tag::CompanyName);
+        if (empty($this->submittedValues[Fld::CompanyName])) {
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyName')), Severity::Error, Fld::CompanyName);
         }
 
-        if (empty($this->submittedValues[Tag::Address])) {
-            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_address')), Severity::Error, Tag::Address);
+        if (empty($this->submittedValues[Fld::Address])) {
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_address')), Severity::Error, Fld::Address);
         }
 
-        if (empty($this->submittedValues[Tag::PostalCode])) {
-            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_postalCode')), Severity::Error, Tag::PostalCode);
-        } elseif (!preg_match('/^\d{4}\s*[a-zA-Z]{2}$/', $this->submittedValues[Tag::PostalCode])) {
-            $this->addFormMessage($this->t('message_validate_postalCode_0'), Severity::Error, Tag::PostalCode);
+        if (empty($this->submittedValues[Fld::PostalCode])) {
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_postalCode')), Severity::Error, Fld::PostalCode);
+        } elseif (!preg_match('/^\d{4}\s*[a-zA-Z]{2}$/', $this->submittedValues[Fld::PostalCode])) {
+            $this->addFormMessage($this->t('message_validate_postalCode_0'), Severity::Error, Fld::PostalCode);
         }
 
-        if (empty($this->submittedValues[Tag::City])) {
-            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_city')), Severity::Error, Tag::City);
+        if (empty($this->submittedValues[Fld::City])) {
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_city')), Severity::Error, Fld::City);
         }
 
-        if (empty($this->submittedValues[Tag::Email])) {
-            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_email')), Severity::Error, Tag::Email);
-        } elseif (!$this->isEmailAddress($this->submittedValues[Tag::Email])) {
-            $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Tag::Email);
+        if (empty($this->submittedValues[Fld::Email])) {
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_email')), Severity::Error, Fld::Email);
+        } elseif (!$this->isEmailAddress($this->submittedValues[Fld::Email])) {
+            $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Fld::Email);
         }
     }
 
@@ -118,18 +118,18 @@ class RegisterForm extends Form
     protected function execute(): bool
     {
         $tags = [
-            Tag::CompanyTypeId,
-            Tag::CompanyName,
-            Tag::FullName,
-            Tag::LoginName,
-            Tag::Gender,
-            Tag::Address,
-            Tag::PostalCode,
-            Tag::City,
-            Tag::Email,
-            Tag::Telephone,
-            Tag::BankAccount,
-            Tag::Notes,
+            Fld::CompanyTypeId,
+            Fld::CompanyName,
+            Fld::FullName,
+            Fld::LoginName,
+            Fld::Gender,
+            Fld::Address,
+            Fld::PostalCode,
+            Fld::City,
+            Fld::Email,
+            Fld::Telephone,
+            Fld::BankAccount,
+            Fld::Notes,
         ];
         $submittedValues = $this->submittedValues;
         $signUp = [];
@@ -138,10 +138,10 @@ class RegisterForm extends Form
         }
 
         // Complete $signUp with non-form values.
-        if (empty($signUp[Tag::Gender])) {
-            $signUp[Tag::Gender] = Api::Gender_Neutral;
+        if (empty($signUp[Fld::Gender])) {
+            $signUp[Fld::Gender] = Api::Gender_Neutral;
         }
-        $signUp[Tag::CreateApiUser] = Api::CreateApiUser_Yes;
+        $signUp[Fld::CreateApiUser] = Api::CreateApiUser_Yes;
 
         $result = $this->acumulusApiClient->signUp($signUp);
 
@@ -176,10 +176,10 @@ class RegisterForm extends Form
     protected function setAccountInfo(array $signUpResponse): bool
     {
         $accountValues = [
-            Tag::ContractCode => $signUpResponse[Tag::ContractCode],
-            Tag::UserName => $signUpResponse['contractapiuserloginname'],
-            Tag::Password => $signUpResponse['contractapiuserpassword'],
-            Tag::EmailOnError => $this->getSubmittedValue(Tag::Email),
+            Fld::ContractCode => $signUpResponse[Fld::ContractCode],
+            Fld::UserName => $signUpResponse['contractapiuserloginname'],
+            Fld::Password => $signUpResponse['contractapiuserpassword'],
+            Fld::EmailOnError => $this->getSubmittedValue(Fld::Email),
         ];
         return $this->acumulusConfig->save($accountValues);
     }
@@ -199,7 +199,7 @@ class RegisterForm extends Form
 //            'contractapiuserloginname' => 'Acumulus-API-ce5bb',
 //            'contractapiuserpassword' => 'OTAcu3eq5VjezM',
 //        ];
-//        $this->submittedValues[Tag::Email] = 'erwin@burorader.com';
+//        $this->submittedValues[Fld::Email] = 'erwin@burorader.com';
         // End test success screen
 
         $fields = [];
@@ -281,7 +281,7 @@ class RegisterForm extends Form
     protected function getPersonFields(): array
     {
         return [
-            Tag::Gender => [
+            Fld::Gender => [
                 'type' => 'radio',
                 'label' => $this->t('field_gender'),
                 'description' => $this->t('desc_gender'),
@@ -294,7 +294,7 @@ class RegisterForm extends Form
                     'required' => true,
                 ],
             ],
-            Tag::FullName => [
+            Fld::FullName => [
                 'type' => 'text',
                 'label' => $this->t('field_fullName'),
                 'description' => $this->t('desc_fullName'),
@@ -303,7 +303,7 @@ class RegisterForm extends Form
                     'size' => 40,
                 ],
             ],
-            Tag::LoginName => [
+            Fld::LoginName => [
                 'type' => 'text',
                 'label' => $this->t('field_loginName'),
                 'description' => sprintf($this->t('desc_loginName'), $this->t('module')),
@@ -331,7 +331,7 @@ class RegisterForm extends Form
     protected function getCompanyFields(): array
     {
         return [
-            Tag::CompanyTypeId => [
+            Fld::CompanyTypeId => [
                 'type' => 'select',
                 'label' => $this->t('field_companyTypeId'),
                 'options' => $this->picklistToOptions(
@@ -343,7 +343,7 @@ class RegisterForm extends Form
                     'required' => true,
                 ],
             ],
-            Tag::CompanyName => [
+            Fld::CompanyName => [
                 'type' => 'text',
                 'label' => $this->t('field_companyName'),
                 'attributes' => [
@@ -351,7 +351,7 @@ class RegisterForm extends Form
                     'size' => 40,
                 ],
             ],
-            Tag::Address => [
+            Fld::Address => [
                 'type' => 'text',
                 'label' => $this->t('field_address'),
                 'attributes' => [
@@ -359,7 +359,7 @@ class RegisterForm extends Form
                     'size' => 40,
                 ],
             ],
-            Tag::PostalCode => [
+            Fld::PostalCode => [
                 'type' => 'text',
                 'label' => $this->t('field_postalCode'),
                 'attributes' => [
@@ -367,7 +367,7 @@ class RegisterForm extends Form
                     'size' => 8,
                 ],
             ],
-            Tag::City => [
+            Fld::City => [
                 'type' => 'text',
                 'label' => $this->t('field_city'),
                 'attributes' => [
@@ -375,7 +375,7 @@ class RegisterForm extends Form
                     'size' => 20,
                 ],
             ],
-            Tag::Email => [
+            Fld::Email => [
                 'type' => 'email',
                 'label' => $this->t('field_emailRegistration'),
                 'description' => sprintf($this->t('desc_emailRegistration'), $this->t('module')),
@@ -384,7 +384,7 @@ class RegisterForm extends Form
                     'size' => 40,
                 ],
             ],
-            Tag::Telephone => [
+            Fld::Telephone => [
                 'type' => 'text',
                 'label' => $this->t('field_telephoneRegistration'),
                 'description' => $this->t('desc_telephoneRegistration'),
@@ -392,7 +392,7 @@ class RegisterForm extends Form
                     'size' => 12,
                 ],
             ],
-            Tag::BankAccount => [
+            Fld::BankAccount => [
                 'type' => 'text',
                 'label' => $this->t('field_bankAccount'),
                 'description' => $this->t('desc_bankAccount'),
@@ -415,7 +415,7 @@ class RegisterForm extends Form
     protected function getNotesFields(): array
     {
         return [
-            Tag::Notes => [
+            Fld::Notes => [
                 'type' => 'textarea',
                 'label' => $this->t('field_notes'),
                 'description' => sprintf($this->t('desc_notes'), $this->t('module')),
@@ -460,7 +460,7 @@ class RegisterForm extends Form
     {
         $line1 = sprintf(
             $this->t('loginDesc_1'),
-            htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8')
+            htmlspecialchars($this->getSubmittedValue(Fld::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8')
         );
         $line2 = $this->t('loginDesc_2');
         return [
@@ -469,32 +469,32 @@ class RegisterForm extends Form
                 'legend' => $this->t('loginHeader'),
                 'description' => "$line1 $line2",
                 'fields' => [
-                    Tag::ContractCode => [
+                    Fld::ContractCode => [
                         'type' => 'text',
                         'label' => $this->t('field_code'),
                         'attributes' => [
                             'readonly' => true,
                             'size' => 8,
                         ],
-                        'value' => $this->signUpResponse[Tag::ContractCode],
+                        'value' => $this->signUpResponse[Fld::ContractCode],
                     ],
-                    Tag::LoginName => [
+                    Fld::LoginName => [
                         'type' => 'text',
                         'label' => $this->t('field_loginName'),
                         'attributes' => [
                             'readonly' => true,
                             'size' => 20,
                         ],
-                        'value' => $this->signUpResponse['contract' . Tag::LoginName],
+                        'value' => $this->signUpResponse['contract' . Fld::LoginName],
                     ],
-                    Tag::Password => [
+                    Fld::Password => [
                         'type' => 'text',
                         'label' => $this->t('field_password'),
                         'attributes' => [
                             'readonly' => true,
                             'size' => 20,
                         ],
-                        'value' => $this->signUpResponse['contract' . Tag::Password],
+                        'value' => $this->signUpResponse['contract' . Fld::Password],
                     ],
                 ],
             ],
@@ -517,32 +517,32 @@ class RegisterForm extends Form
                 'legend' => sprintf($this->t('apiLoginHeader'), $this->t('module')),
                 'description' => $line1,
                 'fields' => [
-                    'contractapiuser' . Tag::ContractCode => [
+                    'contractapiuser' . Fld::ContractCode => [
                         'type' => 'text',
                         'label' => $this->t('field_code'),
                         'attributes' => [
                             'readonly' => true,
                             'size' => 8,
                         ],
-                        'value' => $this->signUpResponse[Tag::ContractCode],
+                        'value' => $this->signUpResponse[Fld::ContractCode],
                     ],
-                    'contractapiuser' . Tag::LoginName => [
+                    'contractapiuser' . Fld::LoginName => [
                         'type' => 'text',
                         'label' => $this->t('field_loginName'),
                         'attributes' => [
                             'readonly' => true,
                             'size' => 20,
                         ],
-                        'value' => $this->signUpResponse['contractapiuser' . Tag::LoginName],
+                        'value' => $this->signUpResponse['contractapiuser' . Fld::LoginName],
                     ],
-                    'contractapiuser' . Tag::Password => [
+                    'contractapiuser' . Fld::Password => [
                         'type' => 'text',
                         'label' => $this->t('field_password'),
                         'attributes' => [
                             'readonly' => true,
                             'size' => 20,
                         ],
-                        'value' => $this->signUpResponse['contractapiuser' . Tag::Password],
+                        'value' => $this->signUpResponse['contractapiuser' . Fld::Password],
                     ],
                     'apiLoginRemark' => [
                         'type' => 'markup',

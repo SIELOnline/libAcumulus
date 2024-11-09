@@ -7,8 +7,8 @@ namespace Siel\Acumulus\Joomla\HikaShop\Collectors;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * DiscountLineCollector contains HikaShop specific {@see LineType::Discount} collecting
@@ -66,7 +66,7 @@ class DiscountLineCollector extends LineCollector
         $discountInc = (float) $order->order_discount_price;
         $discountVat = (float) $order->order_discount_tax;
         $discountEx = $discountInc - $discountVat;
-        $recalculatePrice = Tag::UnitPrice;
+        $recalculatePrice = Fld::UnitPrice;
 
         $description = empty($order->order_discount_code)
             ? $this->t('discount')

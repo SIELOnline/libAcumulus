@@ -11,46 +11,16 @@ namespace Siel\Acumulus\Tests\Unit\ApiClient;
 use Siel\Acumulus\Data\BasicSubmit;
 use Siel\Acumulus\Data\Connector;
 use Siel\Acumulus\Data\Contract;
-use Siel\Acumulus\Tag;
+use Siel\Acumulus\Fld;
 
 /**
  * This class defines a list of realistic request and response sets.
+ *
+ * The submit part in the examples is still all lowercase although that is no longer
+ * necessary, it can be camel cased as our {@see \Siel\Acumulus\Data\AcumulusObject}s.
  */
 class ApiRequestResponseExamples
 {
-    private function getContract(): Contract
-    {
-        $contract = new Contract();
-        $contract->contractCode = '123456';
-        $contract->userName = 'User123456';
-        $contract->password = 'mysecret';
-        $contract->emailOnError = 'test@example.com';
-        $contract->emailOnWarning = 'test@example.com';
-        return $contract;
-    }
-
-    private function getConnector(): Connector
-    {
-        $connector = new Connector();
-        $connector->application = 'WooCommerce 4.0.1 (WordPress: 5.4)';
-        $connector->webKoppel = 'Acumulus 5.9.0';
-        $connector->development = 'SIEL - Buro RaDer';
-        $connector->remark = 'Library 5.10.0-alpha1 - PHP 7.1.33';
-        $connector->sourceUri = 'https://www.siel.nl/';
-        return $connector;
-    }
-
-    public function getBasicSubmit(): BasicSubmit
-    {
-        $submit = new BasicSubmit();
-        $submit->format = 'json';
-        $submit->testMode = '0';
-        $submit->lang = 'nl';
-        $submit->setContract($this->getContract());
-        $submit->setConnector($this->getConnector());
-        return $submit;
-    }
-
     private array $sets = [
         'accounts' => [
             'needContract' => true,
@@ -197,7 +167,7 @@ class ApiRequestResponseExamples
                                 'nature' => 'Service',
                                 'meta-vatrate-range-matches' => '[{"vatrate":"20.0000","vattype":6}]',
                                 'unitpriceinc' => '4.95864',
-                                'meta-fields-calculated' => '["unitpriceinc"]',
+                                'meta-fields-calculated' => '["unitPriceInc"]',
                                 'meta-vattypes-possible' => '6',
                             ],
                         ],
@@ -220,15 +190,15 @@ class ApiRequestResponseExamples
         'signup' => [
             'needContract' => false,
             'submit' => [
-                Tag::CompanyTypeId => 1,
-                Tag::CompanyName => 'My Company',
-                Tag::FullName => 'Smith',
-                Tag::LoginName => 'John',
-                Tag::Gender => 'M',
-                Tag::Address => 'Straat 5',
-                Tag::PostalCode => '1234 AB',
-                Tag::City => 'Amsterdam',
-                Tag::Email => 'john.doe@example.com',
+                Fld::CompanyTypeId => 1,
+                Fld::CompanyName => 'My Company',
+                Fld::FullName => 'Smith',
+                Fld::LoginName => 'John',
+                Fld::Gender => 'M',
+                Fld::Address => 'Straat 5',
+                Fld::PostalCode => '1234 AB',
+                Fld::City => 'Amsterdam',
+                Fld::Email => 'john.doe@example.com',
             ],
             'response body' => '{"signup:":{"contractcode":"123456","contractloginname":"myuser","contractpassword":"mysecret","contractstartdate":"2022-02-22","contractenddate":"","contractapiuserloginname":"myapiuser","contractapiuserpassword":"mysecret"},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
             'mainResponseKey' => 'signup',
@@ -278,5 +248,38 @@ class ApiRequestResponseExamples
     public function getMainResponse(string $key): array
     {
         return $this->sets[$key]['main response'];
+    }
+
+    private function getContract(): Contract
+    {
+        $contract = new Contract();
+        $contract->contractCode = '123456';
+        $contract->userName = 'User123456';
+        $contract->password = 'mysecret';
+        $contract->emailOnError = 'test@example.com';
+        $contract->emailOnWarning = 'test@example.com';
+        return $contract;
+    }
+
+    private function getConnector(): Connector
+    {
+        $connector = new Connector();
+        $connector->application = 'WooCommerce 4.0.1 (WordPress: 5.4)';
+        $connector->webKoppel = 'Acumulus 5.9.0';
+        $connector->development = 'SIEL - Buro RaDer';
+        $connector->remark = 'Library 5.10.0-alpha1 - PHP 7.1.33';
+        $connector->sourceUri = 'https://www.siel.nl/';
+        return $connector;
+    }
+
+    public function getBasicSubmit(): BasicSubmit
+    {
+        $submit = new BasicSubmit();
+        $submit->format = 'json';
+        $submit->testMode = '0';
+        $submit->lang = 'nl';
+        $submit->setContract($this->getContract());
+        $submit->setConnector($this->getConnector());
+        return $submit;
     }
 }

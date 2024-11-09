@@ -7,9 +7,9 @@ namespace Siel\Acumulus\Joomla\HikaShop\Collectors;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * PaymentFeeLineCollector contains HikaShop specific {@see LineType::PaymentFee}
@@ -46,7 +46,7 @@ class PaymentFeeLineCollector extends LineCollector
         $paymentInc = (float) $source->getShopObject()->order_payment_price;
         $paymentVat = (float) $source->getShopObject()->order_payment_tax;
         $paymentEx = $paymentInc - $paymentVat;
-        $recalculatePrice = Tag::UnitPrice;
+        $recalculatePrice = Fld::UnitPrice;
         $description = $this->t('payment_costs');
         $line->product = $description;
         $line->quantity = 1;

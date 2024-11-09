@@ -14,6 +14,7 @@ namespace Siel\Acumulus\Config;
 use SensitiveParameter;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Meta;
@@ -37,10 +38,6 @@ use const Siel\Acumulus\Version;
  * @todo: New settings:
  *   - EmailAsPdf: gfx
  *   - Invoice: concept type???
- * @error: update Tag::... to Fld::...
- *   - Usage in the code
- *   - Update function in ConfigUpgrade
- *   - Quick win for now: Let get check for lowercase version as well
  *
  * @noinspection PhpLackOfCohesionInspection
  */
@@ -195,16 +192,16 @@ class Config
     ): bool {
         // Log values in a notice but without the password.
         $copy = $values;
-        if (!empty($copy[Tag::Password])) {
-            $copy[Tag::Password] = 'REMOVED FOR SECURITY';
+        if (!empty($copy[Fld::Password])) {
+            $copy[Fld::Password] = 'REMOVED FOR SECURITY';
         }
         $this->log->notice('Config::save(): saving %s', json_encode($copy, Meta::JsonFlags));
 
         // Remove password if not sent along. We have had some reports that
         // passwords were gone missing, perhaps some shops do not send the value
         // of password fields to the client???
-        if (array_key_exists(Tag::Password, $values) && empty($values[Tag::Password])) {
-            unset($values[Tag::Password]);
+        if (array_key_exists(Fld::Password, $values) && empty($values[Fld::Password])) {
+            unset($values[Fld::Password]);
         }
 
         // As we have 2 setting screens, but also with updates, not all settings
@@ -397,9 +394,9 @@ class Config
      */
     public function getCredentials(): array
     {
-        $result = $this->getSettingsByGroup(Tag::Contract);
+        $result = $this->getSettingsByGroup(Fld::Contract);
         // No separate key for now.
-        $result[Tag::EmailOnWarning] = $result[Tag::EmailOnError];
+        $result[Fld::EmailOnWarning] = $result[Fld::EmailOnError];
         return $result;
     }
 
@@ -468,7 +465,7 @@ class Config
      */
     public function getCustomerSettings(): array
     {
-        return $this->getSettingsByGroup(Tag::Customer);
+        return $this->getSettingsByGroup(Fld::Customer);
     }
 
     /**
@@ -494,7 +491,7 @@ class Config
      */
     public function getInvoiceSettings(): array
     {
-        return $this->getSettingsByGroup(Tag::Invoice);
+        return $this->getSettingsByGroup(Fld::Invoice);
     }
 
     /**
@@ -511,7 +508,7 @@ class Config
      */
     public function getEmailAsPdfSettings(): array
     {
-        return $this->getSettingsByGroup(Tag::EmailAsPdf);
+        return $this->getSettingsByGroup(Fld::EmailAsPdf);
     }
 
     /**
@@ -659,140 +656,134 @@ class Config
                     'type' => 'int',
                     'default' => Severity::Notice,
                 ],
-                /** @deprecated  */
-                'outputFormat' => [
-                    'group' => 'plugin',
-                    'type' => 'string',
-                    'default' => Api::outputFormat,
-                ],
-                Tag::ContractCode => [
-                    'group' => Tag::Contract,
+                Fld::ContractCode => [
+                    'group' => Fld::Contract,
                     'type' => 'string',
                     'default' => '',
                 ],
-                Tag::UserName => [
-                    'group' => Tag::Contract,
+                Fld::UserName => [
+                    'group' => Fld::Contract,
                     'type' => 'string',
                     'default' => '',
                 ],
-                Tag::Password => [
-                    'group' => Tag::Contract,
+                Fld::Password => [
+                    'group' => Fld::Contract,
                     'type' => 'string',
                     'default' => '',
                 ],
-                Tag::EmailOnError => [
-                    'group' => Tag::Contract,
+                Fld::EmailOnError => [
+                    'group' => Fld::Contract,
                     'type' => 'string',
                     'default' => '',
                 ],
                 'defaultCustomerType' => [
-                    'group' => Tag::Customer,
+                    'group' => Fld::Customer,
                     'type' => 'int',
                     'default' => 0,
                 ],
                 'sendCustomer' => [
-                    'group' => Tag::Customer,
+                    'group' => Fld::Customer,
                     'type' => 'bool',
                     'default' => true,
                 ],
                 'genericCustomerEmail' => [
-                    'group' => Tag::Customer,
+                    'group' => Fld::Customer,
                     'type' => 'string',
                     'default' => "consumer.$hostName@nul.sielsystems.nl",
                 ],
                 'emailIfAbsent' => [
-                    'group' => Tag::Customer,
+                    'group' => Fld::Customer,
                     'type' => 'string',
                     'default' => "$hostName@nul.sielsystems.nl",
                 ],
                 'mainAddress' => [
-                    'group' => Tag::Customer,
+                    'group' => Fld::Customer,
                     'type' => 'string',
                     'default' => Config::MainAddress_FollowShop,
                 ],
                 'countryAutoName' => [
-                    'group' => Tag::Customer,
+                    'group' => Fld::Customer,
                     'type' => 'int',
                     // The default Api::CountryAutoName_Yes matches the old behaviour.
                     'default' => Api::CountryAutoName_Yes,
                 ],
                 'contactStatus' => [
-                    'group' => Tag::Customer,
+                    'group' => Fld::Customer,
                     'type' => 'int',
                     'default' => Api::ContactStatus_Active,
                 ],
                 'overwriteIfExists' => [
-                    'group' => Tag::Customer,
+                    'group' => Fld::Customer,
                     'type' => 'bool',
                     'default' => true,
                 ],
                 'concept' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'int',
                     'default' => Config::Concept_Plugin,
                 ],
                 'euCommerceThresholdPercentage' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'float',
                     'default' => 95.0,
                 ],
                 'missingAmount' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'int',
                     'default' => Config::MissingAmount_Warn,
                 ],
                 'defaultAccountNumber' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'int',
                     'default' => 0,
                 ],
                 'defaultCostCenter' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'int',
                     'default' => 0,
                 ],
                 'defaultInvoiceTemplate' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'int',
                     'default' => 0,
                 ],
                 'defaultInvoicePaidTemplate' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'int',
                     'default' => 0,
                 ],
                 'paymentMethodAccountNumber' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'array',
                     'default' => [],
                 ],
                 'paymentMethodCostCenter' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'array',
                     'default' => [],
                 ],
                 'sendEmptyShipping' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'bool',
                     'default' => true,
                 ],
                 'optionsShow' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'bool',
                     'default' => true,
                 ],
                 'optionsAllOn1Line' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'int',
                     'default' => 2,
                 ],
                 'optionsAllOnOwnLine' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'int',
                     'default' => 4,
                 ],
                 'optionsMaxLength' => [
-                    'group' => Tag::Invoice,
+                    'group' => Fld::Invoice,
                     'type' => 'int',
                     'default' => 80,
                 ],
@@ -897,12 +888,12 @@ class Config
                     'default' => false,
                 ],
                 'emailAsPdf' => [
-                    'group' => Tag::EmailAsPdf,
+                    'group' => Fld::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
                 ],
                 'ubl' => [
-                    'group' => Tag::EmailAsPdf,
+                    'group' => Fld::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
                 ],

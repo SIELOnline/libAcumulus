@@ -8,7 +8,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusResponseException;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Tag;
+use Siel\Acumulus\Fld;
 
 /**
  * CheckAccount checks the account fields for being empty, incorrect, or correct
@@ -57,7 +57,7 @@ class CheckAccount extends MessageCollection
                     $about = $this->acumulusApiClient->getAbout();
                     if ($about->getByCode(403) !== null) {
                         $this->message = 'message_error_auth';
-                        $this->addFormMessage($this->t('message_error_auth_form'), Severity::Error, Tag::ContractCode);
+                        $this->addFormMessage($this->t('message_error_auth_form'), Severity::Error, Fld::ContractCode);
                     } elseif ($about->hasError()) {
                         $this->message = 'message_error_comm';
                         $this->addMessages($about->getMessages(Severity::WarningOrWorse));
@@ -71,14 +71,14 @@ class CheckAccount extends MessageCollection
                                 // Correct role: no additional message.
                                 break;
                             case Api::RoleApiCreator:
-                                $this->addFormMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
+                                $this->addFormMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Fld::UserName);
                                 break;
                             case Api::RoleApiManager:
-                                $this->addFormMessage($this->t('message_warning_role_overkill'), Severity::Warning, Tag::UserName);
+                                $this->addFormMessage($this->t('message_warning_role_overkill'), Severity::Warning, Fld::UserName);
                                 break;
                             default:
                                 $this->message = 'message_error_role_deprecated';
-                                $this->addFormMessage($this->t('message_error_role_deprecated'), Severity::Error, Tag::UserName);
+                                $this->addFormMessage($this->t('message_error_role_deprecated'), Severity::Error, Fld::UserName);
                                 break;
                         }
                     }
@@ -126,7 +126,7 @@ class CheckAccount extends MessageCollection
     protected function emptyCredentials(): bool
     {
         $credentials = $this->acumulusConfig->getCredentials();
-        return empty($credentials[Tag::ContractCode]) || empty($credentials[Tag::UserName]) || empty($credentials[Tag::Password]);
+        return empty($credentials[Fld::ContractCode]) || empty($credentials[Fld::UserName]) || empty($credentials[Fld::Password]);
     }
 
     /**

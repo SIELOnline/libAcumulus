@@ -19,9 +19,9 @@
 namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
-use Siel\Acumulus\Tag;
 
 /**
  * Defines Magento specific invoice line flattener logic.
@@ -48,8 +48,8 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
         $vatRates = $this->getAppearingVatRates($children);
         if (count($vatRates) === 1) {
             $childrenVatRate = array_key_first($vatRates);
-            if ((Number::isZero($childrenVatRate) || $childrenVatRate == $parent[Tag::VatRate])
-                && !Number::isZero($parent[Tag::UnitPrice])
+            if ((Number::isZero($childrenVatRate) || $childrenVatRate == $parent[Fld::VatRate])
+                && !Number::isZero($parent[Fld::UnitPrice])
             ) {
                 $useParentInfo = true;
             }

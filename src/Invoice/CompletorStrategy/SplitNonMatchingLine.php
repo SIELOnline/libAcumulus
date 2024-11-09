@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Data\Line;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
-use Siel\Acumulus\Tag;
 
 use function count;
 
@@ -37,7 +37,7 @@ use function count;
  *   only lines that are marked with the value meta-strategy-split are
  *   corrected.
  * - Each line2complete must have at least 2 of the values 'vatamount',
- *   'unitprice', or 'unitpriceinc', meaning that it can be divided on its own!
+ *   'unitprice', or 'unitPriceInc', meaning that it can be divided on its own!
  * - They have gone through the correction phase, but no matching VAT rate was
  *   found, so the value 'meta-vatrate-matches' is set to 'none'.
  * These lines are split in such a way over the 2 allowed vat rates, that the
@@ -91,7 +91,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
     {
         $this->minVatRate = $this->getVatBreakDownMinRate();
         $this->maxVatRate = $this->getVatBreakDownMaxRate();
-        $this->description = sprintf('"SplitNonMatchingLine(%f, %f)', $this->minVatRate[Tag::VatRate], $this->maxVatRate[Tag::VatRate]);
+        $this->description = sprintf('"SplitNonMatchingLine(%f, %f)', $this->minVatRate[Fld::VatRate], $this->maxVatRate[Fld::VatRate]);
         $result = false;
         foreach ($this->lines2Complete as $key => $line2Complete) {
             // Line may be split and line does not have a matching vat rate.
@@ -114,24 +114,24 @@ class SplitNonMatchingLine extends CompletorStrategyBase
     {
         [$lowAmount, $highAmount] = $this->splitAmountOver2VatRates($line[Meta::LineAmount],
             $line[Meta::LineAmountInc] - $line[Meta::LineAmount],
-            $this->minVatRate[Tag::VatRate],
-            $this->maxVatRate[Tag::VatRate]);
+            $this->minVatRate[Fld::VatRate],
+            $this->maxVatRate[Fld::VatRate]);
 
         // Dividing was possible if both amounts have the same sign.
         if (($highAmount < -0.005 && $lowAmount < -0.005 && $line[Meta::LineAmount] < -0.005)
             || ($highAmount > 0.005 && $lowAmount > 0.005 && $line[Meta::LineAmount] > 0.005)
         ) {
             $splitLine = $line;
-            $splitLine[Tag::Product] .= sprintf(' (%f%% %s)', $this->maxVatRate[Tag::VatRate], $this->t('vat'));
-            $splitLine[Tag::UnitPrice] = $highAmount;
+            $splitLine[Fld::Product] .= sprintf(' (%f%% %s)', $this->maxVatRate[Fld::VatRate], $this->t('vat'));
+            $splitLine[Fld::UnitPrice] = $highAmount;
             unset($splitLine[Meta::UnitPriceInc]);
-            $this->completeLine($splitLine, $this->maxVatRate[Tag::VatRate]);
+            $this->completeLine($splitLine, $this->maxVatRate[Fld::VatRate]);
 
             $splitLine = $line;
-            $splitLine[Tag::Product] .= sprintf(' (%f%% %s)', $this->minVatRate[Tag::VatRate], $this->t('vat'));
-            $splitLine[Tag::UnitPrice] = $lowAmount;
+            $splitLine[Fld::Product] .= sprintf(' (%f%% %s)', $this->minVatRate[Fld::VatRate], $this->t('vat'));
+            $splitLine[Fld::UnitPrice] = $lowAmount;
             unset($splitLine[Meta::UnitPriceInc]);
-            $this->completeLine($splitLine, $this->minVatRate[Tag::VatRate]);
+            $this->completeLine($splitLine, $this->minVatRate[Fld::VatRate]);
             return true;
         }
         return false;

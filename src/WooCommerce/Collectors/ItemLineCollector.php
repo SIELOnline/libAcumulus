@@ -8,9 +8,9 @@ use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 use WC_Order_Item_Product;
 use WC_Product;
 
@@ -95,7 +95,7 @@ class ItemLineCollector extends LineCollector
             if ($reason !== '') {
                 $this->addMessage($line, "Price inc is realistic: $reason", Meta::Info);
                 $precisionInc = 0.001;
-                $recalculatePrice = Tag::UnitPrice;
+                $recalculatePrice = Fld::UnitPrice;
             } else {
                 $precisionInc = 0.02;
                 $recalculatePrice = Meta::UnitPriceInc;

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * Class ApplySameVatRate implements a vat completor strategy by applying the
@@ -42,7 +42,7 @@ class ApplySameVatRate extends CompletorStrategyBase
     {
         // Try all possible vat rates.
         foreach ($this->getVatBreakdown() as $vatRateInfo) {
-            $vatRate = $vatRateInfo[Tag::VatRate];
+            $vatRate = $vatRateInfo[Fld::VatRate];
             if ($this->tryVatRate($vatRate)) {
                 return true;
             }
@@ -65,7 +65,7 @@ class ApplySameVatRate extends CompletorStrategyBase
             $vatAmount += $this->completeLine($line2Complete, $vatRate);
         }
 
-        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategy . $this->getName()] = "tryVatRate($vatRate): $vatAmount";
+        $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategy . $this->getName()] = "tryVatRate($vatRate): $vatAmount";
         // If the vat totals are equal, the strategy worked.
         // We allow for a reasonable margin, as rounding errors may add up.
         return Number::floatsAreEqual($vatAmount, $this->vat2Divide, 0.04);

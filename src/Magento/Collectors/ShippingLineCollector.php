@@ -8,10 +8,10 @@ use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 /**
  * ShippingLineCollector contains Magento specific {@see LineType::Shipping} collecting
@@ -68,7 +68,7 @@ class ShippingLineCollector extends LineCollector
             $line->metadataSet(Meta::PrecisionUnitPrice, $this->shippingPriceIncludeTax() ? 0.02 : 0.01);
             $line->metadataSet(Meta::PrecisionVatAmount, 0.02);
             $line->metadataSet(Meta::UnitPriceInc, $shippingInc);
-            $line->metadataSet(Meta::RecalculatePrice, $this->shippingPriceIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc);
+            $line->metadataSet(Meta::RecalculatePrice, $this->shippingPriceIncludeTax() ? Fld::UnitPrice : Meta::UnitPriceInc);
             $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
 
             // Add vat class meta data.

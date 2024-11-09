@@ -137,7 +137,7 @@ abstract class Mailer
     public function getTo(): string
     {
         $credentials = $this->config->getCredentials();
-        return $credentials[Tag::EmailOnError];
+        return $credentials[Fld::EmailOnError];
     }
 
     /**

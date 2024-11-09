@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
-use Siel\Acumulus\Tag;
+use Siel\Acumulus\Fld;
 
 /**
  * Allows access to Invoices with array bracket syntax and Acumulus tags (all lower case).
@@ -18,7 +18,7 @@ trait InvoiceArrayAccessTrait
     protected function getOffsetMappings(): array
     {
         $result = parent::getOffsetMappings();
-        $result[Tag::Line] = 'lines';
+        $result[Fld::Line] = 'lines';
         return $result;
     }
 }

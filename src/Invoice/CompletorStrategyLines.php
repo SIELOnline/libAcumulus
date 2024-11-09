@@ -20,9 +20,9 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 use function in_array;
 
@@ -76,7 +76,7 @@ class CompletorStrategyLines
     public function complete($invoice, Source $source, array $possibleVatTypes, array $possibleVatRates)
     {
         $this->invoice = $invoice;
-        $this->invoiceLines = &$this->invoice[Tag::Customer][Tag::Invoice][Tag::Line];
+        $this->invoiceLines = &$this->invoice[Fld::Customer][Fld::Invoice][Fld::Line];
         $this->source = $source;
         $this->possibleVatTypes = $possibleVatTypes;
         $this->possibleVatRates = $possibleVatRates;
@@ -92,7 +92,7 @@ class CompletorStrategyLines
     protected function completeStrategyLines(): void
     {
         if ($this->invoiceHasStrategyLine()) {
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-rates'] = json_encode($this->possibleVatRates, Meta::JsonFlags);
+            $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyInput]['vat-rates'] = json_encode($this->possibleVatRates, Meta::JsonFlags);
 
             $isFirst = true;
             $strategies = $this->getStrategyClasses();
@@ -100,16 +100,16 @@ class CompletorStrategyLines
                 /** @var CompletorStrategyBase $strategy */
                 $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
-                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-2-divide'] = $strategy->getVat2Divide();
-                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-breakdown'] = json_encode($strategy->getVatBreakdown(), Meta::JsonFlags);
+                    $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyInput]['vat-2-divide'] = $strategy->getVat2Divide();
+                    $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyInput]['vat-breakdown'] = json_encode($strategy->getVatBreakdown(), Meta::JsonFlags);
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {
                     $this->replaceLinesCompleted($strategy->getLinesCompleted(), $strategy->getReplacingLines(), $strategy->getName());
-                    if (empty($this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed])) {
-                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed] = $strategy->getDescription();
+                    if (empty($this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyUsed])) {
+                        $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyUsed] = $strategy->getDescription();
                     } else {
-                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed] .= '; ' . $strategy->getDescription();
+                        $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyUsed] .= '; ' . $strategy->getDescription();
                     }
                     // Allow for partial solutions: a strategy may correct only
                     // some strategy lines and leave the rest up to other
@@ -173,7 +173,7 @@ class CompletorStrategyLines
     {
         // Remove old strategy lines that are now completed.
         $lines = [];
-        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $key => $line) {
+        foreach ($this->invoice[Fld::Customer][Fld::Invoice][Fld::Line] as $key => $line) {
             if (!in_array($key, $linesCompleted, true)) {
                 $lines[] = $line;
             }
@@ -186,6 +186,6 @@ class CompletorStrategyLines
                 $completedLine[Meta::CompletorStrategyUsed] = $strategyName;
             }
         }
-        $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = array_merge($lines, $completedLines);
+        $this->invoice[Fld::Customer][Fld::Invoice][Fld::Line] = array_merge($lines, $completedLines);
     }
 }

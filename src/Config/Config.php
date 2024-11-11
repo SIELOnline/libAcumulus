@@ -165,10 +165,17 @@ class Config
             $this->values = $this->castValues($this->values);
             $this->isConfigurationLoaded = true;
 
+            // Update the config if it is outdated.
             if (!empty($this->values[Config::VersionKey])
                 && version_compare($this->values[Config::VersionKey], Version, '<')
                 && !isset($this->isUpgrading)
             ) {
+                // ConfigUpgrade will ensure that upgraded config value are saved. This
+                // can be done multiple times, so prevent recursively calling this upgrade
+                // process.
+                // If values have changed and thus are to be saved, the {@see save()}
+                // method of this class will set the property isConfigurationLoaded to
+                // false
                 $this->isUpgrading = true;
                 $this->getConfigUpgrade()->upgrade($this->values[Config::VersionKey]);
                 $this->isUpgrading = false;

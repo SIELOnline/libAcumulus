@@ -20,20 +20,24 @@ use function is_string;
 /**
  * Implements the connection to the Magento 2 config component.
  */
-class ConfigStore extends BaSeConfigStore
+class ConfigStore extends BaseConfigStore
 {
     protected string $configPath = 'siel_acumulus/';
+    protected array $values;
 
     public function load(): array
     {
-        $values = $this->getConfigInterface()->getValue($this->configPath . $this->configKey);
-        if (!empty($values) && is_string($values)) {
-            $values = unserialize($values, ['allowed_classes' => false]);
+        if (!isset($this->values)) {
+            $values = $this->getConfigInterface()->getValue($this->configPath . $this->configKey);
+            if (!empty($values) && is_string($values)) {
+                $values = unserialize($values, ['allowed_classes' => false]);
+            }
+            $this->values = is_array($values) ? $values : [];
         }
-        return is_array($values) ? $values : [];
+        return $this->values;
     }
 
-    public function save(array $values): bool
+    public function saveOld(array $values): bool
     {
         // @todo: switch to json.
         $serializedValues = serialize($values);
@@ -46,31 +50,24 @@ class ConfigStore extends BaSeConfigStore
         return true;
     }
 
-    public function saveNew(array $values): bool
+    public function save(array $values): bool
     {
         // I tried a various number of cache clean solutions, but I can't get any of them
         // to work. Saving config on the Magento own config pages doesn't work either, so
         // I give up.
+        // Keeps values correct in-request.
+        $this->values = $values;
 
-        \Siel\Acumulus\Helpers\Container::getContainer()->getLog()
-            ->notice('ConfigStore::save(): saving %s', json_encode($values, Meta::JsonFlags));
         $serializedValues = serialize($values);
-
-        $configWriter = $this->getWriterInterface();
+        $configWriter = $this->getConfigWriterInterface();
         $configWriter->save($this->configPath . $this->configKey, $serializedValues);
 
+        /** @var \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList */
         $cacheTypeList = Registry::getInstance()->get(\Magento\Framework\App\Cache\TypeListInterface::class);
         $cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
-
-        $reinitableConfig = Registry::getInstance()->get(\Magento\Framework\App\Config\ReinitableConfigInterface::class);
-        $reinitableConfig->reinit();
-
         /** @var \Magento\Framework\App\Cache\Manager $cacheManager */
-        \Siel\Acumulus\Helpers\Container::getContainer()->getLog()
-            ->notice('ConfigStore::save(): flushing all caches');
         $cacheManager = Registry::getInstance()->get(\Magento\Framework\App\Cache\Manager::class);
-        $cacheManager->flush(['config']);
-        $cacheManager->flush($cacheManager->getAvailableTypes());
+        $cacheManager->flush([\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER]);
 
         return true;
     }
@@ -85,7 +82,7 @@ class ConfigStore extends BaSeConfigStore
         return Registry::getInstance()->get(MagentoModelConfig::class);
     }
 
-    protected function getWriterInterface(): WriterInterface
+    protected function getConfigWriterInterface(): WriterInterface
     {
         return Registry::getInstance()->get(WriterInterface::class);
     }

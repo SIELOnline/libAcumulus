@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
-use Siel\Acumulus\Tag;
 use Tools;
 
 /**

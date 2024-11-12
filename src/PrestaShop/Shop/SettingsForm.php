@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Shop;
 
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Shop\SettingsForm as BaseSettingsForm;
-use Siel\Acumulus\Tag;
 
 use function array_key_exists;
 

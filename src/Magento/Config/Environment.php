@@ -26,7 +26,7 @@ class Environment extends EnvironmentBase
         $productMetadata = Registry::getInstance()->get(ProductMetadataInterface::class);
         try {
             $version = $productMetadata->getVersion();
-        } catch (Exception $e) {
+        } catch (Exception) {
             // In CLI mode (php bin/magento ...) getVersion() throws an
             // exception.
             $version = 'UNKNOWN';

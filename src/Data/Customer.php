@@ -18,9 +18,9 @@ use function in_array;
  * Represents an Acumulus API customer object.
  *
  * The definition of the fields is based on the
- * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Data Add API call},
+ * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Invoice Add API call},
  * NOT the
- * {@link https://www.siel.nl/acumulus/API/Contacts/Manage_Contact/ Manage Contact call}.
+ * {@link https://www.siel.nl/acumulus/API/Contacts/Manage_Contact/ Manage Contact API call}.
  * However, there are some notable changes with the API structure:
  * - A Customer is part of the {@see Invoice} instead of the other way in the
  *   API.

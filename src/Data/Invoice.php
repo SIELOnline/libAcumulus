@@ -15,17 +15,11 @@ use Siel\Acumulus\Meta;
  * Represents an Acumulus API Invoice object.
  *
  * The definition of the fields is based on the
- * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Data Add API call},
- * NOT the
- * {@link https://www.siel.nl/acumulus/API/Contacts/Manage_Contact/ Manage Contact call}.
+ * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Invoice Add API call}.
+ *
  * However, there are some notable changes with the API structure:
  * - A Customer is part of the {@see Invoice} instead of the other way in the
  *   API.
- * - We have 2 separate {@see Address} objects, an invoice and billing address.
- *   In the API all address fields are part of the customer itself, the fields
- *   of the 2nd address being prefixed with 'alt'. In decoupling this in the
- *   collector phase, we allow users to relate the 1st and 2 nd address to the
- *   invoice or shipping address as they like.
  *
  * @property ?bool $concept
  * @property ?string $conceptType

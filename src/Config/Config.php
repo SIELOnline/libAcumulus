@@ -794,6 +794,11 @@ class Config
                     'type' => 'int',
                     'default' => 80,
                 ],
+                'stockManagementEnabled' => [
+                    'group' => Fld::Stock,
+                    'type'=> 'bool',
+                    'default' => false,
+                ],
                 'nature_shop' => [
                     'group' => 'shop',
                     'type' => 'int',
@@ -845,6 +850,7 @@ class Config
                     'default' => Config::TriggerCreditNoteEvent_Create,
                 ],
                 'sendEmptyInvoice' => [
+                    // @todo: why is this an event, should be invoice?
                     'group' => 'event',
                     'type' => 'bool',
                     'default' => true,

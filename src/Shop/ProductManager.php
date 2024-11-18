@@ -62,22 +62,55 @@ class ProductManager
         return $this->getContainer()->getConfig();
     }
 
-    public function updateStockForOrderItem(Item $item, int|float $change): void
+    /**
+     * Updates the stock at Acumulus.
+     *
+     * @param \Siel\Acumulus\Invoice\Item $item
+     *   The item line at the origin of the stock change, refers to the product for which
+     *   to update the stock.
+     * @param int|float $change
+     *   The change in stock.
+     *
+     * @todo: setting if we are doing stock management at all, check if the current
+     *   product manages stock (or is a service or ...)
+     */
+    public function updateStockForItem(Item $item, int|float $change): void
     {
-        $product = $item->getProduct();
-        if ($product instanceof Product) {
-            if (!Number::isZero($change, 0.00001)) {
-                // @todo: implement
-            } else {
-                $this->getLog()->warning(
-                    'Zero change in stock for item %d of %s %d',
-                    $item->getId(),
-                    $this->t($item->getSource()->getType()),
-                    $item->getSource()->getId(),
-                );
-            }
-        } else {
-            $this->getLog()->error('No product found for item %d', $item->getId());
+        // Execute a few checks to see if we should and can proceed.
+        if (!$this->getContainer()->getShopCapabilities()->hasStockManagement() || !$this->getConfig()->get('stockManagementEnabled')) {
+            return;
         }
+        $product = $item->getProduct();
+        if ($product === null) {
+            // @todo: does this merit an e-mail?
+            $this->getLog()->error('No product found for item %d: cannot update stock with %+f', $item->getId(), $change);
+            return;
+        }
+        if (Number::isZero($change, 0.00001)) {
+            $this->getLog()->warning(
+                'Zero change in stock for item %d of %s %d',
+                $item->getId(),
+                $this->t($item->getSource()->getType()),
+                $item->getSource()->getId(),
+            );
+            return;
+        }
+
+        // @todo: implement:
+        //   - collect and complete StockTransaction object: map or lookup productId
+        //   - send it
+        //   - check result: send mail on error (so, the checks above should set a send
+        //     status, so we can mail on not sending due to one of the reasons above?)
+        $productWithStock = $product->getStockManagingProduct();
+        $this->getContainer()->getLog()->info(
+            'Changing stock for product %d (%s) (stock managed by %d) line item %d (of %s %d) with %+f',
+            $product->getId(),
+            $product->getReferenceForAcumulusLookup(),
+            $productWithStock->getId(),
+            $item->getId(),
+            $this->t($item->getSource()->getType()),
+            $item->getSource()->getId(),
+            $change,
+        );
     }
 }

@@ -16,17 +16,22 @@ namespace Siel\Acumulus;
  */
 interface Fld
 {
+    // Structures
     public const Connector = 'connector';
     public const Contract = 'contract';
     public const Customer = 'customer';
     public const Invoice = 'invoice';
     public const Line = 'line';
+    public const Stock = 'stock';
 
+    // Contract
     public const ContractCode = 'contractCode';
     public const UserName = 'userName';
     public const Password = 'password';
     public const EmailOnError = 'emailOnError';
     public const EmailOnWarning = 'emailOnWarning';
+
+    // Connector
     public const Application = 'application';
     public const Format = 'format';
     public const TestMode = 'testMode';
@@ -39,12 +44,15 @@ interface Fld
     public const Remark = 'remark';
     public const SourceUri = 'sourceUri';
 
+    // Customer
     public const Type = 'type';
     public const VatTypeId = 'vatTypeId';
     public const ContactId = 'contactId';
     public const ContactYourId = 'contactYourId';
     public const ContactStatus = 'contactStatus';
     public const CompanyName = 'companyName';
+
+    // Address
     public const CompanyName1 = 'companyName1';
     public const CompanyName2 = 'companyName2';
     public const CompanyTypeId = 'companyTypeId';
@@ -59,17 +67,6 @@ interface Fld
     public const CountryCode = 'countryCode';
     public const CountryAutoName = 'countryAutoName';
     public const CountryAutoNameLang = 'countryAutoNameLang';
-    public const AltCompanyName1 = 'altCompanyName1';
-    public const AltCompanyName2 = 'altCompanyName2';
-    public const AltFullName = 'altFullName';
-    public const AltAddress1 = 'altAddress1';
-    public const AltAddress2 = 'altAddress2';
-    public const AltPostalCode = 'altPostalCode';
-    public const AltCity = 'altCity';
-    public const AltCountry = 'altCountry';
-    public const AltCountryCode = 'altCountryCode';
-    public const AltCountryAutoName = 'altCountryAutoName';
-    public const AltCountryAutoNameLang = 'altCountryAutoNameLang';
     public const Website = 'website';
     public const VatNumber = 'vatNumber';
     public const Telephone = 'telephone';
@@ -82,6 +79,20 @@ interface Fld
     public const Mark = 'mark';
     public const DisableDuplicates = 'disableDuplicates';
 
+    // Alternative address
+    public const AltCompanyName1 = 'altCompanyName1';
+    public const AltCompanyName2 = 'altCompanyName2';
+    public const AltFullName = 'altFullName';
+    public const AltAddress1 = 'altAddress1';
+    public const AltAddress2 = 'altAddress2';
+    public const AltPostalCode = 'altPostalCode';
+    public const AltCity = 'altCity';
+    public const AltCountry = 'altCountry';
+    public const AltCountryCode = 'altCountryCode';
+    public const AltCountryAutoName = 'altCountryAutoName';
+    public const AltCountryAutoNameLang = 'altCountryAutoNameLang';
+
+    // Invoice
     public const Concept = 'concept';
     public const ConceptType = 'conceptType';
     public const Number = 'number';
@@ -97,6 +108,7 @@ interface Fld
     public const Notes = 'notes';
     public const InvoiceNotes = 'invoiceNotes';
 
+    // Line
     public const ItemNumber = 'itemNumber';
     public const Product = 'product';
     public const Nature = 'nature';
@@ -105,6 +117,8 @@ interface Fld
     public const Quantity = 'quantity';
     public const CostPrice = 'costPrice';
 
+    // Email PDF/ Get PDF (invoice and packing slip)
+    public const Token = 'token';
     public const EmailAsPdf = 'emailAsPdf';
     public const EmailTo = 'emailTo';
     public const EmailBcc = 'emailBcc';
@@ -115,9 +129,16 @@ interface Fld
     public const Gfx = 'gfx';
     public const Ubl = 'ubl';
 
+    // Register
     public const LoginName = 'loginName';
     public const Gender = 'gender';
     public const CreateApiUser = 'createApiUser';
 
     public const CountryRegion = 'countryRegion';
+
+    // Stock
+    public const ProductId = 'productId';
+    public const StockAmount = 'stockAmount';
+    public const StockDescription = 'stockDescription';
+    public const StockDate = 'stockDate';
 }

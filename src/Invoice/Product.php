@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice;
 
+use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
+
+use function get_class;
+use function sprintf;
 
 /**
  * Product is an adapter (and wrapper) class around a product (variant) ordered (or
@@ -41,12 +45,25 @@ abstract class Product
      * The reference is typically the SKU, ISBN, EAN13, or any other string used to
      * uniquely identify this product (variant).
      */
-//    abstract public function getReference(): string;
+    public function getReference(): string
+    {
+        // @todo: use Mappings + FieldExpander?
+        throw new RuntimeException(sprintf('%s::%s(): Not implemented', get_class(), __FUNCTION__));
+    }
+
+    public function getReferenceForAcumulusLookup(): string
+    {
+        // @todo: define config option that defines which field to use and retrieve that field
+        throw new RuntimeException(sprintf('%s::%s(): Not implemented', get_class(), __FUNCTION__));
+    }
 
     /**
-     * Returns the name of the product.
+     * Returns the human-readable name of the product.
      */
-//    abstract public function getName(): string;
+    public function getName(): string
+    {
+        throw new RuntimeException(sprintf('%s::%s(): Not implemented', get_class(), __FUNCTION__));
+    }
 
     /**
      * Returns the id of the vat class of the product.
@@ -57,4 +74,19 @@ abstract class Product
      * Returns the name of the vat class of the product.
      */
 //    abstract public function getVatClassName(): string;
+
+    /**
+     * Returns the {@see Product} on which the stock is managed for this product.
+     *
+     * This will typically be the product itself, but in case of variants that do not need
+     * separate stock, it may be the parent product. Note: that this is probably a sign of
+     * misconfiguration, as few are products with variants for which all variants ship the
+     * same parent product (electricity cables with some predefined lengths as variants
+     * and cut on order, though normally you wil have prepackaged lengths of 10, 25, 50
+     * and 100m.)
+     */
+    public function getStockManagingProduct(): static
+    {
+        return $this;
+    }
 }

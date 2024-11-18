@@ -13,6 +13,8 @@ use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Data\EmailInvoiceAsPdf;
 use Siel\Acumulus\Data\EmailPackingSlipAsPdf;
 use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\StockTransaction;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
@@ -718,6 +720,8 @@ class Acumulus
      *   Possible errors:
      *
      * @throws AcumulusException|AcumulusResponseException
+     *
+     * @deprecated use {@see stockTransaction()}
      */
     public function stockMutation(int $productId, float $quantity, string $description, string $date = null): AcumulusResult
     {
@@ -733,6 +737,25 @@ class Acumulus
             ]
         ];
         return $this->callApiFunction('stock/stock_add', $message)->setMainAcumulusResponseKey('stock');
+    }
+
+    /**
+     * Updates the stock for a product.
+     *
+     * See {@link https://www.siel.nl/acumulus/API/Stock/Add_Stock_Transaction/}
+     *
+     * @return AcumulusResult
+     *   The result of the webservice call. The structured response will contain
+     *   1 "stock" array, being a keyed array with keys:
+     *   - 'productid'
+     *   - stockamount (the new stock level for this product)
+     *   Possible errors:
+     *
+     * @throws AcumulusException|AcumulusResponseException
+     */
+    public function stockTransaction(StockTransaction $stockTransaction): AcumulusResult
+    {
+        return $this->callApiFunction('stock/stock_add', $stockTransaction->toArray())->setMainAcumulusResponseKey('stock');
     }
 
     /**
@@ -824,8 +847,8 @@ class Acumulus
     ): AcumulusResult
     {
         $message = [
-            'token' => $token,
-            'emailaspdf' => $emailAsPdf->toArray(),
+            Fld::Token => $token,
+            Fld::EmailAsPdf => $emailAsPdf->toArray(),
         ];
         if ($invoiceType !== null) {
             $message['invoicetype'] = $invoiceType;

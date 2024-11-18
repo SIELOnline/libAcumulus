@@ -11,6 +11,7 @@ use Siel\Acumulus\Invoice\Source;
 
 use function array_key_exists;
 use function in_array;
+use function sprintf;
 
 /**
  * Defines an interface to access the shop specific's capabilities.
@@ -409,8 +410,7 @@ abstract class ShopCapabilities
     }
 
     /**
-     * Returns whether our module for this shop (already) implements the
-     * InvoiceStatus screen.
+     * Returns whether our module for this shop implements the InvoiceStatus screen.
      *
      * At this moment all shops implements this screen, so this method returns
      * true and is not overridden.
@@ -423,10 +423,18 @@ abstract class ShopCapabilities
     }
 
     /**
-     * Returns whether our module for this shop (already) implements the
-     * features on the Order list screen.
+     * Returns whether our module for this shop implements the features on the Order list
+     * screen.
      */
     public function hasOrderList(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Returns whether our module for this shop implements the stock management features.
+     */
+    public function hasStockManagement(): bool
     {
         return false;
     }

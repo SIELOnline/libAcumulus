@@ -332,7 +332,7 @@ class BatchForm extends Form
                     'name' => 'order_statuses[]',
                     'type' => 'select',
                     'label' => $this->t('field_order_statuses'),
-                    'description' => $this->t('desc_order_statuses'),
+                    'description' => sprintf($this->t('desc_order_statuses'), $this->t('option_empty_order_statuses')),
                     'options' => $orderStatusesList,
                     'attributes' => [
                         'multiple' => true,

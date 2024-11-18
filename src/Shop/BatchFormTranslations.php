@@ -23,13 +23,13 @@ class BatchFormTranslations extends TranslationCollection
         'field_invoice_source_type' => 'Factuurtype',
         'field_invoice_source_reference_from' => '# van',
         'field_invoice_source_reference_to' => '# tot',
-        'desc_invoice_source_reference_from_to_1' => 'Vul de reeks bestel-referenties of nummers in die u naar Acumulus wilt verzenden. Als u slechts 1 factuur wilt verzenden hoeft u alleen het \'# van\' in te vullen. Laat beide velden leeg als u op datum wilt verzenden.',
-        'desc_invoice_source_reference_from_to_2' => 'Vul de reeks bestel of creditnota-referenties of nummers in die u naar Acumulus wilt verzenden. Als u slechts 1 factuur wilt verzenden hoeft u alleen het \'# van\' in te vullen. Laat beide velden leeg als u op datum wilt verzenden.',
+        'desc_invoice_source_reference_from_to_1' => 'Vul de reeks bestel-referenties of nummers in die u naar Acumulus wilt verzenden. Als u slechts 1 factuur wilt verzenden hoeft u alleen het \'# van\' in te vullen. Laat beide velden leeg als u niet op referentie of nummer wilt filteren.',
+        'desc_invoice_source_reference_from_to_2' => 'Vul de reeks bestel of creditnota-referenties of nummers in die u naar Acumulus wilt verzenden. Als u slechts 1 factuur wilt verzenden hoeft u alleen het \'# van\' in te vullen. Laat beide velden leeg als u niet op referentie of nummer wilt filteren.',
         'field_date_from' => 'Datum van',
         'field_date_to' => 'Datum tot',
-        'desc_date_from_to' => 'Vul de periode in waarvan u de facturen naar Acumulus wilt verzenden. <strong>NB De selectie vindt plaats op basis van de datum van de meest recente wijziging aan de bestelling of creditnota.</strong> Als u slechts de facturen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u op nummer wilt verzenden.',
+        'desc_date_from_to' => 'Vul de periode in waarvan u de facturen naar Acumulus wilt verzenden. <strong>NB De selectie vindt plaats op basis van de datum van de meest recente wijziging aan de bestelling of creditnota.</strong> Als u slechts de facturen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u niet op datum wilt filteren.',
         'field_order_statuses' => 'Bestelstatus',
-        'desc_order_statuses' => 'Selecteer de statussen die een bestelling nu moet hebben. M.b.v. de "Ctrl" toets kunt u meerdere statussen kiezen. Dit veld wordt genegeerd als u creditnota\'s wilt versturen.',
+        'desc_order_statuses' => 'Selecteer de statussen die een bestelling nu moet hebben. M.b.v. de "Ctrl" toets kunt u meerdere statussen kiezen. Dit veld wordt genegeerd als u creditnota\'s wilt versturen. Selecteer "%1$s" als u niet op bestelstatus wilt filteren.',
         'option_empty_order_statuses' => 'Niet filteren op bestelstatus',
         'field_send_mode' => 'Verzendwijze',
         'option_send_normal' => 'Verzend alleen indien nog niet verzonden',
@@ -54,13 +54,12 @@ U kunt dan een time-out krijgen, waardoor het resultaat van de laatst verstuurde
 factuur niet opgeslagen wordt.</strong></p>
 <p>Het versturen van orders gaat net als het automatisch versturen:</p>
 <ul style="list-style: inside disc;">
-<li>De factuur wordt op exact dezelfde wijze aangemaakt als bij het automatisch
-versturen.</li>
-<li>Als er facturen zijn die fouten bevatten ontvangt u een mail per factuur.
-</li>
-<li>Alle door u geregistreerde event handlers die reageren op één van de door
-deze Acumulus module gedefinieerde events (of hook of actie) worden voor alle
-facturen die verzonden gaan worden uitgevoerd.</li>
+<li>De factuur wordt op exact dezelfde wijze aangemaakt als bij het automatisch versturen.</li>
+<li>Als u ingesteld heeft dat u de PDF-factuur naar de klant wilt mailen, gebeurt dat hier ook.</li>
+<li>Als er facturen zijn die fouten bevatten ontvangt u een mail per factuur.</li>
+<li>Alle door u geregistreerde event handlers die reageren op één van de door deze Acumulus
+ module gedefinieerde events (of hook of actie) worden voor alle facturen die verzonden gaan
+ worden uitgevoerd.</li>
 </ul>
 <p>Dit formulier werkt in zijn huidige vorm, maar er zijn vast nog wel
 verbeteringen aan te brengen. Dus als u ideeën heeft, laat het ons weten.</p>
@@ -71,10 +70,6 @@ LONGSTRING
         'message_validate_batch_source_type_invalid' => 'U dient een bestaand factuurtype te selecteren.',
         'message_validate_batch_reference_or_date_1' => 'U dient of een reeks van bestelnummers of een reeks van datums in te vullen.',
         'message_validate_batch_reference_or_date_2' => 'U dient of een reeks van bestel of creditnotanummers of een reeks van datums in te vullen.',
-        // @deprecated
-        'message_validate_batch_reference_and_date_1' => 'U kunt niet en een reeks van bestelnummers en een reeks van datums invullen.',
-        // @deprecated
-        'message_validate_batch_reference_and_date_2' => 'U kunt niet en een reeks van bestel of creditnotanummers en een reeks van datums invullen.',
         'message_validate_batch_bad_date_from' => 'U dient een correcte "Datum van" in te vullen (verwacht formaat: %1$s).',
         'message_validate_batch_bad_date_to' => 'U dient een correcte "Datum tot" in te vullen (verwacht formaat %1$s).',
         'message_validate_batch_bad_date_range' => '"Datum tot" dient na "Datum van" te liggen.',
@@ -107,13 +102,13 @@ LONGSTRING
         'field_invoice_source_type' => 'Invoice type',
         'field_invoice_source_reference_from' => '# from',
         'field_invoice_source_reference_to' => '# to',
-        'desc_invoice_source_reference_from_to_1' => 'Enter the range of order references or ids you want to send to Acumulus. If you only want to send 1 invoice, you only have to fill in the \'# from\' field. Leave empty if you want to send by date.',
-        'desc_invoice_source_reference_from_to_2' => 'Enter the range of order or credit note numbers or ids you want to send to Acumulus. If you only want to send 1 invoice, you only have to fill in the \'# from\' field. Leave empty if you want to send by date.',
+        'desc_invoice_source_reference_from_to_1' => 'Enter the range of order references or ids you want to send to Acumulus. If you only want to send 1 invoice, you only have to fill in the \'# from\' field. Leave empty if you do not want to filter on reference.',
+        'desc_invoice_source_reference_from_to_2' => 'Enter the range of order or credit note numbers or ids you want to send to Acumulus. If you only want to send 1 invoice, you only have to fill in the \'# from\' field. Leave empty if you do not want to filter on reference.',
         'field_date_from' => 'Date from',
         'field_date_to' => 'Date to',
-        'desc_date_from_to' => 'Enter the period over which you want to send invoices to Acumulus. If you want to send the invoices of 1 day, only fill in the \'Date from\' field. Leave empty if you want to send by id.',
+        'desc_date_from_to' => 'Enter the period over which you want to send invoices to Acumulus. <strong>NOTE: The filtering is done on the date of the most recent change, not the creation date.</strong>If you want to send the invoices for 1 day, only fill in the \'Date from\' field. Leave empty if you do not want to filter by date.',
         'field_order_statuses' => 'Order status',
-        'desc_order_statuses' => 'Select the statuses that an order should have now. Using the "Ctrl" key, you can select/deselect multiple items. This field will be ignored if you want to send credit notes.',
+        'desc_order_statuses' => 'Select the statuses that an order should have now. Using the "Ctrl" key, you can select/deselect multiple items. This field will be ignored if you want to send credit notes. Select "%1$s" if you don\'t want to filter on order status.',
         'option_empty_order_statuses' => 'Do not filter on order status',
         'field_send_mode' => 'Send mode',
         'option_send_normal' => 'Only send if not already sent',
@@ -136,6 +131,7 @@ lead to a time-out on your web server.</strong></p>
 <p>Sending invoices is done as with automatic sending:</p>
 <ul style="list-style: inside disc;">
 <li>The invoice is created exactly the same way as with automatic sending.</li>
+<li>If you configured to mail the invoice pdf to the client, this will be done here as well.</li>
 <li>If an invoice for a given order or credit memo has already been sent, it
 will not be sent again, unless you checked the 'Force sending' checkbox.</li>
 <li>If an invoice contains a warning or an error you will receive an email per
@@ -152,10 +148,6 @@ LONGSTRING
         'message_validate_batch_source_type_invalid' => 'Please select an existing invoice type.',
         'message_validate_batch_reference_or_date_1' => 'Fill in a range of order numbers or a range of dates.',
         'message_validate_batch_reference_or_date_2' => 'Fill in a range of order/credit note numbers or a range of dates.',
-        // @deprecated
-        'message_validate_batch_reference_and_date_1' => 'Either fill in a range of order numbers OR a range of dates, not both.',
-        // @deprecated
-        'message_validate_batch_reference_and_date_2' => 'Either fill in a range of order/credit note numbers OR a range of dates, not both.',
         'message_validate_batch_bad_date_from' => 'Incorrect "Date from" (expected format: %1$s).',
         'message_validate_batch_bad_date_to' => 'Incorrect "Date to" (expected format: %1$s).',
         'message_validate_batch_bad_date_range' => '"Date to" should be after "Date from".',

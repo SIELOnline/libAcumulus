@@ -13,6 +13,7 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
 
 use function count;
+use function sprintf;
 
 /**
  * This override provides HikaShop specific queries.

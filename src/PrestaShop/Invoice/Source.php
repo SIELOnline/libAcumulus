@@ -323,7 +323,7 @@ class Source extends BaseSource
         }
         $items = [];
         foreach ($orderDetails as $orderDetail) {
-            $items[] = $this->getContainer()->createItem($this, $orderDetail);
+            $items[] = $this->getContainer()->createItem($orderDetail, $this);
         }
         return $items;
     }

@@ -35,6 +35,6 @@ class Item extends BaseItem
     protected function createProduct(): ?Product
     {
         $product = $this->shopObject->get_product();
-        return $product instanceof WC_Product ? $this->getContainer()->createProduct($this, $product) : null;
+        return $product instanceof WC_Product ? $this->getContainer()->createProduct($product, $this) : null;
     }
 }

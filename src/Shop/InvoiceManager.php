@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection EfferentObjectCouplingInspection
- */
 
 declare(strict_types=1);
 
@@ -18,7 +15,6 @@ use Siel\Acumulus\Data\EmailAsPdf;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\Mailer;
 use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
@@ -27,9 +23,11 @@ use Siel\Acumulus\Config\Config;
 
 use function array_key_exists;
 use function in_array;
+use function ini_get;
+use function sprintf;
 
 /**
- * Provides functionality to manage invoices.
+ * InvoiceManager provides functionality to manage invoices.
  *
  * The features of this class include:
  * - Retrieval of web shop invoice sources (orders or refunds).
@@ -46,6 +44,11 @@ abstract class InvoiceManager
     public function __construct(Container $container)
     {
         $this->container = $container;
+    }
+
+    protected function getContainer(): Container
+    {
+        return $this->container;
     }
 
     /**
@@ -65,37 +68,32 @@ abstract class InvoiceManager
 
     protected function getTranslator(): Translator
     {
-        return $this->container->getTranslator();
+        return $this->getContainer()->getTranslator();
     }
 
     protected function getLog(): Log
     {
-        return $this->container->getLog();
+        return $this->getContainer()->getLog();
     }
 
     protected function getConfig(): Config
     {
-        return $this->container->getConfig();
+        return $this->getContainer()->getConfig();
     }
 
     protected function getShopCapabilities(): ShopCapabilities
     {
-        return $this->container->getShopCapabilities();
+        return $this->getContainer()->getShopCapabilities();
     }
 
     protected function getAcumulusEntryManager(): AcumulusEntryManager
     {
-        return $this->container->getAcumulusEntryManager();
+        return $this->getContainer()->getAcumulusEntryManager();
     }
 
     protected function getAcumulusApiClient(): Acumulus
     {
-        return $this->container->getAcumulusApiClient();
-    }
-
-    protected function getMailer(): Mailer
-    {
-        return $this->container->getMailer();
+        return $this->getContainer()->getAcumulusApiClient();
     }
 
     /**
@@ -103,17 +101,17 @@ abstract class InvoiceManager
      */
     protected function getSource(string $sourceType, object|int|array $idOrSource): Source
     {
-        return $this->container->createSource($sourceType, $idOrSource);
+        return $this->getContainer()->createSource($sourceType, $idOrSource);
     }
 
     protected function getInvoiceCreate(): InvoiceCreate
     {
-        return $this->container->getInvoiceCreate();
+        return $this->getContainer()->getInvoiceCreate();
     }
 
     protected function getInvoiceSend(): InvoiceSend
     {
-        return $this->container->getInvoiceSend();
+        return $this->getContainer()->getInvoiceSend();
     }
 
     /**
@@ -125,7 +123,7 @@ abstract class InvoiceManager
      */
     protected function createInvoiceAddResult(string $trigger): InvoiceAddResult
     {
-        return $this->container->createInvoiceAddResult($trigger);
+        return $this->getContainer()->createInvoiceAddResult($trigger);
     }
 
     /**
@@ -458,12 +456,12 @@ abstract class InvoiceManager
     protected function createEmailAsPdf(Source $source, bool $forInvoice = true): EmailAsPdf
     {
         $type = $forInvoice ? EmailAsPdfType::Invoice : EmailAsPdfType::PackingSlip;
-        $collectorManager = $this->container->getCollectorManager();
+        $collectorManager = $this->getContainer()->getCollectorManager();
         $collectorManager->getPropertySources()->add('source', $source);
         $emailAsPdf = $collectorManager->collectEmailAsPdf($type);
         /** @var \Siel\Acumulus\Completors\EmailInvoiceAsPdfCompletor $completor */
-        $completor = $this->container->getCompletor(DataType::EmailAsPdf);
-        $completor->complete($emailAsPdf, new MessageCollection($this->container->getTranslator()));
+        $completor = $this->getContainer()->getCompletor(DataType::EmailAsPdf);
+        $completor->complete($emailAsPdf, new MessageCollection($this->getTranslator()));
         return $emailAsPdf;
     }
 

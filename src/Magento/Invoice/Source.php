@@ -329,7 +329,7 @@ class Source extends BaseSource
         $result = [];
         // Items may be composed, so start with all "visible" items.
         foreach ($this->getShopObject()->getAllVisibleItems() as $item) {
-            $result[] = $this->getContainer()->createItem($this, $item);
+            $result[] = $this->getContainer()->createItem($item, $this);
         }
         return $result;
     }
@@ -344,7 +344,7 @@ class Source extends BaseSource
         foreach ($this->getShopObject()->getAllItems() as $item) {
             // Only items for which row total is set, are refunded.
             if (!Number::isZero($item->getRowTotal())) {
-                $result[] = $this->getContainer()->createItem($this, $item);
+                $result[] = $this->getContainer()->createItem($item, $this);
             }
         }
         return $result;

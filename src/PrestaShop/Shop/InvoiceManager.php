@@ -15,6 +15,7 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
 use function count;
+use function sprintf;
 
 /**
  * Implements the PrestaShop specific parts of the invoice manager.

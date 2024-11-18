@@ -199,7 +199,7 @@ abstract class Source extends BaseSource
     {
         $result = [];
         foreach ($this->getOrderProducts() as $orderProduct) {
-            $result[] = $this->getContainer()->createItem($this, $orderProduct);
+            $result[] = $this->getContainer()->createItem($orderProduct, $this);
         }
         return $result;
     }

@@ -34,12 +34,12 @@ class Item extends BaseItem
     {
         if ($this->getSource()->getType() === Source::Order) {
             $product = $this->shopObject->getProduct();
-            return $product !== null ? $this->getContainer()->createProduct($this, $product) : null;
+            return $product !== null ? $this->getContainer()->createProduct($product, $this) : null;
         } else {
             /** @var \Magento\Catalog\Model\Product $product */
             $product = $this->getRegistry()->create(MagentoProduct::class);
             $this->getRegistry()->get($product->getResourceName())->load($product, $this->shopObject->getProductId());
-            return !empty($product->getId()) ? $this->getContainer()->createProduct($this, $product) : null;
+            return !empty($product->getId()) ? $this->getContainer()->createProduct($product, $this) : null;
 
         }
     }

@@ -14,6 +14,8 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
+use function sprintf;
+
 /**
  * Implements the OpenCart specific parts of the invoice manager.
  *

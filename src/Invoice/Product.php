@@ -20,12 +20,13 @@ abstract class Product
     use WrapperTrait;
 
     /**
-     * @var Item
-     *   The parent item line for this Product.
+     * @var Item|null
+     *   The {@see \Siel\Acumulus\Invoice\Item ittem line} on which the product appears or
+     *   null if we are not in the context of an order.
      */
-    protected Item $item;
+    protected ?Item $item;
 
-    public function __construct(Item $item, int|string|object|array|null $idOrProduct, Container $container)
+    public function __construct(int|string|object|array|null $idOrProduct, ?Item $item, Container $container)
     {
         $this->item = $item;
         $this->initializeWrapper($idOrProduct, $container);

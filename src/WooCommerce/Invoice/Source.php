@@ -255,7 +255,7 @@ class Source extends BaseSource
         foreach ($items as $item) {
             // Only add when this is not an empty line.
             if (!Number::isZero((float) $item->get_quantity()) || !Number::isZero((float) $item->get_total())) {
-                $result[] = $this->getContainer()->createItem($this, $item);
+                $result[] = $this->getContainer()->createItem($item, $this);
             }
         }
 

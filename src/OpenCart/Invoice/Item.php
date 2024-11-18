@@ -34,7 +34,7 @@ abstract class Item extends BaseItem
         /** @var \Opencart\Admin\Model\Catalog\Product|\ModelCatalogProduct $model */
         $model = $this->getRegistry()->getModel('catalog/product');
         $product = $model->getProduct($this->getShopObject()['product_id']);
-        return !empty($product) ? $this->getContainer()->createProduct($this, $product) : null;
+        return !empty($product) ? $this->getContainer()->createProduct($product, $this) : null;
     }
 
     /**

@@ -28,6 +28,6 @@ class Item extends BaseItem
     protected function createProduct(): ?Product
     {
         $product = $this->shopObject->get_product();
-        return $this->getContainer()->createProduct($this, $this->shopObject->product_id);
+        return $this->getContainer()->createProduct($this->shopObject->product_id, $this);
     }
 }

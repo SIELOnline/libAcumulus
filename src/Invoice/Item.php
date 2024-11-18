@@ -31,7 +31,7 @@ abstract class Item
      */
     protected ?Product $product;
 
-    public function __construct(Source $source, int|string|object|array|null $idOrItem, Container $container)
+    public function __construct(int|string|object|array|null $idOrItem, Source $source, Container $container)
     {
         $this->source = $source;
         $this->initializeWrapper($idOrItem, $container);

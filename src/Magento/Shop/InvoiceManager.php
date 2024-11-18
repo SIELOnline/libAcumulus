@@ -62,12 +62,12 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * @param string $invoiceSourceType
      * @param string|string[] $field
-     * @param int|string|array $condition
+     * @param int|array|string $condition
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non keyed array with invoice Sources.
      */
-    protected function getByCondition(string $invoiceSourceType, $field, $condition): array
+    protected function getByCondition(string $invoiceSourceType, array|string $field, int|array|string $condition): array
     {
         $items = $this
             ->createInvoiceSourceTypeCollection($invoiceSourceType)

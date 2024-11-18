@@ -46,6 +46,8 @@ use Siel\Acumulus\Shop\InvoiceCreate;
 use Siel\Acumulus\Shop\InvoiceManager;
 use Siel\Acumulus\Shop\InvoiceSend;
 
+use Siel\Acumulus\Shop\ProductManager;
+
 use function count;
 
 use function strlen;
@@ -421,7 +423,7 @@ class Container
      *   The type of the invoice source to create.
      * @param int|string|object|array $invoiceSourceOrId
      *   The invoice source itself or its id to create a
-     *   \Siel\Acumulus\Invoice\Source instance for.
+     *   {@see \Siel\Acumulus\Invoice\Source} instance for.
      *
      * @return \Siel\Acumulus\Invoice\Source
      *   A wrapper object around a shop specific invoice source object.
@@ -434,35 +436,36 @@ class Container
     /**
      * Creates a new adapter/wrapper object for the given invoice item line.
      *
-     * @param Source $source
-     *   The type of the invoice source to create.
      * @param int|string|object|array $idOrItem
-     *   The invoice source itself or its id to create an
-     *   \Siel\Acumulus\Invoice\Item instance for.
+     *   The shop specific order/refund item line or its id to create an
+     *    {@see \Siel\Acumulus\Invoice\Item} instance for.
+     * @param Source $source
+     *   The order or refund to which the item line belongs.
      *
      * @return \Siel\Acumulus\Invoice\Item
      *   A wrapper object around a shop specific invoice item line object.
      */
-    public function createItem(Source $source, int|string|object|array $idOrItem): Item
+    public function createItem(int|string|object|array $idOrItem, Source $source): Item
     {
-        return $this->getInstance('Item', 'Invoice', [$source, $idOrItem, $this], true);
+        return $this->getInstance('Item', 'Invoice', [$idOrItem, $source, $this], true);
     }
 
     /**
      * Creates a new adapter/wrapper object for the given product.
      *
-     * @param Item $item
-     *   The item line on which the product appears.
      * @param int|string|object|array $idOrItem
-     *   The product itself or its id to create a
-     *   \Siel\Acumulus\Invoice\Product instance for.
+     *   The shop specific product itself or its id to create a
+     *   {@see \Siel\Acumulus\Invoice\Product} instance for.
+     * @param Item|null $item
+     *   The {@see \Siel\Acumulus\Invoice\Item ittem line} on which the product appears or
+     *   null if we are not in the context of an order.
      *
      * @return \Siel\Acumulus\Invoice\Product
-     *   A wrapper object around a shop specific invoice source object.
+     *   A wrapper object around a shop specific product object.
      */
-    public function createProduct(Item $item, int|string|object|array $idOrItem): Product
+    public function createProduct(int|string|object|array $idOrItem, ?Item $item = null): Product
     {
-        return $this->getInstance('Product', 'Invoice', [$item, $idOrItem, $this], true);
+        return $this->getInstance('Product', 'Invoice', [$idOrItem, $item, $this], true);
     }
 
     /**
@@ -715,6 +718,11 @@ class Container
     public function createAcumulusEntry(object|array $record): AcumulusEntry
     {
         return $this->getInstance('AcumulusEntry', 'Shop', [$record], true);
+    }
+
+    public function getProductManager(): ProductManager
+    {
+        return $this->getInstance('ProductManager', 'Shop', [$this, $this->getLog()]);
     }
 
     public function getAboutBlockForm(): AboutForm

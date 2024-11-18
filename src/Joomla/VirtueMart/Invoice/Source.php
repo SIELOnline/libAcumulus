@@ -231,7 +231,7 @@ class Source extends BaseSource
     {
         $result = [];
         foreach ($this->getShopObject()['items'] as $shopItem) {
-            $result[] = $this->getContainer()->createItem($this, $shopItem);
+            $result[] = $this->getContainer()->createItem($shopItem, $this);
         }
         return $result;
     }

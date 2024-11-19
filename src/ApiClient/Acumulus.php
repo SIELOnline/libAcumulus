@@ -631,11 +631,11 @@ class Acumulus
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "signup" array, being a keyed array with keys:
-     * - 'contractcode'
-     * - 'contractloginname'
-     * - 'contractpassword'
-     * - 'contractapiuserloginname'
-     * - 'contractapiuserpassword'
+     *   - 'contractcode'
+     *   - 'contractloginname'
+     *   - 'contractpassword'
+     *   - 'contractapiuserloginname'
+     *   - 'contractapiuserpassword'
      *
      *   Possible errors/warnings:
      *   - AA7E10AA: Verplichte companyname ontbreekt
@@ -698,58 +698,16 @@ class Acumulus
      *
      * See {@link https://www.siel.nl/acumulus/API/Stock/Add_Stock_Transaction/}
      *
-     * @param int $productId
-     *   The id of the product for which to update the stock.
-     * @param float $quantity
-     *   The quantity to update the actual stock with. Use a positive number for
-     *   an increase in stock (typically with a return), a negative number for a
-     *   decrease of stock (typically with an order). Allows for 2 digits.
-     * @param string $description
-     *   The description to store with the stock update. Ideally, this field
-     *   should identify the system and transaction that triggered the update
-     *   In this context thus probably shop and order/refund number.
-     * @param string|null $date
-     *   ISO date string (yyyy-mm-dd) for the date to set as update date for the
-     *   stock update.
-     *
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "stock" array, being a keyed array with keys:
      *   - 'productid'
-     *   - stockamount (the new stock level for this product)
+     *   - 'stockamount' (the new stock level for this product)
+     *
      *   Possible errors:
-     *
-     * @throws AcumulusException|AcumulusResponseException
-     *
-     * @deprecated use {@see stockTransaction()}
-     */
-    public function stockMutation(int $productId, float $quantity, string $description, string $date = null): AcumulusResult
-    {
-        if (empty($date)) {
-            $date = date(Api::DateFormat_Iso);
-        }
-        $message = [
-            'stock' => [
-                'productid' => $productId,
-                'stockamount' => $quantity,
-                'stockdescription' => $description,
-                'stockdate' => $date,
-            ]
-        ];
-        return $this->callApiFunction('stock/stock_add', $message)->setMainAcumulusResponseKey('stock');
-    }
-
-    /**
-     * Updates the stock for a product.
-     *
-     * See {@link https://www.siel.nl/acumulus/API/Stock/Add_Stock_Transaction/}
-     *
-     * @return AcumulusResult
-     *   The result of the webservice call. The structured response will contain
-     *   1 "stock" array, being a keyed array with keys:
-     *   - 'productid'
-     *   - stockamount (the new stock level for this product)
-     *   Possible errors:
+     *   - 'AA5B85AA' Product not found
+     *   - Not passing a stock amount is not an error, as isn't passing 0.0. The current
+     *     stock level will be returned.
      *
      * @throws AcumulusException|AcumulusResponseException
      */

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\ApiBehaviour\ApiClient;
 
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -16,6 +17,7 @@ use Siel\Acumulus\ApiClient\AcumulusResponseException;
 use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Data\EmailInvoiceAsPdf;
+use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
@@ -210,7 +212,11 @@ class AcumulusErrorHandlingTest extends TestCase
 
     public function testProductNotfound(): void
     {
-        $result = $this->acumulusClient->stockMutation(123, -2, 'Bestelling 123');
+        $stockTransaction = new StockTransaction();
+        $stockTransaction->productId = 1;
+        $stockTransaction->stockAmount = 1;
+
+        $result = $this->acumulusClient->stockTransaction($stockTransaction);
         $this->assertTrue($result->hasError());
         $this->assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertNotNull($result->getByCode(404));

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Magento\Invoice;
+namespace Siel\Acumulus\Magento\Product;
 
 use RuntimeException;
-use Siel\Acumulus\Invoice\Product as BaseProduct;
+use Siel\Acumulus\Product\Product as BaseProduct;
 
 /**
  * Product is a wrapper/adapter around a Magento specific product (appearing on an Item).

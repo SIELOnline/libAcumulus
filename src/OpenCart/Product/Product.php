@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Invoice;
+namespace Siel\Acumulus\OpenCart\Product;
 
 use RuntimeException;
-use Siel\Acumulus\Invoice\Product as BaseProduct;
+use Siel\Acumulus\Product\Product as BaseProduct;
 
 /**
  * Product is a wrapper/adapter around an OpenCart specific product (appearing on an Item).

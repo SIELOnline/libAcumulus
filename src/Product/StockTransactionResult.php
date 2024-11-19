@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Product;
 
 use Siel\Acumulus\ApiClient\AcumulusResult;
-use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Severity;
@@ -16,52 +16,39 @@ use function sprintf;
 
 /**
  * Extension of {@see AcumulusResult} with properties and features specific to the
- * InvoiceAdd web API service call.
- *
- * @noinspection PhpLackOfCohesionInspection
+ * StockTransaction web API service call.
  */
-class InvoiceAddResult extends MessageCollection
+class StockTransactionResult extends MessageCollection
 {
     // Whether to add the raw request and response to mails or log messages.
     public const AddReqResp_Never = 1;
     public const AddReqResp_Always = 2;
     public const AddReqResp_WithOther = 3;
 
-    // Invoice send handling related constants.
+    // Stock transaction handling related constants.
     public const SendStatus_Unknown = 0;
     // Reasons for not sending.
-    public const NotSent_AlreadySent = 0x1;
-    public const NotSent_WrongStatus = 0x2;
-    public const NotSent_EmptyInvoice = 0x3;
-    public const NotSent_TriggerInvoiceCreateNotEnabled = 0x4;
-    public const NotSent_TriggerInvoiceSentNotEnabled = 0x5;
+    public const NotSent_StockManagementNotEnabled = 0x1;
+    public const NotSent_ErrorNoProduct = 0x2;
+    public const NotSent_ZeroChange = 0x3;
+    public const NotSent_NoMatchInAcumulus = 0x4;
     public const NotSent_LocalErrors = 0x6;
     public const NotSent_DryRun = 0x7;
-    public const NotSent_TriggerCreditNoteEventNotEnabled = 0x8;
-    public const NotSent_AlreadyLocked = 0x9;
-    public const NotSent_LockNotAcquired = 0xa;
-    public const NotSent_NoInvoiceLines = 0xb;
-    // @todo: waarom wordt deze niet gebruikt: kloppen deze events nog wel?
-    public const NotSent_EventInvoiceCreateBefore = 0xc;
-    public const NotSent_EventInvoiceCreateAfter = 0xd;
-    public const NotSent_EventInvoiceSendBefore = 0xe;
     public const NotSent_Mask = 0xf;
     // Reasons for sending.
     public const Sent_New = 0x10;
-    public const Sent_Forced = 0x20;
     public const Sent_TestMode = 0x30;
-    public const Sent_LockExpired = 0x40;
     public const Send_Mask = 0xf0;
 
     /**
-     * A string indicating the function that triggered the sending, e.g.
-     * {@see \Siel\Acumulus\Magento\Invoice\SourceInvoiceManager::sourceStatusChange()}.
+     * A string indicating the function or event that triggered the sending, e.g.
+     * 'woocommerce_reduce_order_item_stock'.
      */
     protected string $trigger;
     /**
      * A status indicating if and why an invoice was or was not sent. It will
-     * contain 1 of the {@see InvoiceAddResult}::Send_... or
-     * {@see InvoiceAddResult}::NotSent_... constants.
+     * contain 1 of the {@see StockTransactionResult}::Send_... or
+     * {@see StockTransactionResult}::NotSent_... constants.
      */
     protected int $sendStatus;
     /**
@@ -69,14 +56,14 @@ class InvoiceAddResult extends MessageCollection
      */
     protected array $sendStatusArguments;
     /**
-     * @var \Siel\Acumulus\Data\Invoice|null
-     *   The invoice that is (attempted to) being sent to Acumulus,
+     * @var \Siel\Acumulus\Data\StockTransaction|null
+     *   The stock transaction that is (attempted to) being sent to Acumulus,
      *   or null if not yet set.
      */
-    protected ?Invoice $invoice = null;
+    protected ?StockTransaction $stockTransaction = null;
     /**
      * @var \Siel\Acumulus\ApiClient\AcumulusResult|null
-     *   The API result of sending the invoice to Acumulus,
+     *   The API result of sending the stock transaction to Acumulus,
      *   null if not yet sent or if sending is prevented
      */
     protected ?AcumulusResult $acumulusResult = null;
@@ -85,8 +72,8 @@ class InvoiceAddResult extends MessageCollection
      * Constructor.
      *
      * @param string $trigger
-     *   A string indicating the function that triggered the sending, e.g.
-     *   'InvoiceManager::sourceStatusChange()'.
+     *   A string indicating the function or event that triggered the sending, e.g.
+     *   'woocommerce_reduce_order_item_stock'.
      */
     public function __construct($trigger, Translator $translator)
     {
@@ -98,9 +85,9 @@ class InvoiceAddResult extends MessageCollection
 
     /**
      * @return int
-     *   A status indicating if and why an invoice was or was not sent.
-     *   It will contain 1 of the {@see InvoiceAddResult}::Send_... or
-     *   {@see InvoiceAddResult}::NotSent_... constants.
+     *   A status indicating if and why a stock transaction was or was not sent.
+     *   It will contain 1 of the {@see StockTransaction}::Send_... or
+     *   {@see StockTransaction}::NotSent_... constants.
      */
     public function getSendStatus(): int
     {
@@ -109,9 +96,9 @@ class InvoiceAddResult extends MessageCollection
 
     /**
      * @param int $sendStatus
-     *   A status indicating if and why an invoice was or was not sent.
-     *   It should contain 1 of the {@see InvoiceAddResult}::Sent_... or
-     *   {@see InvoiceAddResult}::Invoice_NotSent_... constants.
+     *   A status indicating if and why a stock transaction was or was not sent.
+     *   It should contain 1 of the {@see StockTransaction}::Sent_... or
+     *   {@see StockTransaction}::NotSent_... constants.
      * @param array $arguments
      *   A list of parameters to use when getting the send status as text.
      *
@@ -125,10 +112,10 @@ class InvoiceAddResult extends MessageCollection
     }
 
     /**
-     * Returns whether the invoice has been sent.
+     * Returns whether the stock transaction has been sent.
      *
      * @return bool
-     *   True if the invoice has been sent, false if sending was prevented or
+     *   True if the stock transaction has been sent, false if sending was prevented or
      *   if the sendStatus has not yet been set.
      */
     public function hasBeenSent(): bool
@@ -137,10 +124,10 @@ class InvoiceAddResult extends MessageCollection
     }
 
     /**
-     * Returns whether the invoice has been prevented from sending.
+     * Returns whether the stock transaction has been prevented from sending.
      *
      * @return bool
-     *   True if the invoice has been prevented from sending,
+     *   True if the stock transaction has been prevented from sending,
      *   false if it has been sent or if the sendStatus has not yet been set.
      */
     public function isSendingPrevented(): bool
@@ -150,8 +137,8 @@ class InvoiceAddResult extends MessageCollection
 
     /**
      * @return string
-     *   A string indicating the function that triggered the sending,
-     *   e.g. InvoiceManager::sourceStatusChange().
+     *   A string indicating the function or event that triggered the sending,
+     *   e.g. 'woocommerce_reduce_order_item_stock'.
      */
     public function getTrigger(): string
     {
@@ -160,14 +147,14 @@ class InvoiceAddResult extends MessageCollection
 
     /**
      * @param string $trigger
-     *   A string indicating the function that triggered the sending,
-     *   e.g. InvoiceManager::sourceStatusChange().
+     *   A string indicating the function or event that triggered the sending,
+     *   e.g.'woocommerce_reduce_order_item_stock'.
      *
      * @return $this
      *
      * @noinspection PhpUnused
      */
-    public function setTrigger(string $trigger): InvoiceAddResult
+    public function setTrigger(string $trigger): StockTransactionResult
     {
         $this->trigger = $trigger;
         return $this;
@@ -194,43 +181,16 @@ class InvoiceAddResult extends MessageCollection
     protected function getSendStatusText(): string
     {
         $messages = [
-            self::NotSent_AlreadySent => 'reason_not_sent_alreadySent',
-            self::NotSent_AlreadyLocked => 'reason_not_sent_alreadySending',
-            self::NotSent_LockNotAcquired => 'reason_not_sent_lockNotAcquired',
-            self::NotSent_EventInvoiceCreateAfter => 'reason_not_sent_prevented_invoiceCreated',
-            self::NotSent_EventInvoiceSendBefore => 'reason_not_sent_prevented_invoiceCompleted',
-            self::NotSent_EmptyInvoice => 'reason_not_sent_empty_invoice',
-            self::NotSent_NoInvoiceLines => 'reason_not_sent_no_invoice_lines',
-            self::NotSent_TriggerInvoiceCreateNotEnabled => 'reason_not_sent_not_enabled_triggerInvoiceCreate',
-            self::NotSent_TriggerInvoiceSentNotEnabled => 'reason_not_sent_not_enabled_triggerInvoiceSent',
+            self::NotSent_StockManagementNotEnabled => 'reason_not_sent_not_enabled',
+            self::NotSent_ErrorNoProduct => 'reason_not_sent_no_product',
+            self::NotSent_ZeroChange => 'reason_not_sent_zero_change',
+            self::NotSent_NoMatchInAcumulus => 'reason_not_sent_no_match',
             self::NotSent_LocalErrors => 'reason_not_sent_local_errors',
             self::NotSent_DryRun => 'reason_not_sent_dry_run',
+            self::Sent_New => 'reason_sent_new',
             self::Sent_TestMode => 'reason_sent_test_mode',
-            self::Sent_LockExpired => 'reason_sent_lock_expired',
-            self::Sent_Forced => 'reason_sent_forced',
         ];
-        if (isset($messages[$this->sendStatus])) {
-            $message = $messages[$this->sendStatus];
-        } else {
-            // Send statuses that can have different messages depending on whether there
-            // are send status arguments.
-            switch ($this->sendStatus) {
-                case self::NotSent_WrongStatus:
-                    $message = count($this->sendStatusArguments) === 0
-                        ? 'reason_not_sent_triggerCreditNoteEvent_None'
-                        : 'reason_not_sent_wrongStatus';
-                    break;
-                case self::Sent_New:
-                    $message = count($this->sendStatusArguments) === 0
-                        ? 'reason_sent_new'
-                        : 'reason_sent_new_status_change';
-                    break;
-                default:
-                    $message = 'reason_unknown';
-                    $this->sendStatusArguments = [($this->sendStatus)];
-                    break;
-            }
-        }
+        $message = $messages[$this->sendStatus];
         $message = $this->t($message);
         if (count($this->sendStatusArguments) !== 0) {
             $message = vsprintf($message, $this->sendStatusArguments);
@@ -239,17 +199,17 @@ class InvoiceAddResult extends MessageCollection
     }
 
     /**
-     * Returns the invoice that is (attempted to) being sent to Acumulus,
+     * Returns the stock transaction that is (attempted to) being sent to Acumulus,
      * or null if not yet set.
      */
-    public function getInvoice(): ?Invoice
+    public function getStockTransaction(): ?StockTransaction
     {
-        return $this->invoice;
+        return $this->stockTransaction;
     }
 
-    public function setInvoice(Invoice $invoice): void
+    public function setStockTransaction(StockTransaction $stockTransaction): void
     {
-        $this->invoice = $invoice;
+        $this->stockTransaction = $stockTransaction;
     }
 
     public function getMainApiResponse(): ?array
@@ -274,13 +234,13 @@ class InvoiceAddResult extends MessageCollection
     /**
      * Returns a translated sentence that can be used for logging.
      *
-     * The returned sentence indicates what happened and why. If the invoice was
+     * The returned sentence indicates what happened and why. If the stock transaction was
      * sent or local errors prevented it being sent, then the returned string
      * also includes any messages.
      *
      * @param int $addReqResp
      *   Whether to add the raw request and response.
-     *   One of the {@see InvoiceAddResult}::AddReqResp_... constants
+     *   One of the {@see StockTransaction}::AddReqResp_... constants
      */
     public function getLogText(int $addReqResp): string
     {

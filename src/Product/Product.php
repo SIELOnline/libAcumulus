@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Product;
 
 use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
+
+use Siel\Acumulus\Invoice\Item;
+use Siel\Acumulus\Invoice\WrapperTrait;
 
 use function get_class;
 use function sprintf;
@@ -76,7 +79,7 @@ abstract class Product
 //    abstract public function getVatClassName(): string;
 
     /**
-     * Returns the {@see Product} on which the stock is managed for this product.
+     * Returns the {@see \Siel\Acumulus\Magento\Product\\Siel\Acumulus\OpenCart\Product\\Siel\Acumulus\WooCommerce\Product\\Siel\Acumulus\TestWebShop\Product\Product} on which the stock is managed for this product.
      *
      * This will typically be the product itself, but in case of variants that do not need
      * separate stock, it may be the parent product. Note: that this is probably a sign of

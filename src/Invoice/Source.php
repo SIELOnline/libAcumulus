@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Product\Product;
 use Stringable;
 
 use function count;

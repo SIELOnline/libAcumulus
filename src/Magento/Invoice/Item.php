@@ -7,13 +7,13 @@ namespace Siel\Acumulus\Magento\Invoice;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use RuntimeException;
 use Siel\Acumulus\Invoice\Item as BaseItem;
-use Siel\Acumulus\Invoice\Product;
+use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Magento\Helpers\Registry;
 
 /**
  * Item is a wrapper/adapter around Magento specific order/credit memo product lines.
  *
- * @method \Siel\Acumulus\Magento\Invoice\Product getProduct()
+ * @method \Siel\Acumulus\Magento\Product\Product getProduct()
  * @method \Magento\Sales\Model\Order\Item|\Magento\Sales\Model\Order\Creditmemo\Item getShopObject()
  * @property \Magento\Sales\Model\Order\Item|\Magento\Sales\Model\Order\Creditmemo\Item $shopObject
  */

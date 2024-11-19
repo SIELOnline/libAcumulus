@@ -6,7 +6,7 @@ namespace Siel\Acumulus\OpenCart\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Invoice\Item as BaseItem;
-use Siel\Acumulus\Invoice\Product;
+use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
@@ -14,7 +14,7 @@ use Siel\Acumulus\OpenCart\Helpers\Registry;
  *
  * @property array $shopObject
  * @method array getShopObject()
- * @method \Siel\Acumulus\OpenCart\Invoice\Product|null getProduct()
+ * @method \Siel\Acumulus\OpenCart\Product\Product|null getProduct()
  */
 abstract class Item extends BaseItem
 {

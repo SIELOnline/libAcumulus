@@ -6,7 +6,7 @@ namespace Siel\Acumulus\TestWebShop\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Invoice\Item as BaseItem;
-use Siel\Acumulus\Invoice\Product;
+use Siel\Acumulus\Product\Product;
 
 /**
  * Item is the TestWebShop specific class to wrap an product item.

@@ -6,7 +6,7 @@ namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Invoice\Item as BaseItem;
-use Siel\Acumulus\Invoice\Product;
+use Siel\Acumulus\Product\Product;
 use WC_Product;
 
 /**
@@ -14,7 +14,7 @@ use WC_Product;
  *
  * @property \WC_Order_Item_Product $shopObject
  * @method \WC_Order_Item_Product getShopObject()
- * @method \Siel\Acumulus\WooCommerce\Invoice\Product getProduct()
+ * @method \Siel\Acumulus\WooCommerce\Product\Product getProduct()
  */
 class Item extends BaseItem
 {

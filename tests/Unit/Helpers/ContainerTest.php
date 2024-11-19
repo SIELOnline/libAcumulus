@@ -44,7 +44,7 @@ use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Item;
-use Siel\Acumulus\Invoice\Product;
+use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\WooCommerce\Collectors\ItemLineCollector;
 use Siel\Acumulus\Shop\AcumulusEntry;

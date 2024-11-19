@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -17,6 +18,7 @@ use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\EmailInvoiceAsPdf;
 use Siel\Acumulus\Data\EmailPackingSlipAsPdf;
 use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\Container;
 
 /**
@@ -53,6 +55,13 @@ class AcumulusTest extends TestCase
         $customer = new Customer();
         $customer->setInvoiceAddress(new Address());
         $invoice->setCustomer($customer);
+
+        $stockTransaction = new StockTransaction();
+        $stockTransaction->productId = 12345;
+        $stockTransaction->stockAmount = 1;
+        $stockTransaction->stockDescription = 'description';
+        $stockTransaction->stockDate = new DateTimeImmutable('2022-02-02');
+
         return [
             'About' => ['getAbout', [], 'general/general_about', true, []],
             'MyAcumulus' => ['getMyAcumulus', [], 'general/my_acumulus', true, []],
@@ -80,7 +89,7 @@ class AcumulusTest extends TestCase
             'emailInvoiceNotes' => ['emailInvoiceAsPdf', ['TOKEN', $emailInvoiceAsPdf, null, 'my notes'], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailAsPdf' => ['emailTo' => 'test@example.com'], 'invoicenotes' => 'my notes']],
             'emailPackingSlip' => ['emailPackingSlipAsPdf', ['TOKEN', $emailPackingslipAsPdf], 'delivery/packing_slip_mail_pdf', true, ['token' => 'TOKEN', 'emailAsPdf' => ['emailTo' => 'test@example.com']]],
             'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, ['signup' => ['companyname' => 'BR']]],
-            'stockMutation' => ['stockMutation', [12345, 1, 'description', '2022-02-02'], 'stock/stock_add', true, ['stock' => ['productid' => 12345, 'stockamount' => 1, 'stockdescription' => 'description', 'stockdate' => '2022-02-02']]],
+            'stockTransaction' => ['stockTransaction', [$stockTransaction], 'stock/stock_add', true, ['stock' => ['productId' => 12345, 'stockAmount' => 1.0, 'stockDescription' => 'description', 'stockDate' => '2022-02-02']]],
         ];
     }
 

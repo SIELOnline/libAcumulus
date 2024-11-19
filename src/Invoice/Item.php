@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Product\Product;
 
 /**
  * Item is an adapter (and wrapper) class around an item line of a web shop order or
@@ -26,7 +27,7 @@ abstract class Item
     protected Source $source;
 
     /**
-     * @var \Siel\Acumulus\Invoice\Product|null
+     * @var \Siel\Acumulus\Product\Product|null
      *   The product ordered on this item line.
      */
     protected ?Product $product;

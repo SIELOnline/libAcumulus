@@ -6,7 +6,7 @@ namespace Siel\Acumulus\PrestaShop\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Invoice\Item as BaseItem;
-use Siel\Acumulus\Invoice\Product;
+use Siel\Acumulus\Product\Product;
 
 /**
  * Item is the PrestaShop specific class to wrap an order/refund item.

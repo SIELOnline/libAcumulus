@@ -11,6 +11,7 @@ namespace Siel\Acumulus\Tests\ApiBehaviour\ApiClient;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -222,21 +223,32 @@ class AcumulusTest extends TestCase
         $this->assertEquals(10000, $threshold);
     }
 
-    public function stockMutationProvider(): array
+    public function stockTransactionProvider(): array
     {
         $productId = 1833636;
-        return [ // $productId, $quantity, $description, $date
-            'buy' => [[$productId, -2, 'Bestelling 123', '2020-12-11'], ['productid' => $productId, 'stockamount' => 18]],
-            'refund' => [[$productId, 2, 'Refund bestelling 123'], ['productid' => $productId, 'stockamount' => 20]]
+
+        $stockTransaction1 = new StockTransaction();
+        $stockTransaction1->productId = $productId;
+        $stockTransaction1->stockAmount = -2.0;
+        $stockTransaction1->stockDescription = 'Bestelling 123';
+
+        $stockTransaction2 = new StockTransaction();
+        $stockTransaction2->productId = $productId;
+        $stockTransaction2->stockAmount = 2.0;
+        $stockTransaction2->stockDescription = 'Refund bestelling 123';
+
+        return [
+            'buy' => [$stockTransaction1, ['productid' => $productId, 'stockamount' => 30.0]],
+            'refund' => [$stockTransaction2, ['productid' => $productId, 'stockamount' => 32.0]]
         ];
     }
 
     /**
-     * @dataProvider stockMutationProvider
+     * @dataProvider stockTransactionProvider
      */
-    public function testStockMutation(array $args, array $expected): void
+    public function testStockTransaction(StockTransaction $stockTransaction, array $expected): void
     {
-        $result = $this->acumulusClient->stockMutation(... $args);
+        $result = $this->acumulusClient->stockTransaction($stockTransaction);
 
         $this->assertSame(Severity::Success, $result->getStatus());
         $actual = $result->getMainAcumulusResponse();

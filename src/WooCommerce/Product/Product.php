@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\WooCommerce\Invoice;
+namespace Siel\Acumulus\WooCommerce\Product;
 
 use RuntimeException;
-use Siel\Acumulus\Invoice\Product as BaseProduct;
+use Siel\Acumulus\Product\Product as BaseProduct;
 
 /**
  * Product is a wrapper/adapter around a WooCommerce specific product (appearing on an Item).

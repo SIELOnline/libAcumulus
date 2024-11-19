@@ -10,7 +10,7 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Item;
-use Siel\Acumulus\Invoice\Product;
+use Siel\Acumulus\Product\Product;
 
 /**
  * ProductManager provides functionality to manage products and their stock.
@@ -74,9 +74,9 @@ class ProductManager
      * @todo: setting if we are doing stock management at all, check if the current
      *   product manages stock (or is a service or ...)
      */
-    public function updateStockForItem(Item $item, int|float $change): void
+    public function updateStockForItem(Item $item, int|float $change, string $trigger): void
     {
-        // Execute a few checks to see if we should and can proceed.
+        $result = $this->getContainer()->createStockTransactionResult($trigger);
         if (!$this->getContainer()->getShopCapabilities()->hasStockManagement() || !$this->getConfig()->get('stockManagementEnabled')) {
             return;
         }

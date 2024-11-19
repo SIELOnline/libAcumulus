@@ -6,7 +6,7 @@ namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Invoice\Item as BaseItem;
-use Siel\Acumulus\Invoice\Product;
+use Siel\Acumulus\Product\Product;
 
 /**
  * Item is the HikaShop specific class to wrap an order/refund item.

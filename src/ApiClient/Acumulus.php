@@ -925,8 +925,8 @@ class Acumulus
         ?bool $applyGraphics = null
     ): AcumulusResult {
         $message = [
-            'token' => $token,
-            'emailaspdf' => $emailAsPdf->toArray(),
+            Fld::Token => $token,
+            Fld::EmailAsPdf => $emailAsPdf->toArray(),
         ];
         if (!empty($deliveryNotes)) {
             $message['deliverynotes'] = $deliveryNotes;

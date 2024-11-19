@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter, CurlHandle is PHP8+
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter
  * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4.
  */
 
@@ -310,7 +310,7 @@ class HttpRequest
     /**
      * Raises a runtime exception with the curl error message.
      *
-     * @param CurlHandle|resource $handle
+     * @param CurlHandle $handle
      * @param string $functionName
      *   The name of the Curl function that failed.
      *
@@ -334,9 +334,9 @@ class HttpRequest
      *
      * This method is a wrapper around access to the ConnectionHandler.
      *
-     * @return CurlHandle|resource
+     * @return CurlHandle
      */
-    protected function getHandle()
+    protected function getHandle(): CurlHandle
     {
         return ConnectionHandler::getInstance()->get($this->getUri());
     }

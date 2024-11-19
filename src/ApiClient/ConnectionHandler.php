@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  CurlHandle is PHP8+
- */
 
 declare(strict_types=1);
 
@@ -31,10 +28,9 @@ class ConnectionHandler
     /**
      * Singleton pattern.
      *
-     * (PHP8: define return type as static)
      * @return static
      */
-    public static function getInstance(): ConnectionHandler
+    public static function getInstance(): static
     {
         if (static::$instance === null) {
             static::$instance = new static();
@@ -43,7 +39,7 @@ class ConnectionHandler
     }
 
     /**
-     * @var resource[]|CurlHandle[]
+     * @var CurlHandle[]
      */
     protected array $curlHandles = [];
 
@@ -75,9 +71,8 @@ class ConnectionHandler
      *     already an open connection to that host.
      *   - set the CURLOPT_URL option.
      *
-     * @return resource|CurlHandle
-     *   A, possibly already open, curl handle with the CURLOPT_URL option
-     *   set to $uri.
+     * @return CurlHandle
+     *   A, possibly already open, curl handle with the CURLOPT_URL option set to $uri.
      *
      * @throws \RuntimeException
      *   curl_init() failed.

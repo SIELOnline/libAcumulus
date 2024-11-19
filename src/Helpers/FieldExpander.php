@@ -246,9 +246,7 @@ class FieldExpander
         // If the specification contains exactly 1 field expansion specification
         // we return the direct result of {@see extractField()} so that the type
         // of that property is retained.
-        if (strncmp($fieldSpecification, '[', 1) === 0
-            && strpos($fieldSpecification, ']') === strlen($fieldSpecification) - 1
-        ) {
+        if (str_starts_with($fieldSpecification, '[') && str_ends_with($fieldSpecification, ']')) {
             return $this->expandSpecification(substr($fieldSpecification, 1, -1));
         } else {
             return preg_replace_callback('/\[([^]]+)]/', [$this, 'expansionSpecificationMatch'], $fieldSpecification);
@@ -741,7 +739,7 @@ class FieldExpander
      */
     protected function castNumericValue(mixed $value): mixed
     {
-        if (is_string($value) && is_numeric($value) && strncmp($value, '+', 1) !== 0 && !preg_match('/^0\d+$/', $value)) {
+        if (is_string($value) && is_numeric($value) && !str_starts_with($value, '+') && !str_starts_with($value, '0')) {
             if (preg_match('/^-?\d+$/', $value)) {
                 $value = (int) $value;
             } else {

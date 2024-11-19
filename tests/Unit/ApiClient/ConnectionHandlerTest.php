@@ -23,11 +23,11 @@ class ConnectionHandlerTest extends TestCase
 
     public function testCreate(): void
     {
-        $isPHP8 = version_compare(phpversion(), '8', '>=');
+        $isPhp8 = version_compare(phpversion(), '8', '>=');
 
         $connectionHandler = $this->getConnectionHandler();
         $ch1 = $connectionHandler->get('https://www.example.com/example-resource');
-        if ($isPHP8) {
+        if ($isPhp8) {
             $this->assertInstanceOf('CurlHandle', $ch1);
         } else {
             $this->assertIsResource($ch1);
@@ -35,7 +35,7 @@ class ConnectionHandlerTest extends TestCase
         $this->assertSame(1, $connectionHandler->getCount());
 
         $ch2 = $connectionHandler->get('https://www.example.com/example-resource2');
-        if ($isPHP8) {
+        if ($isPhp8) {
             $this->assertInstanceOf('CurlHandle', $ch2);
         } else {
             $this->assertIsResource($ch2);
@@ -44,7 +44,7 @@ class ConnectionHandlerTest extends TestCase
         $this->assertSame(1, $connectionHandler->getCount());
 
         $ch3 = $connectionHandler->get('https://www.example.com:80/example-resource');
-        if ($isPHP8) {
+        if ($isPhp8) {
             $this->assertInstanceOf('CurlHandle', $ch3);
         } else {
             $this->assertIsResource($ch3);
@@ -53,7 +53,7 @@ class ConnectionHandlerTest extends TestCase
         $this->assertSame(2, $connectionHandler->getCount());
 
         $ch4 = $connectionHandler->get('https://example.com/example-resource');
-        if ($isPHP8) {
+        if ($isPhp8) {
             $this->assertInstanceOf('CurlHandle', $ch4);
         } else {
             $this->assertIsResource($ch4);

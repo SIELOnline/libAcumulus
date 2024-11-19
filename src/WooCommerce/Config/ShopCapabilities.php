@@ -291,8 +291,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $result = [];
         $orderStatuses = wc_get_order_statuses();
         foreach ($orderStatuses as $key => $label) {
-            // PHP8: str_starts_with()
-            if (strncmp($key, 'wc-', 3) === 0) {
+            if (str_starts_with($key, 'wc-')) {
                 $key = substr($key, strlen('wc-'));
             }
             $result[$key] = $label;

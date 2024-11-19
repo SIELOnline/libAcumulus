@@ -171,14 +171,12 @@ class Container
      * access. Current exception is the separate Acumulus Customise Invoice
      * module, that may not get the instance passed via a constructor.
      *
-     * (PHP8: define return type as static)
-     *
      * @return static
      *
      * @noinspection PhpUnused Should only be used in module own code, not in
      *   the library itself.
      */
-    public static function getContainer(): Container
+    public static function getContainer(): static
     {
         return static::$instance;
     }

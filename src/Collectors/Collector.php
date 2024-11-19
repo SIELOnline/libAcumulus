@@ -319,7 +319,7 @@ abstract class Collector implements CollectorInterface
      */
     public function isMetadata(string $field): bool
     {
-        return strncmp($field, 'meta', strlen('meta')) === 0
+        return str_starts_with($field, 'meta')
             || in_array($field, [Meta::UnitPriceInc, Meta::VatAmount], true);
     }
 

@@ -55,12 +55,8 @@ class Source extends BaseSource
     protected function setId(): void
     {
         if (!$this->shopObject instanceof WC_Abstract_Order) {
-            // @todo: PHP8.0: get_debug_type().
-            $type = gettype($this->shopObject);
-            if ($type === 'object') {
-                $type = get_class($this->shopObject);
-            }
-            throw new RuntimeException("$type is not a WC_Abstract_Order");
+            $type = get_debug_type($this->shopObject);
+            throw new RuntimeException("'$type' is not a WC_Abstract_Order");
         }
         /** @noinspection PhpUndefinedMethodInspection */
         $this->id = $this->getShopObject()->get_id();

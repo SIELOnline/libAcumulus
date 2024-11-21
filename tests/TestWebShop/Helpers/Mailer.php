@@ -18,7 +18,7 @@ class Mailer extends BaseMailer
 
     public function getFrom(): string
     {
-        return 'unit.test@burorader.com';
+        return 'unit.test@example.com';
     }
 
     public function getFromName(): string

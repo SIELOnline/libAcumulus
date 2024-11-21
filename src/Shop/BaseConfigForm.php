@@ -98,6 +98,7 @@ abstract class BaseConfigForm extends Form
      */
     protected function translateAccountMessage(string $message): string
     {
+        // @todo: cleanup: what is still used, what not? Where and when is this used?
         if (!empty($message)) {
             $formType = $this->getType();
             $message = sprintf($this->t($message), $this->t("message_error_arg1_$formType"), $this->t("message_error_arg2_$formType"));

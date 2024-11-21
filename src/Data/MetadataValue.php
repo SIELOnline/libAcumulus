@@ -44,6 +44,7 @@ class MetadataValue
      * @var bool
      *   Indicates whether the value is to be seen as a list. This influences what is
      *   returned with {@see get()} when we have 0 or 1 values.
+     * @todo: expose this property with a getter?
      */
     private bool $isList;
     private array $value = [];

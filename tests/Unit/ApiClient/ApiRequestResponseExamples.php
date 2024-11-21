@@ -101,7 +101,7 @@ class ApiRequestResponseExamples
                     'countrycode' => 'FR',
                     'country' => 'Frankrijk',
                     'telephone' => '1234567890',
-                    'email' => 'erwin@burorader.com',
+                    'email' => 'test@bexample.com',
                     'overwriteifexists' => '1',
                     'mark' => '::1',
                     'invoice' => [

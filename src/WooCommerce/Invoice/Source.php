@@ -15,8 +15,7 @@ use WC_Order;
 use WC_Order_Refund;
 
 use function count;
-use function get_class;
-use function gettype;
+use function sprintf;
 use function strlen;
 
 /**

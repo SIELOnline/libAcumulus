@@ -14,6 +14,9 @@ class MetadataCollection
     /** @var MetadataValue[] $metadata */
     private array $metadata = [];
 
+    /**
+     * Returns whether the metadata name exists, even if it is null.
+     */
     public function exists(string $name): bool
     {
         return array_key_exists($name, $this->metadata);
@@ -33,15 +36,15 @@ class MetadataCollection
     /**
      * Returns the value for the given metadata name, or null if not set.
      *
-     * If the metadata contains multiple values, an array of values will be,
-     * returned, but if the value itself is an array, it may be difficult to
-     * distinguish these 2 situations. For these cases, use
-     * {@see MetadataValue::count()}.
+     * If the metadata contains multiple values, and $index = null, an array of values
+     * will be returned, but if the value itself is an array, also an array will be
+     * returned, so iit may be difficult to distinguish these 2 situations. For these
+     * cases, use {@see MetadataValue::count()}.
      *
      * @param string $name
      *   The name of the metadata value to return.
      * @param int|null $index
-     *   The index of the value to return (if it is list).
+     *   The index of the value to return (if it is a list).
      *
      * @return array|mixed|null
      *   The value for the given metadata name at the given index, or null if not set or

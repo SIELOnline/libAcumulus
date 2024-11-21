@@ -232,13 +232,14 @@ class FieldExpander
      *
      * @return mixed
      *   The expanded field expansion specification, which may be empty if the
-     *   properties referred to do not exist or are empty themselves.
+     *   properties or methods referred to do not exist or are or return an empty value
+     *   themselves.
      *
      *   The type of the return value is either:
-     *     - The type of the property requested if $fieldSpecification contains
-     *       exactly 1 variable field specification, i.e. it begins with a '[' and
-     *       the first and only ']' is at the end.
-     *     - string otherwise.
+     *   - If $fieldSpecification contains exactly 1 field specification (i.e. it begins
+     *     with a '[' and the first and only ']' is at the end): the (return) type of the
+     *     property or method specified in $field.
+     *   - Otherwise: string
      */
     public function expand(string $fieldSpecification, PropertySources $propertySources): mixed
     {
@@ -246,7 +247,7 @@ class FieldExpander
         // If the specification contains exactly 1 field expansion specification
         // we return the direct result of {@see extractField()} so that the type
         // of that property is retained.
-        if (str_starts_with($fieldSpecification, '[') && str_ends_with($fieldSpecification, ']')) {
+        if (str_starts_with($fieldSpecification, '[') && strpos($fieldSpecification, ']') === strlen($fieldSpecification) - 1) {
             return $this->expandSpecification(substr($fieldSpecification, 1, -1));
         } else {
             return preg_replace_callback('/\[([^]]+)]/', [$this, 'expansionSpecificationMatch'], $fieldSpecification);

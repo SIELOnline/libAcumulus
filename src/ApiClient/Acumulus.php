@@ -249,25 +249,22 @@ class Acumulus
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "product" arrays, each "product"
      *   array being a keyed array with keys:
-     * - 'productid'
-     * - 'productnature'
-     * - 'productdescription'
-     * - 'producttagid'
-     * - 'productcontactid'
-     * - 'productprice'
-     * - 'productvatrate'
-     * - 'productsku'
-     * - 'productstockamount'
-     * - 'productean'
-     * - 'producthash'
-     * - 'productnotes'
-     *
-     * @noinspection PhpUnused  Not yet used, but this is a library that,
-     *   eventually, should cover all web services provided.
+     *  - 'productid'
+     *  - 'productnature'
+     *  - 'productdescription'
+     *  - 'producttagid'
+     *  - 'productcontactid'
+     *  - 'productprice'
+     *  - 'productvatrate'
+     *  - 'productsku'
+     *  - 'productstockamount'
+     *  - 'productean'
+     *  - 'producthash'
+     *  - 'productnotes'
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function getPicklistProducts(?string $filter = null, ?int $offset = null, ?int $rowcount = null, ?int $productTagId = null): AcumulusResult
+    public function getPicklistProducts(?string $filter = null, ?int $rowcount = null, ?int $offset = null, ?int $productTagId = null): AcumulusResult
     {
         $filters = [];
         if ($filter !== null) {

@@ -7,6 +7,8 @@ namespace Siel\Acumulus\Invoice;
 use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
 
+use function is_scalar;
+
 /**
  * WrapperTrait implements an adapter/wrapper pattern for objects from the webshop.
  *
@@ -15,7 +17,7 @@ use Siel\Acumulus\Helpers\Container;
  */
 trait WrapperTrait
 {
-    protected Container $container;
+    private Container $container;
     protected int $id;
     protected object|array $shopObject;
 

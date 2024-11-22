@@ -22,6 +22,10 @@ abstract class Environment
     public const Unknown = 'unknown';
     protected const QueryVariables = 'show variables where Variable_name in ("version", "version_comment")';
 
+    /**
+     * @var string[]
+     *   Description.
+     */
     protected array $data = [];
     protected string $shopNamespace;
     protected string $language;
@@ -48,7 +52,7 @@ abstract class Environment
         $this->data['hostName'] = $this->getHostName();
         $this->data['phpVersion'] = PHP_VERSION;
         $variables = $this->getDbVariables();
-        $this->data['dbName'] = $variables['version_comment'] ?? '??MySQL??';
+        $this->data['dbName'] = $variables['version_comment'] ?? static::Unknown;
         $this->data['dbVersion'] = $variables['version'] ?? static::Unknown;
         $this->data['os'] = php_uname();
         /** @noinspection PhpComposerExtensionStubsInspection  false positive in projects with a higher level composer.json */
@@ -63,7 +67,6 @@ abstract class Environment
         $this->data['cmsVersion'] = '';
         $this->data['supportEmail'] = strtolower(rtrim($this->data['shopName'], '0123456789')) . '@acumulus.nl';
         $this->data['language'] = $this->language;
-        $this->setShopEnvironment();
         $this->setShopEnvironment();
     }
 
@@ -103,6 +106,9 @@ abstract class Environment
      *
      * Only override if you cannot just override {@see executeQuery()} to return
      * an array with 2 associative arrays for the 2 variables to get.
+     *
+     * @return string[]
+     *   Keys are the variable names "version" and "version_comment".
      */
     protected function getDbVariables(): array
     {
@@ -125,10 +131,18 @@ abstract class Environment
         throw new RuntimeException(__METHOD__ . ' not implemented');
     }
 
+    public function get(string $key): ?string
+    {
+        if (count($this->data) === 0) {
+            $this->set($this->shopNamespace);
+        }
+        return $this->data[$key] ?? null;
+    }
+
     /**
      * Returns information about the environment of this plugin.
      *
-     * @return array
+     * @return string[]
      *   A keyed array with information about the environment of this library:
      *   - 'baseUri'
      *   - 'apiVersion'
@@ -146,7 +160,7 @@ abstract class Environment
      *   - 'dbVersion'
      *   - 'supportEmail'
      */
-    public function get(): array
+    public function toArray(): array
     {
         if (count($this->data) === 0) {
             $this->set($this->shopNamespace);
@@ -163,7 +177,7 @@ abstract class Environment
      */
     public function getAsLines(): array
     {
-        $environment = $this->get();
+        $environment = $this->toArray();
         return [
             'shop' => "{$environment['shopName']} {$environment['shopVersion']}"
                 . (!empty($environment['cmsName']) ? " on {$environment['cmsName']} {$environment['cmsVersion']}" : ''),

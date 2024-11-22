@@ -101,14 +101,13 @@ class CrashReporter
 
     protected function mailException(string $errorMessage): void
     {
-        $environment = $this->environment->get();
         $moduleName = $this->t('module_name');
         $module = $this->t('module');
         $subject = sprintf($this->t('crash_mail_subject'), $moduleName, $module);
         $from = $this->mailer->getFrom();
         $fromName = $this->mailer->getFromName();
         $to = $this->mailer->getTo();
-        $support = $environment['supportEmail'];
+        $support = $this->environment->get('supportEmail');
         $paragraphIntroduction = sprintf($this->t('crash_mail_body_start'), $moduleName, $module, $support);
         $paragraphIntroductionText = wordwrap($paragraphIntroduction, 70);
         $paragraphIntroductionHtml = nl2br($paragraphIntroduction, false);

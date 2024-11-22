@@ -196,7 +196,7 @@ class AcumulusRequest
 
     protected function getUserAgent(): string
     {
-        $environment = $this->environment->get();
+        $environment = $this->environment->toArray();
         $library = "libAcumulus/{$environment['libraryVersion']}";
         $shop = " {$environment['shopName']}/{$environment['shopVersion']}";
         $cms = !empty($environment['cmsName']) ? " {$environment['cmsName']}/{$environment['cmsVersion']}" : '';

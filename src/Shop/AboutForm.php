@@ -180,7 +180,6 @@ class AboutForm
             ),
         ];
 
-        $environment = $this->getEnvironment()->get();
         $environmentLines = $this->getEnvironment()->getAsLines();
         $fields['environmentHeader'] = [
             'type' => 'markup',
@@ -192,8 +191,8 @@ class AboutForm
                 sprintf($this->t('desc_environmentInformation'), $this->t('module')),
         ];
 
-        $support = $environment['supportEmail'];
-        $subject = sprintf($this->t('support_subject'), $environment['shopName'], $this->t('module'));
+        $support = $this->getEnvironment()->get('supportEmail');
+        $subject = sprintf($this->t('support_subject'), $this->getEnvironment()->get('shopName'), $this->t('module'));
         $body = sprintf(
             "%s:\n%s%s%s%s%s:\n%s%s\n%s\n%s\n",
             $this->t('contract'),

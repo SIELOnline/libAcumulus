@@ -900,8 +900,8 @@ class Acumulus
      */
     protected function constructUri(string $apiFunction): string
     {
-        $environment = $this->environment->get();
-        return $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
+        $environment = $this->environment->toArray();
+        return "{$environment['baseUri']}/{$environment['apiVersion']}/{$apiFunction}.php";
     }
 
     /**

@@ -615,8 +615,7 @@ class Config
      */
     protected function getHostName(): string
     {
-        $environment = $this->environment->get();
-        return $environment['hostName'];
+        return $this->environment->get('hostName');
     }
 
     /**

@@ -82,7 +82,7 @@ abstract class Mailer
         $fromName = $this->getFromName();
         $to = $this->getTo();
         $subject = $this->getSubject($invoiceSendResult);
-        $content = $this->getBody($invoiceSendResult , $invoiceSourceType, $invoiceSourceReference);
+        $content = $this->getBody($invoiceSendResult, $invoiceSourceType, $invoiceSourceReference);
 
         $logMessage = sprintf('Mailer::sendMail("%s", "%s", "%s", "%s")', $from, $fromName, $to, $subject);
         $result = $this->sendMail($from, $fromName, $to, $subject, $content['text'], $content['html']);
@@ -113,8 +113,7 @@ abstract class Mailer
      */
     public function getFrom(): string
     {
-        $env = $this->environment->get();
-        return 'webshop@' . $env['hostName'];
+        return 'webshop@' . $this->environment->get('hostName');
     }
 
     /**

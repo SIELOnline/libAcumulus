@@ -358,6 +358,7 @@ class InvoiceSend
             ? InvoiceAddResult::AddReqResp_WithOther
             : InvoiceAddResult::AddReqResp_Always;
         if ($addReqResp === InvoiceAddResult::AddReqResp_Always || $result->hasRealMessages()) {
+            // @todo: rename to mailInvoiceAddResult ...
             return $this->getMailer()->sendInvoiceAddMailResult($result, $invoiceSource->getType(), $invoiceSource->getReference());
         }
         return true;
@@ -371,7 +372,6 @@ class InvoiceSend
      */
     protected function isTestMode(): bool
     {
-        $pluginSettings = $this->getConfig()->getPluginSettings();
-        return $pluginSettings['debug'] === Config::Send_TestMode;
+        return $this->getConfig()->get('debug') === Config::Send_TestMode;
     }
 }

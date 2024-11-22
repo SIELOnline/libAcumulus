@@ -60,7 +60,7 @@ class ActivateSupportForm extends Form
 
     protected function validate(): void
     {
-        $hostName = $this->environment->get()['hostName'];
+        $hostName = $this->environment->get('hostName');
         if (preg_match('/^' . self::RegExp_Token . '$/', $this->submittedValues['support_token']) === false) {
             $this->addFormMessage($this->t('message_validate_invalid_token'), Severity::Error, 'support_token');
         }
@@ -113,7 +113,7 @@ class ActivateSupportForm extends Form
                     'attributes' => [
                         'readonly' => true,
                     ],
-                    'value' => $this->environment->get()['hostName'],
+                    'value' => $this->environment->get('hostName'),
                 ],
             ],
         ];

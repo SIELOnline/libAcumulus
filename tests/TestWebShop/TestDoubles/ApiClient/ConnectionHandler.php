@@ -23,7 +23,7 @@ class ConnectionHandler extends BaseConnectionHandler
      *
      * @return static
      */
-    public static function getInstance(): BaseConnectionHandler
+    public static function getInstance(): static
     {
         if (!isset(static::$instance)) {
             static::$instance = new static();

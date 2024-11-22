@@ -7,6 +7,8 @@ This file contains a historical overview of changes in our own code.
 8.3.6 (2024-1?-??)
 ------------------
 Bugs:
+- ALL: TypeError: Siel\Acumulus\Helpers\Form::getAboutBlock(): Argument #1
+  ($accountStatus) must be of type ?bool, string given.
 - WC: Division by zero in WooCommerce/Collectors/ItemLineCollector.php:72
 - ALL: TypeError: Siel\Acumulus\Helpers\FormRenderer::addAttribute(): Argument #3 ($value)
   must be of type array|string|bool|null, int given, called in Helpers/FormRenderer.php on
@@ -24,6 +26,7 @@ Testing:
 
 Refactorings:
 - Basic submit structure now created and collected as an AcumulusObject.
+- Basic stock management added but not yet operational.
 
 8.3.5 (2024-11-01) (WC) (actually: all shops that use our own form renderer)
 -----------------------
@@ -35,6 +38,11 @@ Bugs:
 
 8.3.4 (2024-11-01) (ALL)
 ------------------------
+Features:
+- ALL: to determine which menu items should be shown, an Acumulus API call was made on
+  every admin page (to check the account settings). This result is now cached and only
+  refreshed on our own pages.
+
 Bugs:
 - ALL: Uncaught RuntimeException: "curl_exec(): 28 - Connection timed out ..." lead to
   a WSOD on all admin pages (and client-side pages where Acumulus API calls are made). The

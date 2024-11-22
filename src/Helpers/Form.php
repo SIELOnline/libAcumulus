@@ -80,8 +80,8 @@ abstract class Form extends MessageCollection
      * @var string
      *   The type of this form, the class could also be used to determine so,
      *   but as a simple type string is already used on creation, that is used.
-     *   Should be one of: 'register', 'settings', 'mappings', 'register', 'activate',
-     *   'batch', 'invoice', 'message', 'rate'.
+     *   Should be one of: 'register', 'settings', 'mappings', 'activate', 'batch',
+     *   'invoice', 'message', 'rate'.
      */
     protected string $type;
     protected Log $log;
@@ -739,7 +739,7 @@ abstract class Form extends MessageCollection
     /**
      * Returns the About block to add to this form.
      */
-    protected function getAboutBlock(?bool $accountStatus): array
+    protected function getAboutBlock(null|bool|string $accountStatus): array
     {
         if ($this->aboutForm === null) {
             throw new RuntimeException('About block not available');

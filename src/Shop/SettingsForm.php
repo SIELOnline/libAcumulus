@@ -266,7 +266,7 @@ class SettingsForm extends BaseConfigForm
             'legend' => $this->t('pluginSettingsHeader'),
             'fields' => $this->getPluginFields(),
         ];
-        if ($accountStatus) {
+        if ($accountStatus === true) {
             $fields['advancedConfig'] = [
                 'type' => 'details',
                 'summary' => $this->t('mappings_form_header'),

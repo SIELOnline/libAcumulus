@@ -77,7 +77,7 @@ class LineCollector extends BaseLineCollector
     }
 
     /**
-     * Adds vat class and vat rate metadata to $$line.
+     * Adds vat class and vat rate metadata to $line.
      *
      * The following metadata may be added:
      * - Meta::VatClassId: int

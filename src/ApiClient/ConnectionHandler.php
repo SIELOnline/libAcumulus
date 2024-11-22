@@ -77,7 +77,7 @@ class ConnectionHandler
      * @throws \RuntimeException
      *   curl_init() failed.
      */
-    public function get(string $uri)
+    public function get(string $uri): CurlHandle
     {
         // Determine the scheme://host[:port] part to get a handle for the host.
         $key = $this->getKey($uri);

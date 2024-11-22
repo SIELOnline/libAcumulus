@@ -89,7 +89,7 @@ class AcumulusTest extends TestCase
             $this->assertIsArray($response);
             $this->assertNotEmpty($response);
             $singleResponse = reset($response);
-            $this->assertIsInt(key($response));
+            $this->assertIsInt(array_key_first($response));
         } else {
             $singleResponse = $response;
         }

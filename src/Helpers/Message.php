@@ -10,6 +10,7 @@ namespace Siel\Acumulus\Helpers;
 use Throwable;
 
 use function assert;
+use function sprintf;
 
 /**
  * Class Message defines a - human-readable - message.
@@ -76,7 +77,7 @@ class Message
      *
      * @return \Siel\Acumulus\Helpers\Message
      */
-    public static function create(string $message, int $severity, $code = 0): Message
+    public static function create(string $message, int $severity, int|string $code = 0): Message
     {
         return new Message($message, $severity, $code);
     }
@@ -84,8 +85,7 @@ class Message
     protected ?Translator $translator = null;
     protected string $text;
     protected int $severity;
-    /** @var int|string */
-    protected $code;
+    protected int|string $code;
     protected string $codeTag;
     protected string $field;
     /** @var \Throwable|null */
@@ -100,7 +100,7 @@ class Message
     protected function __construct(
         string $text,
         int $severity,
-        $code = 0,
+        int|string $code = 0,
         string $codeTag = '',
         string $field = '',
         ?Throwable $exception = null
@@ -199,7 +199,7 @@ class Message
      *     see {@link https://www.siel.nl/acumulus/API/Basic_Response/}.
      *   - A 7xx number used internally to define messages.
      */
-    public function getCode()
+    public function getCode(): int|string
     {
         return $this->code;
     }

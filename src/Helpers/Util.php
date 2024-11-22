@@ -11,6 +11,7 @@ namespace Siel\Acumulus\Helpers;
 use DOMDocument;
 use DOMElement;
 use DOMException;
+use JsonException;
 use RuntimeException;
 use SensitiveParameter;
 use Siel\Acumulus\ApiClient\AcumulusException;
@@ -177,7 +178,7 @@ class Util
     {
         try {
             return json_encode($objectOrArray, Meta::JsonFlags);
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             throw new AcumulusException($e->getMessage(), $e->getCode(), $e);
         }
     }

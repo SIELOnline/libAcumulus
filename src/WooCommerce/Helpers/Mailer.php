@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Throwable;
 
 /**
  * Extends the base mailer class to send a mail using the WP mail features.
@@ -18,7 +19,7 @@ class Mailer extends BaseMailer
         string $subject,
         string $bodyText,
         string $bodyHtml
-    ) {
+    ): mixed {
         $headers = [
             "from: $fromName <$from>",
             'Content-Type: text/html; charset=UTF-8',

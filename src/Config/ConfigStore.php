@@ -1,7 +1,6 @@
 <?php
 /**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter.
- * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4.
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection SensitiveParameter is PHP 8.2
  */
 
 declare(strict_types=1);
@@ -56,8 +55,5 @@ abstract class ConfigStore
      *
      * @throws \JsonException
      */
-    abstract public function save(
-        #[SensitiveParameter]
-        array $values
-    ): bool;
+    abstract public function save(#[SensitiveParameter] array $values): bool;
 }

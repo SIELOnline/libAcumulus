@@ -52,7 +52,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         //   Magento).
     }
 
-    public function getByEntryId(?int $entryId)
+    public function getByEntryId(?int $entryId): AcumulusEntry|array|null
     {
         // @todo: provide implementation.
     }
@@ -62,12 +62,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         // @todo: provide implementation.
     }
 
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool
     {
         // @todo: insert a new entry (note that save() takes care of distinguishing between insert and update).
     }
 
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
     {
         // @todo: update an existing entry (note that save() takes care of distinguishing between insert and update).
     }

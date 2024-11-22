@@ -22,10 +22,9 @@ use function sprintf;
  *
  * Properties that are computed using logic:
  * - int $productId (optional, if it was not mapped)
- * - \DateTimeInterface $stockDate  @todo will we set it or not?
  *
  * Properties that are not set:
- * - \DateTimeInterface $stockDate  @todo will we set it or not?
+ * - \DateTimeInterface $stockDate
  */
 class StockTransactionCollector extends Collector
 {

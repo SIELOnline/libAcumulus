@@ -35,7 +35,7 @@ trait AcumulusObjectMetadataTrait
     /**
      * See {@see \Siel\Acumulus\Data\MetadataCollection::get()}.
      */
-    public function metadataGet(string $name)
+    public function metadataGet(string $name): mixed
     {
         return $this->getMetadata()->get($name);
     }

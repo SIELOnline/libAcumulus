@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Config;
 
+use SensitiveParameter;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
 /**
@@ -16,7 +17,7 @@ class ConfigStore extends BaSeConfigStore
       return get_option($this->configKey, []);
     }
 
-    public function save(array $values): bool
+    public function save(#[SensitiveParameter] array $values): bool
     {
         // WP: update_option() also returns false when there are no changes. We
         // want to return true, so we perform the same check as update_option()

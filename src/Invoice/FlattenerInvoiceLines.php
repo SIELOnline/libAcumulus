@@ -25,6 +25,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
 use function count;
+use function sprintf;
 use function strlen;
 
 /**
@@ -290,8 +291,8 @@ class FlattenerInvoiceLines
      * - Price info only on parent.
      *
      * What do we do in this situation:
-     * - Copy vat rate info from parent to children (as it may be empty on the
-     *   children).
+     * - Copy vat rate info from parent to children as it may be empty on the
+     *   children.
      * - Remove price info from children (just to be sure).
      *
      * Known usages:

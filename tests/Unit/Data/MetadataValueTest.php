@@ -98,7 +98,7 @@ class MetadataValueTest extends TestCase
             [null, null],
             [true, true],
             [1.23, 1.23],
-            ['2', '2'],
+            ['2', 2],
             ['test', 'test'],
             [['test1', 'test2'], "['test1','test2']"],
             [new DateTime('2023-05-04'), '2023-05-04'],

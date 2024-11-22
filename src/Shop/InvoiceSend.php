@@ -17,6 +17,7 @@ use Siel\Acumulus\Invoice\Source;
 
 use function count;
 use function in_array;
+use function sprintf;
 
 /**
  * SendInvoice handles the task of sending a created invoice to Acumulus.
@@ -89,6 +90,8 @@ class InvoiceSend
     /**
      * Sets the (basic)
      * {@see \Siel\Acumulus\Invoice\InvoiceAddResult::getSendStatus()}.
+     *
+     * @throws \DateException
      */
     public function setBasicSendStatus(Source $invoiceSource, InvoiceAddResult $result, bool $forceSend): void
     {

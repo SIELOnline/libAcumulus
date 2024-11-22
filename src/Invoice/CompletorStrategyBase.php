@@ -28,6 +28,7 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 use function get_class;
+use function sprintf;
 
 /**
  * CompletorStrategyBase is the base class for all strategies that might
@@ -46,14 +47,14 @@ abstract class CompletorStrategyBase
      * @var array[]|Invoice
      *   The invoice according to the Acumulus API definition.
      */
-    protected $invoice;
+    protected array|Invoice $invoice;
     /** @var array[] */
     protected array $possibleVatTypes;
     /** @var array[] */
     protected array $possibleVatRates;
     /**
      * @var int[]
-     *   The indices of the completed lines. As a line2complete may be split
+     *   The indices of the completed lines. As a line2Complete may be split
      *   over multiple new lines we must store the indices separately.
      */
     protected array $linesCompleted;
@@ -95,7 +96,7 @@ abstract class CompletorStrategyBase
     public function __construct(
         Config $config,
         Translator $translator,
-        $invoice,
+        array|Invoice $invoice,
         array $possibleVatTypes,
         array $possibleVatRates,
         Source $source
@@ -408,7 +409,7 @@ abstract class CompletorStrategyBase
      * @return float
      *   The vat amount for the completed line.
      */
-    protected function completeLine($line2Complete, float $vatRate): float
+    protected function completeLine(Line|array $line2Complete, float $vatRate): float
     {
         if (!isset($line2Complete[Fld::Quantity])) {
             $line2Complete[Fld::Quantity] = 1;

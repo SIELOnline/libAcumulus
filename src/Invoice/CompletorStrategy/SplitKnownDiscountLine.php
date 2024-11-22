@@ -11,6 +11,9 @@ use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Meta;
 
+use function count;
+use function sprintf;
+
 /**
  * Class SplitKnownDiscountLine implements a vat completor strategy by using the
  * Meta::LineDiscountAmountInc tags to split a discount line over several
@@ -60,7 +63,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     /** @var float[] */
     protected array $discountsPerVatRate;
     /** @var array|Line */
-    protected $splitLine;
+    protected Line|array $splitLine;
     protected int $splitLineKey;
     protected int $splitLineCount;
 

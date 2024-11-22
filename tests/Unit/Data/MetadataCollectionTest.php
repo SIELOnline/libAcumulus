@@ -31,7 +31,7 @@ class MetadataCollectionTest extends TestCase
         $this->assertFalse($mdc->exists($no_name));
         $this->assertNull($mdc->getMetadataValue($name1));
         $this->assertNull($mdc->get($name1));
-        $this->assertSame([], $mdc->getKeys());
+        $this->assertSame([], $mdc->toArray());
 
         // Test set that creates.
         $mdc->set($name1, $value1);
@@ -39,7 +39,7 @@ class MetadataCollectionTest extends TestCase
         $this->assertFalse($mdc->exists($no_name));
         $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name1));
         $this->assertSame($value1, $mdc->get($name1));
-        $this->assertSame([$name1], $mdc->getKeys());
+        $this->assertSame([$name1], array_keys($mdc->toArray()));
 
         // Test add that creates.
         $mdc->add($name2, $value2);
@@ -48,7 +48,7 @@ class MetadataCollectionTest extends TestCase
         $this->assertFalse($mdc->exists($no_name));
         $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name2));
         $this->assertSame([$value2], $mdc->get($name2));
-        $this->assertSame([$name1, $name2], $mdc->getKeys());
+        $this->assertSame([$name1, $name2], array_keys($mdc->toArray()));
 
         // Test set that overwrites.
         $mdc->set($name1, $value2);
@@ -89,7 +89,7 @@ class MetadataCollectionTest extends TestCase
         $this->assertTrue($mdc->exists($name1));
         $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name1));
         $this->assertNull($mdc->get($name1));
-        $this->assertSame([$name1], $mdc->getKeys());
+        $this->assertSame([$name1], array_keys($mdc->toArray()));
 
         // Test add that creates.
         $name2 = 'my_metadata2';
@@ -97,7 +97,7 @@ class MetadataCollectionTest extends TestCase
         $this->assertTrue($mdc->exists($name2));
         $this->assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name2));
         $this->assertNull($mdc->get($name2));
-        $this->assertSame([$name1, $name2], $mdc->getKeys());
+        $this->assertSame([$name1, $name2], array_keys($mdc->toArray()));
 
         // Test set that overwrites.
         $value2 = 2;

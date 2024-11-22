@@ -59,11 +59,12 @@ abstract class BaseCompletor
     /**
      * Returns the configured value for this setting.
      *
-     * @return mixed|null
-     *   The configured value for this setting, or null if not set and no
-     *   default is available.
+     * @return mixed
+     *   The configured value for this setting, or null if not set and no default is
+     *   available. Our {@see \Siel\Acumulus\Config\Config configuration} knows the types:
+     *   string, int, float, bool and array.
      */
-    protected function configGet(string $key)
+    protected function configGet(string $key): mixed
     {
         return $this->config->get($key);
     }

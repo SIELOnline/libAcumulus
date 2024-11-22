@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Shop;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use RuntimeException;
 use Siel\Acumulus\Api;
 
 use function array_key_exists;
@@ -90,16 +91,16 @@ class AcumulusEntry
      * @var array|object
      *   The web shop specific data holder for the Acumulus entry.
      */
-    protected $record;
+    protected object|array $record;
 
     /**
-     * constructor.
+     * Constructor.
      *
      * @param array|object $record
      *   A web shop specific record object or array that holds an Acumulus entry
      *   record.
      */
-    public function __construct($record)
+    public function __construct(object|array $record)
     {
         $this->record = $record;
     }
@@ -187,9 +188,10 @@ class AcumulusEntry
      * @return string|int|\DateTimeInterface
      *   The timestamp when this record was created.
      *
-     * @throws \Exception
+     * @throws \RuntimeException
+     * @throws \DateException
      */
-    public function getCreated(bool $raw = false)
+    public function getCreated(bool $raw = false): DateTimeInterface|string|int
     {
         $result = $this->get(static::$keyCreated);
         if (!$raw) {
@@ -210,7 +212,7 @@ class AcumulusEntry
      *
      * @throws \Exception
      */
-    public function getUpdated(bool $raw = false)
+    public function getUpdated(bool $raw = false): DateTimeInterface|string|int
     {
         $result = $this->get(static::$keyUpdated);
         // [SIEL #207319]: TypeError: DateTime::createFromFormat() expects parameter 2 to
@@ -227,13 +229,14 @@ class AcumulusEntry
     /**
      * Returns a DateTimeInterface object based on the timestamp in database format.
      *
-     * @param int|float|string $timestamp
+     * @param float|int|string $timestamp
      *
      * @return bool|\DateTimeInterface
      *
-     * @throws \Exception
+     * @throws \RuntimeException
+     * @throws \DateException
      */
-    protected function toDateTime($timestamp): DateTimeInterface|bool
+    protected function toDateTime(float|int|string $timestamp): DateTimeInterface|bool
     {
         $timestamp = (string) $timestamp;
         if (ctype_digit($timestamp)) {
@@ -246,6 +249,9 @@ class AcumulusEntry
             // Formatted timestamp, e.g. yyyy-mm-dd hh:mm:ss. Is assumed to be in the
             // timezone of the webshop if no timezone is specified in the string to parse.
             $result = DateTimeImmutable::createFromFormat(static::$timestampFormat, $timestamp, $this->getDefaultTimeZone());
+            if ($result === false) {
+                throw new RuntimeException("Failed to convert timestamp string '$timestamp'.");
+            }
         }
         return $result;
     }
@@ -255,7 +261,7 @@ class AcumulusEntry
      *
      * The default implementation returns the default time zone of the web server.
      *
-     * @throws \Exception
+     * @throws \DateInvalidTimeZoneException
      */
     protected function getDefaultTimeZone(): DateTimeZone
     {
@@ -270,7 +276,7 @@ class AcumulusEntry
      * @return array|object
      *   The shop specific record for this Acumulus entry.
      */
-    public function getRecord()
+    public function getRecord(): object|array
     {
         return $this->record;
     }
@@ -289,7 +295,7 @@ class AcumulusEntry
      *
      * @noinspection PhpUsageOfSilenceOperatorInspection
      */
-    protected function get(string $field)
+    protected function get(string $field): mixed
     {
         $value = null;
         if (is_array($this->record)) {
@@ -338,11 +344,11 @@ class AcumulusEntry
      *   True if the entry indicates that there is a lock on sending the
      *   invoice, but has expired, false otherwise.
      *
-     * @throws \Exception
+     * @throws \RuntimeException
+     * @throws \DateException
      */
     public function hasLockExpired(): bool
     {
-        /** @noinspection NullPointerExceptionInspection */
         return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTimeS;
     }
 }

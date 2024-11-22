@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Data;
 
 use DateTimeInterface;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
 use Stringable;
@@ -44,7 +45,6 @@ class MetadataValue
      * @var bool
      *   Indicates whether the value is to be seen as a list. This influences what is
      *   returned with {@see get()} when we have 0 or 1 values.
-     * @todo: expose this property with a getter?
      */
     private bool $isList;
     private array $value = [];
@@ -52,6 +52,15 @@ class MetadataValue
     public function __construct(bool $isList = false)
     {
         $this->isList = $isList;
+    }
+
+    /**
+     * Indicates whether this metadata value is to be seen as a list. This influences what
+     * is returned with {@see get()} when we have 0 or 1 values.
+     */
+    public function isList(): bool
+    {
+        return $this->isList;
     }
 
     public function count(): int
@@ -63,7 +72,7 @@ class MetadataValue
      * Returns the value of this metadata field.
      *
      * @return array|mixed|null
-     *   If $$this->isList is:
+     *   If $this->isList is:
      *     - true: a, possibly empty, array with all values for this field.
      *     - false:
      *       - Null if no value is set.
@@ -94,12 +103,13 @@ class MetadataValue
      * @param mixed $value
      *   The value to add to this property.
      *
-     * @todo: add conversion of numeric strings like in FieldExpander. What if an array
-     *   gets passed in: convert recursively?
+     * @return $this
      */
     public function add(mixed $value): static
     {
-        $this->value[] = $value;
+        // Note: we do not cast recursively if an array is passed, we that casting was
+        // done when constructing the array.
+        $this->value[] = Number::castNumericValue($value);
         return $this;
     }
 

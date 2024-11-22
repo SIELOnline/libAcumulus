@@ -10,6 +10,7 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Meta;
 
 use function count;
+use function sprintf;
 
 /**
  * Class TryAllTaxRatePermutations implements a vat completor strategy by trying

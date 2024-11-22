@@ -9,6 +9,8 @@ use Language;
 use Mail;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
+use Throwable;
+
 use function is_int;
 
 /**
@@ -22,7 +24,7 @@ class Mailer extends BaseMailer
     /**
      * Sends an email.
      *
-     * @return bool|string
+     * @return mixed
      *   Success (true); error message, Throwable object or just false otherwise.
      *
      * @throws \PrestaShopException
@@ -34,7 +36,7 @@ class Mailer extends BaseMailer
         string $subject,
         string $bodyText,
         string $bodyHtml
-    ) {
+    ): mixed {
         $this->templateDir = _PS_ROOT_DIR_ . '/mails/';
         $this->templateName = 'acumulus-message';
         $this->writeTemplateFiles($bodyText, $bodyHtml);

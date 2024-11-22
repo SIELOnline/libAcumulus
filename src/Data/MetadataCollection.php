@@ -106,7 +106,7 @@ class MetadataCollection
      *   The name for the metadata field.
      * @param mixed $value
      *   The value to add to (or set for) the metadata field.
-     *   If you can pass null with $$isList = true for a new metadata value, it is assumed
+     *   If you can pass null with $isList = true for a new metadata value, it is assumed
      *   that you want to create an empty list, not a list with null as first value.
      * @param bool $isList
      *   Whether to handle this metadata field as a list (if it has only 1 value).
@@ -120,16 +120,6 @@ class MetadataCollection
             }
         }
         $this->metadata[$name]->add($value);
-    }
-
-    /**
-     * @todo: has this a use outside testing?
-     *
-     * @return string[]
-     */
-    public function getKeys(): array
-    {
-        return array_keys($this->metadata);
     }
 
     public function toArray(): array

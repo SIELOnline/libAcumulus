@@ -9,26 +9,46 @@ use InvalidArgumentException;
 use Stringable;
 
 use function is_string;
+use function sprintf;
 use function strlen;
 
 /**
- * Number contains features to work with float numbers, especially amounts.
+ * Number contains features to work with (float) numbers, especially amounts.
  *
- * Comparing floats for equality is not done via a simple ===, but - because of
- * small possible errors in precision - by getting the difference and allow for
- * a small difference. when working with amounts, typically a difference of
- * half a cent is used.
+ * Comparing floats for equality is not done via a simple ===, but - because of small
+ * possible errors in precision - by getting the difference and allow for a small
+ * difference. when working with amounts, typically a difference of half a cent or (far)
+ * less is used.
  *
- * Some web shops do not store the used vat percentage with orders but store
- * the product price ex vat and the vat amount. As these amounts are often
- * stored with limited precision, typically 1 cent, the exact vat rate cannot
- * be calculated. Instead, a range within which the vat rate falls can be
- * calculated. This library uses this range to determine the actual vat rate
- * later on after knowing which vat rates may apply (Dutch vat rates, foreign
- * vat rates).
+ * Some web shops do not store the used vat percentage with orders but store the product
+ * price ex vat and the vat amount. As these amounts are often stored with limited
+ * precision, typically 1 cent, the exact vat rate cannot be calculated. Instead, a range
+ * within which the vat rate falls can be calculated. This library uses this range to
+ * determine the actual vat rate later on after knowing which vat rates may apply (Dutch
+ * vat rates, foreign vat rates).
  */
 class Number
 {
+    /**
+     * Tries to cast a numeric string value to an int or float.
+     *
+     * Note that we don't want to cast phone numbers that often start with a 0 or +. So we
+     * check that the first digit is not a zero, and we only allow a minus sign before the
+     * number, not a (redundant) plus sign.
+     */
+    public static function castNumericValue(mixed $value): mixed
+    {
+        if (is_string($value) && is_numeric($value)) {
+            // Is it a float or an int? Check integers for phone number.
+            if (strpbrk($value, '.eE') !== false) {
+                $value = (float) $value;
+            } elseif (strpbrk($value, '0+') !== $value || strlen($value) <= 4) {
+                $value = (int) $value;
+            }
+        }
+        return $value;
+    }
+
     /**
      * Returns the range within which the result of a division should fall,
      * given the precision range for the 2 numbers to divide.

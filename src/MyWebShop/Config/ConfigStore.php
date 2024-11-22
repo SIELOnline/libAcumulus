@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\MyWebShop\Config;
 
+use SensitiveParameter;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 use Siel\Acumulus\Helpers\Util;
 use Siel\Acumulus\Meta;
@@ -21,7 +22,7 @@ class ConfigStore extends BaSeConfigStore
         return json_decode($values);
     }
 
-    public function save(array $values): bool
+    public function save(#[SensitiveParameter] array $values): bool
     {
         // @todo: remove this line if your configuration sub system accepts arrays as value.
         $configValue = json_encode($values, Meta::JsonFlags | JSON_FORCE_OBJECT);

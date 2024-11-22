@@ -10,6 +10,7 @@ namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Exception;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Throwable;
 
 /**
  * Extends the base mailer class to send a mail using the OpenCart mailer.
@@ -29,7 +30,7 @@ abstract class Mailer extends BaseMailer
         string $subject,
         string $bodyText,
         string $bodyHtml
-    ) {
+    ): mixed {
         try {
             $config = Registry::getInstance()->config;
             $mail = $this->getMail();

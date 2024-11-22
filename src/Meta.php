@@ -135,8 +135,7 @@ interface Meta
      */
     public const VatRateMax = 'meta-vatrate-max';
     /**
-     * Debug: what fields have been calculated (as opposed to fetched from the
-     * webshop.
+     * Debug: what fields have been calculated as opposed to fetched from the webshop.
      */
     public const FieldsCalculated = 'meta-fields-calculated';
     /**

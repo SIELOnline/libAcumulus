@@ -43,7 +43,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $this->tableName = DB_PREFIX . 'acumulus_entry';
     }
 
-    public function getByEntryId(?int $entryId)
+    public function getByEntryId(?int $entryId): AcumulusEntry|array|null
     {
         $operator = $entryId === null ? 'is' : '=';
         $value = $entryId === null ? 'null' : (string) $entryId;
@@ -64,7 +64,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $this->convertDbResultToAcumulusEntries($result->rows, $ignoreLock);
     }
 
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool
     {
         if ($invoiceSource->getType() === Source::Order) {
             $order = $invoiceSource->getShopObject();
@@ -84,7 +84,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
+    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
     {
         $record = $entry->getRecord();
         return (bool) $this->getDb()->query(sprintf(

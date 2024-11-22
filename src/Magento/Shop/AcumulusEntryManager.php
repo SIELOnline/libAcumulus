@@ -40,7 +40,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return Registry::getInstance()->create(Collection::class);
     }
 
-    public function getByEntryId(?int $entryId)
+    public function getByEntryId(?int $entryId): AcumulusEntry|array|null
     {
         /** @var \Siel\AcumulusMa2\Model\Entry[] $result */
         $result = $this->getResourceCollection()
@@ -64,7 +64,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @throws \Exception
      */
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool
     {
         try {
             $record = $this->getModel()
@@ -86,7 +86,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @throws \Exception
      */
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $record */
         try {

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Config;
 
+use SensitiveParameter;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
@@ -25,7 +26,7 @@ class ConfigStore extends BaSeConfigStore
         return $values[$this->configCode . '_' . $this->configKey] ?? [];
     }
 
-    public function save(array $values): bool
+    public function save(#[SensitiveParameter] array $values): bool
     {
         $modelSettingSetting = $this->getSettings();
         $setting = $modelSettingSetting->getSetting($this->configCode);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\TestWebShop\Config;
 
+use SensitiveParameter;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 use Siel\Acumulus\Meta;
 
@@ -30,7 +31,7 @@ class ConfigStore extends BaseConfigStore
         return is_readable($this->configFile) ? json_decode(file_get_contents($this->configFile), true) : [];
     }
 
-    public function save(array $values): bool
+    public function save(#[SensitiveParameter] array $values): bool
     {
         /** @noinspection JsonEncodingApiUsageInspection */
         file_put_contents($this->configFile, json_encode($values, Meta::JsonFlags | JSON_FORCE_OBJECT));

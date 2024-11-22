@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Data;
 
 use DateTimeInterface;
-use Error;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Meta;
 
 /**
  * Represents an Acumulus API Stock transaction object.

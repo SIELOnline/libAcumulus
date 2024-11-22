@@ -139,7 +139,7 @@ class ShippingLineCollector extends LineCollector
         $taxRateFound = false;
         if (is_array($taxes)) {
             // Since version ?.?, $taxes has an indirection by key 'total'.
-            if (is_string(key($taxes))) {
+            if (is_string(array_key_first($taxes))) {
                 /** @noinspection CallableParameterUseCaseInTypeContextInspection */
                 $taxes = current($taxes);
             }

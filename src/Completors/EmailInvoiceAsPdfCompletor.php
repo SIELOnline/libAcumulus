@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Completors;
 
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\EmailInvoiceAsPdf;
 use Siel\Acumulus\Helpers\MessageCollection;
 

@@ -22,6 +22,7 @@ use Siel\Acumulus\OpenCart\Helpers\Registry;
 use function in_array;
 use function is_array;
 use function is_string;
+use function sprintf;
 use function strlen;
 
 /**
@@ -213,10 +214,9 @@ abstract class Source extends BaseSource
      *   Specifies the type(s) of order total lines to return. If empty, all are returned.
      *
      * @return array[]
-     *   The set of order total lines for this order. This set is ordered by
-     *   sort_order, meaning that lines before the tax line are amounts ex vat
-     *   and lines after are inc vat.
-     *   If a $$code is passed, the set is filtered by the given code.
+     *   The set of order total lines for this order. This set is ordered by  sort_order,
+     *   meaning that lines before the tax line are amounts ex vat and lines after are inc
+     *   vat. If a $code is passed, the set is filtered by the given code.
      */
     public function getOrderTotalLines(string|array $code = ''): array
     {

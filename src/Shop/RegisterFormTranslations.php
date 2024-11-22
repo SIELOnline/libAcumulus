@@ -155,7 +155,7 @@ class RegisterFormTranslations extends TranslationCollection
 
         'loginHeader' => 'Your personal login codes',
         'loginDesc_1' => 'Your login details have been sent to %s, but we have listed them here as well. Preferably keep them in a password manager.',
-        'loginDesc_2' => 'Didn\'t receive an e-mail? It is possible that our e-mail with your login codes will be filtered by your spam filter. Please check your spam folder. If you still did not receive it, please contact us so that we can resend you your details.',
+        'loginDesc_2' => "Didn't receive an e-mail? It is possible that our e-mail with your login codes will be filtered by your spam filter. Please check your spam folder. If you still did not receive it, please contact us so that we can resend you your details.",
 
         'field_password' => 'Password',
 

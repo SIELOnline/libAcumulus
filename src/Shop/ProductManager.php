@@ -30,7 +30,7 @@ use function sprintf;
  */
 class ProductManager
 {
-    protected Container $container;
+    private Container $container;
 
     public function __construct(Container $container)
     {
@@ -236,12 +236,6 @@ class ProductManager
 
     /**
      * Description.
-     *
-     * @param $source
-     * @param \Siel\Acumulus\Product\StockTransactionResult $result
-     *
-     * @return void
-     *   Description.
      */
     private function logStockTransactionResult(Item $item, int|float $change, ?Product $product, StockTransactionResult $result): void
     {

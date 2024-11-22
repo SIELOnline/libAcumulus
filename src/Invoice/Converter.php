@@ -7,12 +7,9 @@ namespace Siel\Acumulus\Invoice;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
-use function array_key_exists;
 use function is_array;
 
 /**

@@ -72,10 +72,8 @@ class MessageCollection
      *   A code to better identify the source of the message.
      *
      * @return $this
-     *
-     * @noinspection ParameterDefaultValueIsNotNullInspection
      */
-    public function createAndAddMessage(string $message, int $severity, $code = 0): self
+    public function createAndAddMessage(string $message, int $severity, int|string $code = 0): static
     {
         return $this->addMessage(Message::create($message, $severity, $code));
     }
@@ -83,7 +81,7 @@ class MessageCollection
     /**
      * @return $this
      */
-    public function addException(Throwable $e): self
+    public function addException(Throwable $e): static
     {
         return $this->addMessage(Message::createFromException($e));
     }
@@ -99,7 +97,7 @@ class MessageCollection
      *
      * @return $this
      */
-    public function addMessages(array $messages, int $severity = Severity::Unknown): self
+    public function addMessages(array $messages, int $severity = Severity::Unknown): static
     {
         foreach ($messages as $message) {
             if ($severity !== Severity::Unknown && $message->getSeverity() > $severity) {
@@ -164,7 +162,7 @@ class MessageCollection
      *   The message with the given code if the result contains such a message,
      *   null otherwise.
      */
-    public function getByCode($code): ?Message
+    public function getByCode(int|string $code): ?Message
     {
         $code = strtolower((string) $code);
         foreach ($this->getMessages() as $message) {
@@ -259,7 +257,7 @@ class MessageCollection
      *
      * @see Message::format()
      */
-    public function formatMessages(int $format, int $severity = Severity::All)
+    public function formatMessages(int $format, int $severity = Severity::All): string|array
     {
         $result = [];
         foreach ($this->getMessages($severity) as $message) {

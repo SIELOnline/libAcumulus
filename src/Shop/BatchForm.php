@@ -281,7 +281,7 @@ class BatchForm extends Form
             // Make it a hidden field.
             $invoiceSourceTypeField = [
                 'type' => 'hidden',
-                'value' => key($invoiceSourceTypes),
+                'value' => array_key_first($invoiceSourceTypes),
             ];
         } else {
             $invoiceSourceTypeField = [

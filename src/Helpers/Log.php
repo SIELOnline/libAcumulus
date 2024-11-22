@@ -9,6 +9,7 @@ use Throwable;
 
 use function count;
 use function get_class;
+use function sprintf;
 
 /**
  * Allows logging messages to a log.
@@ -115,24 +116,16 @@ class Log
     protected function getSeverityString($severity): string
     {
         $severity = (int) $severity;
-        switch ($severity) {
-            case Severity::Log:
-                return 'Debug';
-            case Severity::Success:
-                return 'Success';
-            case Severity::Info:
-                return 'Info';
-            case Severity::Notice:
-                return 'Notice';
-            case Severity::Warning:
-                return 'Warning';
-            case Severity::Error:
-                return 'Error';
-            case Severity::Exception:
-                return 'Exception';
-            default:
-                return "Unknown severity $severity";
-        }
+        return match ($severity) {
+            Severity::Log => 'Debug',
+            Severity::Success => 'Success',
+            Severity::Info => 'Info',
+            Severity::Notice => 'Notice',
+            Severity::Warning => 'Warning',
+            Severity::Error => 'Error',
+            Severity::Exception => 'Exception',
+            default => "Unknown severity $severity",
+        };
     }
 
     /**
@@ -255,7 +248,7 @@ class Log
         if ($pos !== false) {
             $class = substr($class, $pos + 1);
         }
-        $code = !empty($e->getCode()) && strpos($e->getMessage(), (string) $e->getCode()) === false ? $e->getCode() . ': ' : '';
+        $code = !empty($e->getCode()) && !str_contains($e->getMessage(), (string) $e->getCode()) ? $e->getCode() . ': ' : '';
         $message = $e->getMessage();
         $fullMessage = "$class: $code$message in $callingFunction:$callingLine";
         if (!$this->hasBeenLogged($fullMessage)) {

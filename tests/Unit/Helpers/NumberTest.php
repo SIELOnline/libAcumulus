@@ -10,13 +10,42 @@ namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Meta;
 
 /**
  * Test for the {@see Creator} class.
  */
 class NumberTest extends TestCase
 {
+    /**
+     * Note that we test with both DateTime and DateTimeImmutable.
+     */
+    public function getCastNumericValueDataProvider(): array
+    {
+        return [
+            ['2', 2],
+            [3, 3],
+            [null, null],
+            [true, true],
+            ['1.23', 1.23],
+            [1.25, 1.25],
+            ['test', 'test'],
+            ['+33012345678', '+33012345678'],
+            ['012345678', '012345678'],
+            ['0.12', 0.12],
+            ['0.12e-3', 0.12e-3],
+            ['0.12 test', '0.12 test'],
+            [['1', 2], ['1',2]],
+        ];
+    }
+
+    /**
+     * @dataProvider getCastNumericValueDataProvider
+     */
+
+    public function testCastNumericValue(mixed $value, mixed $expected): void
+    {
+        self::assertSame($expected, Number::castNumericValue($value));
+    }
 
     public function testGetVatRangeTags(): void
     {

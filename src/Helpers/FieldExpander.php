@@ -550,7 +550,7 @@ class FieldExpander
             }
         }
 
-        return $this->castNumericValue($value);
+        return Number::castNumericValue($value);
     }
 
     /**
@@ -739,25 +739,6 @@ class FieldExpander
         } catch (Exception $e) {
             $this->log->exception($e);
             $value = '';
-        }
-        return $value;
-    }
-
-    /**
-     * Casts a numeric string value to an int or float.
-     *
-     * Note that we don't want to cast phone numbers that often start with a 0 or +. So we
-     * check that the first digit is not a zero, and we only allow a minus sign before the
-     * number, not a (redundant) plus sign.
-     */
-    protected function castNumericValue(mixed $value): mixed
-    {
-        if (is_string($value) && is_numeric($value) && !str_starts_with($value, '+') && !str_starts_with($value, '0')) {
-            if (preg_match('/^-?\d+$/', $value)) {
-                $value = (int) $value;
-            } else {
-                $value = (float) $value;
-            }
         }
         return $value;
     }

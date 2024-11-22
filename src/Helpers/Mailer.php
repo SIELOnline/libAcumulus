@@ -10,9 +10,11 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Product\StockTransactionResult;
+use Stringable;
 use Throwable;
 
 use function is_string;
+use function sprintf;
 
 /**
  * Mailer allows sending mails.
@@ -61,7 +63,8 @@ abstract class Mailer
      * Sends an email.
      *
      * @return mixed
-     *   Success (true); error message, Throwable object or just false otherwise.
+     *   Success (true); error message, result (hopefully Stringable), Throwable or just
+     *   false otherwise.
      */
     abstract public function sendMail(
         string $from,
@@ -70,15 +73,13 @@ abstract class Mailer
         string $subject,
         string $bodyText,
         string $bodyHtml
-    );
+    ): mixed;
 
     /**
      * Sends an email with the results of sending an invoice to Acumulus.
      * The mail is sent to the shop administrator ('emailonerror' setting).
-     *
-     * @param string|int $invoiceSourceReference
      */
-    public function sendInvoiceAddMailResult(InvoiceAddResult $invoiceSendResult, string $invoiceSourceType, $invoiceSourceReference): bool
+    public function sendInvoiceAddMailResult(InvoiceAddResult $invoiceSendResult, string $invoiceSourceType, string|int $invoiceSourceReference): bool
     {
         $from = $this->getFrom();
         $fromName = $this->getFromName();
@@ -91,14 +92,12 @@ abstract class Mailer
         if ($result !== true) {
             if ($result === false) {
                 $message = 'false';
-            } elseif ($result === null) {
-                $message = 'null';
             } elseif ($result instanceof Throwable) {
                 $message = $result->getMessage();
-            } elseif (!is_string($result)) {
-                $message = print_r($result, true);
+            } elseif (is_string($result) || $result instanceof Stringable) {
+                $message = (string) $result;
             } else {
-                $message = $result;
+                $message = print_r($result, true);
             }
             $this->log->error('%s: failed: %s', $logMessage, $message);
         } else {
@@ -166,21 +165,12 @@ abstract class Mailer
         $subject = $this->t($subjectBase);
 
         $subjectResult = 'mail_subject';
-        switch ($invoiceSendResult->getSeverity()) {
-            case Severity::Exception:
-                $subjectResult .= '_exception';
-                break;
-            case Severity::Error:
-                $subjectResult .= '_error';
-                break;
-            case Severity::Warning:
-                $subjectResult .= '_warning';
-                break;
-            case Severity::Success:
-            default:
-                $subjectResult .= '_success';
-                break;
-        }
+        $subjectResult .= match ($invoiceSendResult->getSeverity()) {
+            Severity::Exception => '_exception',
+            Severity::Error => '_error',
+            Severity::Warning => '_warning',
+            default => '_success',
+        };
         $subject .= ': ' . $this->t($subjectResult);
 
         if ($isTestMode || $isConcept || $invoiceSendResult->hasError()) {
@@ -198,13 +188,11 @@ abstract class Mailer
     /**
      * Returns the mail body as text and as HTML.
      *
-     * @param string|int $invoiceSourceReference
-     *
      * @return string[]
      *   An array with the body text in 2 formats,
      *   keyed by 'text' resp. 'html'.
      */
-    protected function getBody(InvoiceAddResult $result, string $invoiceSourceType, $invoiceSourceReference): array
+    protected function getBody(InvoiceAddResult $result, string $invoiceSourceType, string|int $invoiceSourceReference): array
     {
         $acumulusResult = $result->getAcumulusResult();
         $invoiceInfo = $result->getMainApiResponse();

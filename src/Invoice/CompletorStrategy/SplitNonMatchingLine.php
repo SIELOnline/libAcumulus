@@ -11,6 +11,7 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 
 use function count;
+use function sprintf;
 
 /**
  * Class SplitNonMatchingLine implements a vat completor strategy by recognizing
@@ -36,7 +37,7 @@ use function count;
  * - To prevent "correcting" errors that lead to this non-matching VAT rate,
  *   only lines that are marked with the value meta-strategy-split are
  *   corrected.
- * - Each line2complete must have at least 2 of the values 'vatamount',
+ * - Each line2Complete must have at least 2 of the values 'vatamount',
  *   'unitprice', or 'unitPriceInc', meaning that it can be divided on its own!
  * - They have gone through the correction phase, but no matching VAT rate was
  *   found, so the value 'meta-vatrate-matches' is set to 'none'.
@@ -107,10 +108,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
         return $result;
     }
 
-    /**
-     * @param array|Line $line
-     */
-    protected function splitNonMatchingLine($line): bool
+    protected function splitNonMatchingLine(Line|array $line): bool
     {
         [$lowAmount, $highAmount] = $this->splitAmountOver2VatRates($line[Meta::LineAmount],
             $line[Meta::LineAmountInc] - $line[Meta::LineAmount],

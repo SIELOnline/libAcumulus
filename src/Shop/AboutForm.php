@@ -327,7 +327,7 @@ class AboutForm
             $proSupportList[] = $this->t('no_pro_support');
         } else {
             $mySupportItems = $myData['mysupport']['item'];
-            if (is_string(key($mySupportItems))) {
+            if (is_string(array_key_first($mySupportItems))) {
                 // 1 item: make it an array with 1 item
                 $mySupportItems = [$mySupportItems];
             }
@@ -459,7 +459,7 @@ class AboutForm
      *   If $accountStatus = true, the my_data array as returned from the
      *   my_acumulus web API call, the $accountStatus otherwise.
      */
-    public function getMyData(?bool $accountStatus)
+    public function getMyData(?bool $accountStatus): bool|array|null
     {
         static $myData = null;
         if ($myData === null) {

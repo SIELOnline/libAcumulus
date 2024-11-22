@@ -8,6 +8,7 @@ use Magento\Backend\App\ConfigInterface;
 use Magento\Framework\App\Config as MagentoConfig;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\ObjectManager;
+use SensitiveParameter;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
@@ -39,7 +40,7 @@ class ConfigStore extends BaseConfigStore
         return $values;
     }
 
-    public function save(array $values): bool
+    public function save(#[SensitiveParameter] array $values): bool
     {
         $serializedValues = serialize($values);
         $this->getConfigWriterInterface()->save($this->configPath . $this->configKey, $serializedValues);

@@ -1,7 +1,5 @@
 <?php
 /**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter.
- * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4.
  * @noinspection SelfClassReferencingInspection
  *   I prefer to refer to these constants as Config constants, and so, for me,
  *   it is irrelevant that this happens to be the Config class.
@@ -193,10 +191,8 @@ class Config
      * @return bool
      *   Success.
      */
-    public function save(
-        #[SensitiveParameter]
-        array $values
-    ): bool {
+    public function save(#[SensitiveParameter] array $values): bool
+    {
         // Log values in a notice but without the password.
         $copy = $values;
         if (!empty($copy[Fld::Password])) {
@@ -270,6 +266,9 @@ class Config
                         if (!is_array($values[$key])) {
                             $values[$key] = [$values[$key]];
                         }
+                        break;
+                    default:
+                        $this->log->error("Config::castValues(): unknown config value type '{$keyInfo['type']}'");
                         break;
                 }
             }

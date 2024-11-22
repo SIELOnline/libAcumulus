@@ -11,6 +11,7 @@ use Joomla\CMS\Mail\MailerInterface;
 use PHPMailer\PHPMailer\PHPMailer;
 use RuntimeException;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Throwable;
 
 /**
  * Extends the base mailer class to send a mail using the Joomla mail features.
@@ -27,7 +28,7 @@ class Mailer extends BaseMailer
         string $subject,
         string $bodyText,
         string $bodyHtml
-    ) {
+    ): mixed {
         /** @var MailerInterface $mailer */
         $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
         if ($mailer instanceof PHPMailer) {

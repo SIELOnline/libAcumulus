@@ -69,7 +69,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         }
     }
 
-    public function getByEntryId(?int $entryId)
+    public function getByEntryId(?int $entryId): AcumulusEntry|array|null
     {
         $orders = wc_get_orders(
             [
@@ -107,7 +107,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $result;
     }
 
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool
     {
         $now = $this->sqlNow();
         /** @var \WC_Abstract_Order $source */
@@ -121,7 +121,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return true;
     }
 
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
     {
         /** @var \WC_Abstract_Order $source */
         $source = $invoiceSource !== null ? $invoiceSource->getShopObject() : wc_get_order($entry->getSourceId());

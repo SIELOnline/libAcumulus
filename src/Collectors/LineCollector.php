@@ -50,6 +50,35 @@ use Siel\Acumulus\Meta;
  * Properties that may be based on configuration, if not mapped:
  * - string $nature, though it will be rare that Nature can be mapped from data stored in
  *   the web shop.
+ *
+ *  Hierarchically structured invoice lines
+ *  ---------------------------------------
+ *  If a shop supports:
+ *  1. Options or variants, like size, color, etc.
+ *  2. Bundles or composed products
+ *  Then hierarchical lines are created and stored under the {@see Line::$children}
+ *  property.
+ *
+ *  ad 1)
+ *  For each option or variant you add a child line. Set metadata
+ * {@see Meta::VatRateSource} to {@see VatRateSource::Parent}. Copy the quantity from the
+ * parent to the child. Price info is probably on the parent line only, unless your shop
+ * administers additional or reduced costs for a given option on the child lines in which
+ * case the difference should be set as {@see Line::$unitPrice}.
+ *
+ *  ad 2)
+ *  For each product that is part of the bundle add a child line. As this may be
+ *  a bundle/composed product on its own, you may create multiple levels, there
+ *  is no maximum depth on child lines.
+ *
+ *  Price info may be on the child lines, but may also be on the parent line,
+ *  especially so, if the bundle is cheaper that its separate parts. The child
+ *  lines may have their own vat rates, so depending on your situation fetch the
+ *  vat info from the child line objects itself or copy it from the parent. When
+ *  left empty, it is copied from the parent in the Completor phase.
+ *
+ *  Hierarchical lines are "flattened" in the Completor phase, see
+ *  {@see FlattenerInvoiceLines} based on configuration settings.
  */
 class LineCollector extends SubTypedCollector
 {
@@ -69,8 +98,7 @@ class LineCollector extends SubTypedCollector
     protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
     {
         $acumulusObject->setType($this->subType);
-        // @nth: This should be in the collectBefore() of ItemLineCollectors, but that
-        //   would mean to duplicate it 6 times. Can we do this better?
+        // ItemLineCollectors only: add the {@see Product} as a property source.
         if ($propertySources->get('item') instanceof Item) {
             /** @var Item $item */
             $item = $propertySources->get('item');
@@ -86,6 +114,7 @@ class LineCollector extends SubTypedCollector
     protected function collectAfter(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
         $this->getContainer()->getEvent()->triggerLineCollectAfter($acumulusObject, $propertySources);
+        // Acutally for ItemLineCollectors only, but remove won't fail, throw, or alert.
         $propertySources->remove('product');
     }
 

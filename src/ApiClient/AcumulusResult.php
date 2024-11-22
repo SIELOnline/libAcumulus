@@ -573,14 +573,12 @@ class AcumulusResult extends MessageCollection
                 // "singular", which will be the first (and only) key.
                 /** @var array $singular */
                 $singular = reset($response);
-                // If there was only 1 list result, it wasn't put in a (numeric)
-                // array.
+                // If there was only 1 list result, it wasn't put in a (numeric) array.
                 $response = !is_array(reset($singular)) ? [$singular] : $singular;
             }
         } else {
-            // Not set: probably an error occurred. This object offers ways
-            // to discover so. Therefore, we return an empty list if it
-            // should have been a list.
+            // Not set: probably an error occurred. This object offers ways to discover
+            // so. Therefore, we return an empty list if it should have been a list.
             if ($this->isList) {
                 $response = [];
             }

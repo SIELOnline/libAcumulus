@@ -731,7 +731,7 @@ class Acumulus
      *   The uri to download the invoice PDF.
      *   Errors (in download from the retunned uri, not in this method's return value):
      *   ```
-     *   <response><token>$$token</token>
+     *   <response><token>$token</token>
      *   <errors>
      *       <error><code>400 Bad Request</code><codetag>AA69CBAA</codetag><message>Invalid token.</message></error>
      *       <count_errors>1</count_errors>
@@ -901,7 +901,7 @@ class Acumulus
     protected function constructUri(string $apiFunction): string
     {
         $environment = $this->environment->toArray();
-        return "{$environment['baseUri']}/{$environment['apiVersion']}/{$apiFunction}.php";
+        return "{$environment['baseUri']}/{$environment['apiVersion']}/$apiFunction.php";
     }
 
     /**

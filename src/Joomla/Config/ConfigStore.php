@@ -8,6 +8,7 @@ use Joomla\CMS\Extension\ExtensionHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Table\Extension;
 use Joomla\Database\DatabaseInterface;
+use SensitiveParameter;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 use Siel\Acumulus\Meta;
 
@@ -30,7 +31,7 @@ class ConfigStore extends BaSeConfigStore
         return !empty($values) ? json_decode($values, true, 512, JSON_THROW_ON_ERROR) : [];
     }
 
-    public function save(array $values): bool
+    public function save(#[SensitiveParameter] array $values): bool
     {
         $extensionTable = new Extension(Factory::getContainer()->get(DatabaseInterface::class));
         $extensionTable->load(['element' => 'com_acumulus']);

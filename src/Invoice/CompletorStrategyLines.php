@@ -39,7 +39,7 @@ class CompletorStrategyLines
     protected Config $config;
     protected Translator $translator;
     /** @var array[]|Invoice */
-    protected $invoice;
+    protected array|Invoice $invoice;
     /** @var array[]|Line[] */
     protected array $invoiceLines;
     protected Source $source;
@@ -73,7 +73,7 @@ class CompletorStrategyLines
      * @return array|Invoice
      *   The completed invoice.
      */
-    public function complete($invoice, Source $source, array $possibleVatTypes, array $possibleVatRates)
+    public function complete(Invoice|array $invoice, Source $source, array $possibleVatTypes, array $possibleVatRates): Invoice|array
     {
         $this->invoice = $invoice;
         $this->invoiceLines = &$this->invoice[Fld::Customer][Fld::Invoice][Fld::Line];

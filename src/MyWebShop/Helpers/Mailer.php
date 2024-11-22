@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Siel\Acumulus\MyWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Throwable;
 
 /**
  * Extends the base mailer class to send a mail using the MyWebShop mailer.
  */
 class Mailer extends BaseMailer
 {
-    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
+    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml): mixed
     {
         // @todo: adapt to MyWebShop's way of creating a mailer, a "mail object", and having the "mail object" sent by the mailer.
         // @todo: if necessary, cast the result to a bool indicating success.

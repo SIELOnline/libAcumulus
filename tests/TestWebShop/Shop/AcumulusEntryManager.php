@@ -13,7 +13,7 @@ use Siel\Acumulus\Shop\AcumulusEntry;
 class AcumulusEntryManager extends \Siel\Acumulus\Shop\AcumulusEntryManager
 {
 
-    public function getByEntryId(?int $entryId)
+    public function getByEntryId(?int $entryId): AcumulusEntry|array|null
     {
         return null;
     }
@@ -28,12 +28,12 @@ class AcumulusEntryManager extends \Siel\Acumulus\Shop\AcumulusEntryManager
         return time();
     }
 
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool
     {
         return true;
     }
 
-    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool
+    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
     {
         return true;
     }

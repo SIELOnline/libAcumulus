@@ -39,13 +39,14 @@ abstract class AcumulusEntryManager
      * @param int|null $entryId
      *   The entry id to look up. If $entryId === null, multiple records may be
      *   found, in which case a numerically indexed array will be returned.
-     * @todo: remove the possibility to pass null as $entryId, which also simplifies the return type.
      *
      * @return AcumulusEntry|AcumulusEntry[]|null
      *   Acumulus entry record for the given entry id or null if the entry id is
      *   unknown.
+          *@todo: remove the possibility to pass null as $entryId, which also simplifies the return type.
+     *
      */
-    abstract public function getByEntryId(?int $entryId);
+    abstract public function getByEntryId(?int $entryId): AcumulusEntry|array|null;
 
     /**
      * Returns the Acumulus entry record for the given invoice source.
@@ -73,7 +74,7 @@ abstract class AcumulusEntryManager
      *
      * @return AcumulusEntry|AcumulusEntry[]|null
      */
-    protected function convertDbResultToAcumulusEntries($result, bool $ignoreLock = true)
+    protected function convertDbResultToAcumulusEntries(object|array $result, bool $ignoreLock = true): AcumulusEntry|array|null
     {
         if (empty($result)) {
             $result = null;
@@ -172,7 +173,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    public function save(Source $invoiceSource, $entryId, ?string $token): bool
+    public function save(Source $invoiceSource, int|string|null $entryId, ?string $token): bool
     {
         $now = $this->sqlNow();
         if ($entryId !== null) {
@@ -192,9 +193,8 @@ abstract class AcumulusEntryManager
      *
      * @return int|string
      *   Timestamp
-     * @todo: check timezone handling in all shops (already done: Joomla).
      */
-    abstract protected function sqlNow();
+    abstract protected function sqlNow(): int|string;
 
     /**
      * Inserts an Acumulus entry for the given order in the web shop's database.
@@ -213,7 +213,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool;
+    abstract protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool;
 
     /**
      * Updates the Acumulus entry for the given invoice source.
@@ -233,7 +233,13 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated, ?Source $invoiceSource = null): bool;
+    abstract protected function update(
+        AcumulusEntry $entry,
+        ?int $entryId,
+        ?string $token,
+        int|string $updated,
+        ?Source $invoiceSource = null
+    ): bool;
 
     /**
      * Deletes the Acumulus entry for the given entry id.

@@ -71,7 +71,7 @@ abstract class Collector implements CollectorInterface
      * Returns which set of mappings should be used.
      *
      * @return string
-     *   The key for the set of mappings to be used, (the $$forType parameter to
+     *   The key for the set of mappings to be used, (the $forType parameter to
      *   {@see \Siel\Acumulus\Config\Mappings::getFor()}.
      */
     protected function getMappingsGetForKey(): string
@@ -140,11 +140,11 @@ abstract class Collector implements CollectorInterface
     /**
      * This base implementation divides the collect action into 3 smaller phases:
      * - Creation of target {@see AcumulusObject}.
-     * - Collecting based on simple field mappings (parameter $$fieldSpecifications).
+     * - Collecting based on simple field mappings (parameter $fieldSpecifications).
      * - Collecting based on specialised logic that can use all the API methods and data
      *   models of the host environment (accessible via the property sources in parameter
-     *   $$propertySources) to get the (missing) values for the fields of the
-     *   target {@see \Siel\Acumulus\Data\AcumulusObject}.
+     *   $propertySources) to get the (missing) values for the fields of the target
+     *   {@see \Siel\Acumulus\Data\AcumulusObject}.
      *
      * Between these phases child classes can inject their own behavior:
      * - method {@see collectBefore()}: called after the creation of the target object,
@@ -161,6 +161,8 @@ abstract class Collector implements CollectorInterface
      *   metadata field in the target {@see AcumulusObject}.
      *
      * @return \Siel\Acumulus\Data\AcumulusObject
+     *
+     * @todo: Refactor string[]|null $fieldSpecifications like PropertySources.
      */
     public function collect(PropertySources $propertySources, ?array $fieldSpecifications): AcumulusObject
     {
@@ -185,7 +187,7 @@ abstract class Collector implements CollectorInterface
      *   The set of öbjects"to collect the values from.
      * @param array $fieldSpecifications
      *   The set of mappings that will be used for the "automatic" part of the collection
-     *   phase. @todo: for now it is an array: difficult to modify when passed to events.
+     *   phase.
      */
     protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
     {

@@ -30,6 +30,7 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 use function count;
+use function is_scalar;
 
 /**
  * The invoice lines completor class provides functionality to correct and
@@ -493,7 +494,7 @@ class CompletorInvoiceLines
      *   $matchedVatRates is empty, false otherwise (multiple but different vat
      *   rates).
      */
-    protected function getUniqueVatRate(array $vatRateInfos)
+    protected function getUniqueVatRate(array $vatRateInfos): float|bool|null
     {
         return array_reduce($vatRateInfos, static function ($carry, $matchedVatRate) {
             if ($carry === null) {
@@ -564,7 +565,7 @@ class CompletorInvoiceLines
             }
         }
         arsort($amountPerNature, SORT_NUMERIC);
-        return key($amountPerNature);
+        return array_key_first($amountPerNature);
     }
 
     /**
@@ -660,7 +661,7 @@ class CompletorInvoiceLines
      * Returns the subset of the vat rate infos that have a vat rate that
      * appears within the given set of vat rates.
      *
-     * @param float|float[]|array|array[] $vatRates
+     * @param float|array|array[]|float[] $vatRates
      *   The vat rate(s) or vat rate info(s) to filter against.
      * @param array|null $vatRateInfos
      *   The set of vat rate infos to filter. If not given, the property
@@ -670,7 +671,7 @@ class CompletorInvoiceLines
      *   The, possibly empty, set of $vatRateInfos that have a vat rate that
      *   appears within the set of $vatRates.
      */
-    protected function filterVatRateInfosByVatRates($vatRates, ?array $vatRateInfos = null): array
+    protected function filterVatRateInfosByVatRates(float|array $vatRates, ?array $vatRateInfos = null): array
     {
         $vatRates = (array) $vatRates;
         if ($vatRateInfos === null) {

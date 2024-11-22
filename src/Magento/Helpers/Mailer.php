@@ -21,7 +21,7 @@ class Mailer extends BaseMailer
     /**
      * Sends an email.
      *
-     * @return \Throwable|true
+     * @return mixed
      *   Success (true) or a {@see \Throwable}.
      */
     public function sendMail(
@@ -31,8 +31,7 @@ class Mailer extends BaseMailer
         string $subject,
         string $bodyText,
         string $bodyHtml
-    )
-    {
+    ): mixed {
         try {
             $text = new MimePart($bodyText);
             $text->type = Mime::TYPE_TEXT;

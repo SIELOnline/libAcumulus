@@ -8,6 +8,7 @@
 
 namespace Siel\Acumulus\Helpers;
 
+use ArrayAccess;
 use DateTimeInterface;
 use Exception;
 
@@ -22,6 +23,7 @@ use function is_array;
 use function is_bool;
 use function is_callable;
 use function is_object;
+use function is_scalar;
 use function is_string;
 use function strlen;
 
@@ -76,11 +78,11 @@ use function strlen;
  * - free-text = text
  * - expansion-specification = property-alternative('|'property-alternative)*
  * - property-alternative = space-concatenated-property('+'space-concatenated-property)*
- * - space-concatenated-property = single-property('&'single-property)*
- * - single-property = property-in-named-object|property-name|literal-text|constant
+ * - space-concatenated-property = property('&'property)*
+ * - property = property-in-named-object|single-property-name|literal-text|constant
  * - property-in-named-object = (object-name'::')+property-name
  * - object-name = text
- * - property-name = text
+ * - single-property-name = text
  * - literal-text = "text"
  * - constant = 'true'|'false'|'null'  @todo: numeric constants?
  *
@@ -338,7 +340,7 @@ class FieldExpander
     /**
      * Expands a space concatenated property.
      *
-     * - space-concatenated-property = single-property('&'single-property)*
+     * - space-concatenated-property = concatenated-property('&'concatenated-property)*
      *
      * @return array
      *   Returns an array with 2 keys:
@@ -349,22 +351,23 @@ class FieldExpander
      */
     protected function expandSpaceConcatenatedProperty(string $spaceConcatenatedProperty): array
     {
-        $singleProperties = explode('&', $spaceConcatenatedProperty);
-        $singlePropertyValues = [];
-        foreach ($singleProperties as $singleProperty) {
-            $singlePropertyValues[] = $this->expandSingleProperty($singleProperty);
+        $concatenatedProperties = explode('&', $spaceConcatenatedProperty);
+        $concatenatedPropertyValues = [];
+        foreach ($concatenatedProperties as $concatenatedProperty) {
+            $concatenatedPropertyValues[] = $this->expandProperty($concatenatedProperty);
         }
-        return $this->implodeValues('', $singlePropertyValues);
+        return $this->implodeValues('', $concatenatedPropertyValues);
     }
 
     /**
-     * Expands a single property.
+     * Expands a single property specification.
      *
-     * - single-property = property-in-named-object|property-name|literal-text
+     * - single-property = property-in-named-object|property-name|literal|constant
      * - property-in-named-object = (object-name::)+property-name
      * - object-name = text
      * - property-name = text
-     * - literal-text = "text"
+     * - literal = "text"
+     * - constant = 'true'|'false'|'null'
      *
      * @return array
      *   Returns an array with 2 keys:
@@ -372,33 +375,34 @@ class FieldExpander
      *   - 'value': the value of a single-property.
      *     The type of this value is that of the single property.
      */
-    protected function expandSingleProperty(string $singleProperty): array
+    protected function expandProperty(string $property): array
     {
-        if ($this->isLiteral($singleProperty)) {
+
+        if ($this->isLiteral($property)) {
             $type = self::TypeLiteral;
-            $value = $this->getLiteral($singleProperty);
-        } elseif ($this->isConstant($singleProperty)) {
+            $value = $this->getLiteral($property);
+        } elseif ($this->isConstant($property)) {
             $type = self::TypeLiteral;
-            $value = $this->getConstant($singleProperty);
-        } elseif (str_contains($singleProperty, '::')) {
+            $value = $this->getConstant($property);
+        } elseif (str_contains($property, '::')) {
             $type = self::TypeProperty;
-            $value = $this->expandPropertyInObject($singleProperty);
+            $value = $this->expandPropertyInObject($property);
         } else {
             $type = self::TypeProperty;
-            $value = $this->expandProperty($singleProperty);
+            $value = $this->expandSinglePropertyName($property);
         }
         return compact('type', 'value');
     }
 
     protected function isLiteral(string $singleProperty): bool
     {
-        return $singleProperty[0] === '"' && $singleProperty[strlen($singleProperty) - 1] === '"';
+        return str_starts_with($singleProperty, '"') && str_ends_with($singleProperty, '"');
     }
 
     /**
      * Gets a literal string property.
      *
-     * - literal-text = "text"
+     * - literal = "text"
      *
      * @return string
      *   The text between the quotes
@@ -416,7 +420,7 @@ class FieldExpander
     /**
      * Gets a constant value.
      *
-     * - constant-text = 'true'|'false'|'null'
+     * - constant = 'true'|'false'|'null'
      *
      * @return mixed
      *   The value 'implied' by the constant, for now a bool or null.
@@ -444,33 +448,41 @@ class FieldExpander
     protected function expandPropertyInObject(string $propertyInObject): mixed
     {
         // Start searching in the "super object".
-        $property = $this->objects;
+        $object = $this->objects;
         $propertyParts = explode('::', $propertyInObject);
-        while (count($propertyParts) > 0 && $property !== null) {
+        while (count($propertyParts) > 0 && $object !== null) {
             $propertyName = array_shift($propertyParts);
-            $property = $this->getProperty($propertyName, $property);
+            $object = $this->getPropertyValue($propertyName, $object);
         }
-        return $property;
+        return $object;
     }
 
     /**
-     * Expands a property.
+     * Expands a single named property.
      *
-     * - single-property = property-in-named-object|property-name|literal-text
-     * - object-name = text
-     * - property-name = text
+     * - single-property-name = text
+     *
+     * A single named property does not need its parent object. The property is searched
+     * for in ths "super object" itself and in all objects in that super object
+     * ($this->objects). These objects are not recursively searched (to prevent endless
+     * recursion).
      *
      * @param string $propertyName
-     *   The name of the property, optionally restricted to a(n) (multi-level)
-     *   object, to search for.
+     *   The name of a property to search for, or the name of an object in which case the
+     *   "object" is returned
      *
      * @return mixed
      *   the value of the property, or null if the property was not found.
      */
-    protected function expandProperty(string $propertyName): mixed
+    protected function expandSinglePropertyName(string $propertyName): mixed
     {
+        // Look in the super object itself.
+        if (array_key_exists($propertyName, $this->objects)) {
+            return $this->objects[$propertyName];
+        }
+        // Search in the objects of the super object.
         foreach ($this->objects as $object) {
-            $property = $this->getProperty($propertyName, $object);
+            $property = $this->getPropertyValue($propertyName, $object);
             if ($property !== null && $property !== '') {
                 break;
             }
@@ -496,14 +508,14 @@ class FieldExpander
      *
      * @param string $property
      *   The name of the property to extract from the "object".
-     * @param object|array $object
+     * @param mixed $object
      *   The "object" to extract the property from.
      *
      * @return mixed
      *   The value for the property of the given name, or null or the empty
      *   string if not available.
      */
-    protected function getProperty(string $property, object|array $object): mixed
+    protected function getPropertyValue(string $property, mixed $object): mixed
     {
         $value = null;
 
@@ -514,7 +526,7 @@ class FieldExpander
                 $args = explode(',', $matches[2]);
             }
         }
-        if (is_array($object)) {
+        if (is_array($object) || $object instanceof ArrayAccess) {
             if (is_callable($object)) {
                 array_unshift($args, $property);
                 $value = call_user_func_array($object, $args);

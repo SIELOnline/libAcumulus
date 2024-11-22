@@ -248,6 +248,22 @@ class FieldExpanderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test retrieving an "object" at the top level.
+     *
+     * [language] should not return container::language but the value of the 'language'
+     * entry at the top level.
+     */
+    public function testSingleObject(): void
+    {
+        $objects = $this->createPropertySources()
+            ->add('container', $this->getContainer())
+            ->add('language', 'other language');
+        $field = $this->getFieldExpander();
+        $result = $field->expand('[language]', $objects);
+        $this->assertSame('other language', $result);
+    }
+
     public function objectWithNumericArrayAnd0ValuesProvider(): array
     {
         return [
@@ -257,8 +273,8 @@ class FieldExpanderTest extends TestCase
             ['[order::lines::2::qty|source::getSign()]', 1],
             ['[order::lines::2::price]', 0.0],
             ['[order::lines::2::price|source::getSign()]', 1],
-            ['[order::lines::3::qty]', 0],
-            ['[order::lines::3::price]', 0.0],
+            ['[order::lines::3::qty]', '0'],
+            ['[order::lines::3::price]', '0.0'],
         ];
     }
 

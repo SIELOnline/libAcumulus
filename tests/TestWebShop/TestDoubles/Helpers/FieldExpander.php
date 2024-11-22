@@ -66,14 +66,14 @@ class FieldExpander extends BaseFieldExpander
         return parent::expandSpaceConcatenatedProperty($spaceConcatenatedProperty);
     }
 
-    protected function expandSingleProperty(string $singleProperty): array
+    protected function expandProperty(string $property): array
     {
         $this->trace[__FUNCTION__] ??= [];
         $this->trace[__FUNCTION__][] = func_get_arg(0);
         if ($this->stopAt === __FUNCTION__) {
             return ['type' => static::TypeProperty, 'value' => end($this->trace[__FUNCTION__])];
         }
-        return parent::expandSingleProperty($singleProperty);
+        return parent::expandProperty($property);
     }
 
     protected function getLiteral(string $singleProperty): string
@@ -96,13 +96,13 @@ class FieldExpander extends BaseFieldExpander
         return parent::expandPropertyInObject($propertyInObject);
     }
 
-    protected function expandProperty(string $propertyName): mixed
+    protected function expandSinglePropertyName(string $propertyName): mixed
     {
         $this->trace[__FUNCTION__] ??= [];
         $this->trace[__FUNCTION__][] = func_get_arg(0);
         if ($this->stopAt === __FUNCTION__) {
             return end($this->trace[__FUNCTION__]);
         }
-        return parent::expandProperty($propertyName);
+        return parent::expandSinglePropertyName($propertyName);
     }
 }

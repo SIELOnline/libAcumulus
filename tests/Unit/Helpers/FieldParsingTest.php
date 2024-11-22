@@ -163,7 +163,7 @@ class FieldParsingTest extends TestCase
     public function testExpandSingleProperties(string $field, array $parts, array $spaceConcatenatedProperties): void
     {
         $log = self::$container->getLog();
-        $stopAt = 'expandSingleProperty';
+        $stopAt = 'expandProperty';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, $this->createPropertySources());
@@ -192,7 +192,7 @@ class FieldParsingTest extends TestCase
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, $this->createPropertySources());
         $this->assertEqualsCanonicalizing($propertiesInObject, $vf->trace['expandPropertyInObject']);
-        $this->assertEqualsCanonicalizing($properties, $vf->trace['expandProperty']);
+        $this->assertEqualsCanonicalizing($properties, $vf->trace['expandSinglePropertyName']);
         $this->assertEqualsCanonicalizing($literals, $vf->trace['getLiteral']);
     }
 }

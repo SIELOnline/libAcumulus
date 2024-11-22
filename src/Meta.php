@@ -322,7 +322,6 @@ interface Meta
     public const PrecisionBundleChildrenLineAmountInc = 'meta-bundle-children-line-amountinc-precision';
 
     // Line: Other meta tags.
-
     public const ProductId = 'meta-product-id';
     /**
      * Creator->Event: the internal product type of the order item line product
@@ -373,4 +372,28 @@ interface Meta
      * Uses: Magento
      */
     public const ChildSameAsParent = 'meta-child-same-as-parent';
+
+    // Stock transaction.
+    /**
+     * Collector: field specification of the field, property, method, meta field, or
+     * whatever, that contains the product reference used to match against the Acumulus
+     * catalogue.
+     *
+     * Note that the product picklist filters against product id, description, type, SKU,
+     * EAN and price of the product.
+     */
+    public const MatchFieldSpecification = 'meta-match-field-name';
+    /**
+     * Collector: expanded value of the field specification that thus should contain the
+     * product reference used to match against the Acumulus catalogue.
+     *
+     * Note that the product picklist filters against product id, description, type, SKU,
+     * EAN and price of the product.
+     *
+     * This value should result in exactly 1 product when used as filter for the product
+     * picklist. Unfortunately the product picklist filters strings on "contains" not on
+     * being equal, thus a SKU that also appears as a substring in another SKU gives
+     * multiple results.
+     */
+    public const MatchFieldValue = 'meta-match-field-value';
 }

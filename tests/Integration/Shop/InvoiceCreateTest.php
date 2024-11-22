@@ -23,12 +23,15 @@ class InvoiceCreateTest extends TestCase
     /** @noinspection PhpMissingParentCallCommonInspection */
     public static function setUpBeforeClass(): void
     {
-        self::$container = new Container('TestWebShop', 'nl');
-        self::$container->addTranslations('Translations', 'Invoice');
+        $_SERVER['REQUEST_METHOD'] = 'get';
     }
 
-    private function getContainer(): Container
+    protected static function getAcumulusContainer(): Container
     {
+        if (!isset(self::$container)) {
+            self::$container = new Container('TestWebShop', 'nl');
+            self::$container->addTranslations('Translations', 'Invoice');
+        }
         return self::$container;
     }
 
@@ -36,7 +39,7 @@ class InvoiceCreateTest extends TestCase
     {
         $objects = (new GetTestData())->getJson();
         $order = $objects->order;
-        return $this->getContainer()->createSource(Source::Order, $order);
+        return $this->getAcumulusContainer()->createSource(Source::Order, $order);
     }
 
     /**
@@ -46,8 +49,8 @@ class InvoiceCreateTest extends TestCase
     public function testCreate(): void
     {
         $invoiceSource = $this->getInvoiceSource();
-        $invoiceAddResult = $this->getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = $this->getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceAddResult = $this->getAcumulusContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = $this->getAcumulusContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
         $result = $invoice->toArray();
 
         // Do some basic tests: at all levels, we just check some key(s) being available.

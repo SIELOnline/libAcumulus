@@ -794,9 +794,14 @@ class Config
                     'default' => 80,
                 ],
                 'stockManagementEnabled' => [
-                    'group' => Fld::Stock,
+                    'group' => Fld::Product,
                     'type'=> 'bool',
                     'default' => false,
+                ],
+                'productMatchField' => [
+                    'group' => Fld::Product,
+                    'type'=> 'string',
+                    'default' => '',
                 ],
                 'nature_shop' => [
                     'group' => 'shop',

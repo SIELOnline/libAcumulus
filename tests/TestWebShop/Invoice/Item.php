@@ -17,7 +17,7 @@ class Item extends BaseItem
     {
         $this->shopObject = new \stdClass();
         $this->shopObject->id = $this->id;
-        $this->shopObject->product_id = 1;
+        $this->shopObject->product_id = 3;
     }
 
     protected function setId(): void
@@ -27,7 +27,6 @@ class Item extends BaseItem
 
     protected function createProduct(): ?Product
     {
-        $product = $this->shopObject->get_product();
         return $this->getContainer()->createProduct($this->shopObject->product_id, $this);
     }
 }

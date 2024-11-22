@@ -29,11 +29,14 @@ class StockTransactionResult extends MessageCollection
     public const SendStatus_Unknown = 0;
     // Reasons for not sending.
     public const NotSent_StockManagementNotEnabled = 0x1;
-    public const NotSent_ErrorNoProduct = 0x2;
-    public const NotSent_ZeroChange = 0x3;
-    public const NotSent_NoMatchInAcumulus = 0x4;
-    public const NotSent_LocalErrors = 0x6;
-    public const NotSent_DryRun = 0x7;
+    public const NotSent_StockManagementDisabledForProduct = 0x2;
+    public const NotSent_NoProduct = 0x3;
+    public const NotSent_ZeroChange = 0x4;
+    public const NotSent_NoMatchValueInProduct = 0x6;
+    public const NotSent_NoMatchInAcumulus = 0x6;
+    public const NotSent_TooManyMatchesInAcumulus = 0x7;
+    public const NotSent_LocalErrors = 0x8;
+    public const NotSent_DryRun = 0xf;
     public const NotSent_Mask = 0xf;
     // Reasons for sending.
     public const Sent_New = 0x10;
@@ -182,7 +185,7 @@ class StockTransactionResult extends MessageCollection
     {
         $messages = [
             self::NotSent_StockManagementNotEnabled => 'reason_not_sent_not_enabled',
-            self::NotSent_ErrorNoProduct => 'reason_not_sent_no_product',
+            self::NotSent_NoProduct => 'reason_not_sent_no_product',
             self::NotSent_ZeroChange => 'reason_not_sent_zero_change',
             self::NotSent_NoMatchInAcumulus => 'reason_not_sent_no_match',
             self::NotSent_LocalErrors => 'reason_not_sent_local_errors',

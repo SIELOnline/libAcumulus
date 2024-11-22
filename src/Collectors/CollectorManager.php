@@ -11,11 +11,15 @@ use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdf;
 use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Product\Product;
+use Siel\Acumulus\Product\StockTransactionResult;
 
 /**
  * CollectorManager manages the collector phase.
@@ -100,8 +104,8 @@ class CollectorManager
     public function collectInvoice(): Invoice
     {
         $invoiceMappings = $this->getMappings()->getFor(DataType::Invoice);
+        /** @var \Siel\Acumulus\Collectors\InvoiceCollector $invoiceCollector */
         $invoiceCollector = $this->getContainer()->getCollector(DataType::Invoice);
-        /** @var \Siel\Acumulus\Data\Invoice $invoice */
         $invoice = $invoiceCollector->collect($this->getPropertySources(), $invoiceMappings);
         $this->getPropertySources()->add('invoice', $invoice);
 
@@ -142,15 +146,40 @@ class CollectorManager
         return $emailAsPdf;
     }
 
+    /**
+     * Collects a stock transaction for the given {@see \Siel\Acumulus\Product\Product} and change.
+     */
+    public function collectStockTransactionForItemLine(Product $product, int|float $change, ?Item $item, StockTransactionResult $localResult): StockTransaction
+    {
+        $this->getPropertySources()
+            ->clear()
+            ->add('localResult', $localResult)
+            ->add('product', $product)
+            ->add('change', $change)
+            ->add('item', $item)
+            ->add('environment', $this->getContainer()->getEnvironment()->toArray());
+        $this->addShopPropertySources();
+        return $this->collectStockTransaction();
+    }
+
+    public function collectStockTransaction(): StockTransaction
+    {
+        $stockTransactionMappings = $this->getMappings()->getFor(DataType::StockTransaction);
+        /** @var \Siel\Acumulus\Collectors\StockTransactionCollector $stockTransactionCollector */
+        $stockTransactionCollector = $this->getContainer()->getCollector(DataType::StockTransaction);
+        /** @var \Siel\Acumulus\Data\StockTransaction $stockTransaction */
+        $stockTransaction = $stockTransactionCollector->collect($this->getPropertySources(), $stockTransactionMappings);
+        return $stockTransaction;
+    }
+
     public function collectBasicSubmit(): BasicSubmit
     {
         $this->getPropertySources()
             ->add('config', $this->getContainer()->getConfig())
-            ->add('environment', $this->getContainer()->getEnvironment()->get());
+            ->add('environment', $this->getContainer()->getEnvironment()->toArray());
         /** @var \Siel\Acumulus\Collectors\BasicSubmitCollector $basicSubmitCollector */
         $basicSubmitCollector = $this->getContainer()->getCollector(DataType::BasicSubmit);
         $basicSubmitMappings = $this->getMappings()->getFor(DataType::BasicSubmit);
-        /** @var \Siel\Acumulus\Data\BasicSubmit $basicSubmit */
         $basicSubmit = $basicSubmitCollector->collect($this->getPropertySources(), $basicSubmitMappings);
         $this->getPropertySources()->remove('environment')->remove('config');
         return $basicSubmit;

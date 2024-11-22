@@ -99,6 +99,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [];
     }
 
+    public function hasStockManagement(): bool
+    {
+        return true;
+    }
+
     public function getLink(string $linkType): string
     {
         return match ($linkType) {

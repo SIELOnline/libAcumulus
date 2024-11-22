@@ -221,7 +221,7 @@ class InvoiceCollector extends Collector
                 $invoice->addLine($line);
             }
             // Note: item lines should normally not be flattened. However, for other line
-            // types we do not expect children, so if there are, it i because the info
+            // types we do not expect children, so if there are, it is because the info
             // "object" lead to multiple lines anyway (perhaps for different tax rates).
             if ($flattenChildren) {
                 foreach ($line->getChildren() as $child) {

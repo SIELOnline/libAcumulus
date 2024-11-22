@@ -74,6 +74,7 @@ class LineCollector extends SubTypedCollector
         if ($propertySources->get('item') instanceof Item) {
             /** @var Item $item */
             $item = $propertySources->get('item');
+            /** @deprecated use item::getProduct()::... */
             $propertySources->add('product', $item->getProduct());
         }
         $this->getContainer()->getEvent()->triggerLineCollectBefore($acumulusObject, $propertySources);

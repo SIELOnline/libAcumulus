@@ -384,20 +384,6 @@ abstract class InvoiceManager
         return $result;
     }
 
-    protected function createAndSend(
-        Source $source,
-        InvoiceAddResult $result,
-        bool $forceSend = false,
-        bool $dryRun = false
-    ): InvoiceAddResult {
-        $this->getInvoiceSend()->setBasicSendStatus($source, $result, $forceSend);
-        $invoice = $this->getInvoiceCreate()->create($source, $result);
-        if ($invoice !== null && !$result->isSendingPrevented()) {
-            $this->getInvoiceSend()->send($invoice, $source, $result, $dryRun);
-        }
-        return $result;
-    }
-
     /**
      * Sends the Acumulus invoice as a pdf to the customer.
      *
@@ -423,6 +409,20 @@ abstract class InvoiceManager
         /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $emailAsPdf */
         $emailAsPdf = $this->createEmailAsPdf($source);
         return $this->getAcumulusApiClient()->emailInvoiceAsPdf($token, $emailAsPdf);
+    }
+
+    protected function createAndSend(
+        Source $source,
+        InvoiceAddResult $result,
+        bool $forceSend = false,
+        bool $dryRun = false
+    ): InvoiceAddResult {
+        $this->getInvoiceSend()->setBasicSendStatus($source, $result, $forceSend);
+        $invoice = $this->getInvoiceCreate()->create($source, $result);
+        if ($invoice !== null && !$result->isSendingPrevented()) {
+            $this->getInvoiceSend()->send($invoice, $source, $result, $dryRun);
+        }
+        return $result;
     }
 
     /**

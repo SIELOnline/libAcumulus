@@ -77,5 +77,6 @@ class Source extends BaseSource
 
     protected function createItems(): array
     {
-        return [];    }
+        return [];
+    }
 }

@@ -389,6 +389,32 @@ abstract class ShopCapabilities
     abstract public function getVatClasses(): array;
 
     /**
+     * Returns whether our module for this shop implements the stock management features.
+     */
+    public function hasStockManagement(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Returns an option list of fields that can be used to match with Acumulus products.
+     *
+     * This basis implementation returns an empty array for shops that do not (yet)
+     * implement stock management. Should be overridden by shops that do implement this.
+     *
+     * @return string[]
+     *   An array of product fields, with the key being a mapping,
+     *   and the value being the label of that field in Product forms or lists.
+     */
+    public function getProductMatchFields(): array
+    {
+        if (!$this->hasStockManagement()) {
+            return [];
+        }
+        throw new RuntimeException(__METHOD__ . ' is not implemented');
+    }
+
+    /**
      * Returns a link to a form page or an image.
      *
      * If the web shop adds a session token or something like that to
@@ -432,14 +458,6 @@ abstract class ShopCapabilities
     }
 
     /**
-     * Returns whether our module for this shop implements the stock management features.
-     */
-    public function hasStockManagement(): bool
-    {
-        return false;
-    }
-
-    /**
      * Returns the name of the setting or the address type that the shop uses for fiscal
      * calculations.
      *
@@ -448,8 +466,5 @@ abstract class ShopCapabilities
      *   allow to choose the address, the name of the setting that determines which
      *   address is used otherwise.
      */
-    public function getFiscalAddressSetting(): string
-    {
-        throw new RuntimeException(__METHOD__ . ' is not implemented');
-    }
+    abstract public function getFiscalAddressSetting(): string;
 }

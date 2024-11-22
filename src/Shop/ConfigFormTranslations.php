@@ -496,6 +496,8 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'desc_settings' => 'U bevindt zich nu op het formulier met veldverwijzingen, ofwel de links tussen de data uit de webwinkel en een Acumulus factuur. De "echte" instellingen vindt u op het "%1$s" formulier onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
         // @todo: translate this for other shops (this is WP/WC specific...).
         'menu_settings' => 'Instellingen → Acumulus instellingen',
+
+        'other_field' => 'Ander veld',
     ];
 
     protected array $en = [
@@ -542,6 +544,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_error_forb' => 'Your Acumulus connection settings are correct but do not allow access via the web service. After you have entered correct connection settings %2$s, the %1$s settings will be shown.',
         'message_error_comm' => 'The module encountered an error retrieving your Acumulus configuration. Please try again. When the connection is restored the %1$s settings will be shown as well.',
         'message_auth_unknown' => 'When you have filled in your Acumulus connection settings %2$s, the %1$s settings will be shown as well.',
+        // @todo: cleanup: what is still used, what not?
         'message_error_arg1_config' => 'other',
         'message_error_arg1_advanced' => 'advanced',
         'message_error_arg1_settings' => 'other',
@@ -968,5 +971,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
 
         'desc_settings' => 'You are on the mappings form that defines the relations between the web shop data and the Acumulus invoice. The "real" settings can be found on the "%1$s" form at "%2$s", or via the button below. Note: if you click on this button, any completed or changed values will be lost! Save first!',
         'menu_settings' => 'Settings → Acumulus settings',
+
+        'other_field' => 'Other field',
     ];
 }

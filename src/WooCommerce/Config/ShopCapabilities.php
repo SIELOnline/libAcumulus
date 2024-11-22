@@ -345,30 +345,42 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // Standard tax class is not stored in table wc_tax_rate_classes.
         $labels = WC_Tax::get_tax_classes();
-        $keys =  WC_Tax::get_tax_class_slugs();
+        $keys = WC_Tax::get_tax_class_slugs();
         return ['standard' => $this->t('Standaard')] + array_combine($keys, $labels);
+    }
+
+    public function hasStockManagement(): bool
+    {
+        return true;
+    }
+
+    public function getProductMatchFields(): array
+    {
+        return [
+            '[product::getShopObject()::get_sku()]' => __('SKU', 'woocommerce'),
+            '[product::getShopObject()::get_global_unique_id()]' => __('GTIN, UPC, EAN or ISBN.', 'woocommerce'),
+            'mapping' => $this->t('other_field')
+        ];
+    }
+
+    public function getDefaultShopConfig(): array
+    {
+        return [
+            'productMatchField' => array_key_first($this->getProductMatchFields()),
+        ];
     }
 
     public function getLink(string $linkType): string
     {
-        switch ($linkType) {
-            case 'register':
-            case 'activate':
-            case 'batch':
-                return admin_url("admin.php?page=acumulus_$linkType");
-            case 'settings':
-            case 'mappings':
-                return admin_url("options-general.php?page=acumulus_$linkType");
-            case 'fiscal-address-setting':
-                return admin_url('admin.php?page=wc-settings&tab=tax');
-            case 'logo':
-                return home_url('wp-content/plugins/acumulus/siel-logo.svg');
-            case 'pro-support-image':
-                return home_url('wp-content/plugins/acumulus/pro-support-woocommerce.png');
-            case 'pro-support-link':
-                return 'https://pay.siel.nl/?p=3t0EasGQCcX0lPlraqMiGkTxFRmRo3zicBbhMtmD69bGozBl';
-        }
-        return parent::getLink($linkType);
+        return match ($linkType) {
+            'register', 'activate', 'batch' => admin_url("admin.php?page=acumulus_$linkType"),
+            'settings', 'mappings' => admin_url("options-general.php?page=acumulus_$linkType"),
+            'fiscal-address-setting' => admin_url('admin.php?page=wc-settings&tab=tax'),
+            'logo' => home_url('wp-content/plugins/acumulus/siel-logo.svg'),
+            'pro-support-image' => home_url('wp-content/plugins/acumulus/pro-support-woocommerce.png'),
+            'pro-support-link' => 'https://pay.siel.nl/?p=3t0EasGQCcX0lPlraqMiGkTxFRmRo3zicBbhMtmD69bGozBl',
+            default => parent::getLink($linkType),
+        };
     }
 
     public function hasOrderList(): bool

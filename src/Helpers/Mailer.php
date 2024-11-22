@@ -8,6 +8,8 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Product\Product;
+use Siel\Acumulus\Product\StockTransactionResult;
 use Throwable;
 
 use function is_string;
@@ -383,5 +385,20 @@ abstract class Mailer
             }
         }
         return $messages;
+    }
+
+    /**
+     * @todo: Mails ...
+     *
+     * @return bool
+     *   Success.
+     *
+     * @error: implement: may mean to extract a base class for InvoiceAddResult and
+     *    StockTransactionResult with common methods and constants used here. (or are the
+     *    constants on the wrong class?)
+     */
+    public function mailStockTransactionResult(StockTransactionResult $result, Product $product): bool
+    {
+        return true;
     }
 }

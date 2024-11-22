@@ -248,6 +248,12 @@ class Mappings
                 Meta::Id => '[item::getId()]',
                 Meta::ProductId => '[product::getId()]',
             ],
+            DataType::StockTransaction => [
+                Fld::ProductId => '[product::getAcumulusId()]',
+                Fld::StockAmount => '[change]',
+                Fld::StockDescription => '[environment::hostName+item::getSource()::getTypeLabel(1)+item::getSource()::getReference()|localResult::getTrigger()]',
+                Meta::MatchFieldValue => '[product::getReferenceForAcumulusLookup()]',
+            ],
             DataType::BasicSubmit => [
                 // This was in Config but was never configurable.
                 Fld::Format => Api::Format_Json,

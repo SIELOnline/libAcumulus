@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\FormRenderer;
 use Siel\Acumulus\Tests\Data\GetTestData;
+use stdClass;
 
 /**
  * Tests for the {@see FieldExpander} class.
@@ -228,12 +229,12 @@ class FieldExpanderTest extends TestCase
     public function objectsProvider(): array
     {
         return [
-            ['[container::language]', self::Language],
-            ['[container::translator::language]', self::Language],
+            ['[container::getLanguage()]', self::Language],
+            ['[container::getTranslator()::getLanguage()]', self::Language],
             ['[container::createAcumulusObject(address)::fullName]', null], //magic __get
-            ['[container::createSource(Order,10)::id]', 10], //magic __get
+            ['[container::createSource(Order,10)::getId()]', 10], //magic __get
             ['[container::createSource(Order,10)::getCreditNote()]', null], // () is not '' as a single argument
-            ['[container::createSource(Order,10)::getCreditNote()::id]', null], // null in middle of chain
+            ['[container::createSource(Order,10)::getCreditNote()::getId()]', null], // null in middle of chain
         ];
     }
 
@@ -256,12 +257,14 @@ class FieldExpanderTest extends TestCase
      */
     public function testSingleObject(): void
     {
+        $object = new stdClass();
+        $object->language = self::Language;
         $objects = $this->createPropertySources()
-            ->add('container', $this->getContainer())
+            ->add('object', $object)
             ->add('language', 'other language');
         $field = $this->getFieldExpander();
-        $result = $field->expand('[language]', $objects);
-        $this->assertSame('other language', $result);
+        $this->assertSame('other language', $field->expand('[language]', $objects));
+        $this->assertSame(self::Language, $field->expand('[object::language]', $objects));
     }
 
     public function objectWithNumericArrayAnd0ValuesProvider(): array
@@ -273,8 +276,8 @@ class FieldExpanderTest extends TestCase
             ['[order::lines::2::qty|source::getSign()]', 1],
             ['[order::lines::2::price]', 0.0],
             ['[order::lines::2::price|source::getSign()]', 1],
-            ['[order::lines::3::qty]', '0'],
-            ['[order::lines::3::price]', '0.0'],
+            ['[order::lines::3::qty]', 0],
+            ['[order::lines::3::price]', 0.0],
         ];
     }
 

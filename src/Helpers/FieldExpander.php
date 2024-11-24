@@ -12,13 +12,17 @@ use ArrayAccess;
 use DateTimeInterface;
 use Exception;
 
+use ReflectionProperty;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Meta;
 
+use Stringable;
+use Throwable;
+
 use function array_key_exists;
-use function call_user_func_array;
 use function count;
+use function get_object_vars;
 use function is_array;
 use function is_bool;
 use function is_callable;
@@ -166,12 +170,11 @@ use function strlen;
  *   Result4: ''
  * </pre>
  *
- * A property name should:
- * - Be the name of a (public) property,
- * - Have a (public) getter in the form of getProperty() or get_property(),
- * - Or be handled by the magic method __get() (in the form property),
- * - Or be handled by the magic method __call(), in 1 of the 3 forms allowed:
- *   property(), getProperty(), or get_property().
+ * A property name should be:
+ * - The name of a (public) property,
+ * - Handled by the magic method __get(),
+ * - The name of (public) method (when it ends with (...)).
+ * - Handled by the magic method __call() (when it ends with (...)).
  *
  * A property name may also be:
  * - Any method name that does not have required parameters.
@@ -182,8 +185,11 @@ use function strlen;
  * An "object" is:
  * - An array.
  * - An object.
- * - A {@see is_callable() callable}, in which case the callable is called with
- *   the property name passed as argument. No known usages anymore.
+ * - An object that implements ArrayAccess in which case both ways to retrieve the value
+ *   are tried.
+ *
+ * FieldExpander will not throw on non-existing properties or methods but return null,
+ * and will try to prevent non-fatal error or warning messages from being logged.
  */
 class FieldExpander
 {
@@ -224,6 +230,9 @@ class FieldExpander
      * is expanded by searching the given "objects" for the referenced property
      * or properties.
      *
+     * FieldExpander will not throw on non-existing properties or methods but return null,
+     * and will try to prevent non-fatal error or warning messages from being logged.
+     *
      * @param string $fieldSpecification
      *   The field expansion specification.
      * @param PropertySources $propertySources
@@ -233,9 +242,8 @@ class FieldExpander
      *   variable name typically used in the shop software.
      *
      * @return mixed
-     *   The expanded field expansion specification, which may be empty if the
-     *   properties or methods referred to do not exist or are or return an empty value
-     *   themselves.
+     *   The expanded field expansion specification, which may be empty if the properties
+     *   or methods referred to do not exist or return an empty value themselves.
      *
      *   The type of the return value is either:
      *   - If $fieldSpecification contains exactly 1 field specification (i.e. it begins
@@ -377,7 +385,6 @@ class FieldExpander
      */
     protected function expandProperty(string $property): array
     {
-
         if ($this->isLiteral($property)) {
             $type = self::TypeLiteral;
             $value = $this->getLiteral($property);
@@ -452,7 +459,7 @@ class FieldExpander
         $propertyParts = explode('::', $propertyInObject);
         while (count($propertyParts) > 0 && $object !== null) {
             $propertyName = array_shift($propertyParts);
-            $object = $this->getPropertyValue($propertyName, $object);
+            $object = $this->getValue($propertyName, $object);
         }
         return $object;
     }
@@ -480,9 +487,9 @@ class FieldExpander
         if (array_key_exists($propertyName, $this->objects)) {
             return $this->objects[$propertyName];
         }
-        // Search in the objects of the super object.
+        // Search in the objects of the super object, so 1 level deep only.
         foreach ($this->objects as $object) {
-            $property = $this->getPropertyValue($propertyName, $object);
+            $property = $this->getValue($propertyName, $object);
             if ($property !== null && $property !== '') {
                 break;
             }
@@ -494,59 +501,49 @@ class FieldExpander
      * Looks up a property in an "object".
      *
      * This default implementation looks for the property in the following ways:
-     * If the passed variable is callable:
-     * - returns the return value of the callable function or method.
-     * If the passed variable is an array:
-     * - looking up the property as key.
-     * If the passed variable is an object:
-     * - Looking up the property by name (as existing property or via __get).
-     * - Calling the get{Property} getter.
-     * - Calling the get_{property} getter.
-     * - Calling the {property}() method (as existing method or via __call).
+     * 1. If $property ends with '([args])':
+     *    - Return the value of the call to method $object->$property(...$args)
+     *    - [we could accept string functions if $object is a string, or array functions if
+     *      $object is an array, but that is too risky: e.g. unlink()]
+     * 2. If the passed variable is an array or implements ArrayAccess:
+     *    - Return the value of $object[$property] if it exists.
+     * 3. If the passed variable is an object:
+     *    - Return the value of $object->$property.
      *
      * Override if the property name or getter method is constructed differently.
      *
+     * FieldExpander will not throw on non-existing properties or methods but return null.
+     * but it will try to prevent error or warning messages as well by building in some
+     * checks before just calling a method, accessing an array, or getting a property.
+     *
      * @param string $property
      *   The name of the property to extract from the "object".
-     * @param mixed $object
+     * @param array|object $object
      *   The "object" to extract the property from.
      *
      * @return mixed
-     *   The value for the property of the given name, or null or the empty
-     *   string if not available.
+     *   The value for the property of the given name on the given object, or null or the
+     *   empty string if property does not exist or is not accessible, not even via
+     *   __call() or __get().
      */
-    protected function getPropertyValue(string $property, mixed $object): mixed
+    protected function getValue(string $property, array|object $object): mixed
     {
         $value = null;
 
-        $args = [];
         if (preg_match('/^(.+)\((.*)\)$/', $property, $matches)) {
+            // Case 1: method
             $property = $matches[1];
-            if ($matches[2] !== '') {
-                $args = explode(',', $matches[2]);
+            $args = explode(',', $matches[2]);
+            $value = $this->getValueFromMethod($object, $property, $args);
+        } else {
+            //
+            if (is_array($object) || $object instanceof ArrayAccess) {
+                $value = $this->getValueFromArray($object, $property);
             }
-        }
-        if (is_array($object) || $object instanceof ArrayAccess) {
-            if (is_callable($object)) {
-                array_unshift($args, $property);
-                $value = call_user_func_array($object, $args);
-            } elseif (isset($object[$property])) {
-                $value = $object[$property];
-            }
-        } elseif (is_object($object)) {
-            // It's an object: try to get the property.
-            // Safest and fastest way is via the get_object_vars() function.
-            $properties = get_object_vars($object);
-            if (array_key_exists($property, $properties)) {
-                $value = $properties[$property];
-            }
-            // WooCommerce can have the property customer_id set to null, while
-            // the data store does contain a non-null value: so if value is
-            // still null, even if it is in the get_object_vars() result, we
-            // try to get it the more difficult way.
-            if ($value === null) {
-                // Try some other ways.
-                $value = $this->getPropertyFromObjectByGetterMethod($object, $property, $args);
+            // If the object implements ArrayAccess, the value might already be retrieved.
+            // If not, continue the "object way".
+            if ($value === null && is_object($object)) {
+                $value = $this->getValueFromProperty($object, $property);
             }
         }
 
@@ -554,62 +551,72 @@ class FieldExpander
     }
 
     /**
-     * Looks up a property in a web shop specific object by calling a (getter) method.
+     * Retrieves a value by calling $method on $object.
      *
-     * This part is extracted into a separate method, so it can be overridden
-     * with web shop specific ways to access properties. The base implementation
-     * will probably get the property anyway, so override mainly to prevent
-     * notices or warnings.
-     *
-     * @param object $variable
-     *   The variable to search for the property.
-     * @param string $property
-     *   The property or function to get its value.
-     * @param array $args
-     *   Optional arguments to pass if it is a function.
-     *
-     * @return mixed
-     *   The value for the property of the given name, or null or the empty
-     *   string if not available (or the property really equals null or the
-     *   empty string). The return value may be:
-     *     - A string (for direct use in field expansion).
-     *     - A scalar (numeric) type that can be converted to a string (for use in field expansion).
-     *     - An object or array for further traversing.
+     * The method can be a real existing and accessible method (@see is_callable()} or be
+     * handled by the magic
+     * {@link https://www.php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.methods __call()}
+     * function.
      *
      * @noinspection PhpUsageOfSilenceOperatorInspection
      */
-    protected function getPropertyFromObjectByGetterMethod(object $variable, string $property, array $args): mixed
+    protected function getValueFromMethod(object $object, string $method, array $args): mixed
+    {
+        try {
+            return is_callable([$object, $method])
+                ? @$object->$method(...$args)
+                : null;
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves a value by retrieving an array index.
+     *
+     * @param array|ArrayAccess $array
+     *    The key value data set to search in.
+     * @param int|string $index
+     *    The name of the property to search for.
+     *
+     * @return mixed
+     *    The value for the entry at the given index, or null if the index does not exist.
+     */
+    protected function getValueFromArray(array|ArrayAccess $array, mixed $index): mixed
+    {
+        try {
+            return $array[$index] ?? null;
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves a value by retrieving a property value.
+     */
+    protected function getValueFromProperty(object $object, string $property): mixed
     {
         $value = null;
-        $method1 = $property;
-        $method2 = 'get' . ucfirst($property);
-        $method3 = 'get_' . $property;
-        if (method_exists($variable, $method1)) {
-            $value = call_user_func_array([$variable, $method1], $args);
-        } elseif (method_exists($variable, $method2)) {
-            $value = call_user_func_array([$variable, $method2], $args);
-        } elseif (method_exists($variable, $method3)) {
-            $value = call_user_func_array([$variable, $method3], $args);
-        } elseif (method_exists($variable, '__get')) {
-            /** @noinspection PhpVariableVariableInspection */
-            @$value = $variable->$property;
-        } elseif (method_exists($variable, '__call')) {
-            try {
-                $value = @call_user_func_array([$variable, $method1], $args);
-            } catch (Exception) {
+        try {
+            // Try to get the property. The safest way is via {@see get_object_vars()}.
+            $properties = get_object_vars($object);
+            $value = $properties[$property] ?? null;
+            // However, WooCommerce can have the property customer_id set to null, while
+            // the data store does contain a non-null value: so if value is still null,
+            // even if it is in the get_object_vars() result, we try to get it the more
+            // difficult way.
+            if ($value === null &&
+                ((property_exists($object, $property) && (new ReflectionProperty($object, $property))->isPublic())
+                    || method_exists($object, '__get'))
+            ) {
+                /**
+                 * @noinspection PhpVariableVariableInspection
+                 * @noinspection PhpUsageOfSilenceOperatorInspection  There are still ways
+                 *   that the statement below can fail, especially via the __get() variant.
+                 */
+                $value = @$object->$property;
             }
-            if ($value === null || $value === '') {
-                try {
-                    $value = @call_user_func_array([$variable, $method2], $args);
-                } catch (Exception) {
-                }
-            }
-            if ($value === null || $value === '') {
-                try {
-                    $value = @call_user_func_array([$variable, $method3], $args);
-                } catch (Exception) {
-                }
-            }
+        } catch (Throwable) {
         }
         return $value;
     }
@@ -713,7 +720,7 @@ class FieldExpander
             } elseif (is_array($value)) {
                 $result = '';
                 foreach ($value as $item) {
-                    if (!is_object($item) || method_exists($item, '__toString')) {
+                    if (!is_object($item) || $item instanceof Stringable) {
                         if ($result !== '') {
                             $result .= ' ';
                         }
@@ -728,7 +735,7 @@ class FieldExpander
                 } else {
                     $value = $value->format(Api::Format_TimeStamp);
                 }
-            } elseif (!is_object($value) || method_exists($value, '__toString')) {
+            } elseif (!is_object($value) || $value instanceof Stringable) {
                 // object with a _toString() method, null, or a resource.
                 $value = (string) $value;
             } else {

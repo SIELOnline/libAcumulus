@@ -7,97 +7,74 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
+use ArrayAccess;
 use Siel\Acumulus\Helpers\FieldExpander as BaseFieldExpander;
 use WC_Data;
+use WC_Meta_Data;
 
-use function array_key_exists;
-use function call_user_func_array;
 use function count;
 use function is_array;
+use function is_string;
 
 /**
- * WC override of Token.
+ * WC override of FieldExpander.
  */
 class FieldExpander extends BaseFieldExpander
 {
     /**
-     * @return mixed|string|null
-     *   Description.
+     * This Woocommerce override adds a WC specific way of retrieving properties, namely
+     * via the {@see WC_Data::get_data()} method. This should be done first, as accessing
+     * properties directly via __get() results in a:
+     * wc_doing_it_wrong($key, 'Order properties should not be accessed directly.', '3.0')
      */
-    protected function getPropertyFromObjectByGetterMethod(object $variable, string $property, array $args): mixed
+    protected function getValueFromProperty(object $object, string $property): mixed
     {
-        if ($variable instanceof WC_Data) {
-            $method1 = $property;
-            $method3 = 'get_' . $property;
-            if (method_exists($variable, $method1)) {
-                $value = call_user_func_array([$variable, $method1], $args);
-            } elseif (method_exists($variable, $method3)) {
-                $value = call_user_func_array([$variable, $method3], $args);
-            } else {
-                $value = $this->getDataValue($variable->get_data(), $property);
-            }
-        } else {
-            $value = parent::getPropertyFromObjectByGetterMethod($variable, $property, $args);
+        if ($object instanceof WC_Data) {
+            $array = $object->get_data();
+            $value = $this->getValueFromArray($array, $property) ?? $this->getValueFromMetadata($array['meta_data'], $property) ?? null;
         }
-        return $value;
+        return $value ?? parent::getValueFromProperty($object, $property);
     }
 
     /**
-     * Extracts a value from a WooCommerce data object data array.
-     * A WooCommerce data array (array with key value pairs) returned from the
-     * WC_Data::get_data() method may contain recursive data sets, e.g.
-     * 'billing' for the billing address, and a separate meta_data set.
-     * This method recursively searches for the property by stripping it into
-     * separate pieces delimited by underscores. E.g. billing_email may be found
-     * in $data['billing']['email'].
+     * {inheritdoc}
      *
-     * @param array $data
-     *   The key value data set to search in.
-     * @param string $property
-     *   The name of the property to search for.
+     * This override can also be called by the {@see getValueFromProperty()} override, in
+     * which case $array is the result of a call to {@see WC_Data::get_data()} and $index
+     * is the property name to get. The data array returned from the
+     * {@see WC_Data::get_data()} method may contain:
+     * - Recursive data sets, e.g. 'billing' for the billing address
+     * - A separate meta_data set, but that is handled by {@see getValueFromMetadata()}.
      *
-     * @return mixed
-     *   The value for the property of the given name, or null or the empty
-     *   string if not available (or the property really equals null or the
-     *   empty string). The return value may be a scalar (numeric type) that can
-     *   be converted to a string.
-     *
-     * @noinspection OffsetOperationsInspection
-     *   explode can return false but won't.
+     * This method:
+     * - Looks for $index in the data array.
+     * - Recursively searches for  property by splitting it into separate pieces delimited
+     *   by underscores. E.g. 'billing_email' may be found in $array['billing']['email'].
      */
-    protected function getDataValue(array $data, string $property): mixed
+    protected function getValueFromArray(array|ArrayAccess $array, mixed $index): mixed
     {
-        $value = null;
-        if (array_key_exists($property, $data)) {
-            // Found: return the value.
-            $value = $data[$property];
-        } else {
-            // Not found: check in metadata or descend recursively.
-            if (isset($data['meta_data'])) {
-                $value = $this->getMetaDataValue($data['meta_data'], $property);
-            }
-            if ($value === null) {
-                // Not found in meta_data: check if we should descend a level.
-                $propertyParts = explode('_', $property, 2);
-                if (count($propertyParts) === 2 && array_key_exists($propertyParts[0], $data) && is_array($data[$propertyParts[0]])) {
-                    $value = $this->getDataValue($data[$propertyParts[0]], $propertyParts[1]);
-                }
+        $value = parent::getValueFromArray($array, $index);
+        if ($value === null && is_string($index)) {
+            // Not found: check if we can search recursively.
+            $propertyParts = explode('_', $index, 2);
+            if (count($propertyParts) === 2 && isset($array[$propertyParts[0]]) && is_array($array[$propertyParts[0]])) {
+                $value = $this->getValueFromArray($array[$propertyParts[0]], $propertyParts[1]);
             }
         }
         return $value;
     }
 
     /**
-     * Extracts a value from a set of WooCommerce metadata objects.
+     * Extracts a value from a set of WooCommerce {@see WC_Meta_Data} objects.
      *
      * WooCommerce's metadata is stored in objects having twice the set of
      * properties 'id', 'key', and 'value', once in the property 'current_value'
      * and once in the property 'data'. If 1 of the properties 'id', 'key' or
      * 'value' is retrieved, its value from the 'current_value' set is returned.
      *
-     * @param object[] $metaData
+     * @param WC_Meta_Data[] $metaData
      *   The metadata set to search in.
-     * @param string $property
+     * @param string $key
      *   The name of the property to search for. May be with or without a
      *   leading underscore.
      *
@@ -106,14 +83,16 @@ class FieldExpander extends BaseFieldExpander
      *   string if not available (or the metadata really equals null or the
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
+     *
+     * @noinspection PhpUndefinedFieldInspection  Class WC_Meta_Data implements __get().
      */
-    protected function getMetaDataValue(array $metaData, string $property): mixed
+    protected function getValueFromMetadata(array $metaData, string $key): mixed
     {
-        $property = ltrim($property, '_');
+        $key = ltrim($key, '_');
         $value = null;
         foreach ($metaData as $metaItem) {
-            $key = ltrim($metaItem->key, '_');
-            if ($property === $key) {
+            $itemKey = ltrim($metaItem->key, '_');
+            if ($key === $itemKey) {
                 $value = $metaItem->value;
                 break;
             }

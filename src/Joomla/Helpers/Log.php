@@ -49,20 +49,12 @@ class Log extends BaseLog
      */
     protected function getJoomlaSeverity(int $severity): int
     {
-        switch ($severity) {
-            case Severity::Exception:
-            case Severity::Error:
-                return JoomlaLog::ERROR;
-            case Severity::Warning:
-                return JoomlaLog::WARNING;
-            case Severity::Notice:
-                return JoomlaLog::NOTICE;
-            case Severity::Info:
-                return JoomlaLog::INFO;
-            case Severity::Success:
-            case Severity::Log:
-            default:
-                return JoomlaLog::DEBUG;
-        }
+        return match ($severity) {
+            Severity::Exception, Severity::Error => JoomlaLog::ERROR,
+            Severity::Warning => JoomlaLog::WARNING,
+            Severity::Notice => JoomlaLog::NOTICE,
+            Severity::Info => JoomlaLog::INFO,
+            default => JoomlaLog::DEBUG,
+        };
     }
 }

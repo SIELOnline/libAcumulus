@@ -17,11 +17,13 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 
 use function count;
+use function sprintf;
 
 /**
  * ShippingLineCollector contains HikaShop specific {@see LineType::Shipping} collecting logic.
  *
  * @noinspection LongLine
+ * @noinspection GrazieInspection
  *
  * Note: HS 4+ has a setting on shipping methods "Automatic taxes"/"Automatische
  * belastingen" that determines how the vat on shipping is calculated. It is stored in

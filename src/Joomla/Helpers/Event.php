@@ -56,7 +56,8 @@ class Event implements EventInterface
         PluginHelper::importPlugin('acumulus');
         $params['subject'] = $this->getAcumulusComponent();
         $event = AbstractEvent::create($eventName, $params);
-        // @todo: in Joomla 6 interface CMSApplicationInterface will no longer extend EventAwareInterface.
+        // @todo: in Joomla 6 interface CMSApplicationInterface will no longer extend
+        //   EventAwareInterface. Replacement is not yet clear to me.
         $this->getCMSApplication()->getDispatcher()->dispatch($eventName, $event);
     }
 
@@ -68,6 +69,7 @@ class Event implements EventInterface
 
     private function getCMSApplication(): CMSApplicationInterface
     {
+        /** @noinspection PhpUnhandledExceptionInspection  won't fail, application has started. */
         return Factory::getApplication();
     }
 }

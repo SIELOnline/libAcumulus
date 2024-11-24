@@ -56,7 +56,7 @@ class ItemLineCollector extends LineCollector
         $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);
         $line->metadataSet(Meta::VatAmount, $productVat);
         $line->quantity = (int) $shopItem->product_quantity;
-        $this->addVatData($line, 'VatTax', $productPriceEx, $productVat, (int) $shopItem->virtuemart_order_item_id);
+        $this->addVatData($line, 'VatTax', $productVat, (int) $shopItem->virtuemart_order_item_id);
 
         // Add variant info.
         $this->addVariantLines($line, $shopItem);

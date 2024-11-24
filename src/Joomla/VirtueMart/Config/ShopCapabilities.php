@@ -274,13 +274,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     public function getLink(string $linkType): string
     {
-        switch ($linkType) {
-            case 'pro-support-image':
-                return Uri::root(true) . '/administrator/components/com_acumulus/media/pro-support-virtuemart.png';
-            case 'pro-support-link':
-                return 'https://pay.siel.nl/?p=t7jYwPSWYgFJdWQuWVJmC0R6d6LWHKmNVsNUlgtv82TIhgNS';
-        }
-        return parent::getLink($linkType);
+        return match ($linkType) {
+            'pro-support-image' => Uri::root(true) . '/administrator/components/com_acumulus/media/pro-support-virtuemart.png',
+            'pro-support-link' => 'https://pay.siel.nl/?p=t7jYwPSWYgFJdWQuWVJmC0R6d6LWHKmNVsNUlgtv82TIhgNS',
+            default => parent::getLink($linkType),
+        };
     }
 
     public function getFiscalAddressSetting(): string

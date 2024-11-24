@@ -6,11 +6,12 @@
     ],
     "require": {
         "php": "^8",
-        "ext-json": "*",
+        "ext-ctype": "*",
+        "ext-curl": "*",
         "ext-dom": "*",
+        "ext-json": "*",
         "ext-libxml": "*",
-        "ext-simplexml": "*",
-        "ext-curl": "*"
+        "ext-simplexml": "*"
     },
     "autoload": {
         "psr-4": {

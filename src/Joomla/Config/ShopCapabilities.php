@@ -15,17 +15,10 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
 {
     public function getLink(string $linkType): string
     {
-        switch ($linkType) {
-            case 'register':
-            case 'activate':
-            case 'settings':
-            case 'mappings':
-            case 'batch':
-            case 'invoice':
-                return Route::_("index.php?option=com_acumulus&task=$linkType");
-            case 'logo':
-                return Uri::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg';
-        }
-        return parent::getLink($linkType);
+        return match ($linkType) {
+            'register', 'activate', 'settings', 'mappings', 'batch', 'invoice' => Route::_("index.php?option=com_acumulus&task=$linkType"),
+            'logo' => Uri::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg',
+            default => parent::getLink($linkType),
+        };
     }
 }

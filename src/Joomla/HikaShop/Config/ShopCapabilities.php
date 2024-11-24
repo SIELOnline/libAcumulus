@@ -167,14 +167,17 @@ class ShopCapabilities extends ShopCapabilitiesBase
             DataType::Customer => [
                 // Customer defaults.
                 Fld::ContactYourId => '[source::getShopObject()::order_user_id]',
-                Fld::VatNumber => '[source::getShopObject()::billing_address::address_vat|source::getShopObject()::shipping_address::address_vat]',
+                Fld::VatNumber =>
+                    '[source::getShopObject()::billing_address::address_vat|source::getShopObject()::shipping_address::address_vat]',
                 Fld::Telephone =>
-                    '[source::getShopObject()::billing_address::address_telephone|source::getShopObject()::shipping_address::address_telephone]',
+                    '[source::getShopObject()::billing_address::address_telephone' .
+                    '|source::getShopObject()::shipping_address::address_telephone]',
                 Fld::Telephone2 =>
                     '[source::getShopObject()::billing_address::address_telephone2' .
                     '|source::getShopObject()::shipping_address::address_telephone2' .
                     '|source::getShopObject()::shipping_address::address_telephone]',
-                Fld::Fax => '[source::getShopObject()::billing_address::address_fax|source::getShopObject()::shipping_address::address_fax]',
+                Fld::Fax =>
+                    '[source::getShopObject()::billing_address::address_fax|source::getShopObject()::shipping_address::address_fax]',
                 Fld::Email => '[source::getShopObject()::customer::user_email|source::getShopObject()::customer::email]',
             ],
             AddressType::Invoice => [
@@ -293,15 +296,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     public function getLink(string $linkType): string
     {
-        switch ($linkType) {
-            case 'fiscal-address-setting':
-                return Route::_('index.php?option=com_hikashop&ctrl=config#main_tax');
-            case 'pro-support-image':
-                return Uri::root(true) . '/administrator/components/com_acumulus/media/pro-support-hikashop.png';
-            case 'pro-support-link':
-                return 'https://pay.siel.nl/?p=b5TeLbPw6BtNXRioORwnUtNbpU3yhUAgXLuuEMgk5zcttHbU';
-        }
-        return parent::getLink($linkType);
+        return match ($linkType) {
+            'fiscal-address-setting' => Route::_('index.php?option=com_hikashop&ctrl=config#main_tax'),
+            'pro-support-image' => Uri::root(true) . '/administrator/components/com_acumulus/media/pro-support-hikashop.png',
+            'pro-support-link' => 'https://pay.siel.nl/?p=b5TeLbPw6BtNXRioORwnUtNbpU3yhUAgXLuuEMgk5zcttHbU',
+            default => parent::getLink($linkType),
+        };
     }
 
     public function getFiscalAddressSetting(): string

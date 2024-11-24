@@ -1,10 +1,12 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection SensitiveParameter is PHP 8.2
+ */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\Config;
 
-use Joomla\CMS\Extension\ExtensionHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Table\Extension;
 use Joomla\Database\DatabaseInterface;
@@ -22,9 +24,9 @@ class ConfigStore extends BaSeConfigStore
         // Do not use the ExtensionHelper class: it caches the extension records without
         // any way to clear that cache. So when we update the config values (on one of the
         // config forms or during an update) we do not get the fresh values.
-        $extension = ExtensionHelper::getExtensionRecord('com_acumulus', 'component');
-        $values = $extension->custom_data;
-
+        // $extension = ExtensionHelper::getExtensionRecord('com_acumulus', 'component');
+        // $values = $extension->custom_data;
+        // Instead we load from the database
         $extensionTable = new Extension(Factory::getContainer()->get(DatabaseInterface::class));
         $extensionTable->load(['element' => 'com_acumulus']);
         $values = $extensionTable->custom_data;

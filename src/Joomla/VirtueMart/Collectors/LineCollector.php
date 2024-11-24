@@ -40,13 +40,13 @@ class LineCollector extends BaseLineCollector
     /**
      * Adds vat data and vat lookup metadata to the current (item) line.
      *
-     * @param string $calcRuleType
-     *   Type of calc rule to search for: 'VatTax', 'shipment' or 'payment'.
      * @param int $orderItemId
+     *   Type of calc rule to search for: 'VatTax', 'shipment' or 'payment'.
+     * @param string $calcRuleType
      *   The order item to search the calc rule for, or search at the order
      *   level if left empty.
      */
-    protected function addVatData(Line $line, string $calcRuleType, float $amountEx, float $vatAmount, int $orderItemId = 0): void
+    protected function addVatData(Line $line, string $calcRuleType, float $vatAmount, int $orderItemId = 0): void
     {
         $calcRule = $this->getCalcRule($calcRuleType, $orderItemId);
         if ($calcRule !== null && !empty($calcRule->calc_value)) {

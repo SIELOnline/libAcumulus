@@ -7,7 +7,6 @@ namespace Siel\Acumulus\Joomla\VirtueMart\Collectors;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 
@@ -49,7 +48,7 @@ class PaymentFeeLineCollector extends LineCollector
         $line->unitPrice = $paymentEx;
         $line->quantity = 1;
         $line->metadataSet(Meta::VatAmount, $paymentVat);
-        $this->addVatData($line, 'payment', $paymentEx, $paymentVat);
+        $this->addVatData($line, 'payment', $paymentVat);
     }
 }
 

@@ -45,8 +45,12 @@ class InvoiceManager extends BaseInvoiceManager
      * introduce sequential order numbers, E.g:
      * http://extensions.joomla.org/profile/extension/extension-specific/virtuemart-extensions/human-readable-order-numbers
      */
-    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $referenceFrom, string $referenceTo, bool $fallbackToId): array
-    {
+    public function getInvoiceSourcesByReferenceRange(
+        string $sourceType,
+        string $referenceFrom,
+        string $referenceTo,
+        bool $fallbackToId
+    ): array {
         $result = [];
         if ($sourceType === Source::Order) {
             if (ctype_digit($referenceFrom) && ctype_digit($referenceTo)) {
@@ -63,7 +67,12 @@ class InvoiceManager extends BaseInvoiceManager
             );
             $result = $this->getSourcesByQuery($sourceType, $query);
         }
-        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange($sourceType, $referenceFrom, $referenceTo, $fallbackToId);
+        return count($result) > 0 ? $result : parent::getInvoiceSourcesByReferenceRange(
+            $sourceType,
+            $referenceFrom,
+            $referenceTo,
+            $fallbackToId
+        );
     }
 
     public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array

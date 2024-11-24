@@ -75,8 +75,13 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table->store(true);
     }
 
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
-    {
+    protected function update(
+        BaseAcumulusEntry $entry,
+        ?int $entryId,
+        ?string $token,
+        int|string $updated,
+        ?Source $invoiceSource = null
+    ): bool {
         // Continue with existing table object with already loaded record.
         /** @var AcumulusEntryTable $table */
         $table = $entry->getRecord();
@@ -93,7 +98,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table->delete();
     }
 
-    protected function sqlNow()
+    protected function sqlNow(): int|string
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         return (new Date('now', new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);

@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\Helpers;
 
+use Exception;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Mail\MailerInterface;
 use PHPMailer\PHPMailer\PHPMailer;
-use RuntimeException;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
-use Throwable;
 
 /**
  * Extends the base mailer class to send a mail using the Joomla mail features.
@@ -20,6 +19,9 @@ class Mailer extends BaseMailer
 {
     /**
      * {@inheritdoc}
+     *
+     * @noinspection PhpMixedReturnTypeCanBeReducedInspection
+     * *    @todo: Type can be narrowed to bool|int|string
      */
     public function sendMail(
         string $from,
@@ -43,7 +45,7 @@ class Mailer extends BaseMailer
             if ($result === false) {
                 $result = Text::_('JLIB_MAIL_FUNCTION_OFFLINE');
             }
-        } catch (RuntimeException $e) {
+        } catch (Exception $e) {
             $result = $e->getMessage();
         }
         return $result;

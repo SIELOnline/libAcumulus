@@ -50,7 +50,7 @@ class ShippingLineCollector extends LineCollector
         $line->unitPrice = $shippingEx;
         $line->quantity = 1;
         $line->metadataSet(Meta::VatAmount, $shippingVat);
-        $this->addVatData($line, 'shipment', $shippingEx, $shippingVat);
+        $this->addVatData($line, 'shipment', $shippingVat);
     }
 
     protected function getShippingMethodName(mixed ...$args): string

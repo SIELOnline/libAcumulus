@@ -40,6 +40,7 @@ class AddressCollector extends BaseAddressCollector
             if (!empty($country->country_name)) {
                 vmLanguage::loadJLang('com_virtuemart_countries');
                 $key = "COM_VIRTUEMART_COUNTRY_$country->country_3_code";
+                /** @noinspection NullPointerExceptionInspection  Application will have been created when we get here. */
                 $language = Factory::getApplication()->getLanguage();
                 $name = $language->hasKey($key) ? $language->_($key) : $country->country_name;
                 $acumulusObject->metadataSet(Meta::ShopCountryName, $name);

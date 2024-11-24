@@ -48,20 +48,13 @@ class Log extends BaseLog
      */
     protected function getWooCommerceSeverity(int $severity): string
     {
-        switch ($severity) {
-            case Severity::Exception:
-                return 'critical';
-            case Severity::Error:
-                return 'error';
-            case Severity::Warning:
-                return 'warning';
-            case Severity::Notice:
-                return 'notice';
-            case Severity::Info:
-                return 'info';
-            case Severity::Log:
-            default:
-                return 'debug';
-        }
+        return match ($severity) {
+            Severity::Exception => 'critical',
+            Severity::Error => 'error',
+            Severity::Warning => 'warning',
+            Severity::Notice => 'notice',
+            Severity::Info => 'info',
+            default => 'debug',
+        };
     }
 }

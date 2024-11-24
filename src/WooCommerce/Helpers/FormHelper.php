@@ -6,9 +6,6 @@ namespace Siel\Acumulus\WooCommerce\Helpers;
 
 use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
 
-use function is_array;
-use function is_object;
-
 /**
  * WooCommerce override of the FormHelper.
  *

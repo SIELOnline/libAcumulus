@@ -222,6 +222,7 @@ class Source extends BaseSource
     {
         /** @var \WC_Order_Refund $refund */
         $refund = $this->shopObject;
+        /** @noinspection PhpCastIsUnnecessaryInspection numeric string will be returned */
         return (int) $refund->get_parent_id();
     }
 
@@ -278,7 +279,7 @@ class Source extends BaseSource
 
 
     /**
-     * {@inheritdoc}}
+     * {@inheritdoc}
      *
      * In WooCommerce, discount amounts are distributed over the applicable item lines, so
      * we do not have to add discount lines. However, we still do add them for

@@ -7,13 +7,14 @@ namespace Siel\Acumulus\WooCommerce\Invoice;
 use RuntimeException;
 use Siel\Acumulus\Invoice\Item as BaseItem;
 use Siel\Acumulus\Product\Product;
+use WC_Order_Item_Product;
 use WC_Product;
 
 /**
  * Item is the WooCommerce specific class to wrap an order/refund item.
  *
- * @property \WC_Order_Item_Product $shopObject
- * @method \WC_Order_Item_Product getShopObject()
+ * @property WC_Order_Item_Product $shopObject
+ * @method WC_Order_Item_Product getShopObject()
  * @method \Siel\Acumulus\WooCommerce\Product\Product getProduct()
  */
 class Item extends BaseItem

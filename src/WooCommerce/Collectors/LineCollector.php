@@ -13,6 +13,8 @@ use Siel\Acumulus\Meta;
 use WC_Product;
 use WC_Tax;
 
+use function sprintf;
+
 /**
  * ItemLineCollector contains WooCommerce specific {@see LineType::Item} collecting logic.
  *

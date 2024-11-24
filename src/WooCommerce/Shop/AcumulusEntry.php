@@ -35,7 +35,7 @@ class AcumulusEntry extends BaseAcumulusEntry
     /**
      * @inheritDoc
      */
-    protected function get(string $field)
+    protected function get(string $field): mixed
     {
         $result = parent::get($field);
         if (is_array($result)) {

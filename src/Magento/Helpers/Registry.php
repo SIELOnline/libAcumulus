@@ -13,6 +13,10 @@ use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\Module\ResourceInterface;
 use Magento\Framework\ObjectManagerInterface;
 
+use Siel\Acumulus\Meta;
+
+use function defined;
+
 /**
  * Registry is a wrapper around the Magento2 ObjectManager to get objects that
  * in Magento code would be injected via the constructor.
@@ -101,8 +105,7 @@ class Registry
                 $readFactory = $this->get(ReadFactory::class);
                 $directoryRead = $readFactory->create($path);
                 $composerJsonData = $directoryRead->readFile('composer.json');
-                // @todo: json error handling: switch to throw.
-                $data = json_decode($composerJsonData, false);
+                $data = json_decode($composerJsonData, false, 512, Meta::JsonFlags);
                 if ($data !== null) {
                     if (!empty($data->version)) {
                         $result = $data->version;
@@ -130,7 +133,7 @@ class Registry
      *
      * @return string|false
      */
-    public function getSchemaVersion(string $moduleName)
+    public function getSchemaVersion(string $moduleName): false|string
     {
         /** @var ResourceInterface $resource */
         $resource = $this->get(ResourceInterface::class);

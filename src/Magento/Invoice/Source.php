@@ -24,8 +24,8 @@ use function strlen;
 /**
  * Wraps a Magento order or credit memo in an invoice source object.
  *
- * @property Order|Creditmemo shopObject
  * @method Order|Creditmemo getShopObject()
+ * @property Order|Creditmemo $shopObject
  */
 class Source extends BaseSource
 {

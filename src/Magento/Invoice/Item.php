@@ -26,7 +26,6 @@ class Item extends BaseItem
 
     protected function setId(): void
     {
-        /** noinspection PhpCastIsUnnecessaryInspection  actually a numeric string is returned */
         $this->id = (int) $this->getShopObject()->getId();
     }
 

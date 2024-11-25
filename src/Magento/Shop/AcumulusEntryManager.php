@@ -115,7 +115,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $record = $entry->getRecord();
         try {
             $this->getResourceModel()->delete($record);
-        } catch (Exception $e) {
+        } catch (Exception) {
             // @todo: log exception?
             $result = false;
         }

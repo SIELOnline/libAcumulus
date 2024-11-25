@@ -199,7 +199,7 @@ class FormMapper extends BaseFormMapper
      *
      * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
-    protected function getMagentoProperty(array $config, string $key, $value, string $type): array
+    protected function getMagentoProperty(array $config, string $key, mixed $value, string $type): array
     {
         switch ($key) {
             // Fields to ignore:

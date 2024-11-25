@@ -23,6 +23,9 @@ class Mailer extends BaseMailer
      *
      * @return mixed
      *   Success (true) or a {@see \Throwable}.
+     *
+     * @noinspection PhpMixedReturnTypeCanBeReducedInspection
+     *   @todo Type can be narrowed to '\Exception|\Throwable|true'
      */
     public function sendMail(
         string $from,
@@ -70,7 +73,7 @@ class Mailer extends BaseMailer
     public function getFrom(): string
     {
         $result = $this->getConfig()->getValue('trans_email/ident_general/email');
-        return !empty($result) && strpos($result, 'example.com') === false
+        return !empty($result) && !str_contains($result, 'example.com')
             ? $result
             : parent::getTo();
     }
@@ -86,7 +89,7 @@ class Mailer extends BaseMailer
     public function getTo(): string
     {
         $result = $this->getConfig()->getValue('trans_email/ident_general/email');
-        return !empty($result) && strpos($result, 'example.com') === false
+        return !empty($result) && !str_contains($result, 'example.com')
             ? $result
             : parent::getTo();
     }

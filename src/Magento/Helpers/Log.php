@@ -50,20 +50,13 @@ class Log extends BaseLog
      */
     protected function getMagentoSeverity(int $severity): int
     {
-        switch ($severity) {
-            case Severity::Exception:
-                return Logger::CRITICAL;
-            case Severity::Error:
-                return Logger::ERROR;
-            case Severity::Warning:
-                return Logger::WARNING;
-            case Severity::Notice:
-                return Logger::NOTICE;
-            case Severity::Info:
-                return Logger::INFO;
-            case Severity::Log:
-            default:
-                return Logger::DEBUG;
-        }
+        return match ($severity) {
+            Severity::Exception => Logger::CRITICAL,
+            Severity::Error => Logger::ERROR,
+            Severity::Warning => Logger::WARNING,
+            Severity::Notice => Logger::NOTICE,
+            Severity::Info => Logger::INFO,
+            default => Logger::DEBUG,
+        };
     }
 }

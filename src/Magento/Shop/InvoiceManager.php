@@ -11,7 +11,6 @@ use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoC
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Magento\Framework\Event\ManagerInterface;
 
 use function count;
 

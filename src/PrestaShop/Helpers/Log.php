@@ -42,18 +42,12 @@ class Log extends BaseLog
      */
     protected function getPrestaShopSeverity(int $severity): int
     {
-        switch ($severity) {
-            case Severity::Error:
-                return AbstractLogger::ERROR;
-            case Severity::Warning:
-                return AbstractLogger::WARNING;
-            case Severity::Notice:
-            case Severity::Info:
-                return AbstractLogger::INFO;
-            case Severity::Log:
-            default:
-                return AbstractLogger::DEBUG;
-        }
+        return match ($severity) {
+            Severity::Error => AbstractLogger::ERROR,
+            Severity::Warning => AbstractLogger::WARNING,
+            Severity::Notice, Severity::Info => AbstractLogger::INFO,
+            default => AbstractLogger::DEBUG,
+        };
     }
 
     protected function getLogger(): FileLogger

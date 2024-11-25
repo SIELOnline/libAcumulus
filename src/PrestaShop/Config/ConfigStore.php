@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection SensitiveParameter is PHP 8.2
+ */
 
 declare(strict_types=1);
 

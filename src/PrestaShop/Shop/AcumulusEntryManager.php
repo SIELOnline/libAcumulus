@@ -13,6 +13,8 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
+use function sprintf;
+
 /**
  * Implements the PrestaShop specific acumulus entry model class.
  *
@@ -52,12 +54,14 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $result = $this->getDb()->executeS(sprintf(
-            "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
-            $this->tableName,
-            pSQL($invoiceSource->getType()),
-            $invoiceSource->getId()
-        ));
+        $result = $this->getDb()->executeS(
+            sprintf(
+                "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
+                $this->tableName,
+                pSQL($invoiceSource->getType()),
+                $invoiceSource->getId()
+            )
+        );
         return $this->convertDbResultToAcumulusEntries($result, $ignoreLock);
     }
 
@@ -70,44 +74,55 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             $shopId = 0;
             $shopGroupId = 0;
         }
-        return $this->getDb()->execute(sprintf(
-            "INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES (%u, %u, %s, %s, '%s', %u, '%s')",
-            $this->tableName,
-            $shopId,
-            $shopGroupId,
-            $entryId === null ? 'null' : (string) $entryId,
-            $token === null ? 'null' : ("'" . pSQL($token) . "'"),
-            pSQL($invoiceSource->getType()),
-            $invoiceSource->getId(),
-            pSQL($created)
-        ));
+        return $this->getDb()->execute(
+            sprintf(
+                "INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES (%u, %u, %s, %s, '%s', %u, '%s')",
+                $this->tableName,
+                $shopId,
+                $shopGroupId,
+                $entryId === null ? 'null' : (string) $entryId,
+                $token === null ? 'null' : ("'" . pSQL($token) . "'"),
+                pSQL($invoiceSource->getType()),
+                $invoiceSource->getId(),
+                pSQL($created)
+            )
+        );
     }
 
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
-    {
+    protected function update(
+        BaseAcumulusEntry $entry,
+        ?int $entryId,
+        ?string $token,
+        int|string $updated,
+        ?Source $invoiceSource = null
+    ): bool {
         $record = $entry->getRecord();
-        return $this->getDb()->execute(sprintf(
-            "UPDATE `%s` SET id_entry = %s, token = %s, updated = '%s' WHERE id = %u",
-            $this->tableName,
-            $entryId === null ? 'null' : (string) $entryId,
-            $token === null ? 'null' : ("'" . pSQL($token) . "'"),
-            pSQL($updated),
-            $record['id']
-        ));
+        return $this->getDb()->execute(
+            sprintf(
+                "UPDATE `%s` SET id_entry = %s, token = %s, updated = '%s' WHERE id = %u",
+                $this->tableName,
+                $entryId === null ? 'null' : (string) $entryId,
+                $token === null ? 'null' : ("'" . pSQL($token) . "'"),
+                pSQL($updated),
+                $record['id']
+            )
+        );
     }
 
     public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
         $record = $entry->getRecord();
         /** @noinspection PhpUnhandledExceptionInspection */
-        return $this->getDb()->execute(sprintf(
-            'DELETE FROM `%s` WHERE id = %u',
-            $this->tableName,
-            $record['id']
-        ));
+        return $this->getDb()->execute(
+            sprintf(
+                'DELETE FROM `%s` WHERE id = %u',
+                $this->tableName,
+                $record['id']
+            )
+        );
     }
 
-    protected function sqlNow()
+    protected function sqlNow(): string
     {
         return date(Api::Format_TimeStamp);
     }
@@ -130,7 +145,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function install(): bool
     {
         return $this->getDb()->execute(
-        "CREATE TABLE IF NOT EXISTS `$this->tableName` (
+            "CREATE TABLE IF NOT EXISTS `$this->tableName` (
             `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
             `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
             `id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',

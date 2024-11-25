@@ -9,8 +9,6 @@ use Language;
 use Mail;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
-use Throwable;
-
 use function is_int;
 
 /**
@@ -28,6 +26,8 @@ class Mailer extends BaseMailer
      *   Success (true); error message, Throwable object or just false otherwise.
      *
      * @throws \PrestaShopException
+     * @noinspection PhpMixedReturnTypeCanBeReducedInspection
+     *    @todo: Type can be narrowed to bool|int|string
      */
     public function sendMail(
         string $from,

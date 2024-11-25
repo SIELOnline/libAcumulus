@@ -25,6 +25,7 @@ use Siel\Acumulus\Invoice\Totals;
 use Validate;
 
 use function is_array;
+use function sprintf;
 use function strlen;
 
 /**
@@ -98,6 +99,7 @@ class Source extends BaseSource
     /**
      * Returns the status of this credit note.
      *
+     * @noinspection PhpDocSignatureInspection PHP 8.2: null is a standalone type
      * @return null
      *   A credit note in PrestaShop does not have a state.
      *
@@ -166,7 +168,7 @@ class Source extends BaseSource
     {
         $currency = Currency::getCurrencyInstance($this->getOrder()->shopObject->id_currency);
         /** @noinspection PhpCastIsUnnecessaryInspection  conversion_rate contains the string representation of a float */
-        return new AcumulusCurrency($currency->iso_code, (float) 1.0 / $this->getShopObject()->conversion_rate, true);
+        return new AcumulusCurrency($currency->iso_code, 1.0 / $this->getShopObject()->conversion_rate, true);
     }
 
     /**

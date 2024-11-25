@@ -6,7 +6,6 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 
 use DateTimeInterface;
 use Db;
-use Hook;
 use Order;
 use OrderSlip;
 use RuntimeException;

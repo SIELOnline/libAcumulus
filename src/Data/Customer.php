@@ -6,9 +6,7 @@ namespace Siel\Acumulus\Data;
 
 use Error;
 use Siel\Acumulus\Api;
-
 use Siel\Acumulus\Fld;
-
 use Siel\Acumulus\Meta;
 
 use function assert;

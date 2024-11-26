@@ -96,7 +96,7 @@ abstract class AcumulusObject implements ArrayAccess
      */
     public function &__get(string $name)
     {
-        $this->checkIsProperty($name);
+        $name = $this->checkIsProperty($name);
         return $this->data[$name]->getValue();
     }
 
@@ -125,7 +125,7 @@ abstract class AcumulusObject implements ArrayAccess
      */
     public function __isset(string $name): bool
     {
-        $this->checkIsProperty($name);
+        $name = $this->checkIsProperty($name);
         return $this->data[$name]->getValue() !== null;
     }
 
@@ -174,30 +174,63 @@ abstract class AcumulusObject implements ArrayAccess
      */
     public function __unset(string $name): void
     {
-        $this->checkIsProperty($name);
+        $name = $this->checkIsProperty($name);
         $this->data[$name]->setValue(null);
     }
 
     /**
-     * Returns whether $name is an {@see AcumulusProperty} of this
-     * {@see AcumulusObject}
+     * Returns whether $name is an {@see AcumulusProperty} of this {@see AcumulusObject}.
+     *
+     * @param string $name
+     *   The name to search for.
      */
     public function isProperty(string $name): bool
     {
-        return array_key_exists($name, $this->data);
+        return $this->getPropertyName($name) !== null;
     }
 
     /**
-     * Checks whether  $name is an {@see AcumulusPorperty} of this
-     * {@see AcumulusObject}.
+     * Checks whether $name is an {@see AcumulusProperty} of this {@see AcumulusObject}.
+     *
+     * @param string $name
+     *   The name to search for, may be changed to its lowercase version if a property
+     *   exists in that form!
+     *
+     * @return string
+     *   The real name under which $name is stored as property.
      *
      * @throws \RuntimeException
      *   $name is not an existing property name.
      */
-    private function checkIsProperty(string $name): void
+    private function checkIsProperty(string $name): string
     {
-        if (!$this->isProperty($name)) {
+        $name = $this->getPropertyName($name);
+        if ($name === null) {
             throw new RuntimeException("Unknown property: $name");
+        }
+        return $name;
+    }
+
+    /**
+     * Returns the name under which $name is stored as an {@see AcumulusProperty} of this
+     * {@see AcumulusObject}.
+     *
+     * @param string $name
+     *   The name to search for, may be changed to its lowercase version if a property
+     *   exists in that form.
+     *
+     * @return null|string
+     *   The real name under which the property is stored, or null if $name is not a
+     *   property.
+     */
+    public function getPropertyName(string $name): ?string
+    {
+        if (array_key_exists($name, $this->data)) {
+            return $name;
+        } elseif (array_key_exists(strtolower($name), $this->data)) {
+            return strtolower($name);
+        } else {
+            return null;
         }
     }
 
@@ -222,7 +255,7 @@ abstract class AcumulusObject implements ArrayAccess
      */
     public function set(string $name, mixed $value, int $mode = PropertySet::Always): bool
     {
-        $this->checkIsProperty($name);
+        $name = $this->checkIsProperty($name);
         return $this->data[$name]->setValue($value, $mode);
     }
 

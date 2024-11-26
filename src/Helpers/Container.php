@@ -436,7 +436,7 @@ class Container
     /**
      * Creates a new adapter/wrapper object for the given invoice item line.
      *
-     * @param int|string|object|array $idOrItem
+     * @param int|string|object|array $itemOrId
      *   The shop specific order/refund item line or its id to create an
      *    {@see \Siel\Acumulus\Invoice\Item} instance for.
      * @param Source $source
@@ -445,15 +445,15 @@ class Container
      * @return \Siel\Acumulus\Invoice\Item
      *   A wrapper object around a shop specific invoice item line object.
      */
-    public function createItem(int|string|object|array $idOrItem, Source $source): Item
+    public function createItem(int|string|object|array $itemOrId, Source $source): Item
     {
-        return $this->getInstance('Item', 'Invoice', [$idOrItem, $source, $this], true);
+        return $this->getInstance('Item', 'Invoice', [$itemOrId, $source, $this], true);
     }
 
     /**
      * Creates a new adapter/wrapper object for the given product.
      *
-     * @param int|string|object|array $idOrItem
+     * @param int|string|object|array $producrOrId
      *   The shop specific product itself or its id to create a
      *   {@see \Siel\Acumulus\Product\Product} instance for.
      * @param Item|null $item
@@ -463,9 +463,9 @@ class Container
      * @return \Siel\Acumulus\Product\Product
      *   A wrapper object around a shop specific product object.
      */
-    public function createProduct(int|string|object|array $idOrItem, ?Item $item = null): Product
+    public function createProduct(int|string|object|array $producrOrId, ?Item $item = null): Product
     {
-        return $this->getInstance('Product', 'Product', [$idOrItem, $item, $this], true);
+        return $this->getInstance('Product', 'Product', [$producrOrId, $item, $this], true);
     }
 
     /**
@@ -489,7 +489,8 @@ class Container
     }
 
     /**
-     * Returns an instance of a {@see \Siel\Acumulus\Invoice\Completor} or {@see \Siel\Acumulus\Completors\BaseCompletor}
+     * Returns an instance of a {@see \Siel\Acumulus\Invoice\Completor} or
+     * {@see \Siel\Acumulus\Completors\BaseCompletor}
      *
      * @param string $dataType
      *   The data type to get the

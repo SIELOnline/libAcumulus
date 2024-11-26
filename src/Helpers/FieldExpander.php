@@ -221,6 +221,7 @@ class FieldExpander
     public function __construct(Log $log)
     {
         $this->log = $log;
+        $this->objects = [];
     }
 
     /**
@@ -253,15 +254,19 @@ class FieldExpander
      */
     public function expand(string $fieldSpecification, PropertySources $propertySources): mixed
     {
+        // @todo: Recursively calling expand while already expanding failed because this
+        //   class had "call state". Pass $objects along all methods or keep this solution?
+        $oldObjects = $this->objects;
         $this->objects = $propertySources->toArray();
         // If the specification contains exactly 1 field expansion specification
         // we return the direct result of {@see extractField()} so that the type
         // of that property is retained.
-        if (str_starts_with($fieldSpecification, '[') && strpos($fieldSpecification, ']') === strlen($fieldSpecification) - 1) {
-            return $this->expandSpecification(substr($fieldSpecification, 1, -1));
-        } else {
-            return preg_replace_callback('/\[([^]]+)]/', [$this, 'expansionSpecificationMatch'], $fieldSpecification);
-        }
+        $value = str_starts_with($fieldSpecification, '[')
+        && strpos($fieldSpecification, ']') === strlen($fieldSpecification) - 1
+            ? $this->expandSpecification(substr($fieldSpecification, 1, -1))
+            : preg_replace_callback('/\[([^]]+)]/', [$this, 'expansionSpecificationMatch'], $fieldSpecification);
+        $this->objects = $oldObjects;
+        return $value;
     }
 
     /**
@@ -563,9 +568,7 @@ class FieldExpander
     protected function getValueFromMethod(object $object, string $method, array $args): mixed
     {
         try {
-            return is_callable([$object, $method])
-                ? @$object->$method(...$args)
-                : null;
+            return is_callable([$object, $method]) ? @$object->$method(...$args) : null;
         } catch (Throwable) {
             return null;
         }

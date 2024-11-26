@@ -36,10 +36,10 @@ abstract class Product
      */
     protected ?Item $item;
 
-    public function __construct(int|string|object|array|null $idOrProduct, ?Item $item, Container $container)
+    public function __construct(int|string|object|array|null $productOrId, ?Item $item, Container $container)
     {
         $this->item = $item;
-        $this->initializeWrapper($idOrProduct, $container);
+        $this->initializeWrapper($productOrId, $container);
     }
 
     // @todo: Next phase: add methods that implement the adapter part: getReference(),

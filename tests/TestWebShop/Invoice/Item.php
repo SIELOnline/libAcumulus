@@ -24,7 +24,7 @@ class Item extends BaseItem
     {
         $this->shopObject = new stdClass();
         $this->shopObject->id = $this->id;
-        $this->shopObject->product_id = self::$productIds[$this->id];
+        $this->shopObject->product_id = self::$productIds[$this->id] ?? 1;
     }
 
     protected function setId(): void

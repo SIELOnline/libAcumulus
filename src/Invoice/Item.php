@@ -32,10 +32,10 @@ abstract class Item
      */
     protected ?Product $product;
 
-    public function __construct(int|string|object|array|null $idOrItem, Source $source, Container $container)
+    public function __construct(int|string|object|array|null $itemOrId, Source $source, Container $container)
     {
         $this->source = $source;
-        $this->initializeWrapper($idOrItem, $container);
+        $this->initializeWrapper($itemOrId, $container);
     }
 
     public function getSource(): Source

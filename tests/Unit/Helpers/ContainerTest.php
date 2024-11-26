@@ -226,9 +226,9 @@ class ContainerTest extends TestCase
         $container = new Container('TestWebShop');
         $object = $container->createSource(Source::Order, 1);
         $this->assertInstanceOf(Source::class, $object);
-        $object = $container->createItem(1, $object);
+        $object = $container->createItem(2, $object);
         $this->assertInstanceOf(Item::class, $object);
-        $object = $container->createProduct(1, $object);
+        $object = $container->createProduct(3, $object);
         $this->assertInstanceOf(Product::class, $object);
         $object = $container->getCompletor();
         $this->assertInstanceOf(Completor::class, $object);

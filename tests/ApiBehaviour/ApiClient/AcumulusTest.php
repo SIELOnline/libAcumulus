@@ -225,7 +225,7 @@ class AcumulusTest extends TestCase
 
     public function stockTransactionProvider(): array
     {
-        $productId = 1833636;
+        $productId = 1833641; // (trui bruin)
 
         $stockTransaction1 = new StockTransaction();
         $stockTransaction1->productId = $productId;

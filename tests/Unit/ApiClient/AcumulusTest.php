@@ -89,7 +89,7 @@ class AcumulusTest extends TestCase
             'emailInvoiceNotes' => ['emailInvoiceAsPdf', ['TOKEN', $emailInvoiceAsPdf, null, 'my notes'], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailAsPdf' => ['emailTo' => 'test@example.com'], 'invoicenotes' => 'my notes']],
             'emailPackingSlip' => ['emailPackingSlipAsPdf', ['TOKEN', $emailPackingslipAsPdf], 'delivery/packing_slip_mail_pdf', true, ['token' => 'TOKEN', 'emailAsPdf' => ['emailTo' => 'test@example.com']]],
             'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, ['signup' => ['companyname' => 'BR']]],
-            'stockTransaction' => ['stockTransaction', [$stockTransaction], 'stock/stock_add', true, ['stock' => ['productId' => 12345, 'stockAmount' => 1.0, 'stockDescription' => 'description', 'stockDate' => '2022-02-02']]],
+            'stockTransaction' => ['stockTransaction', [$stockTransaction], 'stock/stock_add', true, ['stock' => ['productid' => 12345, 'stockamount' => 1.0, 'stockDescription' => 'description', 'stockDate' => '2022-02-02']]],
         ];
     }
 

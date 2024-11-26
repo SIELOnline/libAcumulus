@@ -29,8 +29,8 @@ class Product extends BaseProduct
         $this->shopObject = new stdClass();
         $this->shopObject->id = $this->id;
         $this->shopObject->name = 't-shirt groen';
-        $this->shopObject->sku = self::$references[$this->id];
-        $this->shopObject->ean = self::$references[$this->id];
+        $this->shopObject->sku = self::$references[$this->id] ?? 'my-sku';
+        $this->shopObject->ean = self::$references[$this->id] ?? 'my-ean';
     }
 
     protected function setId(): void

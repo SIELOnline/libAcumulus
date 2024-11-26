@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Product\StockTransactionResult;
@@ -46,8 +47,9 @@ class StockTransactionCollector extends Collector
                 try {
                     $acumulusProduct = $this->getContainer()->getProductManager()->getAcumulusProductByReference($reference);
                     if ($acumulusProduct !== null) {
-                        $productId = (int) $acumulusProduct['productid'];
+                        $productId = (int) $acumulusProduct[Fld::ProductId];
                         $acumulusObject->productId = $productId;
+                        $acumulusObject->metadataSet(Meta::AcumulusProductIdSource, 'remote');
                         /** @var \Siel\Acumulus\Product\Product $product */
                         $product = $propertySources->get('product');
                         $product->setAcumulusId($productId);
@@ -63,6 +65,8 @@ class StockTransactionCollector extends Collector
                 $localResult->createAndAddMessage('Empty search reference', Severity::Error);
                 $localResult->setSendStatus(StockTransactionResult::NotSent_NoMatchValueInProduct);
             }
+        } else {
+            $acumulusObject->metadataSet(Meta::AcumulusProductIdSource, 'local');
         }
     }
 }

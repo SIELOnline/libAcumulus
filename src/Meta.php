@@ -262,23 +262,23 @@ interface Meta
     /**
      * Completor: Possible vat types for this line.
      */
-    public const VatTypesPossible = 'meta-vattypes-possible';
+    public const VatTypesPossible = 'meta-vat-types-possible';
     /**
      * Completor: Possible vat types for this invoice (and shop settings).
      */
-    public const VatTypesPossibleInvoice = 'meta-vattypes-possible-invoice';
+    public const VatTypesPossibleInvoice = 'meta-vat-types-possible-invoice';
     /**
      * Completor: Union of possible vat types for the invoice lines.
      */
-    public const VatTypesPossibleInvoiceLinesUnion = 'meta-vattypes-possible-lines-union';
+    public const VatTypesPossibleInvoiceLinesUnion = 'meta-vat-types-possible-lines-union';
     /**
      * Completor: Intersection of possible vat types for the invoice lines.
      */
-    public const VatTypesPossibleInvoiceLinesIntersection = 'meta-vattypes-possible-lines-intersection';
+    public const VatTypesPossibleInvoiceLinesIntersection = 'meta-vat-types-possible-lines-intersection';
     /**
      * Completor: Where was the choice for the vat type made?
      */
-    public const VatTypeSource = 'meta-vattype-source';
+    public const VatTypeSource = 'meta-vat-type-source';
 
     // Line: Parent - Children related meta tags.
     /**
@@ -373,6 +373,11 @@ interface Meta
     public const ChildSameAsParent = 'meta-child-same-as-parent';
 
     // Stock transaction.
+    /**
+     * Support: source of the Acumulus product id when adding a stock transaction: 'local'
+     * or 'remote'.
+     */
+    public const AcumulusProductIdSource = 'meta-acumulus-product-id-source';
     /**
      * Collector: field specification of the field, property, method, meta field, or
      * whatever, that contains the product reference used to match against the Acumulus

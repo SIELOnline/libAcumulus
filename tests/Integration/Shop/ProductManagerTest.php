@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Tests\Integration\Shop;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\Product\StockTransactionResult;
 use Siel\Acumulus\Shop\ProductManager;
 use PHPUnit\Framework\TestCase;
@@ -76,9 +77,11 @@ class ProductManagerTest extends TestCase
             self::assertSame($acumulusProductIdOrError, $result->getSendStatus());
         } else {
             self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
+            self::assertSame($result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource], 'remote');
             $stockAmount = $result->getMainApiResponse()[Fld::StockAmount];
             $result = $productManager->updateStockForItem($item, -4, __METHOD__);
             self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
+            self::assertSame($result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource], 'local');
             self::assertSame($stockAmount - 4.0, (float) $result->getMainApiResponse()[Fld::StockAmount]);
         }
         $config->set('productMatchShopField', $productMatchShopField);

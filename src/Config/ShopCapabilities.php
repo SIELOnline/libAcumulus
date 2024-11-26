@@ -406,7 +406,7 @@ abstract class ShopCapabilities
      *   An array of product fields, with the key being a mapping,
      *   and the value being the label of that field in Product forms or lists.
      */
-    public function getProductMatchFields(): array
+    public function getProductMatchShopFields(): array
     {
         if (!$this->hasStockManagement()) {
             return [];

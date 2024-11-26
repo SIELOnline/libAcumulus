@@ -93,7 +93,7 @@ abstract class Product
      */
     public function getReferenceForAcumulusLookup(): int|string|null
     {
-        return $this->expandField($this->getConfig()->get('productMatchField'));
+        return $this->expandField($this->getConfig()->get('productMatchShopField'));
     }
 
 //    /**

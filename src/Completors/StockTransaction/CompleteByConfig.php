@@ -28,6 +28,7 @@ class CompleteByConfig extends BaseCompletorTask
      */
     public function complete(AcumulusObject $acumulusObject, ...$args): void
     {
-        $acumulusObject->metadataSet(Meta::MatchFieldSpecification, $this->configGet('productMatchField'));
+        $acumulusObject->metadataSet(Meta::MatchShopFieldSpecification, $this->configGet('productMatchShopField'));
+        $acumulusObject->metadataSet(Meta::MatchAcumulusField, $this->configGet('productMatchAcumulusField'));
     }
 }

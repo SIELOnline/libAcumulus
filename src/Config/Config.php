@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection SensitiveParameter is PHP 8.2
  * @noinspection SelfClassReferencingInspection
  *   I prefer to refer to these constants as Config constants, and so, for me,
  *   it is irrelevant that this happens to be the Config class.
@@ -30,8 +31,7 @@ use const Siel\Acumulus\Version;
 /**
  * Provides uniform access to the settings of libAcumulus.
  *
- * Configuration is stored in the host environment bridged via the ConfigStore
- * class.
+ * Configuration is stored in the host environment bridged via the ConfigStore class.
  *
  * @todo: New settings:
  *   - EmailAsPdf: gfx
@@ -797,7 +797,12 @@ class Config
                     'type'=> 'bool',
                     'default' => false,
                 ],
-                'productMatchField' => [
+                'productMatchShopField' => [
+                    'group' => Fld::Product,
+                    'type'=> 'string',
+                    'default' => '',
+                ],
+                'productMatchAcumulusField' => [
                     'group' => Fld::Product,
                     'type'=> 'string',
                     'default' => '',

@@ -40,7 +40,7 @@ class StockTransactionCollector extends Collector
         /** @var \Siel\Acumulus\Product\StockTransactionResult $localResult */
         $localResult = $propertySources->get('localResult');
         if (empty($acumulusObject->productId)) {
-            $reference = $acumulusObject->metadataGet(Meta::MatchFieldValue);
+            $reference = $acumulusObject->metadataGet(Meta::MatchShopValue);
             if (!empty($reference)) {
                 // Try to look up the product at Acumulus.
                 try {

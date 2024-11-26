@@ -381,18 +381,28 @@ interface Meta
      * Note that the product picklist filters against product id, description, type, SKU,
      * EAN and price of the product.
      */
-    public const MatchFieldSpecification = 'meta-match-field-name';
+    public const MatchShopFieldSpecification = 'meta-match-shop-field';
     /**
      * Collector: expanded value of the field specification that thus should contain the
      * product reference used to match against the Acumulus catalogue.
      *
-     * Note that the product picklist filters against product id, description, type, SKU,
-     * EAN and price of the product.
-     *
-     * This value should result in exactly 1 product when used as filter for the product
-     * picklist. Unfortunately the product picklist filters strings on "contains" not on
-     * being equal, thus a SKU that also appears as a substring in another SKU gives
-     * multiple results.
+     * Note that the product picklist filters against the filter being contained in one of
+     * the fields: product id, description, nature, SKU, EAN or price of the product.
      */
-    public const MatchFieldValue = 'meta-match-field-value';
+    public const MatchShopValue = 'meta-match-shop-value';
+    /**
+     * Collector: Name of the Acumulus field to match against.
+     *
+     * The value in {@see Meta::MatchAcumulusField}, being the result of expanding
+     * {@see Meta::MatchShopFieldSpecification}, should ideally result in exactly 1
+     * product when used as filter for the product picklist. Unfortunately, the product
+     * picklist filters strings on "contains" not on being equal, thus a SKU that also
+     * appears as a substring in another SKU or as an EAN gives multiple results.
+     *
+     * To get the correct match if multiple results are returned, it is possible to
+     * specify on which field should be filtered. This is a filter on top of the product
+     * pick list filter form the API and filters on full string equality, not contained
+     * in.
+     */
+    public const MatchAcumulusField = 'meta-match-acumulus-field';
 }

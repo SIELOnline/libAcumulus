@@ -136,9 +136,23 @@ interface Fld
 
     public const CountryRegion = 'countryRegion';
 
+    // Product (on receiving a product, so all lower case, note that empty strings are
+    // represented as an empty array).
+    public const ProductId = 'productid';
+    public const ProductNature = 'productnature';
+    public const ProductDescription = 'productdescription';
+    public const ProductTagId = 'producttagid';
+    public const productContactId = 'productcontactid';
+    public const ProductPrice = 'productprice';
+    public const ProductVatRate = 'productvatrate';
+    public const ProductSku = 'productsku';
+    public const ProductEan = 'productean';
+    public const ProductHash = 'producthash';
+    public const ProductNotes = 'productnotes';
+    public const ProductStockAmount = 'productstockamount';
+
     // Stock
-    public const ProductId = 'productId';
-    public const StockAmount = 'stockAmount';
+    public const StockAmount = 'stockamount';
     public const StockDescription = 'stockDescription';
     public const StockDate = 'stockDate';
 }

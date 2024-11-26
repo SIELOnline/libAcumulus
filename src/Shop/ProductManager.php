@@ -8,6 +8,7 @@ use Siel\Acumulus\ApiClient\AcumulusErrorException;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\StockTransaction;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
@@ -73,9 +74,34 @@ class ProductManager
     }
 
     /**
-     * Description.
+     * Returns the fields in Acumulus that can be used to match against.
      *
-     * @param string $reference
+     * @return array
+     *   Array keyed by the field names as returned by the product picklist API and that
+     *   are used to filter against. The values are a bool:
+     *   - true: recommended
+     *   - false: not recommended
+     *   and can be used in form help texts.
+     */
+    public function getMatchAcumulusFields(): array
+    {
+        return [
+            Fld::ProductSku,
+            Fld::ProductEan,
+            Fld::ProductDescription,
+        ];
+    }
+
+    /**
+     * Returns the Acumulus product that matches the given reference.
+     *
+     * The product matching strategy:
+     * - If the 'productMatchAcumulusField' setting is not empty:
+     *   The product that has an exact match with $reference in the field specified by the
+     *   'productMatchAcumulusField' setting.
+     * - If the 'productMatchAcumulusField' setting is empty:
+     *   The product that has a partial match on $reference in one of the fields used to
+     *   filter by the product picklist API call.
      *
      * @return array|null
      *   A "product" array being a keyed array with keys:
@@ -99,30 +125,63 @@ class ProductManager
     {
         // Try to look up the product at Acumulus.
         $acumulus = $this->getContainer()->getAcumulusApiClient();
-        // Limit results to max. 2 to prevent very large response in case of a filter that
-        // matches too many products.
-        $result = $acumulus->getPicklistProducts($reference, 2);
-        if (!$result->hasError()) {
-            $products = $result->getMainAcumulusResponse();
-            if (count($products) === 0) {
-                // No match.
-                return null;
-            } elseif (count($products) === 1) {
-                // 1 match.
-                return $products[0];
-            } else {
-                // Multiple matches.
-                throw new UnexpectedValueException(
-                    sprintf(
-                        'Search for reference "%s" resulted in at least 2 products ("%s" and "%s")',
-                        $reference,
-                        $products[0]['productdescription'],
-                        $products[1]['productdescription']
-                    )
-                );
-            }
-        } else {
+        $result = $acumulus->getPicklistProducts($reference);
+        if ($result->hasError()) {
             throw new AcumulusErrorException($result);
+        }
+
+        return $this->matchAcumulusProductInList($result->getMainAcumulusResponse(), $reference);
+    }
+
+    /**
+     * Extracts 1 product from a list of products based on filter and
+     * 'productMatchAcumulusField' setting.
+     */
+    protected function matchAcumulusProductInList(array $products, string $reference): ?array
+    {
+        // What to return depends on the 'productMatchAcumulusField' setting:
+        $acumulusField = $this->getConfig()->get('productMatchAcumulusField');
+        return $acumulusField !== ''
+            ? $this->getAcumulusProductByExactMatch($products, $acumulusField, $reference)
+            : $this->getSingleProduct($products, $reference);
+    }
+
+    protected function getAcumulusProductByExactMatch(array $products, mixed $acumulusField, string $reference): ?array
+    {
+        $matchingProducts = [];
+        foreach ($products as $product) {
+            if ($product[$acumulusField] === $reference) {
+                $matchingProducts[] = $product;
+            }
+        }
+        return $this->getSingleProduct($matchingProducts, $reference);
+    }
+
+    /**
+     * @return array|null
+     *   - The single product in $products if $products contains exactly 1 product
+     *   - null if $products is empty.
+     *
+     * @throws \UnexpectedValueException  $products contains more than 1 product.
+     */
+    protected function getSingleProduct(array $products, string $reference): ?array
+    {
+        if (count($products) === 0) {
+            // No match.
+            return null;
+        } elseif (count($products) === 1) {
+            // 1 match.
+            return $products[0];
+        } else {
+            // Multiple matches.
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Search for reference "%s" resulted in at least 2 products ("%s" and "%s")',
+                    $reference,
+                    $products[0][Fld::ProductDescription],
+                    $products[1][Fld::ProductDescription]
+                )
+            );
         }
     }
 

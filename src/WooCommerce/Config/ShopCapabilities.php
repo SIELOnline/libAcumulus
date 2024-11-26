@@ -354,7 +354,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return true;
     }
 
-    public function getProductMatchFields(): array
+    public function getProductMatchShopFields(): array
     {
         return [
             '[product::getShopObject()::get_sku()]' => __('SKU', 'woocommerce'),
@@ -366,7 +366,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDefaultShopConfig(): array
     {
         return [
-            'productMatchField' => array_key_first($this->getProductMatchFields()),
+            'productMatchShopField' => array_key_first($this->getProductMatchShopFields()),
+            'productMatchAcumulusField' => Fld::ProductSku,
         ];
     }
 

@@ -4,20 +4,27 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\TestWebShop\Invoice;
 
-use RuntimeException;
 use Siel\Acumulus\Invoice\Item as BaseItem;
 use Siel\Acumulus\Product\Product;
+use stdClass;
 
 /**
- * Item is the TestWebShop specific class to wrap an product item.
+ * Item is the TestWebShop specific class to wrap a product item line.
  */
 class Item extends BaseItem
 {
+    private static array $productIds = [
+        3 => 13,
+        4 => 14,
+        5 => 15,
+        6 => 16,
+    ];
+
     protected function setShopObject(): void
     {
-        $this->shopObject = new \stdClass();
+        $this->shopObject = new stdClass();
         $this->shopObject->id = $this->id;
-        $this->shopObject->product_id = 3;
+        $this->shopObject->product_id = self::$productIds[$this->id];
     }
 
     protected function setId(): void

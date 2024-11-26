@@ -76,7 +76,7 @@ use function get_class;
  */
 class ContainerTest extends TestCase
 {
-    protected function getContainer(string $namespace): Container
+    private function getContainer(string $namespace): Container
     {
         return new Container($namespace, 'en');
     }

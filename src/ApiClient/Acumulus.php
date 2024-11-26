@@ -264,7 +264,7 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function getPicklistProducts(?string $filter = null, ?int $rowcount = null, ?int $offset = null, ?int $productTagId = null): AcumulusResult
+    public function getPicklistProducts(?string $filter = null, ?int $offset = null, ?int $rowcount = null, ?int $productTagId = null): AcumulusResult
     {
         $filters = [];
         if ($filter !== null) {

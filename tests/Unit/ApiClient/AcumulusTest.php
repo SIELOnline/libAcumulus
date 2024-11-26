@@ -73,7 +73,7 @@ class AcumulusTest extends TestCase
             'Products' => ['getPicklistProducts', [], 'picklists/picklist_products', true, []],
             'ProductsFilter' => ['getPicklistProducts', ['test'], 'picklists/picklist_products', true, ['filter' => 'test']],
             'ProductsTag' => ['getPicklistProducts', [null, null, null, 0], 'picklists/picklist_products', true, ['producttagid' => 0]],
-            'ProductsSegment' => ['getPicklistProducts', [null, 10, 40], 'picklists/picklist_products', true, ['offset' => 40, 'rowcount' => 10]],
+            'ProductsSegment' => ['getPicklistProducts', [null, 40, 10], 'picklists/picklist_products', true, ['offset' => 40, 'rowcount' => 10]],
             'VatInfo' => ['getVatInfo', ['nl'], 'lookups/lookup_vatinfo', true, ['vatcountry' => 'nl', 'vatdate' => date(Api::DateFormat_Iso)]],
             'EuThreshold' => ['reportThresholdEuCommerce', [], 'reports/report_threshold_eu_ecommerce', true, []],
             'EuThresholdYear' => ['reportThresholdEuCommerce', [2021], 'reports/report_threshold_eu_ecommerce', true, ['year' => 2021]],

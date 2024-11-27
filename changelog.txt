@@ -4,7 +4,7 @@ Changelog Acumulus web shop extensions
 This file contains a historical overview of changes in our own code.
 
 
-8.3.6 (2024-1?-??)
+8.3.6 (2024-11-27)
 ------------------
 Bugs:
 - ALL: TypeError: Siel\Acumulus\Helpers\Form::getAboutBlock(): Argument #1
@@ -22,11 +22,12 @@ Bugs:
 
 Testing:
 - Added integration tests for our forms (creation, field definitions and rendering). This
-  should help preventing bugs like the TypeError in the FormRenderer (see above).
+  might help preventing bugs like the TypeError in the FormRenderer (see above).
 
 Refactorings:
 - Basic submit structure now created and collected as an AcumulusObject.
 - Basic stock management added but not yet operational.
+- A lot of ongoing refactorings: clean-up, removing old example code, ...
 
 8.3.5 (2024-11-01) (WC) (actually: all shops that use our own form renderer)
 -----------------------

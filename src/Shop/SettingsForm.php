@@ -53,8 +53,6 @@ class SettingsForm extends BaseConfigForm
 
     /**
      * Validates fields in the account settings fieldset.
-     *
-     * @noinspection InvertedIfElseConstructsInspection
      */
     protected function validateAccountFields(): void
     {

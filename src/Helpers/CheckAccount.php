@@ -106,8 +106,8 @@ class CheckAccount extends MessageCollection
      * @return null|bool|string
      *   - null: (some) credentials are empty
      *   - true: credentials are correct
-     *   - false: credentials are incorrect and $returnMessage = false
-     *   - string: credentials are incorrect and $returnMessage = true
+     *   - false: credentials are incorrect: no message demanded
+     *   - string: credentials are incorrect: error message
      *
      */
     public function getAccountStatus(bool $returnMessage = false): null|bool|string

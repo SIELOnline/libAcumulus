@@ -559,6 +559,9 @@ abstract class Form extends MessageCollection
      *   - true: credentials are correct
      *   - false: credentials are incorrect and $returnMessage = false
      *   - string: credentials are incorrect and $returnMessage = true
+     *
+     *  @ntodo  $accountStatus is being too complex (null|bool|string) => refactor into a
+     *    small object/array
      */
     protected function getAccountStatus(bool $returnMessage = false): null|bool|string
     {

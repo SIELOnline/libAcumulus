@@ -459,7 +459,6 @@ class InvoiceStatusForm extends Form
 
     /**
      * {@inheritdoc}
-     * @noinspection InvertedIfElseConstructsInspection
      *
      * @throws \Exception
      */
@@ -590,8 +589,6 @@ class InvoiceStatusForm extends Form
      *   - 'statusField' (array): a form field array representing the status.
      *
      * @throws \Exception
-     *
-     * @noinspection InvertedIfElseConstructsInspection
      */
     protected function getInvoiceInfo(Source $source, ?AcumulusEntry &$localEntry): array
     {

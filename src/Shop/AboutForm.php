@@ -111,11 +111,11 @@ class AboutForm
     /**
      * Returns the "About" block.
      *
-     *
-     * @param bool|null $accountStatus
-     *   null: no account data set.
-     *   false: incorrect account data set.
-     *   true: correct account data set.
+     * @param null|bool|string $accountStatus
+     *   - null: (some) credentials are empty
+     *   - true: credentials are correct
+     *   - false: credentials are incorrect: no message demanded
+     *   - string: credentials are incorrect: error message
      * @param string $wrapperType
      *   The type of wrapper around this block: 'fieldset' or 'details'.
      *
@@ -124,7 +124,7 @@ class AboutForm
      *
      * @todo: sanitise external data (i.e. data coming from server)
      */
-    public function getAboutBlock(?bool $accountStatus, string $wrapperType): array
+    public function getAboutBlock(null|bool|string $accountStatus, string $wrapperType): array
     {
         $this->loadAboutFormTranslations();
         $fields = [];
@@ -142,7 +142,7 @@ class AboutForm
         ];
 
         $proSupportList = $this->getProSupportList($accountStatus);
-        if ($accountStatus) {
+        if ($accountStatus === true) {
             $fields['proSupportListHeader'] = [
                 'type' => 'markup',
                 'value' => '<h3>' . $this->t('pro_support_list_header') . '</h3>',
@@ -235,10 +235,11 @@ class AboutForm
     }
 
     /**
-     * @param bool|null $accountStatus
-     *   null: no account data set.
-     *   false: incorrect account data set.
-     *   true: correct account data set.
+     * @param null|bool|string $accountStatus
+     *   - null: (some) credentials are empty
+     *   - true: credentials are correct
+     *   - false: credentials are incorrect: no message demanded
+     *   - string: credentials are incorrect: error message
      *
      * @return string[]
      *   Array of strings with:
@@ -246,16 +247,14 @@ class AboutForm
      *   - set of info lines keyed by their label.
      *   - last index: name known for the contract or a general string like
      *     '[your name]'.
-     *
-     * @noinspection InvertedIfElseConstructsInspection
      */
-    protected function getContractList(?bool $accountStatus): array
+    protected function getContractList(null|bool|string $accountStatus): array
     {
         $contractContact = $this->t('your_name');
         $myData = $this->getMyData($accountStatus);
         if ($myData === null) {
             $contract = [$this->t('no_contract_data_local')];
-        } elseif ($myData === false) {
+        } elseif ($myData === false || is_string($myData)) {
             $contract = [$this->t('no_contract_data')];
         } else {
             $contract = [''];
@@ -303,10 +302,11 @@ class AboutForm
     }
 
     /**
-     * @param bool|null $accountStatus
-     *   null: no account data set.
-     *   false: incorrect account data set.
-     *   true: correct account data set.
+     * @param null|bool|string $accountStatus
+     *   - null: (some) credentials are empty
+     *   - true: credentials are correct
+     *   - false: credentials are incorrect: no message demanded
+     *   - string: credentials are incorrect: error message
      *
      * @return array
      *   A, possibly empty, list of active support tokens. Format will be
@@ -315,13 +315,13 @@ class AboutForm
      *
      * @todo: expired support seems to be present in the mysupport response value anyway.
      */
-    protected function getProSupportList(?bool $accountStatus): array
+    protected function getProSupportList(null|bool|string $accountStatus): array
     {
         $proSupportList = [];
         $myData = $this->getMyData($accountStatus);
         if ($myData === null) {
             $proSupportList[] = $this->t('no_contract_data_local');
-        } elseif ($myData === false) {
+        } elseif ($myData === false || is_string($myData)) {
             $proSupportList[] = $this->t('no_contract_data');
         } elseif (empty($myData['mysupport'])) {
             $proSupportList[] = $this->t('no_pro_support');
@@ -357,15 +357,14 @@ class AboutForm
 
     /**
      * @param bool|null $accountStatus
-     *   null: no account data set.
-     *   false: incorrect account data set.
-     *   true: correct account data set.
+     *   - null: (some) credentials are empty
+     *   - true: credentials are correct
+     *   - false: credentials are incorrect: no message demanded
+     *   - string: credentials are incorrect: error message
      *
      * @return array
-     *
-     * @noinspection InvertedIfElseConstructsInspection
      */
-    protected function getEuCommerceInfo(?bool $accountStatus): array
+    protected function getEuCommerceInfo(null|bool|string $accountStatus): array
     {
         $euCommerceMessage = '';
         $warningPercentage = $this->getAcumulusConfig()->getInvoiceSettings()['euCommerceThresholdPercentage'];
@@ -374,7 +373,7 @@ class AboutForm
             if ($accountStatus === null) {
                 $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), $percentage, 'warning');
                 $euCommerceMessage = $this->t('no_contract_data_local');
-            } elseif ($accountStatus === false) {
+            } elseif ($accountStatus === false || is_string($accountStatus)) {
                 $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), $percentage, 'warning');
                 $euCommerceMessage = $this->t('no_contract_data');
             } else {
@@ -450,16 +449,17 @@ class AboutForm
     }
 
     /**
-     * @param bool|null $accountStatus
-     *   null: no account data set.
-     *   false: incorrect account data set.
-     *   true: correct account data set.
+     * @param null|bool|string $accountStatus
+     *   - null: (some) credentials are empty
+     *   - true: credentials are correct
+     *   - false: credentials are incorrect: no message demanded
+     *   - string: credentials are incorrect: error message
      *
-     * @return array|false|null
+     * @return null|bool|string|array
      *   If $accountStatus = true, the my_data array as returned from the
      *   my_acumulus web API call, the $accountStatus otherwise.
      */
-    public function getMyData(?bool $accountStatus): bool|array|null
+    public function getMyData(null|bool|string $accountStatus): null|bool|string|array
     {
         static $myData = null;
         if ($myData === null) {

@@ -326,7 +326,8 @@ class CompletorInvoiceLines
                     if (!$this->getUniqueVatRate($line[Meta::VatRateLookupMatches]) && !empty($line[Meta::VatRateRangeMatches])) {
                         $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByVatRates(
                             $line[Meta::VatRateRangeMatches],
-                            $line[Meta::VatRateLookupMatches]);
+                            $line[Meta::VatRateLookupMatches]
+                        );
                         $vatRateSource = VatRateSource::Completor_Range_Lookup;
                     }
 
@@ -411,8 +412,8 @@ class CompletorInvoiceLines
                     } elseif (isset($line[Meta::VatAmount])) {
                         $line[Fld::UnitPrice] = $line[Meta::UnitPriceInc] - $line[Meta::VatAmount];
                     } // else {
-                        // We cannot fill in unit price reliably, so better to
-                        // leave it empty and fail clearly.
+                    //     We cannot fill in unit price reliably, so better to
+                    //     leave it empty and fail clearly.
                     // }
                     $fieldsCalculated[] = Fld::UnitPrice;
                 }
@@ -435,8 +436,8 @@ class CompletorInvoiceLines
                     } elseif (isset($line[Meta::VatAmount])) {
                         $line[Meta::UnitPriceInc] = $line[Fld::UnitPrice] + $line[Meta::VatAmount];
                     } // else {
-                        // We cannot fill in unit price inc reliably, so we
-                        // leave it empty as it is metadata after all.
+                    //     We cannot fill in unit price inc reliably, so we
+                    //     leave it empty as it is metadata after all.
                     // }
                     $fieldsCalculated[] = Meta::UnitPriceInc;
                 }
@@ -615,6 +616,7 @@ class CompletorInvoiceLines
         $maxVatRate = -1.0;
         foreach ($lines as $key => $line) {
             if (isset($line[Fld::VatRate]) && (float) $line[Fld::VatRate] > $maxVatRate) {
+                /** @noinspection CallableParameterUseCaseInTypeContextInspection will always be an int */
                 $index = $key;
                 $maxVatRate = (float) $line[Fld::VatRate];
             }
@@ -783,8 +785,7 @@ class CompletorInvoiceLines
                         ? $line[Meta::LineDiscountAmount]
                         : $line[Meta::LineDiscountAmount] * (100.0 + $line[Fld::VatRate]) / 100.0;
                     $fieldsCalculated[] = Meta::LineDiscountAmountInc;
-                }
-                elseif (isset($line[Meta::LineDiscountVatAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
+                } elseif (isset($line[Meta::LineDiscountVatAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
                     $line[Meta::LineDiscountAmountInc] = $line[Meta::LineDiscountVatAmount]
                         / $line[Fld::VatRate] * (100 + $line[Fld::VatRate]);
                     $fieldsCalculated[] = Meta::LineDiscountAmountInc;

@@ -65,6 +65,14 @@ trait AcumulusObjectMetadataTrait
     }
 
     /**
+     * See {@see \Siel\Acumulus\Data\MetadataCollection::addMultiple()}.
+     */
+    public function metadataAddMultiple(string $name, array$values): void
+    {
+        $this->getMetadata()->addMultiple($name, $values);
+    }
+
+    /**
      * Returns the metadata as a keyed array.
      *
      * @return string[]

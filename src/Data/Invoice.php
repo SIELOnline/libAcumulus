@@ -11,6 +11,8 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
+use function is_int;
+
 /**
  * Represents an Acumulus API Invoice object.
  *
@@ -95,6 +97,7 @@ class Invoice extends AcumulusObject
         ];
     }
 
+    // @todo: let it fail if customer is not yet set? introduce isCustomerSet?
     public function getCustomer(): ?Customer
     {
         return $this->customer;
@@ -122,6 +125,23 @@ class Invoice extends AcumulusObject
         }
     }
 
+    /**
+     * @todo: unit test
+     */
+    public function removeLine(int|Line $line): void
+    {
+        if (is_int($line)) {
+            unset($this->lines[$line]);
+        } else {
+            foreach ($this->lines as $index => $invoiceLine) {
+                if ($invoiceLine === $line) {
+                    unset($this->lines[$index]);
+                    break;
+                }
+            }
+        }
+    }
+
     public function removeLines(): void
     {
         $this->lines = [];
@@ -143,7 +163,7 @@ class Invoice extends AcumulusObject
         if (!$hasWarning) {
             foreach ($this->getLines() as $line) {
                 if ($line->hasWarning()) {
-                    $hasWarning  = true;
+                    $hasWarning = true;
                     break;
                 }
             }

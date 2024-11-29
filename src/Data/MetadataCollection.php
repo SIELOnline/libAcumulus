@@ -81,19 +81,6 @@ class MetadataCollection
     }
 
     /**
-     * Sets a set of metadata fields.
-     *
-     * @param array $values
-     *   An array keyed by the names of the metadata field to set.
-     */
-    public function setMultiple(array $values): void
-    {
-        foreach ($values as $name => $value) {
-            $this->set($name, $value);
-        }
-    }
-
-    /**
      * Adds a value to a metadata field, creating it if it not already exists.
      *
      * - If the metadata name does not already exist, it will be set to this
@@ -105,9 +92,9 @@ class MetadataCollection
      * @param string $name
      *   The name for the metadata field.
      * @param mixed $value
-     *   The value to add to (or set for) the metadata field.
-     *   If you can pass null with $isList = true for a new metadata value, it is assumed
-     *   that you want to create an empty list, not a list with null as first value.
+     *   The value to add to (or set for) the metadata field. If $isList = true and this
+     *   is a new metadata value and $value is null: an empty list is created (not a list
+     *   with null as first value).
      * @param bool $isList
      *   Whether to handle this metadata field as a list (if it has only 1 value).
      */
@@ -120,6 +107,21 @@ class MetadataCollection
             }
         }
         $this->metadata[$name]->add($value);
+    }
+
+    /**
+     * Sets a set of metadata fields.
+     *
+     * @param string $name
+     *   The name for the metadata field.
+     * @param array $values
+     *   The values to add to the metadata field.
+     */
+    public function addMultiple(string $name, array $values): void
+    {
+        foreach ($values as $value) {
+            $this->add($name, $value, true);
+        }
     }
 
     public function toArray(): array

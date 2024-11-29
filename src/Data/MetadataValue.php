@@ -107,8 +107,8 @@ class MetadataValue
      */
     public function add(mixed $value): static
     {
-        // Note: we do not cast recursively if an array is passed, we that casting was
-        // done when constructing the array.
+        // Note: we do not cast recursively if an array is passed, we assume that casting
+        // was done when constructing the array.
         $this->value[] = Number::castNumericValue($value);
         return $this;
     }

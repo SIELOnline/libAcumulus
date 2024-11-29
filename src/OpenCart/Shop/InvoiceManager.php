@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
- * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
- */
 
 declare(strict_types=1);
 
@@ -52,7 +48,7 @@ class InvoiceManager extends BaseInvoiceManager
     {
         $key = $this->tableInfo[$sourceType]['key'];
         /** @var \stdClass $result (documentation error in DB) */
-        $result = $this->getDb()->query(
+        $result = $this->getRegistry()->db->query(
             sprintf(
                 'SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u',
                 $key,
@@ -69,7 +65,7 @@ class InvoiceManager extends BaseInvoiceManager
     {
         $key = $this->tableInfo[$sourceType]['key'];
         /** @var \stdClass $result (documentation error in class DB) */
-        $result = $this->getDb()->query(
+        $result = $this->getRegistry()->db->query(
             sprintf(
                 "SELECT `%s` FROM `%s` WHERE `date_modified` BETWEEN '%s' AND '%s'",
                 $key,
@@ -79,16 +75,6 @@ class InvoiceManager extends BaseInvoiceManager
             )
         );
         return $this->getSourcesByIdsOrSources($sourceType, array_column($result->rows, $key));
-    }
-
-    /**
-     * Wrapper method to get {@see Registry::$db}.
-     *
-     * @return \Opencart\System\Library\DB|\DB
-     */
-    protected function getDb()
-    {
-        return $this->getRegistry()->db;
     }
 
     /**

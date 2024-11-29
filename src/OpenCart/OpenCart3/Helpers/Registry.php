@@ -8,13 +8,15 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\OpenCart3\Helpers;
 
+use Siel\Acumulus\OpenCart\Helpers\Registry as BaseRegistry;
+
 use function defined;
 use function strlen;
 
 /**
  * OC3 specific Registry code.
  */
-class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
+class Registry extends BaseRegistry
 {
     public function getRoute(string $method, string $extension = 'acumulus', string $extensionType = 'module'): string
     {

@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMultipleClassDeclarationsInspection OC3 has many double class definitions
  * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
  * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
  */
@@ -28,12 +27,10 @@ namespace Siel\Acumulus\OpenCart\Helpers;
 abstract class Registry
 {
     protected static Registry $instance;
-    /**
-     * @var \Opencart\System\Engine\Registry|\Registry
-     */
-    protected $registry;
+    protected \Opencart\System\Engine\Registry|\Registry $registry;
     /**
      * @var \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order|\ModelCheckoutOrder|\ModelSaleOrder
+     * @noinspection PhpMissingFieldTypeInspection Actually a Proxy is returned.
      */
     protected $orderModel;
 
@@ -59,7 +56,7 @@ abstract class Registry
      * @param \Opencart\System\Engine\Registry|\Registry $registry
      *   The OpenCart Registry object.
      */
-    public function __construct($registry)
+    public function __construct(\Opencart\System\Engine\Registry|\Registry $registry)
     {
         $this->registry = $registry;
         static::setInstance($this);
@@ -219,7 +216,8 @@ abstract class Registry
      * As the model returned differs depending on whether we are in the Catalog or Admin
      * section, we cannot use getModel(), so this is a separate method.
      *
-     * @return \Opencart\Admin\Model\Sale\Order|\Opencart\Catalog\Model\Checkout\Order|\ModelCheckoutOrder|\ModelSaleOrder
+     * @return \Opencart\Admin\Model\Sale\Order|\Opencart\Catalog\Model\Checkout\Order
+     * @OC3-return \ModelCheckoutOrder|\ModelSaleOrder
      *
      * @noinspection ReturnTypeCanBeDeclaredInspection  Actually, this method returns a
      *   {@see \Opencart\System\Engine\Proxy}, not one of the Order models.

@@ -10,6 +10,8 @@ namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Siel\Acumulus\Helpers\Log as BaseLog;
 
+use function sprintf;
+
 /**
  * Extends the base log class to log any library logging to the PrestaShop log.
  */

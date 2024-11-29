@@ -25,6 +25,7 @@ class Environment extends EnvironmentBase
     {
         // Module has same version as library.
         $this->data['moduleVersion'] = Version;
+        // Defined in [admin/]index.php
         $this->data['shopVersion'] = VERSION;
     }
 

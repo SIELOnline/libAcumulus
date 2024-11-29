@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\OpenCart4\Helpers;
 
+use Opencart\System\Engine\Registry;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\OpenCart\Helpers\OcHelper as BaseOcHelper;
-
-use function in_array;
 
 /**
  * OC4 specific OcHelper methods.
  */
 class OcHelper extends BaseOcHelper
 {
-    public function __construct($registry, Container $acumulusContainer)
+    public function __construct(Registry $registry, Container $acumulusContainer)
     {
         $this->languageSettingKey = 'config_language_admin';
         parent::__construct($registry, $acumulusContainer);

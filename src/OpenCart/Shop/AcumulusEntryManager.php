@@ -1,13 +1,14 @@
 <?php
 /**
- * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
- * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
+ * @noinspection PhpUndefinedClassInspection OC3 or OC4 classes
  */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Shop;
 
+use DB as OC3DB;
+use Opencart\System\Library\DB;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
@@ -15,6 +16,8 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
+
+use function sprintf;
 
 /**
  * Implements the OpenCart specific acumulus entry model class.
@@ -47,20 +50,22 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $operator = $entryId === null ? 'is' : '=';
         $value = $entryId === null ? 'null' : (string) $entryId;
-        /** @var \stdClass $result  (documentation error in DB) */
+        /** @var \stdClass $result (documentation error in DB) */
         $result = $this->getDb()->query("SELECT * FROM `$this->tableName` WHERE entry_id $operator $value");
         return $this->convertDbResultToAcumulusEntries($result->rows);
     }
 
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
-        /** @var \stdClass $result  (documentation error in DB) */
-        $result = $this->getDb()->query(sprintf(
-            "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
-            $this->tableName,
-            $this->getDb()->escape($invoiceSource->getType()),
-            $invoiceSource->getId()
-        ));
+        /** @var \stdClass $result (documentation error in DB) */
+        $result = $this->getDb()->query(
+            sprintf(
+                "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
+                $this->tableName,
+                $this->getDb()->escape($invoiceSource->getType()),
+                $invoiceSource->getId()
+            )
+        );
         return $this->convertDbResultToAcumulusEntries($result->rows, $ignoreLock);
     }
 
@@ -72,42 +77,48 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         } else {
             $storeId = 0;
         }
-        return (bool) $this->getDb()->query(sprintf(
-            "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%u, %s, %s, '%s', %u, '%s')",
-            $this->tableName,
-            $storeId,
-            $entryId === null ? 'null' : (string) $entryId,
-            $token === null ? 'null' : ("'" . $this->getDb()->escape($token) . "'"),
-            $this->getDb()->escape($invoiceSource->getType()),
-            $invoiceSource->getId(),
-            $this->getDb()->escape($created)
-        ));
+        return (bool) $this->getDb()->query(
+            sprintf(
+                "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%u, %s, %s, '%s', %u, '%s')",
+                $this->tableName,
+                $storeId,
+                $entryId === null ? 'null' : (string) $entryId,
+                $token === null ? 'null' : ("'" . $this->getDb()->escape($token) . "'"),
+                $this->getDb()->escape($invoiceSource->getType()),
+                $invoiceSource->getId(),
+                $this->getDb()->escape($created)
+            )
+        );
     }
 
     protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
     {
         $record = $entry->getRecord();
-        return (bool) $this->getDb()->query(sprintf(
-            "UPDATE `%s` SET entry_id = %s, token = %s, updated = '%s' WHERE id = %u",
-            $this->tableName,
-            $entryId === null ? 'null' : (string) $entryId,
-            $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'",
-            $this->getDb()->escape($updated),
-            $record['id']
-        ));
+        return (bool) $this->getDb()->query(
+            sprintf(
+                "UPDATE `%s` SET entry_id = %s, token = %s, updated = '%s' WHERE id = %u",
+                $this->tableName,
+                $entryId === null ? 'null' : (string) $entryId,
+                $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'",
+                $this->getDb()->escape($updated),
+                $record['id']
+            )
+        );
     }
 
     public function delete(AcumulusEntry $entry, ?Source $invoiceSource = null): bool
     {
         $record = $entry->getRecord();
-        return (bool) $this->getDb()->query(sprintf(
-            'DELETE FROM `%s` WHERE id = %u',
-            $this->tableName,
-            $record['id']
-        ));
+        return (bool) $this->getDb()->query(
+            sprintf(
+                'DELETE FROM `%s` WHERE id = %u',
+                $this->tableName,
+                $record['id']
+            )
+        );
     }
 
-    protected function sqlNow()
+    protected function sqlNow(): string
     {
         return date(Api::Format_TimeStamp);
     }
@@ -140,10 +151,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 // Copy data from old to new table.
                 // Orders only, credit slips were not supported in that version.
                 // Nor did we support multi store shops (though a join could add that).
-                $result = $result && $this->getDb()->query("insert into `$this->tableName`
+                $result = $result && $this->getDb()->query(
+                        "insert into `$this->tableName`
                     (entry_id, token, source_type, source_id, created, updated)
                     select entry_id, token, 'Order' as source_type, order_id as source_id, created, updated
-                    from `$oldTableName``;");
+                    from `$oldTableName``;"
+                    );
 
                 // Delete old table.
                 $result = $result && $this->getDb()->query("DROP TABLE `$oldTableName`");
@@ -175,7 +188,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function createTable(): bool
     {
-        return (bool) $this->getDb()->query("CREATE TABLE IF NOT EXISTS `$this->tableName` (
+        return (bool) $this->getDb()->query(
+            "CREATE TABLE IF NOT EXISTS `$this->tableName` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `store_id` int(11) NOT NULL DEFAULT '0',
             `entry_id` int(11) DEFAULT NULL,
@@ -187,7 +201,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             PRIMARY KEY (`id`),
             INDEX `acumulus_idx_entry_id` (`entry_id`),
             UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
-            )");
+            )"
+        );
     }
 
     /**
@@ -200,17 +215,19 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $result = true;
 
         if (version_compare($currentVersion, '4.4.0', '<')) {
-            $result = $this->getDb()->query("ALTER TABLE `$this->tableName`
+            $result = $this->getDb()->query(
+                "ALTER TABLE `$this->tableName`
                 CHANGE COLUMN `entry_id` `entry_id` INT(11) NULL DEFAULT NULL,
-                CHANGE COLUMN `token` `token` CHAR(32) NULL DEFAULT NULL");
+                CHANGE COLUMN `token` `token` CHAR(32) NULL DEFAULT NULL"
+            );
         }
 
         // Drop and recreate index (to make it non-unique). (Already done in 6.0.0, but
-        // the create statement was not adapted, so users who started using this module
+        // the "create" statement was not adapted, so users who started using this module
         // after 6.0.0, and before 8.0.0, will still get a unique index.)
         if (version_compare($currentVersion, '8.0.0', '<')) {
             $result = $this->getDb()->query("ALTER TABLE `$this->tableName` DROP INDEX `acumulus_idx_entry_id`")
-                  AND $this->getDb()->query("CREATE INDEX `acumulus_idx_entry_id` ON `$this->tableName` (`entry_id`)");
+            and $this->getDb()->query("CREATE INDEX `acumulus_idx_entry_id` ON `$this->tableName` (`entry_id`)");
         }
 
         return $result;
@@ -220,8 +237,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      * Wrapper method to get {@see Registry::$db}.
      *
      * @return \Opencart\System\Library\DB|\DB
+     * @noinspection PhpUndefinedClassInspection OC3 and OC4 type
      */
-    protected function getDb()
+    protected function getDb(): DB|OC3DB
     {
         return $this->getRegistry()->db;
     }

@@ -1,11 +1,4 @@
 <?php
-/**
- * @noinspection PhpMissingParentCallCommonInspection  many parent methods are
- *   no-ops or call {@see Source::callTypeSpecificMethod()}.
- * @noinspection PhpMultipleClassDeclarationsInspection OC3 has many double class definitions
- * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
- * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
- */
 
 declare(strict_types=1);
 
@@ -143,8 +136,7 @@ abstract class Source extends BaseSource
 
     public function getPaymentDate(): ?string
     {
-        // @todo Can we determine this based on history (and optionally
-        //   payment_code)?
+        // @todo Can we determine this based on history (and optionally payment_code)?
         // Will default to the issue date.
         return null;
     }
@@ -295,7 +287,8 @@ abstract class Source extends BaseSource
     }
 
     /**
-     * @return \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order|\ModelCheckoutOrder|\ModelSaleOrder
+     * @return \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order
+     * @OC3-return \ModelCheckoutOrder|\ModelSaleOrder
      */
     protected function getOrderModel()
     {

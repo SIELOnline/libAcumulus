@@ -43,6 +43,7 @@ class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
 
     public function getFileUrl(string $file = '', string $extension = 'acumulus'): string
     {
+        // Defined in [admin/]config.php
         return HTTP_CATALOG . substr(DIR_EXTENSION, strlen(DIR_OPENCART)) . $extension . '/' . strtolower(APPLICATION) . '/' . $file;
     }
 

@@ -204,11 +204,11 @@ abstract class AcumulusObject implements ArrayAccess
      */
     private function checkIsProperty(string $name): string
     {
-        $name = $this->getPropertyName($name);
-        if ($name === null) {
+        $realName = $this->getPropertyName($name);
+        if ($realName === null) {
             throw new RuntimeException("Unknown property: $name");
         }
-        return $name;
+        return $realName;
     }
 
     /**

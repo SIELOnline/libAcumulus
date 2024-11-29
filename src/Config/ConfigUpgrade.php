@@ -162,6 +162,10 @@ class ConfigUpgrade
             $result = $this->upgrade836() && $result;
         }
 
+        if (version_compare($currentVersion, '8.3.7', '<')) {
+            $result = $this->upgrade837() && $result;
+        }
+
         $this->getLog()->notice('Config: finished upgrading to %s (%s)', Version, $result ? 'success' : 'failure');
         return $result;
     }
@@ -381,22 +385,31 @@ class ConfigUpgrade
      * 8.3.6 upgrade.
      *
      * - Removed setting 'outputFormat'.
-     * - Changed case of a number of keys.
      */
     protected function upgrade836(): bool
     {
+        return $this->getConfig()->save([]);
+    }
+
+    /**
+     * 8.3.7 upgrade.
+     *
+     * - API fields are now lower case (as are the tags) => update config store when used
+     *   as config key. Basically we are undoing upgrade836() (which has been cleaned-up).
+     */
+    protected function upgrade837(): bool
+    {
         $values = $this->getConfigStore()->load();
-        unset($values['outputFormat']);
         $replacements = [
-            Tag::ContractCode => Fld::ContractCode,
-            Tag::UserName => Fld::UserName,
-            Tag::EmailOnError => Fld::EmailOnError,
+            'contractCode' => Fld::ContractCode,
+            'userName' => Fld::UserName,
+            'emailOnError' => Fld::EmailOnError,
         ];
-        $camelCasedKeys = [];
+        $lowerCasedKeys = [];
         foreach ($values as $key => $value) {
             $newKey = $replacements[$key] ?? $key;
-            $camelCasedKeys[$newKey] = $value;
+            $lowerCasedKeys[$newKey] = $value;
         }
-        return $this->getConfig()->save($camelCasedKeys);
+        return $this->getConfig()->save($lowerCasedKeys);
     }
 }

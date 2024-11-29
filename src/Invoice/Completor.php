@@ -1,5 +1,8 @@
 <?php
 /**
+ */
+
+/**
  * Although we would like to use strict equality, i.e. including type equality,
  * unconditionally changing each comparison in this file will lead to problems
  * - API responses return each value as string, even if it is an int or float.
@@ -16,6 +19,7 @@
  * @noinspection EfferentObjectCouplingInspection
  * @noinspection PhpLackOfCohesionInspection
  * @noinspection DuplicatedCode  During the transition to Collectors, duplicate code will exist.
+ * @noinspection ReferencingObjectsInspection array|ArrayAccess &array is a false positive.
  */
 
 namespace Siel\Acumulus\Invoice;
@@ -24,6 +28,7 @@ use ArrayAccess;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Completors\CompletorTaskInterface;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
@@ -40,13 +45,13 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
-use Siel\Acumulus\Tag;
-
 use function array_key_exists;
 use function count;
 use function in_array;
 use function is_array;
 use function is_float;
+use function is_scalar;
+use function sprintf;
 
 /**
  * The invoice completor class provides functionality to correct and complete
@@ -167,7 +172,7 @@ class Completor
         return $this->translator->get($key);
     }
 
-    public function getCompletorTask($dataType, $task)
+    public function getCompletorTask(string $dataType, string $task): CompletorTaskInterface
     {
         return Container::getContainer()->getCompletorTask($dataType, $task);
     }
@@ -379,7 +384,7 @@ class Completor
                     // Only add positive NL vat rates that are possible given
                     // the plugin settings and the invoice target (buyer).
                     foreach ($countryVatInfos as $countryVatInfo) {
-                        $countryVatRate = $countryVatInfo[Tag::VatRate];
+                        $countryVatRate = $countryVatInfo[Fld::VatRate];
                         if (!Number::isZero($countryVatRate) && !Number::floatsAreEqual($countryVatRate, Api::VatFree)) {
                             // Positive (non-zero and non free) vat rate:
                             // @todo: only add if not only selling vat-free or 0% vat products.
@@ -418,7 +423,7 @@ class Completor
                     // Only add those EU vat rates that are possible given
                     // the plugin settings.
                     foreach ($countryVatInfos as $countryVatInfo) {
-                        $countryVatRate = $countryVatInfo[Tag::VatRate];
+                        $countryVatRate = $countryVatInfo[Fld::VatRate];
                         if (Number::isZero($countryVatRate)) {
                             // NOTE: we assume here that the 'zeroVatClass'
                             // setting is also set to a vat class when selling
@@ -455,7 +460,7 @@ class Completor
                     // Only add those EU vat rates that are possible given
                     // the plugin settings.
                     foreach ($countryVatInfos as $countryVatInfo) {
-                        $countryVatRate = $countryVatInfo[Tag::VatRate];
+                        $countryVatRate = $countryVatInfo[Fld::VatRate];
                         if (Number::isZero($countryVatRate)) {
                             // NOTE: we assume here that the 'zeroVatClass'
                             // setting is also set to a vat class when selling
@@ -480,7 +485,7 @@ class Completor
             // vat rate infos.
             $vatTypeVatRates = array_unique($vatTypeVatRates, SORT_NUMERIC);
             foreach ($vatTypeVatRates as &$vatRate) {
-                $vatRate = [Tag::VatRate => $vatRate, Tag::VatType => $vatType];
+                $vatRate = [Fld::VatRate => $vatRate, Fld::VatType => $vatType];
             }
             /** @noinspection SlowArrayOperationsInLoopInspection */
             $possibleVatRates = array_merge($possibleVatRates, $vatTypeVatRates);
@@ -1412,14 +1417,14 @@ class Completor
     /**
      * Returns whether the given line has a no-vat vat rate (0% or vat free).
      *
-     * @param array|ArrayAccess $line
+     * @param ArrayAccess|array $line
      *   The invoice line to check.
      *
      * @return bool
      *   True if the given line has a no-vat vat rate (0% or vat free), false
      *   if it has a positive vat rate.
      */
-    protected function lineHasNoVat($line): bool
+    protected function lineHasNoVat(ArrayAccess|array $line): bool
     {
         return $this->isNoVat($line);
     }
@@ -1434,7 +1439,7 @@ class Completor
      *   True if $vatRates contains a no vat vat-rate, false if it only contains
      *   positive vat rates.
      */
-    protected function metaDataHasANoVat($vatRates): bool
+    protected function metaDataHasANoVat(float|array $vatRates): bool
     {
         $vatRates = (array) $vatRates;
         foreach ($vatRates as $vatRate) {
@@ -1455,7 +1460,7 @@ class Completor
      *   True if $vatRates contains only no-vat vat rates, false if it contains
      *   at least 1 positive vat rate.
      */
-    protected function metaDataHasOnlyNoVat($vatRates): bool
+    protected function metaDataHasOnlyNoVat(float|array $vatRates): bool
     {
         $vatRates = (array) $vatRates;
         foreach ($vatRates as $vatRate) {
@@ -1550,7 +1555,7 @@ class Completor
         $result = false;
         if (!$this->isNl()) {
             $vatInfos = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Fld::Customer][Fld::CountryCode]);
-            $regions = array_unique(array_column($vatInfos, Tag::CountryRegion));
+            $regions = array_unique(array_column($vatInfos, Fld::CountryRegion));
             $result = count($regions) === 1 && reset($regions) == Api::Region_EU;
         }
         return $result;
@@ -1605,14 +1610,14 @@ class Completor
     /**
      * Helper method to convert an amount field to euros.
      *
-     * @param array|ArrayAccess $array
+     * @param ArrayAccess|array $array
      * @param string $key
      * @param Currency $currency
      *
      * @return bool
      *   Whether the amount was converted.
      */
-    public function convertAmount(&$array, string $key, Currency $currency): bool
+    public function convertAmount(array|ArrayAccess &$array, string $key, Currency $currency): bool
     {
         if (isset($array[$key])) {
             $array[$key] = $currency->convertAmount($array[$key]);
@@ -1640,7 +1645,7 @@ class Completor
     /**
      * Returns whether the vat class id denotes vat free.
      *
-     * @param int|string|array $lineOrVatClassId
+     * @param int|array|string $lineOrVatClassId
      *   The vat class to check or an invoice line that may contain the key
      *   Meta::VatClassId that refers to a vat class.
      *
@@ -1649,7 +1654,7 @@ class Completor
      *   given and denotes the vat free class (or is left empty), false
      *   otherwise.
      */
-    protected function isVatFreeClass($lineOrVatClassId): bool
+    protected function isVatFreeClass(int|array|string $lineOrVatClassId): bool
     {
         $vatClassId = !is_scalar($lineOrVatClassId)
             ? $lineOrVatClassId[Meta::VatClassId] ?? null
@@ -1662,7 +1667,7 @@ class Completor
     /**
      * Returns whether the vat class id denotes the 0% vat rat.
      *
-     * @param int|string|array $lineOrVatClassId
+     * @param int|array|string $lineOrVatClassId
      *   The vat class to check or an invoice line that may contain the key
      *   Meta::VatClassId that refers to a vat class.
      *
@@ -1670,7 +1675,7 @@ class Completor
      *   True if the shop might sell 0% vat articles and the vat class id
      *   denotes the 0% vat rate class, false otherwise.
      */
-    protected function is0VatClass($lineOrVatClassId): bool
+    protected function is0VatClass(int|array|string $lineOrVatClassId): bool
     {
         $vatClassId = !is_scalar($lineOrVatClassId)
             ? $lineOrVatClassId[Meta::VatClassId] ?? null
@@ -1690,7 +1695,7 @@ class Completor
      * @return bool
      *   True if $vatRate is the 0% or the vat free vat rate, false otherwise.
      */
-    public function isNoVat($vatRate): bool
+    public function isNoVat(float|array $vatRate): bool
     {
         return $this->is0VatRate($vatRate) || $this->isFreeVatRate($vatRate);
     }
@@ -1705,10 +1710,10 @@ class Completor
      * @return bool
      *   True if $vatRate is the 0% vat rate, false otherwise.
      */
-    protected function is0VatRate($lineOrVatRate): bool
+    protected function is0VatRate(float|array $lineOrVatRate): bool
     {
         $vatRate = !is_scalar($lineOrVatRate)
-            ? $lineOrVatRate[Tag::VatRate] ?? null
+            ? $lineOrVatRate[Fld::VatRate] ?? null
             : $lineOrVatRate;
         return isset($vatRate) && Number::isZero($vatRate);
     }
@@ -1723,10 +1728,10 @@ class Completor
      * @return bool
      *   True if $vatRate is the vat free vat rate, false otherwise.
      */
-    protected function isFreeVatRate($lineOrVatRate): bool
+    protected function isFreeVatRate(float|array $lineOrVatRate): bool
     {
         $vatRate = !is_scalar($lineOrVatRate)
-            ? $lineOrVatRate[Tag::VatRate] ?? null
+            ? $lineOrVatRate[Fld::VatRate] ?? null
             : $lineOrVatRate;
         return isset($vatRate) && Number::floatsAreEqual($vatRate, Api::VatFree);
     }
@@ -1841,7 +1846,7 @@ class Completor
     /**
      * Makes the invoice a concept invoice and optionally adds a warning.
      *
-     * @param array|ArrayAccess $array
+     * @param ArrayAccess|array $array
      *   The (sub) array of the Acumulus invoice array for which the warning is
      *   intended. The warning will also be added under a Meta::Warning tag
      * @param string $messageKey
@@ -1852,7 +1857,7 @@ class Completor
      * @param string ...$args
      *   Additional arguments to format the message.
      */
-    public function changeInvoiceToConcept(&$array, string $messageKey, int $code, string ...$args): void
+    public function changeInvoiceToConcept(ArrayAccess|array &$array, string $messageKey, int $code, string ...$args): void
     {
         $pdfMessage = '';
         $invoiceSettings = $this->config->getInvoiceSettings();
@@ -1882,10 +1887,8 @@ class Completor
      * Warnings are placed in the $array under the key Meta::Warning. If no
      * warning is set, $warning is added as a string, otherwise it becomes an
      * array of warnings to which this $warning is added.
-     *
-     * @param array|ArrayAccess $array
      */
-    protected function addWarning(&$array, string $warning, string $severity = Meta::Warning): void
+    protected function addWarning(ArrayAccess|array &$array, string $warning, string $severity = Meta::Warning): void
     {
         if (!isset($array[$severity])) {
             $array[$severity] = $warning;

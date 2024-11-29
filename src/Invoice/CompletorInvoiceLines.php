@@ -27,8 +27,6 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
-use Siel\Acumulus\Tag;
-
 use function count;
 use function is_scalar;
 
@@ -335,7 +333,7 @@ class CompletorInvoiceLines
                     if ($this->getUniqueVatRate($line[Meta::VatRateLookupMatches])) {
                         // Only a single vat rate remains: take that one.
                         $vatRateInfo = reset($line[Meta::VatRateLookupMatches]);
-                        $line[Fld::VatRate] = !is_scalar($vatRateInfo) ? $vatRateInfo[Tag::VatRate] : $vatRateInfo;
+                        $line[Fld::VatRate] = !is_scalar($vatRateInfo) ? $vatRateInfo[Fld::VatRate] : $vatRateInfo;
                         $line[Meta::VatRateSource] = $vatRateSource;
                     }
                 }
@@ -499,8 +497,8 @@ class CompletorInvoiceLines
         return array_reduce($vatRateInfos, static function ($carry, $matchedVatRate) {
             if ($carry === null) {
                 // 1st item: return its vat rate.
-                return (float) $matchedVatRate[Tag::VatRate];
-            } elseif (Number::floatsAreEqual($carry, $matchedVatRate[Tag::VatRate])) {
+                return (float) $matchedVatRate[Fld::VatRate];
+            } elseif (Number::floatsAreEqual($carry, $matchedVatRate[Fld::VatRate])) {
                 // Note that in PHP: '21' == '21.0000' returns true. So using ==
                 // works. Vat rate equals all previous vat rates: return that
                 // vat rate.
@@ -647,8 +645,8 @@ class CompletorInvoiceLines
                 $vatRateInfo = (float) $vatRateInfo;
                 $vatRate = $vatRateInfo;
             } else {
-                $vatRateInfo[Tag::VatRate] = (float) $vatRateInfo[Tag::VatRate];
-                $vatRate = $vatRateInfo[Tag::VatRate];
+                $vatRateInfo[Fld::VatRate] = (float) $vatRateInfo[Fld::VatRate];
+                $vatRate = $vatRateInfo[Fld::VatRate];
             }
             if ($min <= $vatRate && $vatRate <= $max) {
                 $result[] = $vatRateInfo;
@@ -680,11 +678,11 @@ class CompletorInvoiceLines
 
         $result = [];
         foreach ($vatRateInfos as $vatRateInfo) {
-            $vatRate = $vatRateInfo[Tag::VatRate];
+            $vatRate = $vatRateInfo[Fld::VatRate];
             foreach ($vatRates as $vatRateInfo2) {
-                $vatRate2 = !is_scalar($vatRateInfo2) ? $vatRateInfo2[Tag::VatRate] : $vatRateInfo2;
+                $vatRate2 = !is_scalar($vatRateInfo2) ? $vatRateInfo2[Fld::VatRate] : $vatRateInfo2;
                 if (Number::floatsAreEqual($vatRate, $vatRate2)) {
-                    $vatRateInfo[Tag::VatRate] = (float) $vatRateInfo[Tag::VatRate];
+                    $vatRateInfo[Fld::VatRate] = (float) $vatRateInfo[Fld::VatRate];
                     $result[] = $vatRateInfo;
                 }
             }
@@ -703,16 +701,16 @@ class CompletorInvoiceLines
      * To prevent differences between the Acumulus and shop invoice (or between
      * the invoice and line totals) we recompute the 'unitprice' if:
      * - Vat rate is correct.
-     * - 'meta-recalculate-price' is set to Fld::UnitPrice. (Shops should set
-     *   so, if prices are entered inc vat and the price ex vat as obtained by
-     *   this plugin is known to have a precision worse than 0.0001.
+     * - 'meta-recalculate-price' is set to Fld::UnitPrice. Shops should set this if
+     *   prices are entered inc vat and the price ex vat as obtained by this plugin is
+     *   known to have a precision worse than 0.0001.
      * - Unit price inc is available.
      *
      * We recompute the unit price inc if:
      * - Vat rate is correct.
-     * - 'meta-recalculate-price' is set to Meta:UnitPriceInc. (Shops should set
-     *   so, if prices are entered ex vat and the price inc vat as obtained by
-     *   this plugin is known to have a precision worse than 0.0001.
+     * - 'meta-recalculate-price' is set to Meta:UnitPriceInc. Shops should set this if
+     *   prices are entered ex vat and the price inc vat as obtained by this plugin is
+     *   known to have a precision worse than 0.0001.
      * - Unit price is available.
      *
      * @param Line[] $lines

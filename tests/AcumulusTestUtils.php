@@ -14,6 +14,7 @@ use Siel\Acumulus\Invoice\Translations;
 
 use function in_array;
 use function is_float;
+use function is_string;
 
 /**
  * AcumulusTestUtils contains test functionalities for the various shop specific test
@@ -242,8 +243,48 @@ LONGSTRING;
         $append = '.latest';
         $sourceFilename = "$path/$type$id$append.json";
         $targetFilename = "$path/$type$id.json";
-        /** @noinspection JsonEncodingApiUsageInspection  false positive */
         file_put_contents($targetFilename, file_get_contents($sourceFilename));
+    }
+
+    public function updateTestSources(): void
+    {
+        $path = $this->getDataPath();
+        $files = glob("$path/*.json");
+        foreach ($files as $file) {
+            $fileName = pathinfo($file, PATHINFO_FILENAME);
+            if (!str_contains($fileName, '.')) {
+                $this->updateTestSource($file);
+            }
+        }
+    }
+
+    public function updateTestSource(string $file): void
+    {
+        $replacements = [
+            // PHP doesn't know '$1"\L$2": '
+            '/( +)"([a-zA-Z0-9]+)": /' => function (array $matches) {
+                return strtolower($matches[0]);
+            },
+            // PHP doesn't know '$1\L$2$4'
+            '/(\'|")(unitPrice(Inc)?)(\'|")/' => function (array $matches) {
+                return strtolower($matches[0]);
+            },
+            '/"altMeta/' => '"altmeta',
+            '/vat(-t|T)ype/' => 'vattype',
+            '/vat(-r|R)ate/' => 'vatrate',
+            '/vat(-a|A)mount/' => 'vatamount',
+            '/email-as-pdf/' => 'emailaspdf',
+        ];
+
+        $contents = file_get_contents($file);
+        foreach ($replacements as $regExpSearch => $regExpReplace) {
+            if (is_string($regExpReplace)) {
+                $contents = preg_replace($regExpSearch, $regExpReplace, $contents);
+            } else {
+                $contents = preg_replace_callback($regExpSearch, $regExpReplace, $contents);
+            }
+        }
+        file_put_contents($file, $contents);
     }
 
     /**

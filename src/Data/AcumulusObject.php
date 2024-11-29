@@ -225,10 +225,10 @@ abstract class AcumulusObject implements ArrayAccess
      */
     public function getPropertyName(string $name): ?string
     {
-        if (array_key_exists($name, $this->data)) {
-            return $name;
-        } elseif (array_key_exists(strtolower($name), $this->data)) {
+        if (array_key_exists(strtolower($name), $this->data)) {
             return strtolower($name);
+        } elseif (array_key_exists($name, $this->data)) {
+            return $name;
         } else {
             return null;
         }

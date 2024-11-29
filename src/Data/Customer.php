@@ -196,7 +196,7 @@ class Customer extends AcumulusObject
         $altAddress = $altAddress->toArray();
         $altAddressKeys = array_keys($altAddress);
         array_walk($altAddressKeys, static function (&$value) {
-            $value = 'alt' . ucfirst($value);
+            $value = 'alt' . $value;
         });
         $altAddress = array_combine($altAddressKeys, $altAddress);
 

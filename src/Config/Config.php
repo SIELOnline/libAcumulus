@@ -36,7 +36,9 @@ use const Siel\Acumulus\Version;
  * @todo: New settings:
  *   - EmailAsPdf: gfx
  *   - Invoice: concept type???
- *
+ * @todo: Create list of config keys as enum or constants and extract key info into
+ *   a separate class, including allowed values (when not user or shop dependent like
+ *   accountNumber, costCenter, template, and payment methods, trigger order statuses).
  * @noinspection PhpLackOfCohesionInspection
  */
 class Config

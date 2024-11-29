@@ -106,24 +106,24 @@ interface Meta
     public const InvoiceVatAmount = 'meta-total-vatamount';
 
     // Settings:
-    public const AddEmailAsPdfSection = 'meta-add-email-as-pdf-section';
+    public const AddEmailAsPdfSection = 'meta-add-emailaspdf-section';
 
     // Line: Price and vat related meta tags.
     /**
      * Creator -> Completor/Strategy: Unit price inc vat (in addition to
      * unitpriceinc).
      */
-    public const UnitPriceInc = 'unitPriceInc';
+    public const UnitPriceInc = 'unitpriceinc';
     /**
      * Creator -> Completor/Strategy: Amount of vat (per unit) (in addition to
      * vatrate).
      */
-    public const VatAmount = 'vatAmount';
+    public const VatAmount = 'vatamount';
     /**
      * Creator -> Completor/Strategy: How we got the vat rate (which source, or
      * how we computed it).
      */
-    public const VatRateSource = 'meta-vat-rate-source';
+    public const VatRateSource = 'meta-vatrate-source';
     /**
      * The minimum vat rate in case we have to compute it using 2 non-exact
      * amounts.
@@ -262,23 +262,23 @@ interface Meta
     /**
      * Completor: Possible vat types for this line.
      */
-    public const VatTypesPossible = 'meta-vat-types-possible';
+    public const VatTypesPossible = 'meta-vattypes-possible';
     /**
      * Completor: Possible vat types for this invoice (and shop settings).
      */
-    public const VatTypesPossibleInvoice = 'meta-vat-types-possible-invoice';
+    public const VatTypesPossibleInvoice = 'meta-vattypes-possible-invoice';
     /**
      * Completor: Union of possible vat types for the invoice lines.
      */
-    public const VatTypesPossibleInvoiceLinesUnion = 'meta-vat-types-possible-lines-union';
+    public const VatTypesPossibleInvoiceLinesUnion = 'meta-vattypes-possible-lines-union';
     /**
      * Completor: Intersection of possible vat types for the invoice lines.
      */
-    public const VatTypesPossibleInvoiceLinesIntersection = 'meta-vat-types-possible-lines-intersection';
+    public const VatTypesPossibleInvoiceLinesIntersection = 'meta-vattypes-possible-lines-intersection';
     /**
      * Completor: Where was the choice for the vat type made?
      */
-    public const VatTypeSource = 'meta-vat-type-source';
+    public const VatTypeSource = 'meta-vattype-source';
 
     // Line: Parent - Children related meta tags.
     /**

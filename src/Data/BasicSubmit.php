@@ -74,11 +74,11 @@ class BasicSubmit extends AcumulusObject
     {
         $result = [];
         if ($this->needContract && $this->getContract() !== null) {
-            $result['contract'] = $this->getContract()->toArray();
+            $result[Fld::Contract] = $this->getContract()->toArray();
         }
         $result += parent::toArray();
         if ($this->getConnector() !== null) {
-            $result['connector'] = $this->getConnector()->toArray();
+            $result[Fld::Connector] = $this->getConnector()->toArray();
         }
         return $result;
     }

@@ -72,7 +72,7 @@ class Address extends AcumulusObject
      */
     public function set(string $name, mixed $value, int $mode = PropertySet::Always): bool
     {
-        if (($name === Fld::CountryCode) && is_string($value)) {
+        if (($this->getPropertyName($name) === Fld::CountryCode) && is_string($value)) {
             $value = strtoupper($value);
         }
         return parent::set($name, $value, $mode);

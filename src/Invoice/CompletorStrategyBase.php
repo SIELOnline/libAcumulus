@@ -25,7 +25,6 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 use function get_class;
 use function sprintf;
@@ -245,7 +244,7 @@ abstract class CompletorStrategyBase
 
         // Initialize by adding all possible vat rates.
         foreach ($this->possibleVatRates as $possibleVatRate) {
-            $vatRate = sprintf('%.3f', $possibleVatRate[Tag::VatRate]);
+            $vatRate = sprintf('%.3f', $possibleVatRate[Fld::VatRate]);
             if (!isset($this->vatBreakdown[$vatRate])) {
                 $this->vatBreakdown[$vatRate] = [
                     Fld::VatRate => (float) $vatRate,

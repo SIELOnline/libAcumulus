@@ -17,8 +17,6 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Helpers\Severity;
 
-use Siel\Acumulus\Tag;
-
 use function count;
 use function is_string;
 

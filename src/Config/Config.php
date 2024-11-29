@@ -17,7 +17,6 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Tag;
 
 use function array_key_exists;
 use function is_array;
@@ -84,7 +83,7 @@ class Config
     public const EuVat_SwitchOnLimit = 2;
     public const EuVat_No = 3;
 
-    public  const VatClass_NotApplicable = 'vat_class_not_applicable';
+    public const VatClass_NotApplicable = 'vat_class_not_applicable';
     // Note: used both as value in Config and as value for Meta::VatClassId.
     public const VatClass_Null = 'vat_class_null';
 
@@ -114,8 +113,7 @@ class Config
         callable $getConfigUpgrade,
         Environment $environment,
         Log $log
-    )
-    {
+    ) {
         $this->configStore = $configStore;
         $this->shopCapabilities = $shopCapabilities;
         $this->getConfigUpgradeInstance = $getConfigUpgrade;
@@ -796,17 +794,17 @@ class Config
                 ],
                 'stockManagementEnabled' => [
                     'group' => Fld::Product,
-                    'type'=> 'bool',
+                    'type' => 'bool',
                     'default' => false,
                 ],
                 'productMatchShopField' => [
                     'group' => Fld::Product,
-                    'type'=> 'string',
+                    'type' => 'string',
                     'default' => '',
                 ],
                 'productMatchAcumulusField' => [
                     'group' => Fld::Product,
-                    'type'=> 'string',
+                    'type' => 'string',
                     'default' => '',
                 ],
                 'nature_shop' => [

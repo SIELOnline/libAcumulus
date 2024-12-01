@@ -11,17 +11,17 @@ use Siel\Acumulus\Data\PropertySet;
 /**
  * Used to test basics of abstract parent classes, does not add features.
  *
- * @property ?string $itemNumber
- * @property ?string $nature
- * @property float $unitPrice
+ * @property null|string $itemNumber
+ * @property null|string $nature
+ * @property null|float $unitPrice
  *
- * @method getItemNumber(): string
- * @method getNature(): string
- * @method getUnitPrice(): float
+ * @method null|string getItemNumber()
+ * @method null|string getNature()
+ * @method null|float getUnitPrice()
  *
- * @method setItemNumber(string $value, int $mode = PropertySet::Always): void
- * @method setNature(string $value, int $mode = PropertySet::Always): void
- * @method setUnitPrice(float $value, int $mode = PropertySet::Always): void
+ * @method void setItemNumber(string $value, int $mode = PropertySet::Always)
+ * @method void setNature(string $value, int $mode = PropertySet::Always)
+ * @method void setUnitPrice(float $value, int $mode = PropertySet::Always)
  */
 class SimpleTestObject extends AcumulusObject
 {

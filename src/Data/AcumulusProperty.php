@@ -17,6 +17,7 @@ use function is_array;
 use function is_bool;
 use function is_float;
 use function is_int;
+use function is_object;
 use function is_string;
 use function strlen;
 
@@ -59,6 +60,21 @@ class AcumulusProperty
     protected array $allowedValues;
     /** @var mixed|null */
     protected mixed $value;
+
+
+    /**
+     * Completes the shallow clone that PHP automatically performs.
+     *
+     * This implementation (deep) clones any object values. For now this can only be dates
+     * represented with a {@see DateTimeInterface}.
+     */
+    public function __clone(): void
+    {
+        if (is_object($this->value))
+        {
+            $this->value = clone $this->value;
+        }
+    }
 
     /**
      * Creates a property based on the passed-in definition.

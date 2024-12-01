@@ -32,8 +32,6 @@ use Siel\Acumulus\Fld;
  * @method bool setStockAmount(?float $value, int $mode = PropertySet::Always)
  * @method bool setStockDescription(?string $value, int $mode = PropertySet::Always)
  * @method bool setStockDate(?DateTimeInterface $value, int $mode = PropertySet::Always)
- *
- * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
  */
 class StockTransaction extends AcumulusObject
 {

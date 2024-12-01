@@ -62,6 +62,27 @@ class Invoice extends AcumulusObject
     protected array $lines = [];
     protected ?EmailInvoiceAsPdf $emailAsPdf = null;
 
+    /**
+     * Completes the shallow clone that PHP automatically performs.
+     *
+     * This override (deep) clones all properties referring to other
+     * {@see AcumulusObject}s, being the {@see Customer}, {@see EmailinvoiceAsPdf},
+     * and the set of {@see Line invoice lines}.
+     */
+    public function __clone(): void
+    {
+        parent::__clone();
+        if (isset($this->customer)) {
+            $this->setCustomer(clone $this->customer);
+        }
+        if (isset($this->emailAsPdf)) {
+            $this->emailAsPdf = clone $this->emailAsPdf;
+        }
+        foreach ($this->lines as &$line) {
+            $line = clone $line;
+        }
+    }
+
     protected function getPropertyDefinitions(): array
     {
         return [
@@ -118,10 +139,25 @@ class Invoice extends AcumulusObject
         return $this->lines;
     }
 
-    public function addLine(?Line $line): void
+    public function addLine(Line $line): void
     {
-        if ($line !== null) {
-            $this->lines[] = $line;
+        $this->lines[] = $line;
+    }
+
+    /**
+     * Replaces all lines in the invoice with the give set of lines.
+     *
+     * Typically, this is the original set of lines processed in a way that may have lead
+     * more (or less)) lines, e.g. flattening child lines, (actual use case) or splitting
+     * lines because of split vat rates (idea for use case).
+     *
+     * @param Line[] $lines
+     */
+    public function replaceLines(array $lines): void
+    {
+        $this->removeLines();
+        foreach ($lines as $line) {
+            $this->addLine($line);
         }
     }
 

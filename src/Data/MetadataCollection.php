@@ -15,6 +15,20 @@ class MetadataCollection
     private array $metadata = [];
 
     /**
+     * Completes cloning a {@see MetadataCollection}.
+     *
+     * The clone will contain a copy of the array but all entries will refer to the same
+     * {@see MetadataValue} object as the entries in the original array, so we need to
+     * clone each array entry.
+     */
+    public function __clone(): void
+    {
+        foreach ($this->metadata as &$metadata) {
+            $metadata = clone $metadata;
+        }
+    }
+
+    /**
      * Returns whether the metadata name exists, even if it is null.
      */
     public function exists(string $name): bool

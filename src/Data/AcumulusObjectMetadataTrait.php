@@ -18,6 +18,19 @@ trait AcumulusObjectMetadataTrait
 {
     private MetadataCollection $metadata;
 
+
+    /**
+     * Completes the shallow clone that PHP automatically performs.
+     *
+     * This implementation (deep) clones the {@see MetadataCollection}.
+     */
+    public function cloneMetadata(): void
+    {
+        if (isset($this->metadata)) {
+            $this->metadata = clone $this->metadata;
+        }
+    }
+
     public function getMetadata(): MetadataCollection
     {
         $this->metadata ??= new MetadataCollection();

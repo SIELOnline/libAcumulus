@@ -12,6 +12,7 @@ use Siel\Acumulus\Meta;
 use Stringable;
 
 use function count;
+use function is_object;
 use function is_scalar;
 
 /**
@@ -48,6 +49,23 @@ class MetadataValue
      */
     private bool $isList;
     private array $value = [];
+
+    /**
+     * Completes cloning a {@see MetadataValue}.
+     *
+     * The clone will contain a copy of the array but all entries referring to an object
+     * will refer to the same object as in the original array, so we need to clone these
+     * objects.
+     */
+    public function __clone(): void
+    {
+        foreach ($this->value as &$singleMetadataValue) {
+            if (is_object($singleMetadataValue))
+            {
+                $singleMetadataValue = clone $singleMetadataValue;
+            }
+        }
+    }
 
     public function __construct(bool $isList = false)
     {

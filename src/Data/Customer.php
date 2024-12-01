@@ -73,6 +73,25 @@ class Customer extends AcumulusObject
     // @legacy: needed to support fluent ArrayAccess.
     protected ?Invoice $invoice = null;
 
+    /**
+     * Completes the shallow clone that PHP automatically performs.
+     *
+     * This override (deep) clones all properties referring to other
+     * {@see AcumulusObject}s, being the invoice and shipping {@see Address}.
+     * The $invoice property will be set from the {@see Invoice::__clone() cloned}
+     * {@see Invoice}.
+     */
+    public function __clone(): void
+    {
+        parent::__clone();
+        if (isset($this->invoiceAddress)) {
+            $this->invoice = clone $this->invoiceAddress;
+        }
+        if (isset($this->shippingAddress)) {
+            $this->shippingAddress = clone $this->shippingAddress;
+        }
+    }
+
     protected function getPropertyDefinitions(): array
     {
         return [

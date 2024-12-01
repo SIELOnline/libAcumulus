@@ -38,6 +38,23 @@ class BasicSubmit extends AcumulusObject
     public ?Contract $contract = null;
     public ?Connector $connector = null;
 
+    /**
+     * Completes the shallow clone that PHP automatically performs.
+     *
+     * This override (deep) clones all properties referring to other
+     * {@see AcumulusObject}s, being the{@see Contract} and {@see Connector}.
+     */
+    public function __clone(): void
+    {
+        parent::__clone();
+        if (isset($this->contract)) {
+            $this->contract = clone $this->contract;
+        }
+        if (isset($this->connector)) {
+            $this->connector = clone $this->connector;
+        }
+    }
+
     protected function getPropertyDefinitions(): array
     {
         return [

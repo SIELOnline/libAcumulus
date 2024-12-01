@@ -76,10 +76,26 @@ abstract class AcumulusObject implements ArrayAccess
     }
 
     /**
+     * Completes the shallow clone that PHP automatically performs.
+     *
+     * This base implementation (deep) clones all
+     * {@see AcumulusProperty AcumulusProperties} and the {@see MetadataCollection}.
+     */
+    public function __clone(): void
+    {
+        foreach ($this->data as &$acumulusProperty) {
+            $acumulusProperty = clone $acumulusProperty;
+        }
+        $this->cloneMetadata();
+    }
+
+    /**
      * @return array[]
      *   An array of property definitions, a property definition being a keyed
      *   array with keys 'name', 'type', 'required' (optional), and
      *   'allowedValues' (optional).
+     *
+     * @todo: make static? => lighter objects?
      */
     abstract protected function getPropertyDefinitions(): array;
 

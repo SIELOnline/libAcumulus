@@ -105,7 +105,7 @@ class LineCollector extends BaseLineCollector
                     if (!empty($taxRate)
                         && $this->isAddressInGeoZone($order, $taxRule['based'], (int) $taxRate['geo_zone_id'])
                     ) {
-                        $line->metadataAdd(Meta::VatRateLookup, $taxRate['rate']);
+                        $line->metadataAdd(Meta::VatRateLookup, (float) $taxRate['rate']);
                         $line->metadataAdd(Meta::VatRateLookupLabel, $taxRate['name']);
                     }
                 }

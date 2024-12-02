@@ -1,24 +1,10 @@
 <?php
-/**
- * Although we would like to use strict equality, i.e. including type equality,
- * unconditionally changing each comparison in this file will lead to problems
- * - API responses return each value as string, even if it is an int or float.
- * - The shop environment may be lax in its typing by, e.g. using strings for
- *   each value coming from the database.
- * - Our own config object is type aware, but, e.g, uses string for a vat class
- *   regardless the type for vat class ids as used by the shop itself.
- * So for now, we will ignore the warnings about non strictly typed comparisons
- * in this code, and we won't use strict_types=1.
- * @noinspection TypeUnsafeComparisonInspection
- * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode  This is indeed a copy of the original Invoice\Completor.
- */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\Completor as BaseCompletor;
 use Siel\Acumulus\Meta;
 
@@ -44,18 +30,16 @@ class Completor extends BaseCompletor
         // First try the base guesses,
         parent::guessVatType($possibleVatTypes);
         // and if that did not result in a vat type try the WC specific guesses.
-        if (empty($this->invoice[Fld::Customer][Fld::Invoice][Fld::VatType])) {
+        if (empty($this->invoice->vatType)) {
             /** @var \WC_Order $order */
             $order = $this->source->getOrder()->getShopObject();
             if (in_array(Api::VatType_EuReversed, $possibleVatTypes, true)
-                && apply_filters('woocommerce_order_is_vat_exempt', $order->get_meta('is_vat_exempt') === 'yes', $order))
-            {
-                $this->invoice[Fld::Customer][Fld::Invoice][Fld::VatType] = Api::VatType_EuReversed;
-                $this->invoice[Fld::Customer][Fld::Invoice][Meta::VatTypeSource]
-                    = 'WooCommerce\Completor::guessVatType: order is vat exempt';
+                && apply_filters('woocommerce_order_is_vat_exempt', $order->get_meta('is_vat_exempt') === 'yes', $order)) {
+                $this->invoice->vatType = Api::VatType_EuReversed;
+                $this->invoice->metadataSet(Meta::VatTypeSource,  'WooCommerce\Completor::guessVatType: order is vat exempt');
             }
 
-            if (in_array(Api::VatType_National, $possibleVatTypes,true)
+            if (in_array(Api::VatType_National, $possibleVatTypes, true)
                 && in_array(Api::VatType_EuVat, $possibleVatTypes, true)
             ) {
                 $vatPaid = $order->get_meta('vat_compliance_vat_paid', true);
@@ -64,11 +48,8 @@ class Completor extends BaseCompletor
                     if (isset($vatPaid['by_rates']) && count($vatPaid['by_rates']) === 1) {
                         $vat = reset($vatPaid['by_rates']);
                         if (isset($vat['is_variable_eu_vat'])) {
-                            $this->invoice[Fld::Customer][Fld::Invoice][Fld::VatType] = $vat['is_variable_eu_vat']
-                                ? Api::VatType_EuVat
-                                : Api::VatType_National;
-                            $this->invoice[Fld::Customer][Fld::Invoice][Meta::VatTypeSource]
-                                = 'WooCommerce\Completor::guessVatType: is_variable_eu_vat';
+                            $this->invoice->vatType = $vat['is_variable_eu_vat'] ? Api::VatType_EuVat : Api::VatType_National;
+                            $this->invoice->metadataSet(Meta::VatTypeSource, 'WooCommerce\Completor::guessVatType: is_variable_eu_vat');
                         }
                     }
                 }

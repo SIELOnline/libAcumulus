@@ -1,27 +1,14 @@
 <?php
-/**
- * Although we would like to use strict equality, i.e. including type equality,
- * unconditionally changing each comparison in this file will lead to problems
- * - API responses return each value as string, even if it is an int or float.
- * - The shop environment may be lax in its typing by, e.g. using strings for
- *   each value coming from the database.
- * - Our own config object is type aware, but, e.g, uses string for a vat class
- *   regardless the type for vat class ids as used by the shop itself.
- * So for now, we will ignore the warnings about non strictly typed comparisons
- * in this code, and we won't use strict_types=1.
- *
- * @noinspection TypeUnsafeComparisonInspection
- * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode  This is a copy of the old Completor.
- */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
+
+use function count;
 
 /**
  * Defines Magento specific invoice line flattener logic.
@@ -40,16 +27,16 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
      * We keep the info on the parent and remove it from the children to prevent
      * accounting amounts twice.
      */
-    protected function correctInfoBetweenParentAndChildren(Line $parent, array &$children): void
+    protected function correctInfoBetweenParentAndChildren(Line $parent, array $children): void
     {
         parent::correctInfoBetweenParentAndChildren($parent, $children);
 
         $useParentInfo = false;
         $vatRates = $this->getAppearingVatRates($children);
         if (count($vatRates) === 1) {
-            $childrenVatRate = array_key_first($vatRates);
-            if ((Number::isZero($childrenVatRate) || $childrenVatRate == $parent[Fld::VatRate])
-                && !Number::isZero($parent[Fld::UnitPrice])
+            $childrenVatRate = (float) array_key_first($vatRates);
+            if ((Number::isZero($childrenVatRate) || $childrenVatRate === $parent->vatRate)
+                && !Number::isZero($parent->unitPrice)
             ) {
                 $useParentInfo = true;
             }

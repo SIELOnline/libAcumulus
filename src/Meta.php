@@ -283,6 +283,7 @@ interface Meta
     // Line: Parent - Children related meta tags.
     /**
      * Creator->Completor: the children lines.
+     * @deprecated
      */
     public const ChildrenLines = 'children';
     /**
@@ -343,7 +344,7 @@ interface Meta
     /**
      * Support: the input to the strategy phase.
      */
-    public const CompletorStrategyInput = 'meta-completor-strategy-input';
+    public const CompletorStrategyInput = 'meta-completor-strategy-input-';
     /**
      * Support: the name(s) of the strategy(ies) that were successful in
      * completing this line.

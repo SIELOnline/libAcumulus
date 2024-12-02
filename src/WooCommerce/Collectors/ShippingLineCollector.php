@@ -164,7 +164,7 @@ class ShippingLineCollector extends LineCollector
                             }
                             // get_rate_percent() contains a % at the end of the string:
                             // remove it.
-                            $line->metadataAdd(Meta::VatRateLookup, substr(WC_Tax::get_rate_percent($taxRateId), 0, -1), true);
+                            $line->metadataAdd(Meta::VatRateLookup, (float) substr(WC_Tax::get_rate_percent($taxRateId), 0, -1));
                             $line->metadataAdd(Meta::VatRateLookupLabel, WC_Tax::get_rate_label($taxRate), true);
                         }
                     }

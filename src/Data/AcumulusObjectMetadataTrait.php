@@ -18,7 +18,6 @@ trait AcumulusObjectMetadataTrait
 {
     private MetadataCollection $metadata;
 
-
     /**
      * Completes the shallow clone that PHP automatically performs.
      *
@@ -80,7 +79,7 @@ trait AcumulusObjectMetadataTrait
     /**
      * See {@see \Siel\Acumulus\Data\MetadataCollection::addMultiple()}.
      */
-    public function metadataAddMultiple(string $name, array$values): void
+    public function metadataAddMultiple(string $name, array $values): void
     {
         $this->getMetadata()->addMultiple($name, $values);
     }

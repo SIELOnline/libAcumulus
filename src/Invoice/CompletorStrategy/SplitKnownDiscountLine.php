@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
@@ -62,21 +61,18 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     protected float $knownDiscountVatAmount;
     /** @var float[] */
     protected array $discountsPerVatRate;
-    /** @var array|Line */
-    protected Line|array $splitLine;
-    protected int $splitLineKey;
+    protected Line $splitLine;
+    protected int $splitLineIndex;
     protected int $splitLineCount;
 
-    /**
-     * @noinspection PhpMissingParentCallCommonInspection  no-op parent.
-     */
     protected function init(): void
     {
+        parent::init();
         $this->splitLineCount = 0;
-        foreach ($this->lines2Complete as $key => $line2Complete) {
-            if (!empty($line2Complete[Meta::StrategySplit])) {
+        foreach ($this->lines2Complete as $index => $line2Complete) {
+            if ($line2Complete->metadataGet(Meta::StrategySplit)) {
                 $this->splitLine = $line2Complete;
-                $this->splitLineKey = $key;
+                $this->splitLineIndex = $index;
                 $this->splitLineCount++;
             }
         }
@@ -85,57 +81,49 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
             $this->discountsPerVatRate = [];
             $this->knownDiscountAmountInc = 0.0;
             $this->knownDiscountVatAmount = 0.0;
-            foreach ($this->invoice[Fld::Customer][Fld::Invoice][Fld::Line] as $line) {
-                if (isset($line[Meta::LineDiscountAmountInc]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
-                    $this->knownDiscountAmountInc += $line[Meta::LineDiscountAmountInc];
-                    $this->knownDiscountVatAmount += $line[Meta::LineDiscountAmountInc] / (100.0 + $line[Fld::VatRate]) * $line[Fld::VatRate];
-                    $vatRate = sprintf('%.3f', $line[Fld::VatRate]);
-                    if (isset($this->discountsPerVatRate[$vatRate])) {
-                        $this->discountsPerVatRate[$vatRate] += $line[Meta::LineDiscountAmountInc];
-                    } else {
-                        $this->discountsPerVatRate[$vatRate] = $line[Meta::LineDiscountAmountInc];
+            foreach ($this->invoice->getLines() as $line) {
+                if ($line->metadataExists(Meta::LineDiscountAmountInc)
+                    && Completor::isCorrectVatRate($line->metadataGet(Meta::VatRateSource))
+                ) {
+                    $this->knownDiscountAmountInc += $line->metadataGet(Meta::LineDiscountAmountInc);
+                    $this->knownDiscountVatAmount += $line->metadataGet(Meta::LineDiscountAmountInc)
+                        / (100.0 + $line->vatRate) * $line->vatRate;
+                    $vatRate = rtrim(rtrim(sprintf('%.3f', $line->vatRate), '0'), '.');
+                    if (!isset($this->discountsPerVatRate[$vatRate])) {
+                        $this->discountsPerVatRate[$vatRate] = 0.0;
                     }
+                    $this->discountsPerVatRate[$vatRate] += $line->metadataGet(Meta::LineDiscountAmountInc);
                 }
             }
         }
     }
 
-    /**
-     * @noinspection PhpMissingParentCallCommonInspection  no-op parent.
-     */
     protected function checkPreconditions(): bool
     {
-        $result = false;
-        if ($this->splitLineCount === 1) {
-            if ((isset($this->splitLine[Fld::UnitPrice]) && Number::floatsAreEqual($this->splitLine[Fld::UnitPrice], $this->knownDiscountAmountInc - $this->knownDiscountVatAmount))
-                || (isset($this->splitLine[Meta::UnitPriceInc]) && Number::floatsAreEqual($this->splitLine[Meta::UnitPriceInc], $this->knownDiscountAmountInc))
-            ) {
-                $result = true;
-            }
-        }
-        return $result;
+        return $this->splitLineCount === 1
+            && ((isset($this->splitLine->unitPrice)
+                    && Number::floatsAreEqual($this->splitLine->unitPrice, $this->knownDiscountAmountInc - $this->knownDiscountVatAmount))
+                || ($this->splitLine->metadataExists(Meta::UnitPriceInc)
+                    && Number::floatsAreEqual($this->splitLine->metadataGet(Meta::UnitPriceInc), $this->knownDiscountAmountInc))
+            );
     }
 
     protected function execute(): bool
     {
-        $this->linesCompleted = [$this->splitLineKey];
         return $this->splitDiscountLine();
     }
 
     protected function splitDiscountLine(): bool
     {
         $this->description = "SplitKnownDiscountLine($this->knownDiscountAmountInc, $this->knownDiscountVatAmount)";
-        $this->replacingLines = [];
         foreach ($this->discountsPerVatRate as $vatRate => $discountAmountInc) {
-            $line = $this->splitLine;
+            $line = clone $this->splitLine;
             if (count($this->discountsPerVatRate) > 1) {
-                $vatName = $this->t('vat');
-                $vatRateStripped = rtrim($vatRate, '.0');
-                $line[Fld::Product] = "{$line[Fld::Product]} ($vatRateStripped% $vatName)";
+                $line->product .= sprintf('(%s%% %s)', $vatRate, $this->t('vat'));
             }
-            $line[Meta::UnitPriceInc] = $discountAmountInc;
-            unset($line[Fld::UnitPrice]);
-            $this->completeLine($line, (float) $vatRate);
+            $line->metadataSet(Meta::UnitPriceInc, $discountAmountInc);
+            unset($line->unitPrice);
+            $this->completeLine($this->splitLineIndex, $line, (float) $vatRate);
         }
         return true;
     }

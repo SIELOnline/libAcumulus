@@ -78,7 +78,7 @@ class LineCollector extends BaseLineCollector
             $taxRates = WC_Tax::find_rates($args);
             foreach ($taxRates as $taxRate) {
                 // Set here to overwrite the defaults above, add later.
-                $line->metadataAdd(Meta::VatRateLookup, $taxRate['rate']);
+                $line->metadataAdd(Meta::VatRateLookup, (float) $taxRate['rate']);
                 $line->metadataAdd(Meta::VatRateLookupLabel, $taxRate['label']);
             }
         }

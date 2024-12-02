@@ -142,7 +142,7 @@ class ItemLineCollector extends LineCollector
                         /** @var \hikashopCurrencyClass $currencyClass */
                         $currencyClass = hikashop_get('class.currency');
                         $vatRate = $currencyClass->getTax($zone->zone_id, $category->category_id, 'individual');
-                        $line->metadataSet(Meta::VatRateLookup, (float) $vatRate * 100);
+                        $line->metadataSet(Meta::VatRateLookup, 100.0 * $vatRate);
                     }
                 }
             }

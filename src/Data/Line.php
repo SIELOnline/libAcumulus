@@ -8,6 +8,8 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
 
+use function count;
+
 /**
  * Represents an invoice line object of an Acumulus API invoice object.
  *
@@ -79,6 +81,11 @@ class Line extends AcumulusObject
     public function setType(string $type): void
     {
         $this->metadataSet(Meta::SubType, $type);
+    }
+
+    public function hasChildren(): bool
+    {
+        return count($this->getChildren()) > 0;
     }
 
     /**

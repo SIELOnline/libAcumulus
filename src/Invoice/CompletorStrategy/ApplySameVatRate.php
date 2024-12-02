@@ -32,9 +32,8 @@ use Siel\Acumulus\Meta;
 class ApplySameVatRate extends CompletorStrategyBase
 {
     /**
-     * This strategy should be tried first after the split strategies.
-     *
      * @var int
+     *   This strategy should be tried first after the split strategies.
      */
     public static int $tryOrder = 30;
 
@@ -42,8 +41,7 @@ class ApplySameVatRate extends CompletorStrategyBase
     {
         // Try all possible vat rates.
         foreach ($this->getVatBreakdown() as $vatRateInfo) {
-            $vatRate = $vatRateInfo[Fld::VatRate];
-            if ($this->tryVatRate($vatRate)) {
+            if ($this->tryVatRate((float) $vatRateInfo[Fld::VatRate])) {
                 return true;
             }
         }
@@ -59,15 +57,15 @@ class ApplySameVatRate extends CompletorStrategyBase
     protected function tryVatRate(float $vatRate): bool
     {
         $this->description = "ApplySameVatRate($vatRate)";
-        $this->replacingLines = [];
+        $this->clearReplacingLines();
         $vatAmount = 0.0;
-        foreach ($this->lines2Complete as $line2Complete) {
-            $vatAmount += $this->completeLine($line2Complete, $vatRate);
+        foreach ($this->lines2Complete as $index => $line2Complete) {
+            $vatAmount += $this->completeLine($index, clone $line2Complete, $vatRate);
         }
 
-        $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategy . $this->getName()] = "tryVatRate($vatRate): $vatAmount";
+        $this->invoice->metadataSet(Meta::CompletorStrategy . $this->getName(), "tryVatRate($vatRate): $vatAmount");
         // If the vat totals are equal, the strategy worked.
         // We allow for a reasonable margin, as rounding errors may add up.
-        return Number::floatsAreEqual($vatAmount, $this->vat2Divide, 0.04);
+        return Number::floatsAreEqual($vatAmount, $this->getVat2Divide(), 0.04);
     }
 }

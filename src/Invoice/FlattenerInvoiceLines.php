@@ -1,26 +1,16 @@
 <?php
 /**
- * Although we would like to use strict equality, i.e. including type equality,
- * unconditionally changing each comparison in this file will lead to problems
- * - API responses return each value as string, even if it is an int or float.
- * - The shop environment may be lax in its typing by, e.g. using strings for
- *   each value coming from the database.
- * - Our own config object is type aware, but, e.g, uses string for a vat class
- *   regardless the type for vat class ids as used by the shop itself.
- * So for now, we will ignore the warnings about non strictly typed comparisons
- * in this code, and we won't use strict_types=1.
- *
- * @noinspection TypeUnsafeComparisonInspection
- * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection GrazieInspection False positives about phrases being seen as questions.
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
-use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
@@ -71,16 +61,10 @@ class FlattenerInvoiceLines
 
     /**
      * Completes the invoice lines by flattening them.
-     *
-     * @param Line[] $invoiceLines
-     *   The invoice lines to flatten.
-     *
-     * @return Line[]
-     *   The flattened invoice lines.
      */
-    public function complete(array $invoiceLines): array
+    public function complete(Invoice $invoice): void
     {
-        return $this->flattenInvoiceLines($invoiceLines);
+        $this->flattenInvoiceLines($invoice);
     }
 
     /**
@@ -93,53 +77,68 @@ class FlattenerInvoiceLines
      * With composed or variant child lines, amounts may appear twice. This will
      * also be corrected by this method.
      *
+     * @param \Siel\Acumulus\Data\Invoice $invoice
+     */
+    protected function flattenInvoiceLines(Invoice $invoice): void
+    {
+        $invoice->replaceLines($this->flattenLines($invoice->getLines()));
+    }
+
+    /**
+     * Flattens a set of lines.
+     *
      * @param Line[] $lines
-     *   The lines to flatten.
      *
      * @return Line[]
-     *   The flattened lines.
+     *   The flattened set of lines, so may be larger than $lines
      */
-    protected function flattenInvoiceLines(array $lines): array
+    protected function flattenLines(array $lines): array
     {
-        $result = [];
-
+        $chunks = [];
         foreach ($lines as $line) {
-            $children = null;
-            // Ignore children if we do not want to show them.
-            // If it has children, flatten them and determine how to add them.
-            if (count($line->getChildren()) > 0) {
-                $children = $this->flattenInvoiceLines($line->getChildren());
-                // Remove children from parent.
-                $line->removeChildren();
-                // Determine whether to add them at all and if so whether
-                // to add them as a single line or as separate lines.
-                if ($this->keepSeparateLines($line, $children)) {
-                    // Keep them separate but perform the following actions:
-                    // - Allow for some web shop specific corrections.
-                    // - Add metadata to relate parent and children.
-                    // - Indent product descriptions.
-                    $this->correctInfoBetweenParentAndChildren($line, $children);
-                } else {
-                    // Merge the children into the parent product:
-                    // - Allow for some web shop specific corrections.
-                    // - Add metadata about removed children.
-                    // - Add text from children, e.g. the chosen variants, to
-                    //   the parent.
-                    $line = $this->collectInfoFromChildren($line, $children);
-                    // Delete children as their info is merged into the parent.
-                    $children = null;
-                }
-            }
+            $chunks[] = [$line];
+            $chunks[] = $this->flattenLine($line);
+        }
+        return array_merge(...$chunks);
+    }
 
-            // Add the line and its children, if any.
-            $result[] = $line;
-            if (!empty($children)) {
-                /** @noinspection SlowArrayOperationsInLoopInspection */
-                $result = array_merge($result, $children);
+    /**
+     * Flattens 1 invoice line.
+     *
+     * @param \Siel\Acumulus\Data\Line $line
+     *
+     * @return Line[]
+     *   The flattened lines, if children are kept this is an array with > 1 lines.
+     */
+    protected function flattenLine(Line $line): array
+    {
+        $children = [];
+        // Ignore children if we do not want to show them.
+        // If it has children, flatten them and determine how to add them.
+        if (count($line->getChildren()) > 0) {
+            $children = $this->flattenLines($line->getChildren());
+            // Remove children from parent.
+            $line->removeChildren();
+            // Determine whether to add them at all and if so whether
+            // to add them as a single line or as separate lines.
+            if ($this->keepSeparateLines($line, $children)) {
+                // Keep them separate but perform the following actions:
+                // - Allow for some web shop specific corrections.
+                // - Add metadata to relate parent and children.
+                // - Indent product descriptions.
+                $this->correctInfoBetweenParentAndChildren($line, $children);
+            } else {
+                // Merge the children into the parent product:
+                // - Allow for some web shop specific corrections.
+                // - Add metadata about removed children.
+                // - Add text from children, e.g. the chosen variants, to
+                //   the parent.
+                $this->collectInfoFromChildren($line, $children);
+                // Delete children as their info is merged into the parent.
+                $children = [];
             }
         }
-
-        return $result;
+        return $children;
     }
 
     /**
@@ -198,10 +197,10 @@ class FlattenerInvoiceLines
     {
         $childrenTexts = [];
         foreach ($children as $child) {
-            $childrenTexts[] = $child[Fld::Product];
+            $childrenTexts[] = $child->product;
         }
         $childrenText = ' (' . implode(', ', $childrenTexts) . ')';
-        return $parent[Fld::Product] . $childrenText;
+        return $parent->product . $childrenText;
     }
 
     /**
@@ -229,14 +228,14 @@ class FlattenerInvoiceLines
      * @param Line[] $children
      *   The child invoice lines.
      */
-    protected function correctInfoBetweenParentAndChildren(Line $parent, array &$children): void
+    protected function correctInfoBetweenParentAndChildren(Line $parent, array $children): void
     {
         if (count($children) !== 0) {
-            $parent[Meta::Parent] = $this->parentIndex;
-            $parent[Meta::NumberOfChildren] = count($children);
-            foreach ($children as &$child) {
-                $child[Fld::Product] = $this->indentDescription($child[Fld::Product]);
-                $child[Meta::ParentIndex] = $this->parentIndex;
+            $parent->metadataSet(Meta::Parent, $this->parentIndex);
+            $parent->metadataSet(Meta::NumberOfChildren, count($children));
+            foreach ($children as $child) {
+                $child->product = $this->indentDescription($child->product);
+                $child->metadataSet(Meta::ParentIndex, $this->parentIndex);
             }
             $this->parentIndex++;
         }
@@ -267,20 +266,16 @@ class FlattenerInvoiceLines
      *   The parent invoice line.
      * @param Line[] $children
      *   The child invoice lines.
-     *
-     * @return Line
-     *   The parent line extended with the collected info.
      */
-    protected function collectInfoFromChildren(Line $parent, array $children): Line
+    protected function collectInfoFromChildren(Line $parent, array $children): void
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
         if (!$invoiceSettings['optionsShow']) {
-            $parent[Meta::ChildrenNotShown] = count($children);
+            $parent->metadataSet(Meta::ChildrenNotShown, count($children));
         } else {
-            $parent[Fld::Product] = $this->getMergedLinesText($parent, $children);
-            $parent[Meta::ChildrenMerged] = count($children);
+            $parent->product = $this->getMergedLinesText($parent, $children);
+            $parent->metadataSet(Meta::ChildrenMerged, count($children));
         }
-        return $parent;
     }
 
     /**
@@ -291,8 +286,7 @@ class FlattenerInvoiceLines
      * - Price info only on parent.
      *
      * What do we do in this situation:
-     * - Copy vat rate info from parent to children as it may be empty on the
-     *   children.
+     * - Copy vat rate info from parent to children (as it may be empty on the children).
      * - Remove price info from children (just to be sure).
      *
      * Known usages:
@@ -303,10 +297,10 @@ class FlattenerInvoiceLines
      * @param Line[] $children
      *   The child invoice lines.
      */
-    protected function keepChildrenAndPriceOnParentOnly(Line $parent, array &$children): void
+    protected function keepChildrenAndPriceOnParentOnly(Line $parent, array $children): void
     {
-        $children = $this->copyVatInfoToChildren($parent, $children);
-        $children = $this->removePriceInfoFromChildren($children);
+        $this->copyVatInfoToChildren($parent, $children);
+        $this->removePriceInfoFromChildren($children);
     }
 
     /**
@@ -317,8 +311,8 @@ class FlattenerInvoiceLines
      * - Price info is on the children, not on the parent.
      *
      * What do we do in this situation:
-     * - Copy vat rate info from 1 child to the parent (as in e.g. Magento, it
-     *   may be empty on the parent).
+     * - Copy vat rate info from 1 child to the parent (as, e.g. in Magento, it may be
+     *   empty on the parent).
      * - Remove price info from parent (just to be sure).
      *
      * Known usages:
@@ -329,10 +323,10 @@ class FlattenerInvoiceLines
      * @param Line[] $children
      *   The child invoice lines.
      */
-    protected function keepChildrenAndPriceOnChildrenOnly(Line &$parent, array $children): void
+    protected function keepChildrenAndPriceOnChildrenOnly(Line $parent, array $children): void
     {
-        $parent = $this->copyVatInfoToParent($parent, $children);
-        $parent = $this->removePriceInfoFromParent($parent);
+        $this->copyVatInfoToParent($parent, $children);
+        $this->removePriceInfoFromParent($parent);
     }
 
     /**
@@ -343,10 +337,9 @@ class FlattenerInvoiceLines
      * - Price info is on the parent and children, but they double each other.
      *
      * What do we do in this situation:
-     * - Remove price info from parent to ensure that the amount appears only
-     *   once.
-     * - If the vat rate on the parent is absent or incorrect, it should best be
-     *   set to the maximum vat rate appearing on the children.
+     * - Remove price info from parent to ensure that the amount appears only once.
+     * - If the vat rate on the parent is absent or incorrect, it should best be set to
+     *   the maximum vat rate appearing on the children.
      *
      * We could remove price info from the children instead, but that would be
      * wrong if the children do not all have the same vat rate.
@@ -361,12 +354,12 @@ class FlattenerInvoiceLines
      *
      * @noinspection PhpUnused
      */
-    protected function keepChildrenAndPriceOnParentAndChildren(Line &$parent, array $children): void
+    protected function keepChildrenAndPriceOnParentAndChildren(Line $parent, array $children): void
     {
-        if (!Completor::isCorrectVatRate($parent[Meta::VatRateSource]) || Number::isZero($parent[Fld::VatRate])) {
-            $parent = $this->copyVatInfoToParent($parent, $children);
+        if (!Completor::isCorrectVatRate($parent->metadataGet(Meta::VatRateSource)) || Number::isZero($parent->vatRate)) {
+            $this->copyVatInfoToParent($parent, $children);
         }
-        $parent = $this->removePriceInfoFromParent($parent);
+        $this->removePriceInfoFromParent($parent);
     }
 
     /**
@@ -391,7 +384,7 @@ class FlattenerInvoiceLines
      *
      * @noinspection PhpUnused
      */
-    protected function keepChildrenAndPriceOnParentPlusChildren(Line $parent, array &$children): void
+    protected function keepChildrenAndPriceOnParentPlusChildren(Line $parent, array $children): void
     {
     }
 
@@ -405,11 +398,8 @@ class FlattenerInvoiceLines
      *   The parent invoice line.
      * @param Line[] $children
      *   The child invoice lines.
-     *
-     * @return Line[]
-     *   The child invoice lines with vat info copied form the parent.
      */
-    protected function copyVatInfoToChildren(Line $parent, array $children): array
+    protected function copyVatInfoToChildren(Line $parent, array $children): void
     {
         static $vatMetaInfoTags = [
             Meta::VatRateMin,
@@ -422,33 +412,32 @@ class FlattenerInvoiceLines
             Meta::VatClassName,
         ];
 
-        foreach ($children as &$child) {
-            if (isset($parent[Fld::VatRate])) {
-                $child[Fld::VatRate] = $parent[Fld::VatRate];
+        foreach ($children as $child) {
+            if (isset($parent->vatRate)) {
+                $child->vatRate = $parent->vatRate;
             }
-            $child[Meta::VatAmount] = 0;
+            $child->metadataSet(Meta::VatAmount, 0);
             foreach ($vatMetaInfoTags as $tag) {
-                unset($child[$tag]);
+                $child->metadataRemove($tag);
             }
 
-            if (Completor::isCorrectVatRate($parent[Meta::VatRateSource])) {
-                $child[Meta::VatRateSource] = VatRateSource::Copied_From_Parent;
+            if (Completor::isCorrectVatRate($parent->metadataGet(Meta::VatRateSource))) {
+                $child->metadataSet(Meta::VatRateSource, VatRateSource::Copied_From_Parent);
             } else {
                 // The parent does not yet have correct vat rate info, so also
                 // copy the metadata to the child, so later phases can also
                 // correct the children.
-                $child[Meta::VatRateSource] = $parent[Meta::VatRateSource];
+                $child->metadataSet(Meta::VatRateSource, $parent->metadataGet(Meta::VatRateSource));
                 foreach ($vatMetaInfoTags as $tag) {
-                    if (isset($parent[$tag])) {
-                        $child[$tag] = $parent[$tag];
+                    if ($parent->metadataExists($tag)) {
+                        $child->metadataSet($tag, $parent->metadataGet($tag));
                     }
                 }
             }
 
-            $child[Meta::LineVatAmount] = 0;
-            unset($child[Meta::LineDiscountVatAmount]);
+            $child->metadataSet(Meta::LineVatAmount, 0);
+            $child->metadataRemove(Meta::LineDiscountVatAmount);
         }
-        return $children;
     }
 
     /**
@@ -460,32 +449,27 @@ class FlattenerInvoiceLines
      *   The parent invoice line.
      * @param Line[] $children
      *   The child invoice lines.
-     *
-     * @return Line
-     *   The parent invoice line with price info removed.
      */
-    protected function copyVatInfoToParent(Line $parent, array $children): Line
+    protected function copyVatInfoToParent(Line $parent, array $children): void
     {
-        $parent[Meta::VatAmount] = 0;
+        $parent->metadataSet(Meta::VatAmount, 0);
         // Copy vat rate info from a child when the parent has no vat rate info.
-        if (empty($parent[Fld::VatRate]) || Number::isZero($parent[Fld::VatRate])) {
-            $parent[Fld::VatRate] = CompletorInvoiceLines::getMaxAppearingVatRate($children, $index);
-            $parent[Meta::VatRateSource] = VatRateSource::Copied_From_Children;
-            if (isset($children[$index][Meta::VatRateMin])) {
-                $parent[Meta::VatRateMin] = $children[$index][Meta::VatRateMin];
+        if (empty($parent->vatRate) || Number::isZero($parent->vatRate)) {
+            $parent->vatRate = CompletorInvoiceLines::getMaxAppearingVatRate($children, $index);
+            $parent->metadataSet(Meta::VatRateSource, VatRateSource::Copied_From_Children);
+            if ($children[$index]->metadataExists(Meta::VatRateMin)) {
+                $parent->metadataSet(Meta::VatRateMin, $children[$index]->metadataGet(Meta::VatRateMin));
             } else {
-                unset($parent[Meta::VatRateMin]);
+                $parent->metadataRemove(Meta::VatRateMin);
             }
-            if (isset($children[$index][Meta::VatRateMax])) {
-                $parent[Meta::VatRateMax] = $children[$index][Meta::VatRateMax];
+            if ($children[$index]->metadataExists(Meta::VatRateMax)) {
+                $parent->metadataSet(Meta::VatRateMax, $children[$index]->metadataGet(Meta::VatRateMax));
             } else {
-                unset($parent[Meta::VatRateMax]);
+                $parent->metadataRemove(Meta::VatRateMax);
             }
         }
-        $parent[Meta::LineVatAmount] = 0;
-        unset($parent[Meta::LineDiscountVatAmount]);
-
-        return $parent;
+        $parent->metadataSet(Meta::LineVatAmount, 0);
+        $parent->metadataRemove(Meta::LineDiscountVatAmount);
     }
 
     /**
@@ -498,23 +482,17 @@ class FlattenerInvoiceLines
      *
      * @param Line[] $children
      *   The child invoice lines.
-     *
-     * @return Line[]
-     *   The child invoice lines with price info removed.
      */
-    protected function removePriceInfoFromChildren(array $children): array
+    protected function removePriceInfoFromChildren(array $children): void
     {
-        foreach ($children as &$child) {
-            $child[Fld::UnitPrice] = 0;
-            $child[Meta::UnitPriceInc] = 0;
-            unset(
-                $child[Meta::LineAmount],
-                $child[Meta::LineAmountInc],
-                $child[Meta::LineDiscountAmount],
-                $child[Meta::LineDiscountAmountInc]
-            );
+        foreach ($children as $child) {
+            $child->unitPrice = 0;
+            $child->metadataSet(Meta::UnitPriceInc, 0);
+            $child->metadataRemove(Meta::LineAmount);
+            $child->metadataRemove(Meta::LineAmountInc);
+            $child->metadataRemove(Meta::LineDiscountAmount);
+            $child->metadataRemove(Meta::LineDiscountAmountInc);
         }
-        return $children;
     }
 
     /**
@@ -524,16 +502,15 @@ class FlattenerInvoiceLines
      *
      * @param Line $parent
      *   The parent invoice line.
-     *
-     * @return Line
-     *   The parent invoice line with price info removed.
      */
-    protected function removePriceInfoFromParent(Line $parent): Line
+    protected function removePriceInfoFromParent(Line $parent): void
     {
-        $parent[Fld::UnitPrice] = 0;
-        $parent[Meta::UnitPriceInc] = 0;
-        unset($parent[Meta::LineAmount], $parent[Meta::LineAmountInc], $parent[Meta::LineDiscountAmount], $parent[Meta::LineDiscountAmountInc]);
-        return $parent;
+        $parent->unitPrice = 0;
+        $parent->metadataSet(Meta::UnitPriceInc, 0);
+        $parent->metadataRemove(Meta::LineAmount);
+        $parent->metadataRemove(Meta::LineAmountInc);
+        $parent->metadataRemove(Meta::LineDiscountAmount);
+        $parent->metadataRemove(Meta::LineDiscountAmountInc);
     }
 
     /**
@@ -569,13 +546,12 @@ class FlattenerInvoiceLines
     {
         $vatRates = [];
         foreach ($lines as $line) {
-            if (isset($line[Fld::VatRate])) {
-                $vatRate = sprintf('%.1f', $line[Fld::VatRate]);
-                if (isset($vatRates[$vatRate])) {
-                    $vatRates[$vatRate]++;
-                } else {
-                    $vatRates[$vatRate] = 1;
+            if (isset($line->vatRate)) {
+                $vatRate = sprintf('%.1f', $line->vatRate);
+                if (!isset($vatRates[$vatRate])) {
+                    $vatRates[$vatRate] = 0;
                 }
+                $vatRates[$vatRate]++;
             }
         }
         return $vatRates;
@@ -593,6 +569,6 @@ class FlattenerInvoiceLines
     protected function haveSameVatRate(array $lines): bool
     {
         $vatRates = $this->getAppearingVatRates($lines);
-        return count($vatRates) === 1;
+        return count($vatRates) <= 1;
     }
 }

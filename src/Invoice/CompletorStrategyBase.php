@@ -9,6 +9,7 @@
  *   regardless the type for vat class ids as used by the shop itself.
  * So for now, we will ignore the warnings about non strictly typed comparisons
  * in this code, and we won't use strict_types=1.
+ *
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
@@ -42,36 +43,26 @@ abstract class CompletorStrategyBase
      * Indication of the order of execution of the strategy.
      */
     public static int $tryOrder;
-    /**
-     * @var array[]|Invoice
-     *   The invoice according to the Acumulus API definition.
-     */
-    protected array|Invoice $invoice;
+    protected Invoice $invoice;
     /** @var array[] */
     protected array $possibleVatTypes;
     /** @var array[] */
     protected array $possibleVatRates;
     /**
-     * @var int[]
-     *   The indices of the completed lines. As a line2Complete may be split
-     *   over multiple new lines we must store the indices separately.
-     */
-    protected array $linesCompleted;
-    /**
-     * @var array[]|Line[]
+     * @var Line[]
      *   The lines that are to be completed by the strategy.
      */
     protected array $lines2Complete;
     /**
-     * @var array[]|Line[]
-     *   The lines that replace (some of) the $lines2Complete.
+     * @var Line[][]
+     *   The lines that replace the $linesCompleted.
      *
-     *   $linesCompleted indicates which lines in $lines2Complete are completed
-     *   and are to be replaced by the $replacingLines.
+     *   The replacing lines are grouped by the original index of the line they are
+     *   replacing so that we know which lines to replace and with which lines to replace
+     *   them (so we can keep the same order for the lines).
      */
-    protected array $replacingLines;
-    protected float $vat2Divide;
-    protected float $vatAmount;
+    private array $replacingLines;
+    private float $vat2Divide;
     protected float $invoiceAmount;
     protected string $description = 'Not yet set';
     /**
@@ -89,13 +80,10 @@ abstract class CompletorStrategyBase
     private array $vatBreakdown;
     protected Source $source;
 
-    /**
-     * @param array[]|Invoice $invoice
-     */
     public function __construct(
         Config $config,
         Translator $translator,
-        array|Invoice $invoice,
+        Invoice $invoice,
         array $possibleVatTypes,
         array $possibleVatRates,
         Source $source
@@ -162,28 +150,28 @@ abstract class CompletorStrategyBase
     }
 
     /**
-     * Returns the keys of the lines that are completed (and thus should be
-     * replaced by the replacing lines).
-     *
-     * Should only be called after success.
-     *
-     * @return int[]
-     */
-    public function getLinesCompleted(): array
-    {
-        return $this->linesCompleted;
-    }
-
-    /**
      * Returns the lines that should replace the lines completed.
      *
      * Should only be called after success.
      *
-     * @return array[]|Line[]
+     * @return Line[]
      */
     public function getReplacingLines(): array
     {
         return $this->replacingLines;
+    }
+
+    protected function clearReplacingLines(): void
+    {
+        $this->replacingLines = [];
+    }
+
+    protected function addReplacingLine(int $indexToReplace, Line $line): void
+    {
+        if (!isset($this->replacingLines[$indexToReplace])) {
+            $this->replacingLines[$indexToReplace] = [];
+        }
+        $this->replacingLines[$indexToReplace][] = $line;
     }
 
     /**
@@ -195,25 +183,23 @@ abstract class CompletorStrategyBase
      */
     protected function initAmounts(): void
     {
-        $invoicePart = &$this->invoice[Fld::Customer][Fld::Invoice];
-        /** @var \Siel\Acumulus\Invoice\Totals $totals */
-        $totals = $invoicePart[Meta::Totals];
-        $this->vatAmount = $totals->amountVat;
-        $this->invoiceAmount = $totals->amountEx;
-
         // The vat amount to divide over the non completed lines is the total vat
         // amount of the invoice minus all known vat amounts per line.
-        $this->vat2Divide = (float) $this->vatAmount;
-        foreach ($invoicePart[Fld::Line] as $line) {
-            if ($line[Meta::VatRateSource] !== VatRateSource::Strategy) {
+        /** @var \Siel\Acumulus\Invoice\Totals $totals */
+        $totals = $this->invoice->metadataGet(Meta::Totals);
+        $this->invoiceAmount = $totals->amountEx;
+        $this->vat2Divide = $totals->amountVat;
+
+        foreach ($this->invoice->getLines() as $line) {
+            if ($line->metadataGet(Meta::VatRateSource) !== VatRateSource::Strategy) {
                 // Deduct the vat amount from this line: if set, deduct it directly,
                 // otherwise calculate the vat amount using the vat rate and unit price.
-                if (isset($line[Meta::VatAmount])) {
-                    $this->vat2Divide -= $line[Meta::VatAmount] * $line[Fld::Quantity];
+                if ($line->metadataExists(Meta::VatAmount)) {
+                    $this->vat2Divide -= $line->metadataGet(Meta::VatAmount) * $line->quantity;
                 } else {
-                    $this->vat2Divide -= $this->isNoVat($line[Fld::VatRate])
+                    $this->vat2Divide -= $this->isNoVat($line->vatRate)
                         ? 0.0
-                        : ($line[Fld::VatRate] / 100.0) * $line[Fld::UnitPrice] * $line[Fld::Quantity];
+                        : ($line->vatRate / 100.0) * $line->unitPrice * $line->quantity;
                 }
             }
         }
@@ -224,12 +210,10 @@ abstract class CompletorStrategyBase
      */
     protected function initLines2Complete(): void
     {
-        $this->linesCompleted = [];
         $this->lines2Complete = [];
-        foreach ($this->invoice[Fld::Customer][Fld::Invoice][Fld::Line] as $key => $line) {
-            if ($line[Meta::VatRateSource] === VatRateSource::Strategy) {
-                $this->linesCompleted[] = $key;
-                $this->lines2Complete[$key] = $line;
+        foreach ($this->invoice->getLines() as $index => $line) {
+            if ($line->metadataGet(Meta::VatRateSource) === VatRateSource::Strategy) {
+                $this->lines2Complete[$index] = $line;
             }
         }
     }
@@ -256,13 +240,13 @@ abstract class CompletorStrategyBase
         }
 
         // Add amounts and count for appearing vat rates.
-        foreach ($this->invoice[Fld::Customer][Fld::Invoice][Fld::Line] as $line) {
-            if ($line[Meta::VatRateSource] !== VatRateSource::Strategy && isset($line[Fld::VatRate])) {
-                $amount = $line[Fld::UnitPrice] * $line[Fld::Quantity];
-                $vatAmount = $this->isNoVat($line[Fld::VatRate])
+        foreach ($this->invoice->getLines() as $line) {
+            if ($line->metadataGet(Meta::VatRateSource) !== VatRateSource::Strategy && isset($line->vatRate)) {
+                $amount = $line->unitPrice * $line->quantity;
+                $vatAmount = $this->isNoVat($line->vatRate)
                     ? 0.0
-                    : $line[Fld::VatRate] / 100.0 * $amount;
-                $vatRate = sprintf('%.3f', $line[Fld::VatRate]);
+                    : $line->vatRate / 100.0 * $amount;
+                $vatRate = sprintf('%.3f', $line->vatRate);
                 // Add amount to existing vat rate line or create a new line.
                 if (isset($this->vatBreakdown[$vatRate])) {
                     $this->vatBreakdown[$vatRate][Meta::VatAmount] += $vatAmount;
@@ -273,6 +257,7 @@ abstract class CompletorStrategyBase
         }
 
         // Sort high to low.
+        // @todo: filter non used vat rates (count === 0)?
         usort($this->vatBreakdown, static function ($a, $b) {
             return $b['count'] <=> $a['count'];
         });
@@ -287,7 +272,7 @@ abstract class CompletorStrategyBase
      */
     protected function getVatBreakDownMinRate(): array
     {
-        $result = [Fld::VatRate => PHP_INT_MAX];
+        $result = [Fld::VatRate => 100.0];
         foreach ($this->getVatBreakdown() as $breakDown) {
             if ($breakDown[Fld::VatRate] < $result[Fld::VatRate]) {
                 $result = $breakDown;
@@ -305,7 +290,7 @@ abstract class CompletorStrategyBase
      */
     protected function getVatBreakDownMaxRate(): array
     {
-        $result = [Fld::VatRate => -PHP_INT_MAX];
+        $result = [Fld::VatRate => -1.0];
         foreach ($this->getVatBreakdown() as $breakDown) {
             if ($breakDown[Fld::VatRate] > $result[Fld::VatRate]) {
                 $result = $breakDown;
@@ -340,28 +325,21 @@ abstract class CompletorStrategyBase
      */
     public function apply(): bool
     {
-        $this->replacingLines = [];
         $this->init();
         if ($this->checkPreconditions()) {
             return $this->execute();
         } else {
-            if (!empty($this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyPreconditionFailed])) {
-                $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyPreconditionFailed] .= ', ';
-            } else {
-                $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyPreconditionFailed] = '';
-            }
-            $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategyPreconditionFailed] .= $this->getName();
+            $this->invoice->metadataAdd(Meta::CompletorStrategyPreconditionFailed, $this->getName(), true);
             return false;
         }
     }
 
     /**
-     * Strategy dependent initialization.
-     *
-     * This base implementation does nothing.
+     * Strategy initialization.
      */
     protected function init(): void
     {
+        $this->clearReplacingLines();
     }
 
     /**
@@ -399,33 +377,42 @@ abstract class CompletorStrategyBase
      * Completes a line by filling in the given vat rate and calculating other
      * possibly missing fields ('vatamount', 'unitprice').
      *
-     * @param array|Line $line2Complete
-     *   The invoice line to complete. After it has been completed it is added
-     *   to {@see $replacingLines}
+     * @param int $index
+     *   The index of the original line2Complete in the set of lines for the invoice being
+     *   completed.
+     * @param Line $line2Complete
+     *   (A clone of) The invoice line to complete. After it has been completed it is
+     *   added to {@see $replacingLines}
      * @param float $vatRate
      *   The vat rate to add to the line.
      *
      * @return float
      *   The vat amount for the completed line.
      */
-    protected function completeLine(Line|array $line2Complete, float $vatRate): float
+    protected function completeLine(int $index, Line $line2Complete, float $vatRate): float
     {
-        if (!isset($line2Complete[Fld::Quantity])) {
-            $line2Complete[Fld::Quantity] = 1;
+        if (!isset($line2Complete->quantity)) {
+            $line2Complete->quantity = 1;
         }
-        $line2Complete[Fld::VatRate] = $vatRate;
-        if (isset($line2Complete[Fld::UnitPrice])) {
-            $line2Complete[Meta::VatAmount] = $this->isNoVat($line2Complete[Fld::VatRate])
-                ? 0.0
-                : ($line2Complete[Fld::VatRate] / 100.0) * $line2Complete[Fld::UnitPrice];
-        } else { // isset($line2Complete[Meta::UnitPriceInc])
-            $line2Complete[Meta::VatAmount] = $this->isNoVat($line2Complete[Fld::VatRate])
-                ? 0.0
-                : ($line2Complete[Fld::VatRate] / (100.0 + $line2Complete[Fld::VatRate])) * $line2Complete[Meta::UnitPriceInc];
-            $line2Complete[Fld::UnitPrice] = $line2Complete[Meta::UnitPriceInc] - $line2Complete[Meta::VatAmount];
+        $line2Complete->vatRate = $vatRate;
+        if (isset($line2Complete->unitPrice)) {
+            $line2Complete->metadataSet(
+                Meta::VatAmount,
+                $this->isNoVat($line2Complete->vatRate)
+                    ? 0.0
+                    : ($line2Complete->vatRate / 100.0) * $line2Complete->unitPrice
+            );
+        } else { // $line2Complete->metadataExists(Meta::UnitPriceInc)
+            $line2Complete->metadataSet(
+                Meta::VatAmount,
+                $this->isNoVat($line2Complete->vatRate)
+                    ? 0.0
+                    : ($line2Complete->vatRate / (100.0 + $line2Complete->vatRate)) * $line2Complete->metadataGet(Meta::UnitPriceInc)
+            );
+            $line2Complete->unitPrice = $line2Complete->metadataGet(Meta::UnitPriceInc) - $line2Complete->metadataGet(Meta::VatAmount);
         }
-        $this->replacingLines[] = $line2Complete;
-        return $line2Complete[Meta::VatAmount] * $line2Complete[Fld::Quantity];
+        $this->addReplacingLine($index, $line2Complete);
+        return $line2Complete->metadataGet(Meta::VatAmount) * $line2Complete->quantity;
     }
 
     /**

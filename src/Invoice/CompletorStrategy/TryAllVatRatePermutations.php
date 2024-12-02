@@ -91,20 +91,19 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
     protected function try1Permutation(array $permutation): bool
     {
         $this->description = 'TryAllVatRatePermutations(' . implode(', ', $permutation) . ')';
-        $this->replacingLines = [];
+        $this->clearReplacingLines();
         $vatAmount = 0.0;
         $i = 0;
-        foreach ($this->lines2Complete as $line2Complete) {
-            $vatAmount += $this->completeLine($line2Complete, $permutation[$i]);
+        foreach ($this->lines2Complete as $index => $line2Complete) {
+            $vatAmount += $this->completeLine($index, clone $line2Complete, $permutation[$i]);
             $i++;
         }
 
-        $this->invoice[Fld::Customer][Fld::Invoice][Meta::CompletorStrategy . $this->getName()] = sprintf(
-            'try1Permutation([%s]): %f',
-            implode(', ', $permutation),
-            $vatAmount
+        $this->invoice->metadataSet(
+            Meta::CompletorStrategy . $this->getName(),
+            sprintf('try1Permutation([%s]): %f', implode(', ', $permutation), $vatAmount)
         );
         // The strategy worked if the vat totals equals the vat to divide.
-        return Number::floatsAreEqual($vatAmount, $this->vat2Divide);
+        return Number::floatsAreEqual($vatAmount, $this->getVat2Divide());
     }
 }

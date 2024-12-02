@@ -3,6 +3,15 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+8.3.7 (2024-12-??)
+------------------
+Bugs:
+- ALL: Voucher lines should always get vat free and not 0%.
+
+Refactorings:
+- Converted legacy completors in Invoice namespace from array to object use, including new
+  methods on AcumulusObjects and deep cloning them.
+
 
 8.3.6 (2024-11-27)
 ------------------

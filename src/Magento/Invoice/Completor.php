@@ -1,23 +1,10 @@
 <?php
-/**
- * Although we would like to use strict equality, i.e. including type equality,
- * unconditionally changing each comparison in this file will lead to problems
- * - API responses return each value as string, even if it is an int or float.
- * - The shop environment may be lax in its typing by, e.g. using strings for
- *   each value coming from the database.
- * - Our own config object is type aware, but, e.g, uses string for a vat class
- *   regardless the type for vat class ids as used by the shop itself.
- * So for now, we will ignore the warnings about non strictly typed comparisons
- * in this code, and we won't use strict_types=1.
- *
- * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection DuplicatedCode  This is a copy of the old Completor.
- */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Data\LineType;
-use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor as BaseCompletor;
 use Siel\Acumulus\Invoice\Source;
@@ -48,26 +35,29 @@ class Completor extends BaseCompletor
             $discountAmountInc = 0.0;
             $discountLineAmountInc = 0.0;
 
-            $invoiceLines = $this->invoice[Fld::Customer][Fld::Invoice][Fld::Line];
+            $invoiceLines = $this->invoice->getLines();
             foreach ($invoiceLines as $line) {
-                if (isset($line[Meta::LineDiscountAmountInc])) {
-                    $discountAmountInc += $line[Meta::LineDiscountAmountInc];
+                if ($line->metadataExists(Meta::LineDiscountAmountInc)) {
+                    $discountAmountInc += $line->metadataGet(Meta::LineDiscountAmountInc);
                 }
 
-                if ($line[Meta::SubType] === LineType::Discount) {
-                    if (isset($line[Meta::LineAmountInc])) {
-                        $discountLineAmountInc += $line[Meta::LineAmountInc];
-                    } elseif (isset($line[Meta::UnitPriceInc])) {
-                        $discountLineAmountInc += $line[Fld::Quantity] * $line[Meta::UnitPriceInc];
+                if ($line->metadataGet(Meta::SubType) === LineType::Discount) {
+                    if ($line->metadataExists(Meta::LineAmountInc)) {
+                        $discountLineAmountInc += $line->metadataGet(Meta::LineAmountInc);
+                    } elseif ($line->metadataExists(Meta::UnitPriceInc)) {
+                        $discountLineAmountInc += $line->quantity * $line->metadataGet(Meta::UnitPriceInc);
                     }
                 }
             }
 
             if (!Number::floatsAreEqual($discountAmountInc, $discountLineAmountInc)) {
                 foreach ($invoiceLines as $line) {
-                    if ($line[Meta::SubType] === LineType::Shipping && isset($line[Meta::LineDiscountAmountInc])) {
-                        $line[Meta::LineDiscountAmountInc] += $discountLineAmountInc - $discountAmountInc;
-                        $line[Meta::LineDiscountAmountIncCorrected] = true;
+                    if ($line->metadataGet(Meta::SubType) === LineType::Shipping && $line->metadataExists(Meta::LineDiscountAmountInc)) {
+                        $line->metadataSet(
+                            Meta::LineDiscountAmountInc,
+                            $line->metadataGet(Meta::LineDiscountAmountInc) + $discountLineAmountInc - $discountAmountInc
+                        );
+                        $line->metadataSet(Meta::LineDiscountAmountIncCorrected, true);
                     }
                 }
             }

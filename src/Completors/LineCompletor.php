@@ -10,7 +10,6 @@ namespace Siel\Acumulus\Completors;
 
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\MessageCollection;
 
 /**
@@ -25,8 +24,6 @@ use Siel\Acumulus\Helpers\MessageCollection;
  */
 class LineCompletor extends BaseCompletor
 {
-    private Line $line;
-
     /**
      * Completes a {@see \Siel\Acumulus\Data\Line}.
      *
@@ -37,10 +34,8 @@ class LineCompletor extends BaseCompletor
      */
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
-        $this->line = $acumulusObject;
-
-        $this->getContainer()->getCompletorTask(DataType::Line, 'ByConfig')->complete($this->line);
-        $this->getContainer()->getCompletorTask(DataType::Line, 'MarginProducts')->complete($this->line);
-        $this->getContainer()->getCompletorTask(DataType::Line, 'VatRange')->complete($this->line);
+        $this->getContainer()->getCompletorTask(DataType::Line, 'ByConfig')->complete($acumulusObject);
+        $this->getContainer()->getCompletorTask(DataType::Line, 'MarginProducts')->complete($acumulusObject);
+        $this->getContainer()->getCompletorTask(DataType::Line, 'VatRange')->complete($acumulusObject);
     }
 }

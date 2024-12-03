@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Completors;
 
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\EmailInvoiceAsPdf;
 use Siel\Acumulus\Helpers\MessageCollection;
 
 /**
@@ -24,8 +23,6 @@ use Siel\Acumulus\Helpers\MessageCollection;
  */
 class EmailInvoiceAsPdfCompletor extends BaseCompletor
 {
-    private EmailInvoiceAsPdf $emailAsPdf;
-
     /**
      * Completes an {@see \Siel\Acumulus\Data\Address}.
      *
@@ -36,7 +33,6 @@ class EmailInvoiceAsPdfCompletor extends BaseCompletor
      */
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
-        $this->emailAsPdf = $acumulusObject;
-        $this->getContainer()->getCompletorTask('EmailInvoiceAsPdf', 'ByConfig')->complete($this->emailAsPdf);
+        $this->getContainer()->getCompletorTask('EmailInvoiceAsPdf', 'ByConfig')->complete($acumulusObject);
     }
 }

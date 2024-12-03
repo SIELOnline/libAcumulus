@@ -13,7 +13,8 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 
 /**
- * TypedCollector does foo.
+ * SubTypedCollector adds a subType property to collectors for those data type that have
+ * subtypes: Line, Address, and EmailAsPdf
  */
 abstract class SubTypedCollector extends Collector
 {
@@ -25,8 +26,14 @@ abstract class SubTypedCollector extends Collector
      */
     protected string $subType;
 
-    public function __construct(string $subType, Mappings $mappings, FieldExpander $fieldExpander, Container $container, Translator $translator,
-        Log $log)
+    public function __construct(
+        string $subType,
+        Mappings $mappings,
+        FieldExpander $fieldExpander,
+        Container $container,
+        Translator $translator,
+        Log $log
+    )
     {
         $this->subType = $subType;
         parent::__construct($mappings, $fieldExpander, $container, $translator, $log);

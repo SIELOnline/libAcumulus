@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Completors;
 
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Helpers\MessageCollection;
 
 /**
@@ -25,8 +24,6 @@ use Siel\Acumulus\Helpers\MessageCollection;
  */
 class AddressCompletor extends BaseCompletor
 {
-    private Address $address;
-
     /**
      * Completes an {@see \Siel\Acumulus\Data\Address}.
      *
@@ -37,7 +34,6 @@ class AddressCompletor extends BaseCompletor
      */
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
-        $this->address = $acumulusObject;
-        $this->getContainer()->getCompletorTask('Address', 'ByConfig')->complete($this->address);
+        $this->getContainer()->getCompletorTask('Address', 'ByConfig')->complete($acumulusObject);
     }
 }

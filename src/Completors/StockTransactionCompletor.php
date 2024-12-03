@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Completors;
 
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\MessageCollection;
 
 /**
@@ -18,8 +17,6 @@ use Siel\Acumulus\Helpers\MessageCollection;
  */
 class StockTransactionCompletor extends BaseCompletor
 {
-    private StockTransaction $stockTransaction;
-
     /**
      * Completes an {@see \Siel\Acumulus\Data\StockTransaction}.
      *
@@ -30,7 +27,6 @@ class StockTransactionCompletor extends BaseCompletor
      */
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
-        $this->stockTransaction = $acumulusObject;
-        $this->getContainer()->getCompletorTask('StockTransaction', 'ByConfig')->complete($this->stockTransaction);
+        $this->getContainer()->getCompletorTask('StockTransaction', 'ByConfig')->complete($acumulusObject);
     }
 }

@@ -7,5 +7,6 @@ composer.lock
 /vendor/
 /zremoved/
 
-# Test data are committed, but not the *.latest.html files
+# Test data are committed, but not the *.latest.html files or the phpunit cache
 /tests/Data/*.latest.*
+.phpunit.result.cache

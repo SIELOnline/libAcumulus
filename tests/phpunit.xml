@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+         cacheResult="false"
+         colors="true" columns="max" stderr="true">
+    <testsuites>
+        <testsuite name="all">
+            <directory>.</directory>
+        </testsuite>
+        <testsuite name="api">
+            <directory>tests/ApiBehaviour</directory>
+        </testsuite>
+        <testsuite name="local">
+            <directory>Unit</directory>
+            <directory>Integration</directory>
+        </testsuite>
+        <testsuite name="unit">
+            <directory>Unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory>Integration</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

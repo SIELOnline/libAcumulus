@@ -55,8 +55,6 @@ use function is_int;
  */
 class Invoice extends AcumulusObject
 {
-    use InvoiceArrayAccessTrait;
-
     protected ?Customer $customer = null;
     /** @var Line[] */
     protected array $lines = [];
@@ -118,7 +116,11 @@ class Invoice extends AcumulusObject
         ];
     }
 
-    // @todo: let it fail if customer is not yet set? introduce isCustomerSet?
+    public function hasCustomer(): bool
+    {
+        return isset($this->customer);
+    }
+
     public function getCustomer(): ?Customer
     {
         return $this->customer;
@@ -127,7 +129,6 @@ class Invoice extends AcumulusObject
     public function setCustomer(Customer $customer): void
     {
         $this->customer = $customer;
-        // @legacy: needed to support ArrayAccess.
         $this->customer->setInvoice($this);
     }
 
@@ -148,8 +149,8 @@ class Invoice extends AcumulusObject
      * Replaces all lines in the invoice with the give set of lines.
      *
      * Typically, this is the original set of lines processed in a way that may have lead
-     * more (or less)) lines, e.g. flattening child lines, (actual use case) or splitting
-     * lines because of split vat rates (idea for use case).
+     * to more (or less) lines, e.g. flattening child lines, (actual use case) or
+     * splitting lines because of split vat rates.
      *
      * @param Line[] $lines
      */
@@ -226,7 +227,6 @@ class Invoice extends AcumulusObject
         }
         $invoice += $this->metadataToArray();
 
-        /** @noinspection NullPointerExceptionInspection  should throw on null */
         $customer = $this->getCustomer()->toArray();
         $customer[Fld::Invoice] = $invoice;
         return [Fld::Customer => $customer];

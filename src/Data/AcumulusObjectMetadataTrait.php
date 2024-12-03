@@ -7,9 +7,6 @@ namespace Siel\Acumulus\Data;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Meta;
 
-use function assert;
-use function is_string;
-
 /**
  * Wraps the {@see \Siel\Acumulus\Data\MetadataCollection} methods in methods
  * for an {@see \Siel\Acumulus\Data\AcumulusObject}.
@@ -102,7 +99,6 @@ trait AcumulusObjectMetadataTrait
      */
     public function addWarning(string|Message $message): void
     {
-        assert(is_string($message) || $message instanceof Message);
         $this->metadataAdd(Meta::Warning, $message, false);
     }
 

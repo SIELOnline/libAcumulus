@@ -45,13 +45,10 @@ use Siel\Acumulus\Shop\AcumulusEntryManager;
 use Siel\Acumulus\Shop\InvoiceCreate;
 use Siel\Acumulus\Shop\InvoiceManager;
 use Siel\Acumulus\Shop\InvoiceSend;
-
 use Siel\Acumulus\Shop\ProductManager;
-
 use Siel\Acumulus\Product\StockTransactionResult;
 
 use function count;
-
 use function strlen;
 
 use const Siel\Acumulus\Version;

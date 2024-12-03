@@ -69,7 +69,6 @@ class ItemLineCollector extends LineCollector
             // In the old Creator we added all kinds of vat rate related metadata, but as
             // options do not have a price, this seems unnecessary. Just add the
             // VatRateSource::Parent as Meta::VatRateSource.
-//            $result[Meta::ChildrenLines] = [];
 //            $vatMetadata[Meta::VatAmount] = 0;
 //            $vatMetadata[Meta::VatRateSource] = VatRateSource::Parent;
 //            $optionsVatInfo = $vatInfo; // $vatInfo is vat range tags + vat rate lookup metadata

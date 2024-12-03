@@ -43,7 +43,7 @@ class CompleteMarginProducts extends BaseCompletorTask
      */
     protected function completeMarginScheme(Line $line): void
     {
-        if (!empty($line['costPrice']) && $line->getType() === LineType::Item) {
+        if (!empty($line->costPrice) && $line->getType() === LineType::Item) {
             $marginProducts = match ($this->getMarginProducts()) {
                 Config::MarginProducts_No, Config::MarginProducts_Unknown => false,
                 Config::MarginProducts_Both => null,

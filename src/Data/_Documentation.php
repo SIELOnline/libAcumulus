@@ -12,9 +12,7 @@ namespace Siel\Acumulus\Data;
  * The Data namespace contains:
  * - The base classes for the data objects that represent Acumulus API messages,
  *   or message parts:
- *   - {@see \Siel\Acumulus\Data\AcumulusObject} (with the implementation of the
- *     {@see \ArrayAccess} interface in a separate
- *     {@see \Siel\Acumulus\Data\AcumulusObjectArrayAccessTrait} trait.
+ *   - {@see \Siel\Acumulus\Data\AcumulusObject}.
  *   - {@see \Siel\Acumulus\Data\AcumulusProperty}
  *   - {@see \Siel\Acumulus\Data\MetadataCollection}
  *   - {@see \Siel\Acumulus\Data\MetadataValue}

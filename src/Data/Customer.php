@@ -66,11 +66,9 @@ use function in_array;
  */
 class Customer extends AcumulusObject
 {
-    use CustomerArrayAccessTrait;
-
     protected ?Address $invoiceAddress = null;
     protected ?Address $shippingAddress = null;
-    // @legacy: needed to support fluent ArrayAccess.
+    // Is no longer needed, but this link seems logically enough to have.
     protected ?Invoice $invoice = null;
 
     /**
@@ -118,13 +116,11 @@ class Customer extends AcumulusObject
         ];
     }
 
-    // @legacy: needed to support ArrayAccess.
     public function getInvoice(): ?Invoice
     {
         return $this->invoice;
     }
 
-    // @legacy: needed to support ArrayAccess.
     public function setInvoice(?Invoice $invoice): void
     {
         $this->invoice = $invoice;

@@ -144,10 +144,8 @@ class AcumulusProperty
     /**
      * @return mixed
      *   The value of this property, or null if not set.
-     *
-     * @legacy: the return by reference is to make the ArrayAccess working.
      */
-    public function &getValue(): mixed
+    public function getValue(): mixed
     {
         return $this->value;
     }

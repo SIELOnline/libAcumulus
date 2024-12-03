@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice;
 
-use ArrayAccess;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Completors\CompletorTaskInterface;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
@@ -29,7 +29,6 @@ use Siel\Acumulus\Helpers\Severity;
 use function array_key_exists;
 use function count;
 use function in_array;
-use function is_array;
 use function is_float;
 use function is_scalar;
 use function sprintf;
@@ -1787,7 +1786,7 @@ class Completor
     /**
      * Makes the invoice a concept invoice and optionally adds a warning.
      *
-     * @param ArrayAccess $array
+     * @param Invoice $invoice
      *   The (sub) array of the Acumulus invoice array for which the warning is
      *   intended. The warning will also be added under a Meta::Warning tag
      * @param string $messageKey
@@ -1798,7 +1797,7 @@ class Completor
      * @param string ...$args
      *   Additional arguments to format the message.
      */
-    public function changeInvoiceToConcept(ArrayAccess $array, string $messageKey, int $code, string ...$args): void
+    public function changeInvoiceToConcept(Invoice $invoice, string $messageKey, int $code, string ...$args): void
     {
         $pdfMessage = '';
         $invoiceSettings = $this->config->getInvoiceSettings();
@@ -1818,7 +1817,7 @@ class Completor
             }
             $this->result->createAndAddMessage($message, Severity::Warning, $code);
             /** @noinspection NullPointerExceptionInspection */
-            $this->addWarning($array, $this->result->getByCode($code)->format(Message::Format_Plain));
+            $this->addWarning($invoice, $this->result->getByCode($code)->format(Message::Format_Plain));
         }
     }
 
@@ -1829,20 +1828,9 @@ class Completor
      * warning is set, $warning is added as a string, otherwise it becomes an
      * array of warnings to which this $warning is added.
      */
-    protected function addWarning(ArrayAccess $array, string $warning, string $severity = Meta::Warning): void
+    protected function addWarning(AcumulusObject $acumulusObject, string $warning, string $severity = Meta::Warning): void
     {
-        if (!isset($array[$severity])) {
-            $array[$severity] = $warning;
-        } else {
-            if (!is_array($array[$severity])) {
-                $array[$severity] = (array) $array[$severity];
-            }
-            // @todo: find out why a warning could be added multiple times and
-            //   try to prevent it in the first place.
-            if (in_array($warning, $array[$severity], true)) {
-                $array[$severity][] = $warning;
-            }
-        }
+        $acumulusObject->metadataAdd($severity, $warning);
     }
 
     /**

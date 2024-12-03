@@ -17,11 +17,11 @@ class AcumulusRequest extends BaseAcumulusRequest
         $result = parent::getBasicSubmit();
         if (str_contains($this->uri, 'entry/noemailonerror')) {
             $this->uri = str_replace('entry/noemailonerror', 'entry/entry_info', $this->uri);
-            unset($result['contract']['emailonerror'], $result['contract']['emailonwarning']);
+            unset($result->getContract()->emailOnError, $result->getContract()->emailOnWarning);
         }
         if (str_contains($this->uri, 'entry/noemailonwarning')) {
             $this->uri = str_replace('entry/noemailonwarning', 'entry/entry_info', $this->uri);
-            unset($result['contract']['emailonwarning']);
+            unset($result->getContract()->emailOnWarning);
         }
         return $result;
     }

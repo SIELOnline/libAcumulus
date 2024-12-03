@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
-use ArrayAccess;
 use BadMethodCallException;
 use ReflectionClass;
 use RuntimeException;
@@ -59,9 +58,8 @@ use function strlen;
  *
  * Metadata can be added via the {@see MetadataCollection} methods.
  */
-abstract class AcumulusObject implements ArrayAccess
+abstract class AcumulusObject
 {
-    use AcumulusObjectArrayAccessTrait;
     use AcumulusObjectMetadataTrait;
 
     /** @var \Siel\Acumulus\Data\AcumulusProperty[] */
@@ -107,10 +105,8 @@ abstract class AcumulusObject implements ArrayAccess
      *
      * @throws \RuntimeException
      *   $name is not an existing name of an {@see AcumulusProperty}.
-     *
-     * @legacy: the return by reference is to make the ArrayAccess working.
      */
-    public function &__get(string $name)
+    public function __get(string $name)
     {
         $name = $this->checkIsProperty($name);
         return $this->data[$name]->getValue();

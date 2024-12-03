@@ -282,11 +282,6 @@ interface Meta
 
     // Line: Parent - Children related meta tags.
     /**
-     * Creator->Completor: the children lines.
-     * @deprecated
-     */
-    public const ChildrenLines = 'children';
-    /**
      * Support: the index of the parent line this child belonged to before
      * flattening.
      */

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
@@ -498,6 +499,9 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'menu_settings' => 'Instellingen → Acumulus instellingen',
 
         'other_field' => 'Ander veld',
+        Fld::ProductSku => 'SKU',
+        Fld::ProductEan => 'EAN',
+        Fld::ProductDescription => 'Product of dienst',
     ];
 
     protected array $en = [

@@ -1,9 +1,13 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection DateException is PHP8.3
+ */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
+use DateException;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
@@ -188,8 +192,7 @@ class AcumulusEntry
      * @return string|int|\DateTimeInterface
      *   The timestamp when this record was created.
      *
-     * @throws \RuntimeException
-     * @throws \DateException
+     * @throws \DateException|\RuntimeException (PHP8.3: DateException)
      */
     public function getCreated(bool $raw = false): DateTimeInterface|string|int
     {
@@ -210,7 +213,7 @@ class AcumulusEntry
      * @return string|int|\DateTimeInterface
      *   The timestamp when this record was last updated.
      *
-     * @throws \Exception
+     * @throws \DateException|\RuntimeException (PHP8.3: DateException)
      */
     public function getUpdated(bool $raw = false): DateTimeInterface|string|int
     {
@@ -233,8 +236,7 @@ class AcumulusEntry
      *
      * @return bool|\DateTimeInterface
      *
-     * @throws \RuntimeException
-     * @throws \DateException
+     * @throws \DateException|\RuntimeException (PHP8.3: DateException)
      */
     protected function toDateTime(float|int|string $timestamp): DateTimeInterface|bool
     {
@@ -343,12 +345,13 @@ class AcumulusEntry
      * @return bool
      *   True if the entry indicates that there is a lock on sending the
      *   invoice, but has expired, false otherwise.
-     *
-     * @throws \RuntimeException
-     * @throws \DateException
      */
     public function hasLockExpired(): bool
     {
-        return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTimeS;
+        try {
+            return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTimeS;
+        } catch (DateException|RuntimeException) {
+            return false;
+        }
     }
 }

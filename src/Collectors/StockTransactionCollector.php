@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Meta;
@@ -27,7 +29,7 @@ use function sprintf;
  * Properties that are not set:
  * - \DateTimeInterface $stockDate
  *
- * @method \Siel\Acumulus\Data\StockTransaction collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
+ * @method StockTransaction collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null)
  */
 class StockTransactionCollector extends Collector
 {
@@ -56,7 +58,10 @@ class StockTransactionCollector extends Collector
                         $product = $propertySources->get('product');
                         $product->setAcumulusId($productId);
                     } else {
-                        $localResult->createAndAddMessage(sprintf('Search for reference "%s" resulted in no products', $reference), Severity::Error);
+                        $localResult->createAndAddMessage(
+                            sprintf("Search for reference '%s' resulted in no products", $reference),
+                            Severity::Error
+                        );
                         $localResult->setSendStatus(StockTransactionResult::NotSent_NoMatchInAcumulus);
                     }
                 } catch (UnexpectedValueException $e) {
@@ -64,7 +69,10 @@ class StockTransactionCollector extends Collector
                     $localResult->setSendStatus(StockTransactionResult::NotSent_TooManyMatchesInAcumulus);
                 }
             } else {
-                $localResult->createAndAddMessage('Empty search reference', Severity::Error);
+                $localResult->createAndAddMessage(
+                    sprintf("Search field '%s' is empty", $acumulusObject->metadataGet(Meta::MatchShopFieldSpecification)),
+                    Severity::Error
+                );
                 $localResult->setSendStatus(StockTransactionResult::NotSent_NoMatchValueInProduct);
             }
         } else {

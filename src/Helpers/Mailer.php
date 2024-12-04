@@ -354,9 +354,9 @@ abstract class Mailer
         // We add the request and response messages when set so or if there were
         // warnings or worse messages, thus not with notices.
         $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError
-            ? InvoiceAddResult::AddReqResp_WithOther
-            : InvoiceAddResult::AddReqResp_Always;
-        if ($addReqResp === InvoiceAddResult::AddReqResp_Always || $result->getSeverity() >= Severity::Warning) {
+            ? Result::AddReqResp_WithOther
+            : Result::AddReqResp_Always;
+        if ($addReqResp === Result::AddReqResp_Always || $result->getSeverity() >= Severity::Warning) {
             $acumulusResult = $result->getAcumulusResult();
             if ($acumulusResult !== null) {
                 $logMessages = new MessageCollection($this->translator);

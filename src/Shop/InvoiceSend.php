@@ -11,6 +11,7 @@ use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Event;
 use Siel\Acumulus\Helpers\Mailer;
+use Siel\Acumulus\Helpers\Result;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
@@ -90,8 +91,6 @@ class InvoiceSend
     /**
      * Sets the (basic)
      * {@see \Siel\Acumulus\Invoice\InvoiceAddResult::getSendStatus()}.
-     *
-     * @throws \DateException
      */
     public function setBasicSendStatus(Source $invoiceSource, InvoiceAddResult $result, bool $forceSend): void
     {
@@ -358,9 +357,9 @@ class InvoiceSend
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
         $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError
-            ? InvoiceAddResult::AddReqResp_WithOther
-            : InvoiceAddResult::AddReqResp_Always;
-        if ($addReqResp === InvoiceAddResult::AddReqResp_Always || $result->hasRealMessages()) {
+            ? Result::AddReqResp_WithOther
+            : Result::AddReqResp_Always;
+        if ($addReqResp === Result::AddReqResp_Always || $result->hasRealMessages()) {
             // @todo: rename to mailInvoiceAddResult ...
             return $this->getMailer()->sendInvoiceAddMailResult($result, $invoiceSource->getType(), $invoiceSource->getReference());
         }

@@ -12,8 +12,8 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Helpers\Result;
 use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Product\StockTransactionResult;
@@ -176,7 +176,7 @@ class ProductManager
             // Multiple matches.
             throw new UnexpectedValueException(
                 sprintf(
-                    'Search for reference "%s" resulted in at least 2 products ("%s" and "%s")',
+                    "Search for reference '%s' resulted in at least 2 products ('%s' and '%s')",
                     $reference,
                     $products[0][Fld::ProductDescription],
                     $products[1][Fld::ProductDescription]
@@ -208,12 +208,12 @@ class ProductManager
         } elseif (Number::isZero($change, 0.00001)) {
             $result->setSendStatus(StockTransactionResult::NotSent_ZeroChange);
         } elseif ($this->isTestMode()) {
-            $result->setSendStatus(InvoiceAddResult::Sent_TestMode);
+            $result->setSendStatus(Result::Sent_TestMode);
         } else {
-            $result->setSendStatus(InvoiceAddResult::Sent_New);
+            $result->setSendStatus(Result::Sent_New);
         }
 
-        if (($result->getSendStatus() & StockTransactionResult::NotSent_Mask) === 0) {
+        if (!$result->isSendingPrevented()) {
             $productWithStock = $product->getStockManagingProduct();
             $this->createAndSendStockTransaction($productWithStock, $change, $item, $result);
         }
@@ -274,9 +274,9 @@ class ProductManager
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
         $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError
-            ? StockTransactionResult::AddReqResp_WithOther
-            : StockTransactionResult::AddReqResp_Always;
-        if ($addReqResp === StockTransactionResult::AddReqResp_Always || $result->hasRealMessages()) {
+            ? Result::AddReqResp_WithOther
+            : Result::AddReqResp_Always;
+        if ($addReqResp === Result::AddReqResp_Always || $result->hasRealMessages()) {
             return $this->getContainer()->getMailer()->mailStockTransactionResult($result, $product);
         }
         return true;

@@ -16,6 +16,7 @@ use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\MessageCollection;
+use Siel\Acumulus\Helpers\Result;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
@@ -270,7 +271,7 @@ abstract class InvoiceManager
             $result = $this->createAndSend($source, $result, $forceSend, $dryRun);
             $success = $success && !$result->hasError();
             $this->getLog()->notice($this->getSendResultLogText($source, $result));
-            $log[$source->getId()] = $this->getSendResultLogText($source, $result, InvoiceAddResult::AddReqResp_Never);
+            $log[$source->getId()] = $this->getSendResultLogText($source, $result, Result::AddReqResp_Never);
         }
         return $success;
     }
@@ -316,15 +317,15 @@ abstract class InvoiceManager
             // statuses on which to send to the log line.
             $arguments = [$status, implode(',', $shopEventSettings['triggerOrderStatus'])];
             $sendStatus = in_array($status, $shopEventSettings['triggerOrderStatus'], false)
-                ? InvoiceAddResult::SendStatus_Unknown
+                ? Result::SendStatus_Unknown
                 : InvoiceAddResult::NotSent_WrongStatus;
         } else {
             $arguments = [];
             $sendStatus = $shopEventSettings['triggerCreditNoteEvent'] === Config::TriggerCreditNoteEvent_Create
-                ? InvoiceAddResult::SendStatus_Unknown
+                ? Result::SendStatus_Unknown
                 : InvoiceAddResult::NotSent_TriggerCreditNoteEventNotEnabled;
         }
-        if ($sendStatus === InvoiceAddResult::SendStatus_Unknown) {
+        if ($sendStatus === Result::SendStatus_Unknown) {
             $result = $this->createAndSend($source, $result);
             $sendStatus = $result->getSendStatus();
         }
@@ -487,7 +488,7 @@ abstract class InvoiceManager
     protected function getSendResultLogText(
         Source $source,
         InvoiceAddResult $result,
-        int $addReqResp = InvoiceAddResult::AddReqResp_WithOther
+        int $addReqResp = Result::AddReqResp_WithOther
     ): string {
         $invoiceSourceText = sprintf(
             $this->t('message_invoice_source'),

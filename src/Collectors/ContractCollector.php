@@ -13,6 +13,8 @@ namespace Siel\Acumulus\Collectors;
  * - string $password
  * - string $emailOnError
  * - string $emailOnWarning
+ *
+ * @method \Siel\Acumulus\Data\Contract collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
  */
 class ContractCollector extends Collector
 {

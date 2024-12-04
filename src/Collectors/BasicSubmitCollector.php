@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
@@ -29,7 +30,7 @@ class BasicSubmitCollector extends Collector
      * This override collects the fields of a {@see \Siel\Acumulus\Data\BasicSubmit}
      * object, as well as of its 2 child classes {@see Contract} md {@see Connector}.
      */
-    public function collect(PropertySources $propertySources, ?array $fieldSpecifications): BasicSubmit
+    public function collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null): BasicSubmit
     {
         /** @var BasicSubmit $basicSubmit */
         $basicSubmit = parent::collect($propertySources, $fieldSpecifications);
@@ -41,14 +42,14 @@ class BasicSubmitCollector extends Collector
     public function collectContract(PropertySources $propertySources): Contract
     {
         /** @var \Siel\Acumulus\Data\Contract $contract */
-        $contract = $this->getContainer()->getCollector(DataType::Contract)->collect($propertySources, null);
+        $contract = $this->getContainer()->getCollector(DataType::Contract)->collect($propertySources);
         return $contract;
     }
 
     public function collectConnector(PropertySources $propertySources): Connector
     {
         /** @var \Siel\Acumulus\Data\Connector $connector */
-        $connector = $this->getContainer()->getCollector(DataType::Connector)->collect($propertySources, null);
+        $connector = $this->getContainer()->getCollector(DataType::Connector)->collect($propertySources);
         return $connector;
     }
 

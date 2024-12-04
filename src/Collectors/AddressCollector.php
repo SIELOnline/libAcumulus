@@ -28,6 +28,8 @@ namespace Siel\Acumulus\Collectors;
  * Properties that are not set:
  * - string $countryAutoNameLang
  * - string $country
+ *
+ * @method \Siel\Acumulus\Data\Address collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
  */
 class AddressCollector extends SubTypedCollector
 {

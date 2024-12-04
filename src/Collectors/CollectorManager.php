@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
-use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\BasicSubmit;
 use Siel\Acumulus\Data\Customer;
@@ -26,45 +25,36 @@ use Siel\Acumulus\Product\StockTransactionResult;
  *
  * Why this CollectorManager?
  * {@see \Siel\Acumulus\Data\AcumulusObject AcumulusObjects} and
- * {@see \Siel\Acumulus\Data\AcumulusProperty AcumulusProperties} are data objects.
+ * {@see \Siel\Acumulus\Data\AcumulusProperty AcumulusProperties} are data objects and do
+ * not contain complex or shop dependent logic.
  * {@see \Siel\Acumulus\Collectors\Collector Collectors} are the most shop dependent
- * classes and should therefore be as dumb as possible. So Collectors should not have to
- * know where mappings and sources come from, they should be passed in and the Collector
- * should do its work: extracting values from the sources and place them into the
- * {@see AcumulusObject} to be returned.
- *
+ * classes that need mappings and sources coming from shop, environment, and config.
+ * Other code that needs an AcumulusObject should not have to know where to get all this
+ * data from, except for its local object it is working on (e.g. a
+ * {@see \Siel\Acumulus\Invoice\Source} or {@see \Siel\Acumulus\Invoice\Item}).
  * Enter the CollectorManager that, like a controller:
  * - Creates the required {@see Collector Collectors}.
- * - Gets the mappings from {@see Mappings}.
  * - Populates the propertySources parameter.
- * - Executes the Collectors.
- * - Assembles the results (merge child objects into their parent).
+ * - Executes the Collector.
  * - Returns the resulting {@see AcumulusObject}.
  */
 class CollectorManager
 {
     protected FieldExpander $fieldExpander;
     private Container $container;
-    private Mappings $mappings;
     private Log $log;
     private PropertySources $propertySources;
 
-    public function __construct(FieldExpander $fieldExpander, Mappings $mappings, Container $container, Log $log)
+    public function __construct(FieldExpander $fieldExpander, Container $container, Log $log)
     {
         $this->fieldExpander = $fieldExpander;
         $this->container = $container;
-        $this->mappings = $mappings;
         $this->log = $log;
     }
 
     protected function getContainer(): Container
     {
         return $this->container;
-    }
-
-    protected function getMappings(): Mappings
-    {
-        return $this->mappings;
     }
 
     protected function getLog(): Log
@@ -103,23 +93,16 @@ class CollectorManager
 
     public function collectInvoice(): Invoice
     {
-        $invoiceMappings = $this->getMappings()->getFor(DataType::Invoice);
         /** @var \Siel\Acumulus\Collectors\InvoiceCollector $invoiceCollector */
         $invoiceCollector = $this->getContainer()->getCollector(DataType::Invoice);
-        $invoice = $invoiceCollector->collect($this->getPropertySources(), $invoiceMappings);
-        $this->getPropertySources()->add('invoice', $invoice);
-
-        return $invoice;
+        return $invoiceCollector->collect($this->getPropertySources());
     }
 
     public function collectCustomer(): Customer
     {
+        /** @var \Siel\Acumulus\Collectors\CustomerCollector $customerCollector */
         $customerCollector = $this->getContainer()->getCollector(DataType::Customer);
-        $customerMappings = $this->getMappings()->getFor(DataType::Customer);
-
-        /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = $customerCollector->collect($this->getPropertySources(), $customerMappings);
-        return $customer;
+        return $customerCollector->collect($this->getPropertySources());
     }
 
     /**
@@ -128,22 +111,16 @@ class CollectorManager
      */
     public function collectAddress(string $subType): Address
     {
+        /** @var \Siel\Acumulus\Collectors\AddressCollector $addressCollector */
         $addressCollector = $this->getContainer()->getCollector(DataType::Address, $subType);
-        $addressMappings = $this->getMappings()->getFor($subType);
-
-        /** @var \Siel\Acumulus\Data\Address $address */
-        $address = $addressCollector->collect($this->getPropertySources(), $addressMappings);
-        return $address;
+        return $addressCollector->collect($this->getPropertySources());
     }
 
     public function collectEmailAsPdf(string $subType): EmailAsPdf
     {
+        /** @var \Siel\Acumulus\Collectors\EmailAsPdfCollector $emailAsPdfCollector */
         $emailAsPdfCollector = $this->getContainer()->getCollector(DataType::EmailAsPdf, $subType);
-        $emailAsPdfMappings = $this->getMappings()->getFor($subType);
-
-        /** @var \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf */
-        $emailAsPdf = $emailAsPdfCollector->collect($this->getPropertySources(), $emailAsPdfMappings);
-        return $emailAsPdf;
+        return $emailAsPdfCollector->collect($this->getPropertySources());
     }
 
     /**
@@ -164,12 +141,9 @@ class CollectorManager
 
     public function collectStockTransaction(): StockTransaction
     {
-        $stockTransactionMappings = $this->getMappings()->getFor(DataType::StockTransaction);
         /** @var \Siel\Acumulus\Collectors\StockTransactionCollector $stockTransactionCollector */
         $stockTransactionCollector = $this->getContainer()->getCollector(DataType::StockTransaction);
-        /** @var \Siel\Acumulus\Data\StockTransaction $stockTransaction */
-        $stockTransaction = $stockTransactionCollector->collect($this->getPropertySources(), $stockTransactionMappings);
-        return $stockTransaction;
+        return $stockTransactionCollector->collect($this->getPropertySources());
     }
 
     public function collectBasicSubmit(): BasicSubmit
@@ -179,8 +153,7 @@ class CollectorManager
             ->add('environment', $this->getContainer()->getEnvironment()->toArray());
         /** @var \Siel\Acumulus\Collectors\BasicSubmitCollector $basicSubmitCollector */
         $basicSubmitCollector = $this->getContainer()->getCollector(DataType::BasicSubmit);
-        $basicSubmitMappings = $this->getMappings()->getFor(DataType::BasicSubmit);
-        $basicSubmit = $basicSubmitCollector->collect($this->getPropertySources(), $basicSubmitMappings);
+        $basicSubmit = $basicSubmitCollector->collect($this->getPropertySources());
         $this->getPropertySources()->remove('environment')->remove('config');
         return $basicSubmit;
     }

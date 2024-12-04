@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\PropertySet;
@@ -117,15 +118,12 @@ abstract class Collector implements CollectorInterface
     /**
      * Returns the field specifications to use.
      *
-     * @return array
+     * @return ArrayObject
      *   See return value of {@see \Siel\Acumulus\Config\Mappings::getFor()}.
      */
-    protected function getFieldSpecifications(?array $fieldSpecifications): array
+    protected function getFieldSpecifications(?ArrayObject $fieldSpecifications): ArrayObject
     {
-        if ($fieldSpecifications === null) {
-            $fieldSpecifications = $this->getMappings()->getFor($this->getMappingsGetForKey());
-        }
-        return $fieldSpecifications;
+        return $fieldSpecifications ?? new ArrayObject($this->getMappings()->getFor($this->getMappingsGetForKey()));
     }
 
     /**
@@ -156,7 +154,7 @@ abstract class Collector implements CollectorInterface
      *   String keyed set of "objects" that can provide properties to the
      *   {@see FieldExpander} for use in {@see collectMappedFields()} or just pass
      *   information for use in {@see collectLogicFields()}.
-     * @param string[]|null $fieldSpecifications
+     * @param ArrayObject|null $fieldSpecifications
      *   A set of field specifications keyed by the target field name (property or
      *   metadata field in the target {@see AcumulusObject}.
      *
@@ -164,7 +162,7 @@ abstract class Collector implements CollectorInterface
      *
      * @todo: Refactor string[]|null $fieldSpecifications like PropertySources.
      */
-    public function collect(PropertySources $propertySources, ?array $fieldSpecifications): AcumulusObject
+    public function collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null): AcumulusObject
     {
         $fieldSpecifications = $this->getFieldSpecifications($fieldSpecifications);
         $acumulusObject = $this->createAcumulusObject();
@@ -185,11 +183,11 @@ abstract class Collector implements CollectorInterface
      *   The newly constructed object to collect values for.
      * @param \Siel\Acumulus\Collectors\PropertySources $propertySources
      *   The set of öbjects"to collect the values from.
-     * @param array $fieldSpecifications
+     * @param ArrayObject $fieldSpecifications
      *   The set of mappings that will be used for the "automatic" part of the collection
      *   phase.
      */
-    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
     {
     }
 
@@ -211,14 +209,14 @@ abstract class Collector implements CollectorInterface
     /**
      * Collects the fields that can be extracted using simple field mappings.
      *
-     * @param (null|string|string[])[] $fieldSpecifications
+     * @param ArrayObject $fieldSpecifications
      *   A set of field mapping specifications to fill properties of the
      *   $acumulusObject with.
      */
     protected function collectMappedFields(
         AcumulusObject $acumulusObject,
         PropertySources $propertySources,
-        array $fieldSpecifications
+        ArrayObject $fieldSpecifications
     ): void {
         foreach ($fieldSpecifications as $field => $pattern) {
             $this->collectMappedField($acumulusObject, $propertySources, $field, $pattern);

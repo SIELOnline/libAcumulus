@@ -4,10 +4,12 @@
          colors="true" columns="max" stderr="true">
     <testsuites>
         <testsuite name="all">
-            <directory>.</directory>
+            <directory>Unit</directory>
+            <directory>Integration</directory>
+            <directory>ApiBehaviour</directory>
         </testsuite>
         <testsuite name="api">
-            <directory>tests/ApiBehaviour</directory>
+            <directory>ApiBehaviour</directory>
         </testsuite>
         <testsuite name="local">
             <directory>Unit</directory>

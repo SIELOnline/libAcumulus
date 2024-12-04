@@ -21,6 +21,7 @@ namespace Siel\Acumulus\Collectors;
  * Properties that are not set:
  * - string $message
  * - bool $confirmReading
+ * @method \Siel\Acumulus\Data\EmailAsPdf collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
  */
 class EmailAsPdfCollector extends SubTypedCollector
 {

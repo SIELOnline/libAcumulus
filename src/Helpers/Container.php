@@ -551,7 +551,6 @@ class Container
     {
         $arguments = [
             $this->getFieldExpander(),
-            $this->getMappings(),
             $this,
             $this->getLog(),
         ];

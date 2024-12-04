@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Config;
 
+use ArrayObject;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
@@ -29,8 +30,13 @@ class Mappings
         AddressType::Invoice,
         AddressType::Shipping,
         LineType::Item,
+        // @todo: add other line types when defining mappings for them.
         EmailAsPdfType::Invoice,
         EmailAsPdfType::PackingSlip,
+        DataType::StockTransaction,
+        DataType::BasicSubmit,
+        DataType::Contract,
+        DataType::Connector,
     ];
 
     private Config $config;
@@ -78,17 +84,17 @@ class Mappings
      *     - {@see \Siel\Acumulus\Data\LineType} constants for a
      *       {@see \Siel\Acumulus\Data\Line} object.
      *
-     * @return array
+     * @return ArrayObject
      *   An array with as keys property names or metadata keys, and as values mappings for
      *   the specified property or metadata value. These are typically strings that may
      *   contain a field expansion specification, see
      *   {@see \Siel\Acumulus\Helpers\FieldExpander}, but occasionally, it may contain a
      *   value of another scalar type or even complex data when it is metadata.
      */
-    public function getFor(string $forType): array
+    public function getFor(string $forType): ArrayObject
     {
         $mappings = $this->getAll();
-        return ($mappings[$forType] ?? []);
+        return new ArrayObject($mappings[$forType] ?? []);
     }
 
     /**

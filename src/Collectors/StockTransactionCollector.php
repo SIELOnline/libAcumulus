@@ -26,6 +26,8 @@ use function sprintf;
  *
  * Properties that are not set:
  * - \DateTimeInterface $stockDate
+ *
+ * @method \Siel\Acumulus\Data\StockTransaction collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
  */
 class StockTransactionCollector extends Collector
 {

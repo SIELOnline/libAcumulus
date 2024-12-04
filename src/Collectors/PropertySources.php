@@ -65,15 +65,15 @@ class PropertySources
      *
      * @param string $name
      *   The name to use for the source
-     * @param mixed $property
+     * @param mixed $propertySource
      *   The source to add, typically an object or an array, but may be a scalar.
      *
      * @return $this
      */
-    public function add(string $name, mixed $property): static
+    public function add(string $name, mixed $propertySource): static
     {
         // Add in front.
-        $this->propertySources = [$name => $property] + $this->propertySources;
+        $this->propertySources = [$name => $propertySource] + $this->propertySources;
         return $this;
     }
 
@@ -92,7 +92,7 @@ class PropertySources
     }
 
     /**
-     * Returns the set of proeprty sources as a keyed array.
+     * Returns the set of property sources as a keyed array.
      */
     public function toArray(): array
     {

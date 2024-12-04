@@ -13,6 +13,8 @@ namespace Siel\Acumulus\Collectors;
  * - string $development
  * - string $remark
  * - string $sourceUri
+ *
+ * @method \Siel\Acumulus\Data\Connector collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
  */
 class ConnectorCollector extends Collector
 {

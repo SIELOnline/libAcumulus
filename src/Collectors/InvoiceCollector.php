@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
@@ -103,7 +104,7 @@ class InvoiceCollector extends Collector
      *
      * @return \Siel\Acumulus\Data\Invoice
      */
-    public function collect(PropertySources $propertySources, ?array $fieldSpecifications): AcumulusObject
+    public function collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null): AcumulusObject
     {
         /** @var Invoice $invoice */
         $invoice = parent::collect($propertySources, $fieldSpecifications);
@@ -118,15 +119,17 @@ class InvoiceCollector extends Collector
 
     protected function collectCustomer(PropertySources $propertySources): Customer
     {
+        /** @var \Siel\Acumulus\Collectors\CustomerCollector $customerCollector */
+        $customerCollector = $this->getContainer()->getCollector(DataType::Customer);
         /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = $this->getContainer()->getCollector(DataType::Customer)->collect($propertySources, null);
+        $customer = $customerCollector->collect($propertySources);
         return $customer;
     }
 
     protected function collectEmailAsPdf(string $subType, PropertySources $propertySources): EmailInvoiceAsPdf
     {
         /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $emailAsPdf */
-        $emailAsPdf = $this->getContainer()->getCollector(DataType::EmailAsPdf, $subType)->collect($propertySources, null);
+        $emailAsPdf = $this->getContainer()->getCollector(DataType::EmailAsPdf, $subType)->collect($propertySources);
         return $emailAsPdf;
     }
 

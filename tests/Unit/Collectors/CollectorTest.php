@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Collectors;
 
+use ArrayObject;
 use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Collectors\CollectorInterface;
@@ -21,16 +22,9 @@ use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
 class CollectorTest extends TestCase
 {
     protected Container $container;
-    protected array $fieldMappings = [
-        'itemNumber' => '[field_item_number]',
-        'nature' => '[field_nature]',
-        'unitPrice' => '[field_unit_price]',
-    ];
-    protected array $nullFieldMappings = [
-        'itemNumber' => '["null"]',
-        'nature' => '[null]',
-        'unitPrice' => '[""]',
-    ];
+    protected ArrayObject $fieldMappings;
+    protected ArrayObject $nullFieldMappings;
+
 
     public function getCollector(): CollectorInterface
     {
@@ -41,13 +35,23 @@ class CollectorTest extends TestCase
     protected function setUp(): void
     {
         $this->container = new Container('TestWebShop', 'nl');
+        $this->fieldMappings = new ArrayObject([
+            'itemNumber' => '[field_item_number]',
+            'nature' => '[field_nature]',
+            'unitPrice' => '[field_unit_price]',
+            ]);
+        $this->nullFieldMappings = new ArrayObject([
+            'itemNumber' => '["null"]',
+            'nature' => '[null]',
+            'unitPrice' => '[""]',
+        ]);
     }
 
     public function testCollectAllEmpty(): void
     {
         $collector = $this->getCollector();
         $propertySources = $this->container->createPropertySources();
-        $fieldMappings = [];
+        $fieldMappings = new ArrayObject();
         $simpleTestObject = $collector->collect($propertySources, $fieldMappings);
         $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
         $this->assertNull($simpleTestObject->getItemNumber());

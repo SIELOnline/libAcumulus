@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
@@ -79,6 +80,8 @@ use Siel\Acumulus\Meta;
  *
  *  Hierarchical lines are "flattened" in the Completor phase, see
  *  {@see FlattenerInvoiceLines} based on configuration settings.
+ *
+ * @method \Siel\Acumulus\Data\Line collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
  */
 class LineCollector extends SubTypedCollector
 {
@@ -95,7 +98,7 @@ class LineCollector extends SubTypedCollector
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      */
-    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
     {
         $acumulusObject->setType($this->subType);
         // ItemLineCollectors only: add the {@see Product} as a property source.

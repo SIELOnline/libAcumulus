@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\AddressType;
@@ -51,7 +52,7 @@ class CustomerCollector extends Collector
      *
      * @return \Siel\Acumulus\Data\Customer
      */
-    public function collect(PropertySources $propertySources, ?array $fieldSpecifications): AcumulusObject
+    public function collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null): AcumulusObject
     {
         /** @var Customer $customer */
         $customer = parent::collect($propertySources, $fieldSpecifications);
@@ -75,7 +76,7 @@ class CustomerCollector extends Collector
     public function collectAddress(string $subType, PropertySources $propertySources): Address
     {
         /** @var \Siel\Acumulus\Data\Address $address */
-        $address = $this->getContainer()->getCollector(DataType::Address, $subType)->collect($propertySources, null);
+        $address = $this->getContainer()->getCollector(DataType::Address, $subType)->collect($propertySources);
         return $address;
     }
 

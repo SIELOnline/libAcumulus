@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Helpers\Container;
@@ -48,7 +49,7 @@ abstract class SubTypedCollector extends Collector
         return $this->subType;
     }
 
-    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, array &$fieldSpecifications): void
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
     {
         $acumulusObject->metadataSet(Meta::SubType, $this->subType);
     }

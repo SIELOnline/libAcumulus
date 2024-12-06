@@ -56,13 +56,4 @@ class Mailer extends BaseMailer
         /** @noinspection PhpUnhandledExceptionInspection */
         return Factory::getApplication()->get('mailfrom');
     }
-
-    public function getTo(): string
-    {
-        $return = parent::getTo();
-        if (empty($return)) {
-            $return = $this->getFrom();
-        }
-        return $return;
-    }
 }

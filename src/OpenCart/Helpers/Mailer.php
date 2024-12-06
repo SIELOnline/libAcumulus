@@ -65,16 +65,6 @@ abstract class Mailer extends BaseMailer
         return Registry::getInstance()->config->get('config_email');
     }
 
-    public function getTo(): string
-    {
-        $return = parent::getTo();
-        if (empty($return)) {
-            // @todo: does this shop configure an administrator address?
-            $return = $this->getFrom();
-        }
-        return $return;
-    }
-
     /**
      * @return \Opencart\System\Library\Mail|\Mail
      */

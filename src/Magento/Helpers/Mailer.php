@@ -85,12 +85,4 @@ class Mailer extends BaseMailer
             ? $result
             : parent::getFromName();
     }
-
-    public function getTo(): string
-    {
-        $result = $this->getConfig()->getValue('trans_email/ident_general/email');
-        return !empty($result) && !str_contains($result, 'example.com')
-            ? $result
-            : parent::getTo();
-    }
 }

@@ -9,6 +9,7 @@ Bugs:
 - ALL: Voucher lines should always get vat free and not 0%.
 
 Refactorings:
+- ALL: Renamed Source::getTypeLabel() to Source::GetLabel(): Check your mappings!
 - Converted legacy completors in Invoice namespace from array to object use, including new
   methods on AcumulusObjects and deep cloning them.
 

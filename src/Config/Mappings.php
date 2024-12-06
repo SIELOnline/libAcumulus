@@ -212,8 +212,8 @@ class Mappings
             DataType::Invoice => [
                 Fld::PaymentStatus => '[source::getPaymentStatus()]',
                 Fld::PaymentDate => '[source::getPaymentDate()]',
-                Fld::Description => '[source::getTypeLabel(2)+source::getReference()'
-                    . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
+                Fld::Description => '[source::getLabel(2)+source::getReference()'
+                    . '+"-"+source::getParent()::getLabel(1)+source::getParent()::getReference()]',
                 Meta::SourceType => '[source::getType()]',
                 Meta::SourceId => '[source::getId()]',
                 Meta::SourceReference => '[source::getReference()]',
@@ -235,11 +235,11 @@ class Mappings
                 Fld::CountryCode => '[source::getCountryCode()|"nl"]',
             ],
             EmailAsPdfType::Invoice => [
-                Fld::Subject => 'Factuur voor [source::getTypeLabel(1)+source::getReference()'
-                    . '+"-"+source::getParent()::getTypeLabel(1)+source::getParent()::getReference()]',
+                Fld::Subject => 'Factuur voor [source::getLabel(1)+source::getReference()'
+                    . '+"-"+source::getParent()::getLabel(1)+source::getParent()::getReference()]',
             ],
             EmailAsPdfType::PackingSlip => [
-                Fld::Subject => 'Pakbon voor [source::getTypeLabel(1)+source::getReference()]',
+                Fld::Subject => 'Pakbon voor [source::getLabel(1)+source::getReference()]',
             ],
             LineType::Item => [
 // @todo: The adapter part of Product has been stalled temporarily: first move code from
@@ -257,7 +257,7 @@ class Mappings
             DataType::StockTransaction => [
                 Fld::ProductId => '[product::getAcumulusId()]',
                 Fld::StockAmount => '[change]',
-                Fld::StockDescription => '[environment::hostName+item::getSource()::getTypeLabel(1)+item::getSource()::getReference()|localResult::getTrigger()]',
+                Fld::StockDescription => '[environment::hostName+item::getSource()::getLabel(1)+item::getSource()::getReference()|localResult::getTrigger()]',
                 Meta::MatchShopValue => '[product::getReferenceForAcumulusLookup()]',
             ],
             DataType::BasicSubmit => [

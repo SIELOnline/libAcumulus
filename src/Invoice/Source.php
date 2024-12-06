@@ -10,7 +10,6 @@ use Siel\Acumulus\Product\Product;
 use Stringable;
 
 use function count;
-use function function_exists;
 use function get_class;
 
 /**
@@ -22,7 +21,7 @@ use function get_class;
  *
  * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
-abstract class Source implements Stringable
+abstract class Source implements WrapperInterface, Stringable
 {
     use WrapperTrait;
 
@@ -62,58 +61,6 @@ abstract class Source implements Stringable
     public function __toString(): string
     {
         return $this->getType() . $this->getId();
-    }
-
-    /**
-     * Returns the translated type of the wrapped source.
-     *
-     * @param int $case
-     *   - MB_CASE_LOWER (1): convert to all lower case
-     *   - MB_CASE_UPPER (0): convert to all upper case
-     *   - MB_CASE_TITLE (2): convert first character to upper case
-     *   any other value or not passed: return as is, do not convert
-     *
-     * @return string
-     *   One of the constants Source::Order or Source::CreditNote.
-     *
-     * @noinspection PhpUnused   May be called via the
-     *   {@see \Siel\Acumulus\Helpers\FieldExpander}.
-     */
-    public function getTypeLabel(int $case = -1): string
-    {
-        $label = $this->getContainer()->getTranslator()->get($this->getType());
-        if ($case !== -1) {
-            if (function_exists('mb_convert_case')) {
-                $label = mb_convert_case($label, $case);
-            } else {
-                switch ($case) {
-                    case MB_CASE_LOWER:
-                        $label = strtolower($label);
-                        break;
-                    case MB_CASE_UPPER:
-                        $label = strtoupper($label);
-                        break;
-                    case MB_CASE_TITLE:
-                        $label = ucfirst($label);
-                        break;
-                }
-            }
-        }
-        return $label;
-    }
-
-    /**
-     * Returns the user facing reference for the web shop's invoice source.
-     *
-     * Should be overridden when this is not the internal id.
-     *
-     * @return string|int
-     *   The user facing id for the web shop's invoice source. This is not
-     *   necessarily the internal id.
-     */
-    public function getReference(): string|int
-    {
-        return $this->getId();
     }
 
     /**

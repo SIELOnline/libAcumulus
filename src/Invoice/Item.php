@@ -16,7 +16,7 @@ use Siel\Acumulus\Product\Product;
  * object type, web shop order and refund items can be passed around in a strongly typed
  * way.
  */
-abstract class Item
+abstract class Item implements WrapperInterface
 {
     use WrapperTrait;
 

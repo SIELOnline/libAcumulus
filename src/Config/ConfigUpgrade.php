@@ -364,7 +364,7 @@ class ConfigUpgrade
         $replacements = [
             'invoiceSource::' => 'source::',
             '::getSource()::' => '::getShopObject()::',
-            'invoiceSourceType::label' => 'source::getTypeLabel(2)',
+            'invoiceSourceType::label' => 'source::getLabel(2)',
             'order::' => 'source::getOrder()::',
             'refundedOrder::' => 'source::getParent()::',
             'refund::' => 'source::isCreditNote()::',
@@ -398,14 +398,25 @@ class ConfigUpgrade
     protected function upgrade837(): bool
     {
         $values = $this->getConfigStore()->load();
+        $mappings = $values[Config::Mappings] ?? [];
         $replacements = [
+            '::getTypeLabel(' => '::getLabel(',
+        ];
+        array_walk_recursive($mappings, static function (&$value) use ($replacements) {
+            foreach ($replacements as $search => $replace) {
+                if (is_string($value)) {
+                    $value = str_replace($search, $replace, $value);
+                }
+            }
+        });
+        $keyReplacements = [
             'contractCode' => Fld::ContractCode,
             'userName' => Fld::UserName,
             'emailOnError' => Fld::EmailOnError,
         ];
         $lowerCasedKeys = [];
         foreach ($values as $key => $value) {
-            $newKey = $replacements[$key] ?? $key;
+            $newKey = $keyReplacements[$key] ?? $key;
             $lowerCasedKeys[$newKey] = $value;
         }
         return $this->getConfig()->save($lowerCasedKeys);

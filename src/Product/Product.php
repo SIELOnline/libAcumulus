@@ -10,6 +10,7 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Invoice\Item;
+use Siel\Acumulus\Invoice\WrapperInterface;
 use Siel\Acumulus\Invoice\WrapperTrait;
 
 use function get_class;
@@ -25,7 +26,7 @@ use function sprintf;
  * Furthermore, by wrapping it in a single, library defined, object type, web shop
  * products can be passed around in a strongly typed way.
  */
-abstract class Product
+abstract class Product implements WrapperInterface
 {
     use WrapperTrait;
 
@@ -54,7 +55,7 @@ abstract class Product
     public function getReference(): string
     {
         // @todo: use Mappings + FieldExpander?
-        throw new RuntimeException(sprintf('%s::%s(): Not implemented', get_class(), __FUNCTION__));
+        throw new RuntimeException(sprintf('%s::%s(): Not yet implemented', get_class(), __FUNCTION__));
     }
 
     /**

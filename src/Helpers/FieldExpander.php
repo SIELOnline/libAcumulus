@@ -93,7 +93,7 @@ use function strlen;
  * Notes:
  * - This syntax is quite simple. The following features are not possible:
  *     - Grouping, e.g. by using brackets, to override operator precedence.
- *     - Translation of literal strings. Use methods like {@see Source::getTypeLabel()}
+ *     - Translation of literal strings. Use methods like {@see Source::getLabel()}
  *       to allow to get translated texts.
  *     - Lookup based on a value of a property.
  * - The parsing is quite simple: the special symbols - ], |, &, and " - cannot

@@ -1,7 +1,7 @@
 {
     "source": {
             "info": "An Acumulus wrapper around the webshop order or credit note. It defines some helper methods to extract info from those webshop specific sources, but it also defines methods to access those webshop specific data structures and traverse its data model.",
-        "getTypeLabel(2)": "'Order' or 'Credit note' (translated)",
+        "getLabel(2)": "'Order' or 'Credit note' (translated)",
         "getId()": "The (technical) id",
         "getReference()": "The (external) reference",
         "getDate()": "The creation date",

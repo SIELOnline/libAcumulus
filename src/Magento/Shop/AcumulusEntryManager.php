@@ -75,7 +75,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 ->setUpdated($created);
             $this->getResourceModel()->save($record);
         } catch (Exception $e) {
-            $this->log->error(__CLASS__ . '::' . __METHOD__ . ': '. $e->getMessage());
+            $this->log->error(__METHOD__ . ': '. $e->getMessage());
             throw $e;
         }
         return true;
@@ -97,7 +97,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 ->setUpdated($updated);
             $this->getResourceModel()->save($record);
         } catch (Exception $e) {
-            $this->log->error(__CLASS__ . '::' . __METHOD__ . ': '. $e->getMessage());
+            $this->log->error(__METHOD__ . ': '. $e->getMessage());
             throw $e;
         }
         return true;

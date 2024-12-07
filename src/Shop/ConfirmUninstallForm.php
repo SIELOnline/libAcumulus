@@ -30,9 +30,7 @@ class ConfirmUninstallForm extends Form
         Log $log
     ) {
         parent::__construct($acumulusApiClient, $formHelper, $checkAccount, $shopCapabilities, $config, $environment,$translator, $log);
-
-        $translations = new ConfirmUninstallFormTranslations();
-        $this->translator->add($translations);
+        $this->translator->add(new ConfirmUninstallFormTranslations());
     }
 
     /**

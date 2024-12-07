@@ -53,9 +53,7 @@ class ActivateSupportForm extends Form
             $log
         );
         $this->aboutForm = $aboutForm;
-
-        $translations = new ActivateSupportFormTranslations();
-        $this->translator->add($translations);
+        $this->translator->add(new ActivateSupportFormTranslations());
     }
 
     protected function validate(): void

@@ -66,13 +66,8 @@ class BatchForm extends Form
             $log
         );
         $this->aboutForm = $aboutForm;
-
-        $translations = new InvoiceTranslations();
-        $this->translator->add($translations);
-
-        $translations = new BatchFormTranslations();
-        $this->translator->add($translations);
-
+        $this->translator->add(new InvoiceTranslations());
+        $this->translator->add(new BatchFormTranslations());
         $this->screenLog = [];
         $this->invoiceManager = $invoiceManager;
     }

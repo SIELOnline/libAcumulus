@@ -125,13 +125,8 @@ class InvoiceStatusForm extends Form
         );
         $this->addMeta = false;
         $this->isFullPage = false;
-
-        $translations = new InvoiceTranslations();
-        $this->translator->add($translations);
-
-        $translations = new InvoiceStatusFormTranslations();
-        $this->translator->add($translations);
-
+        $this->translator->add(new InvoiceTranslations());
+        $this->translator->add(new InvoiceStatusFormTranslations());
         $this->container = $container;
         $this->acumulusEntryManager = $acumulusEntryManager;
         $this->invoiceManager = $invoiceManager;

@@ -266,13 +266,12 @@ class Container
         $translator = $this->getInstance('Translator', 'Helpers', [$this->getLanguage()]);
         if (!$this->baseTranslationsAdded) {
             // Add some basic translations that are hard to add just-in-time.
-            // @todo: add a hasTranslations interface to (largely) automate this on getInstance?
             $this->baseTranslationsAdded = true;
-            $this->addTranslations('ModuleSpecificTranslations', 'Helpers');
-            $this->addTranslations('ModuleTranslations', 'Shop');
-            $this->addTranslations('SeverityTranslations', 'Helpers');
-            $this->addTranslations('ResultTranslations', 'ApiClient');
-            $this->addTranslations('ResultTranslations', 'Invoice');
+            $translator->add($this->getInstance('ModuleSpecificTranslations', 'Helpers'));
+            $translator->add($this->getInstance('ModuleTranslations', 'Shop'));
+            $translator->add($this->getInstance('SeverityTranslations', 'Helpers'));
+            $translator->add($this->getInstance('ResultTranslations', 'ApiClient'));
+            $translator->add($this->getInstance('ResultTranslations', 'Helpers'));
         }
         return $translator;
     }

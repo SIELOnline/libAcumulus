@@ -47,8 +47,7 @@ class RatePluginForm extends Form
         $this->addMeta = false;
         $this->isFullPage = false;
         $this->addSeverityClassToFields = false;
-        $translations = new RatePluginFormTranslations();
-        $this->translator->add($translations);
+        $this->translator->add(new RatePluginFormTranslations());
     }
 
     /**

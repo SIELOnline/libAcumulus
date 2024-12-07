@@ -48,8 +48,7 @@ class MessageForm extends Form
         $this->addMeta = false;
         $this->isFullPage = false;
         $this->addSeverityClassToFields = false;
-        $translations = new MessageFormTranslations();
-        $this->translator->add($translations);
+        $this->translator->add(new MessageFormTranslations());
     }
 
     /**

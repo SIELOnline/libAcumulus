@@ -128,12 +128,9 @@ class Completor
         $this->log = $log;
 
         $this->translator = $translator;
-        $invoiceHelperTranslations = new Translations();
-        $this->translator->add($invoiceHelperTranslations);
-
+        $this->translator->add(new Translations());
         $this->countries = $countries;
         $this->acumulusApiClient = $acumulusApiClient;
-
         $this->LineCompletor = $completorInvoiceLines;
         $this->LineCompletor->setCompletor($this);
         $this->strategyLineCompletor = $completorStrategyLines;

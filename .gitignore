@@ -10,3 +10,6 @@ composer.lock
 # Test data are committed, but not the *.latest.html files or the phpunit cache
 /tests/Data/*.latest.*
 .phpunit.result.cache
+
+# Local files withut importance
+todo.txt

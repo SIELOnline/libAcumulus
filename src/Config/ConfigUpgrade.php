@@ -386,39 +386,87 @@ class ConfigUpgrade
      */
     protected function upgrade836(): bool
     {
-        return $this->getConfig()->save([]);
+        $values = $this->getConfigStore()->load();
+        unset($values['outputFormat']);
+        return $this->getConfig()->save($values);
     }
 
     /**
      * 8.3.7 upgrade.
      *
-     * - API fields are now lower case (as are the tags) => update config store when used
-     *   as config key. Basically we are undoing upgrade836() (which has been cleaned-up).
+     * - API fields are now lowercase (as are the tags) => update config store when used
+     *   as config key:
+     *   - The contract fields, basically we are undoing upgrade836() (which has been
+     *     cleaned-up).
+     *   - Mappings
+     * - getTypeLabel() in mappings should be renamed to getType()
      */
     protected function upgrade837(): bool
     {
-        $values = $this->getConfigStore()->load();
-        $mappings = $values[Config::Mappings] ?? [];
+        // Mapping keys that are commented out, are already all lowercase.
+        $mappingKeys = [
+            [DataType::Customer, 'contactYourId', Fld::ContactYourId],
+            [AddressType::Invoice, 'companyName1', Fld::CompanyName1],
+            [AddressType::Invoice, 'companyName2', Fld::CompanyName2],
+            [AddressType::Invoice, 'fullName', Fld::FullName],
+//            [AddressType::Invoice, 'salutation', Fld::Salutation],
+//            [AddressType::Invoice, 'address1', Fld::Address1],
+//            [AddressType::Invoice, 'address2', Fld::Address2],
+            [AddressType::Invoice, 'postalCode', Fld::PostalCode],
+//            [AddressType::Invoice, 'city', Fld::City],
+            [DataType::Customer, 'vatNumber', Fld::VatNumber],
+//            [DataType::Customer, 'telephone', Fld::Telephone],
+//            [DataType::Customer, 'fax', Fld::Fax],
+//            [DataType::Customer, 'email', Fld::Email],
+//            [DataType::Customer, 'mark', Fld::Mark],
+//            [DataType::Invoice, 'description', Fld::Description],
+            [DataType::Invoice, 'descriptionText', Fld::DescriptionText],
+            [DataType::Invoice, 'invoiceNotes', Fld::InvoiceNotes],
+            [LineType::Item, 'itemNumber', Fld::ItemNumber],
+//            [LineType::Item, 'product', Fld::Product],
+//            [LineType::Item, 'nature', Fld::Nature],
+            [LineType::Item, 'costPrice', Fld::CostPrice],
+            [EmailAsPdfType::Invoice, 'emailFrom', Fld::EmailFrom],
+            [EmailAsPdfType::Invoice, 'emailTo', Fld::EmailTo],
+            [EmailAsPdfType::Invoice, 'emailBcc', Fld::EmailBcc],
+//            [EmailAsPdfType::Invoice, 'subject', Fld::Subject],
+            [EmailAsPdfType::Invoice, 'confirmReading', Fld::ConfirmReading],
+            [EmailAsPdfType::PackingSlip, 'emailFrom', Fld::EmailFrom],
+            [EmailAsPdfType::PackingSlip, 'emailTo', Fld::EmailTo],
+            [EmailAsPdfType::PackingSlip, 'emailBcc', Fld::EmailBcc],
+//            [EmailAsPdfType::PackingSlip, 'subject', Fld::Subject],
+            [EmailAsPdfType::PackingSlip, 'confirmReading', Fld::ConfirmReading],
+        ];
         $replacements = [
             '::getTypeLabel(' => '::getLabel(',
         ];
-        array_walk_recursive($mappings, static function (&$value) use ($replacements) {
-            foreach ($replacements as $search => $replace) {
-                if (is_string($value)) {
-                    $value = str_replace($search, $replace, $value);
+
+        $values = $this->getConfigStore()->load();
+        $mappings = $values[Config::Mappings] ?? [];
+        $newMappings = [];
+        foreach ($mappings as $group => $mappingsGroup) {
+            $newMappings[$group] = [];
+            foreach ($mappingsGroup as $key => $value) {
+                foreach ($replacements as $search => $replace) {
+                    if (is_string($value)) {
+                        $value = str_replace($search, $replace, $value);
+                    }
                 }
+                $key = $mappingKeys[$group][$key] ?? $key;
+                $newMappings[$group][$key] = $value;
             }
-        });
+        }
+        $newValues = [Config::Mappings => $newMappings];
+
         $keyReplacements = [
             'contractCode' => Fld::ContractCode,
             'userName' => Fld::UserName,
             'emailOnError' => Fld::EmailOnError,
         ];
-        $lowerCasedKeys = [];
         foreach ($values as $key => $value) {
             $newKey = $keyReplacements[$key] ?? $key;
-            $lowerCasedKeys[$newKey] = $value;
+            $newValues[$newKey] = $value;
         }
-        return $this->getConfig()->save($lowerCasedKeys);
+        return $this->getConfig()->save($newValues);
     }
 }

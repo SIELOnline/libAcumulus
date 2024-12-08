@@ -18,7 +18,7 @@ class HttpRequest extends BaseHttpRequest
     public function __construct()
     {
         parent::__construct();
-        $this->examples = new ApiRequestResponseExamples();
+        $this->examples =  ApiRequestResponseExamples::getInstance();
     }
 
     protected function executeWithCurl(): HttpResponse

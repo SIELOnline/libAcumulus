@@ -9,8 +9,10 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\ApiClient\AcumulusResult;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 
 /**
@@ -34,7 +36,7 @@ class AcumulusRequestTest extends TestCase
     {
         $language = 'nl';
         $this->container = new Container('TestWebShop\TestDoubles', $language);
-        $this->examples = new ApiRequestResponseExamples();
+        $this->examples = ApiRequestResponseExamples::getInstance();
     }
 
     private function createAcumulusRequest(): void
@@ -56,10 +58,10 @@ class AcumulusRequestTest extends TestCase
 
         $this->assertSame($uri, $this->acumulusRequest->getUri());
         $fullSubmit = $this->acumulusRequest->getSubmit();
-        $this->assertArrayHasKey('format', $fullSubmit);
-        $this->assertArrayHasKey('testmode', $fullSubmit);
-        $this->assertArrayHasKey('lang', $fullSubmit);
-        $this->assertArrayHasKey('connector', $fullSubmit);
+        $this->assertArrayHasKey(Fld::Format, $fullSubmit);
+        $this->assertArrayHasKey(Fld::TestMode, $fullSubmit);
+        $this->assertArrayHasKey(fld::Lang, $fullSubmit);
+        $this->assertArrayHasKey(Fld::Connector, $fullSubmit);
         $this->assertEqualsCanonicalizing(
             $submit,
             array_intersect_assoc($fullSubmit, $submit)
@@ -78,7 +80,7 @@ class AcumulusRequestTest extends TestCase
         $uri = 'vatinfo';
         $this->getAcumulusRequest($uri);
 
-        $this->assertArrayNotHasKey('contract', $this->acumulusRequest->getSubmit());
+        $this->assertArrayNotHasKey(Fld::Contract, $this->acumulusRequest->getSubmit());
     }
 
     public function testExecuteContract(): void
@@ -86,6 +88,22 @@ class AcumulusRequestTest extends TestCase
         $uri = 'accounts';
         $this->getAcumulusRequest($uri);
 
-        $this->assertArrayHasKey('contract', $this->acumulusRequest->getSubmit());
+        $this->assertArrayHasKey(Fld::Contract, $this->acumulusRequest->getSubmit());
+    }
+
+    public function testIsTestMode(): void
+    {
+        $uri = 'accounts';
+        $this->examples->setOptions([Fld::TestMode => Api::TestMode_Normal]);
+        $this->getAcumulusRequest($uri);
+        $this->assertFalse($this->acumulusRequest->isTestMode());
+
+        $this->examples->setOptions([Fld::TestMode => Api::TestMode_Test]);
+        $this->getAcumulusRequest($uri);
+        $this->assertTrue($this->acumulusRequest->isTestMode());
+
+        $this->examples->setOptions([Fld::TestMode => Api::TestMode_Test]);
+        $this->createAcumulusRequest();
+        $this->assertNull($this->acumulusRequest->isTestMode());
     }
 }

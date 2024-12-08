@@ -12,6 +12,7 @@ use Siel\Acumulus\Data\BasicSubmit;
 use Siel\Acumulus\Data\Connector;
 use Siel\Acumulus\Data\Contract;
 use Siel\Acumulus\Fld;
+use Siel\Acumulus\Helpers\Container;
 
 /**
  * This class defines a list of realistic request and response sets.
@@ -21,6 +22,26 @@ use Siel\Acumulus\Fld;
  */
 class ApiRequestResponseExamples
 {
+    /**
+     * Singleton pattern: single instance
+     */
+    private static ApiRequestResponseExamples $instance;
+
+    /**
+     * Singleton pattern: returns the instance.
+     */
+    public static function getInstance(): static
+    {
+        return static::$instance ?? (static::$instance = new ApiRequestResponseExamples());
+    }
+
+    /**
+     * Singleton pattern: private contructor
+     */
+    private function __construct()
+    {
+    }
+
     private array $sets = [
         'accounts' => [
             'needContract' => true,
@@ -306,6 +327,12 @@ class ApiRequestResponseExamples
             ],
         ],
     ];
+    private array $options= [];
+
+    public function setOptions(array $options): void
+    {
+        $this->options = $options;
+    }
 
     public function needContract(string $key): bool
     {
@@ -367,9 +394,9 @@ class ApiRequestResponseExamples
     public function getBasicSubmit(): BasicSubmit
     {
         $submit = new BasicSubmit();
-        $submit->format = 'json';
-        $submit->testMode = '0';
-        $submit->lang = 'nl';
+        $submit->format = $this->options[Fld::Format] ?? 'json';
+        $submit->testMode = $this->options[Fld::TestMode] ?? '0';
+        $submit->lang = $this->options[Fld::Lang] ?? 'nl';
         $submit->setContract($this->getContract());
         $submit->setConnector($this->getConnector());
         return $submit;

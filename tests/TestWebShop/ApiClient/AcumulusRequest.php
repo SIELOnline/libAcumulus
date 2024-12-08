@@ -12,9 +12,9 @@ use Siel\Acumulus\Data\BasicSubmit;
  */
 class AcumulusRequest extends BaseAcumulusRequest
 {
-    protected function getBasicSubmit(): BasicSubmit
+    protected function createBasicSubmit(): BasicSubmit
     {
-        $result = parent::getBasicSubmit();
+        $result = parent::createBasicSubmit();
         if (str_contains($this->uri, 'entry/noemailonerror')) {
             $this->uri = str_replace('entry/noemailonerror', 'entry/entry_info', $this->uri);
             unset($result->getContract()->emailOnError, $result->getContract()->emailOnWarning);

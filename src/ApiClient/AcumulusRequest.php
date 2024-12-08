@@ -7,6 +7,7 @@ namespace Siel\Acumulus\ApiClient;
 use RuntimeException;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Data\BasicSubmit;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Util;
@@ -71,6 +72,18 @@ class AcumulusRequest
     public function getSubmit(): ?array
     {
         return $this->submit;
+    }
+
+    /**
+     * Returns whether the request is in test mode.
+     *
+     * @return bool|null
+     *   true if the request concerns a test mode request, false if not, null if unknown
+     *   (because the basis submit structure has not yet been created).
+     */
+    public function isTestMode(): ?bool
+    {
+        return isset($this->submit[Fld::TestMode]) ? $this->submit[Fld::TestMode] === 1 : null;
     }
 
     /**
@@ -225,7 +238,7 @@ class AcumulusRequest
      */
     protected function constructFullSubmit(array $submit, bool $needContract): array
     {
-        $basicSubmit = $this->getBasicSubmit();
+        $basicSubmit = $this->createBasicSubmit();
         $basicSubmit->needContract = $needContract;
         return array_merge($basicSubmit->toArray(), $submit);
     }
@@ -236,7 +249,7 @@ class AcumulusRequest
      * The basic submit part is defined at
      * {@link https://www.siel.nl/acumulus/API/Basic_Submit/}
      */
-    protected function getBasicSubmit(): BasicSubmit
+    protected function createBasicSubmit(): BasicSubmit
     {
         return $this->container->getCollectorManager()->collectBasicSubmit();
     }

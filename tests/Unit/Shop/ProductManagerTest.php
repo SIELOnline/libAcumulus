@@ -24,7 +24,7 @@ class ProductManagerTest extends TestCase
     {
         $language = 'nl';
         $this->container = new Container('TestWebShop', $language);
-        $this->examples = new ApiRequestResponseExamples();
+        $this->examples =  ApiRequestResponseExamples::getInstance();
     }
 
     private function getProductManager(): ProductManager

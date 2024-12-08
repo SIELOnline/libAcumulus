@@ -44,7 +44,7 @@ class AcumulusResultTest extends TestCase
         $this->translator = $this->container->getTranslator();
         $this->translator->add(new SeverityTranslations());
         $this->translator->add(new ResultTranslations());
-        $this->examples = new ApiRequestResponseExamples();
+        $this->examples =  ApiRequestResponseExamples::getInstance();
     }
 
     private function getAcumulusResult(string $uri): AcumulusResult
@@ -77,6 +77,7 @@ class AcumulusResultTest extends TestCase
         $this->assertSame($this->t('message_response_success'), $result->getStatusText());
         $this->assertSame(Severity::Unknown, $result->getSeverity());
         $this->assertCount(0, $result->getMessages());
+        $this->assertSame(0, $result->getMessages());
 
         return $result;
     }

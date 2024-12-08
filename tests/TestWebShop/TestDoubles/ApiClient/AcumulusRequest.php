@@ -26,10 +26,10 @@ class AcumulusRequest extends BaseAcumulusRequest
         string $userLanguage
     ) {
         parent::__construct($container, $environment, $util, $userLanguage);
-        $this->examples = new ApiRequestResponseExamples();
+        $this->examples = ApiRequestResponseExamples::getInstance();
     }
 
-    protected function getBasicSubmit(): BasicSubmit
+    protected function createBasicSubmit(): BasicSubmit
     {
         return $this->examples->getBasicSubmit();
     }

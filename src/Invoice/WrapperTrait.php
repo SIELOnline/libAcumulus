@@ -121,8 +121,8 @@ trait WrapperTrait
     }
     public function getLabelReference(int $case = -1): string
     {
-        $class = $this->getType($case);
-        return sprintf('%s %s', $this->t($class), $this->getReference());
+        $class = $this->getLabel($case);
+        return sprintf('%s %s', $class, $this->getReference());
     }
 
     public function getShopObject(): object|array

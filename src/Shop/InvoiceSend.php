@@ -10,11 +10,11 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Event;
-use Siel\Acumulus\Helpers\Mailer;
 use Siel\Acumulus\Helpers\Result;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Mail\Mail;
 
 use function count;
 use function in_array;
@@ -83,9 +83,9 @@ class InvoiceSend
         return $this->getContainer()->getEvent();
     }
 
-    protected function getMailer(): Mailer
+    protected function getMail(): Mail
     {
-        return $this->getContainer()->getMailer();
+        return $this->getContainer()->getMail('InvoiceAddMail', 'Invoice');
     }
 
     /**
@@ -360,8 +360,7 @@ class InvoiceSend
             ? Result::AddReqResp_WithOther
             : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || $result->hasRealMessages()) {
-            // @todo: rename to mailInvoiceAddResult ...
-            return $this->getMailer()->sendInvoiceAddMailResult($result, $invoiceSource->getType(), $invoiceSource->getReference());
+            return $this->getMail()->createAndSend(['source' => $invoiceSource, 'result' => $result]);
         }
         return true;
     }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\OpenCart4\Helpers;
+namespace Siel\Acumulus\OpenCart\OpenCart4\Mail;
 
 use Opencart\System\Library\Mail;
-use Siel\Acumulus\OpenCart\Helpers\Mailer as BaseMailer;
+use Siel\Acumulus\OpenCart\Mail\Mailer as BaseMailer;
 
 /**
  * OC4 specific Mail object creation.

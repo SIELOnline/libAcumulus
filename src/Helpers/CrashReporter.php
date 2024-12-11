@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Helpers;
 
 use Closure;
 use Siel\Acumulus\Config\Environment;
+use Siel\Acumulus\Mail\CrashMail;
 use Throwable;
 
 use function function_exists;
@@ -30,19 +31,19 @@ use function strlen;
  */
 class CrashReporter
 {
-    protected Translator $translator;
+    private Translator $translator;
     protected Util $util;
     protected Log $log;
     protected Environment $environment;
-    protected Mailer $mailer;
+    private CrashMail $mail;
 
-    public function __construct(Mailer $mailer, Environment $environment, Util $util, Translator $translator, Log $log)
+    public function __construct(CrashMail $mail, Environment $environment, Util $util, Translator $translator, Log $log)
     {
         $this->translator = $translator;
         $this->util = $util;
         $this->log = $log;
         $this->environment = $environment;
-        $this->mailer = $mailer;
+        $this->mail = $mail;
     }
 
     /**
@@ -60,6 +61,11 @@ class CrashReporter
         return $this->translator->get($key);
     }
 
+    protected function getMail(): CrashMail
+    {
+        return $this->mail;
+    }
+
     /**
      * Logs the exception and mails a message to the user.
      *
@@ -74,7 +80,7 @@ class CrashReporter
     public function logAndMail(Throwable $e): string
     {
         $message = $this->log->exception($e, true);
-        $this->mailException($e->__toString());
+        $this->mailException($e);
         return $this->toAdminMessage($message);
     }
 
@@ -99,35 +105,10 @@ class CrashReporter
         return sprintf($this->t('crash_admin_message'), $message);
     }
 
-    protected function mailException(string $errorMessage): void
+    protected function mailException(Throwable $e): void
     {
-        $moduleName = $this->t('module_name');
-        $module = $this->t('module');
-        $subject = sprintf($this->t('crash_mail_subject'), $moduleName, $module);
-        $from = $this->mailer->getFrom();
-        $fromName = $this->mailer->getFromName();
-        $to = $this->mailer->getTo();
-        $support = $this->environment->get('supportEmail');
-        $paragraphIntroduction = sprintf($this->t('crash_mail_body_start'), $moduleName, $module, $support);
-        $paragraphIntroductionText = wordwrap($paragraphIntroduction, 70);
-        $paragraphIntroductionHtml = nl2br($paragraphIntroduction, false);
-
-        $aboutEnvironment = $this->t('about_environment');
-        $aboutError = $this->t('about_error');
-        $environmentList = $this->environment->getAsLines();
-        $environmentListText = $this->arrayToList($environmentList, false);
-        $environmentListHtml = $this->arrayToList($environmentList, true);
-        $errorMessageHtml = nl2br($errorMessage, false);
-        $body = [
-            'text' => "$paragraphIntroductionText\n$aboutEnvironment:\n\n$environmentListText\n$aboutError:\n\n$errorMessage\n",
-            'html' => "<p>$paragraphIntroductionHtml</p>
-                  <h3>$aboutEnvironment</h3>
-                  $environmentListHtml
-                  <h3>$aboutError</h3>
-                  <p>$errorMessageHtml</p>\n",
-            ];
-        $this->mailer->sendMail($from, $fromName, $to, $subject, $body['text'], $body['html']);
-    }
+        $this->getMail()->createAndSend(['exception' => $e]);
+   }
 
     protected function arrayToList(array $list, bool $isHtml): string
     {

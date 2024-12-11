@@ -12,11 +12,15 @@ use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\Collectors\AddressCollector;
+use Siel\Acumulus\Collectors\BasicSubmitCollector;
 use Siel\Acumulus\Collectors\CollectorManager;
+use Siel\Acumulus\Collectors\ConnectorCollector;
+use Siel\Acumulus\Collectors\ContractCollector;
 use Siel\Acumulus\Collectors\CustomerCollector;
 use Siel\Acumulus\Collectors\EmailAsPdfCollector;
 use Siel\Acumulus\Collectors\InvoiceCollector;
 use Siel\Acumulus\Collectors\LineCollector;
+use Siel\Acumulus\Collectors\StockTransactionCollector;
 use Siel\Acumulus\Completors\CustomerCompletor;
 use Siel\Acumulus\Completors\InvoiceCompletor;
 use Siel\Acumulus\Config\Config;
@@ -24,6 +28,9 @@ use Siel\Acumulus\Config\ConfigUpgrade;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\BasicSubmit;
+use Siel\Acumulus\Data\Connector;
+use Siel\Acumulus\Data\Contract;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
@@ -32,21 +39,29 @@ use Siel\Acumulus\Data\EmailPackingSlipAsPdf;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\CheckAccount;
+use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\CrashReporter;
+use Siel\Acumulus\Helpers\Event;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\FieldExpanderHelp;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\FormMapper;
 use Siel\Acumulus\Helpers\FormRenderer;
+use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Requirements;
+use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Helpers\Util;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Item;
-use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\WooCommerce\Collectors\ItemLineCollector;
+use Siel\Acumulus\Mail\CrashMail;
+use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager;
 use Siel\Acumulus\Shop\BatchForm;
@@ -57,15 +72,9 @@ use Siel\Acumulus\Shop\RatePluginForm;
 use Siel\Acumulus\Shop\RegisterForm;
 use Siel\Acumulus\TestWebShop\Config\ConfigStore;
 use Siel\Acumulus\TestWebShop\Config\Environment;
-use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\TestWebShop\Config\ShopCapabilities;
-use Siel\Acumulus\TestWebShop\Helpers\Mailer;
-use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\Requirements;
-use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Helpers\Util;
-
+use Siel\Acumulus\TestWebShop\Mail\Mailer;
+use Siel\Acumulus\WooCommerce\Collectors\ItemLineCollector;
 use Siel\Acumulus\WooCommerce\Collectors\OtherLineCollector;
 use Siel\Acumulus\WooCommerce\Collectors\ShippingLineCollector;
 
@@ -76,11 +85,6 @@ use function get_class;
  */
 class ContainerTest extends TestCase
 {
-    private function getContainer(string $namespace): Container
-    {
-        return new Container($namespace, 'en');
-    }
-
     /**
      * Tests the (almost) independent classes in the Helpers namespace.
      */
@@ -107,6 +111,8 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(FieldExpander::class, $object);
         $object = $container->getFieldExpanderHelp();
         $this->assertInstanceOf(FieldExpanderHelp::class, $object);
+        $object = $container->getEvent();
+        $this->assertInstanceOf(Event::class, $object);
     }
 
     public function testConfigNamespace(): void
@@ -141,11 +147,15 @@ class ContainerTest extends TestCase
     {
         return [
             [DataType::Address, Address::class,],
+            [DataType::BasicSubmit, BasicSubmit::class,],
+            [DataType::Connector, Connector::class,],
+            [DataType::Contract, Contract::class,],
             [DataType::Customer, Customer::class,],
             [DataType::EmailInvoiceAsPdf, EmailInvoiceAsPdf::class,],
             [DataType::EmailPackingSlipAsPdf, EmailPackingSlipAsPdf::class,],
             [DataType::Invoice, Invoice::class,],
             [DataType::Line, Line::class,],
+            [DataType::StockTransaction, StockTransaction::class,],
         ];
     }
 
@@ -165,14 +175,18 @@ class ContainerTest extends TestCase
         return [
             [DataType::Address, AddressType::Invoice, AddressCollector::class,],
             [DataType::Address, AddressType::Shipping, AddressCollector::class,],
+            [DataType::BasicSubmit, null, BasicSubmitCollector::class,],
+            [DataType::Connector, null, ConnectorCollector::class,],
+            [DataType::Contract, null, ContractCollector::class,],
             [DataType::Customer, null, CustomerCollector::class,],
             [DataType::EmailAsPdf, EmailAsPdfType::Invoice, EmailAsPdfCollector::class,],
             [DataType::EmailAsPdf, EmailAsPdfType::PackingSlip, EmailAsPdfCollector::class,],
             [DataType::Invoice, null, InvoiceCollector::class,],
-            [DataType::Line, LineType::Item , ItemLineCollector::class,],
-            [DataType::Line, LineType::Shipping , ShippingLineCollector::class,],
-            [DataType::Line, LineType::Other , OtherLineCollector::class,],
-            [DataType::Line, LineType::PaymentFee , LineCollector::class,],
+            [DataType::Line, LineType::Item, ItemLineCollector::class,],
+            [DataType::Line, LineType::Shipping, ShippingLineCollector::class,],
+            [DataType::Line, LineType::Other, OtherLineCollector::class,],
+            [DataType::Line, LineType::PaymentFee, LineCollector::class,],
+            [DataType::StockTransaction, null, StockTransactionCollector::class,],
         ];
     }
 
@@ -193,11 +207,8 @@ class ContainerTest extends TestCase
     public function testHelpersNamespace2(): void
     {
         $container = new Container('TestWebShop');
-        $object = $container->getMailer();
-        $this->assertInstanceOf(Mailer::class, $object);
         $object = $container->getCrashReporter();
         $this->assertInstanceOf(CrashReporter::class, $object);
-
         $object = $container->getFormHelper();
         $this->assertInstanceOf(FormHelper::class, $object);
         $object = $container->getFormMapper();
@@ -219,6 +230,18 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(RatePluginForm::class, $object);
         $object = $container->getForm('message');
         $this->assertInstanceOf(MessageForm::class, $object);
+    }
+
+    /**
+     * Tests the dependent classes in the Helpers namespace.
+     */
+    public function testMailNamespace(): void
+    {
+        $container = new Container('TestWebShop');
+        $object = $container->getMailer();
+        $this->assertInstanceOf(Mailer::class, $object);
+        $object = $container->getMail('CrashMail', 'Mail');
+        $this->assertInstanceOf(CrashMail::class, $object);
     }
 
     public function testInvoiceNamespace(): void

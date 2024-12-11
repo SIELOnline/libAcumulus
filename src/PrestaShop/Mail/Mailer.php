@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\PrestaShop\Helpers;
+namespace Siel\Acumulus\PrestaShop\Mail;
 
 use Configuration;
 use Language;
 use Mail;
-use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Siel\Acumulus\Mail\Mailer as BaseMailer;
 
 use function is_int;
+
+use const Siel\Acumulus\PrestaShop\Helpers\_PS_ROOT_DIR_;
 
 /**
  * Extends the base mailer class to send a mail using the PrestaShop mailer.
@@ -29,14 +31,8 @@ class Mailer extends BaseMailer
      * @noinspection PhpMixedReturnTypeCanBeReducedInspection
      *    @todo: Type can be narrowed to bool|int|string
      */
-    public function sendMail(
-        string $from,
-        string $fromName,
-        string $to,
-        string $subject,
-        string $bodyText,
-        string $bodyHtml
-    ): mixed {
+    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    {
         $this->templateDir = _PS_ROOT_DIR_ . '/mails/';
         $this->templateName = 'acumulus-message';
         $this->writeTemplateFiles($bodyText, $bodyHtml);

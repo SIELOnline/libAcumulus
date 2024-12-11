@@ -2,23 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\WooCommerce\Helpers;
+namespace Siel\Acumulus\WooCommerce\Mail;
 
-use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Siel\Acumulus\Mail\Mailer as BaseMailer;
+
+use function Siel\Acumulus\WooCommerce\Helpers\get_bloginfo;
+use function Siel\Acumulus\WooCommerce\Helpers\wp_mail;
 
 /**
  * Extends the base mailer class to send a mail using the WP mail features.
  */
 class Mailer extends BaseMailer
 {
-    public function sendMail(
-        string $from,
-        string $fromName,
-        string $to,
-        string $subject,
-        string $bodyText,
-        string $bodyHtml
-    ): mixed {
+    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    {
         $headers = [
             "from: $fromName <$from>",
             'Content-Type: text/html; charset=UTF-8',

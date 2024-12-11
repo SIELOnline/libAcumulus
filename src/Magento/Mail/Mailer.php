@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Magento\Helpers;
+namespace Siel\Acumulus\Magento\Mail;
 
 use Laminas\Mail\Message as MailMessage;
 use Laminas\Mail\Transport\Sendmail;
@@ -10,7 +10,8 @@ use Laminas\Mime\Message as MimeMessage;
 use Laminas\Mime\Mime;
 use Laminas\Mime\Part as MimePart;
 use Magento\Backend\App\ConfigInterface as MagentoAppConfigInterface;
-use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Siel\Acumulus\Magento\Helpers\Registry;
+use Siel\Acumulus\Mail\Mailer as BaseMailer;
 use Throwable;
 
 /**
@@ -27,14 +28,8 @@ class Mailer extends BaseMailer
      * @noinspection PhpMixedReturnTypeCanBeReducedInspection
      *   @todo Type can be narrowed to '\Exception|\Throwable|true'
      */
-    public function sendMail(
-        string $from,
-        string $fromName,
-        string $to,
-        string $subject,
-        string $bodyText,
-        string $bodyHtml
-    ): mixed {
+    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    {
         try {
             $text = new MimePart($bodyText);
             $text->type = Mime::TYPE_TEXT;

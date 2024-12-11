@@ -6,10 +6,11 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Helpers;
+namespace Siel\Acumulus\OpenCart\Mail;
 
 use Exception;
-use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Siel\Acumulus\Mail\Mailer as BaseMailer;
+use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
  * Extends the base mailer class to send a mail using the OpenCart mailer.
@@ -22,14 +23,8 @@ abstract class Mailer extends BaseMailer
      * @noinspection PhpDynamicFieldDeclarationInspection All the properties for
      *   $mail are dynamic.
      */
-    public function sendMail(
-        string $from,
-        string $fromName,
-        string $to,
-        string $subject,
-        string $bodyText,
-        string $bodyHtml
-    ): mixed {
+    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    {
         try {
             $config = Registry::getInstance()->config;
             $mail = $this->getMail();

@@ -37,8 +37,11 @@ use Siel\Acumulus\Invoice\CompletorStrategyLines;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Item;
-use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Mail\Mail;
+use Siel\Acumulus\Mail\Mailer;
+use Siel\Acumulus\Product\Product;
+use Siel\Acumulus\Product\StockTransactionResult;
 use Siel\Acumulus\Shop\AboutForm;
 use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager;
@@ -46,7 +49,6 @@ use Siel\Acumulus\Shop\InvoiceCreate;
 use Siel\Acumulus\Shop\InvoiceManager;
 use Siel\Acumulus\Shop\InvoiceSend;
 use Siel\Acumulus\Shop\ProductManager;
-use Siel\Acumulus\Product\StockTransactionResult;
 
 use function count;
 use function strlen;
@@ -284,12 +286,14 @@ class Container
      *   {@see TranslationCollection}.
      * @param string $subNameSpace
      *   The namespace in which $class resides.
+     * @param bool $overwrite
+     *   Whether to overwrite existing translations or not, the default is false.
      *
      * @throws \InvalidArgumentException
      */
-    public function addTranslations(string $class, string $subNameSpace): void
+    public function addTranslations(string $class, string $subNameSpace, bool $overwrite = false): void
     {
-        $this->getTranslator()->add($this->getInstance($class, $subNameSpace));
+        $this->getTranslator()->add($this->getInstance($class, $subNameSpace), $overwrite);
     }
 
     public function getLog(): Log
@@ -328,7 +332,18 @@ class Container
 
     public function getMailer(): Mailer
     {
-        return $this->getInstance('Mailer', 'Helpers', [
+        return $this->getInstance('Mailer', 'Mail', [
+            $this->getConfig(),
+            $this->getEnvironment(),
+            $this->getTranslator(),
+        ]);
+    }
+
+    public function getMail(string $mailTemplate, string $namespace): Mail
+    {
+        $this->addTranslations("{$mailTemplate}Translations", $namespace, true);
+        return $this->getInstance($mailTemplate, $namespace, [
+            $this->getMailer(),
             $this->getConfig(),
             $this->getEnvironment(),
             $this->getTranslator(),
@@ -342,7 +357,7 @@ class Container
     public function getCrashReporter(): CrashReporter
     {
         return $this->getInstance('CrashReporter', 'Helpers', [
-            $this->getMailer(),
+            $this->getMail('CrashMail', 'Mail'),
             $this->getEnvironment(),
             $this->getUtil(),
             $this->getTranslator(),

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Joomla\Helpers;
+namespace Siel\Acumulus\Joomla\Mail;
 
 use Exception;
 use Joomla\CMS\Factory;
@@ -10,7 +10,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Mail\MailerInterface;
 use PHPMailer\PHPMailer\PHPMailer;
-use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Siel\Acumulus\Mail\Mailer as BaseMailer;
 
 /**
  * Extends the base mailer class to send a mail using the Joomla mail features.
@@ -23,14 +23,8 @@ class Mailer extends BaseMailer
      * @noinspection PhpMixedReturnTypeCanBeReducedInspection
      * *    @todo: Type can be narrowed to bool|int|string
      */
-    public function sendMail(
-        string $from,
-        string $fromName,
-        string $to,
-        string $subject,
-        string $bodyText,
-        string $bodyHtml
-    ): mixed {
+    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    {
         /** @var MailerInterface $mailer */
         $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
         if ($mailer instanceof PHPMailer) {

@@ -6,6 +6,8 @@
 
 namespace Siel\Acumulus\Helpers;
 
+use Siel\Acumulus\Mail\Mailer;
+
 /**
  * Documentation for the Helpers namespace
  *

@@ -574,7 +574,9 @@ class AcumulusResult extends MessageCollection
                 /** @var array $singular */
                 $singular = reset($response);
                 // If there was only 1 list result, it wasn't put in a (numeric) array.
-                $response = !is_array(reset($singular)) ? [$singular] : $singular;
+                // API quirk: empty scalar values are returned as an empty array, so treat
+                // an empty array the same as not an array.
+                $response = !is_array(reset($singular)) || empty(reset($singular)) ? [$singular] : $singular;
             }
         } else {
             // Not set: probably an error occurred. This object offers ways to discover

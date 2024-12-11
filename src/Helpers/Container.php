@@ -656,8 +656,6 @@ class Container
 
     public function getConfig(): Config
     {
-        static $is1stTime = true;
-
         $log = $this->getLog();
         /** @var \Siel\Acumulus\Config\Config $config */
         $config = $this->getInstance('Config', 'Config', [
@@ -667,11 +665,6 @@ class Container
             $this->getEnvironment(),
             $log,
         ]);
-        if ($is1stTime) {
-            $is1stTime = false;
-            $pluginSettings = $config->getPluginSettings();
-            $log->setLogLevel($pluginSettings['logLevel']);
-        }
         return $config;
     }
 

@@ -15,6 +15,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Result;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Item;
+use Siel\Acumulus\Mail\Mail;
 use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Product\StockTransactionResult;
 
@@ -71,6 +72,11 @@ class ProductManager
     protected function getConfig(): Config
     {
         return $this->getContainer()->getConfig();
+    }
+
+    protected function getMail(): Mail
+    {
+        return $this->getContainer()->getMail('StockTransactionMail', 'Product');
     }
 
     /**
@@ -220,7 +226,7 @@ class ProductManager
 
         // Mail and log the result.
         $this->logStockTransactionResult($item, $change, $product, $result);
-        $this->mailStockTransactionResult($result, $product);
+        $this->mailStockTransactionResult($item, $change, $product, $result);
 
         return $result;
     }
@@ -270,16 +276,50 @@ class ProductManager
      * @return bool
      *   Success.
      */
-    protected function mailStockTransactionResult(StockTransactionResult $result, Product $product): bool
+    protected function mailStockTransactionResult(Item $item, int|float $change, ?Product $product, StockTransactionResult $result): bool
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
         $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError
             ? Result::AddReqResp_WithOther
             : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || $result->hasRealMessages()) {
-            return $this->getContainer()->getMailer()->mailStockTransactionResult($result, $product);
+            return $this->getMail()->createAndSend([
+                'source' => $item->getSource(),
+                'item' => $item,
+                'product' => $product,
+                'change' => $change,
+                'result' => $result,
+            ]);
         }
         return true;
+    }
+
+    /**
+     * Logs the result of the stock transaction.
+     */
+    private function logStockTransactionResult(
+        Item $item,
+        int|float $change,
+        ?Product $product,
+        StockTransactionResult $result,
+        int $addReqResp = Result::AddReqResp_WithOther
+    ): void {
+        $stockTransactionText = sprintf(
+            $this->t('message_stock_transaction_source'),
+            $product?->getReference() ?? '',
+            $change
+        );
+        $logText = sprintf(
+            $this->t('message_stock_transaction_send'),
+            $result->getTrigger(),
+            $this->t($item->getSource()->getType()),
+            $item->getSource()->getReference(),
+            $item->getId(),
+            $stockTransactionText,
+            $result->getLogText($addReqResp)
+        );
+        $severity = $result->getSeverity();
+        $this->getLog()->log($severity, $logText);
     }
 
     /**
@@ -291,27 +331,5 @@ class ProductManager
     protected function isTestMode(): bool
     {
         return $this->getConfig()->get('debug') === Config::Send_TestMode;
-    }
-
-    /**
-     * Description.
-     */
-    private function logStockTransactionResult(Item $item, int|float $change, ?Product $product, StockTransactionResult $result): void
-    {
-//        $invoiceSourceText = sprintf(
-//            $this->t('message_invoice_source'),
-//            $this->t($source->getType()),
-//            $source->getReference()
-//        );
-//        $logText = sprintf(
-//            $this->t('message_invoice_send'),
-//            $result->getTrigger(),
-//            $invoiceSourceText,
-//            $result->getLogText($addReqResp)
-//        );
-        // @todo: determine text and level of the message to log.
-        $severity = $result->getSeverity();
-        $logText ='@todo';
-        $this->getLog()->log($severity, $logText);
     }
 }

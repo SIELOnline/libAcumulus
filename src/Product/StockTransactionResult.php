@@ -7,6 +7,8 @@ namespace Siel\Acumulus\Product;
 use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\Result;
 
+use function in_array;
+
 /**
  * Extension of {@see Result} with properties and features specific to the
  * StockTransaction web API service call.
@@ -36,15 +38,15 @@ class StockTransactionResult extends Result
     protected function getStatusMessages(): array
     {
         return [
-            self::NotSent_StockManagementNotEnabled => 'reason_not_sent_not_enabled',
-            self::NotSent_StockManagementDisabledForProduct => 'reason_not_sent_disabled_product',
-            self::NotSent_NoProduct => 'reason_not_sent_no_product',
-            self::NotSent_ZeroChange => 'reason_not_sent_zero_change',
-            self::NotSent_NoMatchValueInProduct => 'reason_not_sent_no_value_to_match',
-            self::NotSent_NoMatchInAcumulus => 'reason_not_sent_no_match_in_acumulus',
-            self::NotSent_TooManyMatchesInAcumulus => 'reason_not_sent_multiple_matches_in_acumulus',
-            self::Sent_New => 'reason_sent',
-        ] + parent::getStatusMessages();
+                self::NotSent_StockManagementNotEnabled => 'reason_not_sent_not_enabled',
+                self::NotSent_StockManagementDisabledForProduct => 'reason_not_sent_disabled_product',
+                self::NotSent_NoProduct => 'reason_not_sent_no_product',
+                self::NotSent_ZeroChange => 'reason_not_sent_zero_change',
+                self::NotSent_NoMatchValueInProduct => 'reason_not_sent_no_value_to_match',
+                self::NotSent_NoMatchInAcumulus => 'reason_not_sent_no_match_in_acumulus',
+                self::NotSent_TooManyMatchesInAcumulus => 'reason_not_sent_multiple_matches_in_acumulus',
+                self::Sent_New => 'reason_sent',
+            ] + parent::getStatusMessages();
     }
 
     /**
@@ -59,5 +61,14 @@ class StockTransactionResult extends Result
     public function setStockTransaction(StockTransaction $stockTransaction): void
     {
         $this->stockTransaction = $stockTransaction;
+    }
+
+    public function isMatchError(): bool
+    {
+        return in_array($this->getSendStatus(), [
+            self::NotSent_NoMatchValueInProduct,
+            self::NotSent_NoMatchInAcumulus,
+            self::NotSent_TooManyMatchesInAcumulus,
+        ]);
     }
 }

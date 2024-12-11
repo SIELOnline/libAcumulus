@@ -122,6 +122,18 @@ class Result extends MessageCollection
     }
 
     /**
+     * Returns whether the request was sent in test mode.
+     *
+     * @return bool|null
+     *   true if the request concerned a test mode request, false if not, null if unknown
+     *   (because there's not yet a result.).
+     */
+    public function isTestMode(): ?bool
+    {
+        return $this->getAcumulusResult()?->getAcumulusRequest()->isTestMode();
+    }
+
+    /**
      * @return string
      *   A string indicating the function that triggered the sending,
      *   e.g. InvoiceManager::sourceStatusChange().
@@ -225,28 +237,24 @@ class Result extends MessageCollection
      */
     public function getLogText(int $addReqResp): string
     {
-        $action = $this->getActionText();
-        $reason = sprintf($this->t('message_invoice_reason'), $action, $this->getSendStatusText());
+        $message = sprintf($this->t('message_reason'), $this->getActionText(), $this->getSendStatusText());
 
-        $status = '';
-        $messages = '';
-        $requestResponse = '';
         if ($this->hasBeenSent() || $this->getSendStatus() === self::NotSent_LocalErrors) {
+            if ($this->hasRealMessages()) {
+                $message .= "\n" . $this->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
+            }
             if ($this->getAcumulusResult() !== null) {
-                $status = ' ' . $this->getAcumulusResult()->getStatusText();
+                $message .= ' ' . $this->getAcumulusResult()->getStatusText();
                 if ($addReqResp === self::AddReqResp_Always
                     || ($addReqResp === self::AddReqResp_WithOther && $this->hasRealMessages())
                 ) {
-                    $requestResponse = "\nRequest: " . $this->getAcumulusResult()->getAcumulusRequest()->getMaskedRequest()
+                    $message .= "\nRequest: " . $this->getAcumulusResult()->getAcumulusRequest()->getMaskedRequest()
                         . "\nResponse: " . $this->getAcumulusResult()->getMaskedResponse()
                         . "\n";
                 }
             }
-            if ($this->hasRealMessages()) {
-                $messages = "\n" . $this->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
-            }
         }
 
-        return $reason . $status . $messages . $requestResponse;
+        return $message;
     }
 }

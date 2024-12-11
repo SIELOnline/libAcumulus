@@ -69,7 +69,7 @@ class InvoiceAddResult extends Result
     }
 
     /**
-     * Returns the invoice that is (attempted to) being sent to Acumulus,
+     * Returns the invoice data object that is (attempted to) being sent to Acumulus,
      * or null if not yet set.
      */
     public function getInvoice(): ?Invoice
@@ -80,5 +80,10 @@ class InvoiceAddResult extends Result
     public function setInvoice(Invoice $invoice): void
     {
         $this->invoice = $invoice;
+    }
+
+    public function isConcept(): bool
+    {
+        return !empty($this->getMainApiResponse()['conceptid'] ?? 0);
     }
 }

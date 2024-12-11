@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\Invoice;
-
-use Siel\Acumulus\Helpers\TranslationCollection;
+namespace Siel\Acumulus\Helpers;
 
 /**
  * Contains translations for invoice send result logging.
@@ -14,10 +12,14 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class ResultTranslations extends TranslationCollection
 {
     protected array $nl = [
-        /** {@see \Siel\Acumulus\Shop\\Siel\Acumulus\Shop\InvoiceManager::getSendResultLogText()} */
+        /** {@see \Siel\Acumulus\Helpers\Result::getLogText()} */
+        'message_reason' => '%1$s (reden: %2$s)',
+        /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
         'message_invoice_send' => '%1$s: %2$s is %3$s',
         'message_invoice_source' => 'Factuur voor %1$s %2$s',
-        'message_invoice_reason' => '%1$s (reden: %2$s)',
+        /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
+        'message_stock_transaction_send' => '%1$s(%2$s %3$s, regel %4$d): %2$s is %3$s',
+        'message_stock_transaction_source' => "Voorraadupdate voor product '%1\$s': %2\$+f",
         /** {@see \Siel\Acumulus\Helpers\Result::getActionText()} */
         'action_sent' => 'verzonden',
         'action_not_sent' => 'niet verzonden',
@@ -52,18 +54,23 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_no_value_to_match' => 'Zoekwaarde in product is leeg',
         'reason_not_sent_no_match_in_acumulus' => 'Geen product in Acumulus voor zoekwaarde',
         'reason_not_sent_multiple_matches_in_acumulus' => 'Meerder producten gevonden voor zoekwaarde',
-        'reason_sent' => '',
+        'reason_sent' => 'alles OK',
     ];
 
     protected array $en = [
-        /** {@see \Siel\Acumulus\Shop\\Siel\Acumulus\Shop\InvoiceManager::getSendResultLogText()} */
-        'message_invoice_send' => '%1$s: %2$s was %3$s',
+        /** {@see \Siel\Acumulus\Helpers\Result::getLogText()} */
+        'message_reason' => '%1$s (reason: %2$s)',
+        /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
+        'message_invoice_send' => '%1$s: %2$s has %3$s',
         'message_invoice_source' => 'Invoice for %1$s %2$s',
-        'message_invoice_reason' => '%1$s (reason: %2$s)',
+        /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
+        'message_stock_transaction_send' => '%1$s(%2$s %3$s, line %4$d): %2$s is %3$s',
+        'message_stock_transaction_source' => "Stock mutation for product '%1\$s': %2\$+f",
+        /** {@see \Siel\Acumulus\Shop\\Siel\Acumulus\Shop\InvoiceManager::getSendResultLogText()} */
         /** {@see \Siel\Acumulus\Helpers\Result::getActionText()} */
         'action_unknown' => 'yet unknown',
-        'action_sent' => 'sent',
-        'action_not_sent' => 'not sent',
+        'action_sent' => 'been sent',
+        'action_not_sent' => 'not been sent',
         /** {@see \Siel\Acumulus\Helpers\Result::getStatusMessages()} */
         'reason_not_sent_dry_run' => 'sending prevented by "dry run" option',
         'reason_unknown' => 'unknown reason: %d',
@@ -94,6 +101,6 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_no_value_to_match' => 'Search field for product is empty',
         'reason_not_sent_no_match_in_acumulus' => 'No product found in Acumulus for search value',
         'reason_not_sent_multiple_matches_in_acumulus' => 'Multiple products found for search value',
-        'reason_sent' => '',
+        'reason_sent' => 'everything OK',
     ];
 }

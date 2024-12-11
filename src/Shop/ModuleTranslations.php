@@ -41,11 +41,17 @@ class ModuleTranslations extends TranslationCollection
         'documents' => 'Documenten',
         'document' => 'Document',
         'document_invoice' => 'factuur',
+        'document_concept_invoice' => 'conceptfactuur',
         'document_packing_slip' => 'pakbon',
         'document_show' => '%1$s tonen',
         'document_mail' => '%1$s mailen',
         'document_show_title' => 'Acumulus %1$s openen in uw browser',
         'document_mail_title' => 'Acumulus %1$s mailen',
+
+        // Objects.
+        'Item' => 'bestelregel',
+        'Product' => 'product',
+        'change' => 'mutatie',
 
         // Vat type.
         'vat_type' => 'soort factuur',
@@ -102,11 +108,17 @@ class ModuleTranslations extends TranslationCollection
         'documents' => 'Documents',
         'document' => 'Document',
         'document_invoice' => 'invoice',
+        'document_concept_invoice' => 'concept invoice',
         'document_packing_slip' => 'packing slip',
         'document_show' => 'Show %1$s',
         'document_mail' => 'Mail %1$s',
         'document_show_title' => 'Open Acumulus %1$s in your browser',
         'document_mail_title' => 'Mail Acumulus %1$s',
+
+        // Objects.
+        'Item' => 'item line',
+        'Product' => 'product',
+        'change' => 'mutation',
 
         // Vat type.
         'vat_type' => 'invoice type',

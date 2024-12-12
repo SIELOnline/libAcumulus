@@ -6,8 +6,8 @@ namespace Siel\Acumulus\WooCommerce\Mail;
 
 use Siel\Acumulus\Mail\Mailer as BaseMailer;
 
-use function Siel\Acumulus\WooCommerce\Helpers\get_bloginfo;
-use function Siel\Acumulus\WooCommerce\Helpers\wp_mail;
+use function get_bloginfo;
+use function wp_mail;
 
 /**
  * Extends the base mailer class to send a mail using the WP mail features.

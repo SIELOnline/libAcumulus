@@ -1,0 +1,287 @@
+array (
+  'from' => 'unit.test@example.com',
+  'fromName' => 'Unit Test | Example',
+  'to' => 'admin@example.com',
+  'subject' => 'Conceptfactuur verzonden naar Acumulus: succes, geen pdf verstuurd',
+  'bodyText' => 'Onderstaande factuur is succesvol naar Acumulus verstuurd. De factuur
+is als concept aangemaakt. Controleer de factuur in Acumulus, waarna u
+deze alsnog definitief kan maken. U vindt conceptfacturen onder
+"Overzichten - Conceptfacturen en offertes". U laat Acumulus de
+factuur als pdf naar de klant versturen. Omdat de factuur als concept
+is aangemaakt is deze pdf niet verstuurd.
+
+Over de factuur:
+
+(Webwinkel) Bestelling: 3
+Acumulus factuur:       20240018
+Verzendresultaat:       1 Succes
+
+Informatie voor Acumulus support:
+
+De informatie hieronder wordt alleen getoond om eventuele support te
+vergemakkelijken, u kunt deze informatie negeren. U kunt support
+contacteren door deze mail door te sturen naar
+testdoubles@acumulus.nl.
+
+• Request: uri=invoice-add-concept
+submit={
+    "contract": {
+        "contractcode": "123456",
+        "username": "User123456",
+        "password": "REMOVED FOR SECURITY",
+        "emailonerror": "test@example.com",
+        "emailonwarning": "test@example.com"
+    },
+    "format": "json",
+    "testmode": 0,
+    "lang": "nl",
+    "connector": {
+        "application": "TestWebShop 8.3.7",
+        "webkoppel": "Acumulus 8.3.7",
+        "development": "SIEL - Buro RaDer",
+        "remark": "Library 8.3.7 - PHP 8.1.29",
+        "sourceuri": "https://github.com/SIELOnline/libAcumulus"
+    },
+    "customer": {
+        "type": 3,
+        "vattypeid": 1,
+        "contactyourid": "5",
+        "contactstatus": 1,
+        "fullname": "Consument België",
+        "postalcode": "1000",
+        "city": "Antwerpen",
+        "countrycode": "BE",
+        "country": "België",
+        "email": "consument.belgie@example.com",
+        "overwriteifexists": 1,
+        "invoice": {
+            "concept": 1,
+            "meta-source-type": "Order",
+            "meta-source-id": 8,
+            "issuedate": "2024-06-07",
+            "costcenter": 48663,
+            "accountnumber": 70582,
+            "paymentstatus": 1,
+            "description": "order 8",
+            "template": 39851,
+            "meta-currency": "{\'currency\':\'EUR\',\'rate\':1.0,\'doConvert\':false}",
+            "meta-totals": "{\'amountEx\':200.0,\'amountInc\':243.05,\'amountVat\':43.05,\'vatBreakdown\':{\'BE High\':\'43.0500\'},\'calculated\':\'amountEx\'}",
+            "line": [
+                {
+                    "product": "Samsung SyncMaster 941BW (Product 6)",
+                    "nature": "Product",
+                    "unitprice": "200.0000",
+                    "vatamount": "42.0000",
+                    "quantity": "1",
+                    "vatrate": "21.0000",
+                    "meta-vatrate-min": 20.999661200949,
+                    "meta-vatrate-max": 21.000338800949,
+                    "meta-unitprice-precision": 0.001,
+                    "meta-vatamount-precision": 0.001,
+                    "meta-vatrate-source": "completor-range",
+                    "meta-vatclass-id": "9",
+                    "meta-vatclass-name": "High",
+                    "meta-vatrate-lookup": "[\'21.0000\']",
+                    "meta-vatrate-lookup-label": "[\'BE High\']",
+                    "meta-line-type": "order-item",
+                    "meta-vatrate-range-matches": "[{\'vatrate\':21.0,\'vattype\':6}]",
+                    "unitpriceinc": 242,
+                    "meta-fields-calculated": "[\'unitpriceinc\']"
+                },
+                {
+                    "product": "Flat Shipping Rate",
+                    "quantity": 1,
+                    "unitprice": "5.0000",
+                    "vatrate": "21.0000",
+                    "meta-vatrate-source": "completor-lookup",
+                    "meta-strategy-split": false,
+                    "meta-vatclass-id": "9",
+                    "meta-vatclass-name": "High",
+                    "meta-vatrate-lookup": "[\'21.0000\']",
+                    "meta-vatrate-lookup-label": "[\'BE High\']",
+                    "meta-line-type": "shipping",
+                    "meta-vatrate-lookup-matches": "[{\'vatrate\':21.0,\'vattype\':6}]",
+                    "unitpriceinc": 6.05,
+                    "meta-fields-calculated": "[\'unitpriceinc\',\'vatamount (from vatrate)\']",
+                    "nature": "Product",
+                    "vatamount": 1.05
+                },
+                {
+                    "product": "Gift Certificate (EUR5OFF)",
+                    "quantity": 1,
+                    "unitpriceinc": "-5.0000",
+                    "vatrate": 0,
+                    "meta-vatrate-source": "exact-0,corrected-no-vat",
+                    "meta-line-type": "voucher",
+                    "unitprice": -5.0505050505051,
+                    "meta-fields-calculated": "[\'unitprice\',\'vatamount (from vatrate)\']",
+                    "nature": "Product",
+                    "vatamount": 0
+                }
+            ],
+            "meta-lines-amount": 199.94949494949,
+            "meta-lines-amountinc": 243.05,
+            "meta-lines-vatamount": 43.05,
+            "meta-warning": "810: The invoice total does not match with the lines total. The amount (ex. vat) differs with €0.05. The invoice has been saved as concept. Check and correct the invoice in Acumulus.",
+            "vattype": 6,
+            "meta-vattype-source": "Completor::checkForKnownVatType: only 1 possible vat type"
+        }
+    }
+}
+• Response: status=200
+body={
+    "invoice": {
+        "invoicenumber": "20240018",
+        "token": [],
+        "entryid": [],
+        "contactid": "9978102",
+        "conceptid": "1004704"
+    },
+    "errors": {
+        "count_errors": "0"
+    },
+    "warnings": {
+        "count_warnings": "0"
+    },
+    "status": "0"
+}
+',
+  'bodyHtml' => '<p>Onderstaande factuur is succesvol naar Acumulus verstuurd.
+De factuur is als concept aangemaakt. Controleer de factuur in Acumulus, waarna u deze alsnog definitief kan maken. U vindt conceptfacturen onder &quot;Overzichten - Conceptfacturen en offertes&quot;.
+U laat Acumulus de factuur als pdf naar de klant versturen.
+Omdat de factuur als concept is aangemaakt is deze pdf niet verstuurd.</p>
+<h3>Over de factuur</h3>
+<table>
+<tr><th>(Webwinkel) Bestelling</th><td>3</td></tr>
+<tr><th>Acumulus factuur</th><td>20240018</td></tr>
+<tr><th>Verzendresultaat</th><td>1 Succes</td></tr>
+</table>
+<h3>Informatie voor Acumulus support</h3>
+<p>De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken, u kunt deze informatie negeren.
+U kunt support contacteren door deze mail door te sturen naar testdoubles@acumulus.nl.</p>
+<details><summary><span>(klik om te tonen of te verbergen)</span></summary><ul>
+<li><span>Request: uri=invoice-add-concept<br>
+submit={<br>
+    "contract": {<br>
+        "contractcode": "123456",<br>
+        "username": "User123456",<br>
+        "password": "REMOVED FOR SECURITY",<br>
+        "emailonerror": "test@example.com",<br>
+        "emailonwarning": "test@example.com"<br>
+    },<br>
+    "format": "json",<br>
+    "testmode": 0,<br>
+    "lang": "nl",<br>
+    "connector": {<br>
+        "application": "TestWebShop 8.3.7",<br>
+        "webkoppel": "Acumulus 8.3.7",<br>
+        "development": "SIEL - Buro RaDer",<br>
+        "remark": "Library 8.3.7 - PHP 8.1.29",<br>
+        "sourceuri": "https://github.com/SIELOnline/libAcumulus"<br>
+    },<br>
+    "customer": {<br>
+        "type": 3,<br>
+        "vattypeid": 1,<br>
+        "contactyourid": "5",<br>
+        "contactstatus": 1,<br>
+        "fullname": "Consument België",<br>
+        "postalcode": "1000",<br>
+        "city": "Antwerpen",<br>
+        "countrycode": "BE",<br>
+        "country": "België",<br>
+        "email": "consument.belgie@example.com",<br>
+        "overwriteifexists": 1,<br>
+        "invoice": {<br>
+            "concept": 1,<br>
+            "meta-source-type": "Order",<br>
+            "meta-source-id": 8,<br>
+            "issuedate": "2024-06-07",<br>
+            "costcenter": 48663,<br>
+            "accountnumber": 70582,<br>
+            "paymentstatus": 1,<br>
+            "description": "order 8",<br>
+            "template": 39851,<br>
+            "meta-currency": "{\'currency\':\'EUR\',\'rate\':1.0,\'doConvert\':false}",<br>
+            "meta-totals": "{\'amountEx\':200.0,\'amountInc\':243.05,\'amountVat\':43.05,\'vatBreakdown\':{\'BE High\':\'43.0500\'},\'calculated\':\'amountEx\'}",<br>
+            "line": [<br>
+                {<br>
+                    "product": "Samsung SyncMaster 941BW (Product 6)",<br>
+                    "nature": "Product",<br>
+                    "unitprice": "200.0000",<br>
+                    "vatamount": "42.0000",<br>
+                    "quantity": "1",<br>
+                    "vatrate": "21.0000",<br>
+                    "meta-vatrate-min": 20.999661200949,<br>
+                    "meta-vatrate-max": 21.000338800949,<br>
+                    "meta-unitprice-precision": 0.001,<br>
+                    "meta-vatamount-precision": 0.001,<br>
+                    "meta-vatrate-source": "completor-range",<br>
+                    "meta-vatclass-id": "9",<br>
+                    "meta-vatclass-name": "High",<br>
+                    "meta-vatrate-lookup": "[\'21.0000\']",<br>
+                    "meta-vatrate-lookup-label": "[\'BE High\']",<br>
+                    "meta-line-type": "order-item",<br>
+                    "meta-vatrate-range-matches": "[{\'vatrate\':21.0,\'vattype\':6}]",<br>
+                    "unitpriceinc": 242,<br>
+                    "meta-fields-calculated": "[\'unitpriceinc\']"<br>
+                },<br>
+                {<br>
+                    "product": "Flat Shipping Rate",<br>
+                    "quantity": 1,<br>
+                    "unitprice": "5.0000",<br>
+                    "vatrate": "21.0000",<br>
+                    "meta-vatrate-source": "completor-lookup",<br>
+                    "meta-strategy-split": false,<br>
+                    "meta-vatclass-id": "9",<br>
+                    "meta-vatclass-name": "High",<br>
+                    "meta-vatrate-lookup": "[\'21.0000\']",<br>
+                    "meta-vatrate-lookup-label": "[\'BE High\']",<br>
+                    "meta-line-type": "shipping",<br>
+                    "meta-vatrate-lookup-matches": "[{\'vatrate\':21.0,\'vattype\':6}]",<br>
+                    "unitpriceinc": 6.05,<br>
+                    "meta-fields-calculated": "[\'unitpriceinc\',\'vatamount (from vatrate)\']",<br>
+                    "nature": "Product",<br>
+                    "vatamount": 1.05<br>
+                },<br>
+                {<br>
+                    "product": "Gift Certificate (EUR5OFF)",<br>
+                    "quantity": 1,<br>
+                    "unitpriceinc": "-5.0000",<br>
+                    "vatrate": 0,<br>
+                    "meta-vatrate-source": "exact-0,corrected-no-vat",<br>
+                    "meta-line-type": "voucher",<br>
+                    "unitprice": -5.0505050505051,<br>
+                    "meta-fields-calculated": "[\'unitprice\',\'vatamount (from vatrate)\']",<br>
+                    "nature": "Product",<br>
+                    "vatamount": 0<br>
+                }<br>
+            ],<br>
+            "meta-lines-amount": 199.94949494949,<br>
+            "meta-lines-amountinc": 243.05,<br>
+            "meta-lines-vatamount": 43.05,<br>
+            "meta-warning": "810: The invoice total does not match with the lines total. The amount (ex. vat) differs with €0.05. The invoice has been saved as concept. Check and correct the invoice in Acumulus.",<br>
+            "vattype": 6,<br>
+            "meta-vattype-source": "Completor::checkForKnownVatType: only 1 possible vat type"<br>
+        }<br>
+    }<br>
+}</span></li>
+<li><span>Response: status=200<br>
+body={<br>
+    "invoice": {<br>
+        "invoicenumber": "20240018",<br>
+        "token": [],<br>
+        "entryid": [],<br>
+        "contactid": "9978102",<br>
+        "conceptid": "1004704"<br>
+    },<br>
+    "errors": {<br>
+        "count_errors": "0"<br>
+    },<br>
+    "warnings": {<br>
+        "count_warnings": "0"<br>
+    },<br>
+    "status": "0"<br>
+}</span></li></ul>
+</details>
+',
+)

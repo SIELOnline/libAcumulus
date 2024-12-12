@@ -19,7 +19,7 @@ namespace Siel\Acumulus\TestWebShop;
  *
  * Things to do when developing an extension for another web shop:
  * - Complete {@see \Siel\Acumulus\TestWebShop\Helpers\Log}.
- * - Complete {@see \Siel\Acumulus\TestWebShop\Helpers\Mailer}.
+ * - Complete {@see \Siel\Acumulus\TestWebShop\Mail\Mailer}.
  * - Complete {@see \Siel\Acumulus\TestWebShop\Config\ConfigStore}.
  * - Complete {@see \Siel\Acumulus\TestWebShop\Config\ShopCapabilities}
  *   (getTokenInfo() may be deferred until later).

@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\ApiBehaviour\ApiClient;
 
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;

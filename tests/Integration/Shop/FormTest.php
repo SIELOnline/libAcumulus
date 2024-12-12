@@ -24,7 +24,7 @@ use Siel\Acumulus\Tests\Data\GetTestData;
 use function dirname;
 
 /**
- * SettingsFormTest tests the creation and rendering of the settings form.
+ * FormTest tests the creation and rendering of the forms.
  */
 class FormTest extends TestCase
 {
@@ -38,7 +38,7 @@ class FormTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'get';
     }
 
-    protected static function getAcumulusContainer(): Container
+    protected static function getContainer(): Container
     {
         if (!isset(self::$container)) {
             self::$container = new Container('TestWebShop', 'nl');
@@ -51,7 +51,7 @@ class FormTest extends TestCase
     {
         $objects = (new GetTestData())->getJson();
         $order = $objects->order;
-        return $this->getAcumulusContainer()->createSource(Source::Order, $order);
+        return $this->getContainer()->createSource(Source::Order, $order);
     }
 
     protected function getTestsPath(): string
@@ -61,12 +61,12 @@ class FormTest extends TestCase
 
     private function getForm(string $type): Form
     {
-        return $this->getAcumulusContainer()->getForm($type);
+        return $this->getContainer()->getForm($type);
     }
 
     private function getRenderer(): FormRenderer
     {
-        return $this->getAcumulusContainer()->getFormRenderer();
+        return $this->getContainer()->getFormRenderer();
     }
 
     public function formTypesProvider(): array
@@ -100,7 +100,7 @@ class FormTest extends TestCase
         $renderer = $this->getRenderer();
         $output = $renderer->render($form);
         $name = substr($class, strrpos($class, '\\') + 1);
-        $this->saveTestHtmlData($this->getTestsPath() . '/Data', lcfirst($name), $output);
+        $this->saveTestHtml($this->getTestsPath() . '/Data', lcfirst($name), $output);
 
         $this->assertNotEmpty($output);
 

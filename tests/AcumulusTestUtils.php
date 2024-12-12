@@ -39,16 +39,34 @@ LONGSTRING;
 </html>
 LONGSTRING;
 
+    private static Container $container;
+
     /**
      * Returns an Acumulus Container instance.
      */
-    abstract protected static function getAcumulusContainer(): Container;
+    protected static function getContainer(): Container
+    {
+        if (!isset(self::$container)) {
+            self::$container = self::CreateContainer();
+        }
+        return self::$container;
+    }
+
+    /**
+     * Creates a container for the 'TestWebShop' namespace with 'nl' as language.
+     *
+     * Override if the test needs another container.
+     */
+    protected static function CreateContainer(): Container
+    {
+        return new Container('TestWebShop', 'nl');
+    }
 
     abstract protected function getTestsPath(): string;
 
     protected function getDataPath(): string
     {
-        $shopNamespace = self::getAcumulusContainer()->getShopNamespace();
+        $shopNamespace = self::getContainer()->getShopNamespace();
         return $this->getTestsPath() . "/Integration/$shopNamespace/Data";
     }
 
@@ -58,7 +76,7 @@ LONGSTRING;
      */
     public static function addTranslations(): void
     {
-        self::getAcumulusContainer()->getTranslator()->add(new Translations());
+        self::getContainer()->getTranslator()->add(new Translations());
     }
 
     /**
@@ -104,9 +122,9 @@ LONGSTRING;
      */
     protected function _testCreate(string $dataPath, string $type, int $id, array $excludeFields = []): void
     {
-        $invoiceSource = self::getAcumulusContainer()->createSource($type, $id);
-        $invoiceAddResult = self::getAcumulusContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = self::getAcumulusContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceSource = self::getContainer()->createSource($type, $id);
+        $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
         $result = $invoice->toArray();
         // Get order from Order{id}.json.
         $expected = $this->getTestSource($dataPath, $type, $id);
@@ -288,19 +306,49 @@ LONGSTRING;
     }
 
     /**
-     * Saves test data, typically a created and completed invoice converted to an array.
+     * Saves test html data, typically a rendered form.
      *
-     * @param mixed $data
-     *   The data to be saved (in json format).
+     * @param string $data
+     *   The html string to be saved.
      */
-    protected function saveTestHtmlData(string $path, string $name, mixed $data): void
+    protected function saveTestHtml(string $path, string $name, string $data): void
     {
         $append = 'latest';
         $filename = "$path/$name.html";
         if (file_exists($filename)) {
             $filename = "$path/$name.$append.html";
         }
-        $data = static::getAcumulusContainer()->getUtil()->maskHtml($data);
+        $data = static::getContainer()->getUtil()->maskHtml($data);
         file_put_contents($filename, static::$htmlStart . $data . static::$htmlEnd);
+    }
+
+    /**
+     * Returns a test mail.
+     */
+    protected function getTestMail(string $path, string $name): ?array
+    {
+        $mail = null;
+        $filename = "$path/$name.mail";
+        if (is_readable($filename)) {
+            eval('$mail = ' . file_get_contents($filename) . ';');
+        }
+        /** @noinspection PhpExpressionAlwaysNullInspection */
+        return $mail;
+    }
+
+    /**
+     * Saves test mail data.
+     *
+     * @param array $data
+     *   The mail data to be saved (in json format).
+     */
+    protected function saveTestMail(string $path, string $name, array $data): void
+    {
+        $append = 'latest';
+        $filename = "$path/$name.mail";
+        if (file_exists($filename)) {
+            $filename = "$path/$name.$append.mail";
+        }
+        file_put_contents($filename, var_export($data, true) . "\n");
     }
 }

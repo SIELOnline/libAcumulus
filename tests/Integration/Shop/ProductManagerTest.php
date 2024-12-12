@@ -21,7 +21,7 @@ class ProductManagerTest extends TestCase
 {
     private static Container $container;
 
-    protected static function getAcumulusContainer(): Container
+    protected static function getContainer(): Container
     {
         if (!isset(self::$container)) {
             self::$container = new Container('TestWebShop', 'nl');
@@ -32,7 +32,7 @@ class ProductManagerTest extends TestCase
 
     private function getProductManager(): ProductManager
     {
-        return $this->getAcumulusContainer()->getProductManager();
+        return $this->getContainer()->getProductManager();
     }
 
 //    public function testGetAcumulusProductByReference()
@@ -62,9 +62,9 @@ class ProductManagerTest extends TestCase
      */
     public function testUpdateStock(int $itemId, int $productId, string $acumulusField, int $acumulusProductIdOrError): void
     {
-        $config = $this->getAcumulusContainer()->getConfig();
-        $source = $this->getAcumulusContainer()->createSource(Source::Order, 1);
-        $item = $this->getAcumulusContainer()->createItem($itemId, $source);
+        $config = $this->getContainer()->getConfig();
+        $source = $this->getContainer()->createSource(Source::Order, 1);
+        $item = $this->getContainer()->createItem($itemId, $source);
         $product = $item->getProduct();
         self::assertSame($itemId, $item->getId());
         self::assertSame($productId, $product->getId());

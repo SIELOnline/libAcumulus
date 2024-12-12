@@ -12,7 +12,6 @@ use Siel\Acumulus\Data\BasicSubmit;
 use Siel\Acumulus\Data\Connector;
 use Siel\Acumulus\Data\Contract;
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Container;
 
 /**
  * This class defines a list of realistic request and response sets.
@@ -202,10 +201,117 @@ class ApiRequestResponseExamples
                     ],
                 ],
             ],
-            'response body' => '{"invoice":{"conceptid":{}},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'response body' => '{"invoice":{"invoicenumber":"20240016","token":"lc9gfgYN8bQQHnIV99r4jmDraKhQoeIj","entryid":"55393014","contactid":"9326320","conceptid":[]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
             'mainResponseKey' => 'invoice',
             'isList' => false,
-            'main response' => ['conceptid' => []],
+            'main response' => [
+                'invoicenumber' => '20240016',
+                'token' => 'lc9gfgYN8bQQHnIV99r4jmDraKhQoeIj',
+                'entryid' => '55393014',
+                'contactid' => '9326320',
+                'conceptid' => [],
+            ],
+        ],
+
+        'invoice-add-concept' => [
+            'needContract' => true,
+            'submit' => [
+                'customer' => [
+                    'type' => 3,
+                    'vattypeid' => 1,
+                    'contactyourid' => '5',
+                    'contactstatus' => 1,
+                    'fullname' => 'Consument België',
+                    'postalcode' => '1000',
+                    'city' => 'Antwerpen',
+                    'countrycode' => 'BE',
+                    'country' => 'België',
+                    'email' => 'consument.belgie@example.com',
+                    'overwriteifexists' => 1,
+                    'invoice' => [
+                        'concept' => 1,
+                        'meta-source-type' => 'Order',
+                        'meta-source-id' => 8,
+                        'issuedate' => '2024-06-07',
+                        'costcenter' => 48663,
+                        'accountnumber' => 70582,
+                        'paymentstatus' => 1,
+                        'description' => 'order 8',
+                        'template' => 39851,
+                        'meta-currency' => "{'currency':'EUR','rate':1.0,'doConvert':false}",
+                        'meta-totals' => "{'amountEx':200.0,'amountInc':243.05,'amountVat':43.05,'vatBreakdown':{'BE High':'43.0500'},'calculated':'amountEx'}",
+                        'line' => [
+                            [
+                                'product' => 'Samsung SyncMaster 941BW (Product 6)',
+                                'nature' => 'Product',
+                                'unitprice' => '200.0000',
+                                'vatamount' => '42.0000',
+                                'quantity' => '1',
+                                'vatrate' => '21.0000',
+                                'meta-vatrate-min' => 20.999661200949,
+                                'meta-vatrate-max' => 21.000338800949,
+                                'meta-unitprice-precision' => 0.001,
+                                'meta-vatamount-precision' => 0.001,
+                                'meta-vatrate-source' => 'completor-range',
+                                'meta-vatclass-id' => '9',
+                                'meta-vatclass-name' => 'High',
+                                'meta-vatrate-lookup' => "['21.0000']",
+                                'meta-vatrate-lookup-label' => "['BE High']",
+                                'meta-line-type' => 'order-item',
+                                'meta-vatrate-range-matches' => "[{'vatrate':21.0,'vattype':6}]",
+                                'unitpriceinc' => 242,
+                                'meta-fields-calculated' => "['unitpriceinc']",
+                            ],
+                            [
+                                'product' => 'Flat Shipping Rate',
+                                'quantity' => 1,
+                                'unitprice' => '5.0000',
+                                'vatrate' => '21.0000',
+                                'meta-vatrate-source' => 'completor-lookup',
+                                'meta-strategy-split' => false,
+                                'meta-vatclass-id' => '9',
+                                'meta-vatclass-name' => 'High',
+                                'meta-vatrate-lookup' => "['21.0000']",
+                                'meta-vatrate-lookup-label' => "['BE High']",
+                                'meta-line-type' => 'shipping',
+                                'meta-vatrate-lookup-matches' => "[{'vatrate':21.0,'vattype':6}]",
+                                'unitpriceinc' => 6.05,
+                                'meta-fields-calculated' => "['unitpriceinc','vatamount (from vatrate)']",
+                                'nature' => 'Product',
+                                'vatamount' => 1.05,
+                            ],
+                            [
+                                'product' => 'Gift Certificate (EUR5OFF)',
+                                'quantity' => 1,
+                                'unitpriceinc' => '-5.0000',
+                                'vatrate' => 0,
+                                'meta-vatrate-source' => 'exact-0,corrected-no-vat',
+                                'meta-line-type' => 'voucher',
+                                'unitprice' => -5.0505050505051,
+                                'meta-fields-calculated' => "['unitprice','vatamount (from vatrate)']",
+                                'nature' => 'Product',
+                                'vatamount' => 0,
+                            ],
+                        ],
+                        'meta-lines-amount' => 199.94949494949,
+                        'meta-lines-amountinc' => 243.05,
+                        'meta-lines-vatamount' => 43.05,
+                        'meta-warning' => '810: The invoice total does not match with the lines total. The amount (ex. vat) differs with €0.05. The invoice has been saved as concept. Check and correct the invoice in Acumulus.',
+                        'vattype' => 6,
+                        'meta-vattype-source' => 'Completor::checkForKnownVatType: only 1 possible vat type',
+                    ],
+                ],
+            ],
+            'response body' => '{"invoice":{"invoicenumber":"20240018","token":[],"entryid":[],"contactid":"9978102","conceptid":"1004704"},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'mainResponseKey' => 'invoice',
+            'isList' => false,
+            'main response' => [
+                'invoicenumber' => '20240018',
+                'token' => [],
+                'entryid' => [],
+                'contactid' => '9978102',
+                'conceptid' => '1004704',
+            ],
         ],
 
         'signup' => [
@@ -238,19 +344,19 @@ class ApiRequestResponseExamples
         'products' => [
             'needContract' => true,
             'submit' => ['filter' => 'TESTSKU'],
-            'response body' => '{
-    "products": {
-        "product": [
-            {"productid": "1833636", "productnature": "1", "productdescription": "t-shirt blauw", "producttagid": "0", "productcontactid": [], "productprice": "20.6612", "productvatrate": "21.00", "productsku": "TESTSKU", "productean": [], "productstockamount": "32.00", "producthash": "amrANtCVF7JXq4LN1etWuJzVAG7a2rGOTaXzbMBYI38so3dj", "productnotes": []            },
-            {"productid": "1833637", "productnature": "1", "productdescription": "t-shirt groen", "producttagid": "0", "productcontactid": [], "productprice": "20.6612", "productvatrate": "21.00", "productsku": "TESTSKU-GRO", "productean": [], "productstockamount": [], "producthash": "eIlLlg2Dp0ZHM4LGiF1RQ5oII9KfwWzpRus0792A7fxCxQlk", "productnotes": []            },
-            {"productid": "1833638", "productnature": "1", "productdescription": "t-shirt rood", "producttagid": "0", "productcontactid": [], "productprice": "20.6612", "productvatrate": "21.00", "productsku": "TESTSKU", "productean": [], "productstockamount": [], "producthash": "2dn66ZX7m8c2KPQfqT3v05hYZIg8U5hiSggFQYmH5HxorYEH", "productnotes": []            },
-            {"productid": "1833639", "productnature": "1", "productdescription": "t-shirt zwart", "producttagid": "0", "productcontactid": [], "productprice": "20.6612", "productvatrate": "21.00", "productsku": [], "productean": [], "productstockamount": [], "producthash": "WhlQ1NwoW58fSA9o3rHccBwlpa8yHZ95eLPqaDTrbNsuWm7h", "productnotes": []            },
-            {"productid": "1833640", "productnature": "1", "productdescription": "trui blauw", "producttagid": "0", "productcontactid": [], "productprice": "41.3224", "productvatrate": "21.00", "productsku": [], "productean": [], "productstockamount": [], "producthash": "YBl7qaN7Pw3fDKI2HeVARfDJ340rGdcLDM53Sw0eAViVDi5R", "productnotes": []            },
-    },
-    "errors": {"count_errors": "0"},
-    "warnings": {"count_warnings": "0"},
-    "status": "0"
-}',
+            'response body' => '{"products": {
+                    "product": [
+                        {"productid": "1833636", "productnature": "1", "productdescription": "t-shirt blauw", "producttagid": "0", "productcontactid": [], "productprice": "20.6612", "productvatrate": "21.00", "productsku": "TESTSKU", "productean": [], "productstockamount": "32.00", "producthash": "amrANtCVF7JXq4LN1etWuJzVAG7a2rGOTaXzbMBYI38so3dj", "productnotes": [] },
+                        {"productid": "1833637", "productnature": "1", "productdescription": "t-shirt groen", "producttagid": "0", "productcontactid": [], "productprice": "20.6612", "productvatrate": "21.00", "productsku": "TESTSKU-GRO", "productean": [], "productstockamount": [], "producthash": "eIlLlg2Dp0ZHM4LGiF1RQ5oII9KfwWzpRus0792A7fxCxQlk", "productnotes": [] },
+                        {"productid": "1833638", "productnature": "1", "productdescription": "t-shirt rood", "producttagid": "0", "productcontactid": [], "productprice": "20.6612", "productvatrate": "21.00", "productsku": "TESTSKU", "productean": [], "productstockamount": [], "producthash": "2dn66ZX7m8c2KPQfqT3v05hYZIg8U5hiSggFQYmH5HxorYEH", "productnotes": [] },
+                        {"productid": "1833639", "productnature": "1", "productdescription": "t-shirt zwart", "producttagid": "0", "productcontactid": [], "productprice": "20.6612", "productvatrate": "21.00", "productsku": [], "productean": [], "productstockamount": [], "producthash": "WhlQ1NwoW58fSA9o3rHccBwlpa8yHZ95eLPqaDTrbNsuWm7h", "productnotes": [] },
+                        {"productid": "1833640", "productnature": "1", "productdescription": "trui blauw", "producttagid": "0", "productcontactid": [], "productprice": "41.3224", "productvatrate": "21.00", "productsku": [], "productean": [], "productstockamount": [], "producthash": "YBl7qaN7Pw3fDKI2HeVARfDJ340rGdcLDM53Sw0eAViVDi5R", "productnotes": [] }
+                    ]
+                },
+                "errors": {"count_errors": "0"},
+                "warnings": {"count_warnings": "0"},
+                "status": "0"
+            }',
             'mainResponseKey' => 'products',
             'isList' => true,
             'main response' => [
@@ -326,12 +432,29 @@ class ApiRequestResponseExamples
                 ],
             ],
         ],
+        'stock-transaction' => [
+            'needContract' => true,
+            'submit' => ['productid' => 1833642, 'stockamount' => -2.0, 'stockDescription' => 'Bestelling 123',],
+            'response body' => '{"stock":{"stockamount":"30.00","productid":"1833642"},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'mainResponseKey' => 'stock',
+            'isList' => false,
+            'main response' => ['stockamount' => '30.00', 'productid' => '1833642'],
+        ],
+        'stock-transaction-404' => [
+            'needContract' => true,
+            'submit' => ['productid' => 123, 'stockamount' => -2, 'stockdescription' => 'Bestelling 123', 'stockdate' => '2024-11-19'],
+            'http status code' => 404,
+            'response body' => '{"productid":"123","errors":{"error":{"code":"404 Not Found","codetag":"AA5B85AA","message":"Ongeldig productid"},"count_errors":"1"},"warnings":{"count_warnings":"0"},"status":"1"}',
+            'mainResponseKey' => 'stock',
+            'isList' => false,
+            'main response' => ['productid' => 123],
+        ],
     ];
-    private array $options= [];
+    private array $options = [];
 
     public function setOptions(array $options): void
     {
-        $this->options = $options;
+        $this->options = $options + $this->options;
     }
 
     public function needContract(string $key): bool
@@ -383,11 +506,11 @@ class ApiRequestResponseExamples
     private function getConnector(): Connector
     {
         $connector = new Connector();
-        $connector->application = 'WooCommerce 4.0.1 (WordPress: 5.4)';
-        $connector->webKoppel = 'Acumulus 5.9.0';
+        $connector->application = 'TestWebShop 8.3.7';
+        $connector->webKoppel = 'Acumulus 8.3.7';
         $connector->development = 'SIEL - Buro RaDer';
-        $connector->remark = 'Library 5.10.0-alpha1 - PHP 7.1.33';
-        $connector->sourceUri = 'https://www.siel.nl/';
+        $connector->remark = 'Library 8.3.7 - PHP 8.1.29';
+        $connector->sourceUri = 'https://github.com/SIELOnline/libAcumulus';
         return $connector;
     }
 

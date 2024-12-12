@@ -77,7 +77,6 @@ class AcumulusResultTest extends TestCase
         $this->assertSame($this->t('message_response_success'), $result->getStatusText());
         $this->assertSame(Severity::Unknown, $result->getSeverity());
         $this->assertCount(0, $result->getMessages());
-        $this->assertSame(0, $result->getMessages());
 
         return $result;
     }

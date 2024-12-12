@@ -38,6 +38,11 @@ class Product extends BaseProduct
         $this->id = $this->shopObject->id;
     }
 
+    public function getReference(): string
+    {
+        return $this->shopObject->sku;
+    }
+
     public function getAcumulusId(): ?int
     {
         return $this->shopObject->acumulusId ?? null;

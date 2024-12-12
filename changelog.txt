@@ -7,6 +7,9 @@ This file contains a historical overview of changes in our code.
 ------------------
 Bugs:
 - ALL: Voucher lines should always get vat free and not 0%.
+- WC: Fatal error: Uncaught TypeError: Acumulus::addShopOrderMetaBox(): Argument #2
+  ($shopOrderOrPost) must be of type WP_Post|WC_Order, WP_Comment given, called in
+  class-wp-hook.php on line 324 and defined in acumulus.php:440.
 
 Refactorings:
 - ALL: Renamed Source::getTypeLabel() to Source::GetLabel(): Check your mappings!

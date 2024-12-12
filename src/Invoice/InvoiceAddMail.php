@@ -15,6 +15,25 @@ use Siel\Acumulus\Mail\Mail;
  */
 class InvoiceAddMail extends Mail
 {
+    protected function getPlaceholders(): array
+    {
+        $acumulusInvoiceLabel = $this->t('document_invoice');
+        $acumulusInvoiceId = $this->t('message_not_created');
+        $invoiceInfo = $this->getResult()?->getMainApiResponse();
+        if ($invoiceInfo !== null) {
+            if (isset($invoiceInfo['invoicenumber'])) {
+                $acumulusInvoiceId = $invoiceInfo['invoicenumber'];
+            } elseif (isset($invoiceInfo['conceptid'])) {
+                $acumulusInvoiceLabel = $this->t('document_concept_invoice');
+                $acumulusInvoiceId = $invoiceInfo['conceptid'];
+            }
+        }
+        return [
+                '{acumulus_invoice_label}' => $acumulusInvoiceLabel,
+                '{acumulus_invoice_id}' => $acumulusInvoiceId,
+            ] + parent::getPlaceholders();
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -54,34 +73,6 @@ class InvoiceAddMail extends Mail
             }
         }
         return $subjectResultPhrase;
-    }
-
-    protected
-    function getPlaceholders(): array
-    {
-        $acumulusInvoiceLabel = $this->t('document_invoice');
-        $acumulusInvoiceId = $this->t('message_not_created');
-        $invoiceInfo = $this->getResult()?->getMainApiResponse();
-        if ($invoiceInfo !== null) {
-            if (isset($invoiceInfo['invoicenumber'])) {
-                $acumulusInvoiceId = $invoiceInfo['invoicenumber'];
-            } elseif (isset($invoiceInfo['conceptid'])) {
-                $acumulusInvoiceLabel = $this->t('document_concept_invoice');
-                $acumulusInvoiceId = $invoiceInfo['conceptid'];
-            }
-        }
-        return [
-                '{acumulus_invoice_label}' => $acumulusInvoiceLabel,
-                '{acumulus_invoice_id}' => $acumulusInvoiceId,
-            ] + parent::getPlaceholders();
-    }
-
-    protected function getAboutLines(): array
-    {
-        return [
-                '({shop}) {source_label}' => '{source_reference}',
-                '{module_name} {acumulus_invoice_label}' => '{acumulus_invoice_id}'
-            ] + parent::getAboutLines();
     }
 
     /**
@@ -143,4 +134,11 @@ class InvoiceAddMail extends Mail
         return $sentences;
     }
 
+    protected function getAboutLines(): array
+    {
+        return [
+                '({shop}) {source_label}' => '{source_reference}',
+                '{module_name} {acumulus_invoice_label}' => '{acumulus_invoice_id}'
+            ] + parent::getAboutLines();
+    }
 }

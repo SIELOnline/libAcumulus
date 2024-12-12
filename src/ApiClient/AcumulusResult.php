@@ -203,11 +203,13 @@ class AcumulusResult extends MessageCollection
     }
 
     /**
+     * Returns the status, the result of taking the worst of:
+     * - The response API status (converted to a Severity).
+     * - The severity of the message collection (while ignoring messages of
+     *   Severity::Log).
+     *
      * @return int
-     *   The status is the result of taking the worst of:
-     *   - The response API status (converted to a Severity).
-     *   - The severity of the message collection (while ignoring messages of
-     *     Severity::Log).
+     *   A {@see Severity}.
      */
     public function getStatus(): int
     {

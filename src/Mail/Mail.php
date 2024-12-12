@@ -247,38 +247,38 @@ abstract class Mail
     {
         // Collect the sentences.
         $sentences = [];
-        switch ($this->getResult()?->getSeverity()) {
-            case Severity::Exception:
-                $sentences[] = 'mail_body_exception';
-                $sentences[] = $this->getResult()?->getAcumulusResult()?->getHttpResponse() !== null
-                    ? 'mail_body_exception_maybe_created'
-                    : 'mail_body_exception_not_created';
-                break;
-            case Severity::Error:
-                $sentences[] = 'mail_body_errors';
-                $sentences[] = 'mail_body_errors_not_created';
-                break;
-            case Severity::Warning:
-                $sentences[] = 'mail_body_warnings';
-                if ($this->getResult()?->isTestMode() ?? false) {
-                    $sentences[] = 'mail_body_test_mode';
-                } else {
-                    $sentences[] = 'mail_body_warnings_created';
-                }
-                break;
-            case Severity::Success:
-            default: // Other severities, but I wanted to mention Success explicitly.
-                $sentences[] = 'mail_body_success';
-                if ($this->getResult()?->isTestMode() ?? false) {
-                    $sentences[] = 'mail_body_test_mode';
-                }
-                break;
-            case null:  // No result, thus no severity available: for now: CrashReporter.
-                $sentences[] = 'mail_body_intro_crash';
-                $sentences[] = 'mail_body_intro_temporary';
-                $sentences[] = 'mail_body_intro_contact_support';
-                $sentences[] = 'mail_body_intro_forward_all';
-                break;
+        if ($this->getResult() === null) {
+            $sentences[] = 'mail_body_intro_crash';
+            $sentences[] = 'mail_body_intro_temporary';
+            $sentences[] = 'mail_body_intro_contact_support';
+            $sentences[] = 'mail_body_intro_forward_all';
+        } else {
+            switch ($this->getResult()?->getSeverity()) {
+                case Severity::Exception:
+                    $sentences[] = 'mail_body_exception';
+                    $sentences[] = $this->getResult()?->getAcumulusResult()?->getHttpResponse() !== null
+                        ? 'mail_body_exception_maybe_created'
+                        : 'mail_body_exception_not_created';
+                    break;
+                case Severity::Error:
+                    $sentences[] = 'mail_body_errors';
+                    $sentences[] = 'mail_body_errors_not_created';
+                    break;
+                case Severity::Warning:
+                    $sentences[] = 'mail_body_warnings';
+                    $sentences[] = ($this->getResult()?->isTestMode() ?? false)
+                        ? 'mail_body_test_mode'
+                        : 'mail_body_warnings_created';
+                    break;
+                default:
+                    // Other severities which basically indicate success but possibly
+                    // with "informational"  messages.
+                    $sentences[] = 'mail_body_success';
+                    if ($this->getResult()?->isTestMode() ?? false) {
+                        $sentences[] = 'mail_body_test_mode';
+                    }
+                    break;
+            }
         }
         return $sentences;
     }
@@ -447,7 +447,7 @@ abstract class Mail
             $tableRows[$tableHeader] = $tableCell;
         }
         $tableText = '';
-        $tableHtml = "<table>\n";
+        $tableHtml = "<table style=\"text-align: left;\">\n";
         $rowFormatText = "%-{$maxLabelLength}s%s\n";
         $rowFormatHtml = "<tr><th>%s</th><td>%s</td></tr>\n";
         foreach ($tableRows as $header => $value) {

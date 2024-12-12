@@ -122,6 +122,17 @@ class Result extends MessageCollection
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * This override also takes the {@see AcumulusResult::getStatus() status} into
+     * account, not only the {@see Result::getMessages() messages}.
+     */
+    public function getSeverity(): int
+    {
+        return max($this->getAcumulusResult()?->getStatus() ?? Severity::Unknown, parent::getSeverity());
+    }
+
+    /**
      * Returns whether the request was sent in test mode.
      *
      * @return bool|null

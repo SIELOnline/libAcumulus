@@ -46,9 +46,7 @@ LONGSTRING;
      */
     protected static function getContainer(): Container
     {
-        if (!isset(self::$container)) {
-            self::$container = self::CreateContainer();
-        }
+        self::$container ??= self::CreateContainer();
         return self::$container;
     }
 

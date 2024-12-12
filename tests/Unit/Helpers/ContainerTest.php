@@ -41,7 +41,7 @@ use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\CheckAccount;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\TestWebShop\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\CrashReporter;
 use Siel\Acumulus\Helpers\Event;
@@ -85,12 +85,22 @@ use function get_class;
  */
 class ContainerTest extends TestCase
 {
+    private static Container $container;
+    public static function setUpBeforeClass(): void
+    {
+        self::$container = new Container('TestWebShop');
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        echo 'Container::getInstance() was called ' . Container::$count . " times.\n";
+    }
     /**
      * Tests the (almost) independent classes in the Helpers namespace.
      */
     public function testHelpersNamespace1(): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $object = Container::getContainer();
         $this->assertInstanceOf(Container::class, $object);
         $object = $container->getLog();
@@ -117,7 +127,7 @@ class ContainerTest extends TestCase
 
     public function testConfigNamespace(): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $object = $container->getConfigStore();
         $this->assertInstanceOf(ConfigStore::class, $object);
         $object = $container->getEnvironment();
@@ -134,7 +144,7 @@ class ContainerTest extends TestCase
 
     public function testApiClientNamespace(): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $object = $container->getAcumulusApiClient();
         $this->assertInstanceOf(Acumulus::class, $object);
         $object = $container->createHttpRequest([]);
@@ -164,7 +174,7 @@ class ContainerTest extends TestCase
      */
     public function testDataNameSpace(string $dataType, string $dataClass): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $object = $container->createAcumulusObject($dataType);
         /** @noinspection UnnecessaryAssertionInspection */
         $this->assertInstanceOf($dataClass, $object);
@@ -206,7 +216,7 @@ class ContainerTest extends TestCase
      */
     public function testHelpersNamespace2(): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $object = $container->getCrashReporter();
         $this->assertInstanceOf(CrashReporter::class, $object);
         $object = $container->getFormHelper();
@@ -219,7 +229,7 @@ class ContainerTest extends TestCase
 
     public function testGetForms(): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $object = $container->getForm('batch');
         $this->assertInstanceOf(BatchForm::class, $object);
         $object = $container->getForm('register');
@@ -237,7 +247,7 @@ class ContainerTest extends TestCase
      */
     public function testMailNamespace(): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $object = $container->getMailer();
         $this->assertInstanceOf(Mailer::class, $object);
         $object = $container->getMail('CrashMail', 'Mail');
@@ -246,7 +256,7 @@ class ContainerTest extends TestCase
 
     public function testInvoiceNamespace(): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $object = $container->createSource(Source::Order, 1);
         $this->assertInstanceOf(Source::class, $object);
         $object = $container->createItem(2, $object);
@@ -265,7 +275,7 @@ class ContainerTest extends TestCase
 
     public function testShopNamespace(): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $object = $container->getAcumulusEntryManager();
         $this->assertInstanceOf(AcumulusEntryManager::class, $object);
         $object = $container->createAcumulusEntry([]);
@@ -276,7 +286,7 @@ class ContainerTest extends TestCase
 
     public function testCompletorsNameSpace(): void
     {
-        $container = new Container('TestWebShop');
+        $container = self::$container;
         $completorTypes = [
             DataType::Customer => CustomerCompletor::class,
             DataType::Invoice => InvoiceCompletor::class,
@@ -288,24 +298,4 @@ class ContainerTest extends TestCase
         $object = $container->getCollectorManager();
         $this->assertInstanceOf(CollectorManager::class, $object);
     }
-
-//    public function testGetInstance()
-//    {
-//    }
-//
-//    public function testSetLanguage()
-//    {
-//    }
-//
-//    public function testGetLanguage()
-//    {
-//    }
-//
-//    public function testSetCustomNamespace()
-//    {
-//    }
-//
-//    public function testAddTranslations()
-//    {
-//    }
 }

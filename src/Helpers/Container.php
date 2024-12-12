@@ -1,8 +1,8 @@
 <?php
 /**
- * @noinspection PhpIncompatibleReturnTypeInspection  The get/create...()
- *   methods are strong typed, but the internal getInstance() not, leading to
- *   this warning all over the place.
+ * @noinspection PhpIncompatibleReturnTypeInspection  The get/create...() methods are
+ *   strong typed, but the internal getInstance() not, leading to this warning all over
+ *   the place.
  */
 
 declare(strict_types=1);
@@ -13,6 +13,7 @@ const Version = '8.3.7';
 
 namespace Siel\Acumulus\Helpers;
 
+use Closure;
 use InvalidArgumentException;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusRequest;
@@ -262,6 +263,7 @@ class Container
         $this->customNamespace = $customNamespace;
     }
 
+    /** @noinspection PhpParamsInspection */
     public function getTranslator(): Translator
     {
         /** @var \Siel\Acumulus\Helpers\Translator $translator */
@@ -269,11 +271,11 @@ class Container
         if (!$this->baseTranslationsAdded) {
             // Add some basic translations that are hard to add just-in-time.
             $this->baseTranslationsAdded = true;
-            $translator->add($this->getInstance('ModuleSpecificTranslations', 'Helpers'));
-            $translator->add($this->getInstance('ModuleTranslations', 'Shop'));
-            $translator->add($this->getInstance('SeverityTranslations', 'Helpers'));
-            $translator->add($this->getInstance('ResultTranslations', 'ApiClient'));
-            $translator->add($this->getInstance('ResultTranslations', 'Helpers'));
+            $this->addTranslations('ModuleSpecificTranslations', 'Helpers');
+            $this->addTranslations('ModuleTranslations', 'Shop');
+            $this->addTranslations('SeverityTranslations', 'Helpers');
+            $this->addTranslations('ResultTranslations', 'ApiClient');
+            $this->addTranslations('ResultTranslations', 'Helpers');
         }
         return $translator;
     }
@@ -288,11 +290,10 @@ class Container
      *   The namespace in which $class resides.
      * @param bool $overwrite
      *   Whether to overwrite existing translations or not, the default is false.
-     *
-     * @throws \InvalidArgumentException
      */
     public function addTranslations(string $class, string $subNameSpace, bool $overwrite = false): void
     {
+        /** @noinspection PhpParamsInspection */
         $this->getTranslator()->add($this->getInstance($class, $subNameSpace), $overwrite);
     }
 
@@ -863,37 +864,61 @@ class Container
         array $constructorArgs = [],
         bool $newInstance = false
     ): ?object {
-        $instanceKey = "$subNamespace\\$class";
-        if (!isset($this->instances[$instanceKey]) || $newInstance) {
-            $fqClass = null;
-            // Try custom namespace.
-            if (!empty($this->customNamespace)) {
-                $fqClass = $this->tryNsInstance($class, $subNamespace, $this->customNamespace);
-            }
-
-            // Try the namespace passed to the constructor and any parent
-            // namespaces, but stop at Acumulus.
-            $namespaces = explode('\\', $this->shopNamespace);
-            while ($fqClass === null && count($namespaces) > 0) {
-                if (end($namespaces) === 'Acumulus') {
-                    // We arrived at the base level (\...\Acumulus),
-                    // try the \Siel\Acumulus\ level and stop.
-                    $namespace = static::baseNamespace;
-                    $namespaces = [];
-                } else {
-                    $namespace = implode('\\', $namespaces);
-                    array_pop($namespaces);
-                }
-                $fqClass = $this->tryNsInstance($class, $subNamespace, $namespace);
-            }
-
-            if ($fqClass === null) {
-                return null;
-            }
-
-            // Create a new instance.
-            $this->instances[$instanceKey] = new $fqClass(...$constructorArgs);
+        if ($newInstance || !$this->hasInstance($class, $subNamespace)) {
+            $this->createInstance($class, $subNamespace, $constructorArgs);
         }
+        return $this->instances[$this->getInstanceKey($class, $subNamespace)];
+    }
+
+
+    /**
+     * Returns a key to identify the given class (in the set of created instances).
+     */
+    protected function getInstanceKey(string $class, string $subNamespace): string
+    {
+        return "$subNamespace\\$class";
+    }
+
+    /**
+     * Returns whether an instance of the given class already exists in the set of created
+     * instances.
+     */
+    public function hasInstance(string $class, string $subNamespace): bool
+    {
+        $instanceKey = $this->getInstanceKey($class, $subNamespace);
+        return isset($this->instances[$instanceKey]);
+    }
+
+    public function createInstance(
+        string $class,
+        string $subNamespace,
+        array $constructorArgs = [],
+    ): ?object {
+        $fqClass = null;
+        // Try custom namespace.
+        if ($this->customNamespace !== '') {
+            $fqClass = $this->tryNsInstance($class, $subNamespace, $this->customNamespace);
+        }
+
+        // Try the namespace passed to the constructor and any parent
+        // namespaces, but stop at Acumulus.
+        $namespaces = explode('\\', $this->shopNamespace);
+        while ($fqClass === null && count($namespaces) > 0) {
+            if (end($namespaces) === 'Acumulus') {
+                // We arrived at the base level (\...\Acumulus),
+                // try the \Siel\Acumulus\ level and stop.
+                $namespace = static::baseNamespace;
+                $namespaces = [];
+            } else {
+                $namespace = implode('\\', $namespaces);
+                array_pop($namespaces);
+            }
+            $fqClass = $this->tryNsInstance($class, $subNamespace, $namespace);
+        }
+
+        // Create a new instance.
+        $instanceKey = $this->getInstanceKey($class, $subNamespace);
+        $this->instances[$instanceKey] = $fqClass !== null ? new $fqClass(...$constructorArgs) : null;
         return $this->instances[$instanceKey];
     }
 

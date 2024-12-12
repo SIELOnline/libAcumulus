@@ -184,11 +184,11 @@ abstract class Mail
      */
     protected function getSubjectBase(): string
     {
-        $subjectBase = 'mail_subject';
+        $subjectBase = $this->t('mail_subject');
         if ($this->getResult()?->isTestMode() ?? false) {
-            $subjectBase .= '_test_mode';
+            $subjectBase .= $this->t('mail_subject_test_mode');
         }
-        return $this->t($subjectBase);
+        return $subjectBase;
     }
 
     /**
@@ -261,7 +261,7 @@ abstract class Mail
             case Severity::Warning:
                 $sentences[] = 'mail_body_warnings';
                 if ($this->getResult()?->isTestMode() ?? false) {
-                    $sentences[] = 'mail_body_testmode';
+                    $sentences[] = 'mail_body_test_mode';
                 } else {
                     $sentences[] = 'mail_body_warnings_created';
                 }
@@ -270,7 +270,7 @@ abstract class Mail
             default: // Other severities, but I wanted to mention Success explicitly.
                 $sentences[] = 'mail_body_success';
                 if ($this->getResult()?->isTestMode() ?? false) {
-                    $sentences[] = 'mail_body_testmode';
+                    $sentences[] = 'mail_body_test_mode';
                 }
                 break;
             case null:  // No result, thus no severity available: for now: CrashReporter.
@@ -297,8 +297,7 @@ abstract class Mail
     protected function getAboutLines(): array
     {
         $lines = [];
-        $result = $this->getResult();
-        if ($result instanceof Result) {
+        if ($this->getResult() instanceof Result) {
             $lines += [
                 'send_status' => rtrim('{severity} {status_text}'),
             ];
@@ -420,7 +419,7 @@ abstract class Mail
      */
     protected function toParagraph(string|array $sentences): array
     {
-        $sentences = $this->translatePhrases((array) $sentences);
+        $sentences = $this->replacePlaceholders($this->translatePhrases((array) $sentences));
         return [
             'text' => wordwrap(implode(' ', $sentences), 70) . "\n",
             'html' => '<p>' . htmlspecialchars(implode("\n", $sentences)) . "</p>\n",
@@ -444,7 +443,7 @@ abstract class Mail
             // maximum header length.
             $tableHeader = $this->t(strtr($label, $this->translatedPlaceholders));
             $maxLabelLength = max($maxLabelLength, strlen($tableHeader) + 2);
-            $tableCell = $this->t($value);
+            $tableCell = $this->t(strtr($value, $this->translatedPlaceholders));
             $tableRows[$tableHeader] = $tableCell;
         }
         $tableText = '';
@@ -466,6 +465,13 @@ abstract class Mail
     {
         return array_map(function (string $phrase) {
             return $this->t($phrase);
+        }, $phrases);
+    }
+
+    protected function replacePlaceholders(array $phrases): array
+    {
+        return array_map(function (string $phrase) {
+            return strtr($phrase, $this->translatedPlaceholders);
         }, $phrases);
     }
 

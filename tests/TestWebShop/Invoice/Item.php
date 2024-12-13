@@ -18,6 +18,8 @@ class Item extends BaseItem
         4 => 14,
         5 => 15,
         6 => 16,
+        7 => 17,
+        8 => 18,
     ];
 
     protected function setShopObject(): void

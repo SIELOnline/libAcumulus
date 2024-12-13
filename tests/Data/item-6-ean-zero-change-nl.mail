@@ -1,0 +1,43 @@
+array (
+  'from' => 'unit.test@example.com',
+  'fromName' => 'Unit Test | Example',
+  'to' => 'admin@example.com',
+  'subject' => 'Voorraadmutatie verzonden naar Acumulus: fout(en)',
+  'bodyText' => 'Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten
+opgetreden. De voorraadmutatie is niet verwerkt in Acumulus.
+
+Over de voorraadmutatie:
+
+Bestelling:                1
+Bestelregel:               6
+Product (Webwinkel):       TEST
+Mutatie:                   +0
+Product (Acumulus):        onbekend
+Voorraadniveau (Acumulus): niet aangemaakt in Acumulus
+Verzendresultaat:          32 niet verzonden
+
+Meldingen:
+
+• Fout: Geen toe of afname van het voorraadniveau
+
+Meer informatie over de terugkoppeling van de vermeldde foutcodes kunt u vinden op https://www.siel.nl/acumulus/API/Basic_Response/
+',
+  'bodyHtml' => '<p>Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten opgetreden.
+De voorraadmutatie is niet verwerkt in Acumulus.</p>
+<h3>Over de voorraadmutatie</h3>
+<table style="text-align: left;">
+<tr><th>Bestelling</th><td>1</td></tr>
+<tr><th>Bestelregel</th><td>6</td></tr>
+<tr><th>Product (Webwinkel)</th><td>TEST</td></tr>
+<tr><th>Mutatie</th><td>+0</td></tr>
+<tr><th>Product (Acumulus)</th><td>onbekend</td></tr>
+<tr><th>Voorraadniveau (Acumulus)</th><td>niet aangemaakt in Acumulus</td></tr>
+<tr><th>Verzendresultaat</th><td>32 niet verzonden</td></tr>
+</table>
+<h3>Meldingen</h3>
+<details><summary><span>(klik om te tonen of te verbergen)</span></summary><ul>
+<li><span>Fout:</span> <span>Geen toe of afname van het voorraadniveau</span></li></ul>
+</details>
+<p><p>Meer informatie over de terugkoppeling van vermeldde foutcodes kunt u vinden op <a href="https://www.siel.nl/acumulus/API/Basic_Response/">Acumulus - Basic response</a>.</p></p>
+',
+)

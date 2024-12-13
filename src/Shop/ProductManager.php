@@ -13,6 +13,7 @@ use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Result;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Mail\Mail;
@@ -180,14 +181,10 @@ class ProductManager
             return $products[0];
         } else {
             // Multiple matches.
-            throw new UnexpectedValueException(
-                sprintf(
-                    "Search for reference '%s' resulted in at least 2 products ('%s' and '%s')",
-                    $reference,
-                    $products[0][Fld::ProductDescription],
-                    $products[1][Fld::ProductDescription]
-                )
-            );
+            $message = sprintf("Search for reference '%s' resulted in %d products", $reference, count($products));
+            $messageDetailFormat = count($products) === 2 ? " ('%s' and '%s')" : " ('%s', '%s', and others)";
+            $messageDetail = sprintf($messageDetailFormat, $products[0][Fld::ProductDescription], $products[1][Fld::ProductDescription]);
+            throw new UnexpectedValueException($message . $messageDetail);
         }
     }
 
@@ -211,8 +208,10 @@ class ProductManager
             $result->setSendStatus(StockTransactionResult::NotSent_StockManagementNotEnabled);
         } elseif ($product === null) {
             $result->setSendStatus(StockTransactionResult::NotSent_NoProduct);
+            $result->createAndAddMessage($result->getSendStatusText(), Severity::Error);
         } elseif (Number::isZero($change, 0.00001)) {
             $result->setSendStatus(StockTransactionResult::NotSent_ZeroChange);
+            $result->createAndAddMessage($result->getSendStatusText(), Severity::Error);
         } elseif ($this->isTestMode()) {
             $result->setSendStatus(Result::Sent_TestMode);
         } else {

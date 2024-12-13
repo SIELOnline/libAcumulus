@@ -200,7 +200,7 @@ class Result extends MessageCollection
     /**
      * Returns a translated string indicating the reason for the action taken.
      */
-    protected function getSendStatusText(): string
+    public function getSendStatusText(): string
     {
         $messages = $this->getStatusMessages();
         if (isset($messages[$this->sendStatus])) {

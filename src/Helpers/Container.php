@@ -267,7 +267,7 @@ class Container
     public function getTranslator(): Translator
     {
         /** @var \Siel\Acumulus\Helpers\Translator $translator */
-        $translator = $this->getInstance('Translator', 'Helpers', [$this->getLanguage()]);
+        $translator = $this->getInstance('Translator', 'Helpers', fn() => [$this->getLanguage()]);
         if (!$this->baseTranslationsAdded) {
             // Add some basic translations that are hard to add just-in-time.
             $this->baseTranslationsAdded = true;
@@ -319,7 +319,7 @@ class Container
 
     public function getCheckAccount(): CheckAccount
     {
-        return $this->getInstance('CheckAccount', 'Helpers', [
+        return $this->getInstance('CheckAccount', 'Helpers', fn() => [
             $this->getAcumulusApiClient(),
             $this->getConfig(),
             $this->getTranslator(),
@@ -333,7 +333,7 @@ class Container
 
     public function getMailer(): Mailer
     {
-        return $this->getInstance('Mailer', 'Mail', [
+        return $this->getInstance('Mailer', 'Mail', fn() => [
             $this->getConfig(),
             $this->getEnvironment(),
             $this->getTranslator(),
@@ -343,7 +343,7 @@ class Container
     public function getMail(string $mailTemplate, string $namespace): Mail
     {
         $this->addTranslations("{$mailTemplate}Translations", $namespace, true);
-        return $this->getInstance($mailTemplate, $namespace, [
+        return $this->getInstance($mailTemplate, $namespace, fn() => [
             $this->getMailer(),
             $this->getConfig(),
             $this->getEnvironment(),
@@ -357,7 +357,7 @@ class Container
      */
     public function getCrashReporter(): CrashReporter
     {
-        return $this->getInstance('CrashReporter', 'Helpers', [
+        return $this->getInstance('CrashReporter', 'Helpers', fn() => [
             $this->getMail('CrashMail', 'Mail'),
             $this->getEnvironment(),
             $this->getUtil(),
@@ -368,7 +368,7 @@ class Container
 
     public function getFieldExpander(): FieldExpander
     {
-        return $this->getInstance('FieldExpander', 'Helpers', [$this->getLog()]);
+        return $this->getInstance('FieldExpander', 'Helpers', fn() => [$this->getLog()]);
     }
 
     public function getFieldExpanderHelp(): FieldExpanderHelp
@@ -378,7 +378,7 @@ class Container
 
     public function getFormHelper(): FormHelper
     {
-        return $this->getInstance('FormHelper', 'Helpers', [$this->getTranslator(), $this->getLog()]);
+        return $this->getInstance('FormHelper', 'Helpers', fn() => [$this->getTranslator(), $this->getLog()]);
     }
 
     public function getFormRenderer(bool $newInstance = false): FormRenderer
@@ -391,12 +391,12 @@ class Container
      */
     public function getFormMapper(): FormMapper
     {
-        return $this->getInstance('FormMapper', 'Helpers', [$this->getLog()]);
+        return $this->getInstance('FormMapper', 'Helpers', fn() => [$this->getLog()]);
     }
 
     public function getAcumulusApiClient(): Acumulus
     {
-        return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getEnvironment(), $this->getLog()]);
+        return $this->getInstance('Acumulus', 'ApiClient', fn() => [$this, $this->getEnvironment(), $this->getLog()]);
     }
 
     public function createAcumulusRequest(): AcumulusRequest
@@ -531,8 +531,7 @@ class Container
                 true
             );
         } else {
-            $arguments = [$this, $this->getConfig(), $this->getTranslator()];
-            return $this->getInstance("{$dataType}Completor", 'Completors', $arguments);
+            return $this->getInstance("{$dataType}Completor", 'Completors', fn() => [$this, $this->getConfig(), $this->getTranslator()]);
         }
     }
 
@@ -540,21 +539,21 @@ class Container
     {
         // @legacy remove when all shops are fully converted to new architecture and
         //   the old Completor has been removed.
-        return $this->getInstance('CompletorInvoiceLines', 'Invoice', [$this->getFlattenerInvoiceLines(), $this->getConfig()]);
+        return $this->getInstance('CompletorInvoiceLines', 'Invoice', fn() => [$this->getFlattenerInvoiceLines(), $this->getConfig()]);
     }
 
     public function getFlattenerInvoiceLines(): FlattenerInvoiceLines
     {
         // @legacy remove when all shops are fully converted to new architecture and
         //   the old Completor has been removed.
-        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', [$this->getConfig()]);
+        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', fn() => [$this->getConfig()]);
     }
 
     public function getCompletorStrategyLines(): CompletorStrategyLines
     {
         // @legacy remove when all shops are fully converted to new architecture and
         //   the old Completor has been removed.
-        return $this->getInstance('CompletorStrategyLines', 'Invoice', [$this->getConfig(), $this->getTranslator()]);
+        return $this->getInstance('CompletorStrategyLines', 'Invoice', fn() => [$this->getConfig(), $this->getTranslator()]);
     }
 
     public function createPropertySources(): PropertySources
@@ -564,12 +563,7 @@ class Container
 
     public function getCollectorManager(): CollectorManager
     {
-        $arguments = [
-            $this->getFieldExpander(),
-            $this,
-            $this->getLog(),
-        ];
-        return $this->getInstance('CollectorManager', 'Collectors', $arguments);
+        return $this->getInstance('CollectorManager', 'Collectors', fn() => [$this->getFieldExpander(), $this, $this->getLog(),]);
     }
 
     /**
@@ -589,8 +583,8 @@ class Container
      */
     public function getCollector(string $type, ?string $subType = null): CollectorInterface
     {
-        $arguments = $subType !== null ? [$subType] : [];
-        $arguments = array_merge($arguments, [
+        $args = $subType !== null ? [$subType] : [];
+        $args = fn() => array_merge($args, [
             $this->getMappings(),
             $this->getFieldExpander(),
             $this,
@@ -603,14 +597,14 @@ class Container
             // If a collector exists specifically for the $subType, the constructor
             // arguments will be the same for each instance creation of that $subType
             // collector, so no need to create multiple instances.
-            $result = $this->getInstance("{$subType}Collector", 'Collectors', $arguments);
+            $result = $this->getInstance("{$subType}Collector", 'Collectors', $args);
         }
         if ($result === null) {
             // We need separate instances if $subType is part of the constructor arguments
             // but not of the class name. (We would need only 1 instance per subtype, but
             // for now the caching keys cannot take this into account, so we create a new
             // instance with every call.)
-            $result = $this->getInstance("{$type}Collector", 'Collectors', $arguments, $subType !== null);
+            $result = $this->getInstance("{$type}Collector", 'Collectors', $args, $subType !== null);
         }
         return $result;
     }
@@ -633,8 +627,7 @@ class Container
      */
     public function getCompletorTask(string $dataType, string $task): CompletorTaskInterface
     {
-        $arguments = [$this, $this->getConfig(), $this->getTranslator()];
-        return $this->getInstance("Complete$task", "Completors\\$dataType", $arguments);
+        return $this->getInstance("Complete$task", "Completors\\$dataType", fn() => [$this, $this->getConfig(), $this->getTranslator()]);
     }
 
     /**
@@ -652,26 +645,23 @@ class Container
 
     public function getEnvironment(): Environment
     {
-        return $this->getInstance('Environment', 'Config', [$this->getShopNamespace(), $this->getLanguage()]);
+        return $this->getInstance('Environment', 'Config', fn() => [$this->getShopNamespace(), $this->getLanguage()]);
     }
 
     public function getConfig(): Config
     {
-        $log = $this->getLog();
-        /** @var \Siel\Acumulus\Config\Config $config */
-        $config = $this->getInstance('Config', 'Config', [
+        return $this->getInstance('Config', 'Config', fn() => [
             $this->getConfigStore(),
             $this->getShopCapabilities(),
             [$this, 'getConfigUpgrade'],
             $this->getEnvironment(),
-            $log,
+            $this->getLog(),
         ]);
-        return $config;
     }
 
     public function getConfigUpgrade(): ConfigUpgrade
     {
-        return $this->getInstance('ConfigUpgrade', 'Config', [
+        return $this->getInstance('ConfigUpgrade', 'Config', fn() => [
             $this->getConfig(),
             $this->getConfigStore(),
             $this->getRequirements(),
@@ -686,12 +676,12 @@ class Container
 
     public function getShopCapabilities(): ShopCapabilities
     {
-        return $this->getInstance('ShopCapabilities', 'Config', [$this->shopNamespace, $this->getTranslator()]);
+        return $this->getInstance('ShopCapabilities', 'Config', fn() => [$this->shopNamespace, $this->getTranslator()]);
     }
 
     public function getMappings(): Mappings
     {
-        return $this->getInstance('Mappings', 'Config', [$this->getConfig(), $this->getShopCapabilities()]);
+        return $this->getInstance('Mappings', 'Config', fn() => [$this->getConfig(), $this->getShopCapabilities()]);
     }
 
     public function getInvoiceManager(): InvoiceManager
@@ -711,7 +701,7 @@ class Container
 
     public function getAcumulusEntryManager(): AcumulusEntryManager
     {
-        return $this->getInstance('AcumulusEntryManager', 'Shop', [$this, $this->getLog()]);
+        return $this->getInstance('AcumulusEntryManager', 'Shop', fn() => [$this, $this->getLog()]);
     }
 
     /**
@@ -727,7 +717,7 @@ class Container
 
     public function getProductManager(): ProductManager
     {
-        return $this->getInstance('ProductManager', 'Shop', [$this, $this->getLog()]);
+        return $this->getInstance('ProductManager', 'Shop', fn() => [$this, $this->getLog()]);
     }
 
     /**
@@ -742,17 +732,12 @@ class Container
      */
     public function createStockTransactionResult(string $trigger): StockTransactionResult
     {
-        return $this->getInstance(
-            'StockTransactionResult',
-            'Product',
-            [$trigger, $this->getTranslator(), $this->getLog()],
-            true
-        );
+        return $this->getInstance('StockTransactionResult', 'Product', [$trigger, $this->getTranslator(), $this->getLog()], true);
     }
 
     public function getAboutBlockForm(): AboutForm
     {
-        return $this->getInstance('AboutForm', 'Shop', [
+        return $this->getInstance('AboutForm', 'Shop', fn() => [
             $this->getAcumulusApiClient(),
             $this->getShopCapabilities(),
             $this->getConfig(),
@@ -771,55 +756,53 @@ class Container
      */
     public function getForm(string $type): Form
     {
+        $formClasses = [
+            'register' => 'Register',
+            'settings' => 'Settings',
+            'mappings' => 'Mappings',
+            'activate' => 'ActivateSupport',
+            'batch' => 'Batch',
+            'invoice' => 'InvoiceStatus',
+            'rate' => 'RatePlugin',
+            'message' => 'Message',
+            'uninstall' => 'ConfirmUninstall',
+        ];
+        $class = $formClasses[$type] ?? null;
+        if ($class === null) {
+            throw new InvalidArgumentException("Unknown form type $type");
+        }
+        $class .= 'Form';
+        if ($this->hasInstance($class, 'Shop')) {
+            return $this->instances[$this->getInstanceKey($class, 'Shop')];
+        }
         $arguments = [];
         switch (strtolower($type)) {
-            case 'register':
-                $class = 'Register';
-                $arguments[] = $this->getAboutBlockForm();
-                $arguments[] = $this->getAcumulusApiClient();
-                break;
             case 'settings':
-                $class = 'Settings';
+            case 'activate':
+            case 'register':
                 $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'mappings':
-                $class = 'Mappings';
                 $arguments[] = $this->getMappings();
                 $arguments[] = $this->getFieldExpanderHelp();
                 $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;
-            case 'activate':
-                $class = 'ActivateSupport';
-                $arguments[] = $this->getAboutBlockForm();
-                $arguments[] = $this->getAcumulusApiClient();
-                break;
             case 'batch':
-                $class = 'Batch';
                 $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getInvoiceManager();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'invoice':
-                $class = 'InvoiceStatus';
                 $arguments[] = $this->getInvoiceManager();
                 $arguments[] = $this->getAcumulusEntryManager();
                 $arguments[] = $this->getAcumulusApiClient();
                 $arguments[] = $this;
                 break;
-            case 'rate':
-                $class = 'RatePlugin';
-                break;
-            case 'message':
-                $class = 'Message';
-                break;
             case 'uninstall':
-                $class = 'ConfirmUninstall';
                 $arguments[] = $this->getAcumulusApiClient();
                 break;
-            default;
-                throw new InvalidArgumentException("Unknown form type $type");
         }
         $arguments = array_merge($arguments, [
             $this->getFormHelper(),
@@ -830,7 +813,7 @@ class Container
             $this->getTranslator(),
             $this->getLog(),
         ]);
-        return $this->getInstance($class . 'Form', 'Shop', $arguments);
+        return $this->getInstance($class, 'Shop', $arguments);
     }
 
     /**
@@ -852,8 +835,13 @@ class Container
      * @param string $subNamespace
      *   The sub namespace (within the namespaces tried) in which the class
      *   resides.
-     * @param array $constructorArgs
-     *   A list of arguments to pass to the constructor, may be an empty array.
+     * @param Closure|array $constructorArgs
+     *   Either a(n):
+     *   - Array with the list of arguments to pass to the constructor, may be empty.
+     *   - {@see Closure} that returns the list of arguments to pass to the constructor.
+     *     This allows for lazy evaluation of the arguments, because it only has to be
+     *     evaluated when no instance exists yet, thereby avoiding numerous recursive
+     *     calls to getInstance().
      * @param bool $newInstance
      *   Whether to create a new instance (true) or reuse an already existing
      *   instance (false, default)
@@ -861,15 +849,17 @@ class Container
     public function getInstance(
         string $class,
         string $subNamespace,
-        array $constructorArgs = [],
+        Closure|array $constructorArgs = [],
         bool $newInstance = false
     ): ?object {
         if ($newInstance || !$this->hasInstance($class, $subNamespace)) {
+            if ($constructorArgs instanceof Closure) {
+                $constructorArgs = $constructorArgs();
+            }
             $this->createInstance($class, $subNamespace, $constructorArgs);
         }
         return $this->instances[$this->getInstanceKey($class, $subNamespace)];
     }
-
 
     /**
      * Returns a key to identify the given class (in the set of created instances).
@@ -889,11 +879,8 @@ class Container
         return isset($this->instances[$instanceKey]);
     }
 
-    public function createInstance(
-        string $class,
-        string $subNamespace,
-        array $constructorArgs = [],
-    ): ?object {
+    protected function createInstance(string $class, string $subNamespace, array $constructorArgs): ?object
+    {
         $fqClass = null;
         // Try custom namespace.
         if ($this->customNamespace !== '') {

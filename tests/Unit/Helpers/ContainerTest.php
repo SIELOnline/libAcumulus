@@ -86,15 +86,12 @@ use function get_class;
 class ContainerTest extends TestCase
 {
     private static Container $container;
+
     public static function setUpBeforeClass(): void
     {
         self::$container = new Container('TestWebShop');
     }
 
-    public static function tearDownAfterClass(): void
-    {
-        echo 'Container::getInstance() was called ' . Container::$count . " times.\n";
-    }
     /**
      * Tests the (almost) independent classes in the Helpers namespace.
      */

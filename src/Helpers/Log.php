@@ -25,12 +25,10 @@ use function sprintf;
 class Log
 {
     /**
-     * Set of json_encode flags we use to improve readability of log messages. See
-     * {@see \Siel\Acumulus\Meta::JsonFlags} and
-     * {@see \Siel\Acumulus\Meta::JsonFlagsLooseType}.
+     * Set of json_encode flags we use to improve readability of log messages.
+     * See {@see \Siel\Acumulus\Meta::JsonFlags}.
      */
     public const JsonFlags = Meta::JsonFlags | JSON_PRETTY_PRINT;
-    public const JsonFlagsLooseType = Meta::JsonFlagsLooseType | JSON_PRETTY_PRINT;
 
     private int $logLevel = Severity::Info;
     private bool $isLogLevelSet = false;
@@ -148,7 +146,7 @@ class Log
      */
     public function debug(string $message, ...$values): string
     {
-        return $this->log(Severity::Log, $message, $values);
+        return $this->log(Severity::Log, $message, ...$values);
     }
 
     /**
@@ -165,7 +163,7 @@ class Log
      */
     public function success(string $message, ...$values): string
     {
-        return $this->log(Severity::Success, $message, $values);
+        return $this->log(Severity::Success, $message, ...$values);
     }
 
     /**
@@ -182,7 +180,7 @@ class Log
      */
     public function info(string $message, ...$values): string
     {
-        return $this->log(Severity::Info, $message, $values);
+        return $this->log(Severity::Info, $message, ...$values);
     }
 
     /**
@@ -199,7 +197,7 @@ class Log
      */
     public function notice(string $message, ...$values): string
     {
-        return $this->log(Severity::Notice, $message, $values);
+        return $this->log(Severity::Notice, $message, ...$values);
     }
 
     /**
@@ -216,7 +214,7 @@ class Log
      */
     public function warning(string $message, ...$values): string
     {
-        return $this->log(Severity::Warning, $message, $values);
+        return $this->log(Severity::Warning, $message, ...$values);
     }
 
     /**
@@ -233,7 +231,7 @@ class Log
      */
     public function error(string $message, ...$values): string
     {
-        return $this->log(Severity::Error, $message, $values);
+        return $this->log(Severity::Error, $message, ...$values);
     }
 
     /**
@@ -302,13 +300,13 @@ class Log
      * @param string $message
      *   The message to log, optionally followed by arguments. If there are
      *   arguments the $message is passed through {@see vsprintf()}.
-     * @param array $values
+     * @param mixed $values
      *   Any values to replace %-placeholders in $message.
      *
      * @return string
      *   The formatted message whether it got logged or not.
      */
-    public function log(int $severity, string $message, array $values = []): string
+    public function log(int $severity, string $message, ... $values): string
     {
         $format = $message;
         if (count($values) > 0) {

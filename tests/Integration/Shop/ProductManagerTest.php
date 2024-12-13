@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Integration\Shop;
 
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Product\StockTransactionResult;
@@ -32,15 +34,20 @@ class ProductManagerTest extends TestCase
         return $container;
     }
 
+    private function getLog(): Log
+    {
+        return self::getContainer()->getLog();
+    }
+
     private function getMailer(): Mailer
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getContainer()->getMailer();
+        return static::getContainer()->getMailer();
     }
 
     private function getProductManager(): ProductManager
     {
-        return $this->getContainer()->getProductManager();
+        return static::getContainer()->getProductManager();
     }
 
     public function itemProvider(): array
@@ -75,9 +82,9 @@ class ProductManagerTest extends TestCase
         int|string $acumulusProductIdOrError,
         string $acumulusProductIdSource = 'remote'
     ): void {
-        $config = $this->getContainer()->getConfig();
-        $source = $this->getContainer()->createSource(Source::Order, 1);
-        $item = $this->getContainer()->createItem($itemId, $source);
+        $config = static::getContainer()->getConfig();
+        $source = static::getContainer()->createSource(Source::Order, 1);
+        $item = static::getContainer()->createItem($itemId, $source);
         $product = $item->getProduct();
         self::assertSame($itemId, $item->getId());
         self::assertSame($productId, $product->getId());
@@ -85,9 +92,11 @@ class ProductManagerTest extends TestCase
         $this->mailCount = $this->getMailer()->getMailCount();
         $productMatchShopField = $config->set('productMatchShopField', '[product::getShopObject()::sku]');
         $productMatchAcumulusField = $config->set('productMatchAcumulusField', $acumulusField);
+        $debug = $config->set('debug', $itemId === 17 ? Config::Send_SendAndMail : Config::Send_SendAndMailOnError);
         try {
             $productManager = $this->getProductManager();
-            $result = $productManager->updateStockForItem($item, $change, __METHOD__);
+            $result = $productManager->updateStockForItem($item, $change, 'ProductManagerTest::testUpdateStock');
+            $this->checkLog();
             if ($result->isSendingPrevented()) {
                 self::assertSame($acumulusProductIdOrError, $result->getSendStatus());
                 $this->checkMail();
@@ -103,7 +112,7 @@ class ProductManagerTest extends TestCase
                 $stockAmount = (float) $result->getMainApiResponse()[Fld::StockAmount];
 
                 // Correct the stock, so that continuous (successful) testing  will not change the actual levels at Acumulus.
-                $result = $productManager->updateStockForItem($item, -$change, __METHOD__);
+                $result = $productManager->updateStockForItem($item, -$change, 'ProductManagerTest::returnStock');
                 self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
                 self::assertSame(
                     $result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource],
@@ -114,22 +123,38 @@ class ProductManagerTest extends TestCase
         } finally {
             $config->set('productMatchShopField', $productMatchShopField);
             $config->set('productMatchAcumulusField', $productMatchAcumulusField);
+            $config->set('debug', $debug);
         }
     }
 
     /**
-     * Checks the mail.
+     * Checks the log messages.
+     */
+    public function checkLog(): void
+    {
+        $loggedMessages = $this->getLog()->getLoggedMessages();
+        $logMessage = end($loggedMessages);
+
+        // dataName() returns the key of the actual data set.
+        $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
+        $this->saveTestLogMessage($this->getTestsPath() . '/Data', $name, $logMessage);
+        $expected = $this->getTestLogMessage($this->getTestsPath() . '/Data', $name);
+        static::assertSame($expected, $logMessage);
+    }
+
+    /**
+     * Checks the mail messages.
      */
     public function checkMail(): void
     {
-        $this->assertSame($this->mailCount + 1, $this->getMailer()->getMailCount());
+        static::assertSame($this->mailCount + 1, $this->getMailer()->getMailCount());
         $mailSent = $this->getMailer()->getMailSent($this->mailCount);
-        $this->assertIsArray($mailSent);
+        static::assertIsArray($mailSent);
 
         // dataName() returns the key of the actual data set.
-        $name = str_replace(' ', '-', $this->dataName()) . '-' . $this->getContainer()->getLanguage();
+        $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
         $this->saveTestMail($this->getTestsPath() . '/Data', $name, $mailSent);
         $expected = $this->getTestMail($this->getTestsPath() . '/Data', $name);
-        $this->assertSame($expected, $mailSent);
+        static::assertSame($expected, $mailSent);
     }
 }

@@ -299,7 +299,7 @@ abstract class Mail
         $lines = [];
         if ($this->getResult() instanceof Result) {
             $lines += [
-                'send_status' => rtrim('{severity} {status_text}'),
+                'send_status' => rtrim('{severity} - "{status_text}"'),
             ];
         }
         return $lines;
@@ -404,7 +404,7 @@ abstract class Mail
         $phrase = $this->t($phrase);
         return [
             'text' => "$phrase:\n",
-            'html' => '<h3>' . htmlspecialchars($phrase) . "</h3>\n",
+            'html' => '<h3>' . htmlspecialchars($phrase, ENT_NOQUOTES) . "</h3>\n",
         ];
     }
 
@@ -422,7 +422,7 @@ abstract class Mail
         $sentences = $this->replacePlaceholders($this->translatePhrases((array) $sentences));
         return [
             'text' => wordwrap(implode(' ', $sentences), 70) . "\n",
-            'html' => '<p>' . htmlspecialchars(implode("\n", $sentences)) . "</p>\n",
+            'html' => '<p>' . htmlspecialchars(implode("\n", $sentences), ENT_NOQUOTES) . "</p>\n",
         ];
     }
 
@@ -452,7 +452,7 @@ abstract class Mail
         $rowFormatHtml = "<tr><th>%s</th><td>%s</td></tr>\n";
         foreach ($tableRows as $header => $value) {
             $tableText .= sprintf($rowFormatText, $header . ':', $value);
-            $tableHtml .= sprintf($rowFormatHtml, htmlspecialchars($header), htmlspecialchars($value));
+            $tableHtml .= sprintf($rowFormatHtml, htmlspecialchars($header, ENT_NOQUOTES), htmlspecialchars($value, ENT_NOQUOTES));
         }
         $tableHtml .= "</table>\n";
         return [

@@ -140,6 +140,8 @@ class MailTest extends TestCase
 
     /**
      * @dataProvider stockTransactionMailProvider
+     *
+     * @todo: mail contents is now covered by the broader {@see ProductmanagerTest::testUpdateStock()}
      */
     public function testStockTransactionMail(string $name, string $uri, int $debug, int|float $change): void
     {

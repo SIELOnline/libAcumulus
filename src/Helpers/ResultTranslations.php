@@ -18,11 +18,11 @@ class ResultTranslations extends TranslationCollection
         'message_invoice_send' => '%1$s: %2$s is %3$s',
         'message_invoice_source' => 'Factuur voor %1$s %2$s',
         /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
-        'message_stock_transaction_send' => '%1$s(%2$s %3$s, regel %4$d): %2$s is %3$s',
+        'message_stock_transaction_send' => '%1$s(%2$s, %3$s): %4$s %5$s',
         'message_stock_transaction_source' => "Voorraadupdate voor product '%1\$s': %2\$+f",
         /** {@see \Siel\Acumulus\Helpers\Result::getActionText()} */
-        'action_sent' => 'verzonden',
-        'action_not_sent' => 'niet verzonden',
+        'action_sent' => 'is verzonden',
+        'action_not_sent' => 'is niet verzonden',
         'action_unknown' => 'nog niet bekend',
         /** {@see \Siel\Acumulus\Helpers\Result::getStatusMessages()} */
         'reason_not_sent_local_errors' => 'verzenden tegengehouden omdat er lokaal fouten zijn geconstateerd',
@@ -64,13 +64,13 @@ class ResultTranslations extends TranslationCollection
         'message_invoice_send' => '%1$s: %2$s has %3$s',
         'message_invoice_source' => 'Invoice for %1$s %2$s',
         /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
-        'message_stock_transaction_send' => '%1$s(%2$s %3$s, line %4$d): %2$s is %3$s',
+        'message_stock_transaction_send' => '%1$s(%2$s, %3$s): %4$s %5$s',
         'message_stock_transaction_source' => "Stock mutation for product '%1\$s': %2\$+f",
         /** {@see \Siel\Acumulus\Shop\\Siel\Acumulus\Shop\InvoiceManager::getSendResultLogText()} */
         /** {@see \Siel\Acumulus\Helpers\Result::getActionText()} */
         'action_unknown' => 'yet unknown',
-        'action_sent' => 'been sent',
-        'action_not_sent' => 'not been sent',
+        'action_sent' => 'has been sent',
+        'action_not_sent' => 'has not been sent',
         /** {@see \Siel\Acumulus\Helpers\Result::getStatusMessages()} */
         'reason_not_sent_dry_run' => 'sending prevented by "dry run" option',
         'reason_unknown' => 'unknown reason: %d',
@@ -78,7 +78,7 @@ class ResultTranslations extends TranslationCollection
         'reason_sent_test_mode' => 'test mode',
         /** {@see \Siel\Acumulus\Invoice\InvoiceAddResult::getStatusMessages()} */
         'reason_sent_new' => 'not yet sent',
-        'reason_sent_new_status_change' => 'mot yet sent and %1$s in [%2$s]',
+        'reason_sent_new_status_change' => 'not yet sent and %1$s in [%2$s]',
         'reason_sent_forced' => 'forced',
         'reason_sent_lock_expired' => 'not yet sent because the previous attempt failed',
         /** {@see \Siel\Acumulus\Invoice\InvoiceAddResult::getStatusMessages()} */

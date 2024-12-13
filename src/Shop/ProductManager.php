@@ -81,25 +81,6 @@ class ProductManager
     }
 
     /**
-     * Returns the fields in Acumulus that can be used to match against.
-     *
-     * @return array
-     *   Array keyed by the field names as returned by the product picklist API and that
-     *   are used to filter against. The values are a bool:
-     *   - true: recommended
-     *   - false: not recommended
-     *   and can be used in form help texts.
-     */
-    public function getMatchAcumulusFields(): array
-    {
-        return [
-            Fld::ProductSku,
-            Fld::ProductEan,
-            Fld::ProductDescription,
-        ];
-    }
-
-    /**
      * Returns the Acumulus product that matches the given reference.
      *
      * The product matching strategy:
@@ -224,8 +205,8 @@ class ProductManager
         }
 
         // Mail and log the result.
-        $this->logStockTransactionResult($item, $change, $product, $result);
         $this->mailStockTransactionResult($item, $change, $product, $result);
+        $this->logStockTransactionResult($item, $change, $product, $result);
 
         return $result;
     }
@@ -308,17 +289,16 @@ class ProductManager
             $product?->getReference() ?? '',
             $change
         );
-        $logText = sprintf(
+        $severity = $result->getSeverity();
+        $this->getLog()->log(
+            $severity,
             $this->t('message_stock_transaction_send'),
             $result->getTrigger(),
-            $this->t($item->getSource()->getType()),
-            $item->getSource()->getReference(),
-            $item->getId(),
+            $this->t($item->getSource()->getLabelReference()),
+            $item->getLabelReference(),
             $stockTransactionText,
             $result->getLogText($addReqResp)
         );
-        $severity = $result->getSeverity();
-        $this->getLog()->log($severity, $logText);
     }
 
     /**

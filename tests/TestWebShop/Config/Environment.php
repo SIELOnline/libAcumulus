@@ -19,6 +19,11 @@ class Environment extends EnvironmentBase
         $this->data['shopVersion'] = Version;
     }
 
+    protected function getHostName(): string
+    {
+        return 'example.com';
+    }
+
     /**
      * Returns values for the database variables 'version' and
      * 'version_comment'.

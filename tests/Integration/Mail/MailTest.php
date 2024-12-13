@@ -65,11 +65,6 @@ class MailTest extends TestCase
         return $this->getContainer()->createAcumulusRequest()->execute($uri, $submit, $needContract);
     }
 
-    private function getTestsPath(): string
-    {
-        return dirname(__FILE__, 3);
-    }
-
     private function getMail(string $type, string $namespace): Mail
     {
         return $this->getContainer()->getMail($type, $namespace);
@@ -177,7 +172,7 @@ class MailTest extends TestCase
     }
 
     /**
-     * Tests the form creation process.
+     * Tests the mail creation process.
      */
     public function createAndSendMail(string $type, string $namespace, string $class, array $args, string $description = ''): void
     {

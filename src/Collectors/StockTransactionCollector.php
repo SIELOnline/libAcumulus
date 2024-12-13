@@ -59,7 +59,7 @@ class StockTransactionCollector extends Collector
                         $product->setAcumulusId($productId);
                     } else {
                         $localResult->createAndAddMessage(
-                            sprintf("Search for reference '%s' resulted in no products", $reference),
+                            sprintf("Search for reference '%s' resulted in no products.", $reference),
                             Severity::Error
                         );
                         $localResult->setSendStatus(StockTransactionResult::NotSent_NoMatchInAcumulus);
@@ -70,7 +70,7 @@ class StockTransactionCollector extends Collector
                 }
             } else {
                 $localResult->createAndAddMessage(
-                    sprintf("Search field '%s' is empty", $acumulusObject->metadataGet(Meta::MatchShopFieldSpecification)),
+                    sprintf("Search field '%s' is empty.", $acumulusObject->metadataGet(Meta::MatchShopFieldSpecification)),
                     Severity::Error
                 );
                 $localResult->setSendStatus(StockTransactionResult::NotSent_NoMatchValueInProduct);

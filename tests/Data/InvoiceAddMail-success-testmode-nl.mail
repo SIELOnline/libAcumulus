@@ -11,7 +11,7 @@ Over de factuur:
 
 (Webwinkel) Bestelling: 3
 Acumulus factuur:       20240016
-Verzendresultaat:       1 Succes
+Verzendresultaat:       2 Succes
 
 Informatie voor Acumulus support:
 
@@ -153,10 +153,10 @@ body={
   'bodyHtml' => '<p>Onderstaande factuur is succesvol naar Acumulus verstuurd.
 De factuur is in testmodus verstuurd en is dus niet aan uw boekhouding toegevoegd.</p>
 <h3>Over de factuur</h3>
-<table>
+<table style="text-align: left;">
 <tr><th>(Webwinkel) Bestelling</th><td>3</td></tr>
 <tr><th>Acumulus factuur</th><td>20240016</td></tr>
-<tr><th>Verzendresultaat</th><td>1 Succes</td></tr>
+<tr><th>Verzendresultaat</th><td>2 Succes</td></tr>
 </table>
 <h3>Informatie voor Acumulus support</h3>
 <p>De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken, u kunt deze informatie negeren.

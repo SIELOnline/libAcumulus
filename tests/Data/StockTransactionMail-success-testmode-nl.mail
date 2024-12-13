@@ -15,7 +15,7 @@ Product (Webwinkel):       TEST-GRI
 Mutatie:                   -11
 Product (Acumulus):        1833642
 Voorraadniveau (Acumulus): 30.00
-Verzendresultaat:          1 Succes
+Verzendresultaat:          2 Succes
 
 Informatie voor Acumulus support:
 
@@ -65,14 +65,14 @@ body={
   'bodyHtml' => '<p>Onderstaande voorraadmutatie is succesvol naar Acumulus verstuurd.
 De voorraadmutatie is in testmodus verstuurd en is dus niet aan uw boekhouding toegevoegd.</p>
 <h3>Over de voorraadmutatie</h3>
-<table>
+<table style="text-align: left;">
 <tr><th>Bestelling</th><td>1</td></tr>
 <tr><th>Bestelregel</th><td>5</td></tr>
 <tr><th>Product (Webwinkel)</th><td>TEST-GRI</td></tr>
 <tr><th>Mutatie</th><td>-11</td></tr>
 <tr><th>Product (Acumulus)</th><td>1833642</td></tr>
 <tr><th>Voorraadniveau (Acumulus)</th><td>30.00</td></tr>
-<tr><th>Verzendresultaat</th><td>1 Succes</td></tr>
+<tr><th>Verzendresultaat</th><td>2 Succes</td></tr>
 </table>
 <h3>Informatie voor Acumulus support</h3>
 <p>De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken, u kunt deze informatie negeren.

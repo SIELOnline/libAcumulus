@@ -33,7 +33,7 @@ Dit kan een tijdelijk probleem zijn omdat b.v. de Acumulus server even niet bere
 Als het probleem blijft aanhouden, stuur deze mail dan door naar Acumulus support.
 Stuur in dat geval de hele tekst mee, want deze is nodig om het probleem goed te kunnen onderzoeken.</p>
 <h3>Over uw webwinkel</h3>
-<table>
+<table style="text-align: left;">
 <tr><th>Webwinkel</th><td>TestDoubles 8.3.7</td></tr>
 <tr><th>module</th><td>Acumulus 8.3.7; Library: 8.3.7</td></tr>
 <tr><th>PHP</th><td>8.1.29; (Curl: 8.4.0 (ssl: OpenSSL/1.1.1w; zlib: 1.2.12))</td></tr>

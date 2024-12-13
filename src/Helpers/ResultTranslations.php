@@ -50,10 +50,10 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_not_enabled' => 'voorraadbeheer niet actief',
         'reason_not_sent_disabled_product' => 'Geen voorraadbeheer voor dit product',
         'reason_not_sent_no_product' => 'Product niet gevonden voor factuurregel',
-        'reason_not_sent_zero_change' => 'Geen toe of afname',
+        'reason_not_sent_zero_change' => 'Geen toe of afname van het voorraadniveau',
         'reason_not_sent_no_value_to_match' => 'Zoekwaarde in product is leeg',
         'reason_not_sent_no_match_in_acumulus' => 'Geen product in Acumulus voor zoekwaarde',
-        'reason_not_sent_multiple_matches_in_acumulus' => 'Meerder producten gevonden voor zoekwaarde',
+        'reason_not_sent_multiple_matches_in_acumulus' => 'Meerdere producten gevonden voor zoekwaarde',
         'reason_sent' => 'alles OK',
     ];
 
@@ -97,7 +97,7 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_not_enabled' => 'stock management not enabled',
         'reason_not_sent_disabled_product' => 'No stock managed for this product',
         'reason_not_sent_no_product' => 'Product not for found for invoice line',
-        'reason_not_sent_zero_change' => 'No change in stock',
+        'reason_not_sent_zero_change' => 'No change in stock level',
         'reason_not_sent_no_value_to_match' => 'Search field for product is empty',
         'reason_not_sent_no_match_in_acumulus' => 'No product found in Acumulus for search value',
         'reason_not_sent_multiple_matches_in_acumulus' => 'Multiple products found for search value',

@@ -63,7 +63,7 @@ class InvoiceCreate
      *    allow custom code to change that decision.
      * - We encounter local errors, we do not set the
      *   {@see InvoiceAddResult::getSendStatus()} to
-     *   {@see InvoiceAddResult::NotSent_LocalErrors}. The {@see Invoice} will be passed
+     *   {@see Result::NotSent_LocalErrors}. The {@see Invoice} will be passed
      *   to {@see \Siel\Acumulus\Shop\InvoiceCreate} anyway, which will first trigger the
      *    InvoiceSendBefore event, to allow custom code to solve errors and continue the
      *    sending. Only after that event further sending may be prevented.

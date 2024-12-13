@@ -184,7 +184,7 @@ class Message
             case Severity::Error:
             case Severity::Exception:
             case Severity::Unknown:
-                return $this->t((string) 'severity_' . $this->getSeverity());
+                return $this->t('severity_' . $this->getSeverity());
             default:
                 assert(false, sprintf($this->t('severity_unknown'), $this->getSeverity()));
         }

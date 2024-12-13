@@ -13,18 +13,18 @@ Product (Webwinkel):       TEST-GRI
 Mutatie:                   -5
 Product (Acumulus):        1833642
 Voorraadniveau (Acumulus): 30.00
-Verzendresultaat:          1 Succes
+Verzendresultaat:          2 Succes
 ',
   'bodyHtml' => '<p>Onderstaande voorraadmutatie is succesvol naar Acumulus verstuurd.</p>
 <h3>Over de voorraadmutatie</h3>
-<table>
+<table style="text-align: left;">
 <tr><th>Bestelling</th><td>1</td></tr>
 <tr><th>Bestelregel</th><td>5</td></tr>
 <tr><th>Product (Webwinkel)</th><td>TEST-GRI</td></tr>
 <tr><th>Mutatie</th><td>-5</td></tr>
 <tr><th>Product (Acumulus)</th><td>1833642</td></tr>
 <tr><th>Voorraadniveau (Acumulus)</th><td>30.00</td></tr>
-<tr><th>Verzendresultaat</th><td>1 Succes</td></tr>
+<tr><th>Verzendresultaat</th><td>2 Succes</td></tr>
 </table>
 ',
 )

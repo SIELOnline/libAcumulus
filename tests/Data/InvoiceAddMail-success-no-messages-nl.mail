@@ -9,14 +9,14 @@ Over de factuur:
 
 (Webwinkel) Bestelling: 3
 Acumulus factuur:       20240016
-Verzendresultaat:       1 Succes
+Verzendresultaat:       2 Succes
 ',
   'bodyHtml' => '<p>Onderstaande factuur is succesvol naar Acumulus verstuurd.</p>
 <h3>Over de factuur</h3>
-<table>
+<table style="text-align: left;">
 <tr><th>(Webwinkel) Bestelling</th><td>3</td></tr>
 <tr><th>Acumulus factuur</th><td>20240016</td></tr>
-<tr><th>Verzendresultaat</th><td>1 Succes</td></tr>
+<tr><th>Verzendresultaat</th><td>2 Succes</td></tr>
 </table>
 ',
 )

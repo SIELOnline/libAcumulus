@@ -14,7 +14,7 @@ Over de factuur:
 
 (Webwinkel) Bestelling: 3
 Acumulus factuur:       20240018
-Verzendresultaat:       1 Succes
+Verzendresultaat:       2 Succes
 
 Informatie voor Acumulus support:
 
@@ -151,10 +151,10 @@ De factuur is als concept aangemaakt. Controleer de factuur in Acumulus, waarna 
 U laat Acumulus de factuur als pdf naar de klant versturen.
 Omdat de factuur als concept is aangemaakt is deze pdf niet verstuurd.</p>
 <h3>Over de factuur</h3>
-<table>
+<table style="text-align: left;">
 <tr><th>(Webwinkel) Bestelling</th><td>3</td></tr>
 <tr><th>Acumulus factuur</th><td>20240018</td></tr>
-<tr><th>Verzendresultaat</th><td>1 Succes</td></tr>
+<tr><th>Verzendresultaat</th><td>2 Succes</td></tr>
 </table>
 <h3>Informatie voor Acumulus support</h3>
 <p>De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken, u kunt deze informatie negeren.

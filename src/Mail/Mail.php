@@ -154,7 +154,7 @@ abstract class Mail
             '{source_label}' => $this->getSource()?->getLabel(MB_CASE_TITLE) ?? '',
             '{source_reference}' => $this->getSource()?->getReference() ?? '',
             '{severity}' => $this->getResult()?->getSeverity() ?? Severity::Exception,
-            '{status_text}' => $this->getResult()?->getAcumulusResult()?->getStatusText() ?? '',
+            '{status_text}' => $this->getResult()?->getAcumulusResult()?->getStatusText() ?? $this->t('action_not_sent'),
         ];
     }
 

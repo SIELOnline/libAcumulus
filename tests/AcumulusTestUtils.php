@@ -60,7 +60,15 @@ LONGSTRING;
         return new Container('TestWebShop', 'nl');
     }
 
-    abstract protected function getTestsPath(): string;
+    /**
+     * Returns the path to the 'tests' folder.
+     *
+     * To be overridden when used in webshop specific tests
+     */
+    protected function getTestsPath(): string
+    {
+        return __DIR__;
+    }
 
     protected function getDataPath(): string
     {
@@ -342,10 +350,9 @@ LONGSTRING;
      */
     protected function saveTestMail(string $path, string $name, array $data): void
     {
-        $append = 'latest';
         $filename = "$path/$name.mail";
         if (file_exists($filename)) {
-            $filename = "$path/$name.$append.mail";
+            $filename = "$path/$name.latest.mail";
         }
         file_put_contents($filename, var_export($data, true) . "\n");
     }

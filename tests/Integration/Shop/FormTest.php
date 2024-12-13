@@ -54,11 +54,6 @@ class FormTest extends TestCase
         return $this->getContainer()->createSource(Source::Order, $order);
     }
 
-    protected function getTestsPath(): string
-    {
-        return dirname(__FILE__, 3);
-    }
-
     private function getForm(string $type): Form
     {
         return $this->getContainer()->getForm($type);

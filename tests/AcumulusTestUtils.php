@@ -320,9 +320,9 @@ LONGSTRING;
     protected function saveTestHtml(string $path, string $name, string $data): void
     {
         $append = 'latest';
-        $filename = "$path/$name.html";
+        $filename = "$path/Form/$name.html";
         if (file_exists($filename)) {
-            $filename = "$path/$name.$append.html";
+            $filename = "$path/Form/$name.$append.html";
         }
         $data = static::getContainer()->getUtil()->maskHtml($data);
         file_put_contents($filename, static::$htmlStart . $data . static::$htmlEnd);
@@ -334,7 +334,7 @@ LONGSTRING;
     protected function getTestMail(string $path, string $name): ?array
     {
         $mail = null;
-        $filename = "$path/$name.mail";
+        $filename = "$path/Mail/$name.mail";
         if (is_readable($filename)) {
             eval('$mail = ' . file_get_contents($filename) . ';');
         }
@@ -350,9 +350,38 @@ LONGSTRING;
      */
     protected function saveTestMail(string $path, string $name, array $data): void
     {
-        $filename = "$path/$name.mail";
+        $filename = "$path/Mail/$name.mail";
         if (file_exists($filename)) {
-            $filename = "$path/$name.latest.mail";
+            $filename = "$path/Mail/$name.latest.mail";
+        }
+        file_put_contents($filename, var_export($data, true) . "\n");
+    }
+
+    /**
+     * Returns a test log message.
+     */
+    protected function getTestLogMessage(string $path, string $name): ?array
+    {
+        $logMessage = null;
+        $filename = "$path/Log/$name.log";
+        if (is_readable($filename)) {
+            eval('$logMessage = ' . file_get_contents($filename) . ';');
+        }
+        /** @noinspection PhpExpressionAlwaysNullInspection */
+        return $logMessage;
+    }
+
+    /**
+     * Saves test log messages.
+     *
+     * @param array $data
+     *   The mail data to be saved (in json format).
+     */
+    protected function saveTestLogMessage(string $path, string $name, array $data): void
+    {
+        $filename = "$path/Log/$name.log";
+        if (file_exists($filename)) {
+            $filename = "$path/Log/$name.latest.log";
         }
         file_put_contents($filename, var_export($data, true) . "\n");
     }

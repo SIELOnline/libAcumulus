@@ -1,0 +1,109 @@
+array (
+  'message' => 'ProductManagerTest::testUpdateStock(bestelling 1, bestelregel 8): Voorraadupdate voor product \'TEST\': -1.000000 is verzonden (reden: alles OK)
+• Fout: 404 Not Found, AA5B85AA: Ongeldig productid
+ Mislukt, fouten gevonden
+Request: Request: uri=https://api.sielsystems.nl/acumulus/stable/stock/stock_add.php
+submit={
+    "contract": {
+        "contractcode": "288252",
+        "username": "APIGebruiker12345",
+        "password": "REMOVED FOR SECURITY",
+        "emailonerror": "plugins@siel.nl",
+        "emailonwarning": "plugins@siel.nl"
+    },
+    "format": "json",
+    "testmode": 0,
+    "lang": "nl",
+    "connector": {
+        "application": "TestWebShop 8.3.7",
+        "webkoppel": "Acumulus 8.3.7",
+        "development": "SIEL - Buro RaDer",
+        "remark": "Library 8.3.7 - PHP 8.1.29",
+        "sourceuri": "https://github.com/SIELOnline/libAcumulus"
+    },
+    "stock": {
+        "productid": 1,
+        "stockamount": -1.0,
+        "stockdescription": "example.com bestelling 1",
+        "meta-match-shop-value": "TEST",
+        "meta-acumulus-product-id-source": "local",
+        "meta-match-shop-field": "[product::getShopObject()::sku]",
+        "meta-match-acumulus-field": "productsku"
+    }
+}
+Response: Response: status=404
+body={
+    "productid": "1",
+    "errors": {
+        "error": {
+            "code": "404 Not Found",
+            "codetag": "AA5B85AA",
+            "message": "Ongeldig productid"
+        },
+        "count_errors": "1"
+    },
+    "warnings": {
+        "count_warnings": "0"
+    },
+    "status": "1"
+}
+',
+  'severity' => 32,
+  'format' => '%1$s(%2$s, %3$s): %4$s %5$s',
+  'values' => 
+  array (
+    0 => 'ProductManagerTest::testUpdateStock',
+    1 => 'bestelling 1',
+    2 => 'bestelregel 8',
+    3 => 'Voorraadupdate voor product \'TEST\': -1.000000',
+    4 => 'is verzonden (reden: alles OK)
+• Fout: 404 Not Found, AA5B85AA: Ongeldig productid
+ Mislukt, fouten gevonden
+Request: Request: uri=https://api.sielsystems.nl/acumulus/stable/stock/stock_add.php
+submit={
+    "contract": {
+        "contractcode": "288252",
+        "username": "APIGebruiker12345",
+        "password": "REMOVED FOR SECURITY",
+        "emailonerror": "plugins@siel.nl",
+        "emailonwarning": "plugins@siel.nl"
+    },
+    "format": "json",
+    "testmode": 0,
+    "lang": "nl",
+    "connector": {
+        "application": "TestWebShop 8.3.7",
+        "webkoppel": "Acumulus 8.3.7",
+        "development": "SIEL - Buro RaDer",
+        "remark": "Library 8.3.7 - PHP 8.1.29",
+        "sourceuri": "https://github.com/SIELOnline/libAcumulus"
+    },
+    "stock": {
+        "productid": 1,
+        "stockamount": -1.0,
+        "stockdescription": "example.com bestelling 1",
+        "meta-match-shop-value": "TEST",
+        "meta-acumulus-product-id-source": "local",
+        "meta-match-shop-field": "[product::getShopObject()::sku]",
+        "meta-match-acumulus-field": "productsku"
+    }
+}
+Response: Response: status=404
+body={
+    "productid": "1",
+    "errors": {
+        "error": {
+            "code": "404 Not Found",
+            "codetag": "AA5B85AA",
+            "message": "Ongeldig productid"
+        },
+        "count_errors": "1"
+    },
+    "warnings": {
+        "count_warnings": "0"
+    },
+    "status": "1"
+}
+',
+  ),
+)

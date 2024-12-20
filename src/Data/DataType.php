@@ -19,6 +19,7 @@ interface DataType
     public const EmailPackingSlipAsPdf = 'EmailPackingSlipAsPdf';
     public const Line = 'Line';
     public const StockTransaction = 'StockTransaction';
+    public const Product = 'Product';
     public const BasicSubmit = 'BasicSubmit';
     public const Contract = 'Contract';
     public const Connector = 'Connector';

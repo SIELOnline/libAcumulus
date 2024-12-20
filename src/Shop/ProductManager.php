@@ -81,7 +81,37 @@ class ProductManager
     }
 
     /**
-     * Returns the Acumulus product that matches the given reference.
+     * Returns the Acumulus products that match the given filter.
+     *
+     * @return array[]
+     *   An array of "product" arrays being a keyed array with keys:
+     *   - 'productid'
+     *   - 'productnature'
+     *   - 'productdescription'
+     *   - 'producttagid'
+     *   - 'productcontactid'
+     *   - 'productprice'
+     *   - 'productvatrate'
+     *   - 'productsku'
+     *   - 'productstockamount'
+     *   - 'productean'
+     *   - 'producthash'
+     *   - 'productnotes'
+     *   Or empty if not found.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusErrorException  Error on contacting the API.
+     */
+    public function getAcumulusProducts(string $filter): array
+    {
+        $result = $this->getContainer()->getAcumulusApiClient()->getPicklistProducts($filter);
+        if ($result->hasError()) {
+            throw new AcumulusErrorException($result);
+        }
+        return $result->getMainAcumulusResponse();
+    }
+
+    /**
+     * Returns the Acumulus product that matches the given reference on the given field.
      *
      * The product matching strategy:
      * - If the 'productMatchAcumulusField' setting is not empty:
@@ -108,33 +138,27 @@ class ProductManager
      *   Or null if not found.
      *
      * @throws \UnexpectedValueException  More than 1 result was returned
+     * @throws \Siel\Acumulus\ApiClient\AcumulusErrorException  Error
      */
-    public function getAcumulusProductByReference(string $reference): ?array
+    public function getAcumulusProductByReference(string $acumulusField, string $reference): ?array
     {
-        // Try to look up the product at Acumulus.
-        $acumulus = $this->getContainer()->getAcumulusApiClient();
-        $result = $acumulus->getPicklistProducts($reference);
-        if ($result->hasError()) {
-            throw new AcumulusErrorException($result);
-        }
-
-        return $this->matchAcumulusProductInList($result->getMainAcumulusResponse(), $reference);
+        $products = $this->getAcumulusProducts($reference);
+        return $this->getAcumulusProductByExactMatch($products, $acumulusField, $reference);
     }
 
     /**
-     * Extracts 1 product from a list of products based on filter and
-     * 'productMatchAcumulusField' setting.
+     * Returns the Acumulus product that matches the given reference on the configured
+     * match field.
      */
-    protected function matchAcumulusProductInList(array $products, string $reference): ?array
+    public function getAcumulusProductByMatchField(string $reference): ?array
     {
-        // What to return depends on the 'productMatchAcumulusField' setting:
         $acumulusField = $this->getConfig()->get('productMatchAcumulusField');
         return $acumulusField !== ''
-            ? $this->getAcumulusProductByExactMatch($products, $acumulusField, $reference)
-            : $this->getSingleProduct($products, $reference);
+            ? $this->getAcumulusProductByReference($acumulusField, $reference)
+            : $this->getSingleProduct($this->getAcumulusProducts($reference), $reference);
     }
 
-    protected function getAcumulusProductByExactMatch(array $products, mixed $acumulusField, string $reference): ?array
+    protected function getAcumulusProductByExactMatch(array $products, string $acumulusField, string $reference): ?array
     {
         $matchingProducts = [];
         foreach ($products as $product) {
@@ -258,8 +282,11 @@ class ProductManager
      */
     protected function mailStockTransactionResult(Item $item, int|float $change, ?Product $product, StockTransactionResult $result): bool
     {
-        $pluginSettings = $this->getConfig()->getPluginSettings();
-        $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError
+        // We do not send a mail if stock management has not been enabled at all.
+        if ($result->getSendStatus() === StockTransactionResult::NotSent_StockManagementNotEnabled) {
+            return true;
+        }
+        $addReqResp = $this->getConfig()->get('debug') === Config::Send_SendAndMailOnError
             ? Result::AddReqResp_WithOther
             : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || $result->hasRealMessages()) {

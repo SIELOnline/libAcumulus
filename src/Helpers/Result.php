@@ -27,7 +27,7 @@ class Result extends MessageCollection
     public const SendStatus_Unknown = 0;
     public const NotSent_Mask = 0xf;
     // Reasons for not sending.
-    public const NotSent_LocalErrors = 0xf;
+    public const NotSent_LocalErrors = 0xc;
     public const NotSent_DryRun = 0xe;
     // Reasons for sending.
     public const Send_Mask = 0xf0;
@@ -121,15 +121,30 @@ class Result extends MessageCollection
         return ($this->sendStatus & self::NotSent_Mask) !== 0;
     }
 
+    public function hasLocalErrors(): bool
+    {
+        return $this->sendStatus === self::NotSent_LocalErrors;
+    }
+
     /**
      * {@inheritDoc}
      *
-     * This override also takes the {@see AcumulusResult::getStatus() status} into
-     * account, not only the {@see Result::getMessages() messages}.
+     * This override also takes the {@see AcumulusResult::getSendStatus()} and the
+     * {@see AcumulusResult::getStatus()} into account, not only the severity of the
+     * {@see Result::getMessages() messages}.
      */
     public function getSeverity(): int
     {
-        return max($this->getAcumulusResult()?->getStatus() ?? Severity::Unknown, parent::getSeverity());
+        if ($this->getAcumulusResult()?->getStatus()) {
+            $severity = $this->getAcumulusResult()->getStatus();
+        } elseif ($this->hasLocalErrors()) {
+            $severity = Severity::Error;
+        } elseif ($this->isSendingPrevented()) {
+            $severity = Severity::Success;
+        } else {
+            $severity = Severity::Unknown;
+        }
+        return max($severity, parent::getSeverity());
     }
 
     /**
@@ -250,7 +265,7 @@ class Result extends MessageCollection
     {
         $message = sprintf($this->t('message_reason'), $this->getActionText(), $this->getSendStatusText());
 
-        if ($this->hasBeenSent() || $this->getSendStatus() === self::NotSent_LocalErrors) {
+        if ($this->hasBeenSent() || $this->hasLocalErrors()) {
             if ($this->hasRealMessages()) {
                 $message .= "\n" . $this->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
             }

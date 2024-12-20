@@ -7,11 +7,15 @@ namespace Siel\Acumulus\Product;
 use RuntimeException;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Mappings;
+use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\WrapperInterface;
 use Siel\Acumulus\Invoice\WrapperTrait;
+
+use Siel\Acumulus\Meta;
 
 use function get_class;
 use function sprintf;
@@ -28,7 +32,9 @@ use function sprintf;
  */
 abstract class Product implements WrapperInterface
 {
-    use WrapperTrait;
+    use WrapperTrait {
+        getReference as private getReferenceTrait;
+    }
 
     /**
      * @var Item|null
@@ -55,7 +61,7 @@ abstract class Product implements WrapperInterface
     public function getReference(): string
     {
         // @todo: use Mappings + FieldExpander?
-        throw new RuntimeException(sprintf('%s::%s(): Not yet implemented', get_class(), __FUNCTION__));
+        return $this->getReferenceTrait();
     }
 
     /**
@@ -94,7 +100,11 @@ abstract class Product implements WrapperInterface
      */
     public function getReferenceForAcumulusLookup(): int|string|null
     {
-        return $this->expandField($this->getConfig()->get('productMatchShopField'));
+        $productMatchShopField = $this->getConfig()->get('productMatchShopField');
+        if ($productMatchShopField === 'mapping') {
+            $productMatchShopField = $this->getMappings()->getFor(DataType::Product)[Meta::MatchShopFieldSpecification] ?? '';
+        }
+        return $this->expandField($productMatchShopField);
     }
 
 //    /**
@@ -162,6 +172,11 @@ abstract class Product implements WrapperInterface
     private function getFieldExpander(): FieldExpander
     {
         return $this->getContainer()->getFieldExpander();
+    }
+
+    protected function getMappings(): Mappings
+    {
+        return $this->getContainer()->getMappings();
     }
 
     protected function getConfig(): Config

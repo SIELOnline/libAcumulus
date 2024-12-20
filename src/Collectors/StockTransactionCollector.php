@@ -49,7 +49,7 @@ class StockTransactionCollector extends Collector
             if (!empty($reference)) {
                 // Try to look up the product at Acumulus.
                 try {
-                    $acumulusProduct = $this->getContainer()->getProductManager()->getAcumulusProductByReference($reference);
+                    $acumulusProduct = $this->getContainer()->getProductManager()->getAcumulusProductByMatchField($reference);
                     if ($acumulusProduct !== null) {
                         $productId = (int) $acumulusProduct[Fld::ProductId];
                         $acumulusObject->productId = $productId;

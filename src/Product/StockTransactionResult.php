@@ -32,6 +32,17 @@ class StockTransactionResult extends Result
      */
     protected ?StockTransaction $stockTransaction = null;
 
+    public function hasLocalErrors(): bool
+    {
+        return in_array($this->getSendStatus(), [
+            self::NotSent_NoProduct,
+            self::NotSent_NoMatchValueInProduct,
+            self::NotSent_NoMatchInAcumulus,
+            self::NotSent_TooManyMatchesInAcumulus,
+            self::NotSent_LocalErrors,
+        ], true);
+    }
+
     /**
      * Returns a translated string indicating the reason for the action taken.
      */

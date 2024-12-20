@@ -257,7 +257,7 @@ class Mappings
             DataType::StockTransaction => [
                 Fld::ProductId => '[product::getAcumulusId()]',
                 Fld::StockAmount => '[change]',
-                Fld::StockDescription => '[environment::hostName+item::getSource()::getLabel(1)+item::getSource()::getReference()|localResult::getTrigger()]',
+                Fld::StockDescription => '[environment::hostName+item::getSource()::getLabelReference(1)|localResult::getTrigger()]',
                 Meta::MatchShopValue => '[product::getReferenceForAcumulusLookup()]',
             ],
             DataType::BasicSubmit => [

@@ -15,6 +15,7 @@ use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\WooCommerce\Product\Product;
 use WC_Tax;
 
 use function function_exists;
@@ -274,7 +275,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // - product (or item::getProduct()): Product
             // - product::getShopObject(): ?WC_Product
             LineType::Item => [
-                Fld::ItemNumber => '[product::getShopObject()::get_sku()]',
+                Fld::ItemNumber => '[product::getShopObject()::get_sku()|product::getShopObject()::get_global_unique_id()|"#".product::getShopObject()::get_id()]',
                 Fld::Product => '[item::getShopObject()::get_name()]',
                 // In refunds, the quantity will be negative and prices will be positive,
                 // so no further need for us to correct with sign (unless quantity appears
@@ -359,7 +360,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return [
             '[product::getShopObject()::get_sku()]' => __('SKU', 'woocommerce'),
             '[product::getShopObject()::get_global_unique_id()]' => __('GTIN, UPC, EAN or ISBN.', 'woocommerce'),
-            'mapping' => $this->t('other_field')
+            '[product::getShopObject()::get_name()]' => $this->t('field_productName'),
+//            '[product::getShopObject()::get_meta(' . Product::$acumulusProductIdField . ')]' => __('Custom Field', 'woocommerce'),
         ];
     }
 

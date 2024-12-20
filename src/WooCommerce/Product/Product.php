@@ -17,7 +17,7 @@ use WC_Product;
 class Product extends BaseProduct
 {
     // @todo: generalize to AcumulusProductIdField and move to BaseProduct?
-    public static string $keyAcumulusProductId = '_acumulus_product_id';
+    public static string $acumulusProductIdField = '_acumulus_product_id';
 
     protected function setShopObject(): void
     {
@@ -28,12 +28,19 @@ class Product extends BaseProduct
     {
         $this->id = $this->getShopObject()->get_id();
     }
-//
-//    public function getReference(): string
-//    {
-//        return $this->shopObject->get_sku();
-//    }
-//
+
+    public function getReference(): string
+    {
+        $reference = $this->shopObject->get_sku();
+        if (empty($reference)) {
+            $reference = $this->shopObject->get_global_unique_id();
+            if (empty($reference)) {
+                $reference = '#' . $this->shopObject->get_formatted_name();
+            }
+        }
+        return $reference;
+    }
+
 //    public function getName(): string
 //    {
 //        return $this->shopObject->get_name();
@@ -41,16 +48,16 @@ class Product extends BaseProduct
 
     public function getAcumulusId(): ?int
     {
-        $metaValue = $this->getShopObject()->get_meta(static::$keyAcumulusProductId);
+        $metaValue = $this->getShopObject()->get_meta(static::$acumulusProductIdField);
         return !empty($metaValue) ? (int) $metaValue : null;
     }
 
     public function setAcumulusId(?int $acumulusId): void
     {
         if ($acumulusId !== null) {
-            $this->getShopObject()->add_meta_data(static::$keyAcumulusProductId, $acumulusId, true);
+            $this->getShopObject()->add_meta_data(static::$acumulusProductIdField, $acumulusId, true);
         } else {
-            $this->getShopObject()->delete_meta_data(static::$keyAcumulusProductId);
+            $this->getShopObject()->delete_meta_data(static::$acumulusProductIdField);
         }
         $this->getShopObject()->save_meta_data();
     }

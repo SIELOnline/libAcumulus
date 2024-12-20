@@ -405,37 +405,62 @@ class ConfigUpgrade
     {
         // Mapping keys that are commented out, are already all lowercase.
         $mappingKeys = [
-            [DataType::Customer, 'contactYourId', Fld::ContactYourId],
-            [AddressType::Invoice, 'companyName1', Fld::CompanyName1],
-            [AddressType::Invoice, 'companyName2', Fld::CompanyName2],
-            [AddressType::Invoice, 'fullName', Fld::FullName],
-//            [AddressType::Invoice, 'salutation', Fld::Salutation],
-//            [AddressType::Invoice, 'address1', Fld::Address1],
-//            [AddressType::Invoice, 'address2', Fld::Address2],
-            [AddressType::Invoice, 'postalCode', Fld::PostalCode],
-//            [AddressType::Invoice, 'city', Fld::City],
-            [DataType::Customer, 'vatNumber', Fld::VatNumber],
-//            [DataType::Customer, 'telephone', Fld::Telephone],
-//            [DataType::Customer, 'fax', Fld::Fax],
-//            [DataType::Customer, 'email', Fld::Email],
-//            [DataType::Customer, 'mark', Fld::Mark],
-//            [DataType::Invoice, 'description', Fld::Description],
-            [DataType::Invoice, 'descriptionText', Fld::DescriptionText],
-            [DataType::Invoice, 'invoiceNotes', Fld::InvoiceNotes],
-            [LineType::Item, 'itemNumber', Fld::ItemNumber],
-//            [LineType::Item, 'product', Fld::Product],
-//            [LineType::Item, 'nature', Fld::Nature],
-            [LineType::Item, 'costPrice', Fld::CostPrice],
-            [EmailAsPdfType::Invoice, 'emailFrom', Fld::EmailFrom],
-            [EmailAsPdfType::Invoice, 'emailTo', Fld::EmailTo],
-            [EmailAsPdfType::Invoice, 'emailBcc', Fld::EmailBcc],
-//            [EmailAsPdfType::Invoice, 'subject', Fld::Subject],
-            [EmailAsPdfType::Invoice, 'confirmReading', Fld::ConfirmReading],
-            [EmailAsPdfType::PackingSlip, 'emailFrom', Fld::EmailFrom],
-            [EmailAsPdfType::PackingSlip, 'emailTo', Fld::EmailTo],
-            [EmailAsPdfType::PackingSlip, 'emailBcc', Fld::EmailBcc],
-//            [EmailAsPdfType::PackingSlip, 'subject', Fld::Subject],
-            [EmailAsPdfType::PackingSlip, 'confirmReading', Fld::ConfirmReading],
+            DataType::Customer => [
+                'contactYourId' => Fld::ContactYourId,
+                'vatNumber' => Fld::VatNumber,
+//              [telephone', Fld::Telephone],
+//              'fax' => Fld::Fax,
+//              'email' => Fld::Email,
+//              'mark' => Fld::Mark,
+//              'description' => Fld::Description,
+            ],
+            AddressType::Invoice => [
+                'companyName1' => Fld::CompanyName1,
+                'companyName2' => Fld::CompanyName2,
+                'fullName' => Fld::FullName,
+//              'salutation' => Fld::Salutation,
+//              'address1' => Fld::Address1,
+//              'address2' => Fld::Address2,
+                'postalCode' => Fld::PostalCode,
+//              [city', Fld::City],
+            ],
+            AddressType::Shipping => [
+                'companyName1' => Fld::CompanyName1,
+                'companyName2' => Fld::CompanyName2,
+                'fullName' => Fld::FullName,
+//              'salutation' => Fld::Salutation,
+//              'address1' => Fld::Address1,
+//              'address2' => Fld::Address2,
+                'postalCode' => Fld::PostalCode,
+//              [city', Fld::City],
+            ],
+            DataType::Invoice => [
+                'descriptionText' => Fld::DescriptionText,
+                'invoiceNotes' => Fld::InvoiceNotes,
+            ],
+            LineType::Item => [
+                'itemNumber' => Fld::ItemNumber,
+//              'product' => Fld::Product,
+//              'nature' => Fld::Nature,
+                'costPrice' => Fld::CostPrice,
+            ],
+            EmailAsPdfType::Invoice => [
+                'emailFrom' => Fld::EmailFrom,
+                'emailTo' => Fld::EmailTo,
+                'emailBcc' => Fld::EmailBcc,
+//              'subject' => Fld::Subject,
+                'confirmReading' => Fld::ConfirmReading,
+            ],
+            EmailAsPdfType::PackingSlip => [
+                'emailFrom' => Fld::EmailFrom,
+                'emailTo' => Fld::EmailTo,
+                'emailBcc' => Fld::EmailBcc,
+//              'subject' => Fld::Subject,
+                'confirmReading' => Fld::ConfirmReading,
+                // Error in mappings form, those 2 keys were never corrected before 8.3.7
+                'packingSlipEmailTo' => Fld::EmailTo,
+                'packingSlipEmailBcc' => Fld::EmailBcc,
+            ],
         ];
         $replacements = [
             '::getTypeLabel(' => '::getLabel(',
@@ -464,8 +489,10 @@ class ConfigUpgrade
             'emailOnError' => Fld::EmailOnError,
         ];
         foreach ($values as $key => $value) {
-            $newKey = $keyReplacements[$key] ?? $key;
-            $newValues[$newKey] = $value;
+            if (isset($keyReplacements[$key])) {
+                $newKey = $keyReplacements[$key];
+                $newValues[$newKey] = $value;
+            }
         }
         return $this->getConfig()->save($newValues);
     }

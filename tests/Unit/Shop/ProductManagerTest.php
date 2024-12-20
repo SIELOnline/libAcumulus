@@ -6,7 +6,7 @@ namespace Siel\Acumulus\Tests\Unit\Shop;
 
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\TestWebShop\Shop\ProductManager;
+use Siel\Acumulus\TestWebShop\TestDoubles\Shop\ProductManager;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples;
 use UnexpectedValueException;
@@ -17,13 +17,12 @@ use UnexpectedValueException;
 class ProductManagerTest extends TestCase
 {
     private Container $container;
-    private ApiRequestResponseExamples $examples;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $language = 'nl';
-        $this->container = new Container('TestWebShop', $language);
+        $this->container = new Container('TestWebShop\TestDoubles', $language);
         $this->examples =  ApiRequestResponseExamples::getInstance();
     }
 
@@ -37,11 +36,10 @@ class ProductManagerTest extends TestCase
     {
         $this->expectException(UnexpectedValueException::class);
         $productManager = $this->getProductManager();
-        $products = $this->examples->getMainResponse('products');
         $this->container->getConfig()->get('productMatchAcumulusField');
         $acumulusField = $this->container->getConfig()->set('productMatchAcumulusField', '');
         try {
-            $productManager->matchAcumulusProductInList($products, 'TESTSKU');
+            $productManager->getAcumulusProductByMatchField('TESTSKU');
         } finally {
             $this->container->getConfig()->set('productMatchAcumulusField', $acumulusField);
         }
@@ -50,9 +48,8 @@ class ProductManagerTest extends TestCase
     public function testMatchAcumulusProductInListSuccess(): void
     {
         $productManager = $this->getProductManager();
-        $products = $this->examples->getMainResponse('products');
         $acumulusField = $this->container->getConfig()->set('productMatchAcumulusField', 'productsku');
-        $product = $productManager->matchAcumulusProductInList($products, 'TESTSKU');
+        $product = $productManager->getAcumulusProductByMatchField('TESTSKU');
         self::assertSame('TESTSKU', $product[Fld::ProductSku]);
         self::assertSame('t-shirt rood', $product[Fld::ProductDescription]);
         $this->container->getConfig()->set('productMatchAcumulusField', $acumulusField);

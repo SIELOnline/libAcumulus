@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Integration\Shop;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormRenderer;
 use Siel\Acumulus\Invoice\Source;
@@ -18,10 +17,7 @@ use Siel\Acumulus\Shop\RatePluginForm;
 use Siel\Acumulus\Shop\RegisterForm;
 use Siel\Acumulus\Shop\SettingsForm;
 use Siel\Acumulus\Tests\AcumulusTestUtils;
-
 use Siel\Acumulus\Tests\Data\GetTestData;
-
-use function dirname;
 
 /**
  * FormTest tests the creation and rendering of the forms.
@@ -30,38 +26,27 @@ class FormTest extends TestCase
 {
     use AcumulusTestUtils;
 
-    private static Container $container;
-
     /** @noinspection PhpMissingParentCallCommonInspection */
     public static function setUpBeforeClass(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'get';
     }
 
-    protected static function getContainer(): Container
-    {
-        if (!isset(self::$container)) {
-            self::$container = new Container('TestWebShop', 'nl');
-            self::$container->addTranslations('Translations', 'Invoice');
-        }
-        return self::$container;
-    }
-
     private function getInvoiceSource(): Source
     {
         $objects = (new GetTestData())->getJson();
         $order = $objects->order;
-        return $this->getContainer()->createSource(Source::Order, $order);
+        return static::getContainer()->createSource(Source::Order, $order);
     }
 
     private function getForm(string $type): Form
     {
-        return $this->getContainer()->getForm($type);
+        return static::getContainer()->getForm($type);
     }
 
     private function getRenderer(): FormRenderer
     {
-        return $this->getContainer()->getFormRenderer();
+        return static::getContainer()->getFormRenderer();
     }
 
     public function formTypesProvider(): array
@@ -86,7 +71,8 @@ class FormTest extends TestCase
     public function testCreate(string $type, string $class): void
     {
         $form = $this->getForm($type);
-        $this->assertInstanceOf($class, $form);
+        /** @noinspection UnnecessaryAssertionInspection */
+        static::assertInstanceOf($class, $form);
 
         if ($type === 'invoice') {
             /** @noinspection PhpPossiblePolymorphicInvocationInspection  will be an InvoiceStatusForm */
@@ -95,9 +81,9 @@ class FormTest extends TestCase
         $renderer = $this->getRenderer();
         $output = $renderer->render($form);
         $name = substr($class, strrpos($class, '\\') + 1);
-        $this->saveTestHtml($this->getTestsPath() . '/Data', lcfirst($name), $output);
+        $this->saveTestHtml(lcfirst($name), $output);
 
-        $this->assertNotEmpty($output);
+        static::assertNotEmpty($output);
 
         $this->outputContainsFields($form->getFields(), $output);
     }
@@ -110,7 +96,7 @@ class FormTest extends TestCase
     {
         foreach ($expectedFields as $id => $field) {
             $id = $field['id'] ?? $id;
-            $this->assertStringContainsString("id=\"$id\"", $output, "id=\"$id\" not found in output");
+            static::assertStringContainsString("id=\"$id\"", $output, "id=\"$id\" not found in output");
             if (isset($field['fields'])) {
                 $this->outputContainsFields($field['fields'], $output);
             }

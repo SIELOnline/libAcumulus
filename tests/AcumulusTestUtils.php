@@ -46,7 +46,7 @@ LONGSTRING;
      */
     protected static function getContainer(): Container
     {
-        self::$container ??= self::CreateContainer();
+        self::$container ??= self::createContainer();
         return self::$container;
     }
 
@@ -55,9 +55,11 @@ LONGSTRING;
      *
      * Override if the test needs another container.
      */
-    protected static function CreateContainer(): Container
+    protected static function createContainer(): Container
     {
-        return new Container('TestWebShop', 'nl');
+        $container = new Container('TestWebShop', 'nl');
+        $container->addTranslations('Translations', 'Invoice');
+        return $container;
     }
 
     /**
@@ -73,7 +75,8 @@ LONGSTRING;
     protected function getDataPath(): string
     {
         $shopNamespace = self::getContainer()->getShopNamespace();
-        return $this->getTestsPath() . "/Integration/$shopNamespace/Data";
+        $subPath = str_starts_with($shopNamespace, 'TestWebShop') ? '' : '/' . $shopNamespace;
+        return $this->getTestsPath() . "$subPath/Data";
     }
 
     /**
@@ -126,17 +129,17 @@ LONGSTRING;
      *
      * @throws \JsonException
      */
-    protected function _testCreate(string $dataPath, string $type, int $id, array $excludeFields = []): void
+    protected function _testCreate(string $type, int $id, array $excludeFields = []): void
     {
         $invoiceSource = self::getContainer()->createSource($type, $id);
         $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
         $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
         $result = $invoice->toArray();
         // Get order from Order{id}.json.
-        $expected = $this->getTestSource($dataPath, $type, $id);
+        $expected = $this->getTestSource($type, $id);
         if ($expected !== null) {
             // Save order to Order{id}.latest.json, so we can compare differences ourselves.
-            $this->saveTestSource($dataPath, $type, $id, false, $result);
+            $this->saveTestSource($type, $id, false, $result);
             static::assertCount(1, $result);
             static::assertArrayHasKey(Fld::Customer, $result);
             $messages = [];
@@ -146,7 +149,7 @@ LONGSTRING;
         } else {
             // File does not yet exist: first time for a new test order: save order to Order{id}.json.
             // Will raise a warning that no asserts have been executed.
-            $this->saveTestSource($dataPath, $type, $id, true, $result);
+            $this->saveTestSource($type, $id, true, $result);
         }
     }
 
@@ -216,8 +219,9 @@ LONGSTRING;
      *
      * @throws \JsonException
      */
-    protected function getTestSource(string $path, string $type, int $id): mixed
+    protected function getTestSource(string $type, int $id): mixed
     {
+        $path = $this->getDataPath() . '/Invoice';
         $filename = "$path/$type$id.json";
         if (!is_readable($filename)) {
             return null;
@@ -232,8 +236,9 @@ LONGSTRING;
      * @param mixed $data
      *   The data to be saved (in json format).
      */
-    protected function saveTestSource(string $path, string $type, int $id, bool $isNew, mixed $data): void
+    protected function saveTestSource(string $type, int $id, bool $isNew, mixed $data): void
     {
+        $path = $this->getDataPath() . '/Invoice';
         $append = $isNew ? '' : '.latest';
         $filename = "$path/$type$id$append.json";
         /** @noinspection JsonEncodingApiUsageInspection  false positive */
@@ -317,26 +322,27 @@ LONGSTRING;
      * @param string $data
      *   The html string to be saved.
      */
-    protected function saveTestHtml(string $path, string $name, string $data): void
+    protected function saveTestHtml(string $name, string $data): void
     {
-        $append = 'latest';
-        $filename = "$path/Form/$name.html";
-        if (file_exists($filename)) {
-            $filename = "$path/Form/$name.$append.html";
+        $path = $this->getDataPath() . '/Form';
+        $fileName = "$name.html";
+        if (file_exists("$path/$fileName")) {
+            $fileName = "$name.latest.html";
         }
         $data = static::getContainer()->getUtil()->maskHtml($data);
-        file_put_contents($filename, static::$htmlStart . $data . static::$htmlEnd);
+        file_put_contents("$path/$fileName", static::$htmlStart . $data . static::$htmlEnd);
+
     }
 
     /**
      * Returns a test mail.
      */
-    protected function getTestMail(string $path, string $name): ?array
+    protected function getTestMail(string $name): ?array
     {
         $mail = null;
-        $filename = "$path/Mail/$name.mail";
-        if (is_readable($filename)) {
-            eval('$mail = ' . file_get_contents($filename) . ';');
+        $fullFileName = $this->getDataPath() . "/Mail/$name.mail";
+        if (is_readable($fullFileName)) {
+            eval('$mail = ' . file_get_contents($fullFileName) . ';');
         }
         /** @noinspection PhpExpressionAlwaysNullInspection */
         return $mail;
@@ -348,24 +354,25 @@ LONGSTRING;
      * @param array $data
      *   The mail data to be saved (in json format).
      */
-    protected function saveTestMail(string $path, string $name, array $data): void
+    protected function saveTestMail(string $name, array $data): void
     {
-        $filename = "$path/Mail/$name.mail";
-        if (file_exists($filename)) {
-            $filename = "$path/Mail/$name.latest.mail";
+        $path = $this->getDataPath() . '/Mail';
+        $fileName = "$name.mail";
+        if (file_exists("$path/$fileName")) {
+            $fileName = "$name.latest.mail";
         }
-        file_put_contents($filename, var_export($data, true) . "\n");
+        file_put_contents("$path/$fileName", var_export($data, true) . "\n");
     }
 
     /**
      * Returns a test log message.
      */
-    protected function getTestLogMessage(string $path, string $name): ?array
+    protected function getTestLogMessage(string $name): ?array
     {
         $logMessage = null;
-        $filename = "$path/Log/$name.log";
-        if (is_readable($filename)) {
-            eval('$logMessage = ' . file_get_contents($filename) . ';');
+        $fullFileName = $this->getDataPath() . "/Log/$name.log";
+        if (is_readable($fullFileName)) {
+            eval('$logMessage = ' . file_get_contents($fullFileName) . ';');
         }
         /** @noinspection PhpExpressionAlwaysNullInspection */
         return $logMessage;
@@ -377,12 +384,13 @@ LONGSTRING;
      * @param array $data
      *   The mail data to be saved (in json format).
      */
-    protected function saveTestLogMessage(string $path, string $name, array $data): void
+    protected function saveTestLogMessage(string $name, array $data): void
     {
-        $filename = "$path/Log/$name.log";
-        if (file_exists($filename)) {
-            $filename = "$path/Log/$name.latest.log";
+        $path = $this->getDataPath() . '/Log';
+        $fileName = "$name.log";
+        if (file_exists("$path/$fileName")) {
+            $fileName = "$name.latest.log";
         }
-        file_put_contents($filename, var_export($data, true) . "\n");
+        file_put_contents("$path/$fileName", var_export($data, true) . "\n");
     }
 }

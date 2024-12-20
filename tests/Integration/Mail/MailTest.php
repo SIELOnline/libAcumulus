@@ -192,8 +192,8 @@ class MailTest extends TestCase
             $name .= "$description-";
         }
         $name .= $this->getContainer()->getLanguage();
-        $this->saveTestMail($this->getTestsPath() . '/Data', $name, $mailSent);
-        $expected = $this->getTestMail($this->getTestsPath() . '/Data', $name);
+        $this->saveTestMail($name, $mailSent);
+        $expected = $this->getTestMail($name);
         $this->assertSame($expected, $mailSent);
     }
 }

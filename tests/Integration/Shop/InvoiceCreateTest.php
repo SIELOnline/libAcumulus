@@ -8,9 +8,9 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Integration\Shop;
 
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\Tests\AcumulusTestUtils;
 use Siel\Acumulus\Tests\Data\GetTestData;
 
 /**
@@ -18,7 +18,7 @@ use Siel\Acumulus\Tests\Data\GetTestData;
  */
 class InvoiceCreateTest extends TestCase
 {
-    private static Container $container;
+    use AcumulusTestUtils;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     public static function setUpBeforeClass(): void
@@ -26,20 +26,11 @@ class InvoiceCreateTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'get';
     }
 
-    protected static function getAcumulusContainer(): Container
-    {
-        if (!isset(self::$container)) {
-            self::$container = new Container('TestWebShop', 'nl');
-            self::$container->addTranslations('Translations', 'Invoice');
-        }
-        return self::$container;
-    }
-
     private function getInvoiceSource(): Source
     {
         $objects = (new GetTestData())->getJson();
         $order = $objects->order;
-        return $this->getAcumulusContainer()->createSource(Source::Order, $order);
+        return $this->getContainer()->createSource(Source::Order, $order);
     }
 
     /**
@@ -49,8 +40,8 @@ class InvoiceCreateTest extends TestCase
     public function testCreate(): void
     {
         $invoiceSource = $this->getInvoiceSource();
-        $invoiceAddResult = $this->getAcumulusContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = $this->getAcumulusContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceAddResult = $this->getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = $this->getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
         $result = $invoice->toArray();
 
         // Do some basic tests: at all levels, we just check some key(s) being available.

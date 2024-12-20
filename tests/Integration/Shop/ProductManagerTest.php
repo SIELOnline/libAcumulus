@@ -7,14 +7,13 @@ namespace Siel\Acumulus\Tests\Integration\Shop;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Product\StockTransactionResult;
 use Siel\Acumulus\Shop\ProductManager;
 use Siel\Acumulus\Tests\AcumulusTestUtils;
-use Siel\Acumulus\TestWebShop\Mail\Mailer;
+use Siel\Acumulus\Mail\Mailer;
 
 /**
  * ProductManagerTest tests the {@see ProductManager}.
@@ -27,13 +26,6 @@ class ProductManagerTest extends TestCase
 
     private int $mailCount;
 
-    protected static function createContainer(): Container
-    {
-        $container = new Container('TestWebShop', 'nl');
-        $container->addTranslations('Translations', 'Invoice');
-        return $container;
-    }
-
     private function getLog(): Log
     {
         return self::getContainer()->getLog();
@@ -41,13 +33,57 @@ class ProductManagerTest extends TestCase
 
     private function getMailer(): Mailer
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return static::getContainer()->getMailer();
     }
 
     private function getProductManager(): ProductManager
     {
         return static::getContainer()->getProductManager();
+    }
+
+    public function searchProvider(): array
+    {
+        return [
+            'TEST-GRO' => ['TEST-GRO', [1833637]],
+            'test-gro' => ['test-gro', [1833637]],
+            'test' => ['test', [0 => '1833636', 1 => '1833637', 2 => '1833638', 3 => '1833639', 4 => '1833642', 5 => '1833643',]],
+        ];
+    }
+
+    /**
+     * Tests that the Acumulus product picklist filter is not case-sensitive.
+     *
+     * @dataProvider searchProvider
+     */
+    public function testGetAcumulusProducts(string $filter, array $productIds): void
+    {
+        $productManager = $this->getProductManager();
+        $products = $productManager->getAcumulusProducts($filter);
+        self::assertEqualsCanonicalizing($productIds, array_column($products, Fld::ProductId));
+    }
+
+    public function referenceProvider(): array
+    {
+        return [
+            'TEST-GRO' => ['TEST-GRO', Fld::ProductEan, 1833637],
+            'test-gro' => ['test-gro', Fld::ProductEan, null],
+        ];
+    }
+
+    /**
+     * Tests that the getAcumulusProductByRerference method is case-sensitive.
+     *
+     * @dataProvider referenceProvider
+     */
+    public function testGetAcumulusProductByReference(string $reference, string $acumulusField, ?int $productId): void
+    {
+        $productManager = $this->getProductManager();
+        $product = $productManager->getAcumulusProductByReference($acumulusField, $reference);
+        if ($productId === null) {
+            self::assertNull($product);
+        } else {
+            self::assertSame($productId, (int) $product[Fld::ProductId]);
+        }
     }
 
     public function itemProvider(): array
@@ -137,8 +173,8 @@ class ProductManagerTest extends TestCase
 
         // dataName() returns the key of the actual data set.
         $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
-        $this->saveTestLogMessage($this->getTestsPath() . '/Data', $name, $logMessage);
-        $expected = $this->getTestLogMessage($this->getTestsPath() . '/Data', $name);
+        $this->saveTestLogMessage($name, $logMessage);
+        $expected = $this->getTestLogMessage($name);
         static::assertSame($expected, $logMessage);
     }
 
@@ -153,8 +189,8 @@ class ProductManagerTest extends TestCase
 
         // dataName() returns the key of the actual data set.
         $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
-        $this->saveTestMail($this->getTestsPath() . '/Data', $name, $mailSent);
-        $expected = $this->getTestMail($this->getTestsPath() . '/Data', $name);
+        $this->saveTestMail($name, $mailSent);
+        $expected = $this->getTestMail($name);
         static::assertSame($expected, $mailSent);
     }
 }

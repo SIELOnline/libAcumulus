@@ -23,7 +23,7 @@ class Mailer extends BaseMailer
      * @noinspection PhpMixedReturnTypeCanBeReducedInspection
      * *    @todo: Type can be narrowed to bool|int|string
      */
-    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
     {
         /** @var MailerInterface $mailer */
         $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();

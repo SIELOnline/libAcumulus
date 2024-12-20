@@ -31,7 +31,7 @@ class Mailer extends BaseMailer
      * @noinspection PhpMixedReturnTypeCanBeReducedInspection
      *    @todo: Type can be narrowed to bool|int|string
      */
-    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
     {
         $this->templateDir = _PS_ROOT_DIR_ . '/mails/';
         $this->templateName = 'acumulus-message';

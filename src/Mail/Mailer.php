@@ -10,6 +10,8 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Translator;
 use Throwable;
 
+use function count;
+
 /**
  * Mailer allows sending mails.
  *
@@ -28,6 +30,7 @@ abstract class Mailer
     protected Config $config;
     protected Environment $environment;
     protected Translator $translator;
+    private array $mailsSent = [];
 
     public function __construct(Config $config, Environment $environment, Translator $translator)
     {
@@ -73,6 +76,7 @@ abstract class Mailer
     public function sendMail(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
     {
         try {
+            $this->mailsSent[] = compact('from', 'fromName', 'to', 'subject', 'bodyText', 'bodyHtml');
             return $this->send($from, $fromName, $to, $subject, $bodyText, $bodyHtml);
         } catch (Throwable $e) {
             // We do not log here, we have extensive logging per specific mail
@@ -87,7 +91,7 @@ abstract class Mailer
      *   Success (true); error message, result (hopefully Stringable), Throwable or just
      *   false otherwise.
      */
-    abstract public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed;
+    abstract protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed;
 
     /**
      * Returns the mail from address.
@@ -132,5 +136,15 @@ abstract class Mailer
             $to = $this->getFrom();
         }
         return $to;
+    }
+
+    public function getMailCount(): int
+    {
+        return count($this->mailsSent);
+    }
+
+    public function getMailSent(int $index): ?array
+    {
+        return $this->mailsSent[$index] ?? null;
     }
 }

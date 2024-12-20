@@ -28,7 +28,7 @@ class Mailer extends BaseMailer
      * @noinspection PhpMixedReturnTypeCanBeReducedInspection
      *   @todo Type can be narrowed to '\Exception|\Throwable|true'
      */
-    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
     {
         try {
             $text = new MimePart($bodyText);

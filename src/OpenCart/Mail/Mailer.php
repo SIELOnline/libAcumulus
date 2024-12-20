@@ -23,7 +23,7 @@ abstract class Mailer extends BaseMailer
      * @noinspection PhpDynamicFieldDeclarationInspection All the properties for
      *   $mail are dynamic.
      */
-    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
     {
         try {
             $config = Registry::getInstance()->config;

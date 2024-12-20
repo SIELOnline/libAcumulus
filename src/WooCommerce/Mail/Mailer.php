@@ -14,7 +14,7 @@ use function wp_mail;
  */
 class Mailer extends BaseMailer
 {
-    public function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
     {
         $headers = [
             "from: $fromName <$from>",

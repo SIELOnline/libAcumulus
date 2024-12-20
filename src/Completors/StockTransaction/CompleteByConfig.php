@@ -8,6 +8,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Completors\BaseCompletorTask;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Meta;
 
@@ -28,7 +29,12 @@ class CompleteByConfig extends BaseCompletorTask
      */
     public function complete(AcumulusObject $acumulusObject, ...$args): void
     {
-        $acumulusObject->metadataSet(Meta::MatchShopFieldSpecification, $this->configGet('productMatchShopField'));
+        $matchShopFieldSpecification = $this->configGet('productMatchShopField');
+        if ($matchShopFieldSpecification === 'mapping') {
+            $mappings = $this->getContainer()->getMappings();
+            $matchShopFieldSpecification = $mappings->getFor(DataType::Product)[Meta::MatchShopFieldSpecification] ?? '';
+        }
+        $acumulusObject->metadataSet(Meta::MatchShopFieldSpecification, $matchShopFieldSpecification);
         $acumulusObject->metadataSet(Meta::MatchAcumulusField, $this->configGet('productMatchAcumulusField'));
     }
 }

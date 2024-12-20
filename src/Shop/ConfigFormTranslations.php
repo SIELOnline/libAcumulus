@@ -229,17 +229,14 @@ Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelli
         'relationMappingsHeader' => 'Brongegevens voor de klantgegevens',
         'desc_relationMappingsHeader' => 'Met elke factuur die naar Acumulus verstuurd wordt, worden ook de klantgegevens meegestuurd. Hier kunt u instellen waar deze gegevens vandaan komen.',
         'invoiceAddressMappingsHeader' => 'Brongegevens voor het factuuradres',
-        'desc_invoiceAddressMappingsHeader' => 'Deze velden dien te verwijzen naar wat de webwinkel als het factuuradres beschouwt, ongeacht of dit het hoofd of alternatieve adres in Acumulus is.',
+        'desc_invoiceAddressMappingsHeader' => 'Deze velden dienen te verwijzen naar wat de webwinkel als het factuuradres beschouwt, ongeacht of dit het hoofd of alternatieve adres in Acumulus is.',
         'shippingAddressMappingsHeader' => 'Brongegevens voor het verzendadres',
-        'desc_shippingAddressMappingsHeader' => 'Deze velden dien te verwijzen naar wat de webwinkel als het verzendadres beschouwt, ongeacht of dit het hoofd of alternatieve adres in Acumulus is.',
+        'desc_shippingAddressMappingsHeader' => 'Deze velden dienen te verwijzen naar wat de webwinkel als het verzendadres beschouwt, ongeacht of dit het hoofd of alternatieve adres in Acumulus is.',
         'invoiceMappingsHeader' => 'Brongegevens voor de factuurvelden',
-        'desc_invoiceMappingsHeader' => '',
         'invoiceLinesMappingsHeader' => 'Brongegevens voor de factuurregels',
-        'desc_invoiceLinesMappingsHeader' => '',
         'emailInvoicePdfMappingsHeader' => 'Brongegevens om de factuur als pdf te e-mailen',
-        'desc_emailInvoicePdfMappingsHeader' => '',
         'emailPackingSlipPdfMappingsHeader' => 'Brongegevens om de pakbon als pdf te e-mailen',
-        'desc_emailPackingSlipPdfMappingsHeader' => '',
+        'productMappingsHeader' => 'Brongegevens om voorraadmutaties van producten te versturen',
 
         'field_countryCode' => 'Landcode',
         'desc_countryCode' => 'De ISO 3166-1 alpha 2 landcode, pas dit niet aan tenzij u speciale plugins gebruikt voor het opslaan van adressen',
@@ -460,9 +457,9 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 
         //  Email packing slip settings.
         'field_packingSlipEmailTo' => 'E-mailadres voor de pakbon',
-        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u hierboven e-mailopties voor de pakbon hebt aangevinkt.',
+        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mailopties voor de pakbon hebt aangevinkt.',
         'field_packingSlipEmailBcc' => 'Bcc e-mailadres voor de pakbon',
-        'desc_packingSlipEmailBcc' => 'Vul extra e-mailadressen in waar naartoe u de pakbon wilt sturen. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u hierboven e-mailopties voor de pakbon hebt aangevinkt.',
+        'desc_packingSlipEmailBcc' => 'Vul extra e-mailadressen in waar naartoe u de pakbon wilt sturen. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mailopties voor de pakbon hebt aangevinkt.',
         'message_validate_packing_slip_email_0' => 'Als u de optie "Toon een link om de pdf te mailen." kiest voor de pakbon, is het veld "E-mailadres voor de pakbon" verplicht. Vul een e-mailadres in.',
         'message_validate_packing_slip_email_1' => 'Het veld "E-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
         'message_validate_packing_slip_email_2' => 'Het veld "Bcc e-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
@@ -488,9 +485,10 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
             . '• Het beste selecteert u een van de velden waarin u een uniek artikelnummer of iets dergelijks hebt ingevuld.<br>'
             . '• Als u dat niet heeft, kunt u ook zoeken op "%1$s" (de op een-na-laatste optie).<br>'
             . '• De laatste optie kunt u gebruiken als u een %2$s gebruikt waarin u waardes hebt opgeslagen die ook in Acumulus bij de producten zijn ingevuld.<br>'
-            . 'Als u deze laatste optie selecteert, dient u een veldverwijzing hiervoor te definiëren in het "%3$s" formulier.',
+            . 'Als u deze laatste optie selecteert, dient u een veldverwijzing hiervoor te definiëren in het "<a href="%4$s" target="_blank">%3$s formulier</a>".',
         'other_field' => 'Andere eigenschap',
-        'custom_field' => 'aangepast veld', // WooCommerce specific?
+        // WooCommerce specific wording!
+        'custom_field' => 'aangepast veld',
 
         'field_productMatchAcumulusField' => 'Producteigenschap in Acumulus',
         'desc_productMatchAcumulusField' => 'Geef aan welke eigenschap van een product in Acumulus gebruikt moet worden om naar de hierboven geselecteerde eigenschap te zoeken.<br>'
@@ -506,8 +504,15 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         Fld::Product => 'Alle eigenschappen',
         Meta::MatchShopFieldSpecification => 'Custom producteigenschap',
         'message_validate_product_match_shop_field_0' => 'Het veld "Producteigenschap in uw winkel" is verplicht, kies een eigenschap.',
-        'message_validate_product_match_shop_field_1' => 'Voor Het veld "Producteigenschap in uw winkel" heeft u gekozen voor "%1$s". De veldverwijzing "%2$s" is nog leeg, Vergeet niet deze een waarde te geven! Dit kunt u doen op het "%3$s" formulier.',
+        'message_validate_product_match_shop_field_1' => 'Voor Het veld "Producteigenschap in uw winkel" heeft u gekozen voor "%1$s". De veldverwijzing "%2$s" is nog leeg, Vergeet niet deze een waarde te geven! Dit kunt u doen op het "<a href="%4$s" target="_blank">%3$s formulier</a>".',
         'message_validate_product_match_acumulus_field_0' => 'Het veld "Producteigenschap in Acumulus" is verplicht, kies een eigenschap.',
+
+        // Stock management mapping.
+        'field_matchShopFieldSpecification' => 'Zoekveld',
+        // WooCommerce specific wording!
+        'desc_matchShopFieldSpecification' => 'Geef met een veldverwijzing aan welk (meta)veld van een product in uw winkel gebruikt moet worden om naar een product in Acumulus te zoeken.',
+        // WooCommerce specific example!
+        'desc_matchShopFieldSpecificationExample' => 'Dit zal waarschijnlijk lijken op "[product::getShopObject::get_meta(...)]"',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',
@@ -753,13 +758,9 @@ Field references are denoted by placing the name of the property between square 
         'shippingAddressMappingsHeader' => 'Shipping address source fields',
         'desc_shippingAddressMappingsHeader' => 'These fields should refer to what the web shop considers to be the shipping address, regardless whether this will be the main or alternative address in Acumulus.',
         'invoiceMappingsHeader' => 'Invoice source fields',
-        'desc_invoiceMappingsHeader' => '',
         'invoiceLinesMappingsHeader' => 'Invoice lines source fields',
-        'desc_invoiceLinesMappingsHeader' => '',
         'emailInvoicePdfMappingsHeader' => 'Source fields when mailing an invoice pdf',
-        'desc_emailInvoicePdfMappingsHeader' => '',
         'emailPackingSlipPdfMappingsHeader' => 'Source fields when mailing a packing slip pdf',
-        'desc_emailPackingSlipPdfMappingsHeader' => '',
 
         'field_countryCode' => 'Country code',
         'desc_countryCode' => 'Thee ISO 3166-1 alpha 2 country code, do not change this unless you are using plugins to store addresses.',

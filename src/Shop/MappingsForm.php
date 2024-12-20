@@ -27,6 +27,8 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
+use Siel\Acumulus\Meta;
+
 use function sprintf;
 
 /**
@@ -171,7 +173,7 @@ class MappingsForm extends Form
     {
         $accountStatus = $this->getAccountStatus();
 
-        return [
+        $fields = [
             'configHeader' => [
                 'type' => 'details',
                 'summary' => $this->t('config_form_header'),
@@ -221,8 +223,18 @@ class MappingsForm extends Form
                 'legend' => $this->t('emailPackingSlipPdfMappingsHeader'),
                 'fields' => $this->makeArrayFields($this->getEmailPackingSlipFields(), EmailAsPdfType::PackingSlip),
             ],
-            'versionInformation' => $this->getAboutBlock($accountStatus),
         ];
+        // We could only show this fieldset if stock management has been enabled, but then
+        // we should do the same for the email PDF fieldsets.
+        if ($this->shopCapabilities->hasStockManagement() /*&& $this->acumulusConfig->get('stockManagementEnabled')*/) {
+            $fields['productMappingsHeader'] = [
+                'type' => 'fieldset',
+                'legend' => $this->t('productMappingsHeader'),
+                'fields' => $this->makeArrayFields($this->getStockManagementFields(), DataType::Product),
+            ];
+        }
+        $fields['versionInformation'] = $this->getAboutBlock($accountStatus);
+        return $fields;
     }
 
     /**
@@ -512,6 +524,20 @@ class MappingsForm extends Form
                 'type' => 'text',
                 'label' => $this->t('field_packingSlipEmailBcc'),
                 'description' => $this->t('desc_packingSlipEmailBcc') . ' ' . $this->t('msg_token'),
+                'attributes' => [
+                    'size' => self::Size,
+                ],
+            ],
+        ];
+    }
+
+    protected function getStockManagementFields(): array
+    {
+        return [
+            Meta::MatchShopFieldSpecification => [
+                'type' => 'text',
+                'label' => $this->t('field_matchShopFieldSpecification'),
+                'description' => $this->t('desc_matchShopFieldSpecification') . ' ' . $this->t('desc_matchShopFieldSpecificationExample'),
                 'attributes' => [
                     'size' => self::Size,
                 ],

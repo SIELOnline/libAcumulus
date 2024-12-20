@@ -195,7 +195,8 @@ class SettingsForm extends BaseConfigForm
                     $this->t('message_validate_product_match_shop_field_1'),
                     $this->t('other_field'),
                     $this->t(Meta::MatchShopFieldSpecification),
-                    $this->t('mappings_form_link_text')
+                    $this->t('mappings_form_link_text'),
+                    $this->shopCapabilities->getLink('mappings') . '#productMappingsHeader',
                 );
                 $this->addFormMessage($message, Severity::Warning, 'productMatchShopField');
             }
@@ -867,7 +868,8 @@ class SettingsForm extends BaseConfigForm
                 $this->t('desc_productMatchShopField'),
                 $this->t('field_productName'),
                 $this->t('custom_field'),
-                $this->t('mappings_form_link_text')
+                $this->t('mappings_form_link_text'),
+                $this->shopCapabilities->getLink('mappings') . '#productMappingsHeader',
             ),
             'options' => $this->getProductMatchShopFieldOptions(),
             'attributes' => [

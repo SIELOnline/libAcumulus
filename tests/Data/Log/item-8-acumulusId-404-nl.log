@@ -26,8 +26,8 @@ submit={
         "stockamount": -1.0,
         "stockdescription": "example.com bestelling 1",
         "meta-match-shop-value": "TEST",
+        "meta-match-shop-field": "[product::getReference()]",
         "meta-acumulus-product-id-source": "local",
-        "meta-match-shop-field": "[product::getShopObject()::sku]",
         "meta-match-acumulus-field": "productsku"
     }
 }
@@ -83,8 +83,8 @@ submit={
         "stockamount": -1.0,
         "stockdescription": "example.com bestelling 1",
         "meta-match-shop-value": "TEST",
+        "meta-match-shop-field": "[product::getReference()]",
         "meta-acumulus-product-id-source": "local",
-        "meta-match-shop-field": "[product::getShopObject()::sku]",
         "meta-match-acumulus-field": "productsku"
     }
 }

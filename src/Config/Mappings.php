@@ -33,6 +33,7 @@ class Mappings
         // @todo: add other line types when defining mappings for them.
         EmailAsPdfType::Invoice,
         EmailAsPdfType::PackingSlip,
+        DataType::Product,
         DataType::StockTransaction,
         DataType::BasicSubmit,
         DataType::Contract,

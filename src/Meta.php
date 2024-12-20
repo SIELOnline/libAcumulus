@@ -371,24 +371,18 @@ interface Meta
     // Stock transaction.
     /**
      * Support: source of the Acumulus product id when adding a stock transaction: 'local'
-     * or 'remote'.
+     * (cached during a previous lookup) or 'remote' (fresh lookup).
      */
     public const AcumulusProductIdSource = 'meta-acumulus-product-id-source';
     /**
      * Collector: field specification of the field, property, method, meta field, or
      * whatever, that contains the product reference used to match against the Acumulus
      * catalogue.
-     *
-     * Note that the product picklist filters against product id, description, type, SKU,
-     * EAN and price of the product.
      */
     public const MatchShopFieldSpecification = 'meta-match-shop-field';
     /**
      * Collector: expanded value of the field specification that thus should contain the
      * product reference used to match against the Acumulus catalogue.
-     *
-     * Note that the product picklist filters against the filter being contained in one of
-     * the fields: product id, description, nature, SKU, EAN or price of the product.
      */
     public const MatchShopValue = 'meta-match-shop-value';
     /**

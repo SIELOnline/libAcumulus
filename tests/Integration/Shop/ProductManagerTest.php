@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Tests\Integration\Shop;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
@@ -86,76 +87,78 @@ class ProductManagerTest extends TestCase
         }
     }
 
-    public function itemProvider(): array
+    public function itemProvider1(): array
     {
         return [
-            'item 3 sku' => [3, 13, 4, Fld::ProductSku, StockTransactionResult::NotSent_NoMatchInAcumulus],
-            'item 3 ean' => [3, 13, 4, Fld::ProductEan, 1833637],
-            'item 3 free' => [3, 13, 3, '', 1833637],
-            'item 4 sku' => [4, 14, 5, Fld::ProductSku, StockTransactionResult::NotSent_TooManyMatchesInAcumulus],
-            'item 4 ean' => [4, 14, 6, Fld::ProductEan, StockTransactionResult::NotSent_NoMatchInAcumulus],
-            'item 4 free' => [4, 14, 1, '', StockTransactionResult::NotSent_TooManyMatchesInAcumulus],
-            'item 5 sku' => [5, 15, 2, Fld::ProductSku, 1833642],
-            'item 5 ean' => [5, 15, -1, Fld::ProductEan, StockTransactionResult::NotSent_NoMatchInAcumulus],
-            'item 5 free' => [5, 15, -1, '', 1833642],
-            'item 6 sku' => [6, 16, -1, Fld::ProductSku, 1833638],
-            'item 6 ean' => [6, 16, -2, Fld::ProductEan, 1833636],
-            'item 6 ean zero change' => [6, 16, 0, Fld::ProductEan, StockTransactionResult::NotSent_ZeroChange],
-            'item 6 free' => [6, 16, -1, '', StockTransactionResult::NotSent_TooManyMatchesInAcumulus],
-            'item 7 acumulusId' => [7, 17, -1, Fld::ProductSku, 1833636, 'local'],
-            'item 8 acumulusId 404' => [8, 18, -1, Fld::ProductSku, 'AA5B85AA', 'local'],
+            'item 3 sku' => [3, 4, Fld::ProductSku, StockTransactionResult::NotSent_NoMatchInAcumulus],
+            'item 3 ean' => [3, 4, Fld::ProductEan, 1833637],
+            'item 3 free' => [3, 3, '', 1833637],
+            'item 4 sku' => [4, 5, Fld::ProductSku, StockTransactionResult::NotSent_TooManyMatchesInAcumulus],
+            'item 4 ean' => [4, 6, Fld::ProductEan, StockTransactionResult::NotSent_NoMatchInAcumulus],
+            'item 4 free' => [4, 1, '', StockTransactionResult::NotSent_TooManyMatchesInAcumulus],
+            'item 5 ean' => [5, -1, Fld::ProductEan, StockTransactionResult::NotSent_NoMatchInAcumulus],
+            'item 5 free' => [5, -1, '', 1833642],
+            'item 6 ean' => [6, -2, Fld::ProductEan, 1833636],
+            'item 6 ean zero change' => [6, 0, Fld::ProductEan, StockTransactionResult::NotSent_ZeroChange],
+            'item 6 free' => [6, -1, '', StockTransactionResult::NotSent_TooManyMatchesInAcumulus],
+            'item 7 acumulusId' => [7, -1, Fld::ProductSku, 1833636, 'local'],
         ];
     }
 
     /**
-     * @dataProvider itemProvider
+     * @dataProvider itemProvider1
      */
-    public function testUpdateStock(
+    public function testUpdateStockWithConfig(
         int $itemId,
-        int $productId,
         int|float $change,
         string $acumulusField,
         int|string $acumulusProductIdOrError,
         string $acumulusProductIdSource = 'remote'
     ): void {
         $config = static::getContainer()->getConfig();
-        $source = static::getContainer()->createSource(Source::Order, 1);
-        $item = static::getContainer()->createItem($itemId, $source);
-        $product = $item->getProduct();
-        self::assertSame($itemId, $item->getId());
-        self::assertSame($productId, $product->getId());
-
-        $this->mailCount = $this->getMailer()->getMailCount();
         $productMatchShopField = $config->set('productMatchShopField', '[product::getShopObject()::sku]');
         $productMatchAcumulusField = $config->set('productMatchAcumulusField', $acumulusField);
         $debug = $config->set('debug', $itemId === 17 ? Config::Send_SendAndMail : Config::Send_SendAndMailOnError);
         try {
-            $productManager = $this->getProductManager();
-            $result = $productManager->updateStockForItem($item, $change, 'ProductManagerTest::testUpdateStock');
-            $this->checkLog();
-            if ($result->isSendingPrevented()) {
-                self::assertSame($acumulusProductIdOrError, $result->getSendStatus());
-                $this->checkMail();
-            } elseif ($result->hasError()) {
-                self::assertNotNull($result->getByCodeTag($acumulusProductIdOrError));
-                $this->checkMail();
-            } else {
-                self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
-                self::assertSame(
-                    $acumulusProductIdSource,
-                    $result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource]
-                );
-                $stockAmount = (float) $result->getMainApiResponse()[Fld::StockAmount];
+            $this->updateStock($itemId, $change, $acumulusProductIdOrError, $acumulusProductIdSource);
+        } finally {
+            $config->set('productMatchShopField', $productMatchShopField);
+            $config->set('productMatchAcumulusField', $productMatchAcumulusField);
+            $config->set('debug', $debug);
+        }
+    }
 
-                // Correct the stock, so that continuous (successful) testing  will not change the actual levels at Acumulus.
-                $result = $productManager->updateStockForItem($item, -$change, 'ProductManagerTest::returnStock');
-                self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
-                self::assertSame(
-                    $result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource],
-                    'local'
-                );
-                self::assertSame($stockAmount - $change, (float) $result->getMainApiResponse()[Fld::StockAmount]);
-            }
+    public function itemProvider2(): array
+    {
+        return [
+            'item 5 sku' => [5, 2, Fld::ProductSku, 1833642],
+            'item 6 sku' => [6, -1, Fld::ProductSku, 1833638],
+            'item 8 acumulusId 404' => [8, -1, Fld::ProductSku, 'AA5B85AA', 'local'],
+        ];
+    }
+
+    /**
+     * @dataProvider itemProvider2
+     */
+    public function testUpdateStockWithMapping(
+        int $itemId,
+        int|float $change,
+        string $acumulusField,
+        int|string $acumulusProductIdOrError,
+        string $acumulusProductIdSource = 'remote'
+    ): void {
+        $config = static::getContainer()->getConfig();
+        $productMatchShopField = $config->set('productMatchShopField', 'mapping');
+        $productMatchAcumulusField = $config->set('productMatchAcumulusField', $acumulusField);
+        $debug = $config->set('debug', $itemId === 17 ? Config::Send_SendAndMail : Config::Send_SendAndMailOnError);
+        $this->getContainer()->getMappings()->save([
+            DataType::Product => [
+                Meta::MatchShopFieldSpecification => '[product::getReference()]',
+            ],
+        ]);
+
+        try {
+            $this->updateStock($itemId, $change, $acumulusProductIdOrError, $acumulusProductIdSource);
         } finally {
             $config->set('productMatchShopField', $productMatchShopField);
             $config->set('productMatchAcumulusField', $productMatchAcumulusField);
@@ -164,9 +167,47 @@ class ProductManagerTest extends TestCase
     }
 
     /**
-     * Checks the log messages.
+     * Updates the stock based on a line item.
      */
-    public function checkLog(): void
+    private function updateStock(int $itemId, float|int $change, int|string $acumulusProductIdOrError, string $acumulusProductIdSource): void
+    {
+        $source = static::getContainer()->createSource(Source::Order, 1);
+        $item = static::getContainer()->createItem($itemId, $source);
+        $this->mailCount = $this->getMailer()->getMailCount();
+        $productManager = $this->getProductManager();
+        $result = $productManager->updateStockForItem($item, $change, 'ProductManagerTest::testUpdateStock');
+        $this->checkLog();
+        if ($result->isSendingPrevented()) {
+            self::assertSame($acumulusProductIdOrError, $result->getSendStatus());
+            $this->checkMail();
+        } elseif ($result->hasError()) {
+            self::assertNotNull($result->getByCodeTag($acumulusProductIdOrError));
+            $this->checkMail();
+        } else {
+            self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
+            self::assertSame(
+                $acumulusProductIdSource,
+                $result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource]
+            );
+            $stockAmount = (float) $result->getMainApiResponse()[Fld::StockAmount];
+
+            // Correct the stock, so that continuous (successful) testing  will not change the actual levels at Acumulus.
+            $result = $productManager->updateStockForItem($item, -$change, 'ProductManagerTest::returnStock');
+            self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
+            self::assertSame(
+                $result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource],
+                'local'
+            );
+            self::assertSame($stockAmount - $change, (float) $result->getMainApiResponse()[Fld::StockAmount]);
+        }
+    }
+
+    /**
+     * Checks the log messages.
+     *
+     * @todo: can this (and checkMail() be moved to test utils?
+     */
+    private function checkLog(): void
     {
         $loggedMessages = $this->getLog()->getLoggedMessages();
         $logMessage = end($loggedMessages);
@@ -181,7 +222,7 @@ class ProductManagerTest extends TestCase
     /**
      * Checks the mail messages.
      */
-    public function checkMail(): void
+    private function checkMail(): void
     {
         static::assertSame($this->mailCount + 1, $this->getMailer()->getMailCount());
         $mailSent = $this->getMailer()->getMailSent($this->mailCount);

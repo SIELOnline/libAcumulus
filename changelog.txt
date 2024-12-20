@@ -6,7 +6,9 @@ This file contains a historical overview of changes in our code.
 8.3.7 (2024-12-??)
 ------------------
 Bugs:
-- ALL: Voucher lines should always get vat free and not 0%.
+- ALL: Voucher lines should be treated as "vat free", not as "0%".
+- ALL: Minor: custom mappings for the packing slip email to and BCC addresses were not
+  stored correctly.
 - WC: Fatal error: Uncaught TypeError: Acumulus::addShopOrderMetaBox(): Argument #2
   ($shopOrderOrPost) must be of type WP_Post|WC_Order, WP_Comment given, called in
   class-wp-hook.php on line 324 and defined in acumulus.php:440.

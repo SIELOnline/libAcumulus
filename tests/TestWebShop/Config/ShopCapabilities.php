@@ -104,6 +104,15 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return true;
     }
 
+    public function getProductMatchShopFields(): array
+    {
+        return [
+            '[product::getShopObject()::sku]' => 'SKU',
+            '[product::getShopObject()::ean]' => 'EAN',
+            '[product::getShopObject()::get_name()]' => $this->t('field_productName'),
+        ];
+    }
+
     public function getLink(string $linkType): string
     {
         return match ($linkType) {

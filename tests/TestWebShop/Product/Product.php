@@ -18,22 +18,22 @@ use stdClass;
 class Product extends BaseProduct
 {
     private static array $references = [
-        13 => ['TEST-GRO'], // sku: null; ean: 't-shirt groen'; free: 't-shirt groen'
-        14 => ['TEST-ZWA'], // sku: 2 results; ean: null; free: 2 results
-        15 => ['TEST-GRI'], // sku: 'trui grijs'; ean: null; free: 'trui grijs'
-        16 => ['TEST'],     // sku: 't-shirt rood'; ean: 't-shirt blauw'; free: 6 results
-        17 => ['TEST', 1833636],  // sku: 't-shirt rood'; ean: 't-shirt blauw'; free: 6 results, acumulusId (1833636): t-shirt blauw
-        18 => ['TEST', 1], // sku: 't-shirt rood'; ean: 't-shirt blauw'; free: 6 results, acumulusId (1): null
+        13 => ['t-shirt groen', 'TEST-GRO'], // sku: null; ean: 't-shirt groen'; free: 't-shirt groen'
+        14 => ['t-shirt zwart', 'TEST-ZWA'], // sku: 2 results; ean: null; free: 2 results
+        15 => ['trui grijs', 'TEST-GRI'], // sku: 'trui grijs'; ean: null; free: 'trui grijs'
+        16 => ['t-shirt rood', 'TEST'],     // sku: 't-shirt rood'; ean: 't-shirt blauw'; free: 6 results
+        17 => ['t-shirt rood', 'TEST', 1833636],  // sku: 't-shirt rood'; ean: 't-shirt blauw'; free: 6 results, acumulusId (1833636): t-shirt blauw
+        18 => ['t-shirt rood', 'TEST', 1], // sku: 't-shirt rood'; ean: 't-shirt blauw'; free: 6 results, acumulusId (1): null
     ];
 
     protected function setShopObject(): void
     {
         $this->shopObject = new stdClass();
         $this->shopObject->id = $this->id;
-        $this->shopObject->name = 't-shirt groen';
-        $this->shopObject->sku = self::$references[$this->id][0] ?? 'my-sku';
-        $this->shopObject->ean = self::$references[$this->id][0] ?? 'my-ean';
-        $this->shopObject->acumulusId = self::$references[$this->id][1] ?? null;
+        $this->shopObject->name = self::$references[$this->id][0] ?? 'trui groen';
+        $this->shopObject->sku = self::$references[$this->id][1] ?? 'my-sku';
+        $this->shopObject->ean = self::$references[$this->id][1] ?? 'my-ean';
+        $this->shopObject->acumulusId = self::$references[$this->id][2] ?? null;
     }
 
     protected function setId(): void

@@ -9,9 +9,12 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
+use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Config\Config;
+
+use Siel\Acumulus\Meta;
 
 use function count;
 use function in_array;
@@ -49,6 +52,7 @@ class SettingsForm extends BaseConfigForm
     {
         $this->validateAccountFields();
         $this->validateShopFields();
+        $this->validateStockManagementFields();
     }
 
     /**
@@ -162,6 +166,47 @@ class SettingsForm extends BaseConfigForm
     }
 
     /**
+     * Validates fields in the stock management fieldset.
+     */
+    protected function validateStockManagementFields(): void
+    {
+        if (!$this->shopCapabilities->hasStockManagement()) {
+            unset(
+                $this->submittedValues['stockManagementEnabled'],
+                $this->submittedValues['productMatchShopField'],
+                $this->submittedValues['productMatchAcumulusField'],
+            );
+            return;
+        }
+        if (empty($this->submittedValues['stockManagementEnabled']))
+        {
+            unset(
+                $this->submittedValues['productMatchShopField'],
+                $this->submittedValues['productMatchAcumulusField'],
+            );
+            return;
+        }
+
+        if (empty($this->submittedValues['productMatchShopField'])) {
+            $this->addFormMessage($this->t('message_validate_product_match_shop_field_0'), Severity::Error, 'productMatchShopField');
+        } elseif ($this->submittedValues['productMatchShopField'] === 'mapping') {
+            if (empty($this->acumulusConfig->get('mappings')[DataType::Product][Meta::MatchShopFieldSpecification] ?? '')) {
+                $message = sprintf(
+                    $this->t('message_validate_product_match_shop_field_1'),
+                    $this->t('other_field'),
+                    $this->t(Meta::MatchShopFieldSpecification),
+                    $this->t('mappings_form_link_text')
+                );
+                $this->addFormMessage($message, Severity::Warning, 'productMatchShopField');
+            }
+        }
+
+        if (empty($this->submittedValues['productMatchAcumulusField'])) {
+            $this->addFormMessage($this->t('message_validate_product_match_acumulus_field_0'), Severity::Error, 'productMatchAcumulusField');
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * This override returns the config form. At the minimum, this includes the
@@ -257,6 +302,14 @@ class SettingsForm extends BaseConfigForm
                     'fields' => $this->getDocumentsFields(),
                 ],
             ];
+            if ($this->shopCapabilities->hasStockManagement()) {
+                $fields['stockManagementSettingsHeader'] = [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('stockManagementSettingsHeader'),
+                    'description' => sprintf($this->t('desc_stockManagementSettings'), $this->t('module')),
+                    'fields' => $this->getStockManagementFields(),
+                ];
+            }
         }
 
         $fields['pluginSettings'] = [
@@ -790,6 +843,56 @@ class SettingsForm extends BaseConfigForm
     }
 
     /**
+     * Returns the fields related to the packing slip document.
+     *
+     * @return array[]
+     */
+    protected function getStockManagementFields(): array
+    {
+        $fields = [];
+        $fields['stockManagement'] = [
+            'type' => 'checkbox',
+            'label' => $this->t('field_stockManagement'),
+            'description' => $this->t('desc_stockManagement'),
+            'options' => ['stockManagementEnabled' => $this->t('option_stockManagementEnabled')],
+        ];
+        $fields['stockManagementProductMatchingHelp'] = [
+            'type' => 'markup',
+            'value' => sprintf($this->t('desc_product_matching_help'), $this->t('module')),
+        ];
+        $fields['productMatchShopField'] = [
+            'type' => 'select',
+            'label' => $this->t('field_productMatchShopField'),
+            'description' => sprintf(
+                $this->t('desc_productMatchShopField'),
+                $this->t('field_productName'),
+                $this->t('custom_field'),
+                $this->t('mappings_form_link_text')
+            ),
+            'options' => $this->getProductMatchShopFieldOptions(),
+            'attributes' => [
+                'required' => true,
+                'multiple' => false,
+            ],
+        ];
+        $fields['productMatchAcumulusField'] = [
+            'type' => 'select',
+            'label' => $this->t('field_productMatchAcumulusField'),
+            'description' => sprintf(
+                $this->t('desc_productMatchAcumulusField'),
+                $this->t(Fld::ProductId),
+                $this->t(Fld::ProductDescription)
+            ),
+            'options' => $this->getProductMatchAcumulusFieldOptions(),
+            'attributes' => [
+                'required' => true,
+                'multiple' => false,
+            ],
+        ];
+        return $fields;
+    }
+
+    /**
      * Returns the set of plugin related fields.
      *
      * The fields returned:
@@ -1009,5 +1112,44 @@ class SettingsForm extends BaseConfigForm
             "show$document$page" => sprintf($this->t('option_document'), $label, $show),
             "mail$document$page" => sprintf($this->t('option_document'), $label, $mail),
         ];
+    }
+
+    /**
+     * Returns the set of product fields that can be used to match products in Acumulus.
+     *
+     * @return array
+     *   Array with options (value => label entries), including the empty option and an
+     *   'other' option.
+     */
+    protected function getProductMatchShopFieldOptions(): array
+    {
+        return [0 => $this->t('option_empty')]
+            + $this->shopCapabilities->getProductMatchShopFields()
+            + ['mapping' => $this->t('other_field'),];
+    }
+
+    /**
+     * Returns the set of product fields that can be used to match products in Acumulus.
+     *
+     * @return array
+     *   Array with options (value => label entries), including the empty option and an
+     *   'other' option.
+     */
+    protected function getProductMatchAcumulusFieldOptions(): array
+    {
+        // @todo: should be part of the "config field definitions".
+        $productFilterFields = [
+            Fld::ProductEan,
+            Fld::ProductSku,
+            Fld::ProductId,
+            Fld::ProductDescription,
+            Fld::Product, // "All" fields (listed in product filter specification)
+        ];
+
+        $options = [0 => $this->t('option_empty')];
+        foreach ($productFilterFields as $field) {
+            $options[$field] = $this->t($field);
+        }
+        return $options;
     }
 }

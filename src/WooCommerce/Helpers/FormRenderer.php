@@ -35,6 +35,18 @@ class FormRenderer extends BaseFormRenderer
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * This override adds the id to the attributes, so it is rendered in the title tag
+     * (in wordPress, a fieldset starts with a <h2> and has no wrapping tag).
+     */
+    protected function fieldsetBegin(array $field): string
+    {
+        $field['attributes'] = ($field['attributes'] ?? []) + ['id' => $field['id']];
+        return parent::fieldsetBegin($field);
+    }
+
+    /**
      * @inheritDoc
      *
      * This override adds an information icon as label for descriptions at the

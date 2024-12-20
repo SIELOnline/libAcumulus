@@ -19,7 +19,6 @@ use Siel\Acumulus\Collectors\ContractCollector;
 use Siel\Acumulus\Collectors\CustomerCollector;
 use Siel\Acumulus\Collectors\EmailAsPdfCollector;
 use Siel\Acumulus\Collectors\InvoiceCollector;
-use Siel\Acumulus\Collectors\LineCollector;
 use Siel\Acumulus\Collectors\StockTransactionCollector;
 use Siel\Acumulus\Completors\CustomerCompletor;
 use Siel\Acumulus\Completors\InvoiceCompletor;
@@ -61,6 +60,9 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Mail\CrashMail;
+use Siel\Acumulus\PrestaShop\Collectors\ItemLineCollector;
+use Siel\Acumulus\PrestaShop\Collectors\PaymentFeeLineCollector;
+use Siel\Acumulus\PrestaShop\Collectors\ShippingLineCollector;
 use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager;
@@ -74,9 +76,6 @@ use Siel\Acumulus\TestWebShop\Config\ConfigStore;
 use Siel\Acumulus\TestWebShop\Config\Environment;
 use Siel\Acumulus\TestWebShop\Config\ShopCapabilities;
 use Siel\Acumulus\TestWebShop\Mail\Mailer;
-use Siel\Acumulus\WooCommerce\Collectors\ItemLineCollector;
-use Siel\Acumulus\WooCommerce\Collectors\OtherLineCollector;
-use Siel\Acumulus\WooCommerce\Collectors\ShippingLineCollector;
 
 use function get_class;
 
@@ -191,8 +190,7 @@ class ContainerTest extends TestCase
             [DataType::Invoice, null, InvoiceCollector::class,],
             [DataType::Line, LineType::Item, ItemLineCollector::class,],
             [DataType::Line, LineType::Shipping, ShippingLineCollector::class,],
-            [DataType::Line, LineType::Other, OtherLineCollector::class,],
-            [DataType::Line, LineType::PaymentFee, LineCollector::class,],
+            [DataType::Line, LineType::PaymentFee, PaymentFeeLineCollector::class,],
             [DataType::StockTransaction, null, StockTransactionCollector::class,],
         ];
     }
@@ -202,7 +200,8 @@ class ContainerTest extends TestCase
      */
     public function testCollectorsNameSpace(string $dataType, ?string $subType, string $collectorClass): void
     {
-        $container = new Container('WooCommerce');
+//        $container = self::$container;
+        $container = new Container('PrestaShop');
         $object = $container->getCollector($dataType, $subType);
         /** @noinspection UnnecessaryAssertionInspection  we check for a subtype of the specified return type */
         $this->assertInstanceOf($collectorClass, $object);

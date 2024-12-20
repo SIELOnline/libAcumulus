@@ -1,5 +1,7 @@
 array (
-  'message' => 'ProductManagerTest::testUpdateStock(bestelling 1, bestelregel 5): Voorraadupdate voor product \'TEST-GRI\': -1.000000 is niet verzonden (reden: Geen product in Acumulus voor zoekwaarde)',
+  'message' => 'ProductManagerTest::testUpdateStock(bestelling 1, bestelregel 5): Voorraadupdate voor product \'TEST-GRI\': -1.000000 is niet verzonden (reden: Geen product in Acumulus voor zoekwaarde)
+• Fout: Search for reference \'TEST-GRI\' resulted in no products.
+',
   'severity' => 32,
   'format' => '%1$s(%2$s, %3$s): %4$s %5$s',
   'values' =>
@@ -8,6 +10,8 @@ array (
     1 => 'bestelling 1',
     2 => 'bestelregel 5',
     3 => 'Voorraadupdate voor product \'TEST-GRI\': -1.000000',
-    4 => 'is niet verzonden (reden: Geen product in Acumulus voor zoekwaarde)',
+    4 => 'is niet verzonden (reden: Geen product in Acumulus voor zoekwaarde)
+• Fout: Search for reference \'TEST-GRI\' resulted in no products.
+',
   ),
 )

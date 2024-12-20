@@ -530,6 +530,20 @@ class Config
     }
 
     /**
+     * Returns the set of settings related to products and stock management.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - 'stockManagementEnabled'
+     *   - 'productMatchShopField'
+     *   - 'productMatchAcumulusField'
+     */
+    public function getProductSettings(): array
+    {
+        return $this->getSettingsByGroup(Fld::Product);
+    }
+
+    /**
      * Returns the set of settings related to the pdf documents.
      *
      * @return array

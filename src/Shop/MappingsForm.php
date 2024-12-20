@@ -18,6 +18,7 @@ use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\FieldExpanderHelp;
 use Siel\Acumulus\Helpers\Form;
@@ -246,7 +247,7 @@ class MappingsForm extends Form
     protected function getRelationFields(): array
     {
         return [
-            'contactYourId' => [
+            Fld::ContactYourId => [
                 'type' => 'text',
                 'label' => $this->t('field_contactYourId'),
                 'description' => $this->t('desc_contactYourId'),
@@ -254,7 +255,7 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'salutation' => [
+            Fld::Salutation => [
                 'type' => 'text',
                 'label' => $this->t('field_salutation'),
                 'description' => $this->t('desc_salutation'),
@@ -262,7 +263,7 @@ class MappingsForm extends Form
                     'size' => self::SizeLong,
                 ],
             ],
-            'vatNumber' => [
+            Fld::VatNumber => [
                 'type' => 'text',
                 'label' => $this->t('field_vatNumber'),
                 'description' => $this->t('desc_vatNumber'),
@@ -270,14 +271,14 @@ class MappingsForm extends Form
                     'size' => self::SizeLong,
                 ],
             ],
-            'telephone' => [
+            Fld::Telephone => [
                 'type' => 'text',
                 'label' => $this->t('field_telephone1'),
                 'attributes' => [
                     'size' => self::Size,
                 ],
             ],
-            'telephone2' => [
+            Fld::Telephone2 => [
                 'type' => 'text',
                 'label' => $this->t('field_telephone2'),
                 'description' => $this->t('desc_telephone12'),
@@ -285,7 +286,7 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'fax' => [
+            Fld::Fax => [
                 'type' => 'text',
                 'label' => $this->t('field_fax'),
                 'description' => $this->t('desc_fax1'),
@@ -293,14 +294,14 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'email' => [
+            Fld::Email => [
                 'type' => 'text',
                 'label' => $this->t('field_email'),
                 'attributes' => [
                     'size' => self::Size,
                 ],
             ],
-            'mark' => [
+            Fld::Mark => [
                 'type' => 'text',
                 'label' => $this->t('field_mark'),
                 'description' => $this->t('desc_mark'),
@@ -317,21 +318,21 @@ class MappingsForm extends Form
     protected function getAddressFields(): array
     {
         return [
-            'companyName1' => [
+            Fld::CompanyName1 => [
                 'type' => 'text',
                 'label' => $this->t('field_companyName1'),
                 'attributes' => [
                     'size' => self::Size,
                 ],
             ],
-            'companyName2' => [
+            Fld::CompanyName2 => [
                 'type' => 'text',
                 'label' => $this->t('field_companyName2'),
                 'attributes' => [
                     'size' => self::Size,
                 ],
             ],
-            'fullName' => [
+            Fld::FullName => [
                 'type' => 'text',
                 'label' => $this->t('field_fullName'),
                 'description' => $this->t('desc_fullName'),
@@ -339,14 +340,14 @@ class MappingsForm extends Form
                     'size' => self::SizeLong,
                 ],
             ],
-            'address1' => [
+            Fld::Address1 => [
                 'type' => 'text',
                 'label' => $this->t('field_address1'),
                 'attributes' => [
                     'size' => self::Size,
                 ],
             ],
-            'address2' => [
+            Fld::Address2 => [
                 'type' => 'text',
                 'label' => $this->t('field_address2'),
                 'description' => $this->t('desc_address'),
@@ -354,21 +355,21 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'postalCode' => [
+            Fld::PostalCode => [
                 'type' => 'text',
                 'label' => $this->t('field_postalCode'),
                 'attributes' => [
                     'size' => self::Size,
                 ],
             ],
-            'city' => [
+            Fld::City => [
                 'type' => 'text',
                 'label' => $this->t('field_city'),
                 'attributes' => [
                     'size' => self::Size,
                 ],
             ],
-            'countryCode' => [
+            Fld::CountryCode => [
                 'type' => 'text',
                 'label' => $this->t('field_countryCode'),
                 'description' => $this->t('desc_countryCode'),
@@ -385,7 +386,7 @@ class MappingsForm extends Form
     protected function getInvoiceFields(): array
     {
         return [
-            'description' => [
+            Fld::Description => [
                 'type' => 'text',
                 'label' => $this->t('field_description'),
                 'description' => $this->t('desc_description'),
@@ -393,7 +394,7 @@ class MappingsForm extends Form
                     'size' => self::SizeLong,
                 ],
             ],
-            'descriptionText' => [
+            Fld::DescriptionText => [
                 'type' => 'textarea',
                 'label' => $this->t('field_descriptionText'),
                 'description' => $this->t('desc_descriptionText'),
@@ -403,7 +404,7 @@ class MappingsForm extends Form
                     'style' => 'box-sizing: border-box; width: 83%; min-width: 24em;',
                 ],
             ],
-            'invoiceNotes' => [
+            Fld::InvoiceNotes => [
                 'type' => 'textarea',
                 'label' => $this->t('field_invoiceNotes'),
                 'description' => $this->t('desc_invoiceNotes'),
@@ -422,7 +423,7 @@ class MappingsForm extends Form
     protected function getInvoiceLinesFields(): array
     {
         return [
-            'itemNumber' => [
+            Fld::ItemNumber => [
                 'type' => 'text',
                 'label' => $this->t('field_itemNumber'),
                 'description' => $this->t('desc_itemNumber'),
@@ -430,7 +431,7 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'product' => [
+            Fld::Product => [
                 'type' => 'text',
                 'label' => $this->t('field_productName'),
                 'description' => $this->t('desc_productName'),
@@ -438,7 +439,7 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'nature' => [
+            Fld::Nature => [
                 'type' => 'text',
                 'label' => $this->t('field_nature'),
                 'description' => $this->t('desc_nature'),
@@ -446,7 +447,7 @@ class MappingsForm extends Form
                     'size' => 30,
                 ],
             ],
-            'costPrice' => [
+            Fld::CostPrice => [
                 'type' => 'text',
                 'label' => $this->t('field_costPrice'),
                 'description' => $this->t('desc_costPrice'),
@@ -460,7 +461,7 @@ class MappingsForm extends Form
     protected function getEmailInvoiceFields(): array
     {
         return [
-            'emailTo' => [
+            Fld::EmailTo => [
                 'type' => 'text',
                 'label' => $this->t('field_emailTo'),
                 'description' => $this->t('desc_emailTo'),
@@ -468,7 +469,7 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'emailBcc' => [
+            Fld::EmailBcc => [
                 'type' => 'text',
                 'label' => $this->t('field_emailBcc'),
                 'description' => $this->t('desc_emailBcc'),
@@ -477,7 +478,7 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'emailFrom' => [
+            Fld::EmailFrom => [
                 'type' => 'text',
                 'label' => $this->t('field_emailFrom'),
                 'description' => $this->t('desc_emailFrom'),
@@ -485,7 +486,7 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'subject' => [
+            Fld::Subject => [
                 'type' => 'text',
                 'label' => $this->t('field_subject'),
                 'description' => $this->t('desc_subject'),
@@ -499,7 +500,7 @@ class MappingsForm extends Form
     protected function getEmailPackingSlipFields(): array
     {
         return [
-            'packingSlipEmailTo' => [
+            Fld::EmailTo => [
                 'type' => 'text',
                 'label' => $this->t('field_packingSlipEmailTo'),
                 'description' => $this->t('desc_packingSlipEmailTo') . ' ' . $this->t('msg_token'),
@@ -507,7 +508,7 @@ class MappingsForm extends Form
                     'size' => self::Size,
                 ],
             ],
-            'packingSlipEmailBcc' => [
+            Fld::EmailBcc => [
                 'type' => 'text',
                 'label' => $this->t('field_packingSlipEmailBcc'),
                 'description' => $this->t('desc_packingSlipEmailBcc') . ' ' . $this->t('msg_token'),
@@ -555,8 +556,9 @@ class MappingsForm extends Form
      * - The name is changed into array syntax where the original id becomes a key for an
      *   entry in an array named after the datatype.
      *
-     * Example: field 'address1" for data type 'invoice' gets id = 'invoice_address1', and
-     * name = 'invoice[address1]'.
+     * Example: field {@see Fld::Address1} for {@see DataType::Invoice} gets
+     * - id = 'invoice_address1'
+     * - name = 'invoice[address1]'.
      */
     protected function makeArrayFields(array $fields, string $dataType): array
     {

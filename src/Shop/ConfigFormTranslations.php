@@ -12,6 +12,7 @@ namespace Siel\Acumulus\Shop;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\TranslationCollection;
+use Siel\Acumulus\Meta;
 
 /**
  * Contains translations for the configuration form.
@@ -466,6 +467,48 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_validate_packing_slip_email_1' => 'Het veld "E-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
         'message_validate_packing_slip_email_2' => 'Het veld "Bcc e-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
+        // Stock management setting
+        'stockManagementSettingsHeader' => 'Voorraadbeheer',
+        'desc_stockManagementSettings' => 'De Acumulus %1$s kan veranderingen in de voorraad automatisch doorgeven aan Acumulus. '
+            . 'Hiermee blijven de voorraadniveaus van uw producten in Acumulus actueel. '
+            . 'Vooralsnog wordt dit alleen gedaan voor veranderingen op basis van bestellingen of retouren, dus niet als u handmatig of via een import de voorraad in uw webwinkel bijwerkt. ',
+
+        'field_stockManagement' => 'Voorraadmutaties',
+        'option_stockManagementEnabled' => 'Verstuur naar Acumulus',
+        'desc_stockManagement' => 'Als u deze optie aanvinkt worden veranderingen in het voorraadniveau in uw webwinkel automatisch naar Acumulus verstuurd.',
+
+        'desc_product_matching_help' => 'Om voorraadmutaties door te geven moet de Acumulus-%1$s de producten uit uw webwinkel kunnen koppelen aan producten in Acumulus. '
+            . 'Dit doet de %1$s op basis van het vergelijken van een artikelnummer of een vergelijkbare eigenschap. '
+            . 'U kunt hieronder voor de webwinkel en voor Acumulus aangeven welke eigenschap van producten daarvoor gebruikt moet worden. '
+            . 'Merk op dat het belangrijk is dat deze eigenschap voor elk product (waarvoor voorraadbeheer aan staat) een unieke waarde heeft '
+            . 'en dat de waardes in de webwinkel en Acumulus exact overeenkomen (streepjes, spaties, hoofd en kleine letters, etc.).',
+
+        'field_productMatchShopField' => 'Producteigenschap in uw winkel',
+        'desc_productMatchShopField' => 'Geef aan welke eigenschap van een product in uw winkel gebruikt moet worden om het overeenkomstige product in Acumulus op te zoeken.<br>'
+            . '• Het beste selecteert u een van de velden waarin u een uniek artikelnummer of iets dergelijks hebt ingevuld.<br>'
+            . '• Als u dat niet heeft, kunt u ook zoeken op "%1$s" (de op een-na-laatste optie).<br>'
+            . '• De laatste optie kunt u gebruiken als u een %2$s gebruikt waarin u waardes hebt opgeslagen die ook in Acumulus bij de producten zijn ingevuld.<br>'
+            . 'Als u deze laatste optie selecteert, dient u een veldverwijzing hiervoor te definiëren in het "%3$s" formulier.',
+        'other_field' => 'Andere eigenschap',
+        'custom_field' => 'aangepast veld', // WooCommerce specific?
+
+        'field_productMatchAcumulusField' => 'Producteigenschap in Acumulus',
+        'desc_productMatchAcumulusField' => 'Geef aan welke eigenschap van een product in Acumulus gebruikt moet worden om naar de hierboven geselecteerde eigenschap te zoeken.<br>'
+            . '• Het beste selecteert u "SKU" of "EAN" in de selectielijst.<br>'
+            . '• Zoeken op "%1$s" kan ook, maar dan moet u deze ID\'s Uit Acumulus zelf hebben toegevoegd aan uw producten in uw webwinkel.<br>'
+            . '• Als u echter nog geen "SKU" of iets dergelijks gebruikt, kunt u ook zoeken op "%1$s" (de op een-na-laatste optie).<br>'
+            . '• De laatste optie kunt u gebruiken als u op waardes wilt zoeken die niet altijd in hetzelfde veld in Acumulus ingevuld zijn, bijvoorbeeld of in het "SKU" of in het "EAN"-veld.<br>',
+
+        Fld::ProductId => 'Product id',
+        Fld::ProductSku => 'SKU',
+        Fld::ProductEan => 'EAN',
+        Fld::ProductDescription => 'Product of dienst',
+        Fld::Product => 'Alle eigenschappen',
+        Meta::MatchShopFieldSpecification => 'Custom producteigenschap',
+        'message_validate_product_match_shop_field_0' => 'Het veld "Producteigenschap in uw winkel" is verplicht, kies een eigenschap.',
+        'message_validate_product_match_shop_field_1' => 'Voor Het veld "Producteigenschap in uw winkel" heeft u gekozen voor "%1$s". De veldverwijzing "%2$s" is nog leeg, Vergeet niet deze een waarde te geven! Dit kunt u doen op het "%3$s" formulier.',
+        'message_validate_product_match_acumulus_field_0' => 'Het veld "Producteigenschap in Acumulus" is verplicht, kies een eigenschap.',
+
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',
 
@@ -497,11 +540,6 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'desc_settings' => 'U bevindt zich nu op het formulier met veldverwijzingen, ofwel de links tussen de data uit de webwinkel en een Acumulus factuur. De "echte" instellingen vindt u op het "%1$s" formulier onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
         // @todo: translate this for other shops (this is WP/WC specific...).
         'menu_settings' => 'Instellingen → Acumulus instellingen',
-
-        'other_field' => 'Ander veld',
-        Fld::ProductSku => 'SKU',
-        Fld::ProductEan => 'EAN',
-        Fld::ProductDescription => 'Product of dienst',
     ];
 
     protected array $en = [
@@ -977,5 +1015,10 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'menu_settings' => 'Settings → Acumulus settings',
 
         'other_field' => 'Other field',
+        Fld::ProductId => 'Product ID',
+        Fld::ProductEan => 'EAN',
+        Fld::ProductSku => 'SKU',
+        Fld::ProductDescription => 'Product or service',
+        Fld::Product => 'All fields',
     ];
 }

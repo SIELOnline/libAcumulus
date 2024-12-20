@@ -17,6 +17,7 @@ use function count;
 use function get_class;
 use function in_array;
 use function is_array;
+use function is_string;
 use function sprintf;
 
 /**
@@ -634,7 +635,7 @@ abstract class Form extends MessageCollection
         foreach ($pickListItems as $picklistItem) {
             // Prefer integer ids.
             $optionId = reset($picklistItem);
-            if (ctype_digit((string) $optionId)) {
+            if (is_string($optionId) && ctype_digit($optionId)) {
                 $optionId = (int) $optionId;
             }
 

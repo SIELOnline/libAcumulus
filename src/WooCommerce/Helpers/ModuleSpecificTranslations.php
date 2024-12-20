@@ -42,6 +42,7 @@ Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met na
         'document_show' => 'Tonen',
         'document_mail' => 'Mailen',
 
+//        'custom_field' => \__('Custom Field', 'woocommerce'),
         // Rate our plugin message.
         'review_on_marketplace' => 'Zou jij ons een review willen geven op WordPress.org?',
         // These are the same for English thus no need to copy them.
@@ -74,4 +75,13 @@ Also note that VAT free differs from the 0%% VAT rate below. This difference mai
         // Rate our plugin message.
         'review_on_marketplace' => 'Would you please give us a review on WordPress.org?',
     ];
+
+    public function __construct()
+    {
+        // Not possible to define the language when translating strings in WordPress.
+        // However, the language of our module is also the language of WordPress,
+        // so __() uses the actual language.
+        $this->nl['custom_field'] = __('Custom Field', 'woocommerce');
+    }
+
 }

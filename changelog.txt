@@ -3,8 +3,11 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.3.7 (2024-12-??)
+8.4.0 (2024-12-27)
 ------------------
+Features:
+- WC: Stock management: automatic sending of stock mutations to Acumulus.
+
 Bugs:
 - ALL: Voucher lines should be treated as "vat free", not as "0%".
 - ALL: Minor: custom mappings for the packing slip email to and BCC addresses were not
@@ -16,7 +19,8 @@ Bugs:
 Refactorings:
 - ALL: Renamed Source::getTypeLabel() to Source::GetLabel(): Check your mappings!
 - Converted legacy completors in Invoice namespace from array to object use, including new
-  methods on AcumulusObjects and deep cloning them.
+  methods on AcumulusObjects and deep cloning them. Class AcumulusObject no longer
+  implements interface ArrayAccess.
 
 
 8.3.6 (2024-11-27)

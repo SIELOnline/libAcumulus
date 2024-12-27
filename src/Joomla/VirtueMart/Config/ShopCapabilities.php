@@ -272,12 +272,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    public function getLink(string $linkType): string
+    public function getLink(string $linkType, mixed $parameter = null): string
     {
         return match ($linkType) {
             'pro-support-image' => Uri::root(true) . '/administrator/components/com_acumulus/media/pro-support-virtuemart.png',
             'pro-support-link' => 'https://pay.siel.nl/?p=t7jYwPSWYgFJdWQuWVJmC0R6d6LWHKmNVsNUlgtv82TIhgNS',
-            default => parent::getLink($linkType),
+            default => parent::getLink($linkType, $parameter),
         };
     }
 

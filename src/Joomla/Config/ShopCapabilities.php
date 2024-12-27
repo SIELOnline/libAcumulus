@@ -13,12 +13,12 @@ use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
  */
 abstract class ShopCapabilities extends ShopCapabilitiesBase
 {
-    public function getLink(string $linkType): string
+    public function getLink(string $linkType, mixed $parameter = null): string
     {
         return match ($linkType) {
             'register', 'activate', 'settings', 'mappings', 'batch', 'invoice' => Route::_("index.php?option=com_acumulus&task=$linkType"),
             'logo' => Uri::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg',
-            default => parent::getLink($linkType),
+            default => parent::getLink($linkType, $parameter),
         };
     }
 }

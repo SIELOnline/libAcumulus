@@ -15,7 +15,6 @@ use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\WooCommerce\Product\Product;
 use WC_Tax;
 
 use function function_exists;
@@ -373,7 +372,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getLink(string $linkType): string
+    public function getLink(string $linkType, mixed $parameter = null): string
     {
         return match ($linkType) {
             'register', 'activate', 'batch' => admin_url("admin.php?page=acumulus_$linkType"),
@@ -382,7 +381,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'logo' => home_url('wp-content/plugins/acumulus/siel-logo.svg'),
             'pro-support-image' => home_url('wp-content/plugins/acumulus/pro-support-woocommerce.png'),
             'pro-support-link' => 'https://pay.siel.nl/?p=3t0EasGQCcX0lPlraqMiGkTxFRmRo3zicBbhMtmD69bGozBl',
-            default => parent::getLink($linkType),
+            'product' =>  admin_url("post.php?post=$parameter&action=edit"),
+            default => parent::getLink($linkType, $parameter),
         };
     }
 

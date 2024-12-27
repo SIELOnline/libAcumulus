@@ -294,13 +294,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    public function getLink(string $linkType): string
+    public function getLink(string $linkType, mixed $parameter = null): string
     {
         return match ($linkType) {
             'fiscal-address-setting' => Route::_('index.php?option=com_hikashop&ctrl=config#main_tax'),
             'pro-support-image' => Uri::root(true) . '/administrator/components/com_acumulus/media/pro-support-hikashop.png',
             'pro-support-link' => 'https://pay.siel.nl/?p=b5TeLbPw6BtNXRioORwnUtNbpU3yhUAgXLuuEMgk5zcttHbU',
-            default => parent::getLink($linkType),
+            default => parent::getLink($linkType, $parameter),
         };
     }
 

@@ -585,7 +585,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * @noinspection MultipleReturnStatementsInspection
      */
-    public function getLink(string $linkType): string
+    public function getLink(string $linkType, mixed $parameter = null): string
     {
         $registry = Registry::getInstance();
         /** @var UrlInterface $urlInterface */
@@ -608,7 +608,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'pro-support-link':
                 return 'https://pay.siel.nl/?p=GWFrqaYs68gnhRGP2UAHkXhvGQqWEDmP46DMuxa5BPXvpjmu';
         }
-        return parent::getLink($linkType);
+        return parent::getLink($linkType, $parameter);
     }
 
     public function getFiscalAddressSetting(): string

@@ -423,13 +423,10 @@ abstract class ShopCapabilities
      * @param string $linkType
      *   The form or resource to get the link to: 'settings', 'mappings', 'batch',
      *   'activate', 'register', 'logo', 'pro-support-link', 'pro-support-img'.
-     *
-     * @throws \InvalidArgumentException
-     *   Unknown link type.
      */
-    public function getLink(string $linkType): string
+    public function getLink(string $linkType, mixed $parameter = null): string
     {
-        if ($linkType === 'fiscal-address-setting') {
+        if (in_array($linkType, ['fiscal-address-setting', 'product'])) {
             return '#';
         }
         throw new InvalidArgumentException(__METHOD__ . "('$linkType'): unknown link type");

@@ -113,14 +113,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
-    public function getLink(string $linkType): string
+    public function getLink(string $linkType, mixed $parameter = null): string
     {
         return match ($linkType) {
             'register', 'activate', 'batch', 'settings', 'mappings', 'fiscal-address-setting' => "admin.php?page=acumulus_$linkType",
             'logo' => 'acumulus/siel-logo.svg',
             'pro-support-image' => 'acumulus/pro-support-woocommerce.png',
             'pro-support-link' => 'https://pay.siel.nl/?p=3t0EasGQCcX0lPlraqMiGkTxFRmRo3zicBbhMtmD69bGozBl',
-            default => parent::getLink($linkType),
+            default => parent::getLink($linkType, $parameter),
         };
     }
 

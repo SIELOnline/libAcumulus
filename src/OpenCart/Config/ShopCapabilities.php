@@ -361,7 +361,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
      */
     abstract protected function paymentMethodToOptions(array $extensions): array;
 
-    public function getLink(string $linkType): string
+    public function getLink(string $linkType, mixed $parameter = null): string
     {
         $registry = $this->getRegistry();
         return match ($linkType) {
@@ -370,7 +370,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             'logo' => $registry->getFileUrl('view/image/acumulus/siel-logo.png'),
             'pro-support-image' => $registry->getFileUrl('view/image/acumulus/pro-support-opencart.png'),
             'pro-support-link' => 'https://pay.siel.nl/?p=0nKmWpoNV0wtqeac43dqc5YUAcaHFJkldwy1alKD1G3EJHmC',
-            default => parent::getLink($linkType),
+            default => parent::getLink($linkType, $parameter),
         };
     }
 

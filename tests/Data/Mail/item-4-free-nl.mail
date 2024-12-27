@@ -29,7 +29,7 @@ De voorraadmutatie is niet verwerkt in Acumulus. Pas de zoekdata in uw webshop (
 <table style="text-align: left;">
 <tr><th>Bestelling</th><td>1</td></tr>
 <tr><th>Bestelregel</th><td>4</td></tr>
-<tr><th>Product (Webwinkel)</th><td>TEST-ZWA</td></tr>
+<tr><th>Product (Webwinkel)</th><td><a href="#">TEST-ZWA</a></td></tr>
 <tr><th>Mutatie</th><td>+1</td></tr>
 <tr><th>Product (Acumulus)</th><td>onbekend</td></tr>
 <tr><th>Voorraadniveau (Acumulus)</th><td>niet aangemaakt in Acumulus</td></tr>

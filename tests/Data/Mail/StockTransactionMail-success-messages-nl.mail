@@ -65,7 +65,7 @@ body={
 <table style="text-align: left;">
 <tr><th>Bestelling</th><td>1</td></tr>
 <tr><th>Bestelregel</th><td>5</td></tr>
-<tr><th>Product (Webwinkel)</th><td>TEST-GRI</td></tr>
+<tr><th>Product (Webwinkel)</th><td><a href="#">TEST-GRI</a></td></tr>
 <tr><th>Mutatie</th><td>-7</td></tr>
 <tr><th>Product (Acumulus)</th><td>1833642</td></tr>
 <tr><th>Voorraadniveau (Acumulus)</th><td>30.00</td></tr>

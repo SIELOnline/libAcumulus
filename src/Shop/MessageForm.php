@@ -14,7 +14,6 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
-use function count;
 use function sprintf;
 
 /**
@@ -26,8 +25,8 @@ use function sprintf;
  * SECURITY REMARKS
  * ----------------
  * The only user provided value is the name of the button clicked on POST and that is
- * sanitised as it gets printed in an error message if not recognised (thus faulty user
- * input). For the rest it is only compared to hardcoded values.
+ * sanitised as it gets printed in an error message if not recognised (which means faulty
+ * user input). For the rest it is only compared to hardcoded values.
  *
  * @noinspection PhpUnused
  */
@@ -86,10 +85,10 @@ class MessageForm extends Form
         $this->action = $this->getSubmittedValue('service');
         switch ($this->action) {
             case 'later':
-                $result = $this->acumulusConfig->save(['showPluginV8Message' => time() + 7 * 24 * 60 * 60]);
+                $result = $this->acumulusConfig->save(['showPluginV84Message' => time() + 7 * 24 * 60 * 60]);
                 break;
             case 'hide':
-                $result = $this->acumulusConfig->save(['showPluginV8Message' => PHP_INT_MAX]);
+                $result = $this->acumulusConfig->save(['showPluginV84Message' => PHP_INT_MAX]);
                 break;
             default:
                 $this->createAndAddMessage(sprintf($this->t('unknown_action'), $this->action), Severity::Error);
@@ -119,11 +118,6 @@ class MessageForm extends Form
      */
     protected function getFieldDefinitionsFull(): array
     {
-        $detail = '';
-        $overriddenMappings = $this->acumulusConfig->get('showPluginV8MessageOverriddenMappings');
-        if (count($overriddenMappings) > 0) {
-            $detail = sprintf($this->t('plugin_v8_message_mappings_detail'), implode(', ', $overriddenMappings));
-        }
         return [
             'acumulus-rate' => [
                 'type' => 'fieldset',
@@ -134,11 +128,10 @@ class MessageForm extends Form
                     ],
                     'message' => [
                         'type' => 'markup',
-                        'value' => sprintf($this->t('plugin_v8_message'),
-                            'https://forum.acumulus.nl/index.php/topic,8444.0.html',
-                            $this->shopCapabilities->getLink('settings'),
-                            $this->shopCapabilities->getLink('mappings'),
-                            $detail),
+                        'value' => sprintf($this->t('plugin_v84_message'),
+                            $this->shopCapabilities->getLink('settings') . '#stockManagementSettingsHeader',
+                            'https://forum.acumulus.nl/index.php/topic,8731.msg48337.html'
+                        ),
                     ],
                     'later' => [
                         'type' => 'button',

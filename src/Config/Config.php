@@ -327,6 +327,7 @@ class Config
     /**
      * Returns the Plugin V8 Message config setting.
      *
+     * @deprecated: use get()
      * @noinspection PhpUnused
      *    Called from shop specific code outside this library.
      */
@@ -933,6 +934,11 @@ class Config
                     'default' => false,
                 ],
                 'showRatePluginMessage' => [
+                    'group' => 'other',
+                    'type' => 'int',
+                    'default' => 0,
+                ],
+                'showPluginV84Message' => [
                     'group' => 'other',
                     'type' => 'int',
                     'default' => 0,

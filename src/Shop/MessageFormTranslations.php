@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection HtmlUnknownTarget
+ */
 
 declare(strict_types=1);
 
@@ -12,13 +15,10 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class MessageFormTranslations extends TranslationCollection
 {
     protected array $nl = [
-        'plugin_v8_message' => '<p>Acumulus is bijgewerkt naar versie 8. <a href="%1$s" target="_blank">Lees meer over deze nieuwe versie op het Acumulus forum</a>.
- Het is belangrijk dat je:</p>
- <ul>
- <li>De <a href="%2$s">instellingen</a> controleert (met name het veld "hoofdadres").</li>
- <li>De <a href="%3$s">veldverwijzingen</a> naloopt%4$s.</li>
- </ul>',
-        'plugin_v8_message_mappings_detail' => ' (met name de velden %1$s)',
+        // https://forum.acumulus.nl/index.php/topic,8731.msg48337.html
+        'plugin_v84_message' => '<p>Acumulus is bijgewerkt naar versie 8.4. Deze versie bevat nu het doorsturen van voorraadmutaties naar Acumulus. '
+            . 'U kunt dit aanzetten op het <a href="%1$s">Acumulus instellingen formulier</a>. '
+            . 'Op het Acumulus forum vindt u het document <a href="%2$s" target="_blank">Voorraadbeheer in Acumulus en uw webshop</a> dat het proces toelicht.</p>',
         'later' => 'Herinner me later',
         'hide' => 'Niet meer tonen',
         'no_problem' => 'OK, geen probleem.',
@@ -26,13 +26,9 @@ class MessageFormTranslations extends TranslationCollection
     ];
 
     protected array $en = [
-        'plugin_v8_message' => '<p>Acumulus has been updated to version 8. <a href="%1$s" target="_blank">Read more about this new version onp the Acumulus forum (in Dutch)</a>.
- It is important to check:</p>
- <ul>
- <li>Check the <a href="%2$s">settings</a> (especially the field "main address").</li>
- <li>check the <a href="%3$s">field references</a>%4$s.</li>
- </ul>',
-        'plugin_v8_message_mappings_detail' => ' (especially the fields %1$s)',
+        'plugin_v84_message' => '<p>Acumulus has been updated to version 8.4. This version now allows to send stock mutations to Acumulus. '
+            . 'you can enable this feature on the <a href="%1$s">Acumulus settings form</a>. '
+            . 'At our Acumulus forum, you can find the document <a href="%2$s" target="_blank">Stock management in Acumulus and your web shop (Dutch)</a> that explains the feature.</p>',
         'hide' => "Don't show anymore",
         'later' => 'Remind me later',
         'no_problem' => 'OK, no problem.',

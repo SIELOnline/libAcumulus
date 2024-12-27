@@ -37,6 +37,7 @@ class StockTransactionMail extends Mail
             '{item_reference}' => $this->getItem()->getReference(),
             '{product_label}' => $this->getProduct()?->getLabel(MB_CASE_TITLE) ?? 'Product',
             '{product_reference}' => $this->getProduct()?->getReference() ?? 'unknown',
+            '{product_link}' => $this->getProduct()?->getLink() ?? '#',
             '{change_label}' => mb_convert_case($this->t('change'), MB_CASE_TITLE),
             '{change}' => sprintf('%+.2g', $this->args['change']),
             '{product_acumulus_id}' =>  $stockInfo !== null && isset($stockInfo[Fld::ProductId])
@@ -63,13 +64,14 @@ class StockTransactionMail extends Mail
 
     protected function getAboutLines(): array
     {
+        /** @noinspection HtmlUnknownTarget */
         return [
-            '{source_label}' => '{source_reference}',
-            '{item_label}' => '{item_reference}',
-            '{product_label} ({shop})' => '{product_reference}',
-            '{change_label}' => '{change}',
-            '{product_label} ({module_name})' => '{product_acumulus_id}',
-            '{stock_level_label} ({module_name})' => '{stock_level}',
-        ] + parent::getAboutLines();
+                '{source_label}' => '{source_reference}',
+                '{item_label}' => '{item_reference}',
+                '{product_label} ({shop})' => '<a href="{product_link}">{product_reference}</a>',
+                '{change_label}' => '{change}',
+                '{product_label} ({module_name})' => '{product_acumulus_id}',
+                '{stock_level_label} ({module_name})' => '{stock_level}',
+            ] + parent::getAboutLines();
     }
 }

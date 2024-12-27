@@ -142,6 +142,11 @@ abstract class Product implements WrapperInterface
         return $this;
     }
 
+    public function getLink(): string
+    {
+        return $this->getContainer()->getShopCapabilities()->getLink('product', $this->getId());
+    }
+
     /**
      * Expands a field specification in a local product context.
      *

@@ -26,7 +26,6 @@ use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
-
 use Siel\Acumulus\Meta;
 
 use function sprintf;
@@ -87,8 +86,7 @@ class MappingsForm extends Form
      */
     protected function execute(): bool
     {
-        $submittedValues = $this->submittedValues;
-        return $this->mappings->save($submittedValues);
+        return $this->mappings->save($this->submittedValues);
     }
 
     /**
@@ -230,7 +228,7 @@ class MappingsForm extends Form
             $fields['productMappingsHeader'] = [
                 'type' => 'fieldset',
                 'legend' => $this->t('productMappingsHeader'),
-                'fields' => $this->makeArrayFields($this->getStockManagementFields(), DataType::Product),
+                'fields' => $this->getStockManagementFields(),
             ];
         }
         $fields['versionInformation'] = $this->getAboutBlock($accountStatus);
@@ -533,16 +531,29 @@ class MappingsForm extends Form
 
     protected function getStockManagementFields(): array
     {
-        return [
-            Meta::MatchShopFieldSpecification => [
-                'type' => 'text',
-                'label' => $this->t('field_matchShopFieldSpecification'),
-                'description' => $this->t('desc_matchShopFieldSpecification') . ' ' . $this->t('desc_matchShopFieldSpecificationExample'),
-                'attributes' => [
-                    'size' => self::Size,
+        return $this->makeArrayFields([
+                Meta::MatchShopFieldSpecification => [
+                    'type' => 'text',
+                    'label' => $this->t('field_matchShopFieldSpecification'),
+                    'description' => $this->t('desc_matchShopFieldSpecification') . ' ' . $this->t(
+                            'desc_matchShopFieldSpecificationExample'
+                        ),
+                    'attributes' => [
+                        'size' => self::Size,
+                    ],
                 ],
-            ],
-        ];
+            ], DataType::Product)
+            + $this->makeArrayFields([
+                Fld::StockDescription => [
+                    'type' => 'text',
+                    'label' => $this->t('field_stockDescription'),
+                    'description' => $this->t('desc_stockDescription') . ' ' . $this->t('msg_token'),
+                    'attributes' => [
+                        'size' => self::Size,
+                    ],
+                ],
+            ], DataType::StockTransaction);
+
     }
 
     /**
@@ -567,7 +578,7 @@ class MappingsForm extends Form
                 'value' => sprintf(
                     $this->t('button_link'),
                     $this->t('settings_form_link_text'),
-                    $this->shopCapabilities->getLink('settings')
+                    $this->shopCapabilities->getLink('settings', null)
                 ),
             ],
         ];

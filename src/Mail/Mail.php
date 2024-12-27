@@ -16,6 +16,7 @@ use Siel\Acumulus\Invoice\WrapperInterface;
 use Stringable;
 use Throwable;
 
+use function is_array;
 use function is_string;
 use function sprintf;
 use function strlen;
@@ -451,8 +452,13 @@ abstract class Mail
         $rowFormatText = "%-{$maxLabelLength}s%s\n";
         $rowFormatHtml = "<tr><th>%s</th><td>%s</td></tr>\n";
         foreach ($tableRows as $header => $value) {
-            $tableText .= sprintf($rowFormatText, $header . ':', $value);
-            $tableHtml .= sprintf($rowFormatHtml, htmlspecialchars($header, ENT_NOQUOTES), htmlspecialchars($value, ENT_NOQUOTES));
+            $strippedValue = strip_tags($value);
+            $tableText .= sprintf($rowFormatText, $header . ':', $strippedValue);
+            $tableHtml .= sprintf(
+                $rowFormatHtml,
+                htmlspecialchars($header, ENT_NOQUOTES),
+                $strippedValue !== $value ? $value : htmlspecialchars($value, ENT_NOQUOTES)
+            );
         }
         $tableHtml .= "</table>\n";
         return [

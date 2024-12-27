@@ -438,7 +438,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'field_emailAsPdf' => 'Factuur automatisch versturen',
         'option_emailAsPdf' => 'Laat Acumulus de pdf van de factuur automatisch mailen, direct nadat de factuurgegevens naar Acumulus verzonden zijn.',
         'option_ubl' => 'Voeg een e-factuur toe aan de pdf.',
-        'desc_emailAsPdf' => 'Geef aan of u Acumulus een pdf van de factuur wilt laten versturen, al dan niet inclusief een e-factuur in de vorm van een <a href="https://nl.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL-document</a>. Het bericht in de e-mail body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (geavanceerde instelling), Acumulus geen factuur-pdf kan versturen.',
+        'desc_emailAsPdf' => 'Geef aan of u Acumulus een pdf van de factuur wilt laten versturen (1e vinkje, al dan niet inclusief een e-factuur in de vorm van een <a href="https://nl.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL-document</a> (2e vinkje). Het bericht in de e-mail body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (geavanceerde instelling), Acumulus geen factuur-pdf kan versturen.',
 
         'field_emailTo' => 'Aan',
         'desc_emailTo' => 'Het e-mailadres waar naartoe de factuur verstuurd moet worden. Als u dit leeg laat wordt het e-mailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
@@ -513,6 +513,8 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'desc_matchShopFieldSpecification' => 'Geef met een veldverwijzing aan welk (meta)veld van een product in uw winkel gebruikt moet worden om naar een product in Acumulus te zoeken.',
         // WooCommerce specific example!
         'desc_matchShopFieldSpecificationExample' => 'Dit zal waarschijnlijk lijken op "[product::getShopObject::get_meta(...)]"',
+        'field_stockDescription' => 'Transactieomschrijving',
+        'desc_stockDescription' => 'Elke voorraadmutatie wordt opgeslagen met een korte omschrijving die bijv. de reden en de oorsprong van de mutatie aangeeft.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',
@@ -959,7 +961,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'field_emailAsPdf' => 'Send invoice automatically',
         'option_emailAsPdf' => 'Have Acumulus send the invoice, as a PDF, to your customer, directly after sending the invoice data to Acumulus.',
         'option_ubl' => 'Add an e-invoice to the pdf.',
-        'desc_emailAsPdf' => 'Indicate whether you want Acumulus to send the invoice (as pdf), with optionally an e-invoice added in <a href="https://en.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL format</a>. Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (advanced setting), Acumulus cannot send invoice-pdfs.',
+        'desc_emailAsPdf' => 'Indicate whether you want Acumulus to send the invoice as pdf (first checkbox), with optionally an e-invoice added in <a href="https://en.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL format</a> (second checkbox). Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (advanced setting), Acumulus cannot send invoice-pdfs.',
 
         'field_emailTo' => 'To',
         'desc_emailTo' => 'The e-mail address to send the invoice to. If you leave this empty the e-mail address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;).',
@@ -984,6 +986,59 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'message_validate_packing_slip_email_0' => 'If you enabled one or more of the options to mail a packing slip, than is the field "E-mail address for the packing slip" required. Fill in an e-mail address.',
         'message_validate_packing_slip_email_1' => 'The field "E-mail address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
         'message_validate_packing_slip_email_2' => 'The field "Bcc e-mail address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
+
+        // Stock management setting
+        'stockManagementSettingsHeader' => 'Stock management',
+        'desc_stockManagementSettings' => 'The Acumulus %1$s can automatically send stock changes to Acumulus. '
+            . 'This keeps your stock levels in Acumulus up to date. '
+            . 'For now, this is only done for stock changes based on orders or returns, thus not on manual or bulk changes. ',
+
+        'field_stockManagement' => 'Stock transactions',
+        'option_stockManagementEnabled' => 'Send to Acumulus',
+        'desc_stockManagement' => 'If you check this option, changes in stock levels will automatically be sent to Acumulus.',
+
+        'desc_product_matching_help' => 'To be able to send stock transactions, the Acumulus-%1$s must match products from your store with the products from Acumulus. '
+            . 'The %1$s does so, based on comparing SKUs or similar properties. '
+            . 'Below, you can specify for both your shop and Acumulus which product properties should be used when matching. '
+            . 'Please note that hte properties should have unique values for each product (for which stock management has been enabled)'
+            . 'and that the values should be exact matches, thus same case, hyphens, spaces, etc.',
+
+        'field_productMatchShopField' => 'Product property in your web shop',
+        'desc_productMatchShopField' => 'Select which property of a product in your web shop should be used to search for the matching product in Acumulus.<br>'
+            . '• Preferably, you select one of the properties containing a unique SKU, EAN or something like that.<br>'
+            . '• If you don\'t have so, you can search on "%1$s" (The before-last option).<br>'
+            . '• Use the last option if you use a %2$s in which you have stored unique values that are also present in Acumulus products.<br>'
+            . 'If you select this last option, you should define a mapping for it in the "<a href="%4$s" target="_blank">%3$s form</a>".',
+        'other_field' => 'Other property',
+        // WooCommerce specific wording!
+        'custom_field' => 'custom field',
+
+        'field_productMatchAcumulusField' => 'Product property in Acumulus',
+        'desc_productMatchAcumulusField' => 'Select which property of a product in Acumulus should be used to match the above selected property against.<br>'
+            . '• Preferably, you select either SKU or EAN from the list.<br>'
+            . '• Searching for "%1$s" is possible, but then you must have imported these IDs from Acumulus yourself.<br>'
+            . '• If yuo do not yet use "SKUs" or something like that, you can search on "%1$s" (the before-last option).<br>'
+            . '• Use the last option if you want to search in multiple properties in Acumulus.<br>',
+
+        Fld::ProductId => 'Product ID',
+        Fld::ProductEan => 'EAN',
+        Fld::ProductSku => 'SKU',
+        Fld::ProductDescription => 'Product or service',
+        Fld::Product => 'All fields',
+        Meta::MatchShopFieldSpecification => 'Custom product property',
+        'message_validate_product_match_shop_field_0' => 'The field "Product property in your web shop" is required, please select a property.',
+        'message_validate_product_match_shop_field_1' => 'For the field "Product property in your web shop" you have chosen "%1$s". However, the mapping "%2$s" has not been defined yet, Do not forget to define it! you can do so on the "<a href="%4$s" target="_blank">%3$s form</a>".',
+        'message_validate_product_match_acumulus_field_0' => 'The field "Product property in Acumulus" is required, please select a property.',
+
+        // Stock management mapping.
+        'field_matchShopFieldSpecification' => 'Search field',
+        // WooCommerce specific wording!
+        'desc_matchShopFieldSpecification' => 'Enter a mapping that specifies which (meta) field of an product in your web shop should be sued to search for products in Acumulus.',
+        // WooCommerce specific example!
+        'desc_matchShopFieldSpecificationExample' => 'This will probably look something like "[product::getShopObject::get_meta(...)]"',
+
+        'field_stockDescription' => 'Transaction description',
+        'desc_stockDescription' => 'Each stock transaction is stored with a short description indicating,, e.g, the source and reason for the transaction.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin settings',
@@ -1014,12 +1069,5 @@ Please note that these documents are created by Acumulus, not the web shop. If y
 
         'desc_settings' => 'You are on the mappings form that defines the relations between the web shop data and the Acumulus invoice. The "real" settings can be found on the "%1$s" form at "%2$s", or via the button below. Note: if you click on this button, any completed or changed values will be lost! Save first!',
         'menu_settings' => 'Settings → Acumulus settings',
-
-        'other_field' => 'Other field',
-        Fld::ProductId => 'Product ID',
-        Fld::ProductEan => 'EAN',
-        Fld::ProductSku => 'SKU',
-        Fld::ProductDescription => 'Product or service',
-        Fld::Product => 'All fields',
     ];
 }

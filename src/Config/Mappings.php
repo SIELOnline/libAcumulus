@@ -113,13 +113,17 @@ class Mappings
      */
     public function save(array $mappings): bool
     {
+        // Remove entries with incorrect keys.
         $mappings = array_filter($mappings, static function (string $key) {
             return in_array($key, Mappings::validDataTypes, true);
         }, ARRAY_FILTER_USE_KEY);
-        $existingMappings = $this->getAll();
-        $mappings = array_replace_recursive($existingMappings, $mappings);
-        $mappings = $this->getOverriddenValues($mappings, $this->getDefaults());
-        $result = $this->getConfig()->save(['mappings' => $mappings]);
+        // $mappings should first be used to replace AND filter the currently stored user
+        // defined mappings (an empty value passed in $mappings indicates to clear any
+        // override, not to define empty for the mapping.
+        $userDefined = $this->array_filter_recursive(array_replace_recursive($this->getUserDefined(), $mappings));
+        $userDefined = array_replace_recursive($this->getDefaults(), $userDefined);
+        $userDefined = $this->getOverriddenValues($userDefined, $this->getDefaults());
+        $result = $this->getConfig()->save(['mappings' => $userDefined]);
         // Clear internal cache.
         unset($this->allMappings);
         return $result;
@@ -140,10 +144,7 @@ class Mappings
     public function getAll(): array
     {
         if (!isset($this->allMappings)) {
-            $this->allMappings = array_replace_recursive(
-                $this->getDefaults(),
-                $this->getUserDefined()
-            );
+            $this->allMappings = array_replace_recursive($this->getDefaults(), $this->getUserDefined());
         }
         return $this->allMappings;
     }
@@ -258,7 +259,9 @@ class Mappings
             DataType::StockTransaction => [
                 Fld::ProductId => '[product::getAcumulusId()]',
                 Fld::StockAmount => '[change]',
-                Fld::StockDescription => '[environment::hostName+item::getSource()::getLabelReference(1)|localResult::getTrigger()]',
+                // For now only line item based events are responded to, so item will exist.
+                //Fld::StockDescription => '[environment::hostName+item::getSource()::getLabelReference(1)|localResult::getTrigger()]',
+                Fld::StockDescription => '[environment::hostName+item::getSource()::getLabelReference(1)]',
                 Meta::MatchShopValue => '[product::getReferenceForAcumulusLookup()]',
             ],
             DataType::BasicSubmit => [
@@ -317,5 +320,15 @@ class Mappings
             }
         }
         return $result;
+    }
+
+    protected function array_filter_recursive(array $array, ?callable $callback = null, int $mode = 0): array
+    {
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                $value = $this->array_filter_recursive($value, $callback, $mode);
+            }
+        }
+        return array_filter($array, $callback, $mode);
     }
 }

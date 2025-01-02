@@ -60,7 +60,7 @@ class BasicSubmit extends AcumulusObject
         return [
             ['name' => Fld::Format, 'type' => 'string', 'allowedValues' => [Api::Format_Json, Api::Format_Xml]],
             ['name' => Fld::TestMode, 'type' => 'int', 'allowedValues' => [Api::TestMode_Normal, Api::TestMode_Test]],
-            ['name' => Fld::Lang, 'type' => 'string', 'allowedValues' => [Api::Lang_NL, Api::Lang_EN]],
+            ['name' => Fld::Lang, 'type' => 'string', /*'allowedValues' => [Api::Lang_NL, Api::Lang_EN]*/],
             ['name' => Fld::INodes, 'type' => 'string'],
             ['name' => Fld::ONodes, 'type' => 'string'],
             ['name' => Fld::Order, 'type' => 'string', 'allowedValues' => [Api::Order_Default, Api::Order_Inverted]],

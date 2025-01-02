@@ -216,7 +216,7 @@ class CompletorInvoiceLines
     protected function correctCalculatedVatRates(array $lines): void
     {
         foreach ($lines as $line) {
-            if (!empty($line->metadataGet(Meta::VatRateSource)) && $line->metadataGet(Meta::VatRateSource) === VatRateSource::Calculated) {
+            if ($line->metadataGet(Meta::VatRateSource) === VatRateSource::Calculated) {
                 $this->correctVatRateByRange($line);
             }
             if ($line->hasChildren()) {

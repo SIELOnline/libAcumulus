@@ -177,14 +177,14 @@ class Completor
         $this->initPossibleVatTypes();
         $this->initPossibleVatRates();
         $this->convertToEuro();
-        $this->LineCompletor->complete($this->invoice, $this->possibleVatTypes, $this->possibleVatRates);
+        $this->LineCompletor->complete($invoice, $this->possibleVatTypes, $this->possibleVatRates);
 
         $this->checkMissingAmount();
 
         // Complete strategy lines: those lines that have to be completed based
         // on the whole invoice.
         $this->strategyLineCompletor->complete(
-            $this->invoice,
+            $invoice,
             $this->source,
             $this->possibleVatTypes,
             $this->possibleVatRates
@@ -193,7 +193,7 @@ class Completor
         if ($this->strategyLineCompletor->invoiceHasStrategyLine()) {
             // We did not manage to correct all strategy lines: warn and set the
             // invoice to concept.
-            $this->changeInvoiceToConcept($this->invoice, 'message_warning_strategies_failed', 808);
+            $this->changeInvoiceToConcept($invoice, 'message_warning_strategies_failed', 808);
         }
 
         // Determine the VAT type for the invoice and warn if multiple vat types
@@ -1783,7 +1783,7 @@ class Completor
     /**
      * Makes the invoice a concept invoice and optionally adds a warning.
      *
-     * @param Invoice $invoice
+     * @param AcumulusObject $acumulusObject
      *   The (sub) array of the Acumulus invoice array for which the warning is
      *   intended. The warning will also be added under a Meta::Warning tag
      * @param string $messageKey
@@ -1791,10 +1791,10 @@ class Completor
      *   warning has to be added.
      * @param int $code
      *   The code for this message.
-     * @param string ...$args
+     * @param mixed ...$args
      *   Additional arguments to format the message.
      */
-    public function changeInvoiceToConcept(Invoice $invoice, string $messageKey, int $code, string ...$args): void
+    public function changeInvoiceToConcept(AcumulusObject $acumulusObject, string $messageKey, int $code, mixed ...$args): void
     {
         $pdfMessage = '';
         $invoiceSettings = $this->config->getInvoiceSettings();
@@ -1814,7 +1814,7 @@ class Completor
             }
             $this->result->createAndAddMessage($message, Severity::Warning, $code);
             /** @noinspection NullPointerExceptionInspection */
-            $this->addWarning($invoice, $this->result->getByCode($code)->format(Message::Format_Plain));
+            $this->addWarning($acumulusObject, $this->result->getByCode($code)->format(Message::Format_Plain));
         }
     }
 

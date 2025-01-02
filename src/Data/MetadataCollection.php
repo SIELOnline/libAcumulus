@@ -126,6 +126,8 @@ class MetadataCollection
      */
     public function addMultiple(string $name, array $values): void
     {
+        // Creates an empty list (if $values is empty).
+        $this->add($name, null, true);
         foreach ($values as $value) {
             $this->add($name, $value, true);
         }

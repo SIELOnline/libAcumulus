@@ -15,6 +15,7 @@ class Environment extends EnvironmentBase
 {
     protected function setShopEnvironment(): void
     {
+        // Version is defined in wp-includes/version.php
         /** @var \WooCommerce $woocommerce */
         global $wp_version, $woocommerce;
         $this->data['moduleVersion'] = Acumulus::create()->getVersionNumber();

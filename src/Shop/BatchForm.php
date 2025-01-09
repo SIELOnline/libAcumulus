@@ -237,7 +237,7 @@ class BatchForm extends Form
             $this->screenLog[$type] = $rangeList;
             $this->addFormMessage($rangeList, Severity::Warning, 'reference_from');
             $this->setFormValue('result', $this->screenLog[$type]);
-            $this->log->info('BatchForm::execute(): ' . $this->getFiltersMessage() . $rangeList);
+            $this->log->info('BatchForm::execute(): %s. %s', $this->getFiltersMessage(), $rangeList);
             $result = true;
         } else {
             $rangeList = sprintf($this->t('message_form_range_list'), $this->getInvoiceSourceReferenceList($invoiceSources));
@@ -247,7 +247,7 @@ class BatchForm extends Form
                 $this->acumulusConfig->set('debug', Config::Send_TestMode);
             }
             // Do the sending (and some info/debug logging).
-            $this->log->info('BatchForm::execute(): ' . $this->getFiltersMessage() . ' ' . $rangeList);
+            $this->log->info('BatchForm::execute(): %s. %s', $this->getFiltersMessage(), $rangeList);
             $result = $this->invoiceManager->sendMultiple(
                 $invoiceSources,
                 $sendMode === 'send_force',

@@ -15,7 +15,7 @@ class ResultTranslations extends TranslationCollection
         /** {@see \Siel\Acumulus\Helpers\Result::getLogText()} */
         'message_reason' => '%1$s (reden: %2$s)',
         /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
-        'message_invoice_send' => '%1$s: %2$s is %3$s',
+        'message_invoice_send' => '%1$s: %2$s %3$s',
         'message_invoice_source' => 'Factuur voor %1$s %2$s',
         /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
         'message_stock_transaction_send' => '%1$s(%2$s, %3$s): %4$s %5$s',
@@ -61,7 +61,7 @@ class ResultTranslations extends TranslationCollection
         /** {@see \Siel\Acumulus\Helpers\Result::getLogText()} */
         'message_reason' => '%1$s (reason: %2$s)',
         /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
-        'message_invoice_send' => '%1$s: %2$s has %3$s',
+        'message_invoice_send' => '%1$s: %2$s %3$s',
         'message_invoice_source' => 'Invoice for %1$s %2$s',
         /** {@see \Siel\Acumulus\Invoice\InvoiceManager::getSendResultLogText()} */
         'message_stock_transaction_send' => '%1$s(%2$s, %3$s): %4$s %5$s',

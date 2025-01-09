@@ -3,8 +3,16 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.4.1 (2025-01-02)
-------------------
+8.4.2 (2025-01-??) (PS)
+-----------------------
+Bugs:
+- PS: Error: Call to undefined method
+  Siel\Acumulus\PrestaShop\Invoice\Source::metadataGet() in
+  \Siel\Acumulus\PrestaShop\Collectors\PaymentFeeLineCollector::collectPaymentFeeLine:68.
+
+
+8.4.1 (2025-01-02) (WC)
+-----------------------
 Bugs:
 - ALL: DomainException: lang: not an allowed value: 'de' in AcumulusProperty.php:226.
 - ALL: TypeError: CompletorInvoiceLines::getUniqueVatRate(): Argument #1 ($vatRateInfos)
@@ -13,8 +21,9 @@ Bugs:
 - ALL: TypeError: Completor::changeInvoiceToConcept(): Argument #4 must be of type string,
   float given, called in Completor.php on line 714 and defined in Completor.php:1797.
 
-8.4.0 (2024-12-27)
-------------------
+
+8.4.0 (2024-12-27) (WC)
+-----------------------
 Features:
 - WC: Stock management: automatic sending of stock mutations to Acumulus.
 

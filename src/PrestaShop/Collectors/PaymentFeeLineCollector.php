@@ -43,7 +43,7 @@ class PaymentFeeLineCollector extends LineCollector
     protected function collectPaymentFeeLine(Line $line, PropertySources $propertySources): void
     {
         /** @var Invoice $invoice */
-        $invoice = $propertySources->get('source');
+        $invoice = $propertySources->get('invoice');
         /** @var Source $source */
         $source = $propertySources->get('source');
         $sign = $source->getSign();

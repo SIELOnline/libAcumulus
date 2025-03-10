@@ -3,9 +3,10 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.4.2 (2025-01-??) (PS)
------------------------
+8.4.2 (2025-03-10) (PS|WC)
+--------------------------
 Bugs:
+- ALL: InvalidArgumentException: false is not considered a numeric value in Number.php:155
 - PS: Error: Call to undefined method
   Siel\Acumulus\PrestaShop\Invoice\Source::metadataGet() in
   \Siel\Acumulus\PrestaShop\Collectors\PaymentFeeLineCollector::collectPaymentFeeLine:68.

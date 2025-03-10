@@ -518,7 +518,7 @@ class CompletorInvoiceLines
             if ($carry === null) {
                 // 1st item: return its vat rate.
                 return (float) $matchedVatRate[Fld::VatRate];
-            } elseif (Number::floatsAreEqual($carry, $matchedVatRate[Fld::VatRate])) {
+            } elseif ($carry !== false && Number::floatsAreEqual($carry, $matchedVatRate[Fld::VatRate])) {
                 // Note that in PHP: '21' == '21.0000' returns true. So using ==
                 // works. Vat rate equals all previous vat rates: return that
                 // vat rate.

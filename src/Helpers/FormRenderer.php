@@ -257,7 +257,7 @@ class FormRenderer
     }
 
     /**
-     * Renders a form field itself, ie without label and description.
+     * Renders a form field itself, i.e. without label and description.
      */
     protected function renderElement($field): string
     {
@@ -360,7 +360,6 @@ class FormRenderer
         string $postfix = ''
     ): string {
         $output = '';
-
         if ($this->renderEmptyLabel || !empty($text)) {
             // Split attributes over label and wrapper.
             $wrapperAttributes = [];

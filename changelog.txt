@@ -3,6 +3,13 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+8.4.3 (2025-04-??) (WC)
+-----------------------
+Bugs:
+- WC: TypeError: FormRenderer::renderLabel(): Argument #1 ($text) must be of type string,
+  null given. Als betaalmethodes 'null' als titel hebben (en niet de lege string).
+
+
 8.4.2 (2025-03-10) (PS|WC)
 --------------------------
 Bugs:

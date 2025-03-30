@@ -332,7 +332,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $paymentGateways = WC()->payment_gateways->payment_gateways();
         foreach ($paymentGateways as $id => $paymentGateway) {
             if (isset($paymentGateway->enabled) && $paymentGateway->enabled === 'yes') {
-                $result[$id] = $paymentGateway->title;
+                $result[$id] = $paymentGateway->title ?? $id;
             }
         }
         return $result;

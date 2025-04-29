@@ -469,6 +469,7 @@ class Config
      *   - 'countryAutoName'
      *   - 'contactStatus'
      *   - 'overwriteIfExists'
+     *   - 'disableDuplicates'
      */
     public function getCustomerSettings(): array
     {
@@ -638,7 +639,7 @@ class Config
      *
      * @return array
      *   A keyed array with information (group and type) about the keys that are
-     *   stored in the store config.
+     *   stored in the store-config.
      */
     protected function getKeyInfo(): array
     {
@@ -736,6 +737,11 @@ class Config
                     'group' => Fld::Customer,
                     'type' => 'bool',
                     'default' => true,
+                ],
+                'disableDuplicates' => [
+                    'group' => Fld::Customer,
+                    'type' => 'bool',
+                    'default' => false,
                 ],
                 'concept' => [
                     'group' => Fld::Invoice,

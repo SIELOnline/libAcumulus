@@ -41,8 +41,8 @@ use Siel\Acumulus\Meta;
  * Properties that are not set:
  * - none
  *
- * Note that all address data, shipping and invoice address, are placed in
- * separate {@see \Siel\Acumulus\Data\Address} objects.
+ * Note that all address data, shipping and invoice addresses, are placed in separate
+ * {@see \Siel\Acumulus\Data\Address} objects.
  */
 class CustomerCollector extends Collector
 {

@@ -285,12 +285,14 @@ Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelli
         'field_clientData' => 'Klantadresgegevens',
         'option_sendCustomer' => 'Uw niet zakelijke klanten automatisch aan uw relaties in Acumulus toevoegen.',
         'option_overwriteIfExists' => 'Overschrijf bestaande adresgegevens.',
+        'option_disableDuplicates' => 'Maak bestaande dubbelingen inactief.',
         'desc_clientData' => 'Binnen Acumulus is het mogelijk om uw klantrelaties te beheren.
 Deze koppeling voegt automatisch uw klanten aan het relatieoverzicht van Acumulus toe.
 Dit is niet altijd gewenst en kunt u voorkomen door de eerste optie uit te zetten.
 Hierdoor worden alle transacties van consumenten binnen uw webwinkel onder 1 vaste fictieve relatie ingeboekt in Acumulus.
 De tweede optie moet u alleen uitzetten als u direct in Acumulus adresgegevens van uw webwinkel-klanten bijwerkt.
-Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakelijke klanten.',
+Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakelijke klanten.
+De derde optie kunt u gebruiken om dubbelingen (op basis van het e-mailadres van de klant) inactief te maken.',
 
         // Invoice settings.
         'invoiceSettingsHeader' => 'Uw factuurinstellingen',
@@ -810,12 +812,14 @@ Field references are denoted by placing the name of the property between square 
         'field_clientData' => 'Customer address data',
         'option_sendCustomer' => 'Send consumer client records to Acumulus.',
         'option_overwriteIfExists' => 'Overwrite existing address data.',
+        'option_disableDuplicates' => 'Deactivate existing duplicates.',
         'desc_clientData' => 'Acumulus allows you to store client data.
 This extension automatically sends client data to Acumulus.
 If you don\'t want this, uncheck this option.
 All consumer invoices will be booked on one and the same fictitious client.
 You should uncheck the second option if you edit customer address data manually in Acumulus.
-If you unchecked the first option, the second option only applies to business clients.',
+If you unchecked the first option, the second option only applies to business clients.
+Use the third option to deactivate duplicate customer accounts (based on similar e-mail address).',
 
         // Invoice settings.
         'invoiceSettingsHeader' => 'Your invoice settings',

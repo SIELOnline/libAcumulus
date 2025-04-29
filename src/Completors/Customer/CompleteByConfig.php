@@ -22,6 +22,8 @@ class CompleteByConfig extends BaseCompletorTask
      *   Api::ContactStatus_Active)
      * - overwriteIfExists (bool, Api::OverwriteIfExists_No,
      *   Api::OverwriteIfExists_yes)
+     * - disableDuplicates (bool, Api::DisableDuplicates_No,
+     *   Api::DisableDuplicates_yes)
      *
      * @param \Siel\Acumulus\Data\Customer $acumulusObject
      */
@@ -33,5 +35,6 @@ class CompleteByConfig extends BaseCompletorTask
         }
         $acumulusObject->contactStatus = $this->configGet('contactStatus');
         $acumulusObject->overwriteIfExists = $this->configGet('overwriteIfExists');
+        $acumulusObject->disableDuplicates = $this->configGet('disableDuplicates');
     }
 }

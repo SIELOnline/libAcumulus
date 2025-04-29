@@ -3,6 +3,13 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+8.5.0 (2025-04-30) (WC)
+-----------------------
+Features:
+- ALL: Added a setting to set a value for the "disable duplicates" flag to Acumulus as
+  part of the invoice-add message.
+
+
 8.4.3 (2025-03-31) (WC)
 -----------------------
 Bugs:

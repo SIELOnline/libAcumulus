@@ -1,13 +1,12 @@
 Requirements for the Acumulus web shop extensions
 =================================================
 
-Note that this information will be updated regularly, but will be out-of-date
+Note that this information will be updated regularly but will be out-of-date
 even faster. So the quick changelog here should give you an idea of the
 recentness of this information.
 
 Updates:
-
-- System requirements: valid for 8.2.0.
+- System requirements: valid for our version 8.2.0.
 - Supported shops and versions: july 2024.
 - Supported PHP versions: july 2024.
 
@@ -17,10 +16,9 @@ System Requirements
 - PHP:
     * Minimum version: 8.0, older versions WILL fail.
     * Recommended version: 8.1, soon - probably plugin version 8.3, this will become the
-      minimally required version and older versions WILL fail.
-    * See the PHP versions table further below for which PHP version can be used for which
-      shop.
-    * Note: our own plugin/module has not yet been tested on PHP 8.2 or 8.3 ...
+      minimally required version, and older versions WILL fail.
+    * See the PHP versions table further below for which PHP versions can be used for
+      which shop.
 - Database:
     * MySql: 5.6 or later.
     * MariaDb: 10.0 or later.
@@ -36,10 +34,8 @@ Notes:
   installed) version of a shop for testing. New features of our module may use
   features of the shop as were available when our new feature was developed.
   As it is often not clear when a new API feature became available, this may
-  unknowingly lead to our module failing on older versions of the shop (before
-  that now used feature was available), and thus to us not updating the column
-  "Supported versions" below.
-- Joomla 5(.1) has not yet been tested, but will be in the near future.
+  unknowingly lead to our module failing on older versions of the shop.
+- Joomla 5(.1) has not yet been tested but will be in the near future.
 
 | Tag | Shop             | Version used for testing | Supported versions                  |
 |-----|------------------|--------------------------|-------------------------------------|
@@ -57,11 +53,9 @@ Notes:
 
 Supported PHP versions
 ----------------------
-This is an overview of which PHP version can be used with the supported shops.
-This overview is not updated with each release of this plugin so may be a bit outdated.
+This is an overview of which PHP versions can be used with the supported shops.
 
 Notes:
-
 - Latest, or almost latest, point releases are used of the listed PHP versions.
 - WooCommerce is listed in combination with WordPress 6.6 Note that other plugins gave
   warnings in my test environment, but those were paid plugins that I cannot upgrade, and

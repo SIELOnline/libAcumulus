@@ -12,12 +12,12 @@ onderzoeken.
 
 Over uw webwinkel:
 
-Webwinkel: TestDoubles 8.4.0
-module:    Acumulus 8.4.0; Library: 8.4.0
-PHP:       8.1.29; (Curl: 8.4.0 (ssl: OpenSSL/1.1.1w; zlib: 1.2.12))
+Webwinkel: TestDoubles 8.5.0
+module:    Acumulus 8.5.0; Library: 8.5.0
+PHP:       8.2.27; (Curl: 8.7.0-DEV (ssl: OpenSSL/3.0.15; zlib: 1.2.12))
 Database:  MySQL Community Server - GPL 8.0.27
 Server:    example.com
-OS:        Windows NT ERWINSLAPTOP 10.0 build 22631 (Windows 11) AMD64
+OS:        Windows NT ERWINSLAPTOP 10.0 build 26100 (Windows 11) AMD64
 
 Informatie voor Acumulus support:
 
@@ -34,12 +34,12 @@ Als het probleem blijft aanhouden, stuur deze mail dan door naar Acumulus suppor
 Stuur in dat geval de hele tekst mee, want deze is nodig om het probleem goed te kunnen onderzoeken.</p>
 <h3>Over uw webwinkel</h3>
 <table style="text-align: left;">
-<tr><th>Webwinkel</th><td>TestDoubles 8.4.0</td></tr>
-<tr><th>module</th><td>Acumulus 8.4.0; Library: 8.4.0</td></tr>
-<tr><th>PHP</th><td>8.1.29; (Curl: 8.4.0 (ssl: OpenSSL/1.1.1w; zlib: 1.2.12))</td></tr>
+<tr><th>Webwinkel</th><td>TestDoubles 8.5.0</td></tr>
+<tr><th>module</th><td>Acumulus 8.5.0; Library: 8.5.0</td></tr>
+<tr><th>PHP</th><td>8.2.27; (Curl: 8.7.0-DEV (ssl: OpenSSL/3.0.15; zlib: 1.2.12))</td></tr>
 <tr><th>Database</th><td>MySQL Community Server - GPL 8.0.27</td></tr>
 <tr><th>Server</th><td>example.com</td></tr>
-<tr><th>OS</th><td>Windows NT ERWINSLAPTOP 10.0 build 22631 (Windows 11) AMD64</td></tr>
+<tr><th>OS</th><td>Windows NT ERWINSLAPTOP 10.0 build 26100 (Windows 11) AMD64</td></tr>
 </table>
 <h3>Informatie voor Acumulus support</h3>
 <p>De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken, u kunt deze informatie negeren.

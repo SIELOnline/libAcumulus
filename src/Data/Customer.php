@@ -68,7 +68,7 @@ class Customer extends AcumulusObject
 {
     protected ?Address $invoiceAddress = null;
     protected ?Address $shippingAddress = null;
-    // Is no longer needed, but this link seems logically enough to have.
+    // Is no longer needed, but this link seems logical enough to have.
     protected ?Invoice $invoice = null;
 
     /**

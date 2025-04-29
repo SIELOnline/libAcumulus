@@ -37,8 +37,8 @@ class CompleteAnonymise extends BaseCompletorTask
         assert($acumulusObject instanceof Customer);
         $sendCustomer = $this->configGet('sendCustomer');
         if (!$sendCustomer && !$acumulusObject->isCompany()) {
-            // Create address with only the country and postal code set, we may need the
-            // latter to distinguish XI from GB
+            // Create an address with only the country and postal code set, we may need
+            // the latter to distinguish XI from GB
             $countryCode = $acumulusObject->getFiscalAddress()->countryCode;
             $postalCode = $acumulusObject->getFiscalAddress()->postalCode;
             /** @var \Siel\Acumulus\Data\Address $anonymousAdress */
@@ -68,6 +68,7 @@ class CompleteAnonymise extends BaseCompletorTask
             $acumulusObject->email = $this->configGet('genericCustomerEmail');
             $acumulusObject->contactStatus = Api::ContactStatus_Disabled;
             $acumulusObject->overwriteIfExists = Api::OverwriteIfExists_No;
+            $acumulusObject->disableDuplicates = Api::DisableDuplicates_No;
         }
     }
 }

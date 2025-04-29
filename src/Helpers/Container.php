@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '8.4.3';
+const Version = '8.5.0';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -62,15 +62,15 @@ use const Siel\Acumulus\Version;
  * Principles
  * ----------
  * * This library is built with the idea to extract common code into base
- *   classes and have web shop specific classes extend those base classes with
- *   web shop specific overrides and implementations of abstract methods.
- * * Therefore, upon creating an instance, the most specialized class possible,
+ *   classes and have web-shop specific classes extend those base classes with
+ *   web-shop-specific overrides and implementations of abstract methods.
+ * * Therefore, upon creating an instance, the most specialized class possible
  *   will be instantiated and returned. See below how this is done.
  * * Container::getInstance() is the weakly typed instance getting method, but
  *   for almost all known classes in this library, a strongly typed getter is
  *   available as well. These getters also take care of getting the constructor
  *   arguments.
- * * By default only a single instance is created and this instance is returned
+ * * By default, only a single instance is created, and this instance is returned
  *   on each subsequent request for an instance of that type.
  * * The strongly typed create... methods return a new instance on each call,
  *   turning this container also into a factory.
@@ -95,7 +95,7 @@ use const Siel\Acumulus\Version;
  * Suppose you are writing code for a web shop named <MyWebShop>: place your
  * classes in the namespace \Siel\Acumulus\<MyWebShop>.
  *
- * If you want to support multiple (major) versions of your webs hop, you can
+ * If you want to support multiple (major) versions of your web-shop, you can
  * add a "version level" to the namespace:
  * \Siel\Acumulus\<MyWebShop>\<MyWebShop><version> (note <MyWebShop> is repeated
  * as namespaces may not start with a digit). In this case you should place code
@@ -122,7 +122,7 @@ use const Siel\Acumulus\Version;
  * Invoice, or Shop. Note that there should be no need to override classes in
  * ApiClient or Data.
  *
- * If you do not want to use \Siel\Acumulus as starting part of your namespace,
+ * If you do not want to use \Siel\Acumulus as the starting part of your namespace,
  * you may replace Siel by your own vendor name and/or your department name, but
  * it has to be followed by \Acumulus\<...>. Note that if you do so, you are
  * responsible for ensuring that your classes are autoloaded.
@@ -149,15 +149,14 @@ use const Siel\Acumulus\Version;
  * can define another level of namespace searching by calling
  * {@see setCustomNamespace()}. This will define an additional namespace to look
  * for before the above list as defined by the $shopNamespace argument is
- * traversed. Taking the above example, with 'MyShop\Custom' as custom
- * namespace, the container will first look for the class
- * \MyShop\Custom\Invoice\Creator, before looking for the above list of classes.
+ * traversed. Taking the above example, with 'MyShop\Custom' as the custom namespace, the
+ * container will first look for the class \MyShop\Custom\Invoice\Creator, before looking
+ * for the above list of classes.
  *
  * By defining a custom namespace and placing your custom code in that
  * namespace, instead of changing the code in this library, it remains possible
- * to update this library to a newer version without loosing your
- * customisations. Note that, also in this case, you are responsible that this
- * class gets autoloaded.
+ * to update this library to a newer version without losing your customisations.
+ * Note that, also in this case, you are responsible that this class gets autoloaded.
  */
 class Container
 {

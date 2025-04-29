@@ -660,7 +660,7 @@ class SettingsForm extends BaseConfigForm
      * Returns the set of relation management fields.
      *
      * The fields returned:
-     * - 'clientData': 'sendCustomer' and 'overwriteIfExists'
+     * - 'clientData': 'sendCustomer', 'overwriteIfExists', and 'disableDuplicates'
      * - 'defaultCustomerType'
      * - 'contactStatus'
      *
@@ -677,6 +677,7 @@ class SettingsForm extends BaseConfigForm
                 'options' => [
                     'sendCustomer' => $this->t('option_sendCustomer'),
                     'overwriteIfExists' => $this->t('option_overwriteIfExists'),
+                    'disableDuplicates' => $this->t('option_disableDuplicates'),
                 ],
             ],
             'defaultCustomerType' => [

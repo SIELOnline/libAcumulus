@@ -97,7 +97,7 @@ class CompleteAnonymiseTest extends TestCase
         $customer->overwriteIfExists = false;
         $customer->bankAccountNumber = null;
         $customer->mark = null;
-        $customer->disableDuplicates = null;
+        $customer->disableDuplicates = false;
         return $customer;
     }
 

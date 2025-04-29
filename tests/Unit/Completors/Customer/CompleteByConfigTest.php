@@ -52,15 +52,15 @@ class CompleteByConfigTest extends TestCase
             ['contactStatus', Api::ContactStatus_Active, 'contactStatus', true],
             ['overwriteIfExists', Api::OverwriteIfExists_No, 'overwriteIfExists', false],
             ['overwriteIfExists', Api::OverwriteIfExists_Yes, 'overwriteIfExists', true],
+            ['disableDuplicates', Api::DisableDuplicates_No, 'disableDuplicates', false],
+            ['disableDuplicates', Api::DisableDuplicates_Yes, 'disableDuplicates', true],
         ];
     }
 
     /**
      * @dataProvider customerConfigDataProvider
-     *
-     * @param int|bool $expected
      */
-    public function testComplete(string $key, int $value, string $property, $expected): void
+    public function testComplete(string $key, int $value, string $property, bool|int $expected): void
     {
         $config = $this->getContainer()->getConfig();
         $config->set($key, $value);

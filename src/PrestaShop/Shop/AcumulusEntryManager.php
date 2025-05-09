@@ -20,8 +20,8 @@ use function sprintf;
  *
  * SECURITY REMARKS
  * ----------------
- * In PrestaShop saving and querying acumulus entries is done via self
- * constructed queries, therefore this class takes care of sanitizing itself.
+ * In PrestaShop saving and querying acumulus entries is done via self-constructed
+ * queries. Therefore, this class takes care of sanitizing itself.
  * - Numbers are cast by using numeric formatters (like %u, %d, %f) with
  *   sprintf().
  * - Strings are escaped using pSQL(), unless they are hard coded or are

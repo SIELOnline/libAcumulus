@@ -26,6 +26,7 @@ class AddressCollector extends BaseAddressCollector
      *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     * @noinspection PhpMissingParentCallCommonInspection Empty base method
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {

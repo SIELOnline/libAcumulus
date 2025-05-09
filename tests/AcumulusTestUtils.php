@@ -17,7 +17,7 @@ use function is_float;
 use function is_string;
 
 /**
- * AcumulusTestUtils contains test functionalities for the various shop specific test
+ * AcumulusTestUtils contains test functionalities for the various shop-specific test
  * environments.
  */
 trait AcumulusTestUtils
@@ -215,7 +215,7 @@ LONGSTRING;
      * Returns test data, typically a created and completed invoice converted to an array.
      *
      * @return mixed|null
-     *   The json decoded testdata, or null if the file does not yet exist.
+     *   The JSON decoded testdata, or null if the file does not yet exist.
      *
      * @throws \JsonException
      */
@@ -234,7 +234,7 @@ LONGSTRING;
      * Saves test data, typically a created and completed invoice converted to an array.
      *
      * @param mixed $data
-     *   The data to be saved (in json format).
+     *   The data to be saved (in JSON format).
      */
     protected function saveTestSource(string $type, int $id, bool $isNew, mixed $data): void
     {
@@ -262,7 +262,7 @@ LONGSTRING;
      * Copies latest test data to test data to check against.
      *
      * Refactorings should not alter the resulting array contents but may alter the order
-     * after converting to json. To be able to show real differences not just line order
+     * after converting to JSON. To be able to show real differences not just line order
      * changes, it may come handy to copy the .latest file to the file to check against,
      * BUT ONLY IF THE TESTS PASSED!
      */
@@ -317,10 +317,10 @@ LONGSTRING;
     }
 
     /**
-     * Saves test html data, typically a rendered form.
+     * Saves test HTML data, typically a rendered form.
      *
      * @param string $data
-     *   The html string to be saved.
+     *   The HTML string to be saved.
      */
     protected function saveTestHtml(string $name, string $data): void
     {
@@ -335,7 +335,7 @@ LONGSTRING;
     }
 
     /**
-     * Returns a test mail.
+     * Returns a test e-mail.
      */
     protected function getTestMail(string $name): ?array
     {
@@ -352,7 +352,7 @@ LONGSTRING;
      * Saves test mail data.
      *
      * @param array $data
-     *   The mail data to be saved (in json format).
+     *   The mail data to be saved (in JSON format).
      */
     protected function saveTestMail(string $name, array $data): void
     {
@@ -382,7 +382,7 @@ LONGSTRING;
      * Saves test log messages.
      *
      * @param array $data
-     *   The mail data to be saved (in json format).
+     *   The mail data to be saved (in JSON format).
      */
     protected function saveTestLogMessage(string $name, array $data): void
     {

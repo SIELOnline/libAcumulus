@@ -11,10 +11,8 @@ use Siel\Acumulus\Mail\Mailer as BaseMailer;
 
 use function is_int;
 
-use const Siel\Acumulus\PrestaShop\Helpers\_PS_ROOT_DIR_;
-
 /**
- * Extends the base mailer class to send a mail using the PrestaShop mailer.
+ * Extends the base mailer class to send an e-mail using the PrestaShop mailer.
  */
 class Mailer extends BaseMailer
 {

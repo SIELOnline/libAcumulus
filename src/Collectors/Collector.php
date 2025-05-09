@@ -32,7 +32,7 @@ use function strlen;
  * Child classes should typically do the following:
  * - Pass the type of the {@see \Siel\Acumulus\Data\AcumulusObject} to be
  *   collected and returned to the parent constructor.
- * - Define the logic based phase by implementing {@see collectLogicFields()}.
+ * - Define the logic-based phase by implementing {@see collectLogicFields()}.
  */
 abstract class Collector implements CollectorInterface
 {
@@ -73,7 +73,7 @@ abstract class Collector implements CollectorInterface
      *
      * @return string
      *   The key for the set of mappings to be used, (the $forType parameter to
-     *   {@see \Siel\Acumulus\Config\Mappings::getFor()}.
+     *   {@see \Siel\Acumulus\Config\Mappings::getFor()}).
      */
     protected function getMappingsGetForKey(): string
     {
@@ -151,12 +151,12 @@ abstract class Collector implements CollectorInterface
      *   returning the resulting target object.
      *
      * @param \Siel\Acumulus\Collectors\PropertySources $propertySources
-     *   String keyed set of "objects" that can provide properties to the
+     *   A string-keyed set of "objects" that can provide properties to the
      *   {@see FieldExpander} for use in {@see collectMappedFields()} or just pass
      *   information for use in {@see collectLogicFields()}.
      * @param ArrayObject|null $fieldSpecifications
      *   A set of field specifications keyed by the target field name (property or
-     *   metadata field in the target {@see AcumulusObject}.
+     *   metadata field in the target {@see AcumulusObject}).
      *
      * @return \Siel\Acumulus\Data\AcumulusObject
      *
@@ -177,30 +177,33 @@ abstract class Collector implements CollectorInterface
      * Allows for subclasses to inject specific behaviour just after the new object to
      * collect has been constructed, but before the real collecting starts.
      *
-     * This base implementation does nothing it is meant for subclasses.
+     * This base implementation does nothing, it is only meant for subclasses.
      *
      * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      *   The newly constructed object to collect values for.
      * @param \Siel\Acumulus\Collectors\PropertySources $propertySources
-     *   The set of öbjects"to collect the values from.
+     *   The set of öbjects to collect the values from.
      * @param ArrayObject $fieldSpecifications
      *   The set of mappings that will be used for the "automatic" part of the collection
      *   phase.
      */
-    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
-    {
+    protected function collectBefore(
+        AcumulusObject $acumulusObject,
+        PropertySources $propertySources,
+        ArrayObject $fieldSpecifications
+    ): void {
     }
 
     /**
      * Allows for subclasses to inject specific behaviour just after the new object has
      * been collected.
      *
-     * This base implementation does nothing it is meant for subclasses.
+     * This base implementation does nothing, it is only meant for subclasses.
      *
      * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      *   The object on which the collected values have been set.
      * @param \Siel\Acumulus\Collectors\PropertySources $propertySources
-     *   The set of öbjects"to collect the values came from.
+     *   The set of öbjects to collect the values came from.
      */
     protected function collectAfter(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
@@ -226,7 +229,7 @@ abstract class Collector implements CollectorInterface
     /**
      * Collects fields using logic more complex than a simple mapping.
      *
-     * This base implementation does nothing as it cannot contain any (shop specific)
+     * This base implementation does nothing as it cannot contain any (shop-specific)
      * logic about the properties. Override if the actual data object does have properties
      * that cannot be set with a simple mapping and depend on shop data (thus not
      * configuration only).
@@ -261,10 +264,10 @@ abstract class Collector implements CollectorInterface
         int $mode = PropertySet::Always
     ): bool {
         if ($acumulusObject->isProperty($field)) {
-            return $value !== null && $acumulusObject->set($field, $this->expandValue($value, $propertySources), $mode);
+            $result = $value !== null && $acumulusObject->set($field, $this->expandValue($value, $propertySources), $mode);
         } elseif ($this->isMetadata($field)) {
             $acumulusObject->metadataSet($field, $this->expandValue($value, $propertySources));
-            return true;
+            $result = true;
         } else {
             $this->getLog()->notice(
                 '%s: %s does not have a property %s, nor is it considered metadata',
@@ -272,8 +275,9 @@ abstract class Collector implements CollectorInterface
                 get_class($acumulusObject),
                 $field
             );
-            return false;
+            $result = false;
         }
+        return $result;
     }
 
     /**
@@ -315,7 +319,7 @@ abstract class Collector implements CollectorInterface
      * @param string $field
      *
      * @return bool
-     *   True if $field indicates a metadata name, false otherwise.
+     *   True if the field indicates a metadata name, false otherwise.
      */
     public function isMetadata(string $field): bool
     {
@@ -326,9 +330,9 @@ abstract class Collector implements CollectorInterface
     /**
      * Helper method to add a message to an InvoiceAddResult.
      *
-     * The \$message is placed under the meta key passed as \$severity. If no message is
-     * set yet, \$message is added as a string, otherwise it becomes an array of messages
-     * to which \$message is added.
+     * The message is placed under the meta-key passed as severity. If no message is set
+     * yet, the message is added as a string. Otherwise, it becomes an array of messages
+     * to which the message is added.
      */
     protected function addMessage(AcumulusObject $acumulusObject, string $message, string $severity = Meta::Warning): void
     {

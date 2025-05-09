@@ -16,7 +16,7 @@ class FormMapper extends BaseFormMapper
      * Maps a set of field definitions.
      *
      * @param Form $form
-     *   The Acumulus form definition to map.
+     *   The Acumulus form-definition to map.
      *
      * @return array[]
      *   The PrestaShop form definition for the given Acumulus form.

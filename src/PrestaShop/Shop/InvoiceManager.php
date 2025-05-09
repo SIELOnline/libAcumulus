@@ -22,7 +22,7 @@ use function sprintf;
  * SECURITY REMARKS
  * ----------------
  * In PrestaShop querying orders and order slips is done via available methods
- * on \Order or via self constructed queries. In the latter case, this class has
+ * on \Order or via self-constructed queries. In the latter case, this class has
  * to take care of sanitizing itself.
  * - Numbers are cast by using numeric formatters (like %u, %d, %f) with
  *   sprintf().

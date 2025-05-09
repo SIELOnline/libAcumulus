@@ -58,17 +58,20 @@ class Source extends BaseSource
      *
      * @return string
      *   This override returns the order reference, a sequence of characters, or the order
-     *   slip reference, a configurable prefix plus the id with padding 0s.
+     *   slip reference, a configurable prefix plus the id with padding zeros.
      */
     public function getReference(): string
     {
         return $this->getType() === Source::Order
             ? $this->getShopObject()->reference
-            : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf('%06d', $this->getShopObject()->id);
+            : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf(
+                '%06d',
+                $this->getShopObject()->id
+            );
     }
 
     /**
-     * Sets the id based on the loaded Order.
+     * Sets id based on the loaded Order.
      *
      * @throws \PrestaShopDatabaseException
      */
@@ -104,7 +107,7 @@ class Source extends BaseSource
      *   A credit note in PrestaShop does not have a state.
      *
      * @todo: PHP8.2: standalone null is allowed
-     * @noinspection PhpUnused  Called via getStatus().
+     * @noinspection PhpUnused Called via getStatus().
      */
     protected function getStatusCreditNote(): int|null
     {
@@ -137,15 +140,15 @@ class Source extends BaseSource
         if ($this->getType() === Source::Order) {
             $paymentDate = null;
             /** @var \Order $order */
-            $order = $this->getOrder()->shopObject;
+            $order = $this->getShopObject();
             foreach ($order->getOrderPaymentCollection() as $payment) {
                 /** @var \OrderPayment $payment */
-                if ($payment->date_add && ($paymentDate === null || $payment->date_add > $paymentDate)) {
+                if (!empty($payment->date_add) && ($paymentDate === null || $payment->date_add > $paymentDate)) {
                     $paymentDate = $payment->date_add;
                 }
             }
         } else {
-            // Assumption: last modified date is date of actual reimbursement.
+            // Assumption: last modified date is the date of the actual reimbursement.
             $paymentDate = $this->getShopObject()->date_upd;
         }
 
@@ -162,7 +165,7 @@ class Source extends BaseSource
      * {@inheritdoc}
      *
      * PrestaShop stores the internal currency id, so look up the currency
-     * object first then extract the ISO code for it.
+     * object first, then extract the ISO code for it.
      */
     public function getCurrency(): AcumulusCurrency
     {
@@ -240,11 +243,15 @@ class Source extends BaseSource
      */
     protected function getInvoiceReferenceOrder(): ?string
     {
-        return !empty($this->getShopObject()->invoice_number)
-            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getShopObject()->id_lang, null, $this->getShopObject()->id_shop) . sprintf(
-                '%06d',
-                $this->getShopObject()->invoice_number
-            )
+        /** @var \Order $order */
+        $order = $this->getShopObject();
+        /**
+         * @noinspection PhpCastIsUnnecessaryInspection Despite the type documentation,
+         *   the id_land is returned as a string.
+         */
+        return !empty($order->invoice_number)
+            ? Configuration::get('PS_INVOICE_PREFIX', (int) $order->id_lang, null, $order->id_shop)
+            . sprintf('%06d', $order->invoice_number)
             : null;
     }
 
@@ -264,7 +271,7 @@ class Source extends BaseSource
     {
         /** @var \OrderSlip $orderSlip */
         $orderSlip = $this->shopObject;
-        /** @noinspection PhpCastIsUnnecessaryInspection  despite the documented return
+        /** @noinspection PhpCastIsUnnecessaryInspection Despite the documented return
          *   type, id is returned as a string.
          */
         return (int) $orderSlip->id_order;
@@ -310,7 +317,7 @@ class Source extends BaseSource
     }
 
     /**
-     * Returns records from the:
+     * Returns records from:
      * - Source::Order: order detail table + order_detail_tax.
      * - Source::CreditNote: order_slip_detail + order_detail.
      */
@@ -319,7 +326,10 @@ class Source extends BaseSource
         if ($this->getType() === Source::Order) {
             // Note: these methods return "raw" (and merged) database results, not objects
             //   from the PrestaShop datamodel.
-            $orderDetails = $this->mergeProductLines($this->getShopObject()->getProductsDetail(), $this->getShopObject()->getOrderDetailTaxes());
+            $orderDetails = $this->mergeProductLines(
+                $this->getShopObject()->getProductsDetail(),
+                $this->getShopObject()->getOrderDetailTaxes()
+            );
         } else {
             $orderDetails = OrderSlip::getOrdersSlipProducts($this->getId(), $this->getOrder()->getShopObject());
         }
@@ -334,11 +344,11 @@ class Source extends BaseSource
      * Merges the product and tax details arrays.
      *
      * @param array $productLines
-     *   An array with order line information, the fields being about the
-     *   product of this order line.
+     *   An array of order line information, the fields are about the product of this
+     *   order line.
      * @param array $taxLines
-     *   An array with line tax information, the fields being about the tax on
-     *   this order line.
+     *   An array of line tax information, the fields are about the tax on this
+     *   order line.
      *
      * @return array
      *   An array with the product and tax lines merged based on the field
@@ -349,7 +359,7 @@ class Source extends BaseSource
         // Re-index the product lines on id_order_detail, so we can easily add the tax
         // lines.
         $result = array_column($productLines, null, 'id_order_detail');
-        $alreadyAdded= [];
+        $alreadyAdded = [];
         // Add the tax lines without overwriting existing entries (though in a
         // consistent db the same keys should contain the same values).
         foreach ($taxLines as $taxLine) {
@@ -369,7 +379,7 @@ class Source extends BaseSource
                     $alreadyAdded[$taxLine['id_order_detail']] = true;
                 }
             } else {
-                // We have a tax line for a non product item line ([SIEL #200452]).
+                // We have a tax line for a non-product item line ([SIEL #200452]).
                 Container::getContainer()->getLog()->notice(
                     sprintf(
                         '%s: Tax detail found for order item line %d (of order %d) without product info',
@@ -391,8 +401,8 @@ class Source extends BaseSource
 
     public function getGiftWrappingFeeLineInfos(): array
     {
-        return $this->getType() === Source::Order && $this->getShopObject()->gift
-               && !Number::isZero($this->getShopObject()->total_wrapping_tax_incl)
+        $order = $this->getShopObject();
+        return $this->getType() === Source::Order && $order->gift && !Number::isZero($order->total_wrapping_tax_incl)
             ? [$this]
             : [];
     }
@@ -403,20 +413,19 @@ class Source extends BaseSource
      * This override checks if the fields 'payment_fee' and 'payment_fee_rate'
      * are set and, if so, uses them to add a payment fee line.
      *
-     * These fields are set by the PayPal with a fee module but seem generic
+     * These fields are set by the "PayPal with a fee" module but seem generic
      * enough to also be used by other modules that allow for payment fees.
      *
-     * For now, only orders can have a payment fee, so $sign is superfluous,
-     * but if in future versions payment fees can appear on order slips as well
-     * the code can already handle that.
+     * For now, only orders can have a payment fee.
      */
     public function getPaymentFeeLineInfos(): array
     {
+        $order = $this->getShopObject();
         /**
-         * @noinspection MissingIssetImplementationInspection These fields are set by the
-         *   PayPal with a fee module.
+         * @noinspection MissingIssetImplementationInspection These fields are set by
+         *   the module "PayPal with a fee".
          */
-        return isset($this->getShopObject()->payment_fee, $this->getShopObject()->payment_fee_rate) && (float) $this->getShopObject()->payment_fee !== 0.0 ? [$this] : [];
+        return isset($order->payment_fee, $order->payment_fee_rate) && (float) $order->payment_fee !== 0.0 ? [$this] : [];
     }
 
     /**

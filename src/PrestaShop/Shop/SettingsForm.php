@@ -19,7 +19,7 @@ class SettingsForm extends BaseSettingsForm
     /**
      * {@inheritdoc}
      *
-     * This override ensures that the password value is filled on submit with
+     * This override ensures that the password value is filled when submitting with
      * its current value when the user did not fill it in (not fill it = leave
      * unchanged).
      */

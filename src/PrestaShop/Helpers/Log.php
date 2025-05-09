@@ -35,7 +35,7 @@ class Log extends BaseLog
      * Returns the PrestaShop equivalent of the severity.
      *
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity}::... constants.
      *
      * @return int
      *   The PrestaShop equivalent of the severity.

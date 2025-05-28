@@ -148,7 +148,7 @@ class Source extends BaseSource
                 }
             }
         } else {
-            // Assumption: last modified date is the date of the actual reimbursement.
+            // Assumption: the last modified date is the date of the actual reimbursement.
             $paymentDate = $this->getShopObject()->date_upd;
         }
 
@@ -177,8 +177,8 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-amount for PrestaShop
+     * This override provides the values 'meta-invoice-amountinc' and
+     * 'meta-invoice-amount' for PrestaShop
      */
     public function getTotals(): Totals
     {
@@ -205,7 +205,7 @@ class Source extends BaseSource
             //   incl. VAT!.
             // - The total amount incl. that will be refunded will NOT contain any discount
             //   amount ... (as if the specific amount refunded specified = 0,00)
-            // So to follow the shop we will have to treat this as if no voucher has been
+            // So to follow the shop, we will have to treat this as if no voucher has been
             // revoked.
             //
             // Use the cart rules to correct these errors.
@@ -306,7 +306,7 @@ class Source extends BaseSource
                 )
             );
             if (is_array($row)) {
-                // Get 1st (and only) result if no error
+                // Get the 1st (and only) result if no error
                 $row = reset($row);
                 foreach ($row as $key => $value) {
                     /** @noinspection PhpVariableVariableInspection */
@@ -434,7 +434,7 @@ class Source extends BaseSource
      * A PrestaShop order stores the discounts applied in order cart rules.
      *
      * In a Prestashop credit slip, the discounts are not directly visible but can be
-     * retrieved by looking at the cart rules form the original order. However, the field
+     * retrieved by looking at the cart rules from the original order. However, the field
      * {@see OrderSlip::$order_slip_type} indicates if the cart rules from that order are
      * to be revoked ({@see VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND})
      * or should remain ({@see VoucherRefundType::PRODUCT_PRICES_REFUND}).

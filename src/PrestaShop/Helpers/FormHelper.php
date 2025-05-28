@@ -25,6 +25,7 @@ class FormHelper extends BaseFormHelper
         'emailAsPdfSettingsHeader' => 'icon-file-pdf-o',
         'pluginSettings' => 'icon-puzzle-piece',
         'versionInformation' => 'icon-info-circle',
+        'fieldExpanderHelpHeader' => 'icon-info-circle',
         'advancedConfig' => 'icon-cogs',
         'configHeader' => 'icon-cogs',
         'tokenHelpHeader' => 'icon-question-circle',
@@ -107,7 +108,7 @@ class FormHelper extends BaseFormHelper
             $field['icon'] = $this->icons[$key];
         }
 
-        // Add class "details" to icon (part of headers).
+        // this will add class "details" to the icon part of headers.
         if ($field['type'] === 'details') {
             if (empty($field['icon'])) {
                 $field['icon'] = 'details';

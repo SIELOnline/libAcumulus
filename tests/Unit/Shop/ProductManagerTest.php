@@ -8,7 +8,6 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\TestWebShop\TestDoubles\Shop\ProductManager;
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples;
 use UnexpectedValueException;
 
 /**
@@ -23,7 +22,6 @@ class ProductManagerTest extends TestCase
     {
         $language = 'nl';
         $this->container = new Container('TestWebShop\TestDoubles', $language);
-        $this->examples =  ApiRequestResponseExamples::getInstance();
     }
 
     private function getProductManager(): ProductManager

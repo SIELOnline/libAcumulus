@@ -27,7 +27,7 @@ class Item extends BaseItem
 
     protected function setId(): void
     {
-        $this->id = $this->shopObject['id_order_detail'];
+        $this->id = (int) $this->shopObject['id_order_detail'];
     }
 
     /**

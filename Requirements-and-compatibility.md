@@ -6,6 +6,7 @@ even faster. So the quick changelog here should give you an idea of the
 recentness of this information.
 
 Updates:
+
 - System requirements: valid for our version 8.2.0.
 - Supported shops and versions: july 2024.
 - Supported PHP versions: july 2024.
@@ -15,7 +16,7 @@ System Requirements
 
 - PHP:
     * Minimum version: 8.0, older versions WILL fail.
-    * Recommended version: 8.1, soon - probably plugin version 8.3, this will become the
+    * Recommended version: 8.1, soon, probably plugin version 8.3, this will become the
       minimally required version, and older versions WILL fail.
     * See the PHP versions table further below for which PHP versions can be used for
       which shop.
@@ -35,7 +36,7 @@ Notes:
   features of the shop as were available when our new feature was developed.
   As it is often not clear when a new API feature became available, this may
   unknowingly lead to our module failing on older versions of the shop.
-- Joomla 5(.1) has not yet been tested but will be in the near future.
+- Joomla 5(.1) has not yet been tested but will be in the (near) future.
 
 | Tag | Shop             | Version used for testing | Supported versions                  |
 |-----|------------------|--------------------------|-------------------------------------|
@@ -43,7 +44,7 @@ Notes:
 | HS  | HikaShop (JOO)   | 5.1.0 (starter)          | >= 4.0.0                            |
 | JOO | Joomla (+ HS)    | 4.4.6                    | >= 4.2.5                            | 
 | MA  | Magento          | 2.4.6 (community)        | >= 2.4, 2.3 might still work        |
-| OC  | OpenCart         | 3.0.3.9                  | >= 3.0                              |
+| OC  | OpenCart         | 3.0.3.9                  | >= 3.0.3.9                          |
 |     |                  | 4.0.2.3                  | >= 4.0                              |
 | PS  | PrestaShop       | 8.1.7                    | >= 8.1                              |
 | VM  | VirtueMart (JOO) | 4.2.0                    | >= 4.0.5                            |
@@ -56,22 +57,22 @@ Supported PHP versions
 This is an overview of which PHP versions can be used with the supported shops.
 
 Notes:
-- Latest, or almost latest, point releases are used of the listed PHP versions.
+
+- Last, or almost last, point releases are used of the listed PHP versions.
 - WooCommerce is listed in combination with WordPress 6.6 Note that other plugins gave
   warnings in my test environment, but those were paid plugins that I cannot upgrade, and
   thus for which I have an outdated version.
-- Other installed plugins/modules may not have been updated to the latest
-  PHP version as supported by the shop or our plugin, or may, on the contrary,
-  already require a newer version than the shop does. This table cannot keep
-  track of that.
+- Other installed plugins/modules may not have been updated to the latest PHP version as
+  supported by the shop or our plugin, or may already require a newer version than the
+  shop does. This table cannot keep track of that.
 - HikaShop forum: "4.4.3 fully supports PHP 8.0"
-- HikaShop changelog: 4.6.0 first fix mentioning 8.1; 5.0.1 latest fix mentioning 8.1
-- HikaShop changelog: 4.7.2 first fix mentioning 8.2; 5.1.0 latest fix mentioning 8.2
+- HikaShop changelog: 4.6.0 first fix mentioning 8.1; 5.0.1 last fix mentioning 8.1
+- HikaShop changelog: 4.7.2 first fix mentioning 8.2; 5.1.0 last fix mentioning 8.2
 
-| Tag | Shop Version      | 8.0 | 8.1 | 8.2 | 8.3 | Remarks                                        |
-|-----|-------------------|-----|-----|-----|-----|------------------------------------------------|
-| JOO | 4.4.6             | ❓  | ✅  | ❓  | ❓  | JOO 4 on PHP 8.0 warns abut EOL               |
-| JOO | 5.1               | ❓  | ✅  | ❓  | ❓  | JOO 5 on PHP 8.0 warns abut EOL               |
+| Tag | Shop Version      | 8.0 | 8.1 | 8.2 | 8.3 | Remarks                                       |
+|-----|-------------------|-----|-----|-----|-----|-----------------------------------------------|
+| JOO | 4.4.6             | ❓  | ✅  | ❓  | ❓  | JOO 4 on PHP 8.0 warns about EOL              |
+| JOO | 5.1               | ❓  | ✅  | ❓  | ❓  | JOO 5 on PHP 8.0 warns about EOL              |
 | HS  | 5.1.0 (starter)   | ❓  | ✅  | ❓  | ❓  |                                               |
 | MA  | 2.4.6 (community) | ❌  | ✅  | ✅  | ❓  |                                               |
 | OC  | 3.0.3.9           | ✅  | ✅  | ❌  | ❓  | 3.0.3.9 is said to be compatible with PHP 8.1 |

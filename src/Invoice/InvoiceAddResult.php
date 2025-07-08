@@ -17,7 +17,7 @@ use function count;
  */
 class InvoiceAddResult extends Result
 {
-    // Invoice send handling related constants.
+    // InvoiceAdd handling related constants.
     // Reasons for not sending.
     public const NotSent_AlreadySent = 0x1;
     public const NotSent_WrongStatus = 0x2;
@@ -38,8 +38,7 @@ class InvoiceAddResult extends Result
 
    /**
      * @var \Siel\Acumulus\Data\Invoice|null
-     *   The invoice that is (attempted to) being sent to Acumulus,
-     *   or null if not yet set.
+     *   The invoice (attempted to) being sent to Acumulus, or null if not yet set.
      */
     protected ?Invoice $invoice = null;
 

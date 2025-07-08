@@ -23,11 +23,11 @@ class Result extends MessageCollection
     public const AddReqResp_Always = 2;
     public const AddReqResp_WithOther = 3;
 
-    // Invoice send handling related constants.
+    // InvoiceAdd handling related constants.
     public const SendStatus_Unknown = 0;
     public const NotSent_Mask = 0xf;
     // Reasons for not sending.
-    public const NotSent_LocalErrors = 0xc;
+    public const NotSent_LocalErrors = 0xf;
     public const NotSent_DryRun = 0xe;
     // Reasons for sending.
     public const Send_Mask = 0xf0;

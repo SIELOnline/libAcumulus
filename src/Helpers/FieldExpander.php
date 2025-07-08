@@ -59,7 +59,7 @@ use function strlen;
  * - A property specification is a specification that specifies where a value
  *   should come from. Typically, it refers to a "property" of an "object".
  * - "Objects" are "data structures", in our domain typically the shop order, an
- *   order line, the customer, or an address. Depending on the webshop these
+ *   order line, the customer, or an address. Depending on the webshop, these
  *   "objects" may actually be (keyed) arrays.
  * - "Properties" are the values of these "objects", all elements that have or
  *   can return a value can be used: properties on real objects, key names on
@@ -109,7 +109,7 @@ use function strlen;
  * - Properties that are joined with a '+', are all expanded, where the '+' gets
  *   replaced with a space if and only if the property directly following it,
  *   is not empty (and we already have a non-empty intermediate result).
- * - Properties that are joined with a '&', are all expanded and concatenated
+ * - Properties that are joined with a '&' are all expanded and concatenated
  *   directly, thus not with a space between them like with a '+'.
  * - Literal text that is joined with "real" properties using '&' or '+' only
  *   gets returned when at least 1 of the "real" properties have a non-empty
@@ -212,7 +212,7 @@ class FieldExpander
      *   objects like customer, shipping address, order line, credit note, ...,
      *   "Objects" can be objects or arrays.
      *   Internally, we see this list of "objects" as a super "object"
-     *   containing all "objects" as (named) properties. In this sense it
+     *   containing all "objects" as (named) properties. In this sense, it
      *   facilitates the recursive search algorithm when searching for a mapping
      *   like object1::object2::property.
      */
@@ -258,7 +258,7 @@ class FieldExpander
         //   class had "call state". Pass $objects along all methods or keep this solution?
         $oldObjects = $this->objects;
         $this->objects = $propertySources->toArray();
-        // If the specification contains exactly 1 field expansion specification
+        // If the specification contains exactly 1 field expansion specification,
         // we return the direct result of {@see extractField()} so that the type
         // of that property is retained.
         $value = str_starts_with($fieldSpecification, '[')
@@ -450,7 +450,7 @@ class FieldExpander
      * - property-name = text
      *
      * @param string $propertyInObject
-     *   The object names and property name to search for, e.g:
+     *   The object names and property name to search for, e.g.:
      *   object1::object2::property.
      *
      * @return mixed
@@ -625,7 +625,7 @@ class FieldExpander
     }
 
     /**
-     * Concatenates a list of values using a glue between them.
+     * Concatenates a list of values using a separator between them.
      * Literal strings are only used if they are followed by a non-empty
      * property value. A literal string at the end is only used if the result so
      * far is not empty.
@@ -636,12 +636,11 @@ class FieldExpander
      * @return array
      *   Returns an array with 2 keys:
      *   - 'type' = self:: TypeLiteral or self::TypeProperty
-     *   - 'value': the concatenation of all the values with the glue string
+     *   - 'value': the concatenation of all the values with the separator string
      *     between each value. If $values contains exactly 1 value, that value
-     *     is returned unaltered. So the type of this value is not necessarily a
-     *     string.
+     *     is returned unaltered. So the type of 'value' is not necessarily a string.
      */
-    protected function implodeValues(string $glue, array $values): array
+    protected function implodeValues(string $separator, array $values): array
     {
         // Shortcut: if we have only 1 value, directly return it, so the type
         // may be retained.
@@ -655,12 +654,12 @@ class FieldExpander
         foreach ($values as $value) {
             $valueStr = $this->valueToString($value['value']);
             if ($value['type'] === self::TypeLiteral) {
-                // Literal value: set aside and only add if next property value
+                // Literal value: set aside and only add if the next property value
                 // is not empty.
                 if (!empty($previous)) {
                     // Multiple literals after each other: treat as 1 literal
                     // but do glue them together.
-                    $previous .= $glue;
+                    $previous .= $separator;
                 }
                 $previous .= $valueStr;
             } else { // $value['type'] === self::TypeProperty
@@ -670,12 +669,12 @@ class FieldExpander
                 if (!empty($valueStr)) {
                     if (!empty($previous)) {
                         if (!empty($result)) {
-                            $result .= $glue;
+                            $result .= $separator;
                         }
                         $result .= $previous;
                     }
                     if (!empty($result)) {
-                        $result .= $glue;
+                        $result .= $separator;
                     }
                     $result .= $valueStr;
                 }
@@ -690,7 +689,7 @@ class FieldExpander
         // came as last value(s) and the result so far is not empty.
         if (!empty($previous) && (!$hasProperty || !empty($result))) {
             if (!empty($result)) {
-                $result .= $glue;
+                $result .= $separator;
             }
             $result .= $previous;
         }

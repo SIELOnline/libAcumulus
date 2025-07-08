@@ -33,10 +33,13 @@ class ConfigStore extends BaseConfigStore
 
     public function load(): array
     {
-            $values = $this->getConfigInterface()->getValue($this->configPath . $this->configKey);
-            if (!empty($values) && is_string($values)) {
-                $values = unserialize($values, ['allowed_classes' => false]);
-            }
+        $values = $this->getConfigInterface()->getValue($this->configPath . $this->configKey);
+        if (empty($values)) {
+            // This may happen after installation.
+            $values = [];
+        } elseif (is_string($values)) {
+            $values = unserialize($values, ['allowed_classes' => false]);
+        }
         return $values;
     }
 

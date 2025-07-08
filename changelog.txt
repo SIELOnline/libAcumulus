@@ -3,6 +3,12 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+8.5.2 (2025-07-07) (MA)
+-----------------------
+- MA: Siel\Acumulus\Magento\Config\ConfigStore::load(): Return value must be of type
+  array, null returned.
+
+
 8.5.1 (2025-05-28) (PS)
 -----------------------
 Bugs:

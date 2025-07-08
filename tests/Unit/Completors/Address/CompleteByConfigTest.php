@@ -44,7 +44,7 @@ class CompleteByConfigTest extends TestCase
         return $address;
     }
 
-    public function addressConfigDataProvider(): array
+    public static function addressConfigDataProvider(): array
     {
         return [
             ['countryAutoName', Api::CountryAutoName_No, 'NL', 'Nederland', Api::CountryAutoName_No, null],

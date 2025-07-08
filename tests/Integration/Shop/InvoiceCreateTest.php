@@ -30,7 +30,7 @@ class InvoiceCreateTest extends TestCase
     {
         $objects = (new GetTestData())->getJson();
         $order = $objects->order;
-        return $this->getContainer()->createSource(Source::Order, $order);
+        return self::getContainer()->createSource(Source::Order, $order);
     }
 
     /**
@@ -40,8 +40,8 @@ class InvoiceCreateTest extends TestCase
     public function testCreate(): void
     {
         $invoiceSource = $this->getInvoiceSource();
-        $invoiceAddResult = $this->getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = $this->getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
         $result = $invoice->toArray();
 
         // Do some basic tests: at all levels, we just check some key(s) being available.

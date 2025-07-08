@@ -149,7 +149,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(AcumulusRequest::class, $object);
     }
 
-    public function dataNameSpaceDataProvider(): array
+    public static function dataNameSpaceDataProvider(): array
     {
         return [
             [DataType::Address, Address::class,],
@@ -176,7 +176,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf($dataClass, $object);
     }
 
-    public function collectorNameSpaceDataProvider(): array
+    public static function collectorNameSpaceDataProvider(): array
     {
         return [
             [DataType::Address, AddressType::Invoice, AddressCollector::class,],

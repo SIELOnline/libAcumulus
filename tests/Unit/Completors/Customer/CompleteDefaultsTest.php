@@ -42,7 +42,7 @@ class CompleteDefaultsTest extends TestCase
         return $customer;
     }
 
-    public function customerConfigDataProvider(): array
+    public static function customerConfigDataProvider(): array
     {
         return [
             ['', null, 'NL'],

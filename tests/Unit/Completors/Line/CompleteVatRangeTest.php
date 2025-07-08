@@ -100,7 +100,7 @@ class CompleteVatRangeTest extends TestCase
         self::assertFalse($line->metadataExists(Meta::VatRateMax));
     }
 
-    public function vatRangeWithUnitPriceDataProvider(): array
+    public static function vatRangeWithUnitPriceDataProvider(): array
     {
         return [
             [10, 2.1, VatRateSource::Calculated, 20.9323, 21.0678, null],
@@ -141,7 +141,7 @@ class CompleteVatRangeTest extends TestCase
         }
     }
 
-    public function vatRangeWithUnitPriceIncDataProvider(): array
+    public static function vatRangeWithUnitPriceIncDataProvider(): array
     {
         return [
             [12.1, 2.1, VatRateSource::Calculated, 20.9206, 21.0796, null],

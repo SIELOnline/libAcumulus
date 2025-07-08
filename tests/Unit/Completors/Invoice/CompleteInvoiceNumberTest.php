@@ -46,7 +46,7 @@ class CompleteInvoiceNumberTest extends TestCase
         return $invoice;
     }
 
-    public function invoiceNumberDataProvider(): array
+    public static function invoiceNumberDataProvider(): array
     {
         return [
             [Config::InvoiceNrSource_Acumulus, '2022009', 'BR2022003', null],

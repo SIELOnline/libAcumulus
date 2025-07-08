@@ -46,7 +46,7 @@ class CompleteByConfigTest extends TestCase
         return $line;
     }
 
-    public function natureConfigDataProvider(): array
+    public static function natureConfigDataProvider(): array
     {
         return [
             [Config::Nature_Unknown, LineType::Item, null, null,],

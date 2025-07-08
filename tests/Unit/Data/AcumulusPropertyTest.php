@@ -63,7 +63,7 @@ class AcumulusPropertyTest extends TestCase
         $this->assertNull($p->getValue());
     }
 
-    public function setValueDataProvider(): array
+    public static function setValueDataProvider(): array
     {
         return [
             'int-int' => ['int', 1, 1],
@@ -88,7 +88,7 @@ class AcumulusPropertyTest extends TestCase
         $this->assertSame($propertyValue, $p->getValue());
     }
 
-    public function setBoolValueDataProvider(): array
+    public static function setBoolValueDataProvider(): array
     {
         return [
             'bool-true' => [[0, 1], true, true],
@@ -116,7 +116,7 @@ class AcumulusPropertyTest extends TestCase
     /**
      * @noinspection PhpRedundantOptionalArgumentInspection
      */
-    public function setDateValueDataProvider(): array
+    public static function setDateValueDataProvider(): array
     {
         $now = time();
         $floatNow = ((float) $now) + 0.5;
@@ -138,7 +138,7 @@ class AcumulusPropertyTest extends TestCase
         $this->assertEquals($castValue, $p->getValue());
     }
 
-    public function setValueWrongTypeDataProvider(): array
+    public static function setValueWrongTypeDataProvider(): array
     {
         return [
             'int-array' => ['int', [1]],
@@ -174,7 +174,7 @@ class AcumulusPropertyTest extends TestCase
         $p->setValue($value);
     }
 
-    public function apiValueDataProvider(): array
+    public static function apiValueDataProvider(): array
     {
         return [
             [['type' => 'int'], -2, -2],

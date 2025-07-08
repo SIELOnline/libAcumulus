@@ -43,7 +43,7 @@ class CompleteAccountingInfoTest extends TestCase
         return $invoice;
     }
 
-    public function invoiceNumberDataProvider(): array
+    public static function invoiceNumberDataProvider(): array
     {
         $ccpm = ['ideal' => 345, 'paypal' => 234];
         $acpm = ['ideal' => 678, 'paypal' => 567];

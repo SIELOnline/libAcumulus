@@ -42,7 +42,7 @@ class CompleteByConfigTest extends TestCase
         return $emailInvoiceAsPdf;
     }
 
-    public function emailInvoiceAsPdfConfigDataProvider(): array
+    public static function emailInvoiceAsPdfConfigDataProvider(): array
     {
         return [
             ['ubl', true, true],

@@ -43,7 +43,7 @@ class CompleteTemplateTest extends TestCase
         return $invoice;
     }
 
-    public function templateDataProvider(): array
+    public static function templateDataProvider(): array
     {
         return [
             [Api::PaymentStatus_Due, 123, 789, 123],

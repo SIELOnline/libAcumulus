@@ -42,7 +42,7 @@ class CompleteByConfigTest extends TestCase
         return $customer;
     }
 
-    public function customerConfigDataProvider(): array
+    public static function customerConfigDataProvider(): array
     {
         return [
             ['defaultCustomerType', Api::CustomerType_Debtor, 'type', Api::CustomerType_Debtor],

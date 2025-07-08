@@ -53,7 +53,7 @@ class CompleteMarginProductsTest extends TestCase
         return $line;
     }
 
-    public function marginProductsConfigDataProvider(): array
+    public static function marginProductsConfigDataProvider(): array
     {
         return [
             [

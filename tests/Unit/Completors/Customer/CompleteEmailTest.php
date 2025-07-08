@@ -41,7 +41,7 @@ class CompleteEmailTest extends TestCase
         return $customer;
     }
 
-    public function customerEmailDataProvider(): array
+    public static function customerEmailDataProvider(): array
     {
         return [
             ['burorader@example.com', 'burorader@example.com', false],

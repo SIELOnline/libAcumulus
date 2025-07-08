@@ -91,7 +91,7 @@ class MetadataValueTest extends TestCase
     /**
      * Note that we test with both DateTime and DateTimeImmutable.
      */
-    public function getApiValueDataProvider(): array
+    public static function getApiValueDataProvider(): array
     {
         return [
             [2, 2],

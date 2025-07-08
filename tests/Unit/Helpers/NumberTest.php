@@ -19,7 +19,7 @@ class NumberTest extends TestCase
     /**
      * Note that we test with both DateTime and DateTimeImmutable.
      */
-    public function getCastNumericValueDataProvider(): array
+    public static function getCastNumericValueDataProvider(): array
     {
         return [
             ['2', 2],

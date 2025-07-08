@@ -46,7 +46,7 @@ class CompleteIssueDateTest extends TestCase
         return $invoice;
     }
 
-    public function issueDateDataProvider(): array
+    public static function issueDateDataProvider(): array
     {
         $date20220203 = '2022-02-03';
         $date20230405 = '2023-04-05';

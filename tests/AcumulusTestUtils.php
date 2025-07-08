@@ -15,6 +15,7 @@ use Siel\Acumulus\Invoice\Translations;
 use function in_array;
 use function is_float;
 use function is_string;
+use function strlen;
 
 /**
  * AcumulusTestUtils contains test functionalities for the various shop-specific test
@@ -75,8 +76,12 @@ LONGSTRING;
     protected function getDataPath(): string
     {
         $shopNamespace = self::getContainer()->getShopNamespace();
-        $subPath = str_starts_with($shopNamespace, 'TestWebShop') ? '' : '/' . $shopNamespace;
-        return $this->getTestsPath() . "$subPath/Data";
+        if (str_starts_with($shopNamespace, 'TestWebShop')) {
+            $shopNamespace = '';
+        } elseif (str_ends_with($shopNamespace, '\TestWebShop')) {
+            $shopNamespace = substr($shopNamespace, 0, -strlen('\TestWebShop'));
+        }
+        return $this->getTestsPath() . "/$shopNamespace/Data";
     }
 
     /**

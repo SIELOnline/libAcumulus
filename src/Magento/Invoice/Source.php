@@ -267,9 +267,8 @@ class Source extends BaseSource
     }
 
     /**
-     * {@see Source::getInvoiceId()}
-     *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused
+     *    Called by {@see Source::getInvoiceId()} via {@see Source::callTypeSpecificMethod()}.
      */
     protected function getInvoiceIdOrder(): ?int
     {

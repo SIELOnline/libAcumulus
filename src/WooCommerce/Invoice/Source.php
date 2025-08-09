@@ -7,6 +7,7 @@ namespace Siel\Acumulus\WooCommerce\Invoice;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 use WC_Abstract_Order;
@@ -26,7 +27,7 @@ use function strlen;
  * 'shop_order' and 'shop_order_refund'. The base class for all these types of
  * orders is WC_Abstract_Order
  *
- * @method WC_Order|WC_Order_Refund|WC_Abstract_Order getShopObject()
+ * @method WC_Abstract_Order getShopObject()
  */
 class Source extends BaseSource
 {
@@ -195,6 +196,11 @@ class Source extends BaseSource
             $result = $order->get_billing_country();
         }
         return $result;
+    }
+
+    public function getCurrency(): Currency
+    {
+        return new Currency($this->getShopObject()->get_currency(), );
     }
 
     /**

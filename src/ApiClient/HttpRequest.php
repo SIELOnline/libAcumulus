@@ -296,7 +296,7 @@ class HttpRequest
             // Return request headers in the response of {@see \curl_getinfo()}.
             CURLINFO_HEADER_OUT => true,
             // This is a requirement for the Acumulus web service, but should be
-            // good for all servers.
+            // good for all web servers this code is running on.
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
             CURLOPT_CONNECTTIMEOUT_MS => 15000,
             CURLOPT_TIMEOUT_MS => 15000,

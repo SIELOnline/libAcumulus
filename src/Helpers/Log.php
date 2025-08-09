@@ -25,7 +25,7 @@ use function sprintf;
 class Log
 {
     /**
-     * Set of json_encode flags we use to improve readability of log messages.
+     * Set of json_encode flags we use to improve the readability of log messages.
      * See {@see \Siel\Acumulus\Meta::JsonFlags}.
      */
     public const JsonFlags = Meta::JsonFlags | JSON_PRETTY_PRINT;
@@ -43,7 +43,7 @@ class Log
      *
      * @param string $libraryVersion
      *   The version of the library. It will be logged with each log message,
-     *   allowing to better interpret old log messages when giving support.
+     *   allowing better interpreting old log messages when giving support.
      */
     public function __construct(string $libraryVersion)
     {
@@ -54,7 +54,7 @@ class Log
      * Gets the actual log level.
      *
      * @return int
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      */
     public function getLogLevel(): int
     {
@@ -70,7 +70,7 @@ class Log
      * Sets the log level, e.g. based on configuration.
      *
      * @param int $logLevel
-     *   One of the Severity::... constants: Log, Info, Notice, Warning, Error,
+     *   One of the {@see Severity} constants: Log, Info, Notice, Warning, Error,
      *   or Exception
      */
     public function setLogLevel(int $logLevel): void
@@ -275,7 +275,7 @@ class Log
      * @param string $message
      *   The message to log.
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      */
     protected function write(string $message, int $severity): void
     {
@@ -287,16 +287,16 @@ class Log
     /**
      * Formats and logs the message if the log level indicates so.
      *
-     * Errors, warnings and notices are always logged, other levels only if the
+     * Errors, warnings, and notices are always logged, other levels only if the
      * log level is set to do so. Before the log level is set from config,
      * informational messages are also logged.
      *
      * Formatting involves:
      * - calling {@see vsprintf()} if $args is not empty.
-     * - adding "Acumulus {version} {severity}: " in front of the message.
+     * - adding "Acumulus {version} {severity}:" in front of the message.
      *
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      * @param string $message
      *   The message to log, optionally followed by arguments. If there are
      *   arguments the $message is passed through {@see vsprintf()}.

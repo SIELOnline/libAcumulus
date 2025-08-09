@@ -1,8 +1,10 @@
 <?php
 /**
- * Not all constants may have actual usages, in that case they are here for
- * completeness and future use/auto-completion.
+ * @noinspection SpellCheckingInspection
+ *   The Acumulus API uses all lowercase field names, leading to a lot of "typo"s.
  * @noinspection PhpUnused
+ *   Not all constants may have actual usages, in that case they are here for
+ *   completeness and future use/auto-completion.
  */
 
 declare(strict_types=1);
@@ -13,7 +15,7 @@ namespace Siel\Acumulus;
  * Fld defines string constants for the tags used in the Acumulus API messages.
  *
  * @todo: Add all tags used, also for incoming messages.
- *   And thus replace all usages of string constants in code accessing fields.
+ *   And thus replace all usages of string constants in code accessing the fields.
  */
 interface Fld
 {
@@ -103,6 +105,7 @@ interface Fld
     public const AccountNumber = 'accountnumber';
     public const PaymentStatus = 'paymentstatus';
     public const PaymentDate = 'paymentdate';
+    public const WarehouseCountry = 'warehousecountry ';
     public const Description = 'description';
     public const DescriptionText = 'descriptiontext';
     public const Template = 'template';

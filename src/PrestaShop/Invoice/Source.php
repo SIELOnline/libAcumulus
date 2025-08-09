@@ -239,7 +239,7 @@ class Source extends BaseSource
     /**
      * Returns the invoice reference for an order
      *
-     * @noinspection PhpUnused  Called via getInvoiceReference().
+     * @noinspection PhpUnused  Called via {@see Source::getInvoiceReference()}.
      */
     protected function getInvoiceReferenceOrder(): ?string
     {
@@ -250,8 +250,11 @@ class Source extends BaseSource
          *   the id_land is returned as a string.
          */
         return !empty($order->invoice_number)
-            ? Configuration::get('PS_INVOICE_PREFIX', (int) $order->id_lang, null, $order->id_shop)
-            . sprintf('%06d', $order->invoice_number)
+            ? sprintf(
+                '%s%06d',
+                Configuration::get('PS_INVOICE_PREFIX', (int) $order->id_lang, null, $order->id_shop),
+                $order->invoice_number
+            )
             : null;
     }
 

@@ -3,6 +3,12 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+8.5.3 (2025-08-09) (none)
+-------------------------
+- ALL: Added the API field "warehousecountry" to the definition of Invoice.
+  No other support for it has been added, but custom code can now use it.
+
+
 8.5.2 (2025-07-08) (MA)
 -----------------------
 - MA: Siel\Acumulus\Magento\Config\ConfigStore::load(): Return value must be of type

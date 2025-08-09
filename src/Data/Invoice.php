@@ -12,6 +12,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
 use function is_int;
+use function is_string;
 
 /**
  * Represents an Acumulus API Invoice object.
@@ -32,6 +33,7 @@ use function is_int;
  * @property ?int $accountNumber
  * @property ?int $paymentStatus
  * @property ?DateTimeInterface $paymentDate
+ * @property ?string $warehouseCountry
  * @property ?string $description
  * @property ?string $descriptionText
  * @property ?int $template
@@ -46,6 +48,7 @@ use function is_int;
  * @method bool setAccountNumber(?int $value, int $mode = PropertySet::Always)
  * @method bool setPaymentStatus(?int $value, int $mode = PropertySet::Always)
  * @method bool setPaymentDate(?DateTimeInterface $value, int $mode = PropertySet::Always)
+ * @method bool setWarehouseCountry(?string $value, int $mode = PropertySet::Always)
  * @method bool setDescription(?string $value, int $mode = PropertySet::Always)
  * @method bool setDescriptionText(?string $value, int $mode = PropertySet::Always)
  * @method bool setTemplate(?int $value, int $mode = PropertySet::Always)
@@ -109,11 +112,20 @@ class Invoice extends AcumulusObject
                 'allowedValues' => [Api::PaymentStatus_Due, Api::PaymentStatus_Paid]
             ],
             ['name' => Fld::PaymentDate, 'type' => 'date'],
+            ['name' => Fld::WarehouseCountry, 'type' => 'string'],
             ['name' => Fld::Description, 'type' => 'string'],
             ['name' => Fld::DescriptionText, 'type' => 'string'],
             ['name' => Fld::Template, 'type' => 'int'],
             ['name' => Fld::InvoiceNotes, 'type' => 'string'],
         ];
+    }
+
+    public function set(string $name, mixed $value, int $mode = PropertySet::Always): bool
+    {
+        if (($this->getPropertyName($name) === Fld::WarehouseCountry) && is_string($value)) {
+            $value = strtoupper($value);
+        }
+        return parent::set($name, $value, $mode);
     }
 
     public function hasCustomer(): bool
@@ -227,6 +239,7 @@ class Invoice extends AcumulusObject
         }
         $invoice += $this->metadataToArray();
 
+        /** @noinspection NullPointerExceptionInspection  should throw on null */
         $customer = $this->getCustomer()->toArray();
         $customer[Fld::Invoice] = $invoice;
         return [Fld::Customer => $customer];
@@ -236,7 +249,7 @@ class Invoice extends AcumulusObject
      * Returns whether the invoice is empty (free products only).
      *
      * @return bool
-     *   True if the invoice amount (inc. VAT) is €0,-.
+     *   True if the invoice amount (inc. VAT) is € 0,00.
      */
     public function isZeroAmount(): bool
     {

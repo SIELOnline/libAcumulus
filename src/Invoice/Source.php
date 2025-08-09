@@ -99,7 +99,7 @@ abstract class Source implements WrapperInterface, Stringable
      * getStatusCreditNote() should be implemented.
      *
      * @return int|string|null
-     *   The status for this invoice source, null if no status is known
+     *   The status for this invoice source, or null if no status is known.
      */
     public function getStatus(): int|string|null
     {
@@ -113,7 +113,7 @@ abstract class Source implements WrapperInterface, Stringable
      * getPaymentMethodNote() should be implemented.
      *
      * @return int|string|null
-     *   A value identifying the payment method or null if unknown.
+     *   A value identifying the payment method, or null if the payment method is unknown.
      */
     public function getPaymentMethod(): int|string|null
     {
@@ -128,7 +128,7 @@ abstract class Source implements WrapperInterface, Stringable
      * instead assume it is the same as for its original order.
      *
      * @return int|string|null
-     *   A value identifying the payment method or null if unknown.
+     *   A value identifying the payment method or null if the payment method is unknown.
      *
      * @noinspection PhpUnused  Called via callTypeSpecificMethod().
      */
@@ -143,7 +143,9 @@ abstract class Source implements WrapperInterface, Stringable
      * This method will only be called when $this represents an order.
      *
      * @return int|string|null
-     *   A value identifying the payment method or null if unknown.
+     *   A value identifying the payment method or null if the payment method is unknown.
+     *
+     * @noinspection PhpUnused Called via callTypeSpecificMethod().
      */
     protected function getPaymentMethodOrder(): int|string|null
     {
@@ -205,7 +207,7 @@ abstract class Source implements WrapperInterface, Stringable
      * currencies. This means that the amounts are always in the shop's default
      * currency (which should be EUR). Even if another plugin is used to present
      * another currency to the customer, the amounts stored should still be in
-     * EUR. So, we will not have to convert amounts and this meta info is thus
+     * EUR. So, we will not have to convert amounts and this meta-info is thus
      * purely informative.
      */
     public function getCurrency(): Currency
@@ -359,7 +361,7 @@ abstract class Source implements WrapperInterface, Stringable
     /**
      * Returns the parent {@see Source} for a credit note.
      *
-     * This is typically used in mappings, that do not allow condition testing
+     * This is typically used in mappings as these that do not allow condition testing
      * other than canceling the property/method traversal when null is returned.
      *
      * Do not override this method but override getShopOrderOrId() instead.
@@ -414,7 +416,7 @@ abstract class Source implements WrapperInterface, Stringable
      * Do not do any object loading here if only the id is readily available.
      *
      * @return array|object|int
-     *   The original order itself, if readily available, or the id of the
+     *   The original order itself, if readily available, or the ID of the
      *   original order for this credit note.
      */
     protected function getShopOrderOrId(): object|array|int
@@ -430,7 +432,7 @@ abstract class Source implements WrapperInterface, Stringable
      * @return Source[]
      *   If this invoice source is a(n):
      *   - Order: a - possibly empty - array of credit notes of this order.
-     *   - Credit note: an array with this credit note as only element
+     *   - Credit note: an array with this credit note as the only element.
      */
     public function getCreditNotes(): array
     {
@@ -517,17 +519,17 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * Returns a set of "shipping infos".
+     * Returns a set of "shipping-infos".
      *
-     * A shipping info is an "object" that contains information about a shipping line for
-     * this invoice source. What this info looks like is shop dependent, e.g:
+     * A shipping-info is an "object" that contains information about a shipping line for
+     * this invoice source. What this info looks like is shop-dependent, e.g.:
      * - In many shops shipping info is stored at the order level, so this source is
      *   returned as one and only array value, but only if a shipping took place.
      * - In other shops, shipments may be stored as "total lines", "cart rules", or
-     *   something like that and this method would return an array of those "total lines"
-     *   (or whatever they are called) that represent a shipping.
+     *   something like that, and this method would return an array of those "total lines"
+     *   (or whatever they are called) that represent a shipment.
      *
-     * As the data structures returned are fully shop dependent, so should the processing
+     * As the data structures returned are fully shop-dependent, so should the processing
      * code be. However, defining this method allows the managing code to be shop
      * independent and thus be placed in the base
      * {@see \Siel\Acumulus\Collectors\CollectorManager}.
@@ -538,11 +540,11 @@ abstract class Source implements WrapperInterface, Stringable
      * getUnitPrice(), etc) on them that works for more or less all shops.]
      *
      * This base implementation typically returns an empty set: no shipping lines.
-     * Override to return the shop specific set of shipping infos or implement both
+     * Override to return the shop-specific set of shipping infos or implement both
      * getShippingLineInfosOrder() and getShippingLineInfosCreditNote().
      *
      * @return array
-     *   The - possibly empty - set of shipping infos. The type of the array entries
+     *   The - possibly empty - set of shipping-infos. The type of the array entries
      *   differs per shop and may even differ within the list of 1 shop.
      *
      * @noinspection PhpUnused  called via
@@ -636,20 +638,20 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * Calls a type specific implementation of $method.
+     * Calls a type-specific implementation of $method.
      *
-     * This allows to separate logic for different source types into different
+     * This allows separating the logic for different source types into different
      * methods. The method name is expected to be the original method name
      * suffixed with the source type (Order or CreditNote).
      *
      * @param string $method
-     *   The name of the base method for which to call the Source type specific
+     *   The name of the base-method for which to call the Source type specific
      *   variant.
      * @param mixed $args
      *   The arguments to pass to the method to call.
      *
      * @return mixed
-     *   The return value of that method call, or null if the method does not
+     *   The return-value of that method-call, or null if the method does not
      *   exist.
      */
     protected function callTypeSpecificMethod(string $method, ...$args): mixed

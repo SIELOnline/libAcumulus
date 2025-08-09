@@ -147,7 +147,7 @@ class Customer extends AcumulusObject
     }
 
     /**
-     * Returns the type of the address used as main address.
+     * Returns the type of the address used as the main address.
      *
      * @return string
      *   Either AddressType::Invoice or AddressType::Shipping.
@@ -226,7 +226,7 @@ class Customer extends AcumulusObject
      * address is not empty.
      *
      * Note that this method does not imply vat liability, as not all companies
-     * are vat liable.
+     * are vat-liable.
      */
     public function isCompany(): bool
     {
@@ -237,15 +237,14 @@ class Customer extends AcumulusObject
     /**
      * Returns whether this Customer (probably) is vat liable.
      *
-     * When available, the return value is based on the {@see vatTypeId}
-     * property, otherwise it is based on the {@see Address::$companyName1}
-     * property of the {@see getfiscalAddress()} and the {@see vatNumber}
-     * property both not being empty.
+     * When available, the return value is based on the {@see vatTypeId} property,
+     * otherwise it is based on the {@see Address::$companyName1} property of the
+     * {@see getfiscalAddress()} and the {@see vatNumber} property both not being empty.
      *
-     * Note that in the absence of vat number checking against external web
-     * services (VIES) this method does not return a certainty but a
-     * possibility. (Which is fine, as we mostly use it to check if reversed vat
-     * is possible, we do not decide to use it or not.)
+     * Note that in the absence of vat number checking against external web services
+     * (VIES), this method does not return a certainty but a possibility. (Which is fine,
+     * as we mostly use it to check if reversed vat is possible, we do not decide to use
+     * it or not.)
      */
     public function isVatLiable(): bool
     {

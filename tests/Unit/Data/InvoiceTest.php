@@ -83,6 +83,7 @@ class InvoiceTest extends TestCase
         $invoice->metadataSet(Meta::AddEmailAsPdfSection, true);
         $emailAsPdf = new EmailInvoiceAsPdf();
         $emailAsPdf->emailTo = 'client@example.com';
+        $invoice->setWarehouseCountry('BE');
         $invoice->setEmailAsPdf($emailAsPdf);
         $a = $invoice->toArray();
         $expected = [
@@ -93,6 +94,7 @@ class InvoiceTest extends TestCase
                 'meta-main-address-type' => 'InvoiceAddress',
                 'invoice' => [
                     'concept' => 1,
+                    'warehousecountry' => 'BE',
                     'line' => [],
                     'emailaspdf' => [
                         'emailto' => 'client@example.com',

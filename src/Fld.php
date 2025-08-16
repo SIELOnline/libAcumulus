@@ -105,7 +105,7 @@ interface Fld
     public const AccountNumber = 'accountnumber';
     public const PaymentStatus = 'paymentstatus';
     public const PaymentDate = 'paymentdate';
-    public const WarehouseCountry = 'warehousecountry ';
+    public const WarehouseCountry = 'warehousecountry';
     public const Description = 'description';
     public const DescriptionText = 'descriptiontext';
     public const Template = 'template';

@@ -500,17 +500,17 @@ class Container
     }
 
     /**
-     * Returns an instance of a {@see \Siel\Acumulus\Invoice\Completor} or
+     * Returns an instance of a {@see Completor} or
      * {@see \Siel\Acumulus\Completors\BaseCompletor}
      *
      * @param string $dataType
      *   The data type to get the
      *   {@see \Siel\Acumulus\Completors\BaseCompletor Completor} for, or empty
-     *   or not passed to get a "legacy" {@see \Siel\Acumulus\Invoice\Completor}.
+     *   or not passed to get a "legacy" {@see Completor}.
      *
-     * @return \Siel\Acumulus\Invoice\Completor|\Siel\Acumulus\Completors\BaseCompletor
+     * @return Completor|\Siel\Acumulus\Completors\BaseCompletor|null
      */
-    public function getCompletor(string $dataType = ''): BaseCompletor|Completor
+    public function getCompletor(string $dataType = ''): BaseCompletor|Completor|null
     {
         if ($dataType === '') {
             // @legacy remove when all shops are fully converted to new architecture and
@@ -816,7 +816,7 @@ class Container
     }
 
     /**
-     * Returns an instance of the given class or null if the class could not be found
+     * Returns an instance of the given class or null if the class could not be found.
      *
      * This method should normally be avoided, use the get{Class}() methods as
      * they know (and hide) what arguments to inject into the constructor.
@@ -825,8 +825,8 @@ class Container
      * $customNameSpace properties, continuing with the $shopNamespace property,
      * and finally the base namespace (\Siel\Acumulus).
      *
-     * Normally, only 1 instance is created per class but the $newInstance
-     * argument can be used to change this behavior.
+     * Normally, only 1 instance is created per class, but the $newInstance argument can
+     * be used to change this behavior.
      *
      * @param string $class
      *   The name of the class without namespace. The class is searched for in

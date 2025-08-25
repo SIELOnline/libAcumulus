@@ -5,7 +5,14 @@ This file contains a historical overview of changes in our code.
 
 8.6.0 (2025-09-??)
 ------------------
+Features:
 - ALL: Added a mapping and accompanying UI for the API field "warehousecountry".
+
+Bugs:
+- ALL: Mappings form contained a lot of incorrect field names when validating a form
+  submission.
+- ALL: TypeError: Container::getCompletor(): Return value must be of type
+  BaseCompletor|Completor, null returned in Container.php:533.
 
 
 8.5.4 (2025-08-16) (none)

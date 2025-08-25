@@ -29,6 +29,7 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 
 use function sprintf;
+use function strlen;
 
 /**
  * Provides form handling for the mappings.
@@ -82,7 +83,7 @@ class MappingsForm extends Form
     /**
      * {@inheritdoc}
      *
-     * Saves the submitted and validated form values in the mappings store.
+     * Saves the submitted and validated form values in the mapping store.
      */
     protected function execute(): bool
     {
@@ -94,6 +95,7 @@ class MappingsForm extends Form
      */
     protected function validate(): void
     {
+        $this->validateInvoiceFields();
         $this->validateEmailInvoiceFields();
         $this->validateEmailPackingSlipFields();
     }
@@ -101,9 +103,24 @@ class MappingsForm extends Form
     /**
      * Validates fields in the "Email invoice pdf" mappings fieldset.
      */
+    protected function validateInvoiceFields(): void
+    {
+        $warehouseCountry = $this->submittedValues[DataType::Invoice][Fld::WarehouseCountry] ?? null;
+        if (!empty($warehouseCountry)
+            && !str_contains($warehouseCountry, '[')
+            && strlen($warehouseCountry) !== 2
+        ) {
+            $message = sprintf($this->t('message_validate_warehouseCountry'), $this->t('field_warehouseCountry'));
+            $this->addFormMessage($message, Severity::Error, $this->getArrayFieldId(DataType::Invoice, Fld::WarehouseCountry));
+        }
+    }
+
+    /**
+     * Validates fields in the "Email invoice pdf" mappings fieldset.
+     */
     protected function validateEmailInvoiceFields(): void
     {
-        // Check for valid email address if no token syntax is used.
+        // Check for a valid email address if no token syntax is used.
         if (!empty($this->submittedValues['emailTo'])
             && !str_contains($this->submittedValues['emailTo'], '[')
             && !$this->isEmailAddress($this->submittedValues['emailTo'], true)
@@ -119,7 +136,7 @@ class MappingsForm extends Form
             $this->addFormMessage($this->t('message_validate_email_3'), Severity::Error, 'emailBcc');
         }
 
-        // Check for valid email address if no token syntax is used.
+        // Check for a valid email address if no token syntax is used.
         if (!empty($this->submittedValues['emailFrom'])
             && !str_contains($this->submittedValues['emailFrom'], '[')
             && !$this->isEmailAddress($this->submittedValues['emailFrom'])
@@ -149,7 +166,7 @@ class MappingsForm extends Form
             $this->addFormMessage($this->t('message_validate_packing_slip_email_2'), Severity::Error, 'packingSlipEmailBcc');
         }
 
-        // Check for valid email address if no token syntax is used.
+        // Check for a valid email address if no token syntax is used.
         if (!empty($this->submittedValues['packingSlipEmailFrom'])
             && !str_contains($this->submittedValues['packingSlipEmailFrom'], '[')
             && !$this->isEmailAddress($this->submittedValues['packingSlipEmailFrom'])
@@ -396,6 +413,11 @@ class MappingsForm extends Form
     protected function getInvoiceFields(): array
     {
         return [
+            Fld::WarehouseCountry => [
+                'type' => 'text',
+                'label' => $this->t('field_warehouseCountry'),
+                'description' => $this->t('desc_warehouseCountry'),
+            ],
             Fld::Description => [
                 'type' => 'text',
                 'label' => $this->t('field_description'),
@@ -553,7 +575,6 @@ class MappingsForm extends Form
                     ],
                 ],
             ], DataType::StockTransaction);
-
     }
 
     /**
@@ -601,10 +622,20 @@ class MappingsForm extends Form
     {
         $result = [];
         foreach ($fields as $id => $field) {
-            $field['name'] = "{$dataType}[$id]";
-            $field['id'] = "{$dataType}_$id";
+            $field['name'] = $this->getArrayFieldName($dataType, $id);
+            $field['id'] = $this->getArrayFieldId($dataType, $id);
             $result[$field['name']] = $field;
         }
         return $result;
+    }
+
+    protected function getArrayFieldName(string $dataType, string $id): string
+    {
+        return "{$dataType}[$id]";
+    }
+
+    protected function getArrayFieldId(string $dataType, string $id): string
+    {
+        return "{$dataType}_$id";
     }
 }

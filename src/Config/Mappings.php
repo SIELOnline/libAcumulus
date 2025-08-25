@@ -150,7 +150,7 @@ class Mappings
     }
 
     /**
-     * Returns the default mappings for all objects, shop specific and shop independent.
+     * Returns the default mappings for all objects, shop-specific and shop independent.
      *
      * @return string[][]
      *   The default mappings:

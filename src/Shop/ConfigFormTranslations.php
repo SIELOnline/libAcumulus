@@ -362,6 +362,9 @@ De derde optie kunt u gebruiken om dubbelingen (op basis van het e-mailadres van
         'option_missing_amount_3' => 'Voeg een correctieregel toe, de factuur zal echter nog steeds als concept verstuurd worden.',
         'option_missing_amount_1' => 'Negeer het verschil.',
 
+        'field_warehouseCountry' => 'Land van magazijn',
+        'desc_warehouseCountry' => 'Het EU land (2-letterige landcode) waar het magazijn zich bevindt van waaruit de producten worden verzonden.',
+        'message_validate_warehouseCountry' => "Het veld '%s' bevat geen geldige landcode, vul een 2-letterige landcode in.",
         'field_description' => 'Toelichting',
         'desc_description' => 'Toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden m.b.v. de veldverwijzing [toelichting].',
         'field_descriptionText' => 'Uitgebreide toelichting',
@@ -887,6 +890,9 @@ Use the third option to deactivate duplicate customer accounts (based on similar
         'option_missing_amount_3' => 'Add a correction line, note that the invoice will still be sent as concept.',
         'option_missing_amount_1' => 'Ignore.',
 
+        'field_warehouseCountry' => 'Warehouse country',
+        'desc_warehouseCountry' => 'The EU country where the warehouse is located from which the goods are sent.',
+        'message_validate_warehouseCountry' => "The field '%s' does not contain a valid country code, please fill in a 2 character country code.",
         'field_description' => 'Description',
         'desc_description' => 'Invoice description. In Acumulus, you can use the contents of this field in invoice templates using the field reference [toelichting].',
         'field_descriptionText' => 'Extended description',

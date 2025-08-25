@@ -19,7 +19,7 @@ use function is_array;
 use function is_string;
 
 /**
- * Mappings returns sets of mappings for the different
+ * Class Mappings returns sets of mappings for the different
  * {@see \Siel\Acumulus\Data\_Documentation data} objects.
  */
 class Mappings
@@ -117,9 +117,9 @@ class Mappings
         $mappings = array_filter($mappings, static function (string $key) {
             return in_array($key, Mappings::validDataTypes, true);
         }, ARRAY_FILTER_USE_KEY);
-        // $mappings should first be used to replace AND filter the currently stored user
-        // defined mappings (an empty value passed in $mappings indicates to clear any
-        // override, not to define empty for the mapping.
+        // $mappings should first be used to replace AND filter the currently stored
+        // user-defined mappings (an empty value passed in $mappings indicates to clear
+        // any override, not to define empty for the mapping).
         $userDefined = $this->array_filter_recursive(array_replace_recursive($this->getUserDefined(), $mappings));
         $userDefined = array_replace_recursive($this->getDefaults(), $userDefined);
         $userDefined = $this->getOverriddenValues($userDefined, $this->getDefaults());
@@ -134,7 +134,8 @@ class Mappings
      *
      * @return string[][]
      *   The mappings that are stored in the config.
-     *     - 1st dimension: keys being one of the Data\...Type::... constants.
+     *     - 1st dimension: keys being one of the {@see DataType}, {@see AddressDataType},
+     *       {@see LineDataType}, or {@see EmailAsPdfType} constants.
      *     - 2nd dimension: keys being property names or metadata keys.
      *   Values are mappings for the specified property or metadata field. These are
      *   typically strings that may contain a field expansion specification, see
@@ -154,7 +155,8 @@ class Mappings
      *
      * @return string[][]
      *   The default mappings:
-     *     - 1st dimension: keys being one of the Data\...Type::... constants.
+     *     - 1st dimension: keys being one of the {@see DataType}, {@see AddressDataType},
+     *       {@see LineDataType}, or {@see EmailAsPdfType} constants.
      *     - 2nd dimension: keys being property names or metadata keys.
      *   Values are mappings for the specified property or metadata field. These are
      *   typically strings that may contain a field expansion specification, see
@@ -259,7 +261,8 @@ class Mappings
             DataType::StockTransaction => [
                 Fld::ProductId => '[product::getAcumulusId()]',
                 Fld::StockAmount => '[change]',
-                // For now only line item based events are responded to, so item will exist.
+                // For now only line-item-based events are responded to, so 'item' will
+                // exist.
                 //Fld::StockDescription => '[environment::hostName+item::getSource()::getLabelReference(1)|localResult::getTrigger()]',
                 Fld::StockDescription => '[environment::hostName+item::getSource()::getLabelReference(1)]',
                 Meta::MatchShopValue => '[product::getReferenceForAcumulusLookup()]',

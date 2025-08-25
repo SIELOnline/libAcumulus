@@ -536,7 +536,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'option_logLevel_5' => 'Log foutmeldingen, waarschuwingen, mededelingen, en communicatieberichten.',
         'desc_logLevel' => 'U kunt hier een logniveau kiezen. Kies voor de 1e of 2e optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
 
-        // Link to other config form.
+        // Link to the other config form.
         'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u op het "%1$s" formulier onder "%2$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
         'menu_advancedSettings' => 'Instellingen → Acumulus geavanceerde instellingen',
 
@@ -654,7 +654,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'option_marginProducts_1' => 'New products and/or services as well as products that use the margin scheme.',
         'option_marginProducts_2' => 'Only new products and/or services.',
         'option_marginProducts_3' => 'Only products that use the margin scheme.',
-        'desc_marginProducts' => 'Select whether your store sells (2nd hand) products using the margin scheme. See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Dutch tax office: margin goods (in Dutch)</a>.',
+        'desc_marginProducts' => 'Select whether your store sells (second-hand) products using the margin scheme. See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Dutch tax office: margin goods (in Dutch)</a>.',
 
         'vat_class' => 'tax class',
         'vat_classes' => 'tax classes',
@@ -674,7 +674,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 
         'field_vatFreeClass' => 'Which %1$s defines VAT free?',
         'desc_vatFreeClass' => 'Indicate which %1$s you use to indicate that a product or service is VAT free.<br>
-• Select the 1st option ("%2$s") if you do not sell VAT free goods or services.<br>
+• Select the 1st option ("%2$s") if you do not sell VAT-free goods or services.<br>
 • Select the 2nd option ("%3$s") if you leave the field %1$s empty on VAT free products.<br>
 • NOTE: this setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.
 • Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
@@ -682,12 +682,12 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'field_zeroVatClass' => 'Which %1$s defines the 0%% vat rate?',
         'desc_zeroVatClass' => 'Indicate which %1$s you use to indicate that a product or service is subject to the 0%% vat rate.<br>
 • Select the 1st option ("%2$s") if you do not sell goods or services at the 0%% rate.<br>
-• NOTE 1: the 0%% rate differs from vat free as above and is not common in the Netherlands. E.g, early 2021, masks fell under the 0%% vat rate.<br>
+• NOTE 1: the 0%% rate differs from vat free as above and is not common in the Netherlands. E.g. early 2021, masks fell under the 0%% vat rate.<br>
 • NOTE 2: this setting concerns whether the products or services you offer are inherently subject to the 0%% vat rate, not if you make invoices without vat (e.g. sometimes when selling abroad) or reversed vat.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',
-        'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order or credit note should be sent to Acumulus. If you select multiple instants, the invoice wil be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created,unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
+        'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order or credit note should be sent to Acumulus. If you select multiple instants, the invoice will be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created, unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
 
         'field_triggerOrderStatus' => 'Order',
         'desc_triggerOrderStatus' => 'Using the "Ctrl" key, you can select/deselect multiple items.',
@@ -711,13 +711,13 @@ This means that besides free literal text, these fields can contain data from th
 Field references are denoted by placing the name of the property between square brackets, i.e. [ and ].</p>
 <p>To handle some special situations, field references can be combined as follows:</p>
 <dl class="property-list">
-<dt>[property]:</dt><dd>Simplest form, replace by the value of the property or method (without arguments). All available objects are searched for the given property.</dd>
-<dt>[property(arguments)]:</dt><dd>Replace by the return value of the method. "arguments" is a comma-separated list of arguments to pass to the method. Do not use quotes around strings.</dd>
-<dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the given object (see list below). Use this to get the value from the correct object if multiple objects have a property with the same name (e.g. id).</dd>
+<dt>[property]:</dt><dd>Simplest form, replaced by the value of the property or method (without arguments). All available objects are searched for the given property.</dd>
+<dt>[property(arguments)]:</dt><dd>Replaced by the return value of the method. "arguments" is a comma-separated list of arguments to pass to the method. Do not use quotes around strings.</dd>
+<dt>[object::property]:</dt><dd>Replaced by the value of the property but only if that property is part of the given object (see the list below). Use this to get the value from the correct object if multiple objects have a property with the same name (e.g. id).</dd>
 <dt>[object::property<i>1</i>::...::property<i>n</i>]:</dt><dd>This is the recommended way. Travers the chain of objects/properties/methods to retrieve the value. If one of the intermediate results does not exist, the empty string will be returned.</dd>
-<dt>[property<i>1</i>|property<i>2</i>|...]:</dt><dd>Replace by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR landline number.</dd>
-<dt>[property<i>1</i>+property<i>2</i>+...]:</dt><dd>Replace by the value of property1 and that of property2 with 1 space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
-<dt>[property<i>1</i>&property<i>2</i>&...]:</dt><dd>Replace by the value of property1 and that of property2 but with no space between it.</dd>
+<dt>[property<i>1</i>|property<i>2</i>|...]:</dt><dd>Replaced by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR landline number.</dd>
+<dt>[property<i>1</i>+property<i>2</i>+...]:</dt><dd>Replaced by the value of property1 and that of property2 with a space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
+<dt>[property<i>1</i>&property<i>2</i>&...]:</dt><dd>Replaced by the value of property1 and that of property2 but with no space between it.</dd>
 <dt>["literal text"]:</dt><dd>Replace by the literal text (without quotes) but only if it is combined, using + or &, with another non-empty property.</dd>
 </dl>
 <p><strong>Attention:</strong> in most situations the default value will do fine! Only change these fields in special situations and when you know what you are doing.</p>
@@ -876,9 +876,9 @@ Use the third option to deactivate duplicate customer accounts (based on similar
 
         'field_eu_commerce_threshold_percentage' => 'EU Commerce percentage',
         'desc_eu_commerce_threshold_percentage' => 'Acumulus keeps track of how many sales you already have made within the EU aggregated over all your sales channels. '
-                                                   . 'This %1$s can give you a warning when you are nearing the threshold above which you have to charge EU VAT. If you are passing that threshold it will send all new invoices as a concept.<br>'
+                                                   . 'This %1$s can give you a warning when you are nearing the threshold above which you have to charge EU VAT. If you are passing that threshold, it will send all new invoices as a concept.<br>'
                                                    . '• Enter a percentage as of which Acumulus should start warning you. use a decimal point if you wish to enter a fraction. The %%-sign is optional.<br>'
-                                                   . '• Enter 100 if you don\'t want a warning, but want to send invoices as concept as soon as you are passing or already past the threshold.<br>'
+                                                   . '• Enter 100 if you don\'t want a warning, but want to send invoices as "concept" as soon as you are passing or already past the threshold.<br>'
                                                    . '• Enter 0 if you use EU VAT as of the start of the year and want to receive a warning when some misconfigured articles are sold.<br>'
                                                    . '• Leave empty if you do not want to use this feature.',
         'message_validate_percentage_0' => 'Enter a percentage (a number between 0 and 100) in the field "%s".',
@@ -951,13 +951,13 @@ Use the third option to deactivate duplicate customer accounts (based on similar
 
         // Documents handling
         'documentsSettingsHeader' => 'Acumulus documents',
-        'desc_documentsSettings' => 'Acumulus can create pdf documents for the invoice or packing slip for all invoices sent to Acumulus. These documents:<br>
+        'desc_documentsSettings' => 'Acumulus can create PDF documents for the invoice or packing slip for all invoices sent to Acumulus. These documents:<br>
 • Can be opened by you in your browser.<br>
 • The invoice can be mailed to your customer, with an optional bcc to one of your own addresses.<br>
 • The packing slip can be mailed to a(n internal) address.<br>
-• In the profile part of your customer, you can place links to these pdf documents, but this features falls outside the scope of this plugin and requires some custom code.<br>
+• In the profile part of your customer, you can place links to these PDF documents, but this features falls outside the scope of this plugin and requires some custom code.<br>
 Below you can define how to use these documents.
-Please note that these documents are created by Acumulus, not the web shop. If you do not use these documents, you better not enable these options',
+Please note that these documents are created by Acumulus, not the web shop. If you do not use these documents, you better don\'t enable these options',
         'field_detailPage' => 'Detail page',
         'desc_detailPage' => 'Indicate if and which buttons you want to show on the "Invoice status overview", see above, for the various documents and their actions.',
         'field_listPage' => 'Order list',
@@ -969,8 +969,8 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         // Email invoice settings.
         'field_emailAsPdf' => 'Send invoice automatically',
         'option_emailAsPdf' => 'Have Acumulus send the invoice, as a PDF, to your customer, directly after sending the invoice data to Acumulus.',
-        'option_ubl' => 'Add an e-invoice to the pdf.',
-        'desc_emailAsPdf' => 'Indicate whether you want Acumulus to send the invoice as pdf (first checkbox), with optionally an e-invoice added in <a href="https://en.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL format</a> (second checkbox). Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (advanced setting), Acumulus cannot send invoice-pdfs.',
+        'option_ubl' => 'Add an e-invoice to the PDF.',
+        'desc_emailAsPdf' => 'Indicate whether you want Acumulus to send the invoice as PDF (first checkbox), with optionally an e-invoice added in <a href="https://en.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL format</a> (second checkbox). Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to the menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (advanced setting), Acumulus cannot send invoice-pdfs.',
 
         'field_emailTo' => 'To',
         'desc_emailTo' => 'The e-mail address to send the invoice to. If you leave this empty the e-mail address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;).',
@@ -1022,7 +1022,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'custom_field' => 'custom field',
 
         'field_productMatchAcumulusField' => 'Product property in Acumulus',
-        'desc_productMatchAcumulusField' => 'Select which property of a product in Acumulus should be used to match the above selected property against.<br>'
+        'desc_productMatchAcumulusField' => 'Select which property of a product in Acumulus should be used to match the above-selected property against.<br>'
             . '• Preferably, you select either SKU or EAN from the list.<br>'
             . '• Searching for "%1$s" is possible, but then you must have imported these IDs from Acumulus yourself.<br>'
             . '• If yuo do not yet use "SKUs" or something like that, you can search on "%1$s" (the before-last option).<br>'
@@ -1035,7 +1035,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         Fld::Product => 'All fields',
         Meta::MatchShopFieldSpecification => 'Custom product property',
         'message_validate_product_match_shop_field_0' => 'The field "Product property in your web shop" is required, please select a property.',
-        'message_validate_product_match_shop_field_1' => 'For the field "Product property in your web shop" you have chosen "%1$s". However, the mapping "%2$s" has not been defined yet, Do not forget to define it! you can do so on the "<a href="%4$s" target="_blank">%3$s form</a>".',
+        'message_validate_product_match_shop_field_1' => 'For the field "Product property in your web shop" you have chosen "%1$s". However, the mapping "%2$s" has not been defined yet, Remember to define it! you can do so on the "<a href="%4$s" target="_blank">%3$s form</a>".',
         'message_validate_product_match_acumulus_field_0' => 'The field "Product property in Acumulus" is required, please select a property.',
 
         // Stock management mapping.
@@ -1064,7 +1064,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'option_logLevel_5' => 'Log error messages, warnings, notices, and communication messages.',
         'desc_logLevel' => 'Select a log level. Choose for the 1st or 2nd option unless otherwise instructed by support staff.',
 
-        // Link to other config form.
+        // Link to the other config form.
         'desc_advancedSettings' => 'This plugin is highly configurable and therefore this form does not contain all settings. You can find the other settings in the "%1$s" under "%2$s". Once you have completed and saved the settings over here, you can visit that form to fill in the advanced settings.',
         'menu_advancedSettings' => 'Settings → Acumulus advanced settings',
 

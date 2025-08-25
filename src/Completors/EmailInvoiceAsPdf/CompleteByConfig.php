@@ -8,7 +8,7 @@ use Siel\Acumulus\Completors\BaseCompletorTask;
 use Siel\Acumulus\Data\AcumulusObject;
 
 /**
- * CompleteByConfig adds configuration based values.
+ * CompleteByConfig adds configuration-based values.
  */
 class CompleteByConfig extends BaseCompletorTask
 {

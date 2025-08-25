@@ -34,10 +34,10 @@ class Message
     // Formats in which to return messages.
     /** @var int Format as plain text */
     public const Format_Plain = 0;
-    /** @var int Format as html. */
+    /** @var int Format as HTML. */
     public const Format_Html = 1;
     // PHP7.1: These 2 could become protected.
-    /** @var int Format as list item */
+    /** @var int Format as list-item */
     public const Format_ListItem = 2;
     /** @var int Format with the severity level prepended. */
     public const Format_AddSeverity = 4;
@@ -58,7 +58,7 @@ class Message
      * @param array $apiMessage
      *   An array with keys 'message', 'code', and 'codetag'.
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      */
     public static function createFromApiMessage(array $apiMessage, int $severity): Message
     {
@@ -152,7 +152,7 @@ class Message
 
     /**
      * @return int
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      */
     public function getSeverity(): int
     {
@@ -163,7 +163,7 @@ class Message
      * Overrides the severity of the message.
      *
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      */
     public function setSeverity(int $severity): void
     {
@@ -243,8 +243,8 @@ class Message
      * - If Format_Html is set, the 2 or 3 parts of the message will each be
      *   wrapped in a <span> and newlines in the message text will be converted
      *   to <br>.
-     * - If Format_ListItem is set, list indication will be added, either a
-     *   "* ...\n" or a "<li>...</li>".
+     * - If Format_ListItem is set, a list indication will be added: either an
+     *   asterisk ("* ...\n") or the HTML list tag "<li>...</li>".
      *
      * @param int $format
      *   Any (mix) of the Format_... constants.

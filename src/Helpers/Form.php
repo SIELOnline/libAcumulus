@@ -25,16 +25,16 @@ use function sprintf;
  *
  * Most web shop and CMS software provide their own sort of form API. To be able
  * to generalize or abstract our form handling, this class defines our own
- * minimal form API. This allows us to define our form handing in a cross
- * web shop compatible way. The web shop/CMS specific part should then define a
- * renderer/mapper to the web shop specific way of form handling.
+ * minimal form API. This allows us to define our form handing in a cross-webshop
+ * compatible way. The web shop/CMS-specific part should then define a
+ * renderer/mapper to the webshop-specific way of form handling.
  *
  * This base Form class defines a way to:
  * - Define the form elements, see {@see getFields()}.
  * - Render the form, including assigning values to form elements based on
- *   POSTed values, configuration settings, and defaults.
+ *   POSTed values, configuration-settings, and defaults.
  * - Process a form submission:
- *     * Recognise form submission form just rendering a form.
+ *     * Recognise form-submission from just rendering a form.
  *     * Perform form (submission) validation.
  *     * {@see execute()} a task on valid form submission.
  *     * Show success and/or error messages.
@@ -54,7 +54,7 @@ use function sprintf;
  *   // Create the form and add the values to the elements.
  *   $form = new ChildForm();
  *   $formFields = $form->addValues();
- *   // Render the html for the form.
+ *   // Render the HTML for the form.
  *   $formRenderer = new FormRenderer();
  *   $formRenderer->render($form)
  * </code>
@@ -62,7 +62,7 @@ use function sprintf;
  * This code is to be used when the CMS or web shop does provide its own form
  * handling and processing:
  * <code>
- *   // Create shop specific Form object
+ *   // Create webshop-specific Form object
  *   $shopForm = new ShopForm()
  *   // Map the elements and settings of the Acumulus Form to the shop form.
  *   $formMapper = new FormMapper();
@@ -105,26 +105,25 @@ abstract class Form extends MessageCollection
     protected array $formValues;
     /**
      * @var string[]
-     *   The values as filled in on form submission.
+     *   The values as filled in on the form-submission.
      */
     protected array $submittedValues;
     /**
      * @var bool
-     *   For some forms it is important to know which fields were rendered and
-     *   of what type they were  and to which set (of checkboxes) they belong.
-     *   As empty fields will not be present in the $_POST variable, this may be
-     *   hard to determine on submit, so a hidden field containing a summary of
-     *   rendered fields is added to the form and will thus be available on
-     *   submit.
+     *   For some forms it is important to know which fields were rendered and of what
+     *   type they were and to which set (of checkboxes) they belong. As empty fields will
+     *   not be present in the $_POST variable, this may be hard to determine on form
+     *   submission. Therefore, we add a hidden field containing a summary of the rendered
+     *   fields to the form so that this information will be available on from submission.
      *
-     *   For other forms it turned out to be a hindrance, so a property now
-     *   guides whether the meta field is rendered or not.
+     *   For other forms it turned out to be a hindrance, so this property now guides
+     *   whether the meta-field is rendered or not.
      */
     protected bool $addMeta = true;
     /**
      * @var bool
      *   Whether this form is a full page form, thus surrounded by a <form> tag
-     *   and having a possibly standardized submit button.
+     *   and having a possibly standardized 'submit' button.
      *
      *   Not all "forms" as defined by this library are real forms (in the sense
      *   of being enclosed in a <form> tag) or full page forms (having a
@@ -134,7 +133,7 @@ abstract class Form extends MessageCollection
     protected bool $isFullPage = true;
     /**
      * @var bool
-     *   Whether to add a css class to fields that indicates the severity of
+     *   Whether to add a CSS class to fields that indicates the severity of
      *   any message linked to this field.
      */
     protected bool $addSeverityClassToFields = true;
@@ -179,7 +178,7 @@ abstract class Form extends MessageCollection
 
     /**
      * returns whether this form is a full page form, thus surrounded by a
-     * <form> tag and having a possibly standardized submit button.
+     * <form> tag and having a possibly standardized 'submit' button.
      *
      * @noinspection PhpUnused
      *   Used in shop webshop specific projects.
@@ -224,7 +223,7 @@ abstract class Form extends MessageCollection
             // but do so with some special array handling.
             $defaultFormValues = $this->getDefaultFormValues();
             foreach ($defaultFormValues as $key => $defaultFormValue) {
-                // We start with a simple overwrite.
+                // We start by simply overwriting.
                 if (array_key_exists($key, $this->formValues)) {
                     $this->formValues[$key] = $defaultFormValue;
                 } elseif (is_array($defaultFormValue)) {
@@ -247,7 +246,7 @@ abstract class Form extends MessageCollection
             // definitions.
             $this->formValues = array_merge($this->formValues, $this->getFieldValues($this->getFields()));
 
-            // 5: Allow for any web shop specific processing of the values.
+            // 5: Allow for any webshop-specific processing of the values.
             // Known usages:
             // - Prepend (checked) checkboxes with their collection name
             //   (PrestaShop).
@@ -317,7 +316,7 @@ abstract class Form extends MessageCollection
      * Adds the form values to the field definitions.
      *
      * This internal version of addValues() passes the fields as a parameter to
-     * allow to recursively process field sets.
+     * allow recursively processing field sets.
      */
     protected function addValuesToFields(array $fields): array
     {
@@ -408,9 +407,8 @@ abstract class Form extends MessageCollection
      *
      * @param bool $executeIfValid
      *   Whether this method should execute the intended action after successful
-     *   validation. Some web shops (WooCommerce) sometimes do their own form
-     *   handling (setting pages) and we should only do the validation and
-     *   setting admin notices as necessary.
+     *   validation. Some webshops do their own form handling (e.g. WordPress setting
+     *   pages), and we should only do the validation and setting admin notices as necessary.
      *
      * @return bool
      *   True if there was no form submission or a successful submission.
@@ -449,18 +447,18 @@ abstract class Form extends MessageCollection
     /**
      * Performs form validation.
      *
-     * Any errors are stored as a user readable message in the $errorMessages
+     * Any errors are stored as a user-readable message in the $errorMessages
      * property and will be keyed by the field name.
      *
      * This default implementation does no validation at all. Override to add
-     * form specific validation.
+     * form-specific validation.
      */
     protected function validate(): void
     {
     }
 
     /**
-     * Executes the form action on valid form submission.
+     * Executes the form action on a valid form submission.
      *
      * Override to implement the actual form handling, like saving values.
      *
@@ -475,19 +473,19 @@ abstract class Form extends MessageCollection
      * This should NOT include any:
      * - Submit or cancel buttons. These are often added by the web shop software
      *   in their specific way.
-     * - Tokens, form-id's or other (hidden) fields used by the web shop software
+     * - Tokens, form-ids, or other (hidden) fields used by the web shop software
      *   to protect against certain attacks or to facilitate internal form
      *   processing.
      *
      * This is a recursive, keyed array defining each form field. The key
-     * defines the name of the form field, to be used for the name and  id
-     * attribute. The values are a keyed array, that can have the following
+     * defines the name of the form field, to be used for the name and id
+     * attribute. The values are a keyed array that can have the following
      * keys:
-     * - type: (required, string): fieldset, details, text, number, password,
-     *   email, date, textarea, select, radio, checkbox, markup, hidden, or
-     *   collection.
+     * - type: (required, string): 'fieldset', 'details', 'text', 'number', 'password',
+     *   'email', 'date', 'textarea', 'select', 'radio', 'checkbox', 'markup', 'hidden',
+     *   or 'collection'.
      * - legend/summary: (string) human-readable title for a fieldset/details.
-     * - label: (string) human-readable label, legend or summary.
+     * - label: (string) human-readable 'label', 'legend', or 'summary'.
      * - description: (string) human-readable help text.
      * - value: (string) the value for the form field. Will normally be set by
      *   the form processing, the developer of a form should override
@@ -573,7 +571,7 @@ abstract class Form extends MessageCollection
      * Checks if a string is a valid (list of) e-mail address(es).
      *
      * @param string $submittedValue
-     *   The value to check.
+     *   The value to check. The empty string is not considered a valid e-mail address.
      * @param bool $multi
      *   Whether to allow multiple e-mail addresses separated by a ',' or ';'.
      */
@@ -590,7 +588,7 @@ abstract class Form extends MessageCollection
      * Returns an option list of all order statuses including an empty choice.
      *
      * @return array
-     *   An options array of all order statuses.
+     *   An array of all order statuses that can be used for the 'options' of a 'select'.
      */
     protected function getOrderStatusesList(string $emptyOption): array
     {
@@ -625,7 +623,7 @@ abstract class Form extends MessageCollection
     {
         $result = [];
 
-        // Empty value, if any, at top.
+        // Empty value, if any, at the top.
         if ($emptyValue !== null) {
             $result[$emptyValue] = $emptyText;
         }
@@ -653,7 +651,7 @@ abstract class Form extends MessageCollection
                     } elseif (!empty($optionalText)) {
                         if ($key3 === $key2 . 'nl') {
                             if ($this->translator->getLanguage() === 'nl') {
-                                // English and Dutch descriptions and Dutch is
+                                // English and Dutch descriptions, and Dutch is
                                 // the active language: use the 3rd text.
                                 $optionText = $optionalText;
                             }
@@ -671,7 +669,7 @@ abstract class Form extends MessageCollection
     }
 
     /**
-     * Returns the html of an <img> tag to show the logo.
+     * Returns the HTML of an <img> tag to show the logo.
      */
     protected function getLogo(int $size = 150): string
     {

@@ -99,7 +99,7 @@ class AcumulusTest extends TestCase
         $this->assertEqualsCanonicalizing($expectedKeys, array_keys($singleResponse));
     }
 
-    public function vatInfoProvider(): array
+    public static function vatInfoProvider(): array
     {
         return [
             'nl' => [['nl', '2015-01-01'],
@@ -223,7 +223,7 @@ class AcumulusTest extends TestCase
         $this->assertEquals(10000, $threshold);
     }
 
-    public function stockTransactionProvider(): array
+    public static function stockTransactionProvider(): array
     {
         $productId = 1833641; // (trui bruin)
 

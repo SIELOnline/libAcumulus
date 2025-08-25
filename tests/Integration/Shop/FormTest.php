@@ -49,7 +49,7 @@ class FormTest extends TestCase
         return static::getContainer()->getFormRenderer();
     }
 
-    public function formTypesProvider(): array
+    public static function formTypesProvider(): array
     {
         return [
             ['settings', SettingsForm::class],
@@ -64,7 +64,7 @@ class FormTest extends TestCase
     }
 
     /**
-     * Tests the form creation and rendering process.
+     * Tests the form-creation and rendering process.
      *
      * @dataProvider formTypesProvider
      */

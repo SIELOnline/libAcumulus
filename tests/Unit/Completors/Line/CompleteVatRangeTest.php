@@ -112,9 +112,14 @@ class CompleteVatRangeTest extends TestCase
     /**
      * @dataProvider vatRangeWithUnitPriceDataProvider
      */
-    public function testCompletionWithUnitPrice(float $unitPrice, float $vatAmount, ?string $vatRateSource, ?float $min, ?float $max,
-        ?float $rate): void
-    {
+    public function testCompletionWithUnitPrice(
+        float $unitPrice,
+        float $vatAmount,
+        ?string $vatRateSource,
+        ?float $min,
+        ?float $max,
+        ?float $rate
+    ): void {
         $line = $this->getLine(LineType::Item);
         $line->unitPrice = $unitPrice;
         $line->metadataSet(Meta::VatAmount, $vatAmount);

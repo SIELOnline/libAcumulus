@@ -9,7 +9,7 @@ use Siel\Acumulus\Config\Environment as EnvironmentBase;
 use const Siel\Acumulus\Version;
 
 /**
- * Defines the PrestaShop web shop specific environment.
+ * Defines the PrestaShop webshop-specific environment.
  */
 class Environment extends EnvironmentBase
 {

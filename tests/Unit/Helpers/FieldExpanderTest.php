@@ -56,7 +56,7 @@ class FieldExpanderTest extends TestCase
         return $result;
     }
 
-    public function fieldsNoFieldsProvider(): array
+    public static function fieldsNoFieldsProvider(): array
     {
         return [
             ['No variable fields', 'No variable fields'],
@@ -76,7 +76,7 @@ class FieldExpanderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function fieldsNoObjectsProvider(): array
+    public static function fieldsNoObjectsProvider(): array
     {
         return [
             ['No objects [fields]', 'No objects '],
@@ -93,7 +93,7 @@ class FieldExpanderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function fields1PropertyProvider(): array
+    public static function fields1PropertyProvider(): array
     {
         return [
             ['[id]', 3],
@@ -119,7 +119,7 @@ class FieldExpanderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function fieldsWithAlternativesProvider(): array
+    public static function fieldsWithAlternativesProvider(): array
     {
         return [
             ['[street|street2]', 'Stationsstraat 3'],
@@ -142,7 +142,7 @@ class FieldExpanderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function fieldsWithSpaceConcatenatedPropertiesProvider(): array
+    public static function fieldsWithSpaceConcatenatedPropertiesProvider(): array
     {
         return [
             ['[first_name+last_name]', 'Erwin Derksen'],
@@ -182,7 +182,7 @@ class FieldExpanderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function fieldsWithLiteralsProvider(): array
+    public static function fieldsWithLiteralsProvider(): array
     {
         return [
             ['[returned|"No returns yet"]', 'No returns yet'],
@@ -207,7 +207,7 @@ class FieldExpanderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function complexFieldsProvider(): array
+    public static function complexFieldsProvider(): array
     {
         return [
             ['Beste [first_name] ([middle_name+last_name]),', 'Beste Erwin (Derksen),'],
@@ -226,7 +226,7 @@ class FieldExpanderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function objectsProvider(): array
+    public static function objectsProvider(): array
     {
         return [
             ['[container::getLanguage()]', self::Language],
@@ -234,7 +234,7 @@ class FieldExpanderTest extends TestCase
             ['[container::createAcumulusObject(address)::fullName]', null], //magic __get
             ['[container::createSource(Order,10)::getId()]', 10], //magic __get
             ['[container::createSource(Order,10)::getCreditNote()]', null], // () is not '' as a single argument
-            ['[container::createSource(Order,10)::getCreditNote()::getId()]', null], // null in middle of chain
+            ['[container::createSource(Order,10)::getCreditNote()::getId()]', null], // null in the middle of the chain
         ];
     }
 
@@ -267,7 +267,7 @@ class FieldExpanderTest extends TestCase
         $this->assertSame(self::Language, $field->expand('[object::language]', $objects));
     }
 
-    public function objectWithNumericArrayAnd0ValuesProvider(): array
+    public static function objectWithNumericArrayAnd0ValuesProvider(): array
     {
         return [
             ['[order::lines::0::product]', 'Buro'],

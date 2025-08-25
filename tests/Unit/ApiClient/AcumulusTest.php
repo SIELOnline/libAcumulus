@@ -44,7 +44,7 @@ class AcumulusTest extends TestCase
      * 3: needContract (bool): whether authorisation is required.
      * 4: message (array): submit as expected by Acumulus, created from args.
      */
-    public function argumentsPassed(): array
+    public static function argumentsPassed(): array
     {
         // See for the meaning of each entry the parameter list of testApiCalls.
         $emailInvoiceAsPdf = new EmailInvoiceAsPdf();

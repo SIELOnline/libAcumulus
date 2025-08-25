@@ -61,14 +61,13 @@ class CompleteAccountingInfoTest extends TestCase
     /**
      * @dataProvider invoiceNumberDataProvider
      *
-     * @param int|string $paymentMethod
      * @param int[] $costCenterPerPaymentMethod
      * @param int[] $accountNumberPerPaymentMethod
      *
      * @noinspection PhpTooManyParametersInspection
      */
     public function testComplete(
-        $paymentMethod,
+        int|string $paymentMethod,
         ?int $defaultCostCenter,
         ?int $defaultAccountNumber,
         array $costCenterPerPaymentMethod,

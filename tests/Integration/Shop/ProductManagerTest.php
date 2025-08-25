@@ -42,7 +42,7 @@ class ProductManagerTest extends TestCase
         return static::getContainer()->getProductManager();
     }
 
-    public function searchProvider(): array
+    public static function searchProvider(): array
     {
         return [
             'TEST-GRO' => ['TEST-GRO', [1833637]],
@@ -63,7 +63,7 @@ class ProductManagerTest extends TestCase
         self::assertEqualsCanonicalizing($productIds, array_column($products, Fld::ProductId));
     }
 
-    public function referenceProvider(): array
+    public static function referenceProvider(): array
     {
         return [
             'TEST-GRO' => ['TEST-GRO', Fld::ProductEan, 1833637],
@@ -72,7 +72,7 @@ class ProductManagerTest extends TestCase
     }
 
     /**
-     * Tests that the getAcumulusProductByRerference method is case-sensitive.
+     * Tests that the {@see ProductManager::getAcumulusProductByReference()) method is case-sensitive.
      *
      * @dataProvider referenceProvider
      */
@@ -87,7 +87,7 @@ class ProductManagerTest extends TestCase
         }
     }
 
-    public function itemProvider1(): array
+    public static function itemProvider1(): array
     {
         return [
             'item 3 sku' => [3, 4, Fld::ProductSku, StockTransactionResult::NotSent_NoMatchInAcumulus],
@@ -128,7 +128,7 @@ class ProductManagerTest extends TestCase
         }
     }
 
-    public function itemProvider2(): array
+    public static function itemProvider2(): array
     {
         return [
             'item 5 sku' => [5, 2, Fld::ProductSku, 1833642],
@@ -151,7 +151,7 @@ class ProductManagerTest extends TestCase
         $productMatchShopField = $config->set('productMatchShopField', 'mapping');
         $productMatchAcumulusField = $config->set('productMatchAcumulusField', $acumulusField);
         $debug = $config->set('debug', $itemId === 17 ? Config::Send_SendAndMail : Config::Send_SendAndMailOnError);
-        $this->getContainer()->getMappings()->save([
+        static::getContainer()->getMappings()->save([
             DataType::Product => [
                 Meta::MatchShopFieldSpecification => '[product::getReference()]',
             ],
@@ -191,12 +191,12 @@ class ProductManagerTest extends TestCase
             );
             $stockAmount = (float) $result->getMainApiResponse()[Fld::StockAmount];
 
-            // Correct the stock, so that continuous (successful) testing  will not change the actual levels at Acumulus.
+            // Correct the stock so that continuous (successful) testing will not change the actual levels at Acumulus.
             $result = $productManager->updateStockForItem($item, -$change, 'ProductManagerTest::returnStock');
             self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
             self::assertSame(
-                $result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource],
-                'local'
+                'local',
+                $result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource]
             );
             self::assertSame($stockAmount - $change, (float) $result->getMainApiResponse()[Fld::StockAmount]);
         }

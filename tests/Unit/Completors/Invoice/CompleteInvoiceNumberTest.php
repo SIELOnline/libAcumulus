@@ -71,7 +71,7 @@ class CompleteInvoiceNumberTest extends TestCase
      * @param int|string|null $invoiceReference
      * @param int|null $expected
      */
-    public function testComplete(int $sourceToUse, $orderReference, $invoiceReference, ?int $expected): void
+    public function testComplete(int $sourceToUse, int|string|null $orderReference, int|string|null $invoiceReference, ?int $expected): void
     {
         $config = $this->getContainer()->getConfig();
         $config->set('invoiceNrSource', $sourceToUse);

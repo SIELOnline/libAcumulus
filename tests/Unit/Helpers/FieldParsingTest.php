@@ -35,7 +35,7 @@ class FieldParsingTest extends TestCase
         self::$container = new Container('TestWebShop\TestDoubles', 'en');
     }
 
-    public function fieldsProvider1(): array
+    public static function fieldsProvider1(): array
     {
         return [
             ['No variable fields'],
@@ -58,7 +58,7 @@ class FieldParsingTest extends TestCase
         $this->assertEmpty($vf->trace);
     }
 
-    public function fieldsProvider2(): array
+    public static function fieldsProvider2(): array
     {
         return [
             ['1 variable [field]', 'field'],
@@ -82,7 +82,7 @@ class FieldParsingTest extends TestCase
         $this->assertSame($match, reset($vf->trace[$stopAt]));
     }
 
-    public function fieldsProvider3(): array
+    public static function fieldsProvider3(): array
     {
         return [
             ['multiple [variable] [fields]', ['variable', 'fields']],
@@ -105,7 +105,7 @@ class FieldParsingTest extends TestCase
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
     }
 
-    public function fieldsProvider4(): array
+    public static function fieldsProvider4(): array
     {
         return [
             ['[multiple|alternative|fields]', ['multiple', 'alternative', 'fields']],
@@ -126,7 +126,7 @@ class FieldParsingTest extends TestCase
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
     }
 
-    public function fieldsProvider5(): array
+    public static function fieldsProvider5(): array
     {
         return [
             ['[multiple+concatenated+fields]', ['multiple', 'concatenated', 'fields']],
@@ -148,7 +148,7 @@ class FieldParsingTest extends TestCase
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
     }
 
-    public function fieldsProvider6(): array
+    public static function fieldsProvider6(): array
     {
         return [
             ['[multiple&single&properties]', ['multiple', 'single', 'properties'], ['multiple&single&properties']],
@@ -172,7 +172,7 @@ class FieldParsingTest extends TestCase
         $this->assertEqualsCanonicalizing($spaceConcatenatedProperties, $vf->trace[$logEntry]);
     }
 
-    public function fieldsProvider7(): array
+    public static function fieldsProvider7(): array
     {
         return [
             ['[object1::object2::my_property+"literal"+my_property]', ['object1::object2::my_property'], ['my_property'], ['"literal"']],

@@ -71,6 +71,7 @@ class CompleteMarginProductsTest extends TestCase
 
     /**
      * @dataProvider marginProductsConfigDataProvider
+     * @noinspection PhpUnusedParameterInspection
      */
     public function testComplete(string $lineType, array $lineValues, $lineValuesExpected): void
     {
@@ -81,6 +82,7 @@ class CompleteMarginProductsTest extends TestCase
             $line = $this->getLine($lineType);
             foreach ($lineValues as $field => $lineValue) {
                 if ($line->isProperty($field)) {
+                    /** @noinspection PhpVariableVariableInspection */
                     $line->$field = $lineValue;
                 } else {
                     $line->metadataSet($field, $lineValue);
@@ -89,15 +91,17 @@ class CompleteMarginProductsTest extends TestCase
             $completor->complete($line);
             $method = $lineType === LineType::Item
                 ? "marginProducts$marginProduct"
-                : "marginProductsOtherLine";
+                : 'marginProductsOtherLine';
             $this->$method($line, $lineValues);
         }
     }
 
     /**
      * 0 = Config::MarginProducts_Unknown
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function marginProducts0(Line $line, array $lineValues)
+    private function marginProducts0(Line $line, array $lineValues): void
     {
         self::assertFalse($line->metadataGet(Meta::MarginLine));
         self::assertFalse($line->metadataExists(Meta::MarginLineOldUnitPrice));
@@ -107,8 +111,10 @@ class CompleteMarginProductsTest extends TestCase
 
     /**
      * 1 = Config::MarginProducts_Both
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function marginProducts1(Line $line, array $lineValues)
+    private function marginProducts1(Line $line, array $lineValues): void
     {
         self::assertNull($line->metadataGet(Meta::MarginLine));
         self::assertSame($lineValues[Fld::UnitPrice], $line->metadataGet(Meta::MarginLineOldUnitPrice));
@@ -118,8 +124,10 @@ class CompleteMarginProductsTest extends TestCase
 
     /**
      * 2 = Config::MarginProducts_No
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function marginProducts2(Line $line, array $lineValues)
+    private function marginProducts2(Line $line, array $lineValues): void
     {
         self::assertFalse($line->metadataGet(Meta::MarginLine));
         self::assertFalse($line->metadataExists(Meta::MarginLineOldUnitPrice));
@@ -129,8 +137,10 @@ class CompleteMarginProductsTest extends TestCase
 
     /**
      * 3 = Config::MarginProducts_Only
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function marginProducts3(Line $line, array $lineValues)
+    private function marginProducts3(Line $line, array $lineValues): void
     {
         self::assertTrue($line->metadataGet(Meta::MarginLine));
         self::assertSame($lineValues[Fld::UnitPrice], $line->metadataGet(Meta::MarginLineOldUnitPrice));
@@ -140,8 +150,10 @@ class CompleteMarginProductsTest extends TestCase
 
     /**
      * 2 = Config::MarginProducts_No
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function marginProductsOtherLine(Line $line, array $lineValues)
+    private function marginProductsOtherLine(Line $line, array $lineValues): void
     {
         self::assertFalse($line->metadataExists(Meta::MarginLine));
         self::assertFalse($line->metadataExists(Meta::MarginLineOldUnitPrice));

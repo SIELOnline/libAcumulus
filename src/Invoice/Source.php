@@ -16,7 +16,7 @@ use function get_class;
  * Source is an adapter (and wrapper) class around a web shop order or refund.
  *
  * Source is used to provide unified access to information about an order or refund from
- * the web shop. Furthermore, by wrapping it in a single, library defined, object type,
+ * the web shop. Furthermore, by wrapping it in a single, library-defined, object type,
  * web shop orders and refunds can be passed around in a strongly typed way.
  *
  * @noinspection PhpClassHasTooManyDeclaredMembersInspection
@@ -51,7 +51,7 @@ abstract class Source implements WrapperInterface, Stringable
      * Returns the type of the wrapped source.
      *
      * @return string
-     *   One of the constants Source::Order or Source::CreditNote.
+     *   One of the constants {@see Source::Order} or {@see Source::CreditNote}.
      */
     public function getType(): string
     {
@@ -64,12 +64,12 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * Returns the sign to use for amounts that normally are always defined as a
+     * Returns the sign to be used for amounts that normally are always defined as a
      * positive number, also on credit notes.
      *
      * @return float
      *   1 for orders, -1 for credit notes (unless the amounts or quantities on
-     *   the web shop's credit notes are already negative).
+     *   the webshop's credit notes are already negative).
      */
     public function getSign(): float
     {
@@ -185,7 +185,7 @@ abstract class Source implements WrapperInterface, Stringable
     /**
      * Returns the country code for the order.
      *
-     * The return value is not necessarily in upper case.
+     * The return value is not necessarily in upper-case.
      *
      * @return string
      *   The 2-letter country code for the current order or the empty string if
@@ -196,7 +196,7 @@ abstract class Source implements WrapperInterface, Stringable
     /**
      * Returns info about the used currency on this order/refund.
      *
-     * The currency related info:
+     * The currency-related info:
      * - currency: the code of the currency used for this order/refund
      * - rate: the rate from the used currency to the shop's default
      *   currency.
@@ -207,7 +207,7 @@ abstract class Source implements WrapperInterface, Stringable
      * currencies. This means that the amounts are always in the shop's default
      * currency (which should be EUR). Even if another plugin is used to present
      * another currency to the customer, the amounts stored should still be in
-     * EUR. So, we will not have to convert amounts and this meta-info is thus
+     * EUR. So, we will not have to convert amounts, and this meta-info is thus
      * purely informative.
      */
     public function getCurrency(): Currency
@@ -227,7 +227,7 @@ abstract class Source implements WrapperInterface, Stringable
      * class/rate).
      *
      * The default implementation returns null, i.e. no vat breakdown information.
-     * Override if the shop needs and has this info. Currently only HS and OC override
+     * Override if the shop needs and has this info. Currently, only HS and OC override
      * this.
      */
     public function getVatBreakdown(): ?array
@@ -250,8 +250,8 @@ abstract class Source implements WrapperInterface, Stringable
      * Returns the web shop invoice linked to this source.
      *
      * @return object|array|null
-     *   The web shop invoice linked to this source, or null if no (separate)
-     *   invoice is linked to this source.
+     *   The webshop invoice linked to this source,
+     *   or null if no (separate) invoice is linked to this source.
      */
     protected function getInvoice(): object|array|null
     {
@@ -265,13 +265,13 @@ abstract class Source implements WrapperInterface, Stringable
     /**
      * Returns the id of the web shop invoice linked to this source.
      *
-     * This base implementation will return null, invoices not supported. So,
-     * override if a shop supports invoices as proper objects on their own,
+     * This base implementation will return null: invoices are not supported.
+     * So, override if a shop supports invoices as proper objects on their own,
      * stored under their own id.
      *
      * @return int|null
-     *   The id of the (web shop) invoice linked to this source, or null
-     *   if no invoice is linked to this source.
+     *   The id of the webshop invoice linked to this source,
+     *   or null if no invoice is linked to this source.
      */
     public function getInvoiceId(): ?int
     {
@@ -293,8 +293,8 @@ abstract class Source implements WrapperInterface, Stringable
      * Returns the reference of the web shop invoice linked to this source.
      *
      * @return int|string|null
-     *   The reference of the (web shop) invoice linked to this source, or null
-     *   if no invoice is linked to this source.
+     *   The reference of the webshop invoice that is linked to this source,
+     *   or null if no invoice is linked to this source.
      */
     public function getInvoiceReference(): int|string|null
     {
@@ -523,8 +523,8 @@ abstract class Source implements WrapperInterface, Stringable
      *
      * A shipping-info is an "object" that contains information about a shipping line for
      * this invoice source. What this info looks like is shop-dependent, e.g.:
-     * - In many shops shipping info is stored at the order level, so this source is
-     *   returned as one and only array value, but only if a shipping took place.
+     * - In many shops shipping info is stored at the order level, so that is
+     *   returned as one and only array value, but only if shipping took place.
      * - In other shops, shipments may be stored as "total lines", "cart rules", or
      *   something like that, and this method would return an array of those "total lines"
      *   (or whatever they are called) that represent a shipment.
@@ -537,7 +537,7 @@ abstract class Source implements WrapperInterface, Stringable
      * [Note: a next step would be to create a wrapper/adapter object, e.g. a ShippingItem
      * like we did for {@see Source}, {@see Item}, and {@see Product}, but that only makes
      * senses if we could make methods (like getDescription(), getQuantity(),
-     * getUnitPrice(), etc) on them that works for more or less all shops.]
+     * getUnitPrice(), etc.) on them that works for more or less all shops.]
      *
      * This base implementation typically returns an empty set: no shipping lines.
      * Override to return the shop-specific set of shipping infos or implement both
@@ -645,7 +645,7 @@ abstract class Source implements WrapperInterface, Stringable
      * suffixed with the source type (Order or CreditNote).
      *
      * @param string $method
-     *   The name of the base-method for which to call the Source type specific
+     *   The name of the base-method for which to call the Source type-specific
      *   variant.
      * @param mixed $args
      *   The arguments to pass to the method to call.

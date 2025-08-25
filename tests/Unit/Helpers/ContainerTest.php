@@ -8,12 +8,8 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\ApiClient\AcumulusRequest;
-use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\Collectors\AddressCollector;
 use Siel\Acumulus\Collectors\BasicSubmitCollector;
-use Siel\Acumulus\Collectors\CollectorManager;
 use Siel\Acumulus\Collectors\ConnectorCollector;
 use Siel\Acumulus\Collectors\ContractCollector;
 use Siel\Acumulus\Collectors\CustomerCollector;
@@ -22,9 +18,6 @@ use Siel\Acumulus\Collectors\InvoiceCollector;
 use Siel\Acumulus\Collectors\StockTransactionCollector;
 use Siel\Acumulus\Completors\CustomerCompletor;
 use Siel\Acumulus\Completors\InvoiceCompletor;
-use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Config\ConfigUpgrade;
-use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\BasicSubmit;
@@ -39,35 +32,14 @@ use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Data\StockTransaction;
-use Siel\Acumulus\Helpers\CheckAccount;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Countries;
-use Siel\Acumulus\Helpers\CrashReporter;
-use Siel\Acumulus\Helpers\Event;
-use Siel\Acumulus\Helpers\FieldExpander;
-use Siel\Acumulus\Helpers\FieldExpanderHelp;
-use Siel\Acumulus\Helpers\FormHelper;
-use Siel\Acumulus\Helpers\FormMapper;
-use Siel\Acumulus\Helpers\FormRenderer;
-use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\Requirements;
-use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Helpers\Util;
 use Siel\Acumulus\Invoice\Completor;
-use Siel\Acumulus\Invoice\CompletorInvoiceLines;
-use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Mail\CrashMail;
 use Siel\Acumulus\PrestaShop\Collectors\ItemLineCollector;
 use Siel\Acumulus\PrestaShop\Collectors\PaymentFeeLineCollector;
 use Siel\Acumulus\PrestaShop\Collectors\ShippingLineCollector;
-use Siel\Acumulus\Product\Product;
-use Siel\Acumulus\Shop\AcumulusEntry;
-use Siel\Acumulus\Shop\AcumulusEntryManager;
 use Siel\Acumulus\Shop\BatchForm;
-use Siel\Acumulus\Shop\InvoiceManager;
 use Siel\Acumulus\Shop\InvoiceStatusForm;
 use Siel\Acumulus\Shop\MessageForm;
 use Siel\Acumulus\Shop\RatePluginForm;
@@ -76,8 +48,6 @@ use Siel\Acumulus\TestWebShop\Config\ConfigStore;
 use Siel\Acumulus\TestWebShop\Config\Environment;
 use Siel\Acumulus\TestWebShop\Config\ShopCapabilities;
 use Siel\Acumulus\TestWebShop\Mail\Mailer;
-
-use function get_class;
 
 /**
  * ContainerTest tests the Acumulus {@see \Siel\Acumulus\Helpers\Container}.
@@ -96,29 +66,19 @@ class ContainerTest extends TestCase
      */
     public function testHelpersNamespace1(): void
     {
+        $this->expectNotToPerformAssertions();
         $container = self::$container;
-        $object = Container::getContainer();
-        $this->assertInstanceOf(Container::class, $object);
-        $object = $container->getLog();
-        $this->assertInstanceOf(Log::class, $object);
-        $object = $container->getTranslator();
-        $this->assertInstanceOf(Translator::class, $object);
-        $object = $container->getUtil();
-        $this->assertInstanceOf(Util::class, $object);
-        $object = $container->getCheckAccount();
-        $this->assertInstanceOf(CheckAccount::class, $object);
-        $object = $container->getRequirements();
-        $this->assertInstanceOf(Requirements::class, $object);
-        $object = $container->getUtil();
-        $this->assertInstanceOf(Util::class, $object);
-        $object = $container->getCountries();
-        $this->assertInstanceOf(Countries::class, $object);
-        $object = $container->getFieldExpander();
-        $this->assertInstanceOf(FieldExpander::class, $object);
-        $object = $container->getFieldExpanderHelp();
-        $this->assertInstanceOf(FieldExpanderHelp::class, $object);
-        $object = $container->getEvent();
-        $this->assertInstanceOf(Event::class, $object);
+        Container::getContainer();
+        $container->getLog();
+        $container->getTranslator();
+        $container->getUtil();
+        $container->getCheckAccount();
+        $container->getRequirements();
+        $container->getUtil();
+        $container->getCountries();
+        $container->getFieldExpander();
+        $container->getFieldExpanderHelp();
+        $container->getEvent();
     }
 
     public function testConfigNamespace(): void
@@ -130,23 +90,17 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Environment::class, $object);
         $object = $container->getShopCapabilities();
         $this->assertInstanceOf(ShopCapabilities::class, $object);
-        $object = $container->getConfigUpgrade();
-        $this->assertInstanceOf(ConfigUpgrade::class, $object);
-        $object = $container->getConfig();
-        $this->assertInstanceOf(Config::class, $object);
-        $object = $container->getMappings();
-        $this->assertInstanceOf(Mappings::class, $object);
+        $container->getConfigUpgrade();
+        $container->getConfig();
+        $container->getMappings();
     }
 
     public function testApiClientNamespace(): void
     {
         $container = self::$container;
-        $object = $container->getAcumulusApiClient();
-        $this->assertInstanceOf(Acumulus::class, $object);
-        $object = $container->createHttpRequest([]);
-        $this->assertInstanceOf(HttpRequest::class, $object);
-        $object = $container->createAcumulusRequest();
-        $this->assertInstanceOf(AcumulusRequest::class, $object);
+        $container->getAcumulusApiClient();
+        $container->createHttpRequest([]);
+        $container->createAcumulusRequest();
     }
 
     public static function dataNameSpaceDataProvider(): array
@@ -212,15 +166,12 @@ class ContainerTest extends TestCase
      */
     public function testHelpersNamespace2(): void
     {
+        $this->expectNotToPerformAssertions();
         $container = self::$container;
-        $object = $container->getCrashReporter();
-        $this->assertInstanceOf(CrashReporter::class, $object);
-        $object = $container->getFormHelper();
-        $this->assertInstanceOf(FormHelper::class, $object);
-        $object = $container->getFormMapper();
-        $this->assertInstanceOf(FormMapper::class, $object);
-        $object = $container->getFormRenderer();
-        $this->assertInstanceOf(FormRenderer::class, $object);
+        $container->getCrashReporter();
+        $container->getFormHelper();
+        $container->getFormMapper();
+        $container->getFormRenderer();
     }
 
     public function testGetForms(): void
@@ -253,31 +204,23 @@ class ContainerTest extends TestCase
     public function testInvoiceNamespace(): void
     {
         $container = self::$container;
-        $object = $container->createSource(Source::Order, 1);
-        $this->assertInstanceOf(Source::class, $object);
-        $object = $container->createItem(2, $object);
-        $this->assertInstanceOf(Item::class, $object);
-        $object = $container->createProduct(3, $object);
-        $this->assertInstanceOf(Product::class, $object);
+        $source = $container->createSource(Source::Order, 1);
+        $item = $container->createItem(2, $source);
+        $container->createProduct(3, $item);
         $object = $container->getCompletor();
         $this->assertInstanceOf(Completor::class, $object);
-        $object = $container->createInvoiceAddResult('ContainerTest::testInvoiceNamespace()');
-        $this->assertInstanceOf(InvoiceAddResult::class, $object);
-        $object = $container->getCompletorInvoiceLines();
-        $this->assertInstanceOf(CompletorInvoiceLines::class, $object);
-        $object = $container->getFlattenerInvoiceLines();
-        $this->assertInstanceOf(FlattenerInvoiceLines::class, $object);
+        $container->createInvoiceAddResult('ContainerTest::testInvoiceNamespace()');
+        $container->getCompletorInvoiceLines();
+        $container->getFlattenerInvoiceLines();
     }
 
     public function testShopNamespace(): void
     {
+        $this->expectNotToPerformAssertions();
         $container = self::$container;
-        $object = $container->getAcumulusEntryManager();
-        $this->assertInstanceOf(AcumulusEntryManager::class, $object);
-        $object = $container->createAcumulusEntry([]);
-        $this->assertSame(AcumulusEntry::class, get_class($object));
-        $object = $container->getInvoiceManager();
-        $this->assertInstanceOf(InvoiceManager::class, $object);
+        $container->getAcumulusEntryManager();
+        $container->createAcumulusEntry([]);
+        $container->getInvoiceManager();
     }
 
     public function testCompletorsNameSpace(): void
@@ -291,7 +234,6 @@ class ContainerTest extends TestCase
             $object = $container->getCompletor($dataType);
             $this->assertInstanceOf($completorType, $object);
         }
-        $object = $container->getCollectorManager();
-        $this->assertInstanceOf(CollectorManager::class, $object);
+        $container->getCollectorManager();
     }
 }

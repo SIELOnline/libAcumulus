@@ -113,9 +113,6 @@ class AcumulusPropertyTest extends TestCase
         $this->assertSame($propertyValue, $p->getValue());
     }
 
-    /**
-     * @noinspection PhpRedundantOptionalArgumentInspection
-     */
     public static function setDateValueDataProvider(): array
     {
         $now = time();

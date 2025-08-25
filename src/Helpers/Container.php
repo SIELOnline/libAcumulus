@@ -1,7 +1,7 @@
 <?php
 /**
  * @noinspection PhpIncompatibleReturnTypeInspection  The get/create...() methods are
- *   strong typed, but the internal getInstance() not, leading to this warning all over
+ *   strong-typed, but the internal getInstance() not, leading to this warning all over
  *   the place.
  */
 
@@ -62,7 +62,7 @@ use const Siel\Acumulus\Version;
  * Principles
  * ----------
  * * This library is built with the idea to extract common code into base
- *   classes and have web-shop specific classes extend those base classes with
+ *   classes and have webshop-specific classes extend those base classes with
  *   web-shop-specific overrides and implementations of abstract methods.
  * * Therefore, upon creating an instance, the most specialized class possible
  *   will be instantiated and returned. See below how this is done.
@@ -109,7 +109,7 @@ use const Siel\Acumulus\Version;
  * extensions for that CMS, you can add a "CMS level" to the namespace:
  * \Siel\Acumulus\<MyCMS>\<MyWebShop>[\<MyWebShop><version>]. Classes at the CMS
  * level should contain code common for the CMS, think of configuration storage,
- * logging, mailing and database access.
+ * logging, mailing, and database access.
  *
  * The Joomla namespace is an example of this. The WooCommerce namespace could
  * be an example of this, but as currently no support for other WordPress shop
@@ -166,9 +166,9 @@ class Container
      * Returns the already created instance.
      *
      * Try not to use this: there should be only 1 instance of this class, but
-     * that instance should be passed to the constructor, if a class needs
-     * access. Current exception is the separate Acumulus Customise Invoice
-     * module, that may not get the instance passed via a constructor.
+     * that instance should be passed to the constructor if a class needs
+     * access. The current exception is the separate "Acumulus Customise Invoice"
+     * module that may not get the instance passed via a constructor.
      *
      * @return static
      *
@@ -205,12 +205,12 @@ class Container
      * Constructor.
      *
      * @param string $shopNamespace
-     *   The most specialized namespace to start searching for extending
+     *   The most specialized namespace used to start searching in for extending
      *   classes. This does not have to start with Siel\Acumulus and must not
      *   start or end with a \.
      * @param string $language
-     *   A language or locale code, e.g. nl, nl-NL, or en-UK. Only the first 2
-     *   characters will be used.
+     *   A language or locale code, e.g. 'nl', 'nl-NL', or 'en-UK'.
+     *   Only the first 2 characters will be used.
      */
     public function __construct(string $shopNamespace, string $language = 'nl')
     {
@@ -254,7 +254,7 @@ class Container
      *   the shopNamespace hierarchy in search for a requested class.
      *   It should start with a \, but not end with it.
      *
-     * @noinspection PhpUnused  If used, it will be in shop specific code, not
+     * @noinspection PhpUnused  If used, it will be in shop-specific code, not
      *   in this library itself.
      */
     public function setCustomNamespace(string $customNamespace): void
@@ -352,7 +352,7 @@ class Container
     }
 
     /**
-     * @noinspection PhpUnused  Called from shop specific code .
+     * @noinspection PhpUnused  Called from shop-specific code.
      */
     public function getCrashReporter(): CrashReporter
     {
@@ -386,7 +386,7 @@ class Container
     }
 
     /**
-     * @noinspection PhpUnused  Called from shop specific code .
+     * @noinspection PhpUnused  Called from shop-specific code.
      */
     public function getFormMapper(): FormMapper
     {
@@ -437,7 +437,7 @@ class Container
      *   {@see \Siel\Acumulus\Invoice\Source} instance for.
      *
      * @return \Siel\Acumulus\Invoice\Source
-     *   A wrapper object around a shop specific invoice source object.
+     *   A wrapper object around a shop-specific invoice source object.
      */
     public function createSource(string $invoiceSourceType, int|string|object|array $invoiceSourceOrId): Source
     {
@@ -448,13 +448,13 @@ class Container
      * Creates a new adapter/wrapper object for the given invoice item line.
      *
      * @param int|string|object|array $itemOrId
-     *   The shop specific order/refund item line or its id to create an
+     *   The shop-specific order/refund item line or its id to create an
      *    {@see \Siel\Acumulus\Invoice\Item} instance for.
      * @param Source $source
      *   The order or refund to which the item line belongs.
      *
      * @return \Siel\Acumulus\Invoice\Item
-     *   A wrapper object around a shop specific invoice item line object.
+     *   A wrapper object around a shop-specific invoice item line object.
      */
     public function createItem(int|string|object|array $itemOrId, Source $source): Item
     {
@@ -464,19 +464,19 @@ class Container
     /**
      * Creates a new adapter/wrapper object for the given product.
      *
-     * @param int|string|object|array $producrOrId
-     *   The shop specific product itself or its id to create a
+     * @param int|string|object|array $productOrId
+     *   The shop-specific product itself or its id to create a
      *   {@see \Siel\Acumulus\Product\Product} instance for.
      * @param Item|null $item
      *   The {@see \Siel\Acumulus\Invoice\Item ittem line} on which the product appears or
      *   null if we are not in the context of an order.
      *
      * @return \Siel\Acumulus\Product\Product
-     *   A wrapper object around a shop specific product object.
+     *   A wrapper object around a shop-specific product object.
      */
-    public function createProduct(int|string|object|array $producrOrId, ?Item $item = null): Product
+    public function createProduct(int|string|object|array $productOrId, ?Item $item = null): Product
     {
-        return $this->getInstance('Product', 'Product', [$producrOrId, $item, $this], true);
+        return $this->getInstance('Product', 'Product', [$productOrId, $item, $this], true);
     }
 
     /**
@@ -591,7 +591,7 @@ class Container
             $this->getLog(),
         ]);
         $result = null;
-        // A subtype specific Collector may exist: try to get it.
+        // A subtype-specific Collector may exist: try to get it.
         if ($subType !== null) {
             // If a collector exists specifically for the $subType, the constructor
             // arguments will be the same for each instance creation of that $subType
@@ -838,8 +838,8 @@ class Container
      *   Either a(n):
      *   - Array with the list of arguments to pass to the constructor, may be empty.
      *   - {@see Closure} that returns the list of arguments to pass to the constructor.
-     *     This allows for lazy evaluation of the arguments, because it only has to be
-     *     evaluated when no instance exists yet, thereby avoiding numerous recursive
+     *     This allows for lazy evaluation of the arguments because it only has to be
+     *     evaluated when no instance exists yet, thereby avoiding lots of recursive
      *     calls to getInstance().
      * @param bool $newInstance
      *   Whether to create a new instance (true) or reuse an already existing
@@ -925,8 +925,6 @@ class Container
     protected function tryNsInstance($class, $subNamespace, $namespace): ?string
     {
         $fqClass = $this->getFqClass($class, $subNamespace, $namespace);
-        // Checking if the file exists prevents warnings in Magento whose own
-        // autoloader logs warnings when a class cannot be loaded.
         return class_exists($fqClass) ? $fqClass : null;
     }
 
@@ -936,14 +934,13 @@ class Container
      * @param string $class
      *   The name of the class without any namespace part.
      * @param string $subNamespace
-     *   The sub namespace where the class belongs to, e.g. helpers, invoice or
-     *   shop.
+     *   The sub namespace where the class belongs to, e.g. 'helpers', 'invoice' or 'shop'.
      * @param string $namespace
      *   THe "base" namespace where the class belongs to.
      *
      * @return string
-     *   The fully qualified class name based on the base namespace, sub
-     *   namespace and the class name.
+     *   The fully qualified class name that is based on the base namespace, sub
+     *   namespace, and the class name.
      */
     protected function getFqClass(string $class, string $subNamespace, string $namespace): string
     {

@@ -22,8 +22,6 @@ use Siel\Acumulus\Tests\Data\GetTestData;
 use Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples;
 use Siel\Acumulus\TestWebShop\Mail\Mailer;
 
-use function dirname;
-
 /**
  * MailTest tests the creation and sending of the mails
  */
@@ -43,9 +41,9 @@ class MailTest extends TestCase
     protected function setUp(): void
     {
         $this->testException = new RuntimeException('Test exception');
-        $this->getContainer()->addTranslations('Translations', 'Invoice');
+        static::getContainer()->addTranslations('Translations', 'Invoice');
         $this->examples = ApiRequestResponseExamples::getInstance();
-        $this->examples->setOptions([Fld::Lang => $this->getContainer()->getLanguage()]);
+        $this->examples->setOptions([Fld::Lang => static::getContainer()->getLanguage()]);
     }
 
     protected static function createContainer(): Container
@@ -55,32 +53,32 @@ class MailTest extends TestCase
 
     private function getConfig(): Config
     {
-        return $this->getContainer()->getConfig();
+        return static::getContainer()->getConfig();
     }
 
     private function getAcumulusResult(string $uri): AcumulusResult
     {
         $submit = $this->examples->getSubmit($uri);
         $needContract = $this->examples->needContract($uri);
-        return $this->getContainer()->createAcumulusRequest()->execute($uri, $submit, $needContract);
+        return static::getContainer()->createAcumulusRequest()->execute($uri, $submit, $needContract);
     }
 
     private function getMail(string $type, string $namespace): Mail
     {
-        return $this->getContainer()->getMail($type, $namespace);
+        return static::getContainer()->getMail($type, $namespace);
     }
 
     private function getMailer(): Mailer
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getContainer()->getMailer();
+        return static::getContainer()->getMailer();
     }
 
     private function getInvoiceSource(): Source
     {
         $objects = (new GetTestData())->getJson();
         $order = $objects->order;
-        return $this->getContainer()->createSource(Source::Order, $order);
+        return static::getContainer()->createSource(Source::Order, $order);
     }
 
     public function testCrashMail(): void
@@ -88,7 +86,7 @@ class MailTest extends TestCase
         $this->createAndSendMail('CrashMail', 'Mail', CrashMail::class, ['exception' => 'Test Exception']);
     }
 
-    public function invoiceAddMailProvider(): array
+    public static function invoiceAddMailProvider(): array
     {
         return [
             'success-no-messages' => ['success-no-messages', 'invoice-add', Config::Send_SendAndMailOnError, true],
@@ -107,7 +105,7 @@ class MailTest extends TestCase
         $namespace = 'Invoice';
         $class = InvoiceAddMail::class;
         $invoiceSource = $this->getInvoiceSource();
-        $invoiceAddResult = $this->getContainer()->createInvoiceAddResult(__METHOD__ . "($name)");
+        $invoiceAddResult = static::getContainer()->createInvoiceAddResult(__METHOD__ . "($name)");
         $invoiceAddResult->setSendStatus(InvoiceAddResult::Sent_New);
 
         $oldDebug = $this->getConfig()->set('debug', $debug);
@@ -128,7 +126,7 @@ class MailTest extends TestCase
         }
     }
 
-    public function stockTransactionMailProvider(): array
+    public static function stockTransactionMailProvider(): array
     {
         return [
             'success-no-messages' => ['success-no-messages', 'stock-transaction', Config::Send_SendAndMailOnError, -5],
@@ -148,10 +146,10 @@ class MailTest extends TestCase
         $type = 'StockTransactionMail';
         $namespace = 'Product';
         $class = StockTransactionMail::class;
-        $source = $this->getContainer()->createSource(Source::Order, 1);
-        $item = $this->getContainer()->createItem(5, $source);
+        $source = static::getContainer()->createSource(Source::Order, 1);
+        $item = static::getContainer()->createItem(5, $source);
         $product = $item->getProduct();
-        $stockTransactionResult = $this->getContainer()->createStockTransactionResult(__METHOD__ . "($name)");
+        $stockTransactionResult = static::getContainer()->createStockTransactionResult(__METHOD__ . "($name)");
         $stockTransactionResult->setSendStatus($stockTransactionResult::Sent_New);
 
         $oldDebug = $this->getConfig()->set('debug', $debug);
@@ -180,20 +178,21 @@ class MailTest extends TestCase
     {
         $count = $this->getMailer()->getMailCount();
         $mail = $this->getMail($type, $namespace);
-        $this->assertInstanceOf($class, $mail);
+        /** @noinspection UnnecessaryAssertionInspection  testing for a subclass of Mail */
+        static::assertInstanceOf($class, $mail);
 
         $mail->createAndSend($args);
-        $this->assertSame($count + 1, $this->getMailer()->getMailCount());
+        static::assertSame($count + 1, $this->getMailer()->getMailCount());
         $mailSent = $this->getMailer()->getMailSent($count);
-        $this->assertIsArray($mailSent);
+        static::assertIsArray($mailSent);
 
         $name = "$type-";
         if (!empty($description)) {
             $name .= "$description-";
         }
-        $name .= $this->getContainer()->getLanguage();
+        $name .= static::getContainer()->getLanguage();
         $this->saveTestMail($name, $mailSent);
         $expected = $this->getTestMail($name);
-        $this->assertSame($expected, $mailSent);
+        static::assertSame($expected, $mailSent);
     }
 }

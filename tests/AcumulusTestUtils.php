@@ -162,10 +162,10 @@ LONGSTRING;
      * Asserts that 2 Acumulus objects are equal.
      *
      * @param array $expected
-     *   json encoded, and converted to an associative array, representation of the 1st
+     *   json encoded and converted to an associative array, representation of the 1st
      *   object.
      * @param array $object
-     *   json encoded, and converted to an associative array, representation of the 2nd
+     *   json encoded and converted to an associative array, representation of the 2nd
      *   object.
      * @param string $objectName
      *   The name of the (sub)object, e.g. 'invoice', or 'line'.

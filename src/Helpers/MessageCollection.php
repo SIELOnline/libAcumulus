@@ -67,7 +67,7 @@ class MessageCollection
      * @param string $message
      *   The text of the message.
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      * @param int|string $code
      *   A code to better identify the source of the message.
      *
@@ -92,7 +92,7 @@ class MessageCollection
      * @param Message[] $messages
      * @param int $severity
      *   If passed, it indicates the maximum severity with which to add the
-     *   messages. This can be used, e.g., to merge errors as mere warnings
+     *   messages. This can be used, e.g. to merge errors as mere warnings
      *   because the main result is not really influenced by these errors.
      *
      * @return $this
@@ -150,13 +150,13 @@ class MessageCollection
      * Returns whether the Message collection contains a given code.
      *
      * Though it is expected that codes and code tags are unique, this is not
-     * imposed. If multiple messages with the same code or code tag exists, the
+     * imposed. If multiple messages with the same code or code tag exist, the
      * 1st found will be returned.
      *
      * @param int|string $code
-     *   The code to search for. This is a lax search: a message with code '403 Forbidden'
-     *   should be returned when $code is one of the following: '403 Forbidden',
-     *   '403 forbidden', 403, '403', 'Forbidden', or 'forbidden'.
+     *   The code to search for. This is a lax search: a message with the code
+     *   '403 Forbidden' should be returned when $code is one of the following:
+     *   '403 Forbidden', '403 forbidden', 403, '403', 'Forbidden', or 'forbidden'.
      *
      * @return Message|null
      *   The message with the given code if the result contains such a message,
@@ -183,7 +183,7 @@ class MessageCollection
      * Returns whether the Message collection contains a given codeTag.
      *
      * Though it is expected that codes and code tags are unique, this is not
-     * imposed. If multiple messages with the same code or code tag exists, the
+     * imposed. If multiple messages with the same code or code tag exist, the
      * 1st found will be returned.
      *
      * @return Message|null
@@ -204,7 +204,7 @@ class MessageCollection
      * Returns the Messages in the collection for the given field.
      *
      * @return Message[]
-     *   The messages for the given field, may be empty.
+     *   The messages for the given field, possibly empty.
      */
     public function getByField(string $field): array
     {

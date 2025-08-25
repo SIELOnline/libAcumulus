@@ -97,6 +97,7 @@ class ContainerTest extends TestCase
 
     public function testApiClientNamespace(): void
     {
+        $this->expectNotToPerformAssertions();
         $container = self::$container;
         $container->getAcumulusApiClient();
         $container->createHttpRequest([]);

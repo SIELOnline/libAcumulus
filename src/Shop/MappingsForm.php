@@ -2,7 +2,6 @@
 /**
  * @noinspection DuplicatedCode This form started as a duplicate of
  *   {@see \Siel\Acumulus\Shop\AdvancedConfigForm}.
- * @todo: Change form field names to constants from the Fld class.
  */
 
 declare(strict_types=1);

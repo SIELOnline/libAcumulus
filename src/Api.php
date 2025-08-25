@@ -33,7 +33,7 @@ interface Api
 
     // API result codes. Note that internally I want an increasing order of
     // worseness, so these constants are not used internally but mapped to the
-    // Severity::... constants.
+    // {@see Severity} constants.
     public const Status_Success = 0;
     public const Status_Warnings = 2;
     public const Status_Errors = 1;
@@ -46,7 +46,7 @@ interface Api
     /** @deprecated use Api::Format_Json */
     public const outputFormat = 'json';
 
-    // API related constants.
+    // API-related constants.
     public const Format_Json = 'json';
     public const Format_Xml = 'xml';
     public const Lang_EN = 'en';

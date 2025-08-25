@@ -42,7 +42,7 @@ class Log extends BaseLog
      * Returns the joomla equivalent of the severity.
      *
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      *
      * @return int
      *   the Joomla equivalent of the severity.

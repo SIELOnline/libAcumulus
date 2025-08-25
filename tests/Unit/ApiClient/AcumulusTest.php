@@ -27,6 +27,7 @@ use Siel\Acumulus\Helpers\Container;
 class AcumulusTest extends TestCase
 {
     private Container $container;
+    private Acumulus $acumulusClient;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void

@@ -23,7 +23,7 @@ class Log extends BaseLog
         if (class_exists('WC_Logger')) {
             (new WC_Logger())->log($this->getWooCommerceSeverity($severity), $message, ['source' => 'acumulus']);
         } else {
-            // WooCommerce not activated?
+            // WooCommerce has not been activated?
             parent::write($message, $severity);
         }
     }
@@ -32,7 +32,7 @@ class Log extends BaseLog
      * Returns the WooCommerce equivalent of the severity.
      *
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      *
      * @return string
      *   The WooCommerce equivalent of the severity, @see WC_Logger::Log() for

@@ -216,7 +216,7 @@ class ProductManagerTest extends TestCase
         $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
         $this->saveTestLogMessage($name, $logMessage);
         $expected = $this->getTestLogMessage($name);
-        static::assertSame($expected, $logMessage);
+        static::assertSame($expected, $logMessage, $name);
     }
 
     /**

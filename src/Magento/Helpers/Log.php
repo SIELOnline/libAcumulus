@@ -43,7 +43,7 @@ class Log extends BaseLog
      * Returns the Magento equivalent of the severity.
      *
      * @param int $severity
-     *   One of the Severity::... constants.
+     *   One of the {@see Severity} constants.
      *
      * @return int
      *   The Magento equivalent of the severity.

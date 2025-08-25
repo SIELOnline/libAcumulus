@@ -12,8 +12,8 @@ onderzoeken.
 
 Over uw webwinkel:
 
-Webwinkel: TestDoubles 8.5.0
-module:    Acumulus 8.5.0; Library: 8.5.0
+Webwinkel: TestDoubles 8.5.4
+module:    Acumulus 8.5.4; Library: 8.5.4
 PHP:       8.2.27; (Curl: 8.7.0-DEV (ssl: OpenSSL/3.0.15; zlib: 1.2.12))
 Database:  MySQL Community Server - GPL 8.0.27
 Server:    example.com
@@ -34,8 +34,8 @@ Als het probleem blijft aanhouden, stuur deze mail dan door naar Acumulus suppor
 Stuur in dat geval de hele tekst mee, want deze is nodig om het probleem goed te kunnen onderzoeken.</p>
 <h3>Over uw webwinkel</h3>
 <table style="text-align: left;">
-<tr><th>Webwinkel</th><td>TestDoubles 8.5.0</td></tr>
-<tr><th>module</th><td>Acumulus 8.5.0; Library: 8.5.0</td></tr>
+<tr><th>Webwinkel</th><td>TestDoubles 8.5.4</td></tr>
+<tr><th>module</th><td>Acumulus 8.5.4; Library: 8.5.4</td></tr>
 <tr><th>PHP</th><td>8.2.27; (Curl: 8.7.0-DEV (ssl: OpenSSL/3.0.15; zlib: 1.2.12))</td></tr>
 <tr><th>Database</th><td>MySQL Community Server - GPL 8.0.27</td></tr>
 <tr><th>Server</th><td>example.com</td></tr>

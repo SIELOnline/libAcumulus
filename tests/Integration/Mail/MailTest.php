@@ -193,6 +193,6 @@ class MailTest extends TestCase
         $name .= static::getContainer()->getLanguage();
         $this->saveTestMail($name, $mailSent);
         $expected = $this->getTestMail($name);
-        static::assertSame($expected, $mailSent);
+        static::assertSame($expected, $mailSent, $name);
     }
 }

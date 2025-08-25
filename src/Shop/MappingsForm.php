@@ -105,11 +105,8 @@ class MappingsForm extends Form
      */
     protected function validateInvoiceFields(): void
     {
-        $warehouseCountry = $this->submittedValues[DataType::Invoice][Fld::WarehouseCountry] ?? null;
-        if (!empty($warehouseCountry)
-            && !str_contains($warehouseCountry, '[')
-            && strlen($warehouseCountry) !== 2
-        ) {
+        $warehouseCountry = $this->submittedValues[DataType::Invoice][Fld::WarehouseCountry] ?? '';
+        if (!empty($warehouseCountry) && !str_contains($warehouseCountry, '[') && strlen($warehouseCountry) !== 2) {
             $message = sprintf($this->t('message_validate_warehouseCountry'), $this->t('field_warehouseCountry'));
             $this->addFormMessage($message, Severity::Error, $this->getArrayFieldId(DataType::Invoice, Fld::WarehouseCountry));
         }
@@ -121,27 +118,33 @@ class MappingsForm extends Form
     protected function validateEmailInvoiceFields(): void
     {
         // Check for a valid email address if no token syntax is used.
-        if (!empty($this->submittedValues['emailTo'])
-            && !str_contains($this->submittedValues['emailTo'], '[')
-            && !$this->isEmailAddress($this->submittedValues['emailTo'], true)
-        ) {
-            $this->addFormMessage($this->t('message_validate_email_5'), Severity::Error, 'emailTo');
+        $emailTo = $this->submittedValues[EmailAsPdfType::Invoice][Fld::EmailTo] ?? '';
+        if (!empty($emailTo) && !str_contains($emailTo, '[') && !$this->isEmailAddress($emailTo, true)) {
+            $this->addFormMessage(
+                $this->t('message_validate_email_5'),
+                Severity::Error,
+                $this->getArrayFieldId(EmailAsPdfType::Invoice, Fld::EmailTo)
+            );
         }
 
         // Check for valid email addresses if no token syntax is used.
-        if (!empty($this->submittedValues['emailBcc'])
-            && !str_contains($this->submittedValues['emailBcc'], '[')
-            && !$this->isEmailAddress($this->submittedValues['emailBcc'], true)
-        ) {
-            $this->addFormMessage($this->t('message_validate_email_3'), Severity::Error, 'emailBcc');
+        $emailBcc = $this->submittedValues[EmailAsPdfType::Invoice][Fld::EmailBcc] ?? '';
+        if (!empty($emailBcc) && !str_contains($emailBcc, '[') && !$this->isEmailAddress($emailBcc, true)) {
+            $this->addFormMessage(
+                $this->t('message_validate_email_3'),
+                Severity::Error,
+                $this->getArrayFieldId(EmailAsPdfType::Invoice, Fld::EmailBcc)
+            );
         }
 
         // Check for a valid email address if no token syntax is used.
-        if (!empty($this->submittedValues['emailFrom'])
-            && !str_contains($this->submittedValues['emailFrom'], '[')
-            && !$this->isEmailAddress($this->submittedValues['emailFrom'])
-        ) {
-            $this->addFormMessage($this->t('message_validate_email_4'), Severity::Error, 'emailFrom');
+        $emailFrom = $this->submittedValues[EmailAsPdfType::Invoice][Fld::EmailFrom] ?? '';
+        if (!empty($emailFrom) && !str_contains($emailFrom, '[') && !$this->isEmailAddress($emailFrom)) {
+            $this->addFormMessage(
+                $this->t('message_validate_email_4'),
+                Severity::Error,
+                $this->getArrayFieldId(EmailAsPdfType::Invoice, Fld::EmailFrom)
+            );
         }
     }
 
@@ -151,27 +154,36 @@ class MappingsForm extends Form
     protected function validateEmailPackingSlipFields(): void
     {
         // Check that a valid mail address has been filled in.
-        if (!empty($this->submittedValues['packingSlipEmailTo'])
-            && !str_contains($this->submittedValues['packingSlipEmailTo'], '[')
-            && !$this->isEmailAddress($this->submittedValues['packingSlipEmailTo'], true)
-        ) {
-            $this->addFormMessage($this->t('message_validate_packing_slip_email_1'), Severity::Error, 'packingSlipEmailTo');
+        $packingSlipEmailTo = $this->submittedValues[EmailAsPdfType::PackingSlip][Fld::EmailTo] ?? '';
+        if (!empty($packingSlipEmailTo) && !str_contains($packingSlipEmailTo, '[') && !$this->isEmailAddress($packingSlipEmailTo, true)) {
+            $this->addFormMessage(
+                $this->t('message_validate_packing_slip_email_1'),
+                Severity::Error,
+                $this->getArrayFieldId(EmailAsPdfType::PackingSlip, Fld::EmailTo)
+            );
         }
 
         // Check that valid bcc mail addresses have been filled in.
-        if (!empty($this->submittedValues['packingSlipEmailBcc'])
-            && !str_contains($this->submittedValues['packingSlipEmailBcc'], '[')
-            && !$this->isEmailAddress($this->submittedValues['packingSlipEmailBcc'], true)
+        $packingSlipEmailBcc = $this->submittedValues[EmailAsPdfType::PackingSlip][Fld::EmailBcc] ?? '';
+        if (!empty($packingSlipEmailBcc)
+            && !str_contains($packingSlipEmailBcc, '[')
+            && !$this->isEmailAddress($packingSlipEmailBcc, true)
         ) {
-            $this->addFormMessage($this->t('message_validate_packing_slip_email_2'), Severity::Error, 'packingSlipEmailBcc');
+            $this->addFormMessage(
+                $this->t('message_validate_packing_slip_email_2'),
+                Severity::Error,
+                $this->getArrayFieldId(EmailAsPdfType::PackingSlip, Fld::EmailBcc)
+            );
         }
 
         // Check for a valid email address if no token syntax is used.
-        if (!empty($this->submittedValues['packingSlipEmailFrom'])
-            && !str_contains($this->submittedValues['packingSlipEmailFrom'], '[')
-            && !$this->isEmailAddress($this->submittedValues['packingSlipEmailFrom'])
-        ) {
-            $this->addFormMessage($this->t('message_validate_email_4'), Severity::Error, 'packingSlipEmailFrom');
+        $packingSlipEmailFrom = $this->submittedValues[EmailAsPdfType::PackingSlip][Fld::EmailFrom] ?? '';
+        if (!empty($packingSlipEmailFrom) && !str_contains($packingSlipEmailFrom, '[') && !$this->isEmailAddress($packingSlipEmailFrom)) {
+            $this->addFormMessage(
+                $this->t('message_validate_email_4'),
+                Severity::Error,
+                $this->getArrayFieldId(EmailAsPdfType::PackingSlip, Fld::EmailFrom)
+            );
         }
     }
 
@@ -534,18 +546,34 @@ class MappingsForm extends Form
         return [
             Fld::EmailTo => [
                 'type' => 'text',
-                'label' => $this->t('field_packingSlipEmailTo'),
-                'description' => $this->t('desc_packingSlipEmailTo') . ' ' . $this->t('msg_token'),
+                'label' => $this->t('field_emailTo'),
+                'description' => $this->t('desc_packingSlipEmailTo'),
                 'attributes' => [
                     'size' => self::Size,
                 ],
             ],
             Fld::EmailBcc => [
                 'type' => 'text',
-                'label' => $this->t('field_packingSlipEmailBcc'),
-                'description' => $this->t('desc_packingSlipEmailBcc') . ' ' . $this->t('msg_token'),
+                'label' => $this->t('field_emailBcc'),
+                'description' => $this->t('desc_packingSlipEmailBcc'),
                 'attributes' => [
                     'size' => self::Size,
+                ],
+            ],
+            Fld::EmailFrom => [
+                'type' => 'text',
+                'label' => $this->t('field_emailFrom'),
+                'description' => $this->t('desc_emailFrom'),
+                'attributes' => [
+                    'size' => self::Size,
+                ],
+            ],
+            Fld::Subject => [
+                'type' => 'text',
+                'label' => $this->t('field_subject'),
+                'description' => $this->t('desc_packingSlipSubject'),
+                'attributes' => [
+                    'size' => self::SizeLong,
                 ],
             ],
         ];
@@ -557,9 +585,7 @@ class MappingsForm extends Form
                 Meta::MatchShopFieldSpecification => [
                     'type' => 'text',
                     'label' => $this->t('field_matchShopFieldSpecification'),
-                    'description' => $this->t('desc_matchShopFieldSpecification') . ' ' . $this->t(
-                            'desc_matchShopFieldSpecificationExample'
-                        ),
+                    'description' => $this->t('desc_matchShopFieldSpecification') . ' ' . $this->t('desc_matchExample'),
                     'attributes' => [
                         'size' => self::Size,
                     ],
@@ -569,7 +595,7 @@ class MappingsForm extends Form
                 Fld::StockDescription => [
                     'type' => 'text',
                     'label' => $this->t('field_stockDescription'),
-                    'description' => $this->t('desc_stockDescription') . ' ' . $this->t('msg_token'),
+                    'description' => $this->t('desc_stockDescription'),
                     'attributes' => [
                         'size' => self::Size,
                     ],

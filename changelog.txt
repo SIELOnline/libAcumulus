@@ -10,7 +10,7 @@ Features:
 
 Bugs:
 - ALL: Mappings form contained a lot of incorrect field names when validating a form
-  submission.
+  submission and some packing slip fields were missing completely.
 - ALL: TypeError: Container::getCompletor(): Return value must be of type
   BaseCompletor|Completor, null returned in Container.php:533.
 

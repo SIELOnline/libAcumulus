@@ -458,13 +458,12 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_validate_email_4' => 'Het veld "Afzender" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_subject' => 'Onderwerp',
-        'desc_subject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om hier naar dat factuurnummer te verwijzen. U kunt wel naar het bestelnummer verwijzen',
+        'desc_subject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om hier naar dat factuurnummer te verwijzen, u kunt wel naar het bestelnummer verwijzen',
 
         //  Email packing slip settings.
-        'field_packingSlipEmailTo' => 'E-mailadres voor de pakbon',
         'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mailopties voor de pakbon hebt aangevinkt.',
-        'field_packingSlipEmailBcc' => 'Bcc e-mailadres voor de pakbon',
         'desc_packingSlipEmailBcc' => 'Vul extra e-mailadressen in waar naartoe u de pakbon wilt sturen. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mailopties voor de pakbon hebt aangevinkt.',
+        'desc_packingSlipSubject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Pakbon voor bestelling [nummer]" gebruikt.',
         'message_validate_packing_slip_email_0' => 'Als u de optie "Toon een link om de pdf te mailen." kiest voor de pakbon, is het veld "E-mailadres voor de pakbon" verplicht. Vul een e-mailadres in.',
         'message_validate_packing_slip_email_1' => 'Het veld "E-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
         'message_validate_packing_slip_email_2' => 'Het veld "Bcc e-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
@@ -517,7 +516,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         // WooCommerce specific wording!
         'desc_matchShopFieldSpecification' => 'Geef met een veldverwijzing aan welk (meta)veld van een product in uw winkel gebruikt moet worden om naar een product in Acumulus te zoeken.',
         // WooCommerce specific example!
-        'desc_matchShopFieldSpecificationExample' => 'Dit zal waarschijnlijk lijken op "[product::getShopObject::get_meta(...)]"',
+        'desc_matchExample' => 'Dit zal waarschijnlijk lijken op "[product::getShopObject::get_meta(...)]"',
         'field_stockDescription' => 'Transactieomschrijving',
         'desc_stockDescription' => 'Elke voorraadmutatie wordt opgeslagen met een korte omschrijving die bijv. de reden en de oorsprong van de mutatie aangeeft.',
 
@@ -989,10 +988,9 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'message_validate_email_4' => 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.',
 
         //  Email packing slip settings.
-        'field_packingSlipEmailTo' => 'E-mail address for the packing slip',
-        'desc_packingSlipEmailTo' => 'Fill in the e-mail address to which you want to send the packing slip. This can be, e.g, the address of someone or some printer in your warehouse. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
-        'field_packingSlipEmailBcc' => 'Bcc e-mail address for the packing slip',
-        'desc_packingSlipEmailBcc' => 'Fill in additional e-mail addresses to which you want to send the packing slip. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
+        'desc_packingSlipEmailTo' => 'Fill in the e-mail address to which you want to send the packing slip, e.g. someone or a printer at your warehouse. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
+        'desc_packingSlipEmailBcc' => 'Fill in additional e-mail addresses to which you want to send the packing slip, e.g. someone or a printer at your warehouse. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
+        'desc_packingSlipSubject' => 'The subject line of the e-mail. If you leave this empty "Packing slip for order [number]" will be used.',
         'message_validate_packing_slip_email_0' => 'If you enabled one or more of the options to mail a packing slip, than is the field "E-mail address for the packing slip" required. Fill in an e-mail address.',
         'message_validate_packing_slip_email_1' => 'The field "E-mail address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
         'message_validate_packing_slip_email_2' => 'The field "Bcc e-mail address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
@@ -1045,7 +1043,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         // WooCommerce specific wording!
         'desc_matchShopFieldSpecification' => 'Enter a mapping that specifies which (meta) field of an product in your web shop should be sued to search for products in Acumulus.',
         // WooCommerce specific example!
-        'desc_matchShopFieldSpecificationExample' => 'This will probably look something like "[product::getShopObject::get_meta(...)]"',
+        'desc_matchExample' => 'This will probably look something like "[product::getShopObject::get_meta(...)]"',
 
         'field_stockDescription' => 'Transaction description',
         'desc_stockDescription' => 'Each stock transaction is stored with a short description indicating,, e.g, the source and reason for the transaction.',

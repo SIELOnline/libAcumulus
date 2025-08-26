@@ -101,7 +101,7 @@ class MetadataCollection
      * @param mixed $value
      *   The value to add to (or set for) the metadata field. If $isList = true and this
      *   is a new metadata value and $value is null: an empty list is created (not a list
-     *   with null as first value).
+     *   with null as its first value).
      * @param bool $isList
      *   Whether to handle this metadata field as a list (if it has only 1 value).
      */

@@ -8,7 +8,7 @@ use Siel\Acumulus\Fld;
 
 /**
  * Represents the <contract> part of the
- * {@link https://www.siel.nl/acumulus/API/Basic_Submit/ basic submit} part of an
+ * {@link https://www.siel.nl/acumulus/API/Basic_Submit/ "basic submit"} part of an
  * Acumulus API request.
  *
  * For a few API calls the contract part is not needed.
@@ -26,8 +26,6 @@ use Siel\Acumulus\Fld;
  * @method bool setPassword(?string $value, int $mode = PropertySet::Always)
  * @method bool setEmailOnError(?string $value, int $mode = PropertySet::Always)
  * @method bool setEmailOnWarning(?string $value, int $mode = PropertySet::Always)
- *
- * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
  */
 class Contract extends AcumulusObject
 {

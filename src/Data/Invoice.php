@@ -208,6 +208,7 @@ class Invoice extends AcumulusObject
 
     public function hasWarning(): bool
     {
+        /** @noinspection PhpUnnecessaryBoolCastInspection */
         $hasWarning = parent::hasWarning() || (bool) $this->getCustomer()?->hasWarning() || (bool) $this->getEmailAsPdf()?->hasWarning();
         if (!$hasWarning) {
             foreach ($this->getLines() as $line) {

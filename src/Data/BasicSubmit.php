@@ -8,12 +8,12 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
 
 /**
- * Represents the {@link https://www.siel.nl/acumulus/API/Basic_Submit/ basic submit}
+ * Represents the {@link https://www.siel.nl/acumulus/API/Basic_Submit/ "basic submit"}
  * part of an Acumulus API request.
  *
- * The basic submit structure is a required part of every Acumulus API request and
- * contains authentication and client system information, and options that influence the
- * processing or how the response is constructed.
+ * The "basic submit" structure is a required part of every Acumulus API request and
+ * contains authentication and client system information as well as options that influence
+ * the processing or how the response is constructed.
  *
  * @property ?string $format
  * @property ?string $testMode
@@ -28,8 +28,6 @@ use Siel\Acumulus\Fld;
  * @method bool setINodes(?string $value, int $mode = PropertySet::Always)
  * @method bool setONodes(?string $value, int $mode = PropertySet::Always)
  * @method bool setOrder(?string $value, int $mode = PropertySet::Always)
- *
- * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
  */
 class BasicSubmit extends AcumulusObject
 {

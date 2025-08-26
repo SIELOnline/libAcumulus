@@ -18,8 +18,8 @@ use function strlen;
 /**
  * AcumulusObjects represent Acumulus API message structures.
  *
- * An AcumulusObject may represent only a part of a full API message structure,
- * e.g. the parts 'contract' and 'connector' of the basic submit structure are
+ * An AcumulusObject may represent only a part of a full API message structure.
+ * E.g. the parts 'contract' and 'connector' of the "basic submit" structure are
  * represented as separate objects here.
  *
  * AcumulusObjects are made of:
@@ -174,7 +174,7 @@ abstract class AcumulusObject
     }
 
     /**
-     * Implements direct property unset access , but only for
+     * Implements direct property unset access, but only for
      * {@see AcumulusProperty}s, not properties referring to another
      * {@see AcumulusObject}, nor {@see MetadataCollection} properties.
      *
@@ -205,11 +205,11 @@ abstract class AcumulusObject
      * Checks whether $name is an {@see AcumulusProperty} of this {@see AcumulusObject}.
      *
      * @param string $name
-     *   The name to search for, may be changed to its lowercase version if a property
-     *   exists in that form!
+     *   The name to search for.
      *
      * @return string
-     *   The real name under which $name is stored as property.
+     *   The real name under which $name is stored as property, this may be the lower
+     *   cased version of $name.
      *
      * @throws \RuntimeException
      *   $name is not an existing property name.
@@ -228,8 +228,7 @@ abstract class AcumulusObject
      * {@see AcumulusObject}.
      *
      * @param string $name
-     *   The name to search for, may be changed to its lowercase version if a property
-     *   exists in that form.
+     *   The name to search for.
      *
      * @return null|string
      *   The real name under which the property is stored, or null if $name is not a
@@ -300,7 +299,7 @@ abstract class AcumulusObject
                 $result[$name] = $property->getApiValue();
             } elseif ($this->data[$name]->isRequired()) {
                 // Do not throw an exception as that will prevent the message being part
-                // of the error mail, but instead add a meta warning.
+                // of the error mail, but instead add a meta-warning.
                 $result[Meta::Error] = sprintf(
                     'Required property %s::%s is not set',
                     (new ReflectionClass($this))->getShortName(),

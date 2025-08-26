@@ -20,7 +20,7 @@ use Siel\Acumulus\Fld;
  * - We have 2 separate {@see Address} objects, an invoice and billing address.
  *   In the API all address fields are part of the customer itself, the fields
  *   of the 2nd address being prefixed with 'alt'. In decoupling this in the
- *   collector phase, we allow users to relate the 1st and 2 nd address to the
+ *   collector phase, we allow users to relate the 1st and 2nd address to the
  *   invoice or shipping address as they like.
  *
  * @property ?int $productId

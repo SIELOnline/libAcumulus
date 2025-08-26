@@ -8,7 +8,7 @@ namespace Siel\Acumulus\Data;
  * PropertySet defines the possible modes to set the value of an
  * {@see AcumulusProperty}.
  *
- * PHP8.1: enumeration.
+ * @nth: PHP8.1: enumeration.
  */
 interface PropertySet
 {

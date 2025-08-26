@@ -25,7 +25,7 @@ use function strlen;
  * AcumulusProperty represents a scalar value that is sent as part of an API
  * call.
  *
- * Value sent with Acumulus API messages can be of type 'string', 'int',
+ * Value sent with Acumulus API messages can be of the type 'string', 'int',
  * 'float', 'date', or 'bool'. Note that the Acumulus API does not use booleans.
  * Properties that represent a "yes/no" value are mostly represented by an int
  * with allowed values 0 and 1. However, internally we do work with booleans for
@@ -84,7 +84,7 @@ class AcumulusProperty
      *   - 'name': (string, required) the name of the property, may contain
      *     upper case characters but when added to an Acumulus API message, it
      *     will be added in all lower case.
-     *   - 'type': (string ,required) 1 of the allowed types.
+     *   - 'type': (string, required) 1 of the allowed types.
      *   - 'required': (bool, optional, default = false) whether the property
      *     must be present in the Acumulus API message.
      *   - 'allowedValues': (array, optional, default = no restrictions) the set
@@ -158,7 +158,7 @@ class AcumulusProperty
      *   and will "unset" this property (it will not appear in the Acumulus API
      *   message).
      * @param int $mode
-     *   1 of the PropertySet::... constants to prevent setting an
+     *   One of the {@see PropertySet} constants to prevent setting an
      *   empty value and/or overwriting an already set value. Default is to
      *   unconditionally set the value.
      *
@@ -166,8 +166,6 @@ class AcumulusProperty
      *   true if the value was actually set, false otherwise.
      *
      * @noinspection PhpFunctionCyclomaticComplexityInspection
-     * @noinspection CallableParameterUseCaseInTypeContextInspection yes, we are juggling
-     *   with types.
      */
     public function setValue(mixed $value, int $mode = PropertySet::Always): bool
     {
@@ -240,7 +238,7 @@ class AcumulusProperty
      * Returns the representation of the property as it will be in the API message.
      *
      * @return string|int|float
-     *   The  representation of the property in a message. A bool is converted to one
+     *   The representation of the property in a message. A bool is converted to one
      *   of its allowed values. A date is converted to its ISO representation
      *   (yyyy-mm-dd). Any other type is returned as is.
      */

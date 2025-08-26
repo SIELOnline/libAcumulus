@@ -10,7 +10,7 @@ use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Translator;
 
 /**
- * BaseCompletor implements acts as a base class for  completing tasks.
+ * BaseCompletor implements acts as a base class for completing tasks.
  *
  * Via the constructor it gets access to the Configuration and Container.
  */
@@ -51,7 +51,7 @@ abstract class BaseCompletorTask implements CompletorTaskInterface
      * Returns the configured value for this setting.
      *
      * @return mixed
-     *   The configured value for this setting, or null if not set and no default is
+     *   The configured value for this setting, or null if not set, and no default is
      *   available. Our {@see \Siel\Acumulus\Config\Config configuration} knows the types:
      *   string, int, float, bool and array.
      */

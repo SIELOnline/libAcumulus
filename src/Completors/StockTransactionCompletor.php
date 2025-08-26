@@ -10,7 +10,7 @@ use Siel\Acumulus\Helpers\MessageCollection;
 /**
  * StockTransactionCompletor completes an {@see \Siel\Acumulus\Data\StockTransaction}.
  *
- * After a stock transaction has been collected, the shop specific part, it may need to be
+ * After a stock transaction has been collected, the shop-specific part, it may need to be
  * completed shop independently.
  *
  * @noinspection PhpUnused  Instantiated by type name

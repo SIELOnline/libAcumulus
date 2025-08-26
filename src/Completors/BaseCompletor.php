@@ -18,7 +18,7 @@ use Siel\Acumulus\Helpers\Translator;
 /**
  * CustomerCompletor completes an {@see \Siel\Acumulus\Data\Customer}.
  *
- * After an invoice has been collected, the shop specific part, it needs to be
+ * After an invoice has been collected, the shop-specific part, it needs to be
  * completed, also the customer part. Think of things like:
  * - Adding customer type based on a setting.
  * - Anonymising data.
@@ -60,7 +60,7 @@ abstract class BaseCompletor
      * Returns the configured value for this setting.
      *
      * @return mixed
-     *   The configured value for this setting, or null if not set and no default is
+     *   The configured value for this setting, or null if not set, and no default is
      *   available. Our {@see \Siel\Acumulus\Config\Config configuration} knows the types:
      *   string, int, float, bool and array.
      */
@@ -79,7 +79,7 @@ abstract class BaseCompletor
      * @param string $task
      *   The task to be executed. This is used to construct the class name of a
      *   class that performs the given task and implements
-     *   @see \Siel\Acumulus\Completors\CompletorTaskInterface}. Only the task
+     *   {@see \Siel\Acumulus\Completors\CompletorTaskInterface}. Only the task
      *   name should be provided, not the namespace, nor the 'Complete' at the
      *   beginning.
      */

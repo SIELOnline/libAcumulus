@@ -33,7 +33,7 @@ interface CompletorTaskInterface
      *   The object to complete. It is expected that, on returning, the object
      *   has been changed w.r.t. the task at hand.
      * @param mixed ...$args
-     *   Any additional information needed to complete the task at hand.
+     *   Any additional information that is needed to complete the task at hand.
      */
     public function complete(AcumulusObject $acumulusObject, ... $args): void;
 }

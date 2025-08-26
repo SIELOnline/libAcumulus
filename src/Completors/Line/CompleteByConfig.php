@@ -12,7 +12,7 @@ use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
 
 /**
- * CompleteByConfig adds configuration based values to item lines.
+ * CompleteByConfig adds configuration-based values to item lines.
  */
 class CompleteByConfig extends BaseCompletorTask
 {

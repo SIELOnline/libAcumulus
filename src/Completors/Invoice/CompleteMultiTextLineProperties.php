@@ -23,7 +23,7 @@ class CompleteMultiTextLineProperties extends BaseCompletorTask
      * {@see \Siel\Acumulus\Data\Invoice::$descriptionText} and
      * {@see \Siel\Acumulus\Data\Invoice::$invoiceNotes} properties.
      *
-     * Changes any form of a newline to the literal \n, and tabs to \t.
+     * Changes any form of a newline to the literal '\n' and tabs to '\t'.
      *
      * @param \Siel\Acumulus\Data\Invoice $acumulusObject
      * @param int ...$args

@@ -15,7 +15,7 @@ use Siel\Acumulus\Helpers\MessageCollection;
 /**
  * AddressCompletor completes an {@see \Siel\Acumulus\Data\Address}.
  *
- * After an invoice has been collected, the shop specific part, it needs to be
+ * After an invoice has been collected, the shop-specific part, it needs to be
  * completed, also the address part. Think of things like:
  * - Adding customer type based on a setting.
  * - Anonymising data.

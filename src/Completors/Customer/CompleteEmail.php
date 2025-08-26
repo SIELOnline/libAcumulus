@@ -21,7 +21,7 @@ class CompleteEmail extends BaseCompletorTask
      * - Multiple addresses.
      * - Friendly name (My Name <my.name@example.com>).
      *
-     * If no e-mail address is provided a fallback address will be used.
+     * If no e-mail address is provided, a fallback address will be used.
      *
      * @param \Siel\Acumulus\Data\Customer $acumulusObject
      */
@@ -40,13 +40,13 @@ class CompleteEmail extends BaseCompletorTask
             /** @noinspection DuplicatedCode */
             $at = strpos($email, '@');
             if ($at !== false) {
-                // Comma (,) used as separator?
+                // Is a comma (',') used as a separator?
                 $comma = strpos($email, ',', $at);
                 if ($comma !== false && $at < $comma) {
                     // Multiple addresses, keep the first.
                     $email = trim(substr($email, 0, $comma));
                 }
-                // Semicolon (;) used as separator?
+                // Is a semicolon (';') used as a separator?
                 $semicolon = strpos($email, ';', $at);
                 if ($semicolon !== false && $at < $semicolon) {
                     // Multiple addresses, keep the first.
@@ -54,7 +54,7 @@ class CompleteEmail extends BaseCompletorTask
                 }
             }
 
-            // Display name used in single remaining address?
+            // Display name used in the single remaining address?
             if (preg_match('/^(.+?)<([^>]+)>$/', $email, $matches)) {
                 $email = trim($matches[2]);
             }

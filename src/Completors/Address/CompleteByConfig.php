@@ -14,7 +14,7 @@ use Siel\Acumulus\Meta;
 use function assert;
 
 /**
- * CompleteByConfig adds configuration based values.
+ * CompleteByConfig adds configuration-based values.
  */
 class CompleteByConfig extends BaseCompletorTask
 {

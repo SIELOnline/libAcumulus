@@ -15,9 +15,9 @@ use Siel\Acumulus\Helpers\MessageCollection;
 /**
  * EmailInvoiceAsPdfCompletor completes an {@see \Siel\Acumulus\Data\EmailInvoiceAsPdf}.
  *
- * After an invoice has been collected, the shop specific part, it needs to be
+ * After an invoice has been collected, the shop-specific part, it needs to be
  * completed, also the emailAsPdf part. Think of things like:
- * - Adding config based properties.
+ * - Adding config-based properties.
  *
  * @noinspection PhpUnused  Instantiated by type name
  */

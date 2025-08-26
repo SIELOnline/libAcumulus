@@ -22,7 +22,7 @@ use Siel\Acumulus\Meta;
  *   (@todo: how can we get that rate if we only have a vat amount?)
  *
  * @todo: should we do this at the end, if the vat rate vs vat amount indicates that this
- *   is indeed a margin line.
+ *   indeed is a margin line.
  */
 class CompleteMarginProducts extends BaseCompletorTask
 {
@@ -35,7 +35,7 @@ class CompleteMarginProducts extends BaseCompletorTask
     }
 
     /**
-     * Check for cost price and margin scheme.
+     * Check for cost-price and margin-scheme.
      *
      * This is just a copy of old creator code that - quite early - acts on the fact that
      * a cost price was set and the configuration indicates that the margin scheme may be

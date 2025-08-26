@@ -31,7 +31,7 @@ use Siel\Acumulus\Meta;
  *  - If $denominator = 0 (free product), the vat rate will be set to null
  *    and the Completor will try to get this line listed under the correct
  *    vat rate.
- *  - If $numerator = 0 the vat rate will be set to 0 and be treated as if it
+ *  - If $numerator = 0, the vat rate will be set to 0 and be treated as if it
  *    is an exact vat rate, not a vat range.
  * This completor computes that range and adds it as a min and max vat rate tag.
  *
@@ -108,7 +108,7 @@ class CompleteVatRange extends BaseCompletorTask
         $denominatorPrecision = $line->metadataGet(Meta::PrecisionUnitPrice);
 
         if (Number::isZero($denominator, 0.0001)) {
-            // zero amount (and zero VAT I hope): we cannot determine the range.
+            // zero amounts (and I hope zero VAT): we cannot determine the range.
             $line->vatRate = null;
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
         } elseif (Number::isZero($numerator, 0.0001)) {

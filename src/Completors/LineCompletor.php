@@ -15,9 +15,9 @@ use Siel\Acumulus\Helpers\MessageCollection;
 /**
  *LineCompletor completes a {@see \Siel\Acumulus\Data\Line}.
  *
- * After a line has been collected, the shop specific part, it needs to be completed.
+ * After a line has been collected, the shop-specific part, it needs to be completed.
  * Think of things like:
- * - Adding config based values
+ * - Adding config-based values
  * - Computing vat rates
  * - Converting to euros
  * - ...

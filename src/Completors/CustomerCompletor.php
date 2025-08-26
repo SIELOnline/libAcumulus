@@ -16,7 +16,7 @@ use Siel\Acumulus\Helpers\MessageCollection;
 /**
  * CustomerCompletor completes an {@see \Siel\Acumulus\Data\Customer}.
  *
- * After an invoice has been collected, the shop specific part, it needs to be
+ * After an invoice has been collected, the shop-specific part, it needs to be
  * completed, also the customer part. Think of things like:
  * - Adding customer type based on a setting.
  * - Anonymising data.

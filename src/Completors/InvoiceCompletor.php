@@ -18,7 +18,7 @@ use Siel\Acumulus\Invoice\Source;
 /**
  * InvoiceCompletor completes an {@see \Siel\Acumulus\Data\Invoice}.
  *
- * After an invoice has been collected, the shop specific part, it needs to be
+ * After an invoice has been collected, the shop-specific part, it needs to be
  * completed. think of things like:
  * - Getting vat rates when we have a vat amount and an amount (inc. or ex.).
  * - Determining the cost center, account number and template based on settings

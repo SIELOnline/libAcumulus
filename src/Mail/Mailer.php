@@ -22,8 +22,8 @@ use function count;
  * able to give support, this might be forced by configuration or when using test mode.
  *
  * Normally, using code should call the {@see sendAdminMail()} method, that fetches the
- * 'from' and (adminstrators') 'to' addresses itself.
- * If other (non admin) e-mails need to be sent, just use the {@see sendMail()} method.
+ * 'from' and administrators' 'to' addresses itself.
+ * If other (non-admin) e-mails need to be sent, just use the {@see sendMail()} method.
  */
 abstract class Mailer
 {

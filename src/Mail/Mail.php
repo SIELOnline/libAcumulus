@@ -16,13 +16,12 @@ use Siel\Acumulus\Invoice\WrapperInterface;
 use Stringable;
 use Throwable;
 
-use function is_array;
 use function is_string;
 use function sprintf;
 use function strlen;
 
 /**
- * Mail allows to create and send admin mails.
+ * Mail allows creating and send admin e-mails.
  *
  * This abstract base class serves as a template with some boilerplate code that can be
  * used by actual mail templates.
@@ -213,7 +212,7 @@ abstract class Mail
      *
      * @return string[]
      *   An array with the body text in 2 formats,
-     *   keyed by 'text' resp. 'html'.
+     *   keyed by 'text' respectively 'html'.
      */
     protected function getBody(): array
     {
@@ -226,15 +225,15 @@ abstract class Mail
     }
 
     /**
-     * Returns the status specific part of the body for the mail.
+     * Returns the status-specific part of the body for the mail.
      *
      * This body part depends on:
      * - the result status.
      * - whether the invoice was sent in test mode
      *
      * @return string[]
-     *   An array with the status specific part of the body text in 2 formats,
-     *   keyed by 'text' resp. 'html'.
+     *   An array with the status-specific part of the body text in 2 formats,
+     *   keyed by 'text' respectively 'html'.
      */
     protected function getIntro(): array
     {
@@ -273,7 +272,7 @@ abstract class Mail
                     break;
                 default:
                     // Other severities which basically indicate success but possibly
-                    // with "informational"  messages.
+                    // with "informational" messages.
                     $sentences[] = 'mail_body_success';
                     if ($this->getResult()?->isTestMode() ?? false) {
                         $sentences[] = 'mail_body_test_mode';
@@ -311,7 +310,7 @@ abstract class Mail
      *
      * @return string[]
      *   An array with the messages part of the body text in 2 formats,
-     *   keyed by 'text' resp. 'html'.
+     *   keyed by 'text' respectively 'html'.
      */
     protected function getMessages(): array
     {
@@ -350,7 +349,7 @@ abstract class Mail
      *
      * @return string[]
      *   An array with the support messages part of the body text in 2 formats,
-     *   keyed by 'text' resp. 'html'.
+     *   keyed by 'text' respectively 'html'.
      */
     protected function getSupport(): array
     {
@@ -410,7 +409,7 @@ abstract class Mail
     }
 
     /**
-     * Creates a paragrpah from the sentences.
+     * Creates a paragraph from the sentences.
      *
      * @param string|array $sentences
      *   1 or more sentences that form a paragraph.
@@ -489,7 +488,7 @@ abstract class Mail
      *
      * @return string[]
      *   An array with keys 'text' and 'html', containing the concatenation of all the
-     *  'text' resp. 'html' entries of the given arrays.
+     *  'text' respectively 'html' entries of the given arrays.
      */
     protected function concatenateTextTuples(array ...$textTuples): array
     {

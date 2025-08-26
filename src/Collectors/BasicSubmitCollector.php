@@ -16,7 +16,7 @@ use Siel\Acumulus\Data\DataType;
 /**
  * Collects basic submit data from the shop.
  *
- * The values needed to construct the basic submit data, including its subclasses
+ * The values needed to construct the "basic submit" data, including its subclasses
  * {@see Contract} and {@see Connector}, are all wrapped in our library classes
  * {@see \Siel\Acumulus\Config\Environment} and {@see \Siel\Acumulus\Config\Config}.
  * All fields can be mapped from these objects.

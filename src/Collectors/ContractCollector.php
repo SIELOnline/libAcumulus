@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
+use Siel\Acumulus\Data\Contract;
+
 /**
  * Collects {@see \Siel\Acumulus\Data\Contract} data from the shop.
  *
@@ -14,7 +17,7 @@ namespace Siel\Acumulus\Collectors;
  * - string $emailOnError
  * - string $emailOnWarning
  *
- * @method \Siel\Acumulus\Data\Contract collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
+ * @method Contract collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null)
  */
 class ContractCollector extends Collector
 {

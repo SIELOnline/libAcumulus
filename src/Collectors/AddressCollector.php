@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
+use Siel\Acumulus\Data\Address;
+
 /**
  * Collects address data from the shop.
  *
@@ -29,7 +32,7 @@ namespace Siel\Acumulus\Collectors;
  * - string $countryAutoNameLang
  * - string $country
  *
- * @method \Siel\Acumulus\Data\Address collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
+ * @method Address collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null)
  */
 class AddressCollector extends SubTypedCollector
 {

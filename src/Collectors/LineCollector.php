@@ -45,50 +45,50 @@ use Siel\Acumulus\Meta;
  * - {@see \Siel\Acumulus\Meta::VatRateLookup}
  * - {@see \Siel\Acumulus\Meta::VatRateLookupLabel}
  * - {@see \Siel\Acumulus\Meta::VatRateLookupSource}
- * - {@see \Siel\Acumulus\Meta::PrecisionUnitPrice} and many other for other amounts.
- * - ...
+ * - {@see \Siel\Acumulus\Meta::PrecisionUnitPrice}
+ * - ... and many others for other amounts.
  *
  * Properties that may be based on configuration, if not mapped:
  * - string $nature, though it will be rare that Nature can be mapped from data stored in
  *   the web shop.
  *
- *  Hierarchically structured invoice lines
- *  ---------------------------------------
- *  If a shop supports:
- *  1. Options or variants, like size, color, etc.
- *  2. Bundles or composed products
- *  Then hierarchical lines are created and stored under the {@see Line::$children}
- *  property.
+ * Hierarchically structured invoice lines
+ * ---------------------------------------
+ * If a shop supports:
+ * 1. Options or variants, like size, color, etc.
+ * 2. Bundles or composed products
+ * Then hierarchical lines are created and stored under the {@see Line::$children}
+ * property.
  *
- *  ad 1)
- *  For each option or variant you add a child line. Set metadata
+ * ad 1)
+ * For each option or variant you add a child line. Set metadata
  * {@see Meta::VatRateSource} to {@see VatRateSource::Parent}. Copy the quantity from the
  * parent to the child. Price info is probably on the parent line only, unless your shop
  * administers additional or reduced costs for a given option on the child lines in which
  * case the difference should be set as {@see Line::$unitPrice}.
  *
- *  ad 2)
- *  For each product that is part of the bundle add a child line. As this may be
- *  a bundle/composed product on its own, you may create multiple levels, there
- *  is no maximum depth on child lines.
+ * ad 2)
+ * For each product that is part of the bundle, add a child line. As this may be a
+ * bundle/composed product on its own, you may create multiple levels. There is no
+ * maximum depth on child lines.
  *
- *  Price info may be on the child lines, but may also be on the parent line,
- *  especially so, if the bundle is cheaper that its separate parts. The child
- *  lines may have their own vat rates, so depending on your situation fetch the
- *  vat info from the child line objects itself or copy it from the parent. When
- *  left empty, it is copied from the parent in the Completor phase.
+ * Price info may be on the child lines, but may also be on the parent line,
+ * especially so if the bundle is cheaper than its separate parts. The child
+ * lines may have their own vat rates, so depending on your situation, fetch the
+ * vat info from the child line objects itself or copy it from the parent. When
+ * left empty, it is copied from the parent in the Completor phase.
  *
- *  Hierarchical lines are "flattened" in the Completor phase, see
- *  {@see FlattenerInvoiceLines} based on configuration settings.
+ * Hierarchical lines are "flattened" in the Completor phase, see
+ * {@see FlattenerInvoiceLines} based on configuration settings.
  *
- * @method \Siel\Acumulus\Data\Line collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
+ * @method Line collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null)
  */
 class LineCollector extends SubTypedCollector
 {
     /**
      * This override changes the {@see \Siel\Acumulus\Data\AcumulusObject} type as
      * {@see \Siel\Acumulus\Data\Line} has no subclasses (just subtypes) but does have
-     * subtype specific collectors.
+     * subtype-specific collectors.
      */
     protected function getAcumulusObjectType(): string
     {
@@ -117,7 +117,7 @@ class LineCollector extends SubTypedCollector
     protected function collectAfter(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
         $this->getContainer()->getEvent()->triggerLineCollectAfter($acumulusObject, $propertySources);
-        // Acutally for ItemLineCollectors only, but remove won't fail, throw, or alert.
+        // Actually for ItemLineCollectors only, but remove won't fail, throw, or alert.
         $propertySources->remove('product');
     }
 
@@ -152,7 +152,7 @@ class LineCollector extends SubTypedCollector
      * - If $denominator = 0 (free product), the vat rate will be set to null
      *   and the Completor will try to get this line listed under the correct
      *   vat rate.
-     * - If $numerator = 0 the vat rate will be set to 0 and be treated as if it
+     * - If $numerator = 0, the vat rate will be set to 0 and be treated as if it
      *   is an exact vat rate, not a vat range.
      *
      *  The following fields and metadata will be set/added::
@@ -174,7 +174,8 @@ class LineCollector extends SubTypedCollector
      *   The precision used when rounding the number. This means that the
      *   original denominator will not differ more than half of this.
      *
-     * @deprecated : Move this from the collector to the completor phase: DONE leave for reference
+     * @deprecated : Move this from the collector to the completor phase:
+     *   DONE leave for reference
      */
     public static function addVatRangeTags(
         Line $line,
@@ -184,7 +185,7 @@ class LineCollector extends SubTypedCollector
         float $denominatorPrecision = 0.01
     ): void {
         if (Number::isZero($denominator, 0.0001)) {
-            // zero amount (and zero VAT I hope): we cannot determine the range.
+            // A zero amount (and I hope zero VAT): we cannot determine the range.
             $line->vatRate = null;
             $line->metadataSet(Meta::VatAmount, $numerator);
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);

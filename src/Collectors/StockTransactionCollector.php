@@ -35,7 +35,7 @@ class StockTransactionCollector extends Collector
 {
     /**
      * This override will try to fetch the product id of the product at Acumulus if not
-     * already set. The collectMappedFields will only set it, if it stored locally, i.e.
+     * already set. The collectMappedFields will only set it if it is stored locally, i.e.
      * if it has been looked up before.
      *
      * @param \Siel\Acumulus\Data\StockTransaction $acumulusObject

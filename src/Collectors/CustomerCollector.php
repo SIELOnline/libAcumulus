@@ -103,7 +103,7 @@ class CustomerCollector extends Collector
      * to use or that always use the shipping address.
      *
      * @return string
-     *   Either the (shop specific) value from the corresponding setting in the shop's
+     *   Either the (shop-specific) value from the corresponding setting in the shop's
      *   config, or one of the constants {@see \Siel\Acumulus\Data\AddressType::Invoice}
      *   or {@see \Siel\Acumulus\Data\AddressType::Shipping}.
      */

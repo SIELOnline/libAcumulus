@@ -27,7 +27,7 @@ use Siel\Acumulus\Product\StockTransactionResult;
  * {@see \Siel\Acumulus\Data\AcumulusObject AcumulusObjects} and
  * {@see \Siel\Acumulus\Data\AcumulusProperty AcumulusProperties} are data objects and do
  * not contain complex or shop dependent logic.
- * {@see \Siel\Acumulus\Collectors\Collector Collectors} are the most shop dependent
+ * {@see \Siel\Acumulus\Collectors\Collector Collectors} are the most shop-dependent
  * classes that need mappings and sources coming from shop, environment, and config.
  * Other code that needs an AcumulusObject should not have to know where to get all this
  * data from, except for its local object it is working on (e.g. a

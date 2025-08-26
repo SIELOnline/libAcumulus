@@ -46,11 +46,11 @@ use function strlen;
  *   payment method)
  * - int $template
  *
- * In keeping webshop specific code as small and easy as possible, we can more
+ * In keeping webshop-specific code as small and easy as possible, we can more
  * easily add support for other webshops, conform to new tax rules, and add new
  * features for all those webshops at once.
  *
- * To construct an Acumulus invoice we have on the input side a number of
+ * To construct an "Acumulus invoice", we have on the input side a number of
  * supported webshops that each have their own way of representing customers,
  * orders, refunds and invoices. Their data should be mapped to the structure of
  * an Acumulus invoice as specified on
@@ -59,20 +59,20 @@ use function strlen;
  * This Collector class collects information from the web shop's datamodel. It
  * should do this in a simple way, thus only adding information that is readily
  * available, or at most simple transformations. Thus, if the vat paid is only
- * available as an amount, return that amount, we will not try to calculate the
+ * available as an amount, return that amount. We will not try to calculate the
  * percentage here, we will do that in the common Completor phase.
  *
  * Information that should be returned can be classified like:
  * - Values that map, more or less directly, to the Acumulus invoice model.
- * - Values that allow to decide how to get certain fields, e.g. whether prices
+ * - Values that allow deciding how to get certain fields, e.g. whether prices
  *   are entered with vat included or excluded and which address is used for vat
  *   calculations.
  * - Restrict the possible values for certain fields, e.g. the precision of
  *   amounts to limit the range of possible vat percentages.
  * - Validate the resulting Acumulus invoice and raise warnings when possible
  *   errors are detected.
- * - Determine used paths in the code, so we can debug the followed process
- *   when errors are reported.
+ * - Determine used paths in the code, so we can debug the process when errors are
+ *   reported.
  *
  * The input of a collection phase is an invoice {@see Source}, typically an order, a
  * refund, or, if supported by the webshop, an invoice from the webshop itself. The output
@@ -184,14 +184,13 @@ class InvoiceCollector extends Collector
         foreach ($infos as $key => $lineInfo) {
             $propertySources->add($propertySourceName, $lineInfo);
             $propertySources->add('key', $key);
-            /** @var \Siel\Acumulus\Data\Line $line */
             $line = $lineCollector->collect($propertySources, $lineMappings);
             if (!$line->metadataGet(Meta::DoNotAdd)) {
                 $invoice->addLine($line);
             }
             // Note: item lines should normally not be flattened. However, for other line
             // types we do not expect children, so if there are, it is because the info
-            // "object" lead to multiple lines anyway (perhaps for different tax rates).
+            // "object" leads to multiple lines anyway (perhaps for different tax rates).
             if ($flattenChildren) {
                 foreach ($line->getChildren() as $child) {
                     $invoice->addLine($child);

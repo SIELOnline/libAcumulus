@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
+use Siel\Acumulus\Data\Connector;
+
 /**
  * Collects {@see \Siel\Acumulus\Data\Connector} data from the shop.
  *
@@ -14,7 +17,7 @@ namespace Siel\Acumulus\Collectors;
  * - string $remark
  * - string $sourceUri
  *
- * @method \Siel\Acumulus\Data\Connector collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
+ * @method Connector collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null)
  */
 class ConnectorCollector extends Collector
 {

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Collectors;
 
+use ArrayObject;
+use Siel\Acumulus\Data\EmailAsPdf;
+
 /**
  * Collects emailAsPdf data from the shop and the module's settings.
  *
@@ -21,7 +24,7 @@ namespace Siel\Acumulus\Collectors;
  * Properties that are not set:
  * - string $message
  * - bool $confirmReading
- * @method \Siel\Acumulus\Data\EmailAsPdf collect(PropertySources $propertySources, ?\ArrayObject $fieldSpecifications = null)
+ * @method EmailAsPdf collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null)
  */
 class EmailAsPdfCollector extends SubTypedCollector
 {

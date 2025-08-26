@@ -13,18 +13,18 @@ namespace Siel\Acumulus\Helpers;
  * form subsystem. This abstract base class only defines a logger property
  * and an entry point to perform the mapping
  *
- * To comply with shop specific form building, it is supposed to be overridden
+ * To comply with shop-specific form building, it is supposed to be overridden
  * per shop that uses this way of form building. For now those are: Magento,
  * and PrestaShop.
  *
  * SECURITY REMARKS
  * ----------------
- * - A FormMapper uses the web shop's or CMS's form subsystem and as such it may
+ * - A FormMapper uses the webshop's or CMS's form subsystem, and as such it may
  *   assume safe rendering is the responsibility of the CMS/web shop.
- * - If however, the form sub system declines this responsibility, our form
+ * - However, if the form subsystem declines this responsibility, our form
  *   mapper will have to sanitize texts, values, options and such before
- *   handing them over to the form sub system.
- * - Current webs hops that offer a form sub system:
+ *   handing them over to the form subsystem.
+ * - Current webs hops that offer a form subsystem:
  *     * Magento: sanitizes.
  *     * PrestaShop: sanitizes.
  */

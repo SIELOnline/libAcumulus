@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpMultipleClassDeclarationsInspection
- */
 
 declare(strict_types=1);
 
@@ -28,6 +25,8 @@ use function sprintf;
  * injected upon construction, but should be set afterwards.
  * {@see MessageCollection} will normally do so, as all messages are normally
  * part of a {@see MessageCollection}.
+ *
+ * @noinspection PhpLackOfCohesionInspection
  */
 class Message
 {

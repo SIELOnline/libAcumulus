@@ -28,7 +28,7 @@ use function is_object;
 class FormHelper
 {
     /**
-     * Name of the hidden meta field.
+     * Name of the hidden meta-field.
      */
     public const Meta = 'meta';
 
@@ -87,7 +87,7 @@ class FormHelper
      */
     protected function setMeta(object|array|null $meta): void
     {
-        // json must change an associative array into an object, we reverse that
+        // JSON must change an associative array into an object, we reverse that
         // here.
         if (is_object($meta)) {
             $meta = (array) $meta;
@@ -104,16 +104,16 @@ class FormHelper
     }
 
     /**
-     * Adds the meta field to the form fields.
+     * Adds the meta-field to the form fields.
      *
-     * To prevent problems with rendering (css using + or ~ selector) or with
-     * PrestaShop that only allows <fieldset>s at the top, the meta field is added
+     * To prevent problems with rendering (CSS using + or ~ selector) or with
+     * PrestaShop that only allows <fieldset>s at the top, the meta-field is added
      * to the first fieldset or details element, or placed at the end.
      *
      * @param array[] $fields
      *
      * @return array[]
-     *   The $fields with the meta field added.
+     *   $fields with the meta-field added to it.
      */
     public function addMetaField(array $fields): array
     {
@@ -229,7 +229,7 @@ class FormHelper
     }
 
     /**
-     * Allows to alter the posted values in a web shop specific way.
+     * Allows altering the posted values in a webshop-specific way.
      *
      * This basic implementation returns the unaltered set of posted values.
      */
@@ -239,7 +239,7 @@ class FormHelper
     }
 
     /**
-     * Allows to alter the form values in a web shop specific way.
+     * Allows altering the form values in a webshop-specific way.
      *
      * This basic implementation returns the unaltered set of form values.
      *
@@ -257,7 +257,7 @@ class FormHelper
     }
 
     /**
-     * Adds a severity css class to form fields that do have a message.
+     * Adds a severity CSS class to form fields that do have a message.
      */
     public function addSeverityClassToFields(array $fields, array $messages): array
     {
@@ -270,7 +270,7 @@ class FormHelper
     }
 
     /**
-     * Adds a severity css class to a form field.
+     * Adds a severity CSS class to a form field.
      */
     protected function addSeverityClassToField(array &$fields, string $id, string $severityClass): void
     {
@@ -292,7 +292,7 @@ class FormHelper
     }
 
     /**
-     * Returns a css class for a given severity.
+     * Returns a CSS class for a given severity level.
      */
     protected function severityToCssClass(int $severity): string
     {

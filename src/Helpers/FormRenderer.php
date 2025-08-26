@@ -9,18 +9,17 @@ use function in_array;
 use function is_array;
 
 /**
- * Provides form element rendering functionality. This basic implementation
- * renders the elements as wrapped HTML input elements. To comply with shop
- * specific styling, it is supposed to be overridden per shop that uses this
- * way of rendering. For now those are: HikaShop/VirtueMart (Joomla), OpenCart,
- * and WooCommerce (WordPress).
+ * Provides form element rendering functionality. This basic implementation renders the
+ * elements as wrapped HTML input elements. To comply with shop-specific styling, it is
+ * supposed to be overridden per shop that uses this way of rendering. For now those are:
+ * HikaShop/VirtueMart (Joomla), OpenCart, and WooCommerce (WordPress).
  *
  * SECURITY REMARKS
  * ----------------
  * - All values (inputs) and texts between opening and closing tags are passed
  *   through {@see htmlspecialchars()}.
  * - The exceptions being:
- *     * A label prefix and postfix that come from code and may contain html.
+ *     * A label prefix and postfix that come from code and may contain HTML.
  *       See {@see renderLabel()}.
  *     * Label text if indicated as containing HTML by a label attribute 'html'
  *       (which comes from code).
@@ -31,6 +30,8 @@ use function is_array;
  *   anyway. See {@see getOpenTag()} and {@see getCloseTag()}.
  * - All attributes, name and value are passed through {@see htmlpecialchars()}.
  *   See {@see renderAttributes()}.
+ *
+ * @noinspection PhpLackOfCohesionInspection
  */
 class FormRenderer
 {
@@ -316,7 +317,7 @@ class FormRenderer
 
         // Help text.
         if (!empty($text)) {
-            // Allow for html links in the help text, so no filtering.
+            // Allow for HTML links in the help text, so no filtering.
             $wrapperType = $isFieldset ? 'fieldsetDescription' : 'description';
             $output .= $this->getWrapper($wrapperType);
             $output .= $text;
@@ -332,21 +333,21 @@ class FormRenderer
      * @param string $text
      *   The text for the label.
      * @param string $id
-     *   The value of the for attribute. If the empty string, not a label tag
-     *   but a span with a class="label" will be rendered.
+     *   The value of the for attribute. If it is the empty string, not a label tag
+     *   but a span with a class="label" is rendered.
      * @param array $attributes
      *   Any additional attributes to render for the label. The array is a keyed
      *   array, the keys being the attribute names, the values being the
-     *   value of that attribute. If that value is an array it is rendered as a
+     *   value of that attribute. If that value is an array, it is rendered as a
      *   joined string of the values separated by a space (e.g. multiple classes).
      * @param bool $wrapLabel
      *   Whether to wrap this label within the defined label wrapper tag.
      * @param string $prefix
-     *   Prefix to prepend to the label text, may contain html, so don't escape.
-     *   Will come from code not users.
+     *   Prefix to prepend to the label text, may contain HTML, so don't escape.
+     *   Will come from code, not users.
      * @param string $postfix
-     *   Postfix to append to the label text, may contain html, so don't escape.
-     *   Will come from code not users.
+     *   Postfix to append to the label text, may contain HTML, so don't escape.
+     *   Will come from code, not users.
      *
      * @return string The rendered label.
      *   The rendered label.
@@ -371,7 +372,8 @@ class FormRenderer
             if (isset($attributes['required'])) {
                 $wrapperAttributes['required'] = $attributes['required'];
                 $required = (bool) $attributes['required'];
-                // Required is not an allowed attribute for a label, remove it as attribute.
+                // Required is not an allowed attribute for a label, remove it as an
+                // attribute.
                 unset($attributes['required']);
             }
 
@@ -475,10 +477,10 @@ class FormRenderer
     {
         $output = '';
 
-        // Tag around select element: same as for an input element.
+        // Tag around the 'select' element: the same as for an input element.
         $output .= $this->getWrapper('input');
 
-        // Select tag.
+        // The 'select' tag.
         $attributes = $field['attributes'];
         $attributes = $this->addAttribute($attributes, 'id', $field['id']);
         $attributes = $this->addAttribute($attributes, 'name', $field['name']);
@@ -497,7 +499,7 @@ class FormRenderer
 
         // End tag.
         $output .= $this->getCloseTag('select');
-        // Tag around select element.
+        // Tag around the 'select' element.
         $output .= $this->getWrapperEnd('input');
 
         return $output;
@@ -510,7 +512,7 @@ class FormRenderer
     {
         $output = '';
 
-        // Handling of required attribute: may appear on all radio buttons with
+        // Handling of the 'required' attribute: may appear on all radio buttons with
         // the same name.
         $attributes = $field['attributes'];
         $required = !empty($attributes['required']);
@@ -599,7 +601,8 @@ class FormRenderer
                 $attributes = $this->addAttribute($attributes, 'class', $this->$class);
             }
             if (isset($attributes['required'])) {
-                // Required is not an allowed attribute for a wrapper, remove it as attribute.
+                // Required is not an allowed attribute for a wrapper, remove it as an
+                // attribute.
                 unset($attributes['required']);
             }
             $output .= $this->getOpenTag($this->$tag, $attributes);
@@ -626,7 +629,7 @@ class FormRenderer
      * Returns a secure HTML open tag string.
      *
      * @param string $tag
-     *   The html tag.
+     *   The HTML tag.
      * @param array $attributes
      *   The attributes to render.
      * @param bool $selfClosing
@@ -650,7 +653,7 @@ class FormRenderer
      * Returns a secure HTML close tag string.
      *
      * @param string $tag
-     *   The html tag.
+     *   The HTML tag.
      *
      * @return string
      *   The rendered closing tag.
@@ -679,7 +682,7 @@ class FormRenderer
             if ($value !== false && $value !== '') {
                 $attributeString .= ' ' . htmlspecialchars($key, ENT_QUOTES, 'UTF-8');
                 // HTML5: do not add a value to boolean attributes.
-                // HTML4: add the name of the key as value for the attribute.
+                // HTML4: add the name of the key as the value for the attribute.
                 if (!$this->html5 && $value === true) {
                     $value = $key;
                 }
@@ -787,7 +790,7 @@ class FormRenderer
      * Returns whether an option is part of a set of selected values.
      *
      * @param int|string|array $selectedValues
-     *   The set of selected values, may be just 1 scalar value.
+     *   The set of the selected values, it may be just 1 scalar value.
      * @param int|string $option
      *   The option to search for in the set of selected values.
      *
@@ -800,7 +803,7 @@ class FormRenderer
     }
 
     /**
-     * Returns whether the element is a fieldset or details element.
+     * Returns whether the element is a 'fieldset' or 'details' element.
      *
      * Note that a collection is handled as a simple element.
      */

@@ -15,6 +15,8 @@ use function sprintf;
  *
  * This is not a real extension in the sense of that it extends {@see AcumulusResult}, it
  * wraps an {@see AcumulusResult} and adds methods that are more on the domain level.
+ *
+ * @noinspection PhpLackOfCohesionInspection
  */
 class Result extends MessageCollection
 {
@@ -86,7 +88,7 @@ class Result extends MessageCollection
      *   A status indicating if and why an invoice was or was not sent.  It should contain
      *   1 of the {@see Result}::Sent_... or {@see Result}::NotSent_... constants.
      * @param array $arguments
-     *   A list of parameters to use when getting the send status as text.
+     *   A list of parameters to use when getting the send-status as text.
      *
      * @return $this
      */
@@ -161,7 +163,7 @@ class Result extends MessageCollection
 
     /**
      * @return string
-     *   A string indicating the function that triggered the sending,
+     *   A string indicating the function which triggered the sending,
      *   e.g. InvoiceManager::sourceStatusChange().
      */
     public function getTrigger(): string
@@ -171,7 +173,7 @@ class Result extends MessageCollection
 
     /**
      * @param string $trigger
-     *   A string indicating the function that triggered the sending,
+     *   A string indicating the function which triggered the sending,
      *   e.g. InvoiceManager::sourceStatusChange().
      *
      * @return $this

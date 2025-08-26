@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter
- * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4
- */
 
 declare(strict_types=1);
 
@@ -29,7 +25,7 @@ use function sprintf;
  * Class Util offers some utility functions:
  * - XML: convert an array from or to XML.
  * - HTML: check if a string is an HTML string
- * - JSON: Check for json decoding or encoding errors
+ * - JSON: Check for JSON decoding or encoding errors
  * - Password masking (for logging purposes)
  *
  * Though the utility methods in this class are meant to be generally usable,
@@ -42,7 +38,7 @@ class Util
      *
      * Acumulus specific:
      * Each key is converted to a tag (the tag name being the key in lowercase),
-     * no attributes are used. Numeric sub-arrays are repeated using the same
+     * no attributes are used. Numeric subarrays are repeated using the same
      * tag (not a numeric index).
      *
      * @param array $values
@@ -70,7 +66,7 @@ class Util
                 throw new RuntimeException('DOMDocument::saveXML failed');
             }
             // Backslashes get lost between here and the Acumulus API, but
-            // encoding them makes them get through. Solve here until the
+            // encoding them makes them get through. Solve this here until the
             // real error has been found and solved.
             /** @noinspection PhpUnnecessaryLocalVariableInspection */
             $result = str_replace('\\', '&#92;', $result);
@@ -142,7 +138,7 @@ class Util
      *
      * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Either:
-     *   - The $xml string is not valid xml
+     *   - The $xml string is not valid XML
      *   - The $xml string could not be converted to an (associative) array
      *     (we use json_encode() and json_decode() to convert to an array, so
      *     this would probably mean a structure that is too deep).
@@ -151,8 +147,8 @@ class Util
     {
         // Convert the response to an array via a 3-way conversion:
         // - create a simplexml object
-        // - convert that to json
-        // - convert json to array
+        // - convert that to JSON
+        // - convert JSON to array
         libxml_use_internal_errors(true);
         $result = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
         if (!$result) {
@@ -171,7 +167,7 @@ class Util
      *
      * throws \Siel\Acumulus\ApiClient\AcumulusException|\JsonException
      * @throws \JsonException
-     *   The parameter is not an object or array or an error occurred during
+     *   The parameter is not an object or an array, or an error occurred during
      *   conversion.
      */
     public function convertToJson(object|array $objectOrArray): string
@@ -218,7 +214,7 @@ class Util
      */
     public function convertHtmlToPlainText(string $body): string
     {
-        // DOMDocument::loadHtml() does not accept an empty string as document.
+        // DOMDocument::loadHtml() does not accept an empty string as the document.
         if ($body === '') {
             return $body;
         }
@@ -267,7 +263,7 @@ class Util
     /**
      * Recursively masks passwords in an array.
      *
-     * Acumulus API specific: passwords fields contain 'password' in their name.
+     * Acumulus API specific: password-fields contain 'password' in their name.
      */
     public function maskArray(#[SensitiveParameter] array $subject): array
     {
@@ -280,12 +276,12 @@ class Util
     }
 
     /**
-     * Masks passwords in an XML or json string
+     * Masks passwords in an XML or JSON string
      *
      * To be used when logging raw http responses instead of the fullResponse
      * property from an {@see \Siel\Acumulus\ApiClient\AcumulusResult}.
      *
-     * Acumulus API specific: passwords fields end with 'password'.
+     * Acumulus API specific: password-fields end with 'password'.
      */
     public function maskXmlOrJsonString(
         #[SensitiveParameter]
@@ -297,7 +293,7 @@ class Util
     /**
      * Masks passwords in an XML string
      *
-     * Acumulus API specific: passwords fields end with 'password'.
+     * Acumulus API specific: password-fields end with 'password'.
      */
     public function maskXml(
         #[SensitiveParameter]
@@ -313,9 +309,9 @@ class Util
     }
 
     /**
-     * Masks passwords in a Json string
+     * Masks passwords in a JSON string
      *
-     * Acumulus API specific: passwords fields end with 'password'.
+     * Acumulus API specific: password-fields end with 'password'.
      */
     public function maskJson(
         #[SensitiveParameter]
@@ -332,7 +328,7 @@ class Util
     /**
      * Masks passwords in an XML string
      *
-     * Acumulus API specific: passwords fields end with 'password'.
+     * Acumulus API specific: password-fields end with 'password'.
      */
     public function maskHtml(
         #[SensitiveParameter]
@@ -348,7 +344,7 @@ class Util
     }
 
     /**
-     * Throws an exception with all libxml error messages as message.
+     * Throws an exception with all libxml error messages as its message.
      *
      * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Always.

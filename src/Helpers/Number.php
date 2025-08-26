@@ -16,12 +16,12 @@ use function strlen;
  * Number contains features to work with (float) numbers, especially amounts.
  *
  * Comparing floats for equality is not done via a simple ===, but - because of small
- * possible errors in precision - by getting the difference and allow for a small
+ * possible errors in precision - by getting the difference and allows for a small
  * difference. when working with amounts, typically a difference of half a cent or (far)
  * less is used.
  *
  * Some web shops do not store the used vat percentage with orders but store the product
- * price ex vat and the vat amount. As these amounts are often stored with limited
+ * price ex-vat and the vat amount. As these amounts are often stored with limited
  * precision, typically 1 cent, the exact vat rate cannot be calculated. Instead, a range
  * within which the vat rate falls can be calculated. This library uses this range to
  * determine the actual vat rate later on after knowing which vat rates may apply (Dutch
@@ -76,8 +76,8 @@ class Number
         $numeratorHalfRange = 0.56 * $numeratorPrecision;
         $denominatorHalfRange = 0.56 * $denominatorPrecision;
 
-        // The min values should be closer to 0 then the value.
-        // The max values should be further from 0 then the value.
+        // The min values should be closer to 0 than the value.
+        // The max values should be further from 0 than the value.
         if ($numerator < 0.0) {
             $numeratorHalfRange = -$numeratorHalfRange;
         }
@@ -102,7 +102,7 @@ class Number
     /**
      * Helper method to do a float comparison
      *
-     * Comparison is based on a maximum delta, as exact bit by bit equality
+     * Comparison is based on a maximum delta, as exact bit-by-bit equality
      * for "equal" floats is often not the case.
      *
      * @param $f1
@@ -138,7 +138,7 @@ class Number
      * - WooCommerce: A 0 amount may be stored as an empty string in the
      *   database. Non 0 amounts may be stored as their string representation.
      * - {@see SimpleXMLElement}s can contain numeric values, the conversion is
-     *   done via a string as all xml values are strings.
+     *   done via a string as all XML values are strings.
      *
      * @param mixed $f
      *  A value to be converted into a float
@@ -200,7 +200,7 @@ class Number
      *   The numbers may be passed as a string, and in many cases probably will
      *   indeed be passed as a string as it comes from the database.
      * @param int $precision
-     *   The number of decimals to which they should have been rounded, if they
+     *   The number of decimals to which they should have been rounded if they
      *   are rounded numbers. Should be a non-negative integer.
      *
      * @return bool

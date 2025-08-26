@@ -13,7 +13,7 @@ use Siel\Acumulus\Invoice\Source;
 /**
  * Event defines the events that our library triggers.
  *
- * Implementing classes should convert these events into shop specific event triggers
+ * Implementing classes should convert these events into shop-specific event triggers
  */
 interface Event
 {
@@ -22,7 +22,7 @@ interface Event
      *
      * This event allows you to:
      * - Prevent the invoice from being created and sent at all. To do so,
-     *   change the send status using {@see InvoiceAddResult::setSendStatus()}
+     *   change the send-status using {@see InvoiceAddResult::setSendStatus()}
      *   on the $localResult parameter.
      * - Inject custom behaviour before the invoice is created (collected and
      *   completed) and sent.
@@ -30,8 +30,8 @@ interface Event
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice was created.
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
-     *   Contains any earlier generated messages and the initial send status.
-     *   You can add your own messages and/or change the send status.
+     *   Contains any earlier generated messages and the initial send-status.
+     *   You can add your own messages and/or change the send-status.
      */
     public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void;
 
@@ -61,8 +61,8 @@ interface Event
      *     {lineType} is the {@see \lcfirst()} value of the
      *     {@see \Siel\Acumulus\Data\LineType} constant name (not its value).
      *   - 'key': The key with which the above "lineInfo" object was passed to the
-     *     collector. Most of the time not needed, but there are cases where it contains
-     *     valuable information (OC: shipping tax lines).
+     *     collector. Most of the time this is not needed, but there are cases where it
+     *     contains valuable information (OC: shipping tax lines).
      */
     public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void;
 
@@ -92,7 +92,7 @@ interface Event
      * - Change the invoice by changing the collected data. This is the place to do so if
      *   you need access to the data from the shop environment this library is running in.
      * - Prevent the invoice from being completed and sent. To do so, change the
-     *   send status using {@see InvoiceAddResult::setSendStatus()} on the
+     *   send-status using {@see InvoiceAddResult::setSendStatus()} on the
      *   $localResult parameter.
      * - Inject custom behaviour after the invoice has been created (collected),
      *   but before it is completed and sent.
@@ -102,8 +102,8 @@ interface Event
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice is created.
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
-     *   Contains any earlier generated messages and the initial send status.
-     *   You can add your own messages and/or change the send status.
+     *   Contains any earlier generated messages and the initial send-status.
+     *   You can add your own messages and/or change the send-status.
      */
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void;
 
@@ -115,7 +115,7 @@ interface Event
      *   the place to do so if you need access to the complete invoice itself
      *   just before sending. Note that no Shop order or credit note objects
      *   are passed to this event.
-     * - Prevent the invoice from being sent. To do so, change the send status
+     * - Prevent the invoice from being sent. To do so, change the send-status
      *   using {@see InvoiceAddResult::setSendStatus()} on the $result
      *   parameter.
      * - Inject custom behaviour just before sending.
@@ -123,8 +123,8 @@ interface Event
      * @param \Siel\Acumulus\Data\Invoice $invoice
      *   The invoice that has been created.
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
-     *   Contains any earlier generated messages and the initial send status.
-     *   You can add your own messages and/or change the send status.
+     *   Contains any earlier generated messages and the initial send-status.
+     *   You can add your own messages and/or change the send-status.
      */
     public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void;
 

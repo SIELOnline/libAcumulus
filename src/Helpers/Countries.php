@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Class Countries defines country related features, including:
+ * Class Countries defines country-related features, including
  * - Country codes
  * - Country names (in Dutch)
  * - Fiscal EU countries
@@ -16,7 +16,7 @@ class Countries
     /**
      * Returns whether the country is the Netherlands.
      * For now only the alpha-2 codes are allowed. Other notations will be added
-     * as soon we support a web shop with a different way of storing countries.
+     * as soon as we support a webshop with a different way of storing countries.
      *
      * @param string $countryCode
      *   Case-insensitive ISO 3166-1 alpha-2 country code.

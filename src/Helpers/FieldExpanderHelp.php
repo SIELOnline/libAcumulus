@@ -18,7 +18,7 @@ class FieldExpanderHelp
      * Returns field reference help data.
      *
      * @return array
-     *   The json decoded field reference data. An array describing the most important
+     *   The JSON decoded field reference data. An array describing the most important
      *   objects, properties and methods that can be used as field reference.
      *
      * @throws \JsonException|\RuntimeException
@@ -45,7 +45,7 @@ class FieldExpanderHelp
      * Converts an array with texts to an HTML list.
      *
      * @param array $list
-     *   Multi-level list of strings keyed by object/property name.
+     *   Multi-level list of strings keyed by the object/property name.
      */
     protected function arrayToList(array $list): string
     {

@@ -45,7 +45,7 @@ use function strlen;
  *    - Complex logic: often involving navigating relations in a database, with
  *     edge case handling, fallback values, and such.
  * - Combination from settings and logic: e.g. based on the setting "invoice
- *   number source", the invoice number is either defined by Acumulus, or comes
+ *   number source", the invoice number is either defined by Acumulus or comes
  *   from the invoice for a given order with fallback to the order number itself
  *   if no invoice is available.
  *
@@ -53,15 +53,15 @@ use function strlen;
  * - A "field expansion specification" is a string that specifies how to
  *   assemble the resulting value based on a mix of (possibly multiple) free
  *   text parts and "field extraction specifications".
- * - A "field extraction definition" is enclosed by square brackets, i.e. a '['
- *   and a ']' and can refer to multiple properties, either as alternative
+ * - A "field extraction definition" is enclosed by square brackets, i.e. '['
+ *   and ']' and can refer to multiple properties, either as an alternative
  *   (fallback) or for concatenation.
  * - A property specification is a specification that specifies where a value
  *   should come from. Typically, it refers to a "property" of an "object".
  * - "Objects" are "data structures", in our domain typically the shop order, an
  *   order line, the customer, or an address. Depending on the webshop, these
  *   "objects" may actually be (keyed) arrays.
- * - "Properties" are the values of these "objects", all elements that have or
+ * - "Properties" are the values of these "objects". All elements that have or
  *   can return a value can be used: properties on real objects, key names on
  *   arrays, or (getter) methods on real objects. Even methods with parameters
  *   can be used.
@@ -73,8 +73,8 @@ use function strlen;
  *         - bool: to the string 'true' or 'false'.
  *         - null: empty string.
  *         - number: string representation of the number. (@todo: precision?)
- *         - array: imploded with glue = ' '.
- *         - object: if the _toString() exists it will be called, otherwise
+ *         - array: imploded with glue = ' ' (a space).
+ *         - object: if the _toString() method exists, it will be called, otherwise
  *           {@see json_encode()} will be used.
  *
  * The syntax specification below formalizes the description above:
@@ -94,7 +94,7 @@ use function strlen;
  * - This syntax is quite simple. The following features are not possible:
  *     - Grouping, e.g. by using brackets, to override operator precedence.
  *     - Translation of literal strings. Use methods like {@see Source::getLabel()}
- *       to allow to get translated texts.
+ *       to allow getting translated texts.
  *     - Lookup based on a value of a property.
  * - The parsing is quite simple: the special symbols - ], |, &, and " - cannot
  *   appear otherwise:
@@ -106,13 +106,13 @@ use function strlen;
  *       definitions with (mostly) the same results.
  * - Alternatives are expanded left to right until a property alternative is
  *   found that is not empty.
- * - Properties that are joined with a '+', are all expanded, where the '+' gets
- *   replaced with a space if and only if the property directly following it,
+ * - Properties that are joined with a '+' are all expanded where the '+' gets
+ *   replaced with a space if and only if the property directly following it
  *   is not empty (and we already have a non-empty intermediate result).
  * - Properties that are joined with a '&' are all expanded and concatenated
  *   directly, thus not with a space between them like with a '+'.
  * - Literal text that is joined with "real" properties using '&' or '+' only
- *   gets returned when at least 1 of the "real" properties have a non-empty
+ *   gets returned when at least 1 of the "real" properties has a non-empty
  *   value. (Otherwise, you could just place it outside the variable-field
  *   definition.)
  *
@@ -143,7 +143,7 @@ use function strlen;
  * distinguish it from the "property" name itself. This allows specifying which
  * object the property should be taken from. This is useful when multiple
  * "objects" have some equally named "properties" (e.g. 'id'). This also allows
- * to travers deeper into related objects, in which case this syntax is a
+ * traversing deeper into related objects, in which case this syntax is a
  * necessity, as plain properties are only searched for in the "top level"
  * "objects".
  *
@@ -188,7 +188,7 @@ use function strlen;
  * - An object that implements ArrayAccess in which case both ways to retrieve the value
  *   are tried.
  *
- * FieldExpander will not throw on non-existing properties or methods but return null,
+ * FieldExpander will not throw on non-existing properties or methods but return null
  * and will try to prevent non-fatal error or warning messages from being logged.
  */
 class FieldExpander
@@ -231,7 +231,7 @@ class FieldExpander
      * is expanded by searching the given "objects" for the referenced property
      * or properties.
      *
-     * FieldExpander will not throw on non-existing properties or methods but return null,
+     * FieldExpander will not throw on non-existing properties or methods but return null
      * and will try to prevent non-fatal error or warning messages from being logged.
      *
      * @param string $fieldSpecification
@@ -475,7 +475,7 @@ class FieldExpander
      * - single-property-name = text
      *
      * A single named property does not need its parent object. The property is searched
-     * for in ths "super object" itself and in all objects in that super object
+     * for in this "super object" itself and in all objects in that super object
      * ($this->objects). These objects are not recursively searched (to prevent endless
      * recursion).
      *
@@ -488,7 +488,7 @@ class FieldExpander
      */
     protected function expandSinglePropertyName(string $propertyName): mixed
     {
-        // Look in the super object itself.
+        // Look into the super object itself.
         if (array_key_exists($propertyName, $this->objects)) {
             return $this->objects[$propertyName];
         }
@@ -528,7 +528,7 @@ class FieldExpander
      *
      * @return mixed
      *   The value for the property of the given name on the given object, or null or the
-     *   empty string if property does not exist or is not accessible, not even via
+     *   empty string if the property does not exist or is not accessible, not even via
      *   __call() or __get().
      */
     protected function getValue(string $property, array|object $object): mixed
@@ -605,9 +605,9 @@ class FieldExpander
             $properties = get_object_vars($object);
             $value = $properties[$property] ?? null;
             // However, WooCommerce can have the property customer_id set to null, while
-            // the data store does contain a non-null value: so if value is still null,
-            // even if it is in the get_object_vars() result, we try to get it the more
-            // difficult way.
+            // the data store does contain a non-null value: so if the value is still
+            // null, even if it is in the get_object_vars() result, we try to get it the
+            // more difficult way.
             if ($value === null &&
                 ((property_exists($object, $property) && (new ReflectionProperty($object, $property))->isPublic())
                     || method_exists($object, '__get'))

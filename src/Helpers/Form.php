@@ -394,7 +394,7 @@ abstract class Form extends MessageCollection
      * @return string|null
      *   The submitted value, or the default if the value was not submitted.
      */
-    protected function getSubmittedValue(string $name, string $default = null): ?string
+    protected function getSubmittedValue(string $name, ?string $default = null): ?string
     {
         if (count($this->submittedValues) === 0) {
             $this->setSubmittedValues();

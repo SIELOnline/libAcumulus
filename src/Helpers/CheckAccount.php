@@ -48,7 +48,7 @@ class CheckAccount extends MessageCollection
         if ($this->message === null) {
             $this->messages = [];
             if ($this->emptyCredentials()) {
-                // First fill in your account details.
+                // Start with filling in your account details.
                 $this->message = 'message_auth_unknown';
             } else {
                 try {
@@ -87,7 +87,7 @@ class CheckAccount extends MessageCollection
                     $this->addException($e);
                 }
             }
-            // Store in cache.
+            // "Cache" this value in the (local) config to prevent further API calls.
             $this->acumulusConfig->save(['cachedAccountMessage' => $this->message]);
         }
         return $this->message;
@@ -99,7 +99,7 @@ class CheckAccount extends MessageCollection
      * @param bool $returnMessage
      *   Whether to return the error message or false when the account settings are not
      *   correct/complete. Sometimes we just want to know whether the account settings
-     *   are correct ro not, sometimes we want to inform the user what is not correct.
+     *   are correct or not, sometimes we want to inform the user what is not correct.
      *   A second meaning of this parameter is whether to force a recheck or just use the
      *   cached status.
      *
@@ -127,7 +127,7 @@ class CheckAccount extends MessageCollection
     }
 
     /**
-     * Returns whether (at least one of) the credentials are (is) empty.
+     * Returns whether (at least one of) the credentials are empty.
      */
     protected function emptyCredentials(): bool
     {

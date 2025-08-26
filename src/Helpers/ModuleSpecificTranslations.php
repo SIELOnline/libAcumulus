@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Contains plugin specific overrides.
+ * Contains plugin-specific overrides.
  *
  * This base class, obviously, does not override any translation, but override
  * this class, e.g. to use terminology specific for your webshop environment.

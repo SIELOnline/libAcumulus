@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Helpers;
 
-use Closure;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Mail\CrashMail;
 use Throwable;
@@ -26,7 +25,7 @@ use function strlen;
  * - If our code fails, we allow the request to continue until its end. We think
  *   this is better than a WSOD, especially on the user-side.
  * - May webshops have suboptimal error handling. By doing this ourselves we
- *   ensure that errors in or code are actually loggend and reported (instead of
+ *   ensure that errors in or code are actually logged and reported (instead of
  *   ignored) and thus can be solved faster.
  */
 class CrashReporter
@@ -74,7 +73,7 @@ class CrashReporter
      *
      * @return string
      *   A message of at most 150 characters that can be used to display to the
-     *   user, if we know that we are in the backend. Do not display if we might
+     *   user if we know that we are in the backend. Do not display if we might
      *   be on the frontend!
      */
     public function logAndMail(Throwable $e): string
@@ -112,6 +111,6 @@ class CrashReporter
 
     protected function arrayToList(array $list, bool $isHtml): string
     {
-        return $this->util->arrayToList($list, $isHtml, Closure::fromCallable([$this, 't']));
+        return $this->util->arrayToList($list, $isHtml, $this->t(...));
     }
 }

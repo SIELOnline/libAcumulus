@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpUnhandledExceptionInspection Config::save may throw but we ignore that.
+ * @noinspection PhpUnhandledExceptionInspection Config::save may throw, but we ignore that.
  */
 
 declare(strict_types=1);
@@ -66,14 +66,14 @@ class ConfigUpgrade
      * This method should only be called when the module just got updated. But
      * as not all host systems offer a specific update moment, it may get called
      * on each (real) initialisation of this module, so we return quick and fast
-     * in the situation where the config data is up-to-date.
+     * in the situation where the config data is up to date.
      *
      * Notes:
      * - $currentVersion can be empty if the host environment cannot deliver
      *   this value (MA2.4). If so, we switch to using a new key 'VersionKey'
      *   in the set of config values.
      * - 'VersionKey' was introduced in 6.4.1. So when upgrading from an
-     *   older version it will not be set and if $currentVersion is also not
+     *   older version, it will not be set, and if $currentVersion is also not
      *   passed in, we have to guess it. The 6.0.0 update is not idempotent,
      *   whereas the 6.3.1 update is, so we "guess" 6.3.0, making this work for
      *   everybody running on 6.0.1 when updating at once to 6.4.1(release date
@@ -204,7 +204,7 @@ class ConfigUpgrade
     /**
      * 7.4.0 upgrade.
      *
-     * - settings to show invoice and packing slip pdf now available for
+     * - settings to show invoice and packing slip PDF now available for
      *   detail and list screen:
      *   - renamed the original settings by adding 'Detail' to the end.
      *   - introduced 2 new settings for the list page, copy value from the
@@ -235,8 +235,8 @@ class ConfigUpgrade
      * - Settings to mappings:
      *   - Keep the old settings (for emergency revert).
      *   - Copy the settings that are a mapping to the 'mappings' settings.
-     *   - Cater for defaults that have been rephrased (start with Source::, use method
-     *     call syntax), so only copy those that are stored in the config.
+     *   - Cater for defaults that have been rephrased (starting with 'Source::',
+     *     use method call syntax), so only copy those that are stored in the config.
      */
     protected function upgrade800(): bool
     {
@@ -279,7 +279,7 @@ class ConfigUpgrade
         foreach ($mappingKeys as $key => [$group, $property]) {
             // - Was the old key being overridden by the user? That is, is there a value,
             //   even if it is empty?
-            // - Does the new mapping somehow already has a value? do not overwrite.
+            // - Does the new mapping somehow already have a value? do not overwrite.
             if (isset($values[$key]) && !isset($mappings[$group][$property])) {
                 // Chances are it won't work anymore, as you now probably have to start
                 // with 'Source::getShopObject()::{method on shop Order}'. So we should issue
@@ -333,8 +333,8 @@ class ConfigUpgrade
         }
         if (isset($mappings[AddressType::Shipping][Fld::Salutation])) {
             if (!$doSave) {
-                // salutation field was not set on invoice address but is set on shipping
-                // address, copy it from that address.
+                // 'salutation' field was not set on the "invoice address" but it is set
+                // on the "shipping address", copy it from that address.
                 $mappings[DataType::Customer][Fld::Salutation] = $mappings[AddressType::Shipping][Fld::Salutation];
             }
             unset($mappings[AddressType::Shipping][Fld::Salutation]);
@@ -395,15 +395,15 @@ class ConfigUpgrade
      * 8.3.7 upgrade.
      *
      * - API fields are now lowercase (as are the tags) => update config store when used
-     *   as config key:
+     *   as a config key:
      *   - The contract fields, basically we are undoing upgrade836() (which has been
-     *     cleaned-up).
+     *     cleaned up).
      *   - Mappings
      * - getTypeLabel() in mappings should be renamed to getType()
      */
     protected function upgrade837(): bool
     {
-        // Mapping keys that are commented out, are already all lowercase.
+        // Mapping keys that are commented out are already all lowercase.
         $mappingKeys = [
             DataType::Customer => [
                 'contactYourId' => Fld::ContactYourId,
@@ -457,7 +457,7 @@ class ConfigUpgrade
                 'emailBcc' => Fld::EmailBcc,
 //              'subject' => Fld::Subject,
                 'confirmReading' => Fld::ConfirmReading,
-                // Error in mappings form, those 2 keys were never corrected before 8.3.7
+                // Error in the 'mappings' form, those 2 keys were never corrected before 8.3.7.
                 'packingSlipEmailTo' => Fld::EmailTo,
                 'packingSlipEmailBcc' => Fld::EmailBcc,
             ],

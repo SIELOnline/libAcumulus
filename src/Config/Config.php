@@ -168,7 +168,7 @@ class Config
                 && version_compare($this->values[Config::VersionKey], Version, '<')
                 && !isset($this->isUpgrading)
             ) {
-                // ConfigUpgrade will ensure that upgraded config value are saved. This
+                // ConfigUpgrade will ensure that upgraded config values are saved. This
                 // can be done multiple times, so prevent recursively calling this upgrade
                 // process.
                 // If values have changed and thus are to be saved, the {@see save()}
@@ -200,8 +200,8 @@ class Config
         }
         $this->log->notice('Config::save(): saving %s', json_encode($copy, Meta::JsonFlags));
 
-        // Remove password if not sent along. We have had some reports that
-        // passwords were gone missing, perhaps some shops do not send the value
+        // Remove the password if not sent along. We have had some reports that
+        // passwords were gone missing, perhaps because some shops do not send the value
         // of password fields to the client???
         if (array_key_exists(Fld::Password, $values) && empty($values[Fld::Password])) {
             unset($values[Fld::Password]);
@@ -317,7 +317,7 @@ class Config
      * Returns the ShowRatePluginMessage config setting.
      *
      * @noinspection PhpUnused
-     *    Called form shop specific code outside this library.
+     *    Called from shop-specific code outside this library.
      */
     public function getShowRatePluginMessage(): int
     {
@@ -329,7 +329,7 @@ class Config
      *
      * @deprecated: use get()
      * @noinspection PhpUnused
-     *    Called from shop specific code outside this library.
+     *    Called from shop-specific code outside this library.
      */
     public function getPluginV8Message(): int
     {
@@ -546,7 +546,7 @@ class Config
     }
 
     /**
-     * Returns the set of settings related to the pdf documents.
+     * Returns the set of settings related to the PDF documents.
      *
      * @return array
      *   A keyed array with the keys:
@@ -584,7 +584,7 @@ class Config
     }
 
     /**
-     * Returns a list of keys that are stored in the shop specific config store.
+     * Returns a list of keys that are stored in the shop-specific config store.
      */
     public function getKeys(): array
     {
@@ -625,7 +625,7 @@ class Config
     /**
      * Returns the hostname of the current request.
      *
-     * The hostname is returned without www. so it can be used as domain name
+     * The hostname is returned without www. so it can be used as the domain name
      * in constructing e-mail addresses.
      */
     protected function getHostName(): string

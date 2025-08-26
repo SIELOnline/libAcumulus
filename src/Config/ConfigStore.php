@@ -12,8 +12,8 @@ use SensitiveParameter;
 /**
  * This class is the bridge between the library and the config subsystem.
  *
- * All CMS and web shop software offers some way of storing settings and
- * libAcumulus uses this configuration subsystem of the host environment it is
+ * All CMSs and webshop software packages offer some way of storing settings.
+ * LibAcumulus uses this configuration subsystem of the host environment it is
  * running in to store its own settings.
  *
  * Only values that are set and that differ from the default value are stored.

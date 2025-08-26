@@ -41,7 +41,7 @@ abstract class Environment
      *
      * This method consists of 2 parts:
      * - Setting information that is shop independent
-     * - Calling {@see setShopEnvironment()} for shop dependent information,
+     * - Calling {@see setShopEnvironment()} for shop-dependent information,
      *   and allowing shops to override the values set here.
      */
     protected function set(string $shopNamespace): void
@@ -74,7 +74,7 @@ abstract class Environment
      * Sets web shop specific environment values.
      *
      * Overriding methods should set:
-     *  - shopName, but only if different from last part of shop namespace.
+     *  - shopName, but only if different from the last part of shop namespace.
      *  - shopVersion.
      *  - moduleVersion, if different from this library's version.
      *  - cmsName, but only if the shop is an addon on top of a CMS.
@@ -85,7 +85,7 @@ abstract class Environment
     /**
      * Returns the hostname of the current request.
      *
-     * The hostname is returned without www. so it can be used as domain name
+     * The hostname is returned without www. so it can be used as the domain name
      * in constructing e-mail addresses.
      */
     protected function getHostName(): string
@@ -122,7 +122,7 @@ abstract class Environment
     /**
      * Executes a query and returns the resulting rows.
      *
-     * Override to use the shop specific database API.
+     * Override to use the shop-specific database API.
      *
      * @return array[]
      */
@@ -173,7 +173,7 @@ abstract class Environment
      *   A set of text lines that describe the environment. Can be used to
      *   display the environment as a bullet list. The lines are keyed by what
      *   can be seen as a 'header' for that line. The keys 'shop' and 'module'
-     *   can be translated (using shop specific terminology).
+     *   can be translated (using shop-specific terminology).
      */
     public function getAsLines(): array
     {

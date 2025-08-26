@@ -27,7 +27,7 @@ use function sprintf;
  * {@see \Siel\Acumulus\Invoice\Item item line} of a {@see \Siel\Acumulus\Invoice\Source}.
  *
  * Product is used to provide unified access to information about a product or service.
- * Furthermore, by wrapping it in a single, library defined, object type, web shop
+ * Furthermore, by wrapping it in a single, library-defined, object type, web shop
  * products can be passed around in a strongly typed way.
  */
 abstract class Product implements WrapperInterface
@@ -83,7 +83,7 @@ abstract class Product implements WrapperInterface
      */
     public function setAcumulusId(?int $acumulusId): void
     {
-        throw new RuntimeException(sprintf('%s::%s(): Not implemented', get_class(), __FUNCTION__));
+        throw new RuntimeException(sprintf('%s::%s(): Not implemented', get_class($this), __FUNCTION__));
     }
 
     /**
@@ -95,7 +95,7 @@ abstract class Product implements WrapperInterface
      *   products in Acumulus, which may be an empty value indicating the product cannot
      *   be matched to a product in Acumulus.
      *
-     * @noinspection PhpUnused  Used in the FieldExpander via  a mapping in
+     * @noinspection PhpUnused  Used in the FieldExpander via a mapping in
      *   {@see \Siel\Acumulus\Config\Mappings::getShopIndependentDefaults()}.
      */
     public function getReferenceForAcumulusLookup(): int|string|null
@@ -167,7 +167,8 @@ abstract class Product implements WrapperInterface
     }
 
     /**
-     * Returns a {@see PropertySources} object with the product as property source.
+     * Returns a {@see PropertySources} object with the product as the single property
+     * source.
      */
     private function getProductPropertySources(): PropertySources
     {

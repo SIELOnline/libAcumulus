@@ -28,7 +28,7 @@ use function sprintf;
 /**
  * ProductManager provides functionality to manage products and their stock.
  *
- * Acumulus allows to define a catalogue of products and services that can be sold,
+ * Acumulus allows defining a catalogue of products and services that can be sold,
  * including a.o. their nature and stock
  */
 class ProductManager
@@ -197,7 +197,7 @@ class ProductManager
      * Updates the stock at Acumulus.
      *
      * We assume that if we get here, stock management for the product itself has been
-     * enabled (assuming that the shop allows to disable it per product)
+     * enabled (assuming that the shop allows disabling it per product)
      *
      * @param \Siel\Acumulus\Invoice\Item $item
      *   The item line at the origin of the stock change, refers to the product for which
@@ -282,7 +282,7 @@ class ProductManager
      */
     protected function mailStockTransactionResult(Item $item, int|float $change, ?Product $product, StockTransactionResult $result): bool
     {
-        // We do not send a mail if stock management has not been enabled at all.
+        // We do not send an email if stock management has not been enabled at all.
         if ($result->getSendStatus() === StockTransactionResult::NotSent_StockManagementNotEnabled) {
             return true;
         }
@@ -303,6 +303,8 @@ class ProductManager
 
     /**
      * Logs the result of the stock transaction.
+     *
+     * @noinspection PhpSameParameterValueInspection
      */
     private function logStockTransactionResult(
         Item $item,

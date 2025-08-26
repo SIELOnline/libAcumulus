@@ -115,7 +115,7 @@ LONGSTRING
         'option_send_force' => 'Always send, overwrite the existing invoice if already sent',
         'option_send_test_mode' => 'Send in test mode',
         'desc_send_mode' => '<p>Invoices that fall within the range but are already sent to Acumulus will normally not be sent again. This is the 1st option. By checking the 2nd option, these orders will be sent again. If still available, the old entry will be moved to the waste bin in Acumulus.</p>
-                             <p>With the 3rd option, invoices will be sent to Acumulus using the test mode. Acumulus will only check the input for errors and warnings but not store the invoice, so your administration will not be polluted. You will always receive a mail with the results. This option overrules the setting "Invoice send mode" on the configuration form. Use this option so you can forward the mail you receive with a support request.</p>',
+                             <p>With the 3rd option, invoices will be sent to Acumulus using the test mode. Acumulus will only check the input for errors and warnings but not store the invoice, so your administration will not be polluted. You will always receive an email with the results. This option overrules the setting "Invoice send mode" on the configuration form. Use this option so you can forward the mail you receive with a support request.</p>',
         'field_dry_run' => 'Dry run',
         'option_dry_run' => 'Dry run',
         'desc_dry_run' => '<p>In some cases, the filters you defined here can lead to surprises. By checking this option you will get a list of invoices that would be sent, without actually being sent.</p>',
@@ -126,15 +126,15 @@ LONGSTRING
 This is most useful when you just installed the plugin, because normally you
 should prefer automatic sending.</p>
 <p><strong>Performance: sending an invoice can take up to a few seconds.
-Therefore, you should not try to send to many invoices in 1 batch as that may
+Therefore, you should not try to send too many invoices in 1 batch as that may
 lead to a time-out on your web server.</strong></p>
 <p>Sending invoices is done as with automatic sending:</p>
 <ul style="list-style: inside disc;">
 <li>The invoice is created exactly the same way as with automatic sending.</li>
-<li>If you configured to mail the invoice pdf to the client, this will be done here as well.</li>
+<li>If you configured to mail the invoice PDF to the client, this will be done here as well.</li>
 <li>If an invoice for a given order or credit memo has already been sent, it
 will not be sent again, unless you checked the 'Force sending' checkbox.</li>
-<li>If an invoice contains a warning or an error you will receive an email per
+<li>If an invoice contains a warning or an error, you will receive an email per
 incorrect invoice.</li>
 <li>All registered event handlers that react to 1 of the Acumulus defined
 events are triggered for all invoices that are sent.</li>

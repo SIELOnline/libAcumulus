@@ -18,9 +18,9 @@ use Siel\Acumulus\Helpers\Translator;
 use function sprintf;
 
 /**
- * Provides the "Activate pro support" form.
+ * Provides the "Activate pro-support" form.
  *
- * Shop specific overrides should - of course - implement the abstract method:
+ * Shop-specific overrides should - of course - implement the abstract methods:
  * - none
  * Should typically override:
  * - none

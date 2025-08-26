@@ -123,7 +123,7 @@ abstract class AcumulusEntryManager
      * Deletes the lock for sending on the given invoice source.
      *
      * @param Source $invoiceSource
-     *   The invoice source to delete the lock for.
+     *   The invoice-source to delete the lock for.
      *
      * @return int
      *   One of the AcumulusEntry::Lock_... constants describing the status of
@@ -138,7 +138,7 @@ abstract class AcumulusEntryManager
     {
         $entry = $this->getByInvoiceSource($invoiceSource, false);
         if ($entry === null) {
-            // - The process that had the lock may have failed sending the
+            // - The process that had the lock may have failed to send the
             //   invoice to Acumulus and has removed the lock (e.g. a connection
             //   timeout, with the timeout being longer than our lock expiry).
             // - Yet another process already cleared the lock.
@@ -149,8 +149,8 @@ abstract class AcumulusEntryManager
             $this->delete($entry, $invoiceSource);
             return AcumulusEntry::Lock_Deleted;
         }
-        // The AcumulusEntry became a real entry: apparently the process that
-        // had the lock, successfully finished sending the invoice after all.
+        // The AcumulusEntry became a real entry: apparently the process which
+        // had the lock successfully finished sending the invoice after all.
         return AcumulusEntry::Lock_BecameRealEntry;
     }
 
@@ -165,7 +165,7 @@ abstract class AcumulusEntryManager
      *   The source object for which the invoice was created.
      * @param int|string|null $entryId
      *   The Acumulus entry id assigned to the invoice for this order. This is
-     *   an int, but is returned as a string by the API.
+     *   an int but is returned as a string by the API.
      * @param string|null $token
      *   The Acumulus token to be used to access the invoice for this order via
      *   the Acumulus API.

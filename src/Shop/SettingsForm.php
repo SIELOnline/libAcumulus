@@ -33,14 +33,14 @@ class SettingsForm extends BaseConfigForm
 {
     /**
      * @var array
-     *   Array of key => value pairs that can be used in a select and that
+     *   Array of key => value pairs that can be used in a 'select' element and that
      *   represents all cost centers defined in Acumulus for the given account.
      */
     protected array $costCenterOptions;
 
     /**
      * @var array
-     *   Array of key => value pairs that can be used in a select and that
+     *   Array of key => value pairs that can be used in a 'select' element and that
      *   represents all bank accounts defined in Acumulus for the given account.
      */
     protected array $accountNumberOptions;
@@ -331,7 +331,7 @@ class SettingsForm extends BaseConfigForm
     }
 
     /**
-     * Returns the set of account related fields.
+     * Returns the set of account-related fields.
      * The fields returned:
      * - optional: 'Register' button + explanation.
      * - 'description': replaces the legend, as it should come below the
@@ -342,13 +342,13 @@ class SettingsForm extends BaseConfigForm
      * - 'emailonerror'
      *
      * @param null|bool|string $accountStatus
-     *   null: no account settings filled in yet.
-     *   true: account settings OK.
-     *   string: message describing the authentication error that occurred using the given
+     *   Null: no account settings filled in yet.
+     *   True: account settings OK.
+     *   String: message describing the authentication error that occurred using the given
      *     account settings.
      *
      * @return array[]
-     *   The set of account related fields.
+     *   The set of account-related fields.
      */
     protected function getAccountFields(null|bool|string $accountStatus): array
     {
@@ -417,7 +417,7 @@ class SettingsForm extends BaseConfigForm
     }
 
     /**
-     * Returns the set of shop related fields.
+     * Returns the set of shop-related fields.
      *
      * The fields returned:
      * - nature_shop
@@ -427,7 +427,7 @@ class SettingsForm extends BaseConfigForm
      * - 'zeroVatClass'
      *
      * @return array[]
-     *   The set of shop related fields.
+     *   The set of shop-related fields.
      */
     protected function getShopFields(): array
     {
@@ -497,14 +497,14 @@ class SettingsForm extends BaseConfigForm
     }
 
     /**
-     * Returns the set of trigger related fields.
+     * Returns the set of trigger-related fields.
      *
      * The fields returned:
      * - 'triggerOrderStatus'
      * - 'triggerInvoiceEvent'
      *
      * @return array[]
-     *   The set of trigger related fields.
+     *   The set of trigger-related fields.
      */
     protected function getTriggerFields(): array
     {
@@ -695,7 +695,7 @@ class SettingsForm extends BaseConfigForm
     }
 
     /**
-     * Returns the set of options related fields.
+     * Returns the set of options-related fields.
      *
      * The fields returned:
      * - 'optionsAllOn1Line'
@@ -703,7 +703,7 @@ class SettingsForm extends BaseConfigForm
      * - 'optionsMaxLength'
      *
      * @return array[]
-     *   The set of options related fields.
+     *   The set of options-related fields.
      *
      * @todo: deze velden samenvoegen met "verzend gratis verzending regels" in een
      *   fieldset Factuurregels?
@@ -937,7 +937,7 @@ class SettingsForm extends BaseConfigForm
     }
 
     /**
-     * Returns the set of fields introducing the mappings form.
+     * Returns the set of fields introducing the 'mappings' form.
      *
      * The fields returned:
      * - 'tellAboutMappings'
@@ -976,7 +976,7 @@ class SettingsForm extends BaseConfigForm
      * @param string $key
      *   Prefix of the keys to use for the different ids.
      * @param array $options
-     *   Options for all the selects.
+     *   Options for all the 'select' elements.
      *
      * @return array
      *   The fieldset definition.
@@ -1098,7 +1098,7 @@ class SettingsForm extends BaseConfigForm
      * @param string $page
      *   'Detail' or 'List'.
      * @param string $document
-     *   'invoice' or 'packing_slip'.
+     *   One of 'invoice' or 'packing_slip'.
      *
      * @return array
      *   Array with 2 options (value => label entries).

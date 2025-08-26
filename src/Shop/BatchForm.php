@@ -27,7 +27,7 @@ use function sprintf;
 /**
  * Provides batch form handling.
  *
- * Shop specific overrides should - of course - implement the abstract method:
+ * Shop-specific overrides should - of course - implement the abstract methods:
  * - none
  * Should typically override:
  * - none
@@ -113,7 +113,7 @@ class BatchForm extends Form
         }
 
         if ($this->submittedValues['reference_from'] === '' && $this->submittedValues['date_from'] === '') {
-            // Either a range of order id's or a range of dates should be entered.
+            // Either a range of order ids or a range of dates should be entered.
             $message = count($invoiceSourceTypes) === 1
                 ? 'message_validate_batch_reference_or_date_1'
                 : 'message_validate_batch_reference_or_date_2';

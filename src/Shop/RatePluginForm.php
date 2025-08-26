@@ -24,7 +24,7 @@ use function sprintf;
  *
  * SECURITY REMARKS
  * ----------------
- * The only user provided value is the button clicked and that is sanitised as
+ * The only user-provided value is the button clicked, and that is sanitised as
  * it gets printed in an error message if not recognised (thus faulty user
  * input). For the rest it is only compared to hardcoded values.
  *

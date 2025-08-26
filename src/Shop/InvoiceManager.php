@@ -203,14 +203,14 @@ abstract class InvoiceManager
     }
 
     /**
-     * Creates a set of Invoice Sources given their ids or shop specific sources.
+     * Creates a set of Invoice Sources given their ids or shop-specific sources.
      *
      * @param string $sourceType
      * @param array $idsOrSources
-     *   An array with shop specific orders or credit notes or just their ids.
+     *   An array with shop-specific orders or credit notes or just their ids.
      *
      * @return \Siel\Acumulus\Invoice\Source[]
-     *   A non keyed array with invoice Sources.
+     *   A non-keyed array with invoice Sources.
      */
     public function getSourcesByIdsOrSources(string $sourceType, array $idsOrSources): array
     {
@@ -225,7 +225,7 @@ abstract class InvoiceManager
      * Creates a source given its type and id.
      *
      * @param object|int|array $idOrSource
-     *   A shop specific order or credit note or just its ids.
+     *   A shop-specific order or credit note or just its ids.
      *
      * @return \Siel\Acumulus\Invoice\Source
      *   An invoice Source.
@@ -246,7 +246,7 @@ abstract class InvoiceManager
      *   If true, return the reason/status only but do not actually send the
      *   invoice, nor mail the result or store the result.
      * @param string[] $log
-     *   An array to add a (human-readable) send result per invoice sent to.
+     *   An array to add a human-readable result message to per invoice that was sent.
      *
      * @return bool
      *   Success.
@@ -299,7 +299,7 @@ abstract class InvoiceManager
     /**
      * Processes an invoice source status change event.
      *
-     * For now, we don't look at credit note statuses, they are always sent.
+     * For now, we don't look at credit note statuses as they are always sent.
      *
      * @param \Siel\Acumulus\Invoice\Source $source
      *   The source whose status has changed.
@@ -361,7 +361,7 @@ abstract class InvoiceManager
     /**
      * Processes a shop invoice send event.
      *
-     * This is the invoice created by the shop and that is now sent/mailed to
+     * This is the invoice created by the shop, and that is now sent/mailed to
      * the customer.
      *
      * @param \Siel\Acumulus\Invoice\Source $source
@@ -386,7 +386,7 @@ abstract class InvoiceManager
     }
 
     /**
-     * Sends the Acumulus invoice as a pdf to the customer.
+     * Sends the Acumulus invoice as a PDF to the customer.
      *
      * @param \Siel\Acumulus\Invoice\Source $source
      *   The invoice source for which to mail the invoice to the customer.
@@ -427,7 +427,7 @@ abstract class InvoiceManager
     }
 
     /**
-     * Sends the Acumulus invoice as a pdf to the customer.
+     * Sends the Acumulus invoice as a PDF to the customer.
      *
      * @param \Siel\Acumulus\Invoice\Source $source
      *   The invoice source for which to mail the packing slip.
@@ -462,9 +462,7 @@ abstract class InvoiceManager
         $emailAsPdf = $collectorManager->collectEmailAsPdf($type);
         /** @var \Siel\Acumulus\Completors\EmailInvoiceAsPdfCompletor $completor */
         $completor = $this->getContainer()->getCompletor(DataType::EmailAsPdf);
-        if ($completor !== null) {
-            $completor->complete($emailAsPdf, new MessageCollection($this->getTranslator()));
-        }
+        $completor?->complete($emailAsPdf, new MessageCollection($this->getTranslator()));
         return $emailAsPdf;
     }
 

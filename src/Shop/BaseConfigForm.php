@@ -95,7 +95,7 @@ abstract class BaseConfigForm extends Form
     }
 
     /**
-     * Translates and formats an account based error message.
+     * Translates and formats an account-based error message.
      */
     protected function translateAccountMessage(string $message): string
     {
@@ -134,7 +134,7 @@ abstract class BaseConfigForm extends Form
     /**
      * Creates a hidden or an option field
      * If there is only 1 option, a hidden value with a fixed value will be
-     * created, an option field that gives the user th choice otherwise.
+     * created, an option field that gives the user the choice otherwise.
      *
      * @param string $name
      *   The name of the field.
@@ -150,12 +150,8 @@ abstract class BaseConfigForm extends Form
      * @return array
      *   A form field definition.
      */
-    protected function getOptionsOrHiddenField(
-        string $name,
-        string $type,
-        bool $required = true,
-        array $options = null
-    ): array {
+    protected function getOptionsOrHiddenField(string $name, string $type, bool $required = true, ?array $options = null): array
+    {
         if ($options === null) {
             $methodName = 'get' . ucfirst($name) . 'Options';
             $options = $this->shopCapabilities->$methodName();

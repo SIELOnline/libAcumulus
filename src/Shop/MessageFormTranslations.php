@@ -26,8 +26,8 @@ class MessageFormTranslations extends TranslationCollection
     ];
 
     protected array $en = [
-        'plugin_v84_message' => '<p>Acumulus has been updated to version 8.4. This version now allows to send stock mutations to Acumulus. '
-            . 'you can enable this feature on the <a href="%1$s">Acumulus settings form</a>. '
+        'plugin_v84_message' => '<p>Acumulus has been updated to version 8.4. This version now allows sending stock mutations to Acumulus. '
+            . 'You can enable this feature on the <a href="%1$s">Acumulus settings form</a>. '
             . 'At our Acumulus forum, you can find the document <a href="%2$s" target="_blank">Stock management in Acumulus and your web shop (Dutch)</a> that explains the feature.</p>',
         'hide' => "Don't show anymore",
         'later' => 'Remind me later',

@@ -7,7 +7,7 @@ namespace Siel\Acumulus\Shop;
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
- * Contains translations for the confirm uninstall form.
+ * Contains translations for the "Confirm uninstall" form.
  */
 class ConfirmUninstallFormTranslations extends TranslationCollection
 {

@@ -47,12 +47,11 @@ use function sprintf;
  * ----------------
  * The info received from an external API call should not be trusted, so it
  * should be sanitised. As most info from this API call is placed in markup
- * fields we cannot rely on the FormRenderer or the web shop's form API, who do
- * not sanitise markup fields. so we do this in this form.
+ * fields, we cannot rely on the FormRenderer or the webshop's form API who does
+ * not sanitise markup fields. So we do this in this form.
  *
- * This form uses ajax calls, values received from an ajax call are to be
- * treated as user input and thus should be sanitised and checked as all user
- * input.
+ * This form uses ajax calls, values received from an ajax call are to be treated as user
+ * input and thus should be sanitised and checked as is all other user input.
  */
 class InvoiceStatusForm extends Form
 {
@@ -189,7 +188,7 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Returns a string to use as css class for the current status.
+     * Returns a string to use as CSS class for the current status.
      */
     public function getStatusClass(int $status): string
     {
@@ -283,7 +282,7 @@ class InvoiceStatusForm extends Form
     protected function setServiceAndSubmittedSource(): void
     {
         // Get base source. The action may be on one of its children, a credit
-        // note, but we also have to set the base source,so we can fully
+        // note, but we also have to set the base source, so we can fully
         // process and render the form.
         $type = $this->getSubmittedValue('acumulus_main_source_type');
         $id = (int) $this->getSubmittedValue('acumulus_main_source_id');
@@ -372,7 +371,7 @@ class InvoiceStatusForm extends Form
             $idPrefix = $this->getIdPrefix($source);
             switch ($service) {
                 case 'invoice_show':
-                    // Just show(/refresh) the form (Ajax based lazy load).
+                    // Just show(/refresh) the form (Ajax-based lazy-load).
                     $success = true;
                     break;
 
@@ -471,7 +470,7 @@ class InvoiceStatusForm extends Form
         $idPrefix = $this->getIdPrefix($source);
         if (!$this->isSubmitted()) {
             // We are loading the form for the first time: just add a "show"
-            // button to lazy load it (so no calls to the Acumulus API).
+            // button to lazy-load it (so no calls to the Acumulus API).
             $fields[$idPrefix . 'invoice_show'] = [
                 'type' => 'button',
                 'value' => $this->t('show'),
@@ -551,7 +550,7 @@ class InvoiceStatusForm extends Form
             ],
         };
 
-        // Create main status field after we have the other fields, so we can
+        // Create the main status field after we have the other fields, so we can
         // use the results in rendering the overall status.
         return [
             'status' => [
@@ -757,7 +756,7 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Returns additional form fields to show when the invoice has been sent but
+     * Returns additional form fields to show when the invoice has been sent, but
      * a communication error occurred in retrieving the entry.
      *
      * @param \Siel\Acumulus\ApiClient\AcumulusResult $result
@@ -991,7 +990,7 @@ class InvoiceStatusForm extends Form
                 $amountForeignEuVatAcumulus = $entry['totalvalueforeignvat'];
                 // Old or new way of storage?
                 if (Number::isZero($amountVatAcumulus)) {
-                    // Old (or zero vat): correct the vat and ex amount.
+                    // Old (or zero vat): correct the vat and amount ex-vat.
                     $amountVatAcumulus += $amountForeignEuVatAcumulus;
                     $amountExAcumulus -= $amountForeignEuVatAcumulus;
                 } elseif (!Number::floatsAreEqual($amountVatAcumulus, $amountForeignEuVatAcumulus)) {
@@ -1051,7 +1050,7 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Formats an amount in html, adding classes given the status.
+     * Formats an amount in HTML, adding classes given the status.
      *
      * @param int $status
      *   One of the {@see InvoiceStatusForm}::Status_... constants.
@@ -1251,11 +1250,11 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * sanitises an entry struct received via a getEntry API call.
+     * Sanitises an entry struct received via a getEntry API call.
      *
      * The info received from an external API call should not be trusted, so it
      * should be sanitised. As most info from this API call is placed in markup
-     * fields we cannot rely on the FormRenderer or the web shop's form API
+     * fields, we cannot rely on the FormRenderer or the web shop's form API
      * (which do not sanitise markup fields).
      *
      * So we sanitise the values in the struct itself before using them:
@@ -1264,7 +1263,7 @@ class InvoiceStatusForm extends Form
      *   string.
      * - Strings that can only contain a restricted set of values are checked
      *   against that set and emptied if not part of it.
-     * - Free string values are escaped to save html.
+     * - Free string values are escaped to save HTML.
      * - Keys we don't use are not returned. This keeps the output safe when a
      *   future API version returns additional fields, and we forget to sanitise
      *   it and thus use it non sanitised.
@@ -1336,7 +1335,7 @@ class InvoiceStatusForm extends Form
      *
      * The info received from an external API call should not be trusted, so it
      * should be sanitised. As most info from this API call is placed in markup
-     * fields we cannot rely on the FormRenderer or the web shop's form API as
+     * fields, we cannot rely on the FormRenderer or the web shop's form API as
      * these do not sanitise markup fields.
      *
      * So we sanitise the values in the struct itself before using them:
@@ -1345,7 +1344,7 @@ class InvoiceStatusForm extends Form
      *   string.
      * - Strings that can only contain a restricted set of values are checked
      *   against that set and emptied if not part of it.
-     * - Free string values are escaped to save html.
+     * - Free string values are escaped to save HTML.
      * - Keys we don't use are not returned. This keeps the output safe when a
      *   future API version returns additional fields, and we forget to sanitise
      *   it and thus use it non sanitised.
@@ -1372,7 +1371,7 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Returns a html safe version of a string in an entry record.
+     * Returns an HTML safe version of a string in an entry record.
      *
      * @param array $entry
      * @param string $key
@@ -1383,7 +1382,7 @@ class InvoiceStatusForm extends Form
      *   value is tested for being in the array.
      *
      * @return string
-     *   The html safe version of the value under this key or the empty string
+     *   The HTML safe version of the value under this key or the empty string
      *   if not set.
      */
     protected function sanitiseStringValue(array $entry, string $key, array|string|null $additionalRestriction = null): string
@@ -1411,7 +1410,7 @@ class InvoiceStatusForm extends Form
      *
      * @return int|int[]
      *   The int value of the value under this key or 0 if not provided. If
-     *   $allowArray is set, an empty array is returned, if no value is set.
+     *   $allowArray is set, an empty array is returned if no value is set.
      */
     protected function sanitiseIntValue(array $entry, string $key, bool $allowArray = false): array|int
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
-use Closure;
 use DateTimeImmutable;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -120,7 +119,7 @@ class AboutForm
      *   The type of wrapper around this block: 'fieldset' or 'details'.
      *
      * @return array[]
-     *   The set of version related informational fields.
+     *   The set of version-related informational fields.
      *
      * @todo: sanitise external data (i.e. data coming from server)
      */
@@ -152,6 +151,7 @@ class AboutForm
                 'value' => $this->arrayToList($proSupportList, true),
             ];
 
+            /** @noinspection PhpConditionAlreadyCheckedInspection */
             [$euCommerceProgressBar, $euCommerceMessage] = $this->getEuCommerceInfo($accountStatus);
             if (!empty($euCommerceMessage)) {
                 $fields['euCommerceHeader'] = [
@@ -412,13 +412,13 @@ class AboutForm
     }
 
     /**
-     * Returns the HTML for a progress bar indicating the  progress of sales at
+     * Returns the HTML for a progress bar indicating the progress of sales at
      * NL taxed compared to the EU threshold.
      * @param string $nlTaxed
      *   The amount of sales taxed with Dutch tax, or 'unknown'.
      * @param string $threshold
      *   The threshold at which a seller has to switch to EU tax, or 'unknown'.
-     *   Note: this threshold is currently 10.000,-€, but is queried from the
+     *   Note: this threshold is currently 10.000 €, but is queried from the
      *   API, not hard coded, so it may be 'unknown'.
      * @param string $percentage
      *   The ratio of $nlTaxed / $threshold, as a whole number (between 0 and
@@ -445,7 +445,7 @@ class AboutForm
      */
     protected function arrayToList(array $list, bool $isHtml): string
     {
-        return $this->util->arrayToList($list, $isHtml, Closure::fromCallable([$this, 't']));
+        return $this->util->arrayToList($list, $isHtml, $this->t(...));
     }
 
     /**

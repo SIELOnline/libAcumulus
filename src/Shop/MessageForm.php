@@ -24,7 +24,7 @@ use function sprintf;
  *
  * SECURITY REMARKS
  * ----------------
- * The only user provided value is the name of the button clicked on POST and that is
+ * The only user-provided value is the name of the button clicked on POST and that is
  * sanitised as it gets printed in an error message if not recognised (which means faulty
  * user input). For the rest it is only compared to hardcoded values.
  *

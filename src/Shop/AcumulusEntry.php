@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection DateException is PHP8.3
- */
 
 declare(strict_types=1);
 
@@ -44,8 +41,8 @@ use function is_object;
  * - Concept new style: entryId = concept id AND token = null
  * - Lock record: entryId = const lockEntryId AND token = const lockToken
  *
- * Most web shops also require/expect a single primary key (technical key) but
- * that is irrelevant for this class.
+ * Most webshops also require/expect a single primary key (technical key),
+ * but that is irrelevant for this class.
  *
  * Usages of this information (* = not (yet) implemented):
  * - Prevent that an invoice for a given order or credit note is sent twice.
@@ -55,6 +52,8 @@ use function is_object;
  *
  * Note: some of these features are only implemented in the Acumulus
  *   WooCommerce plugin.
+ *
+ * @noinspection PhpLackOfCohesionInspection
  */
 class AcumulusEntry
 {
@@ -73,7 +72,7 @@ class AcumulusEntry
     public const Lock_BecameRealEntry = 3;
 
     /**
-     * Access to the fields, may differ per web shop as we follow db naming
+     * Access to the fields may differ per webshop as we follow db naming
      * conventions from the web shop.
      */
     protected static string $keyEntryId = 'entry_id';
@@ -101,7 +100,7 @@ class AcumulusEntry
      * Constructor.
      *
      * @param array|object $record
-     *   A web shop specific record object or array that holds an Acumulus entry
+     *   A webshop-specific record object or array that holds an Acumulus entry
      *   record.
      */
     public function __construct(object|array $record)
@@ -118,9 +117,8 @@ class AcumulusEntry
      */
     public function getEntryId(): ?int
     {
-        // Is it a real entry id or a concept id.
+        // Is it a real entry id or a concept id?
         $token = $this->getToken();
-
         return !empty($token) && $token !== static::lockToken ? (int) ($this->get(static::$keyEntryId)) : null;
     }
 
@@ -137,9 +135,8 @@ class AcumulusEntry
      */
     public function getConceptId(): ?int
     {
-        // Is it a concept id or a real entry id.
+        // Is it a concept id or a real entry id?
         $token = $this->getToken();
-
         return empty($token) ? (int) $this->get(static::$keyEntryId) : null;
     }
 
@@ -154,7 +151,7 @@ class AcumulusEntry
     {
         $token = $this->get(static::$keyToken);
         // WorDPress cannot store null as meta value, so we store(d) '' for an empty
-        // token, although the meta key can also be just not set.
+        // token, although the meta-key can also be just not set.
         return !empty($token) ? $token : null;
     }
 
@@ -162,7 +159,7 @@ class AcumulusEntry
      * Return the type of shop source this Acumulus entry was created for.
      *
      * @return string
-     *   The type of shop source: Source::Order or Source::CreditNote.
+     *   The type of the shop {@see Source}: {@see Source::Order} or {@see Source::CreditNote).
      *
      * @noinspection PhpUnused
      */
@@ -186,7 +183,7 @@ class AcumulusEntry
      * Returns the time when this record was created.
      *
      * @param bool $raw
-     *   Whether to return the raw value as stored in the database, or a DateTimeInterface
+     *   Whether to return the raw value as stored in the database or a DateTimeInterface
      *   object. The raw value will differ per web shop.
      *
      * @return string|int|\DateTimeInterface
@@ -207,7 +204,7 @@ class AcumulusEntry
      * Returns the time when this record was last updated.
      *
      * @param bool $raw
-     *   Whether to return the raw value as stored in the database, or a DatetimeInterface
+     *   Whether to return the raw value as stored in the database or a DatetimeInterface
      *   object. The raw value will differ per web shop.
      *
      * @return string|int|\DateTimeInterface
@@ -271,12 +268,12 @@ class AcumulusEntry
     }
 
     /**
-     * Returns the shop specific record for this Acumulus entry.
+     * Returns the shop-specific record for this Acumulus entry.
      *
      * This getter should only be used by the AcumulusEntryManager.
      *
      * @return array|object
-     *   The shop specific record for this Acumulus entry.
+     *   The shop-specific record for this Acumulus entry.
      */
     public function getRecord(): object|array
     {
@@ -307,7 +304,7 @@ class AcumulusEntry
             }
         } elseif (is_object($this->record)) {
             // It's an object: try to get the property.
-            // Safest way is via the get_object_vars() function.
+            // The safest way is via the get_object_vars() function.
             $properties = get_object_vars($this->record);
             if (array_key_exists($field, $properties)) {
                 $value = $properties[$field];

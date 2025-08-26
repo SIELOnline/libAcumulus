@@ -123,7 +123,7 @@ class InvoiceSend
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source to create and send the invoice for.
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
-     *   The result to store the send result, messages, and the source.
+     *   The result to store the send-result, messages, and the source.
      * @param bool $dryRun
      *   Whether to prevent the actual sending and storing the result, but execute all
      *   other steps. Mainly used for debug/test/support reasons, but also to discover
@@ -149,14 +149,14 @@ class InvoiceSend
      *
      * NOTE: the mechanism used to lock and verify if we got the lock is not
      * atomic, nor foolproof for all possible situations. However, it is a
-     * relatively easy to understand solution that will catch 99,9% of the
+     * relatively easy-to-understand solution that will catch 99,9% of the
      * situations. If double sending still occurs, some warning mechanisms are
      * built in (were already built in) to delete one of the entries in Acumulus
      * and warn the user.
      *
      * After sending the invoice:
-     * - The invoice sent event gets triggered.
-     * - A mail with the results may be sent.
+     * - The invoice-sent event gets triggered.
+     * - An email with the results may be sent.
      */
     protected function lockAndSend(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
@@ -191,7 +191,7 @@ class InvoiceSend
             // Trigger the InvoiceSent event.
             $this->getEvent()->triggerInvoiceSendAfter($invoice, $invoiceSource, $result);
 
-            // Send a mail if there are messages.
+            // Send an email if there are messages.
             $this->mailInvoiceAddResult($result, $invoiceSource);
         }
     }

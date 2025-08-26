@@ -3,16 +3,21 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.6.0 (2025-09-??)
-------------------
+8.6.0 (2025-08-??) (MA)
+-----------------------
 Features:
-- ALL: Added a mapping and accompanying UI for the API field "warehousecountry".
+- ALL: Added support for the API field "warehousecountry": a mapping, an accompanying UI,
+  and adapted logic to determine the vat type.
 
 Bugs:
 - ALL: MappingsForm contained a lot of incorrect field names when validating a form
   submission, and some packing slip fields were missing completely.
 - ALL: TypeError: Container::getCompletor(): Return value must be of type
   BaseCompletor|Completor, null returned in Container.php:533.
+
+Refactorings:
+- ALL: Removed PHP 8.4 warnings and deprecations.
+- ALL: Started using PHP 8.1 language constructs. 
 
 
 8.5.4 (2025-08-16) (none)
@@ -108,7 +113,7 @@ Bugs:
 
 Testing:
 - Added integration tests for our forms (creation, field definitions, and rendering). This
-  might help preventing bugs like the TypeError in the FormRenderer (see above).
+  might help prevent bugs like the TypeError in the FormRenderer (see above).
 
 Refactorings:
 - Basic submit structure now created and collected as an AcumulusObject.
@@ -160,8 +165,8 @@ Features:
 - WC: Tried to improve accuracy of shipping lines to prevent rounding errors on the total.
 
 Bugs:
-- ALL: Help text for (your) phone number on register form was not used but overruled by
-  the help text for the field phone number on the mappings form.
+- ALL: Help text for (your) phone number on the 'register' form was not used but overruled
+  by the help text for the field phone number on the 'mappings' form.
 
 Refactorings:
 - ALL: Moved margin scheme handling from the ItemLineCollectors to CompleteMarginScheme.
@@ -176,12 +181,12 @@ Minimal requirements:
     * Joomla 3
     * PrestaShop 1.7
     * VirtueMart 3
-  Note that PHP 8.0 already reached end of life and will no longer receive security
+  Note that PHP 8.0 already reached its end of life and will no longer receive security
   updates. So, in the NEAR future we will upgrade our minimal requirements to PHP 8.1.
 
 Incompatibilities:
 - Mappings: For those who have custom mappings: lots of "objects" were renamed. If, in the
-  past, you have defined mappings for order item lines in the mappings form, you MUST
+  past, you have defined mappings for order item lines in the 'mappings' form, you MUST
   check and probably adapt those settings. The following properties are no longer
   available. Note that we try to update most of them automatically:
   - invoiceSource::...: use source::...
@@ -201,20 +206,20 @@ Features:
 - JOO: Native support for Joomla 5, our component and plugins do no longer need the compat
   plugin. However, please note that VirtueMart still needs that plugin. HikaShop has its
   own compat layer, so probably does not need that plugin.
-- ALL: improved register message after install.
+- ALL: improved register message after installation.
 
 Bugs:
 - OC: Strict typing error in AcumulusEntry::getSourceId().
 - PS: Settings form: set of order statuses to trigger sending the invoice data to Acumulus
   was not stored or displayed correctly.
-- ALL: mapping for a metadata value may be the constant null but this was rejected when
+- ALL: mapping for a metadata value may be the constant null, but this was rejected when
   expanding mappings (as fields may not set to null).
 - ALL: Only still valid Pro-support should be listed in the About section on our forms.
 - ALL (minor): Comparison of codes of Messages changed due to changes in how PHP8 compares
   strings and numbers.
 
 Refactorings:
-- ALL: Removed Creator class(replaced by Collectors)
+- ALL: Removed class Creator (replaced by Collectors)
 - ALL: Introduced Item and Product as wrapper/adapter around item lines and product
   objects from the web shop. Extracted common wrapper/adapter code into WrapperTrait.
 - ALL: Started using Line collectors and completors the new way, gradually moving code
@@ -222,8 +227,8 @@ Refactorings:
 - ALL: Removed the old Creator and Completor code from the Invoice namespace and moved the
   Completors\Legacy namespace "back" to invoice. This lead to many clean-ups of no longer
   used code all over the code base.
-- ALL: Removed vat breakdown from Totals. Totals now merely represents an amount (broken
-  down in a price inc, price ex, and vat amount).
+- ALL: Removed vat breakdown from Totals. A Totals object now merely represents an amount
+  (broken down in a price inc, price ex, and vat amount).
 - ALL: Moved to using DateTimeImmutable and, as a consequence, DateTimeInterface for type
   hinting.
 
@@ -231,9 +236,9 @@ Refactorings:
 8.2.0 (2024-07-11) (ALL)
 ------------------------
 Features:
-- ALL: A new setting has been introduced that allows to add the e-invoice to the Acumulus
-  invoice pdf when it gets mailed to the customer (either on sending the invoice data to
-  Acumulus or using the buttons specific for mailing the invoice pdf (on the invoice list
+- ALL: A new setting has been introduced that allows adding the e-invoice to the Acumulus
+  invoice PDF when it gets mailed to the customer either on sending the invoice data to
+  Acumulus or using the specific buttons to mail the invoice PDF (on the invoice list
   and/or details screens).
 
 Bugs:
@@ -246,8 +251,8 @@ Bugs:
 Bugs:
 - ALL: External links on our forms: were not all opened in a new tab; and some referred to
   outdated URLs.
-- ALL: Field product name on mappings form does not correspond with mapping for product
-  name. As it was not yet really used, this is no big deal.
+- ALL: Field product name on the 'mappings' form does not correspond with mapping for
+  product name. As it was not yet really used, this is no big deal.
 - ALL: Completing invoice lines: computing unitprice based on unitpriceinc with a vatrate
   of -1 (vat free) was not done correctly. Known usages: OC.
 - OC4: Source::getPaymentMethod(): storage of this info has changed in OC4 compared to OC3
@@ -286,9 +291,9 @@ Bugs:
 8.1.2 (2024-05-15) (PS, WC)
 ---------------------------
 Features
-- ALL: Message "Required property vatRate is not set ..."  prevents the xml-message being
-  sent and subsequently, as the request will fail, be part of the mail. Add it as a meta
-  error and do send the message, even knowing it will fail.
+- ALL: Message "Required property vatRate is not set ..." prevents the xml-message being
+  sent and subsequently, as the request will fail, be part of the mail. Add it as a
+  meta-error and do send the message, even knowing it will fail.
 
 Bugs:
 - ALL: NOTICE ...\Collector::expandAndSet: Siel\Acumulus\Data\EmailInvoiceAsPdf does not
@@ -299,19 +304,20 @@ Refactorings:
 - PS: Better handling of discounts in refunds, including adding tests for it. This
   revealed that PS does make errors itself. We follow the shop, so we follow the incorrect
   calculations the shop makes.
-- PS: Use Version::VERSION as version, not the indirect _PS_VERSION_ or AppKernel::VERSION.
-- ALL: Renamed some meta keys (key + string value).
+- PS: Use Version::VERSION to get the version, not _PS_VERSION_ or AppKernel::VERSION.
+- ALL: Renamed some meta-keys (key + string value).
 
 
 8.1.1 (2024-01-04) (WC)
 -----------------------
 NOTE: code changes are breaking backwards compatibility, but as the changed methods are
-  only called form within the library this may only be a problem with custom code.
+  only called form within the library, this may only be a problem with custom code.
 
 Bugs:
-- WC: Metadata in in-memory Order object does not get updated when AcumulusEntry metadata
-  is updated or deleted. Acumulus status meta box does not get updated after clicking the
-  "Send Now" button, even while the data has been successfully sent to Acumulus.
+- WC: Metadata in an in-memory Order object does not get updated when AcumulusEntry
+  metadata updated or deleted. The Acumulus status meta-box does not get updated after
+  clicking the "Send Now" button, even while the data has been successfully sent to
+  Acumulus.
 
 
 8.1.0 (2024-01-03) (JOO, WC)

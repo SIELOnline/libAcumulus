@@ -1,15 +1,15 @@
 <?php
 /**
- * @noinspection PhpIncompatibleReturnTypeInspection  The get/create...() methods are
- *   strong-typed, but the internal getInstance() not, leading to this warning all over
- *   the place.
+ * @noinspection PhpIncompatibleReturnTypeInspection
+ *   The get/create...() methods are strong-typed, but the internal getInstance() not,
+ *   leading to this warning all over the place.
  */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '8.5.4';
+const Version = '8.6.0';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -145,7 +145,7 @@ use const Siel\Acumulus\Version;
  * library to your specific situation.
  *
  * Most of these problems can be solved by reacting to one of the events
- * triggered by the Acumulus module. but if that turns out to be impossible, you
+ * triggered by the Acumulus module. However, if that turns out to be impossible, you
  * can define another level of namespace searching by calling
  * {@see setCustomNamespace()}. This will define an additional namespace to look
  * for before the above list as defined by the $shopNamespace argument is

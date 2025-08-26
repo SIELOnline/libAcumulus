@@ -1,7 +1,6 @@
 <?php
 /**
  * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter
- * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4.
  */
 
 declare(strict_types=1);
@@ -91,7 +90,7 @@ class HttpRequest
     /**
      * Returns the result of this request, or null if not yet executed.
      *
-     * This "forward-linking" is ony used to be able to log what we have in case
+     * This "forward-linking" is only used to be able to log what we have in case
      * of exceptions thrown during the execution of this request or the
      * processing of it.
      *
@@ -115,7 +114,7 @@ class HttpRequest
      *
      * @throws \RuntimeException
      *   An error occurred at:
-     *   - The Curl internals level, e.g. an out of memory error.
+     *   - The Curl internals level, e.g. an out-of-memory error.
      *   - The communication level, e.g. time-out or no response received.
      */
     public function get(string $uri): HttpResponse
@@ -124,7 +123,7 @@ class HttpRequest
     }
 
     /**
-     * Sets up an HTTP post request.
+     * Sets up an HTTP POST request.
      *
      * @param string $uri
      *   The uri to send the HTTP request to.
@@ -139,7 +138,7 @@ class HttpRequest
      *
      * @throws \RuntimeException
      *   An error occurred at:
-     *   - The Curl internals level, e.g. an out of memory error.
+     *   - The Curl internals level, e.g. an out-of-memory error.
      *   - The communication level, e.g. time-out or no response received.
      */
     public function post(
@@ -169,13 +168,13 @@ class HttpRequest
      *
      * @throws \RuntimeException
      *   An error occurred at:
-     *   - The Curl internals level, e.g. an out of memory error.
+     *   - The Curl internals level, e.g. an out-of-memory error.
      *   - The communication level, e.g. time-out or no response received.
      */
     protected function execute(
         string $method,
         string $uri,
-        #[SensitiveParameter] array|string $body = null
+        #[SensitiveParameter] array|string|null $body = null
     ): HttpResponse {
         $method = strtoupper($method);
         assert(in_array($method, ['GET', 'POST']), 'HttpRequest::execute(): non-supported method.');
@@ -196,7 +195,7 @@ class HttpRequest
      *
      * All details regarding the fact we are using Curl are contained in this
      * single method (except perhaps, the info array passed to the HttpResponse
-     * that gets created which is based on curl_get_info()). This is also done
+     * that gets created, which is based on curl_get_info()). This is also done
      * to be able to unit test this class (by just mocking this 1 method) while
      * not going so far as to inject a "communication library".
      *
@@ -251,7 +250,7 @@ class HttpRequest
      * The Curl options consist of:
      * 1) options fixed by this class and that may not be overridden.
      * 2) Options passed in by the caller.
-     * 3) Defaults, that may be overridden by the options passed in.
+     * 3) Default options that may be overridden by the options passed in.
      *
      * @return array
      *  The assembled Curl options.
@@ -278,7 +277,7 @@ class HttpRequest
                 break;
         }
 
-        // 2) Options passed in by the caller, will overwrite our defaults.
+        // 2) Options passed in by the caller will overwrite our defaults.
         $options += $this->options;
 
         // 3) Defaults.

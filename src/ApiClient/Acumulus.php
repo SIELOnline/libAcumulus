@@ -23,15 +23,15 @@ use Siel\Acumulus\Helpers\Severity;
  * Acumulus provides an easy interface towards the different API calls of the
  * Acumulus web API.
  *
- * This class simplifies the communication so that the different web shop
- * specific interfaces can be more rapidly developed.
+ * This class simplifies the communication so that the different webshop-specific
+ * interfaces can be more rapidly developed.
  *
  * More info:
  * - {@link https://www.siel.nl/acumulus/API/}
  * - {@link https://www.siel.nl/acumulus/koppelingen/}
  *
  * The ApiClient API call wrappers return their information as a keyed array,
- * which is a simplified version of the call specific part of the response
+ * which is a simplified version of the call-specific part of the response
  * structure.
  */
 class Acumulus
@@ -57,11 +57,11 @@ class Acumulus
      *   1 "about" array, being a keyed array with keys:
      *   - about: General name for the API.
      *   - tree: stable, current, deprecated or closed.
-     *   - role: Name of user role, current known roles: Beheerder, Gebruiker,
+     *   - role: Name of userrole, current known roles: Beheerder, Gebruiker,
      *       Invoerder, API-beheerder, API-gebruiker, API-invoerder, API-open
      *       (not a real role, just to indicate the calls that are available
      *       without authentication).
-     *   - roleid: Numeric identifier of user role.
+     *   - roleid: Numeric identifier of userrole.
      *   Possible errors:
      *   - 553 XUPR7NEC8: Warning: You are using a deprecated user role to
      *     connect to the Acumulus API. Please add another user with an
@@ -285,7 +285,7 @@ class Acumulus
     /**
      * A helper method to retrieve a given picklist.
      *
-     * The Acumulus API for picklists is so well standardized, that it is
+     * The Acumulus API for picklists is so well standardized that it is
      * possible to use 1 general picklist retrieval function that can process
      * all picklist types.
      *
@@ -335,7 +335,7 @@ class Acumulus
      *
      * @throws AcumulusException|AcumulusResponseException
      */
-    public function getVatInfo(string $countryCode, DateTimeInterface|string $date = null): AcumulusResult
+    public function getVatInfo(string $countryCode, DateTimeInterface|string|null $date = null): AcumulusResult
     {
         if ($date instanceof DateTimeInterface) {
             $date = $date->format(Api::DateFormat_Iso);
@@ -363,9 +363,9 @@ class Acumulus
      *   - year: int, Year to which information in response is applicable.
      *   - threshold: float, threshold value at which the EU e-Commerce
      *     directive applies.
-     *   - nltaxed, float, Amount of turnover taxed using Dutch VAT against
-     *     target customer set. Should ideally not gain when threshold reached.
-     *   - reached: int, 0 when threshold not reached. 1 when so.
+     *   - nltaxed, float, Amount of turnover taxed using Dutch VAT against target
+     *     customer set. Should ideally not gain when the threshold has been reached.
+     *   - reached: int, 0 when the threshold has not yet been reached. 1 when so.
      *   Possible errors:
      *   - AAC37EAA: Ongeldig year. EU regelgeving van toepassing vanaf 2021.
      *
@@ -564,7 +564,7 @@ class Acumulus
      *   Api::PaymentStatus_Due constants.
      * @param string $paymentDate
      *   ISO date string (yyyy-mm-dd) for the date to set as payment date, may
-     *   be empty for today or if the payment status is Api::PaymentStatus_Due.
+     *   be empty for today, or if the payment status is Api::PaymentStatus_Due.
      *
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -768,10 +768,11 @@ class Acumulus
      * - 'confirmreading'
      * - 'ubl'
      * @param int|null $invoiceType
-     *   One of the constants Api::Email_Normal (default) or Api::Email_Reminder.
+     *   One of the constants {@see Api::Email_Normal} (default) or
+     *   {@see Api::Email_Reminder}.
      * @param string $invoiceNotes
      *   Multiline field for additional remarks. Use \n for newlines and \t for
-     *   tabs. Contents is placed in notes/comments section of the invoice.
+     *   tabs. Contents are placed in the notes/comments section of the invoice.
      *   Content will not appear on the actual invoice or associated emails.
      * @param ?bool $applyGraphics
      *   False to prevent any embedded graphics from being applied to the
@@ -785,7 +786,7 @@ class Acumulus
      * - 'invoicetype'
      *   Possible errors/warnings:
      *   - GK6FKHU52: Incorrect invoicetype value used (9) in invoicetype tag as
-     *     part of invoice section in the XML. Using default value of 0 normal."
+     *     part of the invoice section in the XML. Using default value of 0 normal."
      *   - TNFE4035G: Requested token not found or invalid token supplied.
      *     Unable to proceed."
      *
@@ -857,7 +858,7 @@ class Acumulus
      *   - 'message'
      * @param string $deliveryNotes
      *   Multiline field for additional remarks. Use \n for newlines and \t for
-     *   tabs. Contents is placed in notes/comments section of the invoice.
+     *   tabs. Contents are placed in the notes/comments section of the invoice.
      *   Content will not appear on the actual packing slip or associated emails.
      * @param ?bool $applyGraphics
      *   False to prevent any embedded graphics from being applied to the

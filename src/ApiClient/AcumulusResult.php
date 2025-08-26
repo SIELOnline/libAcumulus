@@ -1,4 +1,6 @@
 <?php
+/**
+ */
 
 declare(strict_types=1);
 
@@ -23,7 +25,7 @@ use function sprintf;
  * Class AcumulusResult processes and wraps an Acumulus web service result.
  *
  * An AcumulusResult object contains
- * Most important:
+ * Most importantly:
  * - The received response, without the basic response part, converted to an
  *   array.
  * But also a lot of other info:
@@ -40,24 +42,24 @@ use function sprintf;
  * - Errors at the protocol/communication level. These will be thrown as
  *   {@see AcumulusException}s or {@see AcumulusResponseException}s.
  * - Application (domain) level errors. Think of things like input validation
- *   errors, or object does no(t) (longer) exist. These will be set as error
+ *   errors, or the object does no(t) (longer) exist. These will be set as error
  *   messages in this AcumulusResult object. No exception will be thrown,
  *   calling code should thus check for errors and act accordingly, e.g. showing
  *   form error messages to the user, deleting no longer valid concept or entry
- *   id's, or send a mail to inform the user that errors occurred.
+ *   id's, or send an e-mail to inform the user that errors occurred.
  * - Success (optionally with warnings). Any warnings will be set as warning
  *   messages in this AcumulusResult object. The calling code should happily
  *   process the response.
  *
  * Also see {@link https://www.siel.nl/acumulus/API/Basic_Response/}.
  *
- * To distinguish the above situations we look at the following conditions (each
+ * To distinguish the above situations, we look at the following conditions (each
  * condition assumes the negation of all former conditions):
  * 1. No response was obtained: httpResponse = null: protocol level error.
- * 2. status code indicates a protocol level error.
- * 3. status code indicates either a protocol or application level error.
- * 4. status code indicates an application level error.
- * 5. status code indicates success.
+ * 2. The status code indicates a protocol level error.
+ * 3. The status code indicates either a protocol or application level error.
+ * 4. The status code indicates an application level error.
+ * 5. The status code indicates success.
  *
  * Ad 1.
  *
@@ -69,17 +71,17 @@ use function sprintf;
  * Most probably, other layers will also not handle these exceptions, so the
  * user request will fail completely. If a request can be handled in a
  * reasonable way, without the result of a specific API call, likely an
- * additional information retrieving call, higher layers may catch and dispose
+ * additional information retrieving call, higher layers may catch and dispose of
  * the error and continue their work.
  *
  * Ad 2.
  *
- * The HTTP request was executed but something went wrong on the server side.
+ * The HTTP request was executed, but something went wrong on the server side.
  * The status code is not one of {200, 400, 403, 404}:
  * - Response might be from another part of the server, e.g. the load balancer,
  *   or web server daemon. In this case, the body is probably an HTML error
  *   page, thus having a 'Content-type: text/html[; ...]' header.
- * - The response might also be from the API server in which case a JSON (or
+ * - The response might also be from the API server, in which case a JSON (or
  *   XML) formatted error message is expected in the body (and an accompanying
  *   Content-Type header).
  *
@@ -122,6 +124,8 @@ use function sprintf;
  * - Other properties (outside the basic response) will contain the actual API
  *   response to the request, accessible by calling code via the method
  *   {@see getMainAcumulusResponse()}.
+ *
+ * @noinspection PhpLackOfCohesionInspection
  */
 class AcumulusResult extends MessageCollection
 {
@@ -284,7 +288,7 @@ class AcumulusResult extends MessageCollection
     }
 
     /**
-     * Returns the status code and password masked response from the Acumulus API.
+     * Returns the status code and password-masked response from the Acumulus API.
      *
      * We mask all values of tags/keys that have 'password' in their name.
      * By masking any password, this result can be used for logging purposes.
@@ -313,7 +317,7 @@ class AcumulusResult extends MessageCollection
      *   level) response from the API server.
      * - 'xml': If 'format' was set to 'xml' and we have a (domain level)
      *   response from the API server OR if the API server encountered an error
-     *   before parsing the 'format' tag, e.g. invalid xml.
+     *   before parsing the 'format' tag, e.g. invalid XML.
      * - 'html': If the response came from another system, e.g. the load
      *   balancer (429) or http daemon (404)
      * - '': Absent or incorrect Content-Type header or plain text
@@ -343,7 +347,7 @@ class AcumulusResult extends MessageCollection
      * an exception). But are we in situation 2, 3, 4, or 5?
      *
      * @throws AcumulusResponseException
-     *   If any (non domain level) error occurred during the execution of the
+     *   If any (non-domain level) error occurred during the execution of the
      *   request (situation 2 or 3 in the documentation on error handling).
      */
     protected function processHttpResponse(): void
@@ -456,7 +460,7 @@ class AcumulusResult extends MessageCollection
     }
 
     /**
-     * Processes the - well formatted - HTTP response body.
+     * Processes the - well-formatted - HTTP response body.
      *
      * - The parts of the basic response are extracted into separate properties,
      *   accessible via e.g. {@see getStatus()}, {@see getMessages()}, or
@@ -563,7 +567,7 @@ class AcumulusResult extends MessageCollection
      */
     protected function simplifyMainResponse(array $response): array
     {
-        // Simplify response by removing main key, which should be the only
+        // Simplify $response by removing the main key, which should be the only
         // remaining key, except in case of errors, when there may be a number
         // of keys indicating the erroneous parameter values.
         if (isset($response[$this->mainAcumulusResponseKey])) {

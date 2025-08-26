@@ -19,7 +19,7 @@ use function sprintf;
  * AcumulusRequest turns a call to {@see Acumulus} into an {@see HttpRequest}.
  *
  * It offers:
- * - Adding the basic submit structure - contract, connector, testmode, ... - to
+ * - Adding the "basic submit" structure - contract, connector, testmode, ... - to
  *   create a complete request structure.
  * - Conversion from the request structure (array or AcumulusObject) to XML.
  * - Sending the request.
@@ -59,14 +59,14 @@ class AcumulusRequest
     }
 
     /**
-     * Returns the full submit structure as has been sent to Acumulus.
+     * Returns the "full submit" structure as has been sent to Acumulus.
      *
-     * The full submit structure consists of the:
-     * - basic submit: see {@link https://www.siel.nl/acumulus/API/Basic_Submit/}.
-     * - submit: the API call specific part as passed to {@see execute()}.
+     * The "full submit" structure consists of:
+     * - "basic submit": see {@link https://www.siel.nl/acumulus/API/Basic_Submit/}.
+     * - "submit": the API call specific part as passed to {@see execute()}.
      *
      * @return array|null
-     *    The full submit structure as has been sent to Acumulus, or null if
+     *    The "full submit" structure as has been sent to Acumulus, or null if
      *    this Acumulus request has not yet been executed.
      */
     public function getSubmit(): ?array
@@ -89,8 +89,8 @@ class AcumulusRequest
     /**
      * Returns the uri and submit structure as a loggable string.
      *
-     * - We use json_encode() to turn submit into a string, so we may use it to create
-     *   test input.
+     * - We use json_encode() to turn the "submit" structure into a string, so we may use
+     *   it to create test input.
      * - We mask all values that have 'password' in their key, so we can safely
      *   log it.
      */
@@ -128,14 +128,14 @@ class AcumulusRequest
      *
      * @throws AcumulusException|AcumulusResponseException
      *   An error occurred:
-     *   - At the internal level, e.g. an out of memory error.
+     *   - At the internal level, e.g. an out-of-memory error.
      *   - At the communication level, e.g. time-out or no response received.
      *   - While converting the {@see HttpResponse} into an
      *     {@see AcumulusResult}. This conversion is done during the
      *     construction of the {@see AcumulusResult}, so no result object will
      *     be created in the case of errors.
      *   Note that errors at the application level will not be thrown as an
-     *   exception, but will have to be handled by the calling code.
+     *   exception but will have to be handled by the calling code.
      */
     public function execute(string $uri, array $submit, bool $needContract): AcumulusResult
     {
@@ -155,7 +155,7 @@ class AcumulusRequest
     /**
      * Actually executes an Acumulus request.
      *
-     * [By wrapping the actual communication call in its own method we can
+     * [By wrapping the actual communication call in its own method, we can
      * unit-test this class by just overriding this one method, while not going
      * so far as to inject the httpRequest.]
      *
@@ -169,7 +169,7 @@ class AcumulusRequest
      *
      * @throws AcumulusException
      *   An error occurred at:
-     *   - The internal level, e.g. an out of memory error.
+     *   - The internal level, e.g. an out-of-memory error.
      *   - The communication level, e.g. time-out or no response received.
      *   Note that errors at the application level will be detected when the
      *   response is interpreted.
@@ -180,7 +180,7 @@ class AcumulusRequest
     {
         // - Convert message to XML. XML requires 1 top level tag, so add one.
         //   This top tag name is ignored by the API, we use <acumulus>.
-        // - 'xmlstring' is the post field that Acumulus expects.
+        // - 'xmlstring' is the POST field that Acumulus expects.
         $options = $this->getCurlOptions();
         $body = ['xmlstring' => trim($this->util->convertArrayToXml(['acumulus' => $this->submit]))];
         $this->httpRequest = $this->container->createHttpRequest($options);
@@ -218,23 +218,23 @@ class AcumulusRequest
     }
 
     /**
-     * Constructs the full submit structure to be sent to the Acumulus API.
+     * Constructs the "full submit" structure to be sent to the Acumulus API.
      * A submit-message is an XML message consisting of:
      * - A {@link https://www.siel.nl/acumulus/API/Basic_Submit/ [basic submit]}
      *   part containing a.o. tags like <contract>, <testmode>, and <connector>.
-     * - An endpoint specific part, the actual data to be sent.
+     * - An endpoint-specific part, the actual data to be sent.
      *
      * @param array $submit
-     *   The endpoint specific part to be sent.
+     *   The endpoint-specific part to be sent.
      * @param bool $needContract
      *   Whether this endpoint needs the <contract> part to authorize and
      *   authenticate the call.
      *
      * @return array
-     *   The post fields to send to Acumulus.
+     *   The POST fields to send to Acumulus.
      *
      * @throws \RuntimeException
-     *    Required property is not set.
+     *    A required property is not set.
      */
     protected function constructFullSubmit(array $submit, bool $needContract): array
     {
@@ -244,9 +244,9 @@ class AcumulusRequest
     }
 
     /**
-     * Returns the basic submit part of each API message.
+     * Returns the "basic submit" part of each API message.
      *
-     * The basic submit part is defined at
+     * The "basic submit" part is defined at
      * {@link https://www.siel.nl/acumulus/API/Basic_Submit/}
      */
     protected function createBasicSubmit(): BasicSubmit

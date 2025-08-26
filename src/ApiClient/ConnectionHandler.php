@@ -89,7 +89,7 @@ class ConnectionHandler
                 throw new RuntimeException(__METHOD__ . "($uri): curl_init() failed");
             }
         } else {
-            // We can reuse the handle, but reset the options.
+            // We can reuse the handle, but we should reset the options.
             curl_reset($this->curlHandles[$key]);
         }
         return $this->curlHandles[$key];
@@ -111,12 +111,12 @@ class ConnectionHandler
     }
 
     /**
-     * Returns a key that functions as key for the connection pool.
+     * Returns a key that functions as the key for the connection pool.
      *
      * @param string $uri
      *
      * @return string
-     *   The scheme and host part of the uri that functions as key for the
+     *   The scheme and host part of the uri that functions as the key for the
      *   connection pool.
      */
     protected function getKey(string $uri): string

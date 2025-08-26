@@ -56,7 +56,7 @@ class HttpResponse
      *
      * @return string
      *   The HTTP response headers as 1 string. Each header is separated by a
-     *   new line (\r\n) and the headers end with a double new line. The return
+     *   new line ("\r\n"), and the headers end with a double new line. The return
      *   will be the empty string if the headers were not returned.
      */
     public function getHeaders(): string
@@ -140,7 +140,7 @@ class HttpResponse
      *
      * @return string
      *   The HTTP request headers as 1 string. Each header is separated by a
-     *   new line (\r\n) and the headers end with a double new line. If the
+     *   new line ("\r\n"), and the headers end with a double new line. If the
      *   request headers are not known, an empty string is returned.
      */
     public function getRequestHeaders(): string
@@ -153,7 +153,7 @@ class HttpResponse
      * {@see HttpResponse}.
      *
      * @return HttpRequest
-     *   The HttpRequest belonging that lead to this response.
+     *   The HttpRequest that lead to this response.
      */
     public function getRequest(): HttpRequest
     {

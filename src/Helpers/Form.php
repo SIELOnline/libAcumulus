@@ -177,7 +177,7 @@ abstract class Form extends MessageCollection
     }
 
     /**
-     * returns whether this form is a full page form, thus surrounded by a
+     * Returns whether this form is a full page form, thus surrounded by a
      * <form> tag and having a possibly standardized 'submit' button.
      *
      * @noinspection PhpUnused
@@ -609,7 +609,7 @@ abstract class Form extends MessageCollection
      * - Most picklist items contain a describing string in the 2nd entry.
      * - Some picklist items contain an alternative/additional description in
      *   the 3rd entry.
-     * - The company type picklist contains an English resp. Dutch description in
+     * - The company type picklist contains an English and Dutch description in
      *   the 2nd and 3rd entry.
      *
      * @param \Siel\Acumulus\ApiClient\AcumulusResult $picklist

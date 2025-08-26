@@ -86,7 +86,7 @@ class InvoiceAddMail extends Mail
      *
      * @return string[]
      *   An array with the status specific part of the body text in 2 formats,
-     *   keyed by 'text' resp. 'html'.
+     *   keyed by 'text' respectively 'html'.
      */
     protected function getIntroSentences(): array
     {

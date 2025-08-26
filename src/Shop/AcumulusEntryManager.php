@@ -20,7 +20,7 @@ use function is_object;
  *   refunds).
  * - Retrieval of an Acumulus entry record for a given entry id.
  * - Save (insert or update) an Acumulus entry.
- * - Install and uninstall the db table at module install resp. uninstall time.
+ * - Install and uninstall the db table at module install respectively uninstall time.
  */
 abstract class AcumulusEntryManager
 {

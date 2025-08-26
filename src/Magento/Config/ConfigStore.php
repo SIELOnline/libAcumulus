@@ -22,7 +22,7 @@ use function is_string;
  *   - phpunit: \\wsl.localhost\Ubuntu\home\erwin\Projecten\Acumulus\Magento\www24linux\dev\tests\integration\tmp\sandbox-acumulus\var\cache
  *              \\wsl.localhost\Ubuntu\home\erwin\Projecten\Acumulus\Magento\www24linux\app\etc\config.php
  *   - website: \\wsl.localhost\Ubuntu\home\erwin\Projecten\Acumulus\Magento\www24linux\var\cache
- * So be sure to clear all these caches. use these commands:
+ * So be sure to clear all these caches. Use these commands:
  * - sudo chmod a+rwX -R *
  * - sudo rm -R *
  */

@@ -11,7 +11,7 @@ use Siel\Acumulus\Config\Environment as EnvironmentBase;
 use Siel\Acumulus\Magento\Helpers\Registry;
 
 /**
- * Defines the Magento 2 web shop specific environment.
+ * Defines the Magento 2 webshop-specific environment.
  */
 class Environment extends EnvironmentBase
 {

@@ -19,8 +19,8 @@ use function count;
  *
  * SECURITY REMARKS
  * ----------------
- * In Magento saving and querying orders or credit memos is done via the Magento
- * DB API which takes care of sanitizing.
+ * In Magento saving and querying orders or credit memos is done via the Magento DB API,
+ * which takes care of sanitizing.
  */
 class InvoiceManager extends BaseInvoiceManager
 {
@@ -64,7 +64,7 @@ class InvoiceManager extends BaseInvoiceManager
      * @param int|array|string $condition
      *
      * @return \Siel\Acumulus\Invoice\Source[]
-     *   A non keyed array with invoice Sources.
+     *   A non-keyed array with invoice Sources.
      */
     protected function getByCondition(string $invoiceSourceType, array|string $field, int|array|string $condition): array
     {

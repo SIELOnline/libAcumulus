@@ -58,7 +58,7 @@ class ShippingLineCollector extends LineCollector
             //   - $magentoSource->getBaseShippingDiscountAmount() - $magentoSource->getBaseShippingTaxAmount());
             // However, we will use the 2nd way as that seems to be more
             // precise and thus generally leads to a smaller range:
-            // Get range based on normal shipping costs inc and ex VAT.
+            // Get range based on normal shipping costs inc and ex-VAT.
             $sign = $source->getSign();
             $shippingInc = $sign * $shopSource->getBaseShippingInclTax();
             $shippingEx = $sign * $shopSource->getBaseShippingAmount();

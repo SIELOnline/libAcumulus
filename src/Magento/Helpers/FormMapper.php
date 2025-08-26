@@ -77,7 +77,7 @@ class FormMapper extends BaseFormMapper
         $this->isFirstElement = false;
 
         if ($magentoType === 'note') {
-            // Attributes are ignored by an element of type note, we add them to
+            // Attributes are ignored by a 'note' element. We add them to
             // a wrapper element using beforeElementHtml and afterElementHtml.
             $htmlAttributes = ['class', 'title'];
             $label = $element->getLabelHtml();
@@ -95,8 +95,8 @@ class FormMapper extends BaseFormMapper
         }
 
         if (!empty($field['fields'])) {
-            // Add description at the start of the fieldset/details as a Note
-            // element. descriptions for simple elements are handled elsewhere.
+            // Add description at the start of the fieldset/details as a 'note'
+            // element. Descriptions for simple elements are handled elsewhere.
             if (!empty($field['description']) && !in_array($field['type'], ['fieldset', 'details'])) {
                 $element->addField($field['id'] . '-note', 'note', ['text' => '<p class="note">' . $field['description'] . '</p>']);
             }
@@ -182,7 +182,7 @@ class FormMapper extends BaseFormMapper
     }
 
     /**
-     * Converts an Acumulus settings to a Magento setting.
+     * Converts an Acumulus setting to a Magento setting.
      *
      * @param array $config
      *   The Magento settings constructed so far. New settings should be added
@@ -240,11 +240,10 @@ class FormMapper extends BaseFormMapper
                 }
                 break;
             case 'attributes':
-                // In magento you add pure html attributes at the same level as
-                // the "field attributes" that are for Magento. Most attributes
-                // are accepted and rendered by input accepting elements, but a
-                // Note (our markup type) ignores all these, as are all label
-                // attributes.
+                // In magento you add pure HTML attributes at the same level as the
+                // "field attributes" that are for Magento. Most attributes are accepted
+                // and rendered by input elements, but a 'note' (our markup type) ignores
+                // all these, as are all label attributes.
                 foreach ($value as $attributeName => $attributeValue) {
                     switch ($attributeName) {
                         case 'required':
@@ -264,9 +263,9 @@ class FormMapper extends BaseFormMapper
                             $config['class'] = array_merge($config['class'], $class);
                             break;
                         case 'label':
-                            // Just add them to the element. For a note, they
-                            // will then be put into a wrapping element. That
-                            // should be enough to address them in css.
+                            // Just add them to the element. For a 'note', they will then
+                            // be put into a wrapping element. That should be enough to
+                            // address them in CSS.
                             if (isset($attributeValue['html'])) {
                                 $attributeValue['label_is_html'] = $attributeValue['html'];
                                 unset($attributeValue['html']);

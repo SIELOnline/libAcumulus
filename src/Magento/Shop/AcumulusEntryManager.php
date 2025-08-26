@@ -20,8 +20,8 @@ use Siel\AcumulusMa2\Model\ResourceModel\Entry\Collection;
  *
  * SECURITY REMARKS
  * ----------------
- * In Magento saving and querying acumulus entries is done via the Magento DB
- * API which takes care of sanitizing.
+ * In Magento saving and querying acumulus entries is done via the Magento DB API,
+ * which takes care of sanitizing.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {

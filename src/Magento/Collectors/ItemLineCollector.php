@@ -83,7 +83,7 @@ class ItemLineCollector extends LineCollector
 
         }
         // For higher precision of the unit price, we will recalculate the price
-        // ex vat later on if product prices are entered inc vat by the admin.
+        // ex-vat later on if product prices are entered inc vat by the admin.
         $productPriceEx = (float) $shopItem->getBasePrice(); // copied to mappings.
         $productPriceInc = (float) $shopItem->getBasePriceInclTax(); // copied to mappings.
 
@@ -95,13 +95,13 @@ class ItemLineCollector extends LineCollector
         // Get vat and discount information
         // - Tax percent = VAT % as specified in product settings, for the
         //   parent of bundled products this may be 0 and incorrect.
-        $vatRate = (float) $shopItem->getTaxPercent(); // copied to mappings.
+        $vatRate = (float) $shopItem->getTaxPercent(); // Copied to mappings.
         // - (Base) tax amount = VAT on discounted item line =
         //   ((product price - discount) * qty) * vat rate.
         // But as discounts get their own lines, this order item line should
         // show the vat amount over the normal, not discounted, price. To get
         // that, we can use the:
-        // - (Base) discount tax compensation amount = VAT over line discount.
+        // - [Base]discount tax compensation amount = VAT over line discount.
         // However, it turned out ([SIEL #127821]) that if discounts are applied
         // before tax, this value is 0, so in those cases we can't use that.
         $lineVat = (float) $shopItem->getBaseTaxAmount();
@@ -135,7 +135,7 @@ class ItemLineCollector extends LineCollector
             $line->metadataSet(Meta::VatRateLookup, $vatRate);
             $line->metadataSet(Meta::VatRateLookupSource, '$item->getTaxPercent()');
         } elseif (Number::isZero($vatRate) && Number::isZero($productPriceEx) && !$isChild) {
-            // 0 vat rate and zero price on a main item: when the invoice gets
+            // 0 vatrate and a zero price on a main item: when the invoice gets
             // send on order creation, I have seen child lines on their own,
             // i.e. not being attached to their parent, while at the same time
             // the parent did have (a copy of) that child under its
@@ -144,7 +144,7 @@ class ItemLineCollector extends LineCollector
             $line->metadataSet(Meta::DoNotAdd, true);
             return;
         } else {
-            // No 0 VAT, or 0 vat and not a parent product and not a zero price:
+            // No 0 VAT, or 0 VAT and not a parent product and not a zero price:
             // the vat rate is real.
             $line->vatRate = $vatRate;
             $line->metadataSet(Meta::VatRateSource, Number::isZero($vatRate) ? VatRateSource::Exact0 : VatRateSource::Exact);
@@ -231,7 +231,7 @@ class ItemLineCollector extends LineCollector
         $productPriceEx = -$shopItem->getBasePrice();
         $productPriceInc = -$shopItem->getBasePriceInclTax();
 
-        // Check for cost price and margin scheme.
+        // Check for a cost price and the margin scheme.
         // Add price info.
         $line->unitPrice = $productPriceEx;  // copied to mappings.
         $line->metadataSet(Meta::UnitPriceInc, $productPriceInc);  // copied to mappings.

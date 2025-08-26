@@ -26,7 +26,7 @@ class InvoiceCollector extends BaseInvoiceCollector
      *
      * @return bool
      *   True if the prices for the products are entered with tax, false if the
-     *   prices are entered without tax.
+     *   prices are entered without VAT.
      */
     protected function productPricesIncludeVat(): bool
     {

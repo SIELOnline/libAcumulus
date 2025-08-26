@@ -26,7 +26,7 @@ class Mailer extends BaseMailer
      *   Success (true) or a {@see \Throwable}.
      *
      * @noinspection PhpMixedReturnTypeCanBeReducedInspection
-     *   @todo Type can be narrowed to '\Exception|\Throwable|true'
+     * @todo Type can be narrowed to '\Exception|\Throwable|true'
      */
     protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
     {
@@ -63,21 +63,17 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * @noinspection PhpMissingParentCallCommonInspection  Default implementation not needed.
+     * @noinspection PhpMissingParentCallCommonInspection The default implementation is not needed.
      */
     public function getFrom(): string
     {
         $result = $this->getConfig()->getValue('trans_email/ident_general/email');
-        return !empty($result) && !str_contains($result, 'example.com')
-            ? $result
-            : parent::getTo();
+        return !empty($result) && !str_contains($result, 'example.com') ? $result : $this->getTo();
     }
 
     public function getFromName(): string
     {
         $result = $this->getConfig()->getValue('general/store_information/name');
-        return !empty($result)
-            ? $result
-            : parent::getFromName();
+        return !empty($result) ? $result : parent::getFromName();
     }
 }

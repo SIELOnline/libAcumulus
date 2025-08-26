@@ -120,8 +120,8 @@ class Source extends BaseSource
      * Returns the status of this order.
      *
      * @return int
-     *   1 of
-     *   \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN     = 1;
+     *   One of
+     *   \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN = 1;
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_REFUNDED = 2;
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED = 3;
      *
@@ -302,8 +302,8 @@ class Source extends BaseSource
         /** @var \Magento\Sales\Model\Order\Creditmemo $creditmemo */
         $creditmemo = $this->shopObject;
         /**
-         * @noinspection PhpCastIsUnnecessaryInspection  despite the documented return
-         *   type, id is returned as a string.
+         * @noinspection PhpCastIsUnnecessaryInspection
+         *   Despite the documented return type, id is returned as a string.
          */
         return (int) $creditmemo->getOrderId();
     }
@@ -341,7 +341,7 @@ class Source extends BaseSource
         $result = [];
         // A CreditMemo does not have the method getAllVisibleItems().
         foreach ($this->getShopObject()->getAllItems() as $item) {
-            // Only items for which row total is set, are refunded.
+            // Only items for which row total is set are refunded.
             if (!Number::isZero($item->getRowTotal())) {
                 $result[] = $this->getContainer()->createItem($item, $this);
             }

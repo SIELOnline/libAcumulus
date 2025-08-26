@@ -76,7 +76,7 @@ class FormHelper extends BaseFormHelper
         foreach ($this->getMeta() as $key => $fieldMeta) {
             /**
              * @var \stdClass $fieldMeta
-             *   Having properties name, type and, optionally, collection.
+             *   Having properties 'name', 'type' and, optionally, 'collection'.
              */
             if (($fieldMeta->type === 'checkbox') && !empty($formValues[$key])) {
                 // Check for empty() as the collection name may have

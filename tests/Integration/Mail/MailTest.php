@@ -117,7 +117,7 @@ class MailTest extends TestCase
             $invoiceAddResult->setAcumulusResult($apiResult);
             $args = [
                 'source' => $invoiceSource,
-                'result' => $invoiceAddResult
+                'result' => $invoiceAddResult,
             ];
             $this->createAndSendMail($type, $namespace, $class, $args, $name);
         } finally {
@@ -191,8 +191,6 @@ class MailTest extends TestCase
             $name .= "$description-";
         }
         $name .= static::getContainer()->getLanguage();
-        $this->saveTestMail($name, $mailSent);
-        $expected = $this->getTestMail($name);
-        static::assertSame($expected, $mailSent, $name);
+        $this->assertMailMatches($name, $mailSent);
     }
 }

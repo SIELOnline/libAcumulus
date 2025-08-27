@@ -13,6 +13,7 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Translations;
 
 use function in_array;
+use function is_array;
 use function is_float;
 use function is_string;
 use function strlen;
@@ -85,8 +86,8 @@ LONGSTRING;
     }
 
     /**
-     * @beforeClass Adds translations that are not added by default when the Translator is
-     *   created.
+     * @beforeClass
+     *   Adds translations that are not added by default when the Translator is created.
      */
     public static function addTranslations(): void
     {
@@ -273,7 +274,6 @@ LONGSTRING;
      */
     protected function copyLatestTestSource(string $path, string $type, int $id): void
     {
-
         $append = '.latest';
         $sourceFilename = "$path/$type$id$append.json";
         $targetFilename = "$path/$type$id.json";
@@ -336,7 +336,6 @@ LONGSTRING;
         }
         $data = static::getContainer()->getUtil()->maskHtml($data);
         file_put_contents("$path/$fileName", static::$htmlStart . $data . static::$htmlEnd);
-
     }
 
     /**
@@ -370,6 +369,47 @@ LONGSTRING;
     }
 
     /**
+     * Asserts that the contents of the mail sent match the expected contents.
+     *
+     * It also saves the mail sent using the name and '.latest.mail' as extension.
+     *
+     * @param string $name
+     *   The name under which the mail is saved.
+     * @param array|null $mailSent
+     *   The mail sent, or null if no mail was sent.
+     */
+    protected function assertMailMatches(string $name, ?array $mailSent): void
+    {
+        $this->saveTestMail($name, $mailSent);
+        $expected = $this->getTestMail($name);
+        if (is_array($expected['bodyText'] ?? null) || is_array($expected['bodyHtml'] ?? null)) {
+            // Compare mail contents using str_contains (the contents contain version
+            // numbers or so).
+            foreach ($expected as $key => $value) {
+                if (is_array($value)) {
+                    foreach ($value as $text) {
+                        static::assertStringContainsString($text, $mailSent[$key], $name);
+                    }
+                } else {
+                    static::assertSame($value, $mailSent[$key], $name);
+                }
+            }
+            if (is_array($expected['bodyText'])) {
+                foreach ($expected['bodyText'] as $text) {
+                    static::assertStringContainsString($text, $mailSent['bodyText'], $name);
+                }
+            }
+            if (is_array($expected['bodyHtml'])) {
+                foreach ($expected['bodyHtml'] as $text) {
+                    static::assertStringContainsString($text, $mailSent['bodyHtml'], $name);
+                }
+            }
+        } else {
+            static::assertSame($expected, $mailSent, $name);
+        }
+    }
+
+    /**
      * Returns a test log message.
      */
     protected function getTestLogMessage(string $name): ?array
@@ -397,5 +437,41 @@ LONGSTRING;
             $fileName = "$name.latest.log";
         }
         file_put_contents("$path/$fileName", var_export($data, true) . "\n");
+    }
+
+    /**
+     * Asserts that the contents of the mail sent match the expected contents.
+     *
+     * It also saves the mail sent using the name and '.latest.mail' as extension.
+     *
+     * @param string $name
+     *   The name under which the log message was saved.
+     * @param array|false $logMessage
+     *   The mail sent, or false if no log was sent.
+     */
+    protected function assertLogMatches(string $name, array|false $logMessage): void
+    {
+        self::assertIsArray($logMessage);
+        $this->saveTestLogMessage($name, $logMessage);
+        $expected = $this->getTestLogMessage($name);
+        foreach ($expected as $key => $value) {
+            if ($key === 'values') {
+                foreach ($value as $index => $argument) {
+                    if (is_array($argument)) {
+                        foreach ($argument as $subString => $text) {
+                            static::assertStringContainsString($text, $logMessage[$key][$index], "$name-$key-$index-$subString");
+                        }
+                    } else {
+                        static::assertSame($value[$index], $logMessage[$key][$index], "$name-$key-$index");
+                    }
+                }
+            } elseif (is_array($value)) {
+                foreach ($value as $subString => $text) {
+                    static::assertStringContainsString($text, $logMessage[$key], "$name-$key-$subString");
+                }
+            } else {
+                static::assertSame($value, $logMessage[$key], "$name-$key");
+            }
+        }
     }
 }

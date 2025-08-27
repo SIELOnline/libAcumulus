@@ -3,7 +3,8 @@ array (
   'fromName' => 'Unit Test | Example',
   'to' => 'admin@example.com',
   'subject' => 'Voorraadmutatie verzonden naar Acumulus: fout(en)',
-  'bodyText' => 'Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten
+  'bodyText' => [
+    'Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten
 opgetreden. De voorraadmutatie is niet verwerkt in Acumulus.
 
 Over de voorraadmutatie:
@@ -42,11 +43,8 @@ submit={
     "testmode": 0,
     "lang": "nl",
     "connector": {
-        "application": "TestWebShop 8.5.4",
-        "webkoppel": "Acumulus 8.5.4",
-        "development": "SIEL - Buro RaDer",
-        "remark": "Library 8.5.4 - PHP 8.2.27",
-        "sourceuri": "https://github.com/SIELOnline/libAcumulus"
+        "application": "TestWebShop ',
+    '"sourceuri": "https://github.com/SIELOnline/libAcumulus"
     },
     "stock": {
         "productid": 1,
@@ -74,8 +72,10 @@ body={
     },
     "status": "1"
 }
-',
-  'bodyHtml' => '<p>Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten opgetreden.
+'
+],
+  'bodyHtml' => [
+    '<p>Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten opgetreden.
 De voorraadmutatie is niet verwerkt in Acumulus.</p>
 <h3>Over de voorraadmutatie</h3>
 <table style="text-align: left;">
@@ -109,11 +109,8 @@ submit={<br>
     "testmode": 0,<br>
     "lang": "nl",<br>
     "connector": {<br>
-        "application": "TestWebShop 8.5.4",<br>
-        "webkoppel": "Acumulus 8.5.4",<br>
-        "development": "SIEL - Buro RaDer",<br>
-        "remark": "Library 8.5.4 - PHP 8.2.27",<br>
-        "sourceuri": "https://github.com/SIELOnline/libAcumulus"<br>
+        "application": "TestWebShop ',
+    '"sourceuri": "https://github.com/SIELOnline/libAcumulus"<br>
     },<br>
     "stock": {<br>
         "productid": 1,<br>
@@ -142,5 +139,6 @@ body={<br>
     "status": "1"<br>
 }</span></li></ul>
 </details>
-',
+'
+],
 )

@@ -214,9 +214,7 @@ class ProductManagerTest extends TestCase
 
         // dataName() returns the key of the actual data set.
         $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
-        $this->saveTestLogMessage($name, $logMessage);
-        $expected = $this->getTestLogMessage($name);
-        static::assertSame($expected, $logMessage, $name);
+        $this->assertLogMatches($name, $logMessage);
     }
 
     /**
@@ -230,8 +228,6 @@ class ProductManagerTest extends TestCase
 
         // dataName() returns the key of the actual data set.
         $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
-        $this->saveTestMail($name, $mailSent);
-        $expected = $this->getTestMail($name);
-        static::assertSame($expected, $mailSent);
+        $this->assertMailMatches($name, $mailSent);
     }
 }

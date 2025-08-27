@@ -1,5 +1,6 @@
 array (
-  'message' => 'ProductManagerTest::testUpdateStock(bestelling 1, bestelregel 8): Voorraadupdate voor product \'TEST\': -1.000000 is verzonden (reden: alles OK)
+  'message' => [
+    'ProductManagerTest::testUpdateStock(bestelling 1, bestelregel 8): Voorraadupdate voor product \'TEST\': -1.000000 is verzonden (reden: alles OK)
 • Fout: 404 Not Found, AA5B85AA: Ongeldig productid
  Mislukt, fouten gevonden
 Request: Request: uri=https://api.sielsystems.nl/acumulus/stable/stock/stock_add.php
@@ -15,11 +16,8 @@ submit={
     "testmode": 0,
     "lang": "nl",
     "connector": {
-        "application": "TestWebShop 8.5.4",
-        "webkoppel": "Acumulus 8.5.4",
-        "development": "SIEL - Buro RaDer",
-        "remark": "Library 8.5.4 - PHP 8.2.27",
-        "sourceuri": "https://github.com/SIELOnline/libAcumulus"
+        "application": "TestWebShop ',
+    '"sourceuri": "https://github.com/SIELOnline/libAcumulus"
     },
     "stock": {
         "productid": 1,
@@ -47,7 +45,7 @@ body={
     },
     "status": "1"
 }
-',
+'],
   'severity' => 32,
   'format' => '%1$s(%2$s, %3$s): %4$s %5$s',
   'values' =>
@@ -56,7 +54,8 @@ body={
     1 => 'bestelling 1',
     2 => 'bestelregel 8',
     3 => 'Voorraadupdate voor product \'TEST\': -1.000000',
-    4 => 'is verzonden (reden: alles OK)
+    4 => [
+      'is verzonden (reden: alles OK)
 • Fout: 404 Not Found, AA5B85AA: Ongeldig productid
  Mislukt, fouten gevonden
 Request: Request: uri=https://api.sielsystems.nl/acumulus/stable/stock/stock_add.php
@@ -72,11 +71,8 @@ submit={
     "testmode": 0,
     "lang": "nl",
     "connector": {
-        "application": "TestWebShop 8.5.4",
-        "webkoppel": "Acumulus 8.5.4",
-        "development": "SIEL - Buro RaDer",
-        "remark": "Library 8.5.4 - PHP 8.2.27",
-        "sourceuri": "https://github.com/SIELOnline/libAcumulus"
+        "application": "TestWebShop ',
+    '"sourceuri": "https://github.com/SIELOnline/libAcumulus"
     },
     "stock": {
         "productid": 1,
@@ -104,6 +100,7 @@ body={
     },
     "status": "1"
 }
-',
+'
+],
   ),
 )

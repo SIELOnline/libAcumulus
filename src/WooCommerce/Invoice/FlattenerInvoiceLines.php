@@ -19,7 +19,7 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
      * @inheritDoc
      *
      * This override adds support for the woocommerce-bundled-products plugin.
-     * This plugin allows to define a base price for the parent but to keep
+     * This plugin allows defining a base price for the parent but to keep
      * price info on the children, so this should all be added.
      */
     protected function collectInfoFromChildren(Line $parent, array $children): void

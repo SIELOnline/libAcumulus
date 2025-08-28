@@ -38,7 +38,7 @@ class LineCollector extends BaseLineCollector
     /**
      * Looks up and returns vat rate metadata for product lines.
      * A product has a tax class. A tax class can have multiple tax rates,
-     * depending on the region of the customer. We use the customers address in
+     * depending on the region of the customer. We use the customer's address in
      * the raw invoice that is being created, to get the possible rates.
      *
      * @param string|null $taxClassId
@@ -89,11 +89,10 @@ class LineCollector extends BaseLineCollector
      *
      * @return bool
      *   True if the prices as entered by an admin include VAT, false if they are
-     *   entered ex VAT.
+     *   entered ex-VAT.
      */
     protected function productPricesIncludeTax(): bool
     {
-        /** @noinspection PhpUndefinedFunctionInspection   false positive */
         return wc_prices_include_tax();
     }
 

@@ -25,7 +25,7 @@ use function is_string;
  * Collector3rdPartyPluginSupport contains support for features added by other plugins.
  *
  * The WooCommerce market contains many additional plugins that add features to standard
- * WooCommerce. Supporting all these plugins is difficult and results in hard to read and
+ * WooCommerce. Supporting all these plugins is difficult, and results in hard to read and
  * maintain code. Therefore, we try to split support for these other plugins off into its
  * own containers that react to the Acumulus events (actions).
  */
@@ -227,8 +227,8 @@ class Collector3rdPartyPluginSupport
      * Supports the "WooCommerce TM Extra Product Options" plugin.
      *
      * This method supports the tm-woo-extra-product-options extension that places its
-     * data in the metadata under keys that start wth 'tm_epo' or 'tmcartepo'. We need the
-     * 'tncartepo_data' value as that contains the options.
+     * data in the metadata under keys that start with 'tm_epo' or 'tmcartepo'.
+     * We need the 'tmcartepo_data' value as that contains the options.
      *
      * This method adds the option data as children to the invoice line.
      */
@@ -239,7 +239,7 @@ class Collector3rdPartyPluginSupport
         /** @var WC_Order_Item_Product[] $items */
         $items = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
-            // If the plugin is no longer used, we may still have an order with/ products
+            // If the plugin is no longer used, we may still have an order with products
             // where the plugin was used. Moreover, we don't use any function or method
             // from the plugin, only its stored data. So we do not have to check for the
             // plugin being active, just for the data being there.

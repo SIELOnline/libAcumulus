@@ -18,14 +18,14 @@ use function strlen;
  *
  * SECURITY REMARKS
  * ----------------
- * In WooCommerce/WordPress querying orders is done via the WooCommerce
- * {@see wc_get_orders()} function or the {@see \WC_Order_Query} class.
- * Escaping and sanitizing (or using placeholders) is done by these features.
+ * In WooCommerce/WordPress, one queries orders via the WooCommerce {@see wc_get_orders()}
+ * function or the {@see \WC_Order_Query} class. Both take care of escaping and sanitizing
+ * data.
  */
 class InvoiceManager extends BaseInvoiceManager
 {
     /**
-     * Helper method that converts our source type constants to a WP/WC post type.
+     * Helper method that converts our source type constants to a WP/WC post-type.
      *
      * @param string $invoiceSourceType
      *
@@ -89,7 +89,7 @@ class InvoiceManager extends BaseInvoiceManager
      * These plugins mostly only store the number part, not the prefix, suffix
      * or date part. If so, you will have to search for the number part only.
      *
-     * To be able to define the query we need to know under which meta key
+     * To be able to define the query we need to know under which meta-key
      * the order number/reference is stored.
      * - WooCommerce Sequential Order Numbers: _order_number.
      * - WooCommerce Sequential Order Numbers Pro: _order_number or _order_number_formatted.
@@ -128,7 +128,7 @@ class InvoiceManager extends BaseInvoiceManager
                         // We assume non formatted search arguments.
                         $key = '_order_number';
                     } else {
-                        // Formatted numeric search arguments: e.g. 'yyyynnnn'.
+                        // Formatted numeric search arguments: e.g. "yyyynnnn".
                         $key = '_order_number_formatted';
                     }
                     $sourceType = 'UNSIGNED';

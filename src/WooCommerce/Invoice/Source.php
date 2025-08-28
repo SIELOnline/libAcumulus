@@ -12,8 +12,6 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 use WC_Abstract_Order;
 use WC_Coupon;
-use WC_Order;
-use WC_Order_Refund;
 
 use function count;
 use function sprintf;
@@ -102,7 +100,7 @@ class Source extends BaseSource
      */
     public function getStatus(): string|null
     {
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+        /** @noinspection PhpUndefinedMethodInspection false positive */
         return $this->getShopObject()->get_status();
     }
 
@@ -132,7 +130,9 @@ class Source extends BaseSource
      */
     protected function getPaymentStatusOrder(): int
     {
-        return $this->getShopObject()->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
+        /** @var \WC_Order $order */
+        $order = $this->getShopObject();
+        return $order->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     /**
@@ -162,7 +162,7 @@ class Source extends BaseSource
     protected function getPaymentDateOrder(): string
     {
         // get_date_paid() returns a WC_DateTime which has a _toString() method.
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+        /** @noinspection PhpUndefinedMethodInspection false positive */
         return substr((string) $this->getShopObject()->get_date_paid(), 0, strlen('2000-01-01'));
     }
 
@@ -200,7 +200,8 @@ class Source extends BaseSource
 
     public function getCurrency(): Currency
     {
-        return new Currency($this->getShopObject()->get_currency(), );
+        /** @noinspection PhpUndefinedMethodInspection false positive */
+        return new Currency($this->getShopObject()->get_currency());
     }
 
     /**

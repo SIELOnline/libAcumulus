@@ -30,6 +30,7 @@ class FieldExpander extends BaseFieldExpander
     protected function getValueFromProperty(object $object, string $property): mixed
     {
         if ($object instanceof WC_Data) {
+            /** @noinspection PhpUndefinedMethodInspection false positive */
             $array = $object->get_data();
             $value = $this->getValueFromArray($array, $property) ?? $this->getValueFromMetadata($array['meta_data'], $property) ?? null;
         }
@@ -48,7 +49,7 @@ class FieldExpander extends BaseFieldExpander
      *
      * This method:
      * - Looks for $index in the data array.
-     * - Recursively searches for  property by splitting it into separate pieces delimited
+     * - Recursively searches for property by splitting it into separate pieces delimited
      *   by underscores. E.g. 'billing_email' may be found in $array['billing']['email'].
      */
     protected function getValueFromArray(array|ArrayAccess $array, mixed $index): mixed
@@ -75,7 +76,7 @@ class FieldExpander extends BaseFieldExpander
      * @param WC_Meta_Data[] $metaData
      *   The metadata set to search in.
      * @param string $key
-     *   The name of the property to search for. May be with or without a
+     *   The name of the property to search for. This may be with or without a
      *   leading underscore.
      *
      * @return mixed

@@ -23,21 +23,21 @@ use function get_class;
  *
  * SECURITY REMARKS
  * ----------------
- * In WooCommerce/WordPress the acumulus entries are stored as post metadata,
- * saving and querying is done via the WordPress API which takes care of
- * sanitizing.
+ * In WooCommerce/WordPress the acumulus entries are stored as post-metadata, saving and
+ * querying this data is done via the WordPress API, which takes care of sanitizing.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
     public static string $keyEntryId = '_acumulus_entry_id';
     public static string $keyToken = '_acumulus_token';
-    // Note: the following 2 meta keys are not actually stored, as the post/order id and
+    // Note: the following 2 meta keys are not stored, as the post/order id and
     // post/order type give us that information.
     public static string $keySourceId = '_acumulus_id';
     public static string $keySourceType = '_acumulus_type';
     public static string $keyCreated = '_acumulus_created';
     public static string $keyUpdated = '_acumulus_updated';
 
+    /** @noinspection PhpUndefinedMethodInspection false positive */
     protected function createEntryRecordFromSource(WC_Abstract_Order $source): array
     {
         $entry = [];
@@ -52,6 +52,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * Helper method that converts a WC object to a source type constant.
+     *
+     * @noinspection PhpUndefinedMethodInspection false positive
      */
     protected function shopObjectToSourceType(WC_Abstract_Order $shopObject): string
     {
@@ -95,9 +97,10 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $result = null;
         /** @var \WC_Order|\WC_Order_Refund $source */
         $source = $invoiceSource->getShopObject();
-        // [SIEL #123927]: EntryId may be null and that can lead to an
+        // [SIEL #123927]: EntryId may be null, and that can lead to an
         // incorrect "not found" result: use a key that will never
         // contain a null value.
+        /** @noinspection PhpUndefinedMethodInspection false positive */
         if ($source->get_meta(static::$keyCreated) !== '') {
             // Acumulus metadata found: add source id and type as these
             // are not stored in the metadata.
@@ -155,7 +158,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      *
-     * We use the WordPress metadata API which is readily available, so nothing
+     * We use the WordPress metadata API, which is readily available, so nothing
      * has to be done here.
      */
     public function install(): bool
@@ -166,7 +169,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      *
-     * We use the WordPress metadata API which is readily available, so nothing
+     * We use the WordPress metadata API, which is readily available, so nothing
      * has to be done here.
      */
     public function uninstall(): bool

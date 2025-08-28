@@ -10,7 +10,7 @@ use function get_bloginfo;
 use function wp_mail;
 
 /**
- * Extends the base mailer class to send a mail using the WP mail features.
+ * Extends the base mailer class to send an email using the WP email features.
  */
 class Mailer extends BaseMailer
 {

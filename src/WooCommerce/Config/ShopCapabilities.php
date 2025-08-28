@@ -216,7 +216,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * {@inheritdoc}
      *
      * WooCommerce core does not support entering a VAT number. However, various
-     * plugins exists that do allow so, and that also allow for the reversed VAT
+     * plugins exist that do allow so, and that also allow for the reversed VAT
      * and EU-VAT schemes. These plugins use different keys to store the vat
      * number in the order meta:
      * - WooCommerce EU VAT assistent: 'vat_number', or in older versions

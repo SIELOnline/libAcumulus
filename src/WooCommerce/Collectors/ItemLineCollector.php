@@ -44,7 +44,7 @@ class ItemLineCollector extends LineCollector
      * - It turns out that you can do partial refunds by entering a broken
      *   number in the quantity field when defining a refund on the edit order
      *   page. However, the quantity stored is still rounded towards zero and
-     *   thus may result in qty = 0 but line total != 0 or just item price not
+     *   thus may result in qty = 0 but line total != 0, or just item price not
      *   being equal to line total divided by the qty.
      *
      * @param Line $line
@@ -84,12 +84,11 @@ class ItemLineCollector extends LineCollector
 
         // Get precision info.
         if ($this->productPricesIncludeTax()) {
-            // In the past I have seen WooCommerce store rounded vat amounts
-            // together with a not rounded ex price. If that is the case, the
-            // precision of the - calculated - inc price is not best, and we
-            // should not recalculate the price ex when we have obtained a
-            // corrected vat rate as that will worsen the precision of the price
-            // ex.
+            // In the past I have seen WooCommerce store rounded vat amounts together with
+            // a not rounded ex-price. If that is the case, the precision of the
+            // - calculated - inc price is not best. Also, in this case, we should not
+            // recalculate the price ex when we have obtained a corrected vat rate as that
+            // will worsen the precision of the price ex.
             $precisionEx = $this->precision;
             $reason = $this->isPriceIncRealistic($productPriceInc, $taxes, $shopProduct);
             if ($reason !== '') {
@@ -105,9 +104,8 @@ class ItemLineCollector extends LineCollector
             $precisionInc = $this->precision;
             $recalculatePrice = Meta::UnitPriceInc;
         }
-        // Note: this assumes that line calculations are done in a very precise
-        // way (in other words: total_tax has not a precision of
-        // base_precision * quantity) ...
+        // Note: this assumes that line calculations are done in a very precise way.
+        // In other words: the precision of total_tax is not base_precision * quantity.
         $precisionVat = max(abs($this->precision / $quantity), 0.001);
 
         $line->unitPrice = $productPriceEx;
@@ -132,7 +130,7 @@ class ItemLineCollector extends LineCollector
     }
 
     /**
-     * Adds child lines that describes this variant.
+     * Adds child lines that describe this variant.
      *
      * This method supports the default WooCommerce variant functionality.
      *
@@ -169,13 +167,13 @@ class ItemLineCollector extends LineCollector
                 // Skip hidden fields:
                 // - arrays
                 // - serialized data (which are also hidden fields)
-                // - tm extra product options plugin metadata which should be
-                //   removed by that plugin via the
-                //  'woocommerce_hidden_order_itemmeta' filter, but they don't.
-                // - all metadata keys starting with an underscore (_). This is
-                //   the convention for post metadata, but it is unclear if this
-                //   is also the case for woocommerce order item metadata, see
-                //   their own list versus the documentation on
+                // - tm extra product options plugin metadata which should be removed by
+                //   that plugin via the 'woocommerce_hidden_order_itemmeta' filter, but
+                //   they don't.
+                // - all metadata keys starting with an underscore (_). This is the
+                //   convention for post-metadata, but it is unclear if this is also the
+                //   case for woocommerce order item metadata. See their own list versus
+                //   the documentation on
                 //   https://developer.wordpress.org/plugins/metadata/managing-post-metadata/#hidden-custom-fields
                 if (in_array($meta->key, $hiddenOrderItemMeta, true)
                     || is_array($meta->value)

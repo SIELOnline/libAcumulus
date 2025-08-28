@@ -26,16 +26,17 @@ class Product extends BaseProduct
 
     protected function setId(): void
     {
+        /** @noinspection PhpUndefinedMethodInspection false positive */
         $this->id = $this->getShopObject()->get_id();
     }
 
     public function getReference(): string
     {
-        $reference = $this->shopObject->get_sku();
+        $reference = $this->getShopObject()->get_sku();
         if (empty($reference)) {
-            $reference = $this->shopObject->get_global_unique_id();
+            $reference = $this->getShopObject()->get_global_unique_id();
             if (empty($reference)) {
-                $reference = '#' . $this->shopObject->get_formatted_name();
+                $reference = '#' . $this->getShopObject()->get_formatted_name();
             }
         }
         return $reference;
@@ -48,6 +49,7 @@ class Product extends BaseProduct
 
     public function getAcumulusId(): ?int
     {
+        /** @noinspection PhpUndefinedMethodInspection false positive */
         $metaValue = $this->getShopObject()->get_meta(static::$acumulusProductIdField);
         return !empty($metaValue) ? (int) $metaValue : null;
     }
@@ -55,10 +57,13 @@ class Product extends BaseProduct
     public function setAcumulusId(?int $acumulusId): void
     {
         if ($acumulusId !== null) {
+            /** @noinspection PhpUndefinedMethodInspection false positive */
             $this->getShopObject()->add_meta_data(static::$acumulusProductIdField, $acumulusId, true);
         } else {
+            /** @noinspection PhpUndefinedMethodInspection false positive */
             $this->getShopObject()->delete_meta_data(static::$acumulusProductIdField);
         }
+        /** @noinspection PhpUndefinedMethodInspection false positive */
         $this->getShopObject()->save_meta_data();
     }
 

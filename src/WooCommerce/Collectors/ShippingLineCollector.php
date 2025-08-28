@@ -36,6 +36,8 @@ class ShippingLineCollector extends LineCollector
     /**
      * @param \Siel\Acumulus\Data\Line $line
      *   A shipping line with the mapped fields filled in.
+     *
+     * @noinspection GrazieInspection
      */
     protected function collectShippingLine(Line $line, PropertySources $propertySources): void
     {
@@ -47,7 +49,7 @@ class ShippingLineCollector extends LineCollector
         $line->quantity = (float) $shippingItem->get_quantity();
 
         // Note: this info is WC3+ specific.
-        // Precision: shipping costs are entered ex VAT, so that may be very
+        // Precision: shipping costs are entered ex-VAT, so that may be very
         // precise. However, in the order item metadata, get_total() will be rounded to
         // the cent by WC. The VAT in get_total_tax() is also rounded to the cent. So, we
         // should ty to get more precise amounts:
@@ -68,7 +70,7 @@ class ShippingLineCollector extends LineCollector
         if (str_starts_with($methodId, 'legacy_')) {
             $methodId = substr($methodId, strlen('legacy_'));
         }
-        // Instance id is the zone, will return an empty value if not present.
+        // Instance id is the zone or an empty value if not present.
         $instanceId = $shippingItem->get_instance_id();
         $optionName = !empty($instanceId)
             ? "woocommerce_{$methodId}_{$instanceId}_settings"
@@ -76,11 +78,11 @@ class ShippingLineCollector extends LineCollector
         $option = get_option($optionName);
 
         if (!empty($option['cost'])) {
-            // Note that "Cost" may contain a formula or use commas. Dutch help text: 'Vul
-            // een bedrag(excl. btw) in of een berekening zoals 10.00 * [qty]. Gebruik
-            // [qty] voor het aantal artikelen, [cost] voor de totale prijs van alle
-            // artikelen, en [fee percent="10" max_fee=""min_fee="20"] voor prijzen
-            // gebaseerd op percentage.'
+            // Note that "Cost" may contain a formula or use commas. Dutch help text:
+            //   'Vul een bedrag(excl. btw) in of een berekening zoals 10.00 * [qty].
+            //   Gebruik [qty] voor het aantal artikelen, [cost] voor de totale prijs van
+            //   alle artikelen, en [fee percent="10" max_fee="" min_fee="20"] voor
+            //   prijzen gebaseerd op percentage.'
             $cost = str_replace(',', '.', $option['cost']);
             if (is_numeric($cost)) {
                 $cost = (float) $cost;
@@ -121,7 +123,7 @@ class ShippingLineCollector extends LineCollector
      * Looks up and returns vat rate (lookup) metadata for shipping lines.
      *
      * In WooCommerce, a shipping line can have multiple taxes. I am not sure if that is
-     * possible for Dutch web shops, but if a shipping line does have multiple taxes we
+     * possible for Dutch web shops, but if a shipping line does have multiple taxes, we
      * fall back to the tax class setting for shipping methods.
      *
      * This method may add the following metadata:

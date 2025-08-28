@@ -53,8 +53,8 @@ class DiscountLineCollector extends LineCollector
      * - have a fixed amount or a percentage.
      * - be applied to the whole cart or only be used for a set of products.
      *
-     * Discounts are already applied, we just add a descriptive line with 0 amount. The
-     * VAT rate to categorize this line under should be determined by the completor.
+     * Discounts are already applied, we just add a descriptive line with 0 amounts.
+     * The completor should determine the VAT rate to categorize this line under.
      */
     protected function CollectCouponDiscountLine(Line $line, WC_Coupon $coupon, PropertySources $propertySources): void
     {

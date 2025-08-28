@@ -69,8 +69,16 @@
             "country_code": "NL"
         }
     },
+    "foreign_address": {
+        "id": 7,
+        "street": "Kade 99",
+        "street2": null,
+        "postal_code": "2000",
+        "city": "Antwerpen",
+        "country_code": "BE"
+    },
     "address": {
-        "id": 5,
+        "id": 6,
         "street": "Stationsstraat 3",
         "street2": null,
         "postal_code": "4321 BA",

@@ -7,11 +7,14 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Integration\Shop;
 
+use Siel\Acumulus\Api;
+use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\Source;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Tests\AcumulusTestUtils;
 use Siel\Acumulus\Tests\Data\GetTestData;
+use Siel\Acumulus\TestWebShop\Helpers\Event;
 
 /**
  * SendInvoiceTest tests the process of creation and sending process.
@@ -55,5 +58,27 @@ class InvoiceCreateTest extends TestCase
         $invoice = $customer[Fld::Invoice];
         $this->assertArrayHasKey(Fld::Concept, $invoice);
         $this->assertIsArray($invoice[Fld::Line]);
+    }
+
+    /**
+     * Tests the {@see Fld::WarehouseCountry} field in an {@see \Siel\Acumulus\Data\Invoice}.
+     *
+     * Note that this tests works because BE and NL have the same high VAT rate.
+     */
+    public function testCreateWithWarehouseCountry(): void
+    {
+        $invoiceSource = $this->getInvoiceSource();
+        $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        // Verify that the normal vat type has been set
+        self::assertSame(Api::VatType_National, $invoice->vatType);
+
+        Event::registerHook(Event::INVOICE_COLLECT_AFTER, static function (Invoice $invoice) {
+            $invoice->setWarehouseCountry('BE');
+        });
+        $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        // Verify that the warehouse country has been taken into account.
+        self::assertSame(Api::VatType_EuVat, $invoice->vatType);
     }
 }

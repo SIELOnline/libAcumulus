@@ -224,10 +224,12 @@ class Completor
      * - Whether there is at least 1 line with a cost price.
      * - The country of the client.
      * - Whether the client is a company.
-     * - The shop settings (using EU vat or selling vat free products).
+     * - The shop settings (using EU vat or selling vat-free products).
      * - Optionally, the date of the invoice.
      *
      * See also: {@link https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland}.
+     *
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
     protected function initPossibleVatTypes(): void
     {
@@ -237,35 +239,36 @@ class Completor
         $nature = $this->getNature();
         $euVat = $shopSettings['euVat'];
 
+        $isEuWarehouse = !empty($this->invoice->warehouseCountry) && $this->isEu($this->invoice->warehouseCountry);
         if (!empty($this->invoice->vatType)) {
-            // If shop specific code or an event handler has already set the vat
+            // If shop-specific code or an event handler has already set the vat
             // type, we obey so.
             $possibleVatTypes[] = $this->invoice->vatType;
         } else {
             if ($this->isNl()) {
-                $possibleVatTypes[] = Api::VatType_National;
+                $possibleVatTypes[] = $isEuWarehouse ? Api::VatType_EuVat : Api::VatType_National;
                 // Can it be national reversed VAT: not really supported but
                 // possible. Note that reversed vat should not be used with vat
                 // free items. @todo: thus if we know that only vat free is used...
                 if ($this->isCompany()) {
-                    $possibleVatTypes[] = Api::VatType_NationalReversed;
+                    $possibleVatTypes[] = $isEuWarehouse ? Api::VatType_EuReversed : Api::VatType_NationalReversed;
                 }
             } elseif ($this->isEu()) {
-                // Can it be Dutch vat?
-                if ($euVat !== Config::EuVat_Yes) {
+                // Can it be Dutch VAT?
+                if ($euVat !== Config::EuVat_Yes && !$isEuWarehouse) {
                     $possibleVatTypes[] = Api::VatType_National;
                 }
-                // Can it be EU vat?
-                if ($euVat !== Config::EuVat_No) {
+                // Can it be EU VAT?
+                if ($euVat !== Config::EuVat_No || $isEuWarehouse) {
                     $possibleVatTypes[] = Api::VatType_EuVat;
                 }
                 // Can it be EU reversed VAT? Note that reversed vat should not
-                // be used with vat free items.
+                // be used with VAT-free items.
                 if ($this->isCompany()) {
                     $possibleVatTypes[] = Api::VatType_EuReversed;
                 }
             } elseif ($this->isUk()) {
-                // Handle UK and Northern Ireland separately:
+                // Handle the UK and Northern Ireland separately:
                 // https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/wat-betekent-brexit-voor-de-btw
                 // https://www.taxence.nl/nieuws/fiscaal-nieuws/brexit-en-btw-3/
                 if ($this->isNorthernIreland()) {
@@ -275,15 +278,15 @@ class Completor
                         $this->invoice->getCustomer()->getFiscalAddress()->countryCode = 'XI';
                         // @nth: remove duplication (with case isEu()).
                         // Can it be Dutch vat?
-                        if ($euVat !== Config::EuVat_Yes) {
+                        if ($euVat !== Config::EuVat_Yes && !$isEuWarehouse) {
                             $possibleVatTypes[] = Api::VatType_National;
                         }
-                        // Can it be EU vat?
-                        if ($euVat !== Config::EuVat_No) {
+                        // Can it be EU-VAT?
+                        if ($euVat !== Config::EuVat_No || $isEuWarehouse) {
                             $possibleVatTypes[] = Api::VatType_EuVat;
                         }
                         // Can it be EU reversed VAT? Note that reversed vat
-                        // should not be used with vat free items.
+                        // should not be used with vat-free items.
                         if ($this->isCompany()) {
                             $possibleVatTypes[] = Api::VatType_EuReversed;
                         }
@@ -300,7 +303,7 @@ class Completor
                     $possibleVatTypes[] = Api::VatType_RestOfWorld;
                 }
                 if (($nature & Config::Nature_Services) !== 0) {
-                    // Nature = Services => treat Northern Ireland as UK, i.e.
+                    // Nature = Services => treat Northern Ireland as the UK, i.e.
                     // as rest of world.
                     // Services should use vat type = 1 with vat free.
                     $possibleVatTypes[] = Api::VatType_National;
@@ -1517,9 +1520,10 @@ class Completor
     /**
      * Wrapper around Countries::isNl().
      */
-    protected function isNl(): bool
+    protected function isNl(?string $countryCode = null): bool
     {
-        return $this->countries->isNl($this->invoice->getCustomer()?->getFiscalAddress()->countryCode);
+        $countryCode ??= $this->invoice->getCustomer()?->getFiscalAddress()->countryCode;
+        return $this->countries->isNl($countryCode);
     }
 
     /**
@@ -1532,13 +1536,14 @@ class Completor
      *
      * Note: Northern Ireland, part of the UK (country code = GB), is handled
      * differently. This method wil return false for Northern Ireland, but vat
-     * type 3 and 6 will be allowed.
+     * type 3 and 6 will still be allowed for Northern Ireland
      */
-    protected function isEu(): bool
+    protected function isEu(?string $countryCode = null): bool
     {
         $result = false;
-        if (!$this->isNl()) {
-            $vatInfos = $this->getVatRatesByCountryAndInvoiceDate($this->invoice->getCustomer()?->getFiscalAddress()->countryCode);
+        $countryCode ??= $this->invoice->getCustomer()?->getFiscalAddress()->countryCode;
+        if (!$this->isNl($countryCode)) {
+            $vatInfos = $this->getVatRatesByCountryAndInvoiceDate($countryCode);
             $regions = array_unique(array_column($vatInfos, Fld::CountryRegion));
             $result = count($regions) === 1 && (int) reset($regions) === Api::Region_EU;
         }

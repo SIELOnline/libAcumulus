@@ -13,7 +13,7 @@ class GetTestData
     {
         $data = file_get_contents(__DIR__ . '/data.json');
         if ($decode) {
-            $data = json_decode($data, false, 512, JSON_THROW_ON_ERROR);
+            $data = json_decode($data, false, flags: JSON_THROW_ON_ERROR);
             $data->order->customer = $data->customer;
             $data->invoiceSource = $data->order;
         }

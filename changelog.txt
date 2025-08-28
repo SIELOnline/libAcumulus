@@ -3,8 +3,8 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.6.0 (2025-08-??) (MA)
------------------------
+8.6.0 (2025-08-28) (MA|WC)
+--------------------------
 Features:
 - ALL: Added support for the API field "warehousecountry": a mapping, an accompanying UI,
   and adapted logic to determine the vat type.

@@ -345,7 +345,13 @@ LONGSTRING;
     {
         $mail = null;
         $fullFileName = $this->getDataPath() . "/Mail/$name.mail";
-        if (is_readable($fullFileName)) {
+        $phpFileName = "$fullFileName.php";
+
+        if (is_readable($phpFileName)) {
+            /** @noinspection UntrustedInclusionInspection The variable contains an absolute path. */
+            include $phpFileName;
+        } elseif (is_readable($fullFileName)) {
+            // @todo: add a "doing it wrong".
             eval('$mail = ' . file_get_contents($fullFileName) . ';');
         }
         /** @noinspection PhpExpressionAlwaysNullInspection */
@@ -362,7 +368,7 @@ LONGSTRING;
     {
         $path = $this->getDataPath() . '/Mail';
         $fileName = "$name.mail";
-        if (file_exists("$path/$fileName")) {
+        if (file_exists("$path/$fileName") || file_exists("$path/$fileName.php")) {
             $fileName = "$name.latest.mail";
         }
         file_put_contents("$path/$fileName", var_export($data, true) . "\n");
@@ -433,7 +439,7 @@ LONGSTRING;
     {
         $path = $this->getDataPath() . '/Log';
         $fileName = "$name.log";
-        if (file_exists("$path/$fileName")) {
+        if (file_exists("$path/$fileName") || file_exists("$path/$fileName.php")) {
             $fileName = "$name.latest.log";
         }
         file_put_contents("$path/$fileName", var_export($data, true) . "\n");
@@ -462,7 +468,7 @@ LONGSTRING;
                             static::assertStringContainsString($text, $logMessage[$key][$index], "$name-$key-$index-$subString");
                         }
                     } else {
-                        static::assertSame($value[$index], $logMessage[$key][$index], "$name-$key-$index");
+                        static::assertSame($argument, $logMessage[$key][$index], "$name-$key-$index");
                     }
                 }
             } elseif (is_array($value)) {

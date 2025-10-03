@@ -66,9 +66,10 @@ class ConfigFormTranslations extends TranslationCollection
         'message_error_forb' => 'Uw Acumulus accountgegevens zijn juist maar staan geen toegang via de web service toe. Zodra u %2$s correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden hier de %1$s instellingen getoond.',
         'message_auth_unknown' => 'Zodra u %2$s uw Acumulus accountgegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
+        'message_error_arg1_settings' => 'overige',
         'message_error_arg1_config' => 'basis',
         'message_error_arg1_advanced' => 'geavanceerde',
-        'message_error_arg1_settings' => 'overige',
+        'message_error_arg2_settings' => 'hier',
         'message_error_arg2_config' => 'hier',
         'message_error_arg2_advanced' => 'in het "Acumulus instellingenformulier"',
         'message_error_role_deprecated' => 'U gebruikt accountgegevens met een gebruikerstype dat binnenkort niet meer gebruikt kan worden om de Acumulus API mee te benaderen. Voeg een andere gebruiker toe met gebruikerstype API-Gebruiker of verander het gebruikerstype van de huidige gebruiker.',
@@ -110,7 +111,7 @@ class ConfigFormTranslations extends TranslationCollection
 
         // Shop settings.
         'shopSettingsHeader' => 'Over uw winkel',
-        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw-tarieven terugrekenen.',
+        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://acumulus.nl/facturen/facturen-naar-het-buitenland/4359/#Verschillende_type_facturen" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw-tarieven terugrekenen.',
 
         'field_nature_shop' => 'Soort: wat verkoopt u?',
         'option_nature_1' => 'Zowel producten als diensten.',
@@ -642,7 +643,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 
         // Shop settings.
         'shopSettingsHeader' => 'About your shop',
-        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland" target="_blank">invoice type</a>; perform some sanity checks; and to compute VAT rates.',
+        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://acumulus.nl/facturen/facturen-naar-het-buitenland/4359/#Verschillende_type_facturen" target="_blank">invoice type</a>; perform some sanity checks; and to compute VAT rates.',
 
         'field_nature_shop' => 'Nature: what do you sell?',
         'option_nature_1' => 'Products and services.',

@@ -227,7 +227,7 @@ class Completor
      * - The shop settings (using EU vat or selling vat-free products).
      * - Optionally, the date of the invoice.
      *
-     * See also: {@link https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland}.
+     * See also: {@link https://acumulus.nl/facturen/facturen-naar-het-buitenland/4359/#Verschillende_type_facturen}.
      *
      * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
@@ -238,8 +238,8 @@ class Completor
         $margin = $shopSettings['marginProducts'];
         $nature = $this->getNature();
         $euVat = $shopSettings['euVat'];
-
         $isEuWarehouse = !empty($this->invoice->warehouseCountry) && $this->isEu($this->invoice->warehouseCountry);
+
         if (!empty($this->invoice->vatType)) {
             // If shop-specific code or an event handler has already set the vat
             // type, we obey so.
@@ -1312,7 +1312,7 @@ class Completor
      *
      * See:
      * - {@link https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/tarieven_en_vrijstellingen/}
-     * - {@link https://www.siel.nl/acumulus/handleiding/?a=facturen_naar_het_buitenland}:
+     * - {@link https://acumulus.nl/facturen/facturen-naar-het-buitenland/4359/#Verschillende_type_facturen}:
      */
     protected function correctNoVatLines(): void
     {

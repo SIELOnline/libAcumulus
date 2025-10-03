@@ -3,6 +3,19 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+
+8.6.1 (2025-10-04) (PS)
+-----------------------
+Features:
+- PS: Support for PrestaShop 9.
+
+Bugs:
+- ALL: Link naar handleiding over factuurtypes bijgewerk (in helptektsten en
+  codedocumentatie).
+- PS: PS kapt ingevulde en niet gewijzigde wachtwoorden af op 16 karakters waardoor het
+  gewijzigd kan worden bij verzending van het instellingenformulier.
+
+
 8.6.0 (2025-08-28) (MA|WC)
 --------------------------
 Features:
@@ -17,7 +30,7 @@ Bugs:
 
 Refactorings:
 - ALL: Removed PHP 8.4 warnings and deprecations.
-- ALL: Started using PHP 8.1 language constructs. 
+- ALL: Started using PHP 8.1 language constructs.
 
 
 8.5.4 (2025-08-16) (none)

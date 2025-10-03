@@ -26,9 +26,12 @@ class SettingsForm extends BaseSettingsForm
     protected function setSubmittedValues(): void
     {
         parent::setSubmittedValues();
-        if (array_key_exists(Fld::Password, $this->submittedValues) && $this->submittedValues[Fld::Password] === '') {
+        $accountStatus = $this->getAccountStatus();
+        if ($accountStatus && array_key_exists(Fld::Password, $this->submittedValues)) {
             $credentials = $this->acumulusConfig->getCredentials();
-            if (!empty($credentials[Fld::Password])) {
+            if ($this->submittedValues[Fld::Password] === ''
+                || str_starts_with($credentials[Fld::Password], $this->submittedValues[Fld::Password])
+            ) {
                 $this->submittedValues[Fld::Password] = $credentials[Fld::Password];
             }
         }

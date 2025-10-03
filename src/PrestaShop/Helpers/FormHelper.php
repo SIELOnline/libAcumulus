@@ -52,6 +52,7 @@ class FormHelper extends BaseFormHelper
      */
     protected function alterPostedValues(array $postedValues): array
     {
+        $postedValues = parent::alterPostedValues($postedValues);
         /** @var object[]|null $meta */
         $meta = $this->getMeta();
         foreach ($meta as $key => $fieldMeta) {

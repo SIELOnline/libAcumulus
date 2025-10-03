@@ -169,6 +169,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * Wrapper method around the Db instance.
+     *
+     * @noinspection PhpUnhandledExceptionInspection
      */
     protected function getDb(): Db
     {

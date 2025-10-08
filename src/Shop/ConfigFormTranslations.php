@@ -310,7 +310,7 @@ De derde optie kunt u gebruiken om dubbelingen (op basis van het e-mailadres van
         AddressType::Shipping => 'verzendadres',
 
         'field_countryAutoName' => 'Landnaam',
-        'desc_countryAutoName' => 'Geef aan wanneer en hoe de landnaam aan dde factuur toegevoegd moet worden. De landcode wordt altijd naar Acumulus verzonden, maar het versturen en tonen van de landnaam is flexibeler. De landnaam kan van Acumulus komen (gebaseerd op de landcode) of van de naam zoals die in de webwinkel is ingevuld kan gebruikt worden. De 2e en 3e opties zijn de aanbevolen opties.',
+        'desc_countryAutoName' => 'Geef aan wanneer en hoe de landnaam aan de factuur toegevoegd moet worden. De landcode wordt altijd naar Acumulus verzonden, maar het versturen en tonen van de landnaam is flexibeler. De landnaam kan van Acumulus komen (gebaseerd op de landcode) of van de naam zoals die in de webwinkel is ingevuld kan gebruikt worden. De 2e en 3e opties zijn de aanbevolen opties.',
         'option_countryAutoName_No' => 'Voeg geen landnaam toe aan de factuur.',
         'option_countryAutoName_Yes' => 'Laat Acumulus altijd de (Nederlandstalige) landnaam toevoegen (aanbevolen).',
         'option_countryAutoName_OnlyForeign' => 'Laat Acumulus alleen aan buitenlandse adressen de (Nederlandstalige) landnaam toevoegen (aanbevolen).',

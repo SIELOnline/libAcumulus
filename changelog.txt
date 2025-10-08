@@ -4,16 +4,16 @@ Changelog Acumulus web shop extensions
 This file contains a historical overview of changes in our code.
 
 
-8.6.1 (2025-10-04) (PS)
+8.6.1 (2025-10-0?) (PS)
 -----------------------
 Features:
 - PS: Support for PrestaShop 9.
 
 Bugs:
-- ALL: Link naar handleiding over factuurtypes bijgewerk (in helptektsten en
-  codedocumentatie).
-- PS: PS kapt ingevulde en niet gewijzigde wachtwoorden af op 16 karakters waardoor het
-  gewijzigd kan worden bij verzending van het instellingenformulier.
+- ALL: Link to the documentation on invoice types has been updated (in help texts and
+  code documentation).
+- PS: PS truncates password fields to 16 characters leading to unwanted password changes
+  when submitting the settings form.
 
 
 8.6.0 (2025-08-28) (MA|WC)

@@ -157,6 +157,8 @@ use const Siel\Acumulus\Version;
  * namespace, instead of changing the code in this library, it remains possible
  * to update this library to a newer version without losing your customisations.
  * Note that, also in this case, you are responsible that this class gets autoloaded.
+ *
+ * @noinspection EfferentObjectCouplingInspection
  */
 class Container
 {

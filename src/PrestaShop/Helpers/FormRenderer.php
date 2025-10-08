@@ -24,7 +24,7 @@ class FormRenderer extends BaseFormRenderer
         $this->detailsWrapperTag = 'div';
         $this->detailsWrapperClass = 'panel';
         $this->summaryWrapperTag = 'div';
-        $this->summaryWrapperClass = 'panel-heading';
+        $this->summaryWrapperClass = 'panel-heading details';
 
         $this->fieldsetContentWrapperTag = 'div';
         // The classes below may be specific to the invoice status overview form.

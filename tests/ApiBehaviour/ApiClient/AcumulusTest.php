@@ -59,8 +59,7 @@ class AcumulusTest extends TestCase
         ];
     }
 
-
-    public function responseKeysProvider(): array
+    public static function responseKeysProvider(): array
     {
         return [
             'About' => ['getAbout', [], false, ['about', 'role', 'roleapi', 'roleid', 'rolenl']],

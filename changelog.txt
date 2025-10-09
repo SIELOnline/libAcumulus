@@ -4,7 +4,7 @@ Changelog Acumulus web shop extensions
 This file contains a historical overview of changes in our code.
 
 
-8.6.1 (2025-10-0?) (PS)
+8.6.1 (2025-10-09) (PS)
 -----------------------
 Features:
 - PS: Support for PrestaShop 9.

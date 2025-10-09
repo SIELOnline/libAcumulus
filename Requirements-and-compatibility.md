@@ -9,6 +9,7 @@ Updates:
 - System requirements: valid for our version 8.6
 - Supported shops and versions: August 2025: MA, WC. July 2024 (others)
 - Supported PHP versions: August 2025.
+- Tested PS 9 up to PHP 8.3: October 2025
 
 System Requirements
 -------------------
@@ -45,7 +46,7 @@ Notes:
 | MA  | Magento          | 2.4.8 (community)        | >= 2.4, 2.3 might still work        |
 | OC  | OpenCart         | 3.0.3.9                  | >= 3.0.3.9                          |
 |     |                  | 4.0.2.3                  | >= 4.0                              |
-| PS  | PrestaShop       | 8.1.7                    | >= 8.1                              |
+| PS  | PrestaShop       | 9.0.0                    | >= 8.1                              |
 | VM  | VirtueMart (JOO) | 4.2.0                    | >= 4.0.5                            |
 | JOO | Joomla (+ VM)    | 4.4.6                    | >= 4.2.5                            |
 | WC  | WooCommerce      | 10.1                     | >= 5.0 (9.1 for stock management!)  |
@@ -76,6 +77,6 @@ Notes:
 | MA  | 2.4.6 (community) | ✅  | ✅  | ✅  | ✅  |                                               |
 | OC  | 3.0.3.9           | ✅  | ❌  | ❌  | ❌  | 3.0.3.9 is said to be compatible with PHP 8.1 |
 |     | 4.0.2.3           | ✅  | ❓  | ❓  | ❓  |                                               |
-| PS  | 8.1               | ✅  | ❓  | ❓  | ❓  | Warnings get logged on PHP 8.1                |
+| PS  | 9.0               | ✅  | ✅  | ✅  | ❓  |                                               |
 | VM  | 4.2.0             | ✅  | ❓  | ❓  | ❓  | VM 4.2 still produces warnings on 8.1         |
 | WC  | 9.1.0             | ✅  | ✅  | ✅  | ❓  | Many warnings from other plugins on 8.1       |

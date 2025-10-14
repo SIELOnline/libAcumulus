@@ -632,6 +632,7 @@ abstract class Form extends MessageCollection
         $pickListItems = $picklist->getMainAcumulusResponse();
         foreach ($pickListItems as $picklistItem) {
             // Prefer integer ids.
+            /** @var int|string $optionId */
             $optionId = reset($picklistItem);
             if (is_string($optionId) && ctype_digit($optionId)) {
                 $optionId = (int) $optionId;

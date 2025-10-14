@@ -165,10 +165,11 @@ class Util
      * @return string
      *   The JSON representation for the given object or array.
      *
-     * throws \Siel\Acumulus\ApiClient\AcumulusException|\JsonException
-     * @throws \JsonException
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   The parameter is not an object or an array, or an error occurred during
      *   conversion.
+     *
+     * @noinspection PhpRedundantCatchClauseInspection JSON_THROW_ON_ERROR is part of Meta::JsonFlags
      */
     public function convertToJson(object|array $objectOrArray): string
     {
@@ -188,15 +189,21 @@ class Util
      * @return array
      *  An (associative) array representation of the JSON string.
      *
-     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\JsonException
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Either:
      *   - The $json string is not valid JSON.
      *   - The $json string could not be converted to an (associative) array
      *     because it is either not an object, or it is too deep.
+     *
+     * @noinspection PhpRedundantCatchClauseInspection JSON_THROW_ON_ERROR is part of Meta::JsonFlags
      */
     public function convertJsonToArray(string $json): array
     {
-        $result = json_decode($json, true, 512, Meta::JsonFlags);
+        try {
+            $result = json_decode($json, true, 512, Meta::JsonFlags);
+        } catch (JsonException $e) {
+            throw new AcumulusException($e->getMessage(), $e->getCode(), $e);
+        }
         if (!is_array($result)) {
             throw new AcumulusException('Not a JSON array');
         }
@@ -283,10 +290,8 @@ class Util
      *
      * Acumulus API specific: password-fields end with 'password'.
      */
-    public function maskXmlOrJsonString(
-        #[SensitiveParameter]
-        string $subject
-    ): string {
+    public function maskXmlOrJsonString(#[SensitiveParameter] string $subject): string
+    {
         return $this->maskJson($this->maskXml($subject));
     }
 
@@ -295,10 +300,8 @@ class Util
      *
      * Acumulus API specific: password-fields end with 'password'.
      */
-    public function maskXml(
-        #[SensitiveParameter]
-        string $subject
-    ): string {
+    public function maskXml(#[SensitiveParameter] string $subject): string
+    {
         // Mask all values that have 'password' in their tag.
         // @todo: use back reference in closing tag, but test it (is this still used, is it tested?)
         return preg_replace(
@@ -313,10 +316,8 @@ class Util
      *
      * Acumulus API specific: password-fields end with 'password'.
      */
-    public function maskJson(
-        #[SensitiveParameter]
-        string $subject
-    ): string {
+    public function maskJson(#[SensitiveParameter] string $subject): string
+    {
         // Mask all values that have 'password' in their key.
         return preg_replace(
             '!"([a-z]*)password"(\s*):(\s*)"(((\\\\.)|[^\\\\"])*)"!',
@@ -330,10 +331,8 @@ class Util
      *
      * Acumulus API specific: password-fields end with 'password'.
      */
-    public function maskHtml(
-        #[SensitiveParameter]
-        string $subject
-    ): string {
+    public function maskHtml(#[SensitiveParameter] string $subject): string
+    {
         // Mask all "value"s of input elements of type ='password'.
         // @todo: use back reference in closing tag, but test it (is this still used, is it tested?)
         return preg_replace(

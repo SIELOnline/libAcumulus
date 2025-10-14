@@ -25,6 +25,7 @@ use Siel\Acumulus\Config\Config;
 use function array_key_exists;
 use function in_array;
 use function ini_get;
+use function is_scalar;
 use function sprintf;
 
 /**
@@ -207,7 +208,8 @@ abstract class InvoiceManager
      *
      * @param string $sourceType
      * @param array $idsOrSources
-     *   An array with shop-specific orders or credit notes or just their ids.
+     *   An array with shop-specific orders or credit notes, or just their ids (possibly
+     *   as numeric strings).
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non-keyed array with invoice Sources.
@@ -216,23 +218,12 @@ abstract class InvoiceManager
     {
         $results = [];
         foreach ($idsOrSources as $sourceId) {
-            $results[] = $this->getSourceByIdOrSource($sourceType, $sourceId);
+            if (is_scalar($sourceId)) {
+                $sourceId = (int) $sourceId;
+            }
+            $results[] = $this->getSource($sourceType, $sourceId);
         }
         return $results;
-    }
-
-    /**
-     * Creates a source given its type and id.
-     *
-     * @param object|int|array $idOrSource
-     *   A shop-specific order or credit note or just its ids.
-     *
-     * @return \Siel\Acumulus\Invoice\Source
-     *   An invoice Source.
-     */
-    protected function getSourceByIdOrSource(string $sourceType, object|int|array $idOrSource): Source
-    {
-        return $this->getSource($sourceType, $idOrSource);
     }
 
     /**

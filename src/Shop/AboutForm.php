@@ -257,6 +257,7 @@ class AboutForm
         } elseif ($myData === false || is_string($myData)) {
             $contract = [$this->t('no_contract_data')];
         } else {
+            /** @var array $myData */
             $contract = [''];
             $contract[$this->t('field_code')] = $myData['mycontractcode'] ?? $this->t('unknown');
             $contract[$this->t('field_companyName')] = $myData['mycompanyname'] ?? $this->t('unknown');

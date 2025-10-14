@@ -4,8 +4,19 @@ Changelog Acumulus web shop extensions
 This file contains a historical overview of changes in our code.
 
 
+8.6.3 (2025-10-14) (OC)
+-----------------------
+Bugs:
+- OC3: Our own autoLoader is still needed.
+- OC3(|OC4?): TypeError: Siel\Acumulus\Shop\InvoiceManager::getSourceByIdOrSource():
+  Argument #2 ($idOrSource) must be of type object|array|int, string given.
+
+Refactorings:
+- ALL: Error handling: throw an AcumulusException when a JsonException is thrown.
+
+
 8.6.2 (2025-10-14) (OC)
---------------------------
+-----------------------
 Refactorings:
 - typos, docu, code inspections.
 

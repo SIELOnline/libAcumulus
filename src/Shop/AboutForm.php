@@ -458,6 +458,8 @@ class AboutForm
      * @return null|bool|string|array
      *   If $accountStatus = true, the my_data array as returned from the
      *   my_acumulus web API call, the $accountStatus otherwise.
+     *
+     * @todo: PHP 8.2 change bool to false in return type.
      */
     public function getMyData(null|bool|string $accountStatus): null|bool|string|array
     {

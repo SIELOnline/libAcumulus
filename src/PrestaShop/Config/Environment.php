@@ -23,7 +23,9 @@ class Environment extends EnvironmentBase
     /**
      * Returns the values of the database variables 'version' and 'version_comment'.
      *
-     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function executeQuery(string $query): array
     {
@@ -32,6 +34,8 @@ class Environment extends EnvironmentBase
 
     /**
      * Helper method to get the db object.
+     *
+     * @throws \PrestaShopException
      */
     protected function getDb(): Db
     {

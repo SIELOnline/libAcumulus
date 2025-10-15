@@ -3,6 +3,11 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+8.6.4 (2025-10-15) (PS)
+-----------------------
+Features:
+- PS: Added support for Mollie payment fees.
+
 
 8.6.3 (2025-10-14) (OC)
 -----------------------

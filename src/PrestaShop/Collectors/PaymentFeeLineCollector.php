@@ -76,6 +76,15 @@ class PaymentFeeLineCollector extends LineCollector
     /**
      * Collects an optional payment fee line if the Mollie module is used.
      *
+     * Mollie stores payment fees in the table mol_order_payment_fee. Records of this
+     * table are represented by a {@see MolOrderPaymentFee} object, having - a.o. -
+     * properties:
+     * - int id_order
+     * - float fee_tax_excl (precision €0,01)
+     * - float fee_tax_incl (precision €0,01)
+     * The resulting vat rate will be calculated by the
+     * {@see \Siel\Acumulus\Completors\Line\CompleteVatRange} completor.
+     *
      * @param \Siel\Acumulus\Data\Line $line
      *   A payment fee line with the mapped fields filled in.
      */

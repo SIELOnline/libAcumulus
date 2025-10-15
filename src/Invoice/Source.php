@@ -548,7 +548,7 @@ abstract class Source implements WrapperInterface, Stringable
      *   differs per shop and may even differ within the list of 1 shop.
      *
      * @noinspection PhpUnused  called via
-     *    {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     *    {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getShippingLineInfos(): array
     {
@@ -557,7 +557,7 @@ abstract class Source implements WrapperInterface, Stringable
 
     /**
      * @noinspection PhpUnused  called via
-     *   {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     *   {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getGiftWrappingFeeLineInfos(): array
     {
@@ -566,7 +566,7 @@ abstract class Source implements WrapperInterface, Stringable
 
     /**
      * @noinspection PhpUnused  called via
-     *   {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     *   {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getPaymentFeeLineInfos(): array
     {
@@ -575,7 +575,7 @@ abstract class Source implements WrapperInterface, Stringable
 
     /**
      * @noinspection PhpUnused  called via
-     *   {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     *   {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getOtherLineInfos(): array
     {
@@ -593,7 +593,7 @@ abstract class Source implements WrapperInterface, Stringable
      *   differs per shop and may even differ within the list of 1 shop.
      *
      * @noinspection PhpUnused  called via
-     *    {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     *    {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getDiscountLineInfos(): array
     {
@@ -621,7 +621,7 @@ abstract class Source implements WrapperInterface, Stringable
      *   Description.
      *
      * @noinspection PhpUnused  called via
-     *    {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     *    {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getManualLineInfos(): array
     {
@@ -630,7 +630,7 @@ abstract class Source implements WrapperInterface, Stringable
 
     /**
      * @noinspection PhpUnused  called via
-     *   {@see \Siel\Acumulus\Collectors\CollectorManager::collectLinesForType()}
+     *   {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getVoucherLineInfos(): array
     {

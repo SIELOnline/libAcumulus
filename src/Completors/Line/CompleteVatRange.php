@@ -22,17 +22,15 @@ use Siel\Acumulus\Meta;
  * - However, knowing the precision of both numbers, we can calculate a range in which the
  *   actual vat rate will be.
  *
- * If a web shop does not store the vat rates used in the order, we must
- *  calculate them using a (product) price and the vat on it. But as web
- *  shops often store these numbers rounded to cents, the vat rate
- *  calculation becomes imprecise. Therefore, we compute the range in which
- *  it will lie and will let the Completor do a comparison with the actual
- *  vat rates that an order can have.
- *  - If $denominator = 0 (free product), the vat rate will be set to null
- *    and the Completor will try to get this line listed under the correct
- *    vat rate.
- *  - If $numerator = 0, the vat rate will be set to 0 and be treated as if it
- *    is an exact vat rate, not a vat range.
+ * If a webshop does not store the vat rates used in the order, we must calculate them
+ * using a (product) price and the vat on it. But as webshops often store these numbers
+ * rounded to cents, the vat rate calculation becomes imprecise. Therefore, we compute the
+ * range in which it will lie and will let the Completor do a comparison with the actual
+ * vat rates that an order can have.
+ * - If $denominator = 0 (free product), the vat rate will be set to null and the
+ *   Completor will try to get this line listed under the correct vat rate.
+ * - If $numerator = 0, the vat rate will be set to 0 and be treated as if it is an exact
+ *   vat rate, not a vat range.
  * This completor computes that range and adds it as a min and max vat rate tag.
  *
  * Note that this is:

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Collectors;
 
+use MolOrderPaymentFee;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
@@ -26,30 +27,32 @@ class PaymentFeeLineCollector extends LineCollector
      *   A payment fee line with the mapped fields filled in.
      *
      * @throws \Exception
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Empty base method.
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $this->collectPaymentFeeLine($acumulusObject, $propertySources);
+        $paymentFeeInfo = $propertySources->get('paymentFeeLineInfo');
+        if ($paymentFeeInfo instanceof Source) {
+            $this->collectPaymentFeeLineForPayPalWithAFee($acumulusObject, $propertySources->get('invoice'), $paymentFeeInfo);
+        }
+        if ($paymentFeeInfo instanceof MolOrderPaymentFee) {
+            $this->collectPaymentFeeLineForMollie($acumulusObject, $propertySources->get('invoice'), $propertySources->get('source'), $paymentFeeInfo);
+        }
     }
 
     /**
-     * Collects the payment fee line for the invoice.
+     * Collects an optional payment fee line if the PayPal with a Fee module is used
      *
      * @param \Siel\Acumulus\Data\Line $line
      *   A payment fee line with the mapped fields filled in.
      *
      * @throws \Exception
      */
-    protected function collectPaymentFeeLine(Line $line, PropertySources $propertySources): void
+    protected function collectPaymentFeeLineForPayPalWithAFee(Line $line, Invoice $invoice, Source $source): void
     {
-        /** @var Invoice $invoice */
-        $invoice = $propertySources->get('invoice');
-        /** @var Source $source */
-        $source = $propertySources->get('source');
-        $sign = $source->getSign();
-
         /** @noinspection PhpUndefinedFieldInspection These fields are set by the PayPal with a fee module. */
-        $paymentInc = $sign * $source->getShopObject()->payment_fee;
+        $paymentInc = $source->getSign() * $source->getShopObject()->payment_fee;
         /** @noinspection PhpUndefinedFieldInspection */
         $paymentVatRate = (float) $source->getShopObject()->payment_fee_rate;
         $paymentEx = $paymentInc / (100.0 + $paymentVatRate) * 100;
@@ -63,6 +66,31 @@ class PaymentFeeLineCollector extends LineCollector
         $line->metadataSet(Meta::VatAmount, $paymentVat);
         $line->metadataAdd(Meta::FieldsCalculated, Fld::UnitPrice);
         $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
+
+        /** @var \Siel\Acumulus\Invoice\Totals $totals */
+        $totals = $invoice->metadataGet(Meta::Totals);
+        $totals->add($paymentInc, null, $paymentEx);
+    }
+
+
+    /**
+     * Collects an optional payment fee line if the Mollie module is used.
+     *
+     * @param \Siel\Acumulus\Data\Line $line
+     *   A payment fee line with the mapped fields filled in.
+     */
+    protected function collectPaymentFeeLineForMollie(Line $line, Invoice $invoice, Source $source, MolOrderPaymentFee $molOrderPaymentFee): void
+    {
+        $sign = $source->getSign();
+        $paymentEx = $sign * $molOrderPaymentFee->fee_tax_excl;
+        $paymentInc = $sign * $molOrderPaymentFee->fee_tax_incl;
+        $line->product = $this->t('payment_costs');
+        $line->quantity = 1;
+        $line->unitPrice = $paymentEx;
+        $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);
+        $line->metadataSet(Meta::UnitPriceInc, $paymentInc);
+        $line->metadataSet(Meta::PrecisionUnitPriceInc, 0.01);
+        $line->metadataSet(Meta::VatRateSource, VatRateSource::Calculated);
 
         /** @var \Siel\Acumulus\Invoice\Totals $totals */
         $totals = $invoice->metadataGet(Meta::Totals);

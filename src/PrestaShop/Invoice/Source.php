@@ -10,10 +10,14 @@ use Context;
 use Country;
 use Currency;
 use Db;
+use Mollie\Factory\ModuleFactory;
+use Mollie\Repository\MolOrderPaymentFeeRepositoryInterface;
+use MolOrderPaymentFee;
 use Order;
 use OrderSlip;
 use PrestaShop\PrestaShop\Core\Domain\Order\VoucherRefundType;
 use PrestaShop\PrestaShop\Core\Version;
+use PrestaShopCollection;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
@@ -24,6 +28,7 @@ use Siel\Acumulus\Invoice\Totals;
 
 use Validate;
 
+use function count;
 use function is_array;
 use function sprintf;
 use function strlen;
@@ -59,6 +64,8 @@ class Source extends BaseSource
      * @return string
      *   This override returns the order reference, a sequence of characters, or the order
      *   slip reference, a configurable prefix plus the id with padding zeros.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
     public function getReference(): string
     {
@@ -73,7 +80,7 @@ class Source extends BaseSource
     /**
      * Sets id based on the loaded Order.
      *
-     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopDatabaseException|\PrestaShopException
      */
     protected function setId(): void
     {
@@ -83,6 +90,9 @@ class Source extends BaseSource
         }
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
+     */
     public function getDate(): string
     {
         return substr($this->getShopObject()->date_add, 0, strlen('2000-01-01'));
@@ -127,6 +137,9 @@ class Source extends BaseSource
         return $order->module ?? parent::getPaymentMethod();
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
+     */
     public function getPaymentStatus(): int
     {
         // Assumption: credit slips are always in a paid status.
@@ -135,6 +148,9 @@ class Source extends BaseSource
             : Api::PaymentStatus_Due;
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
+     */
     public function getPaymentDate(): ?string
     {
         if ($this->getType() === Source::Order) {
@@ -166,6 +182,8 @@ class Source extends BaseSource
      *
      * PrestaShop stores the internal currency id, so look up the currency
      * object first, then extract the ISO code for it.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
     public function getCurrency(): AcumulusCurrency
     {
@@ -221,6 +239,7 @@ class Source extends BaseSource
                 $order = $this->getOrder()->getShopObject();
                 /** @var \OrderCartRule[] $cartRules */
                 $cartRules = $order->getCartRules();
+                /** @var array $cartRule */
                 foreach ($cartRules as $cartRule) {
                     /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
                     if ((int) $creditNote->order_slip_type === VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND) {
@@ -270,6 +289,9 @@ class Source extends BaseSource
             : null;
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
+     */
     protected function getShopOrderOrId(): int
     {
         /** @var \OrderSlip $orderSlip */
@@ -280,6 +302,9 @@ class Source extends BaseSource
         return (int) $orderSlip->id_order;
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
+     */
     protected function getShopCreditNotesOrIds(): iterable
     {
         /** @var \Order $order */
@@ -295,7 +320,7 @@ class Source extends BaseSource
      * total_shipping_tax_incl. As we need them, we load them ourselves.
      * Remove in the far future.
      *
-     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopDatabaseException|\PrestaShopException
      */
     protected function addProperties(): void
     {
@@ -323,6 +348,8 @@ class Source extends BaseSource
      * Returns records from:
      * - Source::Order: order detail table + order_detail_tax.
      * - Source::CreditNote: order_slip_detail + order_detail.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
     protected function createItems(): array
     {
@@ -397,11 +424,17 @@ class Source extends BaseSource
         return $result;
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
+     */
     public function getShippingLineInfos(): array
     {
         return !empty($this->getOrder()->getShopObject()->id_carrier) ? [$this] : [];
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
+     */
     public function getGiftWrappingFeeLineInfos(): array
     {
         $order = $this->getShopObject();
@@ -420,19 +453,55 @@ class Source extends BaseSource
      * enough to also be used by other modules that allow for payment fees.
      *
      * For now, only orders can have a payment fee.
+     *
+     * @throws \PrestaShopException
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Empty base method.
      */
     public function getPaymentFeeLineInfos(): array
+    {
+        return array_merge($this->getMolliePaymentFeeLineInfos(), $this->getPayPalWithAFeePaymentFeeLineInfos());
+    }
+
+    /**
+     * Gets payment fees for the current order as registered by the Mollie module.
+     *
+     * @throws \PrestaShopException
+     *
+     * @todo: extract into a separate 3rd party module support class? (see WC)
+     */
+    private function getMolliePaymentFeeLineInfos(): array
+    {
+        if ($this->getType() === Source::Order && class_exists(ModuleFactory::class)) {
+            $paymentFeeRepository = (new ModuleFactory())->getModule()?->getService(MolOrderPaymentFeeRepositoryInterface::class);
+            if ($paymentFeeRepository instanceof MolOrderPaymentFeeRepositoryInterface) {
+                $paymentFee = $paymentFeeRepository->findOneBy(['id_order' => $this->getId()]);
+                if ($paymentFee instanceof MolOrderPaymentFee) {
+                    return [$paymentFee];
+                }
+            }
+        }
+        return [];
+    }
+
+    /**
+     * Gets payment fees for the current order as registered by the PayPal with a fee module.
+     */
+    private function getPayPalWithAFeePaymentFeeLineInfos(): array
     {
         $order = $this->getShopObject();
         /**
          * @noinspection MissingIssetImplementationInspection These fields are set by
          *   the module "PayPal with a fee".
          */
-        return isset($order->payment_fee, $order->payment_fee_rate) && (float) $order->payment_fee !== 0.0 ? [$this] : [];
+        if (isset($order->payment_fee, $order->payment_fee_rate) && (float) $order->payment_fee !== 0.0) {
+            return [$this];
+        }
+        return [];
     }
 
     /**
-     * Description.
+     * {@inheritdoc}
      *
      * A PrestaShop order stores the discounts applied in order cart rules.
      *
@@ -441,6 +510,8 @@ class Source extends BaseSource
      * {@see OrderSlip::$order_slip_type} indicates if the cart rules from that order are
      * to be revoked ({@see VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND})
      * or should remain ({@see VoucherRefundType::PRODUCT_PRICES_REFUND}).
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
     public function getDiscountLineInfos(): array
     {

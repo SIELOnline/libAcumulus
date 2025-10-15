@@ -89,6 +89,8 @@ class LineCollector extends SubTypedCollector
      * This override changes the {@see \Siel\Acumulus\Data\AcumulusObject} type as
      * {@see \Siel\Acumulus\Data\Line} has no subclasses (just subtypes) but does have
      * subtype-specific collectors.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
     protected function getAcumulusObjectType(): string
     {
@@ -97,6 +99,8 @@ class LineCollector extends SubTypedCollector
 
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Empty base method.
      */
     protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
     {
@@ -113,6 +117,8 @@ class LineCollector extends SubTypedCollector
 
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Empty base method.
      */
     protected function collectAfter(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {

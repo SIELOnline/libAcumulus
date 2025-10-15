@@ -43,12 +43,17 @@ abstract class SubTypedCollector extends Collector
     /**
      * This override returns the subtype, a {@see \Siel\Acumulus\Data\LineType} constant
      * as mappings differ per subtype (address type, line type, emailAsPdf type).
+     *
+     * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
     protected function getMappingsGetForKey(): string
     {
         return $this->subType;
     }
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection Empty base method.
+     */
     protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
     {
         $acumulusObject->metadataSet(Meta::SubType, $this->subType);

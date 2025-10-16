@@ -170,6 +170,7 @@ class AcumulusProperty
     public function setValue(mixed $value, int $mode = PropertySet::Always): bool
     {
         if (in_array($value, [null, 'null', ''], true)) {
+            // Though note that unsetting will fail with mode {@see PropertySet::NotEmpty}
             $value = null;
         } else {
             switch ($this->type) {

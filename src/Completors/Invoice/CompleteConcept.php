@@ -33,8 +33,6 @@ class CompleteConcept extends BaseCompletorTask
         if ($concept === Config::Concept_Plugin) {
             $concept = $acumulusObject->hasWarning();
         }
-        if ($concept !== null) {
-            $acumulusObject->setConcept($concept, PropertySet::NotOverwrite);
-        }
+        $acumulusObject->setConcept($concept, PropertySet::NotOverwrite);
     }
 }

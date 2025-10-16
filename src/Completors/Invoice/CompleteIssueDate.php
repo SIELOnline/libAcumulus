@@ -8,6 +8,7 @@ use Siel\Acumulus\Completors\BaseCompletorTask;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Meta;
 
 use function assert;
@@ -48,8 +49,6 @@ class CompleteIssueDate extends BaseCompletorTask
             default:
                 assert(false, __METHOD__ . ": setting 'dateToUse' has an unknown value $dateToUse");
         }
-        if ($date !== null) {
-            $acumulusObject->issueDate = $date;
-        }
+        $acumulusObject->setIssueDate($date, PropertySet::NotOverwrite);
     }
 }

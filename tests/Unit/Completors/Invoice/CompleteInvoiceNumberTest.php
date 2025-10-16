@@ -51,8 +51,11 @@ class CompleteInvoiceNumberTest extends TestCase
         return [
             [Config::InvoiceNrSource_Acumulus, '2022009', 'BR2022003', null],
             [Config::InvoiceNrSource_Acumulus, 2022009, 'BR2022003', null],
+            [Config::InvoiceNrSource_Acumulus, 2022009, 'BR2022003', 1234, 1234],
             [Config::InvoiceNrSource_ShopOrder, '2022009', 'BR2022003', 2022009],
+            [Config::InvoiceNrSource_ShopOrder, '2022009', 'BR2022003', 1234, 1234],
             [Config::InvoiceNrSource_ShopInvoice, '2022009', 'BR2022003', 2022003],
+            [Config::InvoiceNrSource_ShopInvoice, '2022009', 'BR2022003', 1234, 1234],
             [Config::InvoiceNrSource_ShopOrder, null, 'BR2022003', null],
             [Config::InvoiceNrSource_ShopInvoice, '2022009', null, 2022009],
             [Config::InvoiceNrSource_ShopInvoice, null, null, null],
@@ -65,18 +68,21 @@ class CompleteInvoiceNumberTest extends TestCase
 
     /**
      * @dataProvider invoiceNumberDataProvider
-     *
-     * @param int $sourceToUse
-     * @param int|string|null $orderReference
-     * @param int|string|null $invoiceReference
-     * @param int|null $expected
      */
-    public function testComplete(int $sourceToUse, int|string|null $orderReference, int|string|null $invoiceReference, ?int $expected): void
-    {
+    public function testComplete(
+        int $sourceToUse,
+        int|string|null $orderReference,
+        int|string|null $invoiceReference,
+        ?int $expected,
+        ?int $filledIn = null
+    ): void {
         $config = $this->getContainer()->getConfig();
         $config->set('invoiceNrSource', $sourceToUse);
         $completor = $this->getContainer()->getCompletorTask('Invoice','InvoiceNumber');
         $invoice = $this->getInvoice();
+        if ($filledIn !== null) {
+            $invoice->number = $filledIn;
+        }
         $invoice->metadataSet(Meta::SourceReference, $orderReference);
         $invoice->metadataSet(Meta::ShopInvoiceReference, $invoiceReference);
         $completor->complete($invoice, $sourceToUse);

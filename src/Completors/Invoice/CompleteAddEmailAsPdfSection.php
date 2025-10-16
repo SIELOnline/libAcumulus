@@ -26,7 +26,9 @@ class CompleteAddEmailAsPdfSection extends BaseCompletorTask
     public function complete(AcumulusObject $acumulusObject, ...$args): void
     {
         assert($acumulusObject instanceof Invoice);
-        $addEmailAsPdfSection = $this->configGet('emailAsPdf');
-        $acumulusObject->metadataSet(Meta::AddEmailAsPdfSection, $addEmailAsPdfSection);
+        if (!$acumulusObject->metadataExists(Meta::AddEmailAsPdfSection)) {
+            $addEmailAsPdfSection = $this->configGet('emailAsPdf');
+            $acumulusObject->metadataSet(Meta::AddEmailAsPdfSection, $addEmailAsPdfSection);
+        }
     }
 }

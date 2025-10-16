@@ -55,6 +55,7 @@ class CompleteAccountingInfoTest extends TestCase
             ['paypal', null, null, $ccpm, $acpm, 234, 567],
             ['ideal', null, null, $ccpm, $acpm, 345, 678],
             ['card', null, null, $ccpm, $acpm, null, null],
+            ['paypal', 123, 789, $ccpm, $acpm, 890, 901, 890, 901],
         ];
     }
 
@@ -73,7 +74,9 @@ class CompleteAccountingInfoTest extends TestCase
         array $costCenterPerPaymentMethod,
         array $accountNumberPerPaymentMethod,
         ?int $expectedCostCenter,
-        ?int $expectedAccountNumber
+        ?int $expectedAccountNumber,
+        ?int $filledInCostCenter = null,
+        ?int $filledInAccountNumber = null
     ): void
     {
         $config = $this->getContainer()->getConfig();
@@ -83,6 +86,12 @@ class CompleteAccountingInfoTest extends TestCase
         $config->set('paymentMethodAccountNumber', $accountNumberPerPaymentMethod);
         $completor = $this->getContainer()->getCompletorTask('Invoice','AccountingInfo');
         $invoice = $this->getInvoice();
+        if ($filledInCostCenter !== null) {
+            $invoice->costCenter = $filledInCostCenter;
+        }
+        if ($filledInAccountNumber !== null) {
+            $invoice->accountNumber = $filledInAccountNumber;
+        }
         $invoice->metadataSet(Meta::PaymentMethod, $paymentMethod);
         $completor->complete($invoice);
         $this->assertSame($expectedCostCenter, $invoice->costCenter);

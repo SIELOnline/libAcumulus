@@ -53,7 +53,32 @@ class CompleteAddEmailAsPdfSectionTest extends TestCase
         $completor->complete($invoice);
         $this->assertTrue($invoice->metadataGet(Meta::AddEmailAsPdfSection));
 
+        $invoice = $this->getInvoice();
         $config->set('emailAsPdf', false);
+        $completor->complete($invoice);
+        $this->assertFalse($invoice->metadataGet(Meta::AddEmailAsPdfSection));
+    }
+
+    public function testCompleteAlreadyTrue(): void
+    {
+        $config = $this->getContainer()->getConfig();
+        $completor = $this->getContainer()->getCompletorTask('Invoice','AddEmailAsPdfSection');
+        $invoice = $this->getInvoice();
+        $invoice->metadataSet(Meta::AddEmailAsPdfSection, true);
+
+        $config->set('emailAsPdf', false);
+        $completor->complete($invoice);
+        $this->assertTrue($invoice->metadataGet(Meta::AddEmailAsPdfSection));
+    }
+
+    public function testCompleteAlreadyFalse(): void
+    {
+        $config = $this->getContainer()->getConfig();
+        $completor = $this->getContainer()->getCompletorTask('Invoice','AddEmailAsPdfSection');
+        $invoice = $this->getInvoice();
+        $invoice->metadataSet(Meta::AddEmailAsPdfSection, false);
+
+        $config->set('emailAsPdf', true);
         $completor->complete($invoice);
         $this->assertFalse($invoice->metadataGet(Meta::AddEmailAsPdfSection));
     }

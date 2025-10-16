@@ -50,6 +50,8 @@ class CompleteTemplateTest extends TestCase
             [Api::PaymentStatus_Paid, 123, 789, 789],
             [Api::PaymentStatus_Due, 123, 0, 123],
             [Api::PaymentStatus_Paid, 123, 0, 123],
+            [Api::PaymentStatus_Due, 123, 789, 456, 456],
+            [Api::PaymentStatus_Paid, 123, 0, 567, 567],
         ];
     }
 
@@ -60,15 +62,27 @@ class CompleteTemplateTest extends TestCase
      * @param int $defaultInvoiceTemplate
      * @param int $defaultInvoicePaidTemplate
      * @param int $expected
+     * @param ?int $filledIn
+     *
+     * @todo: add cases where template has already been filled in.
+     *    and do the same for all other completors...
      */
-    public function testComplete(int $paymentStatus, int $defaultInvoiceTemplate, int $defaultInvoicePaidTemplate, int $expected): void
-    {
+    public function testComplete(
+        int $paymentStatus,
+        int $defaultInvoiceTemplate,
+        int $defaultInvoicePaidTemplate,
+        int $expected,
+        ?int $filledIn = null
+    ): void {
         $config = $this->getContainer()->getConfig();
         $config->set('defaultInvoiceTemplate', $defaultInvoiceTemplate);
         $config->set('defaultInvoicePaidTemplate', $defaultInvoicePaidTemplate);
         $completor = $this->getContainer()->getCompletorTask('Invoice','Template');
         $invoice = $this->getInvoice();
         $invoice->paymentStatus = $paymentStatus;
+        if ($filledIn !== null) {
+            $invoice->template = $filledIn;
+        }
         $completor->complete($invoice);
         $this->assertEquals($expected, $invoice->template);
     }

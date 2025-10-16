@@ -8,6 +8,7 @@ use Siel\Acumulus\Completors\BaseCompletorTask;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Meta;
 
 use function assert;
@@ -49,11 +50,16 @@ class CompleteInvoiceNumber extends BaseCompletorTask
                 assert(false, __METHOD__ . ": setting 'invoiceNrSource' has an unknown value $sourceToUse");
         }
         if (is_string($number)) {
-            // Remove any prefix consisting of non-numerical characters.
-            $number = preg_replace('/^\D+/', '', $number);
+            // Remove any prefix consisting of non-numerical characters. Any non-numeric
+            // characters not at the beginning of the string will be removed when
+            // converting to an int.
+            $number = (int) preg_replace('/^\D+/', '', $number);
         }
-        if (!empty($number)) {
-            $acumulusObject->number = (int) $number;
+        // if the "number" as extracted from one of the metadata values is not a real
+        // number, let Acumulus decide.
+        if ($number === 0) {
+            $number = null;
         }
+        $acumulusObject->setNumber($number, PropertySet::NotOverwrite);
     }
 }

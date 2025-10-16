@@ -10,6 +10,8 @@ use Siel\Acumulus\Data\AcumulusObject;
 
 use Siel\Acumulus\Data\Invoice;
 
+use Siel\Acumulus\Data\PropertySet;
+
 use function assert;
 
 /**
@@ -37,8 +39,6 @@ class CompleteTemplate extends BaseCompletorTask
         } else {
             $template = $defaultInvoicePaidTemplate;
         }
-        if (!empty($template)) {
-            $acumulusObject->template = $template;
-        }
+        $acumulusObject->setTemplate($template, PropertySet::NotOverwriteNotEmpty);
     }
 }

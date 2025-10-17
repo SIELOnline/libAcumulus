@@ -26,13 +26,13 @@ class Event implements EventInterface
     public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        Hook::exec('actionAcumulusItemLineCollectBefore', compact('line', 'propertySources'));
+        Hook::exec('actionAcumulusLineCollectBefore', compact('line', 'propertySources'));
     }
 
     public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        Hook::exec('actionAcumulusItemLineCollectAfter', compact('line', 'propertySources'));
+        Hook::exec('actionAcumulusLineCollectAfter', compact('line', 'propertySources'));
     }
 
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void

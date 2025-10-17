@@ -321,8 +321,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     public function getPaymentMethods(): array
     {
-        $paymentModules = PaymentModule::getInstalledPaymentModules();
         $result = [];
+        $paymentModules = PaymentModule::getInstalledPaymentModules();
         foreach($paymentModules as $paymentModule)
         {
             $module = Module::getInstanceById($paymentModule['id_module']);

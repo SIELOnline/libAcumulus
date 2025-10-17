@@ -24,11 +24,13 @@ class Event implements EventInterface
 
     public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
     {
+        // @error: rename to acumulus_line_collect_before.
         $this->getEventManager()->dispatch('acumulus_item_line_collect_before', compact('line', 'propertySources'));
     }
 
     public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
     {
+        // @error: rename to acumulus_line_collect_after.
         $this->getEventManager()->dispatch('acumulus_item_line_collect_after', compact('line', 'line', 'propertySources'));
     }
 

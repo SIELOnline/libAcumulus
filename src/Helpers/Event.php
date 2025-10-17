@@ -44,7 +44,8 @@ interface Event
      * - Inject custom behaviour before an item line is collected, but before it is
      *   completed and sent.
      * - Prevent a line being collected and added to the invoice by setting the metadata
-     *   value {@see \Siel\Acumulus\Meta::DoNotAdd} to true.
+     *   value {@see \Siel\Acumulus\Meta::DoNotAdd} to true:
+     *   <code>$line->metadataSet(Meta::DoNotAdd, true);</code>
      *
      * @param \Siel\Acumulus\Data\Line $line
      *   The line to store the collected values in.
@@ -72,11 +73,14 @@ interface Event
      * This event allows you to:
      * - Remove property sources added during the {@see triggerLineCollectBefore}
      *   event.
+     * - Prevent a line being collected and added to the invoice by setting the metadata
+     *   value {@see \Siel\Acumulus\Meta::DoNotAdd} to true:
+     *   <code>$line->metadataSet(Meta::DoNotAdd, true);</code>
      * - Inject custom behaviour after an item line has been collected, but before it is
      *   completed and sent.
      *
      * @param \Siel\Acumulus\Data\Line $line
-     *    The collected item line.
+     *   The collected item line.
      *   The item (line) for which this item line has been collected.The product sold (or
      *   refunded) on the item (line) can be retrieved with $item->getProduct().
      * @param \Siel\Acumulus\Collectors\PropertySources $propertySources

@@ -13,6 +13,10 @@ Features:
 Bugs:
 - ALL: Completors should complete not overwrite values already set.
 
+Refactorings:
+- ALL: Generalise class totals towards a class Amount (split into part amount and part
+  VAT) allowing to retrieve its separate parts and which parts were calculated.
+
 
 8.6.4 (2025-10-15) (PS)
 -----------------------

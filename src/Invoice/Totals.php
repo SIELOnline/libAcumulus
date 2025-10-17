@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice;
 
+use function assert;
+use function in_array;
+
 /**
  * Totals holds metadata about the invoice totals of an order/refund.
  *
- * @todo: what if we have 1 amount (ex or inc) and a vat rate? how to handle that
+ * @todo: this class now represents a more generalised "amount" (broken up into its parts)
+ *   and thus can probably be used more widely.
+ * @todo: add precision?
  */
 class Totals
 {
@@ -32,42 +37,103 @@ class Totals
      */
     public array $calculated;
 
-    public function __construct(?float $amountInc, ?float $amountVat, ?float $amountEx = null)
+    /**
+     * Constructor for an amount.
+     *
+     * Typically 2 out of the 4 parameters are passed and the others are then calculated.
+     * This simplifies extracting amounts from webshop data stores: just pass what is
+     * directly available, do not try to calculate yourself. This also allows to factor in
+     * some precision as this class keeps track of whic fields were calculated.
+     *
+     */
+    public function __construct(?float $amountInc, ?float $amountVat, ?float $amountEx = null, ?float $vatRate = null)
     {
-        if (!isset($amountEx)) {
-            $amountEx = $amountInc - $amountVat;
-            $calculated = 'amountEx';
-        } elseif (!isset($amountInc)) {
-            $amountInc = $amountEx + $amountVat;
-            $calculated = 'amountInc';
-        } elseif (!isset($amountVat)) {
-            $amountVat = $amountInc - $amountEx;
-            $calculated = 'amountVat';
-        }
+        $calculated = $this->completeParameters($amountInc, $amountVat, $amountEx, $vatRate);
+
         $this->amountInc = $amountInc;
         $this->amountVat = $amountVat;
         $this->amountEx = $amountEx;
-        $this->calculated = [$calculated] ?? [];
+        $this->calculated = $calculated;
     }
 
-    public function add(?float $amountInc, ?float $amountVat, ?float $amountEx = null): void
+    public function add(?float $amountInc, ?float $amountVat, ?float $amountEx = null, ?float $vatRate = null): static
     {
-        if (!isset($amountEx)) {
-            $amountEx = $amountInc - $amountVat;
-            $calculated = 'amountEx';
-        } elseif (!isset($amountInc)) {
-            $amountInc = $amountEx + $amountVat;
-            $calculated = 'amountInc';
-        } elseif (!isset($amountVat)) {
-            $amountVat = $amountInc - $amountEx;
-            $calculated = 'amountVat';
-        }
+        $calculated = $this->completeParameters($amountInc, $amountVat, $amountEx, $vatRate);
+
+        $this->amountEx += $amountEx;
         $this->amountInc += $amountInc;
         $this->amountVat += $amountVat;
-        $this->amountEx += $amountEx;
-        if (isset($calculated)) {
-            $this->calculated[] = $calculated;
-            $this->calculated = array_unique($this->calculated);
+        $this->calculated += array_unique(array_merge($this->calculated, $calculated));
+        return $this;
+    }
+
+    /**
+     * Calculates all parameters that were passed as null.
+     *
+     * @return string[]
+     *   The list of parameter names that were null and are now calculated.
+     */
+    private function completeParameters(?float &$amountInc, ?float &$amountVat, ?float &$amountEx, ?float $vatRate): array
+    {
+        assert($vatRate === null || ($vatRate >= 0.0 && $vatRate < 1.0));
+        $calculated = [];
+        // Check if amount ex is set, otherwise calculate it.
+        if ($amountEx === null) {
+            if ($amountInc === null) {
+                assert($amountVat !== null && $vatRate !== null);
+                // Quite a special situation: only vat amount and rate are known. We can
+                // calculate the amount ex (and thus inc), but the results can have a very
+                // low precision. But we (have to) continue anyway.
+                $amountEx = $amountVat / $vatRate;
+            } elseif ($amountVat === null) {
+                assert($vatRate !== null);
+                // Amount inc and vat rate known: as consumers we see this all the time:
+                // calculate the amount ex.
+                $amountEx = $amountInc / (1 + $vatRate);
+            } else {
+                // Amount inc and vat amount known: easy to calculate the amount ex.
+                $amountEx = $amountInc - $amountVat;
+            }
+            $calculated[] = 'amountEx';
         }
+
+        // Check if amount inc is set, otherwise calculate it.
+        if ($amountInc === null) {
+            if ($amountVat === null) {
+                assert($vatRate !== null);
+                $amountInc = (1 + $vatRate) * $amountEx;
+            } else {
+                $amountInc = $amountEx + $amountVat;
+            }
+            $calculated[] = 'amountInc';
+        }
+
+        // Check if AmountVat is set, otherwise calculate it.
+        if ($amountVat === null) {
+            $amountVat = $amountInc - $amountEx;
+            $calculated[] = 'amountVat';
+        }
+
+        return $calculated;
+    }
+
+    public function getVatRate(): float
+    {
+        return $this->amountVat / $this->amountEx;
+    }
+
+    public function isAmountIncCalculated(): bool
+    {
+        return in_array('amountInc', $this->calculated, true);
+    }
+
+    public function isAmountExCalculated(): bool
+    {
+        return in_array('amountEx', $this->calculated, true);
+    }
+
+    public function isAmountVatCalculated(): bool
+    {
+        return in_array('amountVat', $this->calculated, true);
     }
 }

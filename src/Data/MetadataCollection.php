@@ -117,7 +117,7 @@ class MetadataCollection
     }
 
     /**
-     * Sets a set of metadata fields.
+     * Sets a metadata list field.
      *
      * @param string $name
      *   The name for the metadata field.

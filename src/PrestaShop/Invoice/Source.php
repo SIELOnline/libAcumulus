@@ -10,25 +10,22 @@ use Context;
 use Country;
 use Currency;
 use Db;
-use Mollie\Factory\ModuleFactory;
-use Mollie\Repository\MolOrderPaymentFeeRepositoryInterface;
-use MolOrderPaymentFee;
 use Order;
 use OrderSlip;
 use PrestaShop\PrestaShop\Core\Domain\Order\VoucherRefundType;
 use PrestaShop\PrestaShop\Core\Version;
-use PrestaShopCollection;
 use RuntimeException;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Currency as AcumulusCurrency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
 
+use Siel\Acumulus\Meta;
 use Validate;
 
-use function count;
 use function is_array;
 use function sprintf;
 use function strlen;
@@ -197,6 +194,8 @@ class Source extends BaseSource
      *
      * This override provides the values 'meta-invoice-amountinc' and
      * 'meta-invoice-amount' for PrestaShop
+     *
+     * @throws \PrestaShopException
      */
     public function getTotals(): Totals
     {
@@ -251,8 +250,16 @@ class Source extends BaseSource
                 }
             }
         }
-
-        return new Totals($sign * $amountInc, null, $sign * $amountEx);
+        $totals = new Totals($sign * $amountInc, null, $sign * $amountEx);
+        foreach ($this->getPaymentFeeLineInfos() as $paymentFeeLineInfo) {
+            $totals->add(
+                $paymentFeeLineInfo->metadataGet(Meta::UnitPriceInc),
+                $paymentFeeLineInfo->metadataGet(Meta::VatAmount),
+                $paymentFeeLineInfo->unitPrice,
+                $paymentFeeLineInfo->vatRate
+            );
+        }
+        return $totals;
     }
 
     /**
@@ -454,50 +461,15 @@ class Source extends BaseSource
      *
      * For now, only orders can have a payment fee.
      *
+     * @return Line[]
+     *
      * @throws \PrestaShopException
      *
      * @noinspection PhpMissingParentCallCommonInspection Empty base method.
      */
     public function getPaymentFeeLineInfos(): array
     {
-        return array_merge($this->getMolliePaymentFeeLineInfos(), $this->getPayPalWithAFeePaymentFeeLineInfos());
-    }
-
-    /**
-     * Gets payment fees for the current order as registered by the Mollie module.
-     *
-     * @throws \PrestaShopException
-     *
-     * @todo: extract into a separate 3rd party module support class? (see WC)
-     */
-    private function getMolliePaymentFeeLineInfos(): array
-    {
-        if ($this->getType() === Source::Order && class_exists(ModuleFactory::class)) {
-            $paymentFeeRepository = (new ModuleFactory())->getModule()?->getService(MolOrderPaymentFeeRepositoryInterface::class);
-            if ($paymentFeeRepository instanceof MolOrderPaymentFeeRepositoryInterface) {
-                $paymentFee = $paymentFeeRepository->findOneBy(['id_order' => $this->getId()]);
-                if ($paymentFee instanceof MolOrderPaymentFee) {
-                    return [$paymentFee];
-                }
-            }
-        }
-        return [];
-    }
-
-    /**
-     * Gets payment fees for the current order as registered by the PayPal with a fee module.
-     */
-    private function getPayPalWithAFeePaymentFeeLineInfos(): array
-    {
-        $order = $this->getShopObject();
-        /**
-         * @noinspection MissingIssetImplementationInspection These fields are set by
-         *   the module "PayPal with a fee".
-         */
-        if (isset($order->payment_fee, $order->payment_fee_rate) && (float) $order->payment_fee !== 0.0) {
-            return [$this];
-        }
-        return [];
+        return (new ThirdPartyModuleSupport($this))->getPaymentFeeLineInfos();
     }
 
     /**

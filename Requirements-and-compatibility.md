@@ -41,8 +41,8 @@ Notes:
 | Tag | Shop             | Version used for testing | Supported versions                  |
 |-----|------------------|--------------------------|-------------------------------------|
 | ALL | All webshops.    |                          |                                     |
-| HS  | HikaShop (JOO)   | 5.1.0 (starter)          | >= 4.0.0                            |
-| JOO | Joomla (+ HS)    | 4.4.6                    | >= 4.2.5                            | 
+| HS  | HikaShop (JOO)   | 6.1.0 (starter)          | >= 4.0.0                            |
+| JOO | Joomla (+ HS)    | 5.4.0                    | >= 4.2.5                            | 
 | MA  | Magento          | 2.4.8 (community)        | >= 2.4, 2.3 might still work        |
 | OC  | OpenCart         | 3.0.3.9                  | >= 3.0.3.9                          |
 |     |                  | 4.0.2.3                  | >= 4.0                              |
@@ -68,15 +68,16 @@ Notes:
 - HikaShop forum: "4.4.3 fully supports PHP 8.0"
 - HikaShop changelog: 4.6.0 first fix mentioning 8.1; 5.0.1 last fix mentioning 8.1
 - HikaShop changelog: 4.7.2 first fix mentioning 8.2; 5.1.0 last fix mentioning 8.2
+- Joomla 5.1.2 emits many warnings on 8.4
 
 | Tag | Shop Version      | 8.1 | 8.2 | 8.3 | 8.4 | Remarks                                       |
 |-----|-------------------|-----|-----|-----|-----|-----------------------------------------------|
 | JOO | 4.4.6             | ✅  | ❓  | ❓  | ❓  | JOO 4 on PHP 8.0 warns about EOL              |
-| JOO | 5.1               | ✅  | ❓  | ❓  | ❓  | JOO 5 on PHP 8.0 warns about EOL              |
-| HS  | 5.1.0 (starter)   | ✅  | ❓  | ❓  | ❓  |                                               |
+| JOO | 5.4               | ✅  | ✅  | ✅  | ❓  | Warnings on PHP 8.4 (Implicit nullable types) |
+| HS  | 6.1.0 (starter)   | ✅  | ✅  | ✅  | ❓  |                                               |
 | MA  | 2.4.6 (community) | ✅  | ✅  | ✅  | ✅  |                                               |
 | OC  | 3.0.3.9           | ✅  | ❌  | ❌  | ❌  | 3.0.3.9 is said to be compatible with PHP 8.1 |
 |     | 4.0.2.3           | ✅  | ❓  | ❓  | ❓  |                                               |
-| PS  | 9.0               | ✅  | ✅  | ✅  | ✅  | Warnings on PHP 8.4 (Implicitly marking ...)  |
+| PS  | 9.0               | ✅  | ✅  | ✅  | ✅  | Warnings on PHP 8.4 (Implicit nullable types) |
 | VM  | 4.2.0             | ✅  | ❓  | ❓  | ❓  | VM 4.2 still produces warnings on 8.1         |
 | WC  | 9.1.0             | ✅  | ✅  | ✅  | ❓  | Many warnings from other plugins on 8.1       |

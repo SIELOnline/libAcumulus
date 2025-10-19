@@ -9,7 +9,7 @@ Updates:
 - System requirements: valid for our version 8.6
 - Supported shops and versions: August 2025: MA, WC. July 2024 (others)
 - Supported PHP versions: August 2025.
-- Tested PS 9 up to PHP 8.3: October 2025
+- Tested PS 9 up to PHP 8.4: October 2025
 
 System Requirements
 -------------------
@@ -77,6 +77,6 @@ Notes:
 | MA  | 2.4.6 (community) | ✅  | ✅  | ✅  | ✅  |                                               |
 | OC  | 3.0.3.9           | ✅  | ❌  | ❌  | ❌  | 3.0.3.9 is said to be compatible with PHP 8.1 |
 |     | 4.0.2.3           | ✅  | ❓  | ❓  | ❓  |                                               |
-| PS  | 9.0               | ✅  | ✅  | ✅  | ❓  |                                               |
+| PS  | 9.0               | ✅  | ✅  | ✅  | ✅  | Warnings on PHP 8.4 (Implicitly marking ...)  |
 | VM  | 4.2.0             | ✅  | ❓  | ❓  | ❓  | VM 4.2 still produces warnings on 8.1         |
 | WC  | 9.1.0             | ✅  | ✅  | ✅  | ❓  | Many warnings from other plugins on 8.1       |

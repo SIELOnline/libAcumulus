@@ -31,14 +31,14 @@ class Item extends BaseItem
      * {@inheritdoc}
      *
      * HikaShop stores all "relevant" product data in the item (an order_product) itself,
-     * allowing to retrieve product data as it was at the time of placing the order, so
+     * allowing to retrieve product data as it was at the time of placing the order. So,
      * preferably use these fields. However, exactly what should be considered relevant
      * varies from use case to use case, therefore we do load the product record and
      * return it, so data that was not put in the order_product table can still be
      * accessed.
      *
-     * It may still return null if not found (no longer available), or product_id is empty
-     * to begin with.
+     * It may still return null if not found (no longer available), or if product_id is
+     * empty to begin with.
      */
     protected function createProduct(): ?Product
     {

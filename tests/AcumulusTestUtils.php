@@ -74,6 +74,9 @@ LONGSTRING;
         return __DIR__;
     }
 
+    /**
+     * Returns the path to the data folder of the actual web shop.
+     */
     protected function getDataPath(): string
     {
         $shopNamespace = self::getContainer()->getShopNamespace();
@@ -351,7 +354,7 @@ LONGSTRING;
             /** @noinspection UntrustedInclusionInspection The variable contains an absolute path. */
             include $phpFileName;
         } elseif (is_readable($fullFileName)) {
-            // @todo: add a "doing it wrong".
+            self::assertTrue(false, 'Switch to use PHP files for mails instead of text files');
             eval('$mail = ' . file_get_contents($fullFileName) . ';');
         }
         /** @noinspection PhpExpressionAlwaysNullInspection */
@@ -452,10 +455,11 @@ LONGSTRING;
      *
      * @param string $name
      *   The name under which the log message was saved.
-     * @param array|false $logMessage
-     *   The mail sent, or false if no log was sent.
+     * @param array $logMessage
+     *   The mail sent, or false if no log was sent, though false will lead to an
+     *   immediate test assertion failure.
      */
-    protected function assertLogMatches(string $name, array|false $logMessage): void
+    protected function assertLogMatches(string $name, mixed $logMessage): void
     {
         self::assertIsArray($logMessage);
         $this->saveTestLogMessage($name, $logMessage);

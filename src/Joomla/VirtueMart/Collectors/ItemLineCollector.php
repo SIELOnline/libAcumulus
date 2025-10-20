@@ -44,7 +44,7 @@ class ItemLineCollector extends LineCollector
     protected function getItemLine(Line $line, PropertySources $propertySources): void
     {
         // Set some often used variables.
-        /** @var \Siel\Acumulus\Joomla\HikaShop\Invoice\Item $shopItem */
+        /** @var \Siel\Acumulus\Joomla\VirtueMart\Invoice\Item $item */
         $item = $propertySources->get('item');
         $shopItem = $item->getShopObject();
 

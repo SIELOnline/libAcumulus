@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Joomla\Mail;
 use Exception;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Mail\Mail;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Mail\MailerInterface;
 use Siel\Acumulus\Mail\Mailer as BaseMailer;
@@ -18,12 +19,14 @@ class Mailer extends BaseMailer
 {
     /**
      * {@inheritdoc}
+     *
+     * @throws \PHPMailer\PHPMailer\Exception
      */
     protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml):
     bool|int|string {
         /** @var MailerInterface $mailer */
         $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
-        if ($mailer instanceof Mailer) {
+        if ($mailer instanceof Mail) {
             $mailer->isHTML(true);
         }
         $mailer->setSender($from, $fromName);

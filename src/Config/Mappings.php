@@ -282,7 +282,7 @@ class Mappings
                 Fld::EmailOnWarning => 'plugins@siel.nl',
             ],
             DataType::Connector => [
-                Fld::Application => '[environment::shopName+environment::shopVersion+"("&environment::cmsName+environment::cmsName&")"]',
+                Fld::Application => '[environment::shopName+environment::shopVersion+"("&environment::cmsName+environment::cmsVersion&")"]',
                 Fld::WebKoppel => '["Acumulus"+environment::moduleVersion]',
                 Fld::Development => 'SIEL - Buro RaDer',
                 Fld::Remark => '["Library"+environment::libraryVersion+"- PHP"+environment::phpVersion]',

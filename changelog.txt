@@ -3,8 +3,8 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.6.5 (2025-10-??) (PS)
------------------------
+8.6.5 (2025-10-??) (PS|HS|VM)
+-----------------------------
 Features:
 - PS: Updated the acumulus_customise_invoice module to this version of the module and
   base library.
@@ -12,6 +12,8 @@ Features:
 
 Bugs:
 - ALL: Completors should complete not overwrite values already set.
+- JOO|WP: CMS version not mentioned in <connector> tag in messages to the Acumulus API.
+- JOO: Mails were not sent as HTML mails but as text mails with HTML tags.
 
 Refactorings:
 - ALL: Generalise class totals towards a class Amount (split into part amount and part

@@ -84,9 +84,10 @@ class ItemLineCollector extends LineCollector
         // VAT lookup metadata should be based on the address used for VAT calculations.
         /** @noinspection NullPointerExceptionInspection */
         $vatBasedOn = $invoice->getCustomer()->getMainAddressType();
-        $addressId = $vatBasedOn === AddressType::Invoice
+        /** @noinspection UnnecessaryCastingInspection  those properties might be numeric strings. */
+        $addressId = (int) ($vatBasedOn === AddressType::Invoice
             ? $source->getOrder()->getShopObject()->id_address_invoice
-            : $source->getOrder()->getShopObject()->id_address_delivery;
+            : $source->getOrder()->getShopObject()->id_address_delivery);
         $this->addVatRateLookupMetadata($line, $addressId, $taxRulesGroupId);
 
         /** @noinspection UnsupportedStringOffsetOperationsInspection */

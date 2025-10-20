@@ -68,7 +68,8 @@ class GiftWrappingFeeLineCollector extends LineCollector
 
         $this->addVatRateLookupMetadata(
             $line,
-            $source->getShopObject()->id_address_invoice,
+            /** @noinspection UnnecessaryCastingInspection  this property might be a numeric string. */
+            (int) $source->getShopObject()->id_address_invoice,
             (int) Configuration::get('PS_GIFT_WRAPPING_TAX_RULES_GROUP')
         );
         $line->product = $this->t('gift_wrapping');

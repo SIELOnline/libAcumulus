@@ -25,16 +25,14 @@ class Event implements EventInterface
 
     public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
     {
-        // @error: rename to lineCollect.
-        $route = Registry::getInstance()->getAcumulusTrigger('itemLineCollect', 'before');
+        $route = Registry::getInstance()->getAcumulusTrigger('lineCollect', 'before');
         $args = compact('line', 'propertySources');
         $this->getEvent()->trigger($route, $args);
     }
 
     public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
     {
-        // @error: rename to lineCollect.
-        $route = Registry::getInstance()->getAcumulusTrigger('itemLineCollect', 'after');
+        $route = Registry::getInstance()->getAcumulusTrigger('lineCollect', 'after');
         $args = compact('line', 'propertySources');
         $this->getEvent()->trigger($route, $args);
     }
@@ -42,6 +40,13 @@ class Event implements EventInterface
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $route = Registry::getInstance()->getAcumulusTrigger('invoiceCollect', 'after');
+        $args = compact('invoice', 'invoiceSource', 'localResult');
+        $this->getEvent()->trigger($route, $args);
+    }
+
+    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
+        $route = Registry::getInstance()->getAcumulusTrigger('invoiceCreate', 'after');
         $args = compact('invoice', 'invoiceSource', 'localResult');
         $this->getEvent()->trigger($route, $args);
     }

@@ -41,6 +41,12 @@ class Event implements EventInterface
         Hook::exec('actionAcumulusInvoiceCollectAfter', compact('invoice', 'invoiceSource', 'localResult'));
     }
 
+    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        Hook::exec('actionAcumulusInvoiceCreateAfter', compact('invoice', 'invoiceSource', 'localResult'));
+    }
+
     public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */

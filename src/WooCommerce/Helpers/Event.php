@@ -36,6 +36,11 @@ class Event implements EventInterface
         do_action('acumulus_invoice_collect_after', $invoice, $invoiceSource, $localResult);
     }
 
+    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
+        do_action('acumulus_invoice_create_after', $invoice, $invoiceSource, $localResult);
+    }
+
     public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
     {
         do_action('acumulus_invoice_send_before', $invoice, $localResult);

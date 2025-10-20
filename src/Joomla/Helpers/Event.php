@@ -41,6 +41,11 @@ class Event implements EventInterface
         $this->triggerEvent('onAcumulusInvoiceCollectAfter', compact('invoice', 'invoiceSource', 'localResult'));
     }
 
+    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
+        $this->triggerEvent('onAcumulusInvoiceCreateAfter', compact('invoice', 'invoiceSource', 'localResult'));
+    }
+
     public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
     {
         $this->triggerEvent('onAcumulusInvoiceSendBefore', compact('invoice', 'localResult'));

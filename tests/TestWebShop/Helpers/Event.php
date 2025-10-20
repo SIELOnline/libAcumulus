@@ -12,12 +12,13 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 
 /**
- * Event implements the {@see \Siel\Acumulus\Helpers\Event} interface for the test webshop.
+ * Event implements the {@see EventInterface Event interface} for the test webshop.
  */
 class Event implements EventInterface
 {
     public const INVOICE_CREATE_BEFORE = 'triggerInvoiceCreateBefore';
     public const INVOICE_COLLECT_AFTER = 'triggerInvoiceCollectAfter';
+    public const INVOICE_CREATE_AFTER = 'triggerInvoiceCreateAfter';
     public const INVOICE_SEND_BEFORE = 'triggerInvoiceSendBefore';
     public const INVOICE_SEND_AFTER = 'triggerInvoiceSendAfter';
     public const LINE_COLLECT_BEFORE = 'triggerLineCollectBefore';
@@ -55,9 +56,6 @@ class Event implements EventInterface
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         self::triggerHooks(self::INVOICE_CREATE_BEFORE, $invoiceSource, $localResult);
@@ -73,25 +71,21 @@ class Event implements EventInterface
         self::triggerHooks(self::LINE_COLLECT_AFTER, $line, $propertySources);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         self::triggerHooks(self::INVOICE_COLLECT_AFTER, $invoice, $invoiceSource, $localResult);
     }
 
-    /**
-     * @inheritDoc
-     */
+    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
+        self::triggerHooks(self::INVOICE_CREATE_AFTER, $invoice, $invoiceSource, $localResult);
+    }
+
     public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
     {
         self::triggerHooks(self::INVOICE_SEND_BEFORE, $invoice, $localResult);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         self::triggerHooks(self::INVOICE_SEND_AFTER, $invoice, $invoiceSource, $result);

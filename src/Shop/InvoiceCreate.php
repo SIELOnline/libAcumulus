@@ -77,6 +77,7 @@ class InvoiceCreate
             $this->getEvent()->triggerInvoiceCollectAfter($invoice, $invoiceSource, $result);
             if (!$result->isSendingPrevented()) {
                 $this->getInvoiceCompletor()->setSource($invoiceSource)->complete($invoice, $result);
+                $this->getEvent()->triggerInvoiceCreateAfter($invoice, $invoiceSource, $result);
             }
         }
         return $invoice ?? null;

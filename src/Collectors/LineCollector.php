@@ -60,14 +60,14 @@ use Siel\Acumulus\Meta;
  * Then hierarchical lines are created and stored under the {@see Line::$children}
  * property.
  *
- * ad 1)
+ * Ad 1)
  * For each option or variant you add a child line. Set metadata
  * {@see Meta::VatRateSource} to {@see VatRateSource::Parent}. Copy the quantity from the
  * parent to the child. Price info is probably on the parent line only, unless your shop
  * administers additional or reduced costs for a given option on the child lines in which
  * case the difference should be set as {@see Line::$unitPrice}.
  *
- * ad 2)
+ * Ad 2)
  * For each product that is part of the bundle, add a child line. As this may be a
  * bundle/composed product on its own, you may create multiple levels. There is no
  * maximum depth on child lines.
@@ -100,10 +100,13 @@ class LineCollector extends SubTypedCollector
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *
-     * @noinspection PhpMissingParentCallCommonInspection Empty base method.
+     * @noinspection PhpMissingParentCallCommonInspection Base method does not what we want.
      */
-    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
-    {
+    protected function collectBefore(
+        AcumulusObject $acumulusObject,
+        PropertySources $propertySources,
+        ArrayObject $fieldSpecifications
+    ): void {
         $acumulusObject->setType($this->subType);
         // ItemLineCollectors only: add the {@see Product} as a property source.
         if ($propertySources->get('item') instanceof Item) {
@@ -181,7 +184,7 @@ class LineCollector extends SubTypedCollector
      *   original denominator will not differ more than half of this.
      *
      * @deprecated : Move this from the collector to the completor phase:
-     *   DONE leave for reference
+     *   DONE left for reference.
      */
     public static function addVatRangeTags(
         Line $line,

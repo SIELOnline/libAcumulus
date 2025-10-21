@@ -12,8 +12,8 @@ use stdClass;
 /**
  * Item is the VirtueMart specific class to wrap an order/refund item.
  *
- * @method object getShopObject() $shopObject
- * @property object $shopObject A virtuemart_order_items table record
+ * @method stdClass getShopObject() $shopObject
+ * @property stdClass $shopObject A virtuemart_order_items table record
  */
 class Item extends BaseItem
 {

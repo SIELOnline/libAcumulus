@@ -26,6 +26,8 @@ class ItemLineCollector extends LineCollector
      *
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   An item line with the mapped fields filled in.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection empty parent.
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
@@ -90,7 +92,6 @@ class ItemLineCollector extends LineCollector
             : $source->getOrder()->getShopObject()->id_address_delivery);
         $this->addVatRateLookupMetadata($line, $addressId, $taxRulesGroupId);
 
-        /** @noinspection UnsupportedStringOffsetOperationsInspection */
         $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
     }
 }

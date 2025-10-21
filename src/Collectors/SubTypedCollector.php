@@ -54,8 +54,11 @@ abstract class SubTypedCollector extends Collector
     /**
      * @noinspection PhpMissingParentCallCommonInspection Empty base method.
      */
-    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
-    {
+    protected function collectBefore(
+        AcumulusObject $acumulusObject,
+        PropertySources $propertySources,
+        ArrayObject $fieldSpecifications
+    ): void {
         $acumulusObject->metadataSet(Meta::SubType, $this->subType);
     }
 }

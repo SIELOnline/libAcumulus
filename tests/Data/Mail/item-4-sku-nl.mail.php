@@ -1,9 +1,18 @@
-array (
-  'from' => 'unit.test@example.com',
-  'fromName' => 'Unit Test | Example',
-  'to' => 'admin@example.com',
-  'subject' => 'Voorraadmutatie verzonden naar Acumulus: fout(en)',
-  'bodyText' => 'Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten
+<?php
+/**
+ * @noinspection GrazieInspection
+ * @noinspection SpellCheckingInspection
+ */
+
+declare(strict_types=1);
+
+$mail =
+    [
+        'from' => 'unit.test@example.com',
+        'fromName' => 'Unit Test | Example',
+        'to' => 'admin@example.com',
+        'subject' => 'Voorraadmutatie verzonden naar Acumulus: fout(en)',
+        'bodyText' => 'Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten
 opgetreden. De voorraadmutatie is niet verwerkt in Acumulus. Pas de
 zoekdata in uw webshop (of in Acumulus) aan.
 
@@ -12,7 +21,7 @@ Over de voorraadmutatie:
 Bestelling:                1
 Bestelregel:               4
 Product (Webwinkel):       TEST-ZWA
-Mutatie:                   +1
+Mutatie:                   +5
 Product (Acumulus):        onbekend
 Voorraadniveau (Acumulus): niet aangemaakt in Acumulus
 Verzendresultaat:          32 - "is niet verzonden"
@@ -23,14 +32,14 @@ Meldingen:
 
 Meer informatie over de terugkoppeling van de vermeldde foutcodes kunt u vinden op https://www.siel.nl/acumulus/API/Basic_Response/
 ',
-  'bodyHtml' => '<p>Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten opgetreden.
+        'bodyHtml' => '<p>Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten opgetreden.
 De voorraadmutatie is niet verwerkt in Acumulus. Pas de zoekdata in uw webshop (of in Acumulus) aan.</p>
 <h3>Over de voorraadmutatie</h3>
 <table style="text-align: left;">
 <tr><th>Bestelling</th><td>1</td></tr>
 <tr><th>Bestelregel</th><td>4</td></tr>
 <tr><th>Product (Webwinkel)</th><td><a href="#">TEST-ZWA</a></td></tr>
-<tr><th>Mutatie</th><td>+1</td></tr>
+<tr><th>Mutatie</th><td>+5</td></tr>
 <tr><th>Product (Acumulus)</th><td>onbekend</td></tr>
 <tr><th>Voorraadniveau (Acumulus)</th><td>niet aangemaakt in Acumulus</td></tr>
 <tr><th>Verzendresultaat</th><td>32 - "is niet verzonden"</td></tr>
@@ -41,4 +50,4 @@ De voorraadmutatie is niet verwerkt in Acumulus. Pas de zoekdata in uw webshop (
 </details>
 <p><p>Meer informatie over de terugkoppeling van vermeldde foutcodes kunt u vinden op <a href="https://www.siel.nl/acumulus/API/Basic_Response/">Acumulus - Basic response</a>.</p></p>
 ',
-)
+    ];

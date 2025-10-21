@@ -1,9 +1,18 @@
-array (
-  'from' => 'unit.test@example.com',
-  'fromName' => 'Unit Test | Example',
-  'to' => 'admin@example.com',
-  'subject' => 'Voorraadmutatie verzonden naar Acumulus: succes',
-  'bodyText' => 'Onderstaande voorraadmutatie is succesvol naar Acumulus verstuurd.
+<?php
+/**
+ * @noinspection GrazieInspection
+ * @noinspection SpellCheckingInspection
+ */
+
+declare(strict_types=1);
+
+$mail =
+    [
+        'from' => 'unit.test@example.com',
+        'fromName' => 'Unit Test | Example',
+        'to' => 'admin@example.com',
+        'subject' => 'Voorraadmutatie verzonden naar Acumulus: succes',
+        'bodyText' => 'Onderstaande voorraadmutatie is succesvol naar Acumulus verstuurd.
 
 Over de voorraadmutatie:
 
@@ -15,7 +24,7 @@ Product (Acumulus):        1833642
 Voorraadniveau (Acumulus): 30.00
 Verzendresultaat:          2 - "Succes"
 ',
-  'bodyHtml' => '<p>Onderstaande voorraadmutatie is succesvol naar Acumulus verstuurd.</p>
+        'bodyHtml' => '<p>Onderstaande voorraadmutatie is succesvol naar Acumulus verstuurd.</p>
 <h3>Over de voorraadmutatie</h3>
 <table style="text-align: left;">
 <tr><th>Bestelling</th><td>1</td></tr>
@@ -27,4 +36,4 @@ Verzendresultaat:          2 - "Succes"
 <tr><th>Verzendresultaat</th><td>2 - "Succes"</td></tr>
 </table>
 ',
-)
+    ];

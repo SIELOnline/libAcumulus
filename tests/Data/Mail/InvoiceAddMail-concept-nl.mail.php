@@ -1,9 +1,18 @@
-array (
-  'from' => 'unit.test@example.com',
-  'fromName' => 'Unit Test | Example',
-  'to' => 'admin@example.com',
-  'subject' => 'Conceptfactuur verzonden naar Acumulus: succes, geen pdf verstuurd',
-  'bodyText' => 'Onderstaande factuur is succesvol naar Acumulus verstuurd. De factuur
+<?php
+/**
+ * @noinspection GrazieInspection
+ * @noinspection SpellCheckingInspection
+ */
+
+declare(strict_types=1);
+
+$mail =
+    [
+        'from' => 'unit.test@example.com',
+        'fromName' => 'Unit Test | Example',
+        'to' => 'admin@example.com',
+        'subject' => 'Conceptfactuur verzonden naar Acumulus: succes, geen pdf verstuurd',
+        'bodyText' => 'Onderstaande factuur is succesvol naar Acumulus verstuurd. De factuur
 is als concept aangemaakt. Controleer de factuur in Acumulus, waarna u
 deze alsnog definitief kan maken. U vindt conceptfacturen onder
 "Overzichten - Conceptfacturen en offertes". U laat Acumulus de
@@ -146,7 +155,7 @@ body={
     "status": "0"
 }
 ',
-  'bodyHtml' => '<p>Onderstaande factuur is succesvol naar Acumulus verstuurd.
+        'bodyHtml' => '<p>Onderstaande factuur is succesvol naar Acumulus verstuurd.
 De factuur is als concept aangemaakt. Controleer de factuur in Acumulus, waarna u deze alsnog definitief kan maken. U vindt conceptfacturen onder "Overzichten - Conceptfacturen en offertes".
 U laat Acumulus de factuur als pdf naar de klant versturen.
 Omdat de factuur als concept is aangemaakt is deze pdf niet verstuurd.</p>
@@ -284,4 +293,4 @@ body={<br>
 }</span></li></ul>
 </details>
 ',
-)
+    ];

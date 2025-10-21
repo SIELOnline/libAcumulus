@@ -1,3 +1,12 @@
+<?php
+/**
+ * @noinspection GrazieInspection
+ * @noinspection SpellCheckingInspection
+ */
+
+declare(strict_types=1);
+
+$mail =
 array (
   'from' => 'unit.test@example.com',
   'fromName' => 'Unit Test | Example',
@@ -10,16 +19,16 @@ zoekdata in uw webshop (of in Acumulus) aan.
 Over de voorraadmutatie:
 
 Bestelling:                1
-Bestelregel:               5
-Product (Webwinkel):       TEST-GRI
-Mutatie:                   -1
+Bestelregel:               4
+Product (Webwinkel):       TEST-ZWA
+Mutatie:                   +6
 Product (Acumulus):        onbekend
 Voorraadniveau (Acumulus): niet aangemaakt in Acumulus
 Verzendresultaat:          32 - "is niet verzonden"
 
 Meldingen:
 
-• Fout: Search for reference \'TEST-GRI\' resulted in no products.
+• Fout: Search for reference \'TEST-ZWA\' resulted in no products.
 
 Meer informatie over de terugkoppeling van de vermeldde foutcodes kunt u vinden op https://www.siel.nl/acumulus/API/Basic_Response/
 ',
@@ -28,17 +37,18 @@ De voorraadmutatie is niet verwerkt in Acumulus. Pas de zoekdata in uw webshop (
 <h3>Over de voorraadmutatie</h3>
 <table style="text-align: left;">
 <tr><th>Bestelling</th><td>1</td></tr>
-<tr><th>Bestelregel</th><td>5</td></tr>
-<tr><th>Product (Webwinkel)</th><td><a href="#">TEST-GRI</a></td></tr>
-<tr><th>Mutatie</th><td>-1</td></tr>
+<tr><th>Bestelregel</th><td>4</td></tr>
+<tr><th>Product (Webwinkel)</th><td><a href="#">TEST-ZWA</a></td></tr>
+<tr><th>Mutatie</th><td>+6</td></tr>
 <tr><th>Product (Acumulus)</th><td>onbekend</td></tr>
 <tr><th>Voorraadniveau (Acumulus)</th><td>niet aangemaakt in Acumulus</td></tr>
 <tr><th>Verzendresultaat</th><td>32 - "is niet verzonden"</td></tr>
 </table>
 <h3>Meldingen</h3>
 <details><summary><span>(klik om te tonen of te verbergen)</span></summary><ul>
-<li><span>Fout:</span> <span>Search for reference \'TEST-GRI\' resulted in no products.</span></li></ul>
+<li><span>Fout:</span> <span>Search for reference \'TEST-ZWA\' resulted in no products.</span></li></ul>
 </details>
 <p><p>Meer informatie over de terugkoppeling van vermeldde foutcodes kunt u vinden op <a href="https://www.siel.nl/acumulus/API/Basic_Response/">Acumulus - Basic response</a>.</p></p>
 ',
 )
+;

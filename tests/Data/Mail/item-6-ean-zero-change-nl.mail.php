@@ -1,9 +1,18 @@
-array (
-  'from' => 'unit.test@example.com',
-  'fromName' => 'Unit Test | Example',
-  'to' => 'admin@example.com',
-  'subject' => 'Voorraadmutatie verzonden naar Acumulus: fout(en)',
-  'bodyText' => 'Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten
+<?php
+/**
+ * @noinspection GrazieInspection
+ * @noinspection SpellCheckingInspection
+ */
+
+declare(strict_types=1);
+
+$mail =
+    [
+        'from' => 'unit.test@example.com',
+        'fromName' => 'Unit Test | Example',
+        'to' => 'admin@example.com',
+        'subject' => 'Voorraadmutatie verzonden naar Acumulus: fout(en)',
+        'bodyText' => 'Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten
 opgetreden. De voorraadmutatie is niet verwerkt in Acumulus.
 
 Over de voorraadmutatie:
@@ -22,7 +31,7 @@ Meldingen:
 
 Meer informatie over de terugkoppeling van de vermeldde foutcodes kunt u vinden op https://www.siel.nl/acumulus/API/Basic_Response/
 ',
-  'bodyHtml' => '<p>Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten opgetreden.
+        'bodyHtml' => '<p>Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten opgetreden.
 De voorraadmutatie is niet verwerkt in Acumulus.</p>
 <h3>Over de voorraadmutatie</h3>
 <table style="text-align: left;">
@@ -40,4 +49,4 @@ De voorraadmutatie is niet verwerkt in Acumulus.</p>
 </details>
 <p><p>Meer informatie over de terugkoppeling van vermeldde foutcodes kunt u vinden op <a href="https://www.siel.nl/acumulus/API/Basic_Response/">Acumulus - Basic response</a>.</p></p>
 ',
-)
+    ];

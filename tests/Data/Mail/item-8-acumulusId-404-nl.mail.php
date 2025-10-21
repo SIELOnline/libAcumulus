@@ -1,18 +1,28 @@
-array (
-  'from' => 'unit.test@example.com',
-  'fromName' => 'Unit Test | Example',
-  'to' => 'admin@example.com',
-  'subject' => 'Voorraadmutatie verzonden naar Acumulus: fout(en)',
-  'bodyText' => 'Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten
+<?php
+/**
+ * @noinspection GrazieInspection
+ * @noinspection SpellCheckingInspection
+ */
+
+declare(strict_types=1);
+
+$mail =
+    [
+        'from' => 'unit.test@example.com',
+        'fromName' => 'Unit Test | Example',
+        'to' => 'admin@example.com',
+        'subject' => 'Voorraadmutatie verzonden naar Acumulus: fout(en)',
+        'bodyText' => [
+            'Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten
 opgetreden. De voorraadmutatie is niet verwerkt in Acumulus.
 
 Over de voorraadmutatie:
 
 Bestelling:                1
-Bestelregel:               5
-Product (Webwinkel):       TEST-GRI
-Mutatie:                   -13
-Product (Acumulus):        123
+Bestelregel:               8
+Product (Webwinkel):       TEST
+Mutatie:                   -1
+Product (Acumulus):        1
 Voorraadniveau (Acumulus): niet aangemaakt in Acumulus
 Verzendresultaat:          32 - "Mislukt, fouten gevonden"
 
@@ -27,35 +37,37 @@ Informatie voor Acumulus support:
 De informatie hieronder wordt alleen getoond om eventuele support te
 vergemakkelijken, u kunt deze informatie negeren. U kunt support
 contacteren door deze mail door te sturen naar
-testdoubles@acumulus.nl.
+testwebshop@acumulus.nl.
 
-• Request: uri=stock-transaction-404
+• Request: uri=https://api.sielsystems.nl/acumulus/stable/stock/stock_add.php
 submit={
     "contract": {
-        "contractcode": "123456",
-        "username": "User123456",
+        "contractcode": "288252",
+        "username": "APIGebruiker12345",
         "password": "REMOVED FOR SECURITY",
-        "emailonerror": "test@example.com",
-        "emailonwarning": "test@example.com"
+        "emailonerror": "plugins@siel.nl",
+        "emailonwarning": "plugins@siel.nl"
     },
     "format": "json",
     "testmode": 0,
     "lang": "nl",
     "connector": {
-        "application": "TestWebShop 8.3.7",
-        "webkoppel": "Acumulus 8.3.7",
-        "development": "SIEL - Buro RaDer",
-        "remark": "Library 8.3.7 - PHP 8.1.29",
-        "sourceuri": "https://github.com/SIELOnline/libAcumulus"
+        "application": "TestWebShop ',
+            '"sourceuri": "https://github.com/SIELOnline/libAcumulus"
     },
-    "productid": 123,
-    "stockamount": -2,
-    "stockdescription": "Bestelling 123",
-    "stockdate": "2024-11-19"
+    "stock": {
+        "productid": 1,
+        "stockamount": -1.0,
+        "stockdescription": "example.com bestelling 1",
+        "meta-match-shop-value": "TEST",
+        "meta-match-shop-field": "[product::getReference()]",
+        "meta-acumulus-product-id-source": "local",
+        "meta-match-acumulus-field": "productsku"
+    }
 }
 • Response: status=404
 body={
-    "productid": "123",
+    "productid": "1",
     "errors": {
         "error": {
             "code": "404 Not Found",
@@ -70,15 +82,17 @@ body={
     "status": "1"
 }
 ',
-  'bodyHtml' => '<p>Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten opgetreden.
+        ],
+        'bodyHtml' => [
+            '<p>Bij het verzenden van een voorraadmutatie naar Acumulus zijn er fouten opgetreden.
 De voorraadmutatie is niet verwerkt in Acumulus.</p>
 <h3>Over de voorraadmutatie</h3>
 <table style="text-align: left;">
 <tr><th>Bestelling</th><td>1</td></tr>
-<tr><th>Bestelregel</th><td>5</td></tr>
-<tr><th>Product (Webwinkel)</th><td><a href="#">TEST-GRI</a></td></tr>
-<tr><th>Mutatie</th><td>-13</td></tr>
-<tr><th>Product (Acumulus)</th><td>123</td></tr>
+<tr><th>Bestelregel</th><td>8</td></tr>
+<tr><th>Product (Webwinkel)</th><td><a href="#">TEST</a></td></tr>
+<tr><th>Mutatie</th><td>-1</td></tr>
+<tr><th>Product (Acumulus)</th><td>1</td></tr>
 <tr><th>Voorraadniveau (Acumulus)</th><td>niet aangemaakt in Acumulus</td></tr>
 <tr><th>Verzendresultaat</th><td>32 - "Mislukt, fouten gevonden"</td></tr>
 </table>
@@ -89,35 +103,37 @@ De voorraadmutatie is niet verwerkt in Acumulus.</p>
 <p><p>Meer informatie over de terugkoppeling van vermeldde foutcodes kunt u vinden op <a href="https://www.siel.nl/acumulus/API/Basic_Response/">Acumulus - Basic response</a>.</p></p>
 <h3>Informatie voor Acumulus support</h3>
 <p>De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken, u kunt deze informatie negeren.
-U kunt support contacteren door deze mail door te sturen naar testdoubles@acumulus.nl.</p>
+U kunt support contacteren door deze mail door te sturen naar testwebshop@acumulus.nl.</p>
 <details><summary><span>(klik om te tonen of te verbergen)</span></summary><ul>
-<li><span>Request: uri=stock-transaction-404<br>
+<li><span>Request: uri=https://api.sielsystems.nl/acumulus/stable/stock/stock_add.php<br>
 submit={<br>
     "contract": {<br>
-        "contractcode": "123456",<br>
-        "username": "User123456",<br>
+        "contractcode": "288252",<br>
+        "username": "APIGebruiker12345",<br>
         "password": "REMOVED FOR SECURITY",<br>
-        "emailonerror": "test@example.com",<br>
-        "emailonwarning": "test@example.com"<br>
+        "emailonerror": "plugins@siel.nl",<br>
+        "emailonwarning": "plugins@siel.nl"<br>
     },<br>
     "format": "json",<br>
     "testmode": 0,<br>
     "lang": "nl",<br>
     "connector": {<br>
-        "application": "TestWebShop 8.3.7",<br>
-        "webkoppel": "Acumulus 8.3.7",<br>
-        "development": "SIEL - Buro RaDer",<br>
-        "remark": "Library 8.3.7 - PHP 8.1.29",<br>
-        "sourceuri": "https://github.com/SIELOnline/libAcumulus"<br>
+        "application": "TestWebShop ',
+            '"sourceuri": "https://github.com/SIELOnline/libAcumulus"<br>
     },<br>
-    "productid": 123,<br>
-    "stockamount": -2,<br>
-    "stockdescription": "Bestelling 123",<br>
-    "stockdate": "2024-11-19"<br>
+    "stock": {<br>
+        "productid": 1,<br>
+        "stockamount": -1.0,<br>
+        "stockdescription": "example.com bestelling 1",<br>
+        "meta-match-shop-value": "TEST",<br>
+        "meta-match-shop-field": "[product::getReference()]",<br>
+        "meta-acumulus-product-id-source": "local",<br>
+        "meta-match-acumulus-field": "productsku"<br>
+    }<br>
 }</span></li>
 <li><span>Response: status=404<br>
 body={<br>
-    "productid": "123",<br>
+    "productid": "1",<br>
     "errors": {<br>
         "error": {<br>
             "code": "404 Not Found",<br>
@@ -133,4 +149,5 @@ body={<br>
 }</span></li></ul>
 </details>
 ',
-)
+        ],
+    ];

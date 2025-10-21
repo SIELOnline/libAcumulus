@@ -1,11 +1,18 @@
-array (
-  'from' => 'unit.test@example.com',
-  'fromName' => 'Unit Test | Example',
-  'to' => 'admin@example.com',
-  'subject' => 'Factuur verzonden naar Acumulus in testmodus: succes, geen pdf verstuurd',
-  'bodyText' => 'Onderstaande factuur is succesvol naar Acumulus verstuurd. De factuur
-is in testmodus verstuurd en is dus niet aan uw boekhouding
-toegevoegd.
+<?php
+/**
+ * @noinspection GrazieInspection
+ * @noinspection SpellCheckingInspection
+ */
+
+declare(strict_types=1);
+
+$mail =
+    [
+        'from' => 'unit.test@example.com',
+        'fromName' => 'Unit Test | Example',
+        'to' => 'admin@example.com',
+        'subject' => 'Factuur verzonden naar Acumulus: succes',
+        'bodyText' => 'Onderstaande factuur is succesvol naar Acumulus verstuurd.
 
 Over de factuur:
 
@@ -30,7 +37,7 @@ submit={
         "emailonwarning": "test@example.com"
     },
     "format": "json",
-    "testmode": 1,
+    "testmode": 0,
     "lang": "nl",
     "connector": {
         "application": "TestWebShop 8.3.7",
@@ -150,8 +157,7 @@ body={
     "status": "0"
 }
 ',
-  'bodyHtml' => '<p>Onderstaande factuur is succesvol naar Acumulus verstuurd.
-De factuur is in testmodus verstuurd en is dus niet aan uw boekhouding toegevoegd.</p>
+        'bodyHtml' => '<p>Onderstaande factuur is succesvol naar Acumulus verstuurd.</p>
 <h3>Over de factuur</h3>
 <table style="text-align: left;">
 <tr><th>(Webwinkel) Bestelling</th><td>3</td></tr>
@@ -172,7 +178,7 @@ submit={<br>
         "emailonwarning": "test@example.com"<br>
     },<br>
     "format": "json",<br>
-    "testmode": 1,<br>
+    "testmode": 0,<br>
     "lang": "nl",<br>
     "connector": {<br>
         "application": "TestWebShop 8.3.7",<br>
@@ -293,4 +299,4 @@ body={<br>
 }</span></li></ul>
 </details>
 ',
-)
+    ];

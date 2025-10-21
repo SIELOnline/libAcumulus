@@ -3,10 +3,10 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.6.5 (2025-10-??) (PS|HS|VM)
+8.6.5 (2025-10-21) (PS|HS|VM)
 -----------------------------
 Features:
-- PS: Updated the acumulus_customise_invoice module to this version of the module and
+- PS|JOO: Updated the acumulus_customise_invoice module to this version of the module and
   base library.
 - PS: Added support for Mollie payment fees on the Acumulus invoice status tab.
 

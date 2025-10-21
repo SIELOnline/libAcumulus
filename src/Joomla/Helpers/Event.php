@@ -53,7 +53,14 @@ class Event implements EventInterface
 
     public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
-        $this->triggerEvent('onAcumulusInvoiceSendAfter', compact('invoice', 'invoiceSource', 'result'));
+        // \Joomla\CMS\Plugin\CMSPlugin::registerLegacyListener(), line 308:
+        //   "Extract any old results; they must not be part of the method call."
+        // Thus: a parameter with a name result is unset
+        $this->triggerEvent('onAcumulusInvoiceSendAfter', [
+            'invoice' => $invoice,
+            'invoiceSource' => $invoiceSource,
+            'invoiceAddResult' => $result,
+        ]);
     }
 
     private function triggerEvent(string $eventName, array $params): void

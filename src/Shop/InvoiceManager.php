@@ -447,13 +447,13 @@ abstract class InvoiceManager
 
     protected function createEmailAsPdf(Source $source, bool $forInvoice = true): EmailAsPdf
     {
-        $type = $forInvoice ? EmailAsPdfType::Invoice : EmailAsPdfType::PackingSlip;
+        $subType = $forInvoice ? EmailAsPdfType::Invoice : EmailAsPdfType::PackingSlip;
         $collectorManager = $this->getContainer()->getCollectorManager();
         $collectorManager->getPropertySources()->add('source', $source);
-        $emailAsPdf = $collectorManager->collectEmailAsPdf($type);
+        $emailAsPdf = $collectorManager->collectEmailAsPdf($subType);
         /** @var \Siel\Acumulus\Completors\EmailInvoiceAsPdfCompletor $completor */
-        $completor = $this->getContainer()->getCompletor(DataType::EmailAsPdf);
-        $completor?->complete($emailAsPdf, new MessageCollection($this->getTranslator()));
+        $completor = $this->getContainer()->getCompletor(DataType::EmailAsPdf, $subType);
+        $completor->complete($emailAsPdf, new MessageCollection($this->getTranslator()));
         return $emailAsPdf;
     }
 

@@ -16,8 +16,13 @@ use Siel\Acumulus\Collectors\CustomerCollector;
 use Siel\Acumulus\Collectors\EmailAsPdfCollector;
 use Siel\Acumulus\Collectors\InvoiceCollector;
 use Siel\Acumulus\Collectors\StockTransactionCollector;
+use Siel\Acumulus\Completors\AddressCompletor;
 use Siel\Acumulus\Completors\CustomerCompletor;
+use Siel\Acumulus\Completors\EmailInvoiceAsPdfCompletor;
 use Siel\Acumulus\Completors\InvoiceCompletor;
+use Siel\Acumulus\Completors\LineCompletor;
+use Siel\Acumulus\Completors\NoopCompletor;
+use Siel\Acumulus\Completors\StockTransactionCompletor;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\BasicSubmit;
@@ -224,17 +229,32 @@ class ContainerTest extends TestCase
         $container->getInvoiceManager();
     }
 
-    public function testCompletorsNameSpace(): void
+    public static function completorsNameSpaceDataProvider(): array
+    {
+        return [
+            ['', '', Completor::class,],
+            [DataType::Address, AddressType::Invoice, AddressCompletor::class,],
+            [DataType::Address, AddressType::Shipping, AddressCompletor::class,],
+            [DataType::BasicSubmit, '', NoopCompletor::class,],
+            [DataType::Connector, '', NoopCompletor::class,],
+            [DataType::Contract, '', NoopCompletor::class,],
+            [DataType::Customer, '', CustomerCompletor::class,],
+            [DataType::EmailAsPdf, EmailAsPdfType::Invoice, EmailInvoiceAsPdfCompletor::class,],
+            [DataType::EmailAsPdf, EmailAsPdfType::PackingSlip, NoopCompletor::class,],
+            [DataType::Invoice, '', InvoiceCompletor::class,],
+            [DataType::Line, LineType::Item, LineCompletor::class,],
+            [DataType::Line, LineType::Shipping, LineCompletor::class,],
+            [DataType::StockTransaction, '', StockTransactionCompletor::class,],
+        ];
+    }
+
+    /**
+     * @dataProvider completorsNameSpaceDataProvider
+     */
+    public function testCompletorsNameSpace(string $dataType, string $subType, string $completorClass): void
     {
         $container = self::$container;
-        $completorTypes = [
-            DataType::Customer => CustomerCompletor::class,
-            DataType::Invoice => InvoiceCompletor::class,
-        ];
-        foreach ($completorTypes as $dataType => $completorType) {
-            $object = $container->getCompletor($dataType);
-            $this->assertInstanceOf($completorType, $object);
-        }
-        $container->getCollectorManager();
+        $object = $container->getCompletor($dataType, $subType);
+        $this->assertInstanceOf($completorClass, $object);
     }
 }

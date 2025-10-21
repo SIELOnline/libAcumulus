@@ -502,22 +502,31 @@ class Container
     }
 
     /**
-     * Returns an instance of a {@see Completor} or
-     * {@see \Siel\Acumulus\Completors\BaseCompletor}
+     * Returns an instance of a {@see Completor} or {@see BaseCompletor}.
      *
      * @param string $dataType
      *   The data type to get the
-     *   {@see \Siel\Acumulus\Completors\BaseCompletor Completor} for, or empty
-     *   or not passed to get a "legacy" {@see Completor}.
+     *   {@see BaseCompletor Completor} for, or empty or not passed to get a "legacy"
+     *   {@see Completor}.
+     * @param ?string $subType
+     *   The sub data type to get the {@see BaseCompletor Completor} for, or empty or not
+     *   passed if the $dataType has no subtypes.
      *
-     * @return Completor|\Siel\Acumulus\Completors\BaseCompletor|null
+     * @return Completor|\Siel\Acumulus\Completors\BaseCompletor
+     *   - The legacy {@see Completor} if $dataType is empty.
+     *   - A {@see BaseCompletor} for the $subType, if $subType is not empty and a
+     *     {@see BaseCompletor} for that $subType exists.
+     *   - A {@see BaseCompletor} for the $dataType if a {@see BaseCompletor} for that
+     *     $dataType exists and $subType is empty or no {@see BaseCompletor} for that
+     *     $subType exists.
+     *   - A {@see NoopCompletor} otherwise.
      */
-    public function getCompletor(string $dataType = ''): BaseCompletor|Completor|null
+    public function getCompletor(string $dataType = '', string $subType = ''): BaseCompletor|Completor
     {
         if ($dataType === '') {
             // @legacy remove when all shops are fully converted to new architecture and
             //   the old Completor has been removed.
-            return $this->getInstance(
+            $result = $this->getInstance(
                 'Completor',
                 'Invoice',
                 [
@@ -532,8 +541,19 @@ class Container
                 true
             );
         } else {
-            return $this->getInstance("{$dataType}Completor", 'Completors', fn() => [$this, $this->getConfig(), $this->getTranslator()]);
+            $constructorArgsClosure = fn() => [$this, $this->getConfig(), $this->getTranslator()];
+            $result = null;
+            if (!empty($subType)) {
+                $result = $this->getInstance("{$subType}Completor", 'Completors', $constructorArgsClosure);
+            }
+            if ($result === null) {
+                $result = $this->getInstance("{$dataType}Completor", 'Completors', $constructorArgsClosure);
+            }
+            if ($result === null) {
+                $result = $this->getInstance('NoopCompletor', 'Completors', $constructorArgsClosure);
+            }
         }
+        return $result;
     }
 
     public function getCompletorInvoiceLines(): CompletorInvoiceLines
@@ -820,11 +840,11 @@ class Container
     /**
      * Returns an instance of the given class or null if the class could not be found.
      *
-     * This method should normally be avoided, use the get{Class}() methods as
+     * This method should not normally be called directly, use the get{Class}() methods as
      * they know (and hide) what arguments to inject into the constructor.
      *
-     * The class is looked for in multiple namespaces, starting with the
-     * $customNameSpace properties, continuing with the $shopNamespace property,
+     * The class to instantiate is looked for in multiple namespaces, starting with the
+     * $customNameSpace property, continuing with the $shopNamespace property,
      * and finally the base namespace (\Siel\Acumulus).
      *
      * Normally, only 1 instance is created per class, but the $newInstance argument can

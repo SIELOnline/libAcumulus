@@ -101,7 +101,10 @@ class InvoiceCompletor extends BaseCompletor
      */
     protected function completeEmailAsPdf(MessageCollection $result): void
     {
-        $this->getContainer()->getCompletor(EmailAsPdfType::Invoice)->complete($this->invoice->getEmailAsPdf(), $result);
+        $this->getContainer()->getCompletor(DataType::EmailAsPdf, EmailAsPdfType::Invoice)->complete(
+            $this->invoice->getEmailAsPdf(),
+            $result
+        );
     }
 
     protected function completeLines(MessageCollection $result): void

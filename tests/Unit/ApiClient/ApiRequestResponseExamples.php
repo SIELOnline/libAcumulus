@@ -514,13 +514,15 @@ class ApiRequestResponseExamples
         return $connector;
     }
 
-    public function getBasicSubmit(): BasicSubmit
+    public function getBasicSubmit(bool $needContract): BasicSubmit
     {
         $submit = new BasicSubmit();
         $submit->format = $this->options[Fld::Format] ?? 'json';
         $submit->testMode = $this->options[Fld::TestMode] ?? '0';
         $submit->lang = $this->options[Fld::Lang] ?? 'nl';
-        $submit->setContract($this->getContract());
+        if ($needContract) {
+            $submit->setContract($this->getContract());
+        }
         $submit->setConnector($this->getConnector());
         return $submit;
     }

@@ -21,6 +21,10 @@ Bugs:
 Refactorings:
 - ALL: Generalise class totals towards a class Amount (split into part amount and part
   VAT) allowing to retrieve its separate parts and which parts were calculated.
+- ALL: BasicSubmit: removed needContract as a parameter and introduced it as a parameter
+  during collecting, so we do not collect contract data (and store it in the BasicSubmit
+  object) if we do not need it. Also added a complete phase, even if for now it is
+  handled by the (newly introduced) NoopCompletor.
 - PS: extracted payment fee handling into a separate class that adds support for 3rd
   party modules.
 

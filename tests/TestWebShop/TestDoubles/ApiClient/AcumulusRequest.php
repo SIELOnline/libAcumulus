@@ -29,8 +29,8 @@ class AcumulusRequest extends BaseAcumulusRequest
         $this->examples = ApiRequestResponseExamples::getInstance();
     }
 
-    protected function createBasicSubmit(): BasicSubmit
+    protected function createBasicSubmit(bool $needContract): BasicSubmit
     {
-        return $this->examples->getBasicSubmit();
+        return $this->examples->getBasicSubmit($needContract);
     }
 }

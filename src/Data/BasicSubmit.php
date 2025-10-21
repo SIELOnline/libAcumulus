@@ -31,8 +31,6 @@ use Siel\Acumulus\Fld;
  */
 class BasicSubmit extends AcumulusObject
 {
-    public bool $needContract = true;
-
     public ?Contract $contract = null;
     public ?Connector $connector = null;
 
@@ -88,7 +86,7 @@ class BasicSubmit extends AcumulusObject
     public function toArray(): array
     {
         $result = [];
-        if ($this->needContract && $this->getContract() !== null) {
+        if ($this->getContract() !== null) {
             $result[Fld::Contract] = $this->getContract()->toArray();
         }
         $result += parent::toArray();

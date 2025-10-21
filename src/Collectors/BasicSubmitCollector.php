@@ -34,7 +34,9 @@ class BasicSubmitCollector extends Collector
     {
         /** @var BasicSubmit $basicSubmit */
         $basicSubmit = parent::collect($propertySources, $fieldSpecifications);
-        $basicSubmit->setContract($this->collectContract($propertySources));
+        if ($propertySources->get('needContract')) {
+            $basicSubmit->setContract($this->collectContract($propertySources));
+        }
         $basicSubmit->setConnector($this->collectConnector($propertySources));
         return $basicSubmit;
     }

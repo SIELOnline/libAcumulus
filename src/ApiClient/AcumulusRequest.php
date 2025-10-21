@@ -7,9 +7,11 @@ namespace Siel\Acumulus\ApiClient;
 use RuntimeException;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Data\BasicSubmit;
+use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Util;
 
 use function assert;
@@ -238,8 +240,7 @@ class AcumulusRequest
      */
     protected function constructFullSubmit(array $submit, bool $needContract): array
     {
-        $basicSubmit = $this->createBasicSubmit();
-        $basicSubmit->needContract = $needContract;
+        $basicSubmit = $this->createBasicSubmit($needContract);
         return array_merge($basicSubmit->toArray(), $submit);
     }
 
@@ -249,8 +250,10 @@ class AcumulusRequest
      * The "basic submit" part is defined at
      * {@link https://www.siel.nl/acumulus/API/Basic_Submit/}
      */
-    protected function createBasicSubmit(): BasicSubmit
+    protected function createBasicSubmit(bool $needContract): BasicSubmit
     {
-        return $this->container->getCollectorManager()->collectBasicSubmit();
+        $basicSubmit = $this->container->getCollectorManager()->collectBasicSubmit($needContract);
+        $this->container->getCompletor(DataType::BasicSubmit)->complete($basicSubmit, new MessageCollection($this->container->getTranslator()));
+        return $basicSubmit;
     }
 }

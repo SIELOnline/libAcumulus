@@ -146,9 +146,10 @@ class CollectorManager
         return $stockTransactionCollector->collect($this->getPropertySources());
     }
 
-    public function collectBasicSubmit(): BasicSubmit
+    public function collectBasicSubmit(bool $needContract): BasicSubmit
     {
         $this->getPropertySources()
+            ->add('needContract', $needContract)
             ->add('config', $this->getContainer()->getConfig())
             ->add('environment', $this->getContainer()->getEnvironment()->toArray());
         /** @var \Siel\Acumulus\Collectors\BasicSubmitCollector $basicSubmitCollector */

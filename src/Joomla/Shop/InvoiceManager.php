@@ -68,7 +68,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function toSql(string $dateStr): string
     {
-        /** @noinspection PhpUndefinedMethodInspection  {@see \Joomla\Application\ConfigurationAwareApplicationInterface::get()} */
+        /** @noinspection NullPointerExceptionInspection */
         return (new Date($dateStr, new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 }

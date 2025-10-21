@@ -26,10 +26,13 @@ use Siel\Joomla\Component\Acumulus\Administrator\Table\AcumulusEntryTable;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
+    /**
+     * @throws \Exception
+     */
     private function getAcumulusComponent(): AcumulusComponent
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         /** @noinspection PhpIncompatibleReturnTypeInspection */
+        /** @noinspection NullPointerExceptionInspection */
         return Factory::getApplication()->bootComponent('acumulus');
     }
 
@@ -98,9 +101,13 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table->delete();
     }
 
+    /**
+     * @throws \DateInvalidTimeZoneException
+     * @throws \Exception
+     */
     protected function sqlNow(): int|string
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @noinspection NullPointerExceptionInspection */
         return (new Date('now', new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 

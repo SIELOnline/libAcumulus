@@ -27,7 +27,7 @@ class Mailer extends BaseMailer
         /** @var MailerInterface $mailer */
         $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
         if ($mailer instanceof Mail) {
-            $mailer->isHTML(true);
+            $mailer->isHtml(true);
         }
         $mailer->setSender($from, $fromName);
         $mailer->addRecipient($to);

@@ -13,9 +13,13 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  */
 class AcumulusEntry extends BaseAcumulusEntry
 {
+    /**
+     * @throws \DateInvalidTimeZoneException
+     * @throws \Exception
+     */
     protected function getDefaultTimeZone(): DateTimeZone
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @noinspection NullPointerExceptionInspection */
         return new DateTimeZone(Factory::getApplication()->get('offset'));
     }
 }

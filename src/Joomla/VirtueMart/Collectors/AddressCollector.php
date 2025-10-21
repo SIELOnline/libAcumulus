@@ -20,8 +20,8 @@ class AddressCollector extends BaseAddressCollector
     /**
      * @param \Siel\Acumulus\Data\Address $acumulusObject
      *
-     * @noinspection MissingIssetImplementationInspection  class vObject does
-     *    create real properties for all fields.
+     * @noinspection MissingIssetImplementationInspection
+     *    Class vObject does create real properties for all fields.
      *
      * @throws \Exception
      */

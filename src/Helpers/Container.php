@@ -162,7 +162,7 @@ use const Siel\Acumulus\Version;
  */
 class Container
 {
-    private static Container $instance;
+    private static ?Container $instance = null;
 
     /**
      * Returns the already created instance.
@@ -172,12 +172,12 @@ class Container
      * access. The current exception is the separate "Acumulus Customise Invoice"
      * module that may not get the instance passed via a constructor.
      *
-     * @return static
+     * @return ?static
      *
      * @noinspection PhpUnused Should only be used in module own code, not in
      *   the library itself.
      */
-    public static function getContainer(): static
+    public static function getContainer(): ?static
     {
         return static::$instance;
     }
@@ -508,7 +508,7 @@ class Container
      *   The data type to get the
      *   {@see BaseCompletor Completor} for, or empty or not passed to get a "legacy"
      *   {@see Completor}.
-     * @param ?string $subType
+     * @param string $subType
      *   The sub data type to get the {@see BaseCompletor Completor} for, or empty or not
      *   passed if the $dataType has no subtypes.
      *

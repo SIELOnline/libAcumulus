@@ -61,78 +61,72 @@ use const Siel\Acumulus\Version;
  *
  * Principles
  * ----------
- * * This library is built with the idea to extract common code into base
- *   classes and have webshop-specific classes extend those base classes with
- *   web-shop-specific overrides and implementations of abstract methods.
- * * Therefore, upon creating an instance, the most specialized class possible
- *   will be instantiated and returned. See below how this is done.
- * * Container::getInstance() is the weakly typed instance getting method, but
- *   for almost all known classes in this library, a strongly typed getter is
- *   available as well. These getters also take care of getting the constructor
- *   arguments.
- * * By default, only a single instance is created, and this instance is returned
- *   on each subsequent request for an instance of that type.
- * * The strongly typed create... methods return a new instance on each call,
- *   turning this container also into a factory.
+ * - This library is built with the idea to extract common code into base classes and have
+ *   webshop-specific classes extend those base classes with web-shop-specific overrides
+ *   and implementations of abstract methods.
+ * - Therefore, upon creating an instance, the most specialized class possible  will be
+ *   instantiated and returned. See below how this is done.
+ * - Container::getInstance() is the weakly typed instance getting method, but for almost
+ *   all known classes in this library, a strongly typed getter is available as well.
+ *   These getters also take care of getting the constructor arguments.
+ * - By default, only a single instance is created, and this instance is returned on each
+ *   subsequent request for an instance of that type.
+ * - The strongly typed create... methods return a new instance on each call, turning this
+ *   container also into a factory.
  *
  * Creating the container
  * ----------------------
- * Creating the container is normally done by code in the part adhering to your
- * web shop's architecture, e.g. a controller or model. That code must pass the
- * following arguments:
- * * $shopNamespace: defines the namespace hierarchy where to look for
- *   specialized classes. This is further explained below.
- * * $language: the language to use with translating. As the container is able
- *   to pass constructor arguments all by itself, it must know the current
- *   language, as the {@see Translator} is often used as constructor argument
- *   for other objects.
+ * Creating the container is normally done by code in the part adhering to your webshop's
+ * architecture, e.g. a controller or model. That code must pass the following arguments:
+ * - $shopNamespace: defines the namespace hierarchy where to look for specialized
+ *   classes. This is further explained below.
+ * - $language: the language to use with translating. As the container is able to pass
+ *   constructor arguments all by itself, it must know the current language, as the
+ *   {@see Translator} is often used as constructor argument for other objects.
  *
  * How the container finds the class to instantiate
  * ------------------------------------------------
- * Finding the most specialized class is not done via configuration, as is
- * normally done in container implementations, but via namespace hierarchy.
+ * Finding the most specialized class is not done via configuration, as is normally done
+ * in container implementations, but via namespace hierarchy.
  *
- * Suppose you are writing code for a web shop named <MyWebShop>: place your
- * classes in the namespace \Siel\Acumulus\<MyWebShop>.
+ * Suppose you are writing code for a webshop named <MyWebShop>: place your classes in the
+ * namespace \Siel\Acumulus\<MyWebShop>.
  *
- * If you want to support multiple (major) versions of your web-shop, you can
- * add a "version level" to the namespace:
- * \Siel\Acumulus\<MyWebShop>\<MyWebShop><version> (note <MyWebShop> is repeated
- * as namespaces may not start with a digit). In this case you should place code
- * common for all versions in classes under \Siel\Acumulus\<MyWebShop>, but code
- * specific for a given version under
- * \Siel\Acumulus\<MyWebShop>\<MyWebShop><version>.
+ * If you want to support multiple (major) versions of your web-shop, you can add a
+ * "version level" to the namespace:
+ * \Siel\Acumulus\<MyWebShop>\<MyWebShop><version> (note <MyWebShop> is repeated as
+ * namespaces may not start with a digit). In this case you should place code common for
+ * all versions in classes under \Siel\Acumulus\<MyWebShop>, but code specific for a given
+ * version under \Siel\Acumulus\<MyWebShop>\<MyWebShop><version>.
  *
  * The Magento and WooCommerce namespaces are examples of this.
  *
- * If your web shop is embedded in a CMS and there are multiple web shop
- * extensions for that CMS, you can add a "CMS level" to the namespace:
- * \Siel\Acumulus\<MyCMS>\<MyWebShop>[\<MyWebShop><version>]. Classes at the CMS
- * level should contain code common for the CMS, think of configuration storage,
- * logging, mailing, and database access.
+ * If your webshop is embedded in a CMS and there are multiple webshop extensions for that
+ * CMS, you can add a "CMS level" to the namespace:
+ * \Siel\Acumulus\<MyCMS>\<MyWebShop>[\<MyWebShop><version>]. Classes at the CMS level
+ * should contain code common for the CMS, think of configuration storage, logging,
+ * mailing, and database access.
  *
- * The Joomla namespace is an example of this. The WooCommerce namespace could
- * be an example of this, but as currently no support for other WordPress shop
- * extensions is foreseen, the WordPress namespace was not added to the
- * hierarchy.
+ * The Joomla namespace is an example of this. The WooCommerce namespace could be an
+ * example of this, but as currently no support for other WordPress shop extensions is
+ * foreseen, and logging is based on theWooCommerce logging facilities, the WordPress
+ * namespace was not added to the hierarchy.
  *
- * At whatever level you are overriding classes from this library, you always
- * have to place them in the same sub namespace as where they are placed in this
- * library. That is, in 1 of the namespaces Collectors, Config, Helpers,
- * Invoice, or Shop. Note that there should be no need to override classes in
- * ApiClient or Data.
+ * At whatever level you are overriding classes from this library, you always have to
+ * place them in the same sub namespace as where they are placed in this library. That is,
+ * in 1 of the namespaces Collectors, Config, Helpers, Invoice, or Shop. Note that there
+ * should be no need to override classes in ApiClient or Data.
  *
- * If you do not want to use \Siel\Acumulus as the starting part of your namespace,
- * you may replace Siel by your own vendor name and/or your department name, but
- * it has to be followed by \Acumulus\<...>. Note that if you do so, you are
- * responsible for ensuring that your classes are autoloaded.
+ * If you do not want to use \Siel\Acumulus as the starting part of your namespace, you
+ * may replace Siel by your own vendor name and/or your department name, but it has to be
+ * followed by \Acumulus\<...>. Note that if you do so, you are responsible for ensuring
+ * that your classes are autoloaded.
  *
- * Whatever hierarchy you use, the container should be informed about it by
- * passing it as the 1st constructor argument. Example:
- * If 'MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebShop\MyWebShop2' is
- * passed as 1st constructor argument to the Container and the container is
- * asked to return a {@see \Siel\Acumulus\Invoice\Creator}, it will look for
- * the following classes:
+ * Whatever hierarchy you use, the container should be informed about it by passing it as
+ * the 1st constructor argument. Example: If
+ * 'MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebShop\MyWebShop2' is passed as 1st
+ * constructor argument to the Container and the container is asked to return a
+ * {@see \Siel\Acumulus\Invoice\Creator}, it will look for the following classes:
  * 1. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebShop\MyWebShop2\Invoice\Creator
  * 2. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebShop\Invoice\Creator
  * 3. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\Invoice\Creator
@@ -140,23 +134,22 @@ use const Siel\Acumulus\Version;
  *
  * Customising the library
  * -----------------------
- * There might be cases where you are not implementing a new extension but are
- * using an existing extension and just want to adapt some behaviour of this
- * library to your specific situation.
+ * There might be cases where you are not implementing a new extension but are using an
+ * existing extension and just want to adapt some behaviour of this library to your
+ * specific situation.
  *
- * Most of these problems can be solved by reacting to one of the events
- * triggered by the Acumulus module. However, if that turns out to be impossible, you
- * can define another level of namespace searching by calling
- * {@see setCustomNamespace()}. This will define an additional namespace to look
- * for before the above list as defined by the $shopNamespace argument is
- * traversed. Taking the above example, with 'MyShop\Custom' as the custom namespace, the
- * container will first look for the class \MyShop\Custom\Invoice\Creator, before looking
- * for the above list of classes.
+ * Most of these problems can be solved by reacting to one of the events triggered by the
+ * Acumulus module. However, if that turns out to be impossible, you can define another
+ * level of namespace searching by calling {@see setCustomNamespace()}. This will define
+ * an additional namespace to look for before the above list as defined by the
+ * $shopNamespace argument is traversed. Taking the above example, with 'MyShop\Custom' as
+ * the custom namespace, the container will first look for the class
+ * \MyShop\Custom\Invoice\Creator, before looking for the above list of classes.
  *
- * By defining a custom namespace and placing your custom code in that
- * namespace, instead of changing the code in this library, it remains possible
- * to update this library to a newer version without losing your customisations.
- * Note that, also in this case, you are responsible that this class gets autoloaded.
+ * By defining a custom namespace and placing your custom code in that namespace, instead
+ * of changing the code in this library, it remains possible to update this library to a
+ * newer version without losing your customisations. Note that, also in this case, you are
+ * responsible that this class gets autoloaded.
  *
  * @noinspection EfferentObjectCouplingInspection
  */
@@ -167,15 +160,15 @@ class Container
     /**
      * Returns the already created instance.
      *
-     * Try not to use this: there should be only 1 instance of this class, but
-     * that instance should be passed to the constructor if a class needs
-     * access. The current exception is the separate "Acumulus Customise Invoice"
-     * module that may not get the instance passed via a constructor.
+     * Try not to use this: there should be only 1 instance of this class, but that
+     * instance should be passed to the constructor if a class needs access. The current
+     * exception is the separate "Acumulus Customise Invoice" module that may not get the
+     * instance passed via a constructor.
      *
      * @return ?static
      *
-     * @noinspection PhpUnused Should only be used in module own code, not in
-     *   the library itself.
+     * @noinspection PhpUnused
+     *   Should only be used in module own code, not in the library itself.
      */
     public static function getContainer(): ?static
     {
@@ -207,9 +200,8 @@ class Container
      * Constructor.
      *
      * @param string $shopNamespace
-     *   The most specialized namespace used to start searching in for extending
-     *   classes. This does not have to start with Siel\Acumulus and must not
-     *   start or end with a \.
+     *   The most specialized namespace used to start searching in for extending classes.
+     *   This does not have to start with Siel\Acumulus and mustn't start or end with a \.
      * @param string $language
      *   A language or locale code, e.g. 'nl', 'nl-NL', or 'en-UK'.
      *   Only the first 2 characters will be used.
@@ -239,8 +231,8 @@ class Container
      * Sets the language code.
      *
      * @param string $language
-     *   A language or locale code, e.g. nl, nl-NL, or en-UK. Only the first 2
-     *   characters will be used.
+     *   A language or locale code, e.g. nl, nl-NL, or en-UK.
+     *   Only the first 2 characters will be used.
      */
     public function setLanguage(string $language): self
     {
@@ -252,12 +244,12 @@ class Container
      * Sets a custom namespace for customisations on top of the current shop.
      *
      * @param string $customNamespace
-     *   A custom namespace that will be searched for first, before traversing
-     *   the shopNamespace hierarchy in search for a requested class.
-     *   It should start with a \, but not end with it.
+     *   A custom namespace that will be searched for first, before traversing the
+     *   shopNamespace hierarchy in search for a requested class. It should start with a
+     *   '\', but not end with it.
      *
-     * @noinspection PhpUnused  If used, it will be in shop-specific code, not
-     *   in this library itself.
+     * @noinspection PhpUnused
+     *    If used, it will be in shop-specific code, not in this library itself.
      */
     public function setCustomNamespace(string $customNamespace): void
     {
@@ -485,8 +477,8 @@ class Container
      * Returns a new Acumulus invoice-add service result instance.
      *
      * @param string $trigger
-     *   A string indicating the situation that triggered the need to get a new
-     *   instance. Typically, the name of the calling method.
+     *   A string indicating the situation that triggered the need to get a new instance.
+     *   Typically, the name of the calling method.
      *
      * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   A wrapper object around an Acumulus invoice-add service result.
@@ -505,9 +497,8 @@ class Container
      * Returns an instance of a {@see Completor} or {@see BaseCompletor}.
      *
      * @param string $dataType
-     *   The data type to get the
-     *   {@see BaseCompletor Completor} for, or empty or not passed to get a "legacy"
-     *   {@see Completor}.
+     *   The data type to get the {@see BaseCompletor Completor} for, or empty or not
+     *   passed to get a "legacy" {@see Completor}.
      * @param string $subType
      *   The sub data type to get the {@see BaseCompletor Completor} for, or empty or not
      *   passed if the $dataType has no subtypes.
@@ -592,13 +583,12 @@ class Container
      * given type.
      *
      * @param string $type
-     *   The child type of the {@see \Siel\Acumulus\Collectors\Collector}
-     *   requested. The class name only, without namespace and without Collector
-     *   at the end. Typically, a {@see \Siel\Acumulus\Data\DataType} constant.
+     *   The child type of the {@see \Siel\Acumulus\Collectors\Collector} requested.
+     *   The class name only, without namespace and without Collector at the end.
+     *   Typically, a {@see \Siel\Acumulus\Data\DataType} constant.
      * @param ?string $subType
-     *   The grandchild type of the {@see \Siel\Acumulus\Collectors\Collector}
-     *    requested. The class name only, without namespace and without Collector
-     *    at the end. E.g:
+     *   The grandchild type of the {@see \Siel\Acumulus\Collectors\Collector} requested.
+     *   The class name only, without namespace and without Collector at the end. E.g:
      *      - A {@see \Siel\Acumulus\Data\LineType} constant for $type = 'Line', or a
      *      - {@see \Siel\Acumulus\Data\EmailAsPdfType} constant for $type = 'EmailAsPdf'
      */
@@ -631,8 +621,8 @@ class Container
     }
 
     /**
-     * Returns a {@see \Siel\Acumulus\Completors\CompletorTaskInterface} instance
-     * that performs the given task.
+     * Returns a {@see \Siel\Acumulus\Completors\CompletorTaskInterface} instance that
+     * performs the given task.
      *
      * @param string $dataType
      *   The data type it operates on. One of the {@see \Siel\Acumulus\Data\DataType},
@@ -640,11 +630,10 @@ class Container
      *   constants. This is used as a sub namespace when constructing the class name to
      *   load.
      * @param string $task
-     *   The task to be executed. This is used to construct the class name of a
-     *   class that performs the given task and implements
-     *   {@see \Siel\Acumulus\Completors\CompletorTaskInterface}. Only the task
-     *   name should be provided, not the namespace, nor the 'Complete' at the
-     *   beginning.
+     *   The task to be executed. This is used to construct the class name of a class that
+     *   performs the given task and implements
+     *   {@see \Siel\Acumulus\Completors\CompletorTaskInterface}. Only the task name
+     *   should be provided, not the namespace, nor the 'Complete' at the beginning.
      */
     public function getCompletorTask(string $dataType, string $task): CompletorTaskInterface
     {
@@ -652,12 +641,11 @@ class Container
     }
 
     /**
-     * Returns a {@see \Siel\Acumulus\Data\AcumulusObject} instance of the
-     * given type.
+     * Returns a {@see \Siel\Acumulus\Data\AcumulusObject} instance of the given type.
      *
      * @param string $type
-     *   The child type of the {@see \Siel\Acumulus\Data\AcumulusObject}
-     *   requested. The class name only, without namespace.
+     *   The child type of the {@see \Siel\Acumulus\Data\AcumulusObject} requested.
+     *   The class name only, without namespace.
      */
     public function createAcumulusObject(string $type): AcumulusObject
     {
@@ -745,8 +733,8 @@ class Container
      * Returns a new stock transaction result instance.
      *
      * @param string $trigger
-     *   A string indicating the situation that triggered the need to get a new
-     *   instance. Typically, the name of the calling method.
+     *   A string indicating the situation that triggered the need to get a new instance.
+     *   Typically, the name of the calling method.
      *
      * @return \Siel\Acumulus\Product\StockTransactionResult
      *   A wrapper object around an Acumulus invoice-add service result.
@@ -851,11 +839,10 @@ class Container
      * be used to change this behavior.
      *
      * @param string $class
-     *   The name of the class without namespace. The class is searched for in
-     *   multiple namespaces, see above.
+     *   The name of the class without namespace. The class is searched for in multiple
+     *   namespaces, see above.
      * @param string $subNamespace
-     *   The sub namespace (within the namespaces tried) in which the class
-     *   resides.
+     *   The sub namespace (within the namespaces tried) in which the class resides.
      * @param Closure|array $constructorArgs
      *   Either a(n):
      *   - Array with the list of arguments to pass to the constructor, may be empty.
@@ -864,8 +851,8 @@ class Container
      *     evaluated when no instance exists yet, thereby avoiding lots of recursive
      *     calls to getInstance().
      * @param bool $newInstance
-     *   Whether to create a new instance (true) or reuse an already existing
-     *   instance (false, default)
+     *   Whether to create a new instance (true) or reuse an already existing instance
+     *   (false, default)
      */
     public function getInstance(
         string $class,
@@ -941,8 +928,8 @@ class Container
      *   The namespace to search in.
      *
      * @return string|null
-     *   The full name of the class if it exists in the given namespace, or null
-     *   if it does not exist.
+     *   The full name of the class if it exists in the given namespace,
+     *   or null if it does not exist.
      */
     protected function tryNsInstance($class, $subNamespace, $namespace): ?string
     {

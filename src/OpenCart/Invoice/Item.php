@@ -1,4 +1,9 @@
 <?php
+/**
+ * @noinspection PhpMultipleClassDeclarationsInspection OC3 has many double class definitions
+ * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
+ * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
+ */
 
 declare(strict_types=1);
 

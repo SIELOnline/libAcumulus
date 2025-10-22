@@ -244,7 +244,7 @@ abstract class Registry
     }
 
     /**
-     * indicates whether we are in Admin (true) or Catalog (false).
+     * Indicates whether we are in Admin (true) or Catalog (false).
      */
     abstract protected function inAdmin(): bool;
 }

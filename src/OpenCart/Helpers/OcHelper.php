@@ -43,14 +43,15 @@ abstract class OcHelper
      * @param \Opencart\System\Engine\Registry|\Registry $registry
      * @param \Siel\Acumulus\Helpers\Container $acumulusContainer
      *
-     * @noinspection PhpMissingParamTypeInspection Types differ per version and don't
-     *    exist in the other version. Moreover, OpenCart uses the
-     *    {@see \Opencart\System\Engine\Proxy} class everywhere to replace objects, so
-     *    the actual type of the object passed is Proxy.
+     * @noinspection PhpMissingParamTypeInspection
+     *    Types differ per version and don't exist in the other version. Moreover,
+     *    OpenCart uses the {@see \Opencart\System\Engine\Proxy} class everywhere to
+     *    replace objects, so, at runtime, the actual type of the object passed is Proxy.
      */
     public function __construct($registry, Container $acumulusContainer)
     {
         $this->acumulusContainer = $acumulusContainer;
+        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->registry = $this->acumulusContainer->getInstance('Registry', 'Helpers', [$registry]);
         $this->data = [];
 
@@ -525,18 +526,7 @@ abstract class OcHelper
      */
     protected function doInstall(): bool
     {
-        $requirements = $this->acumulusContainer->getRequirements();
-        $messages = $requirements->check();
-        foreach ($messages as $key => $message) {
-            $this->addMessages([Message::create($message, Severity::Error)]);
-            if (str_contains($key, 'warning')) {
-                $this->acumulusContainer->getLog()->warning($message);
-                unset($messages[$key]);
-            } else {
-                $this->acumulusContainer->getLog()->error($message);
-            }
-        }
-        if (!empty($messages)) {
+        if (count($this->checkRequirements()) > 0) {
             return false;
         }
 
@@ -609,29 +599,17 @@ abstract class OcHelper
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
-        // if  'acumulus_siel_datamodel_version' is not set, we must be coming
-        // from a version before it was introduced. I have no idea when that
-        // was, but let's say we pick every update as of version 4.0:
+        // If 'acumulus_siel_datamodel_version' is not set, we must be coming from a
+        // version before it was introduced. I have no idea when that was, but let's say
+        // we pick every update as of version 4.0:
         $currentDataModelVersion = $setting['acumulus_siel_datamodel_version'] ?? '4.0.0-beta1';
 
-        // Update or even install table.
+        // Check requirements anew before we continue upgrading.
+        if (count($this->checkRequirements()) > 0) {
+            return false;
+        }
         if ($currentDataModelVersion === '' || version_compare($currentDataModelVersion, '4.0', '<')) {
-            // Check requirements before we continue upgrading from such an old
-            // version, because this also means that the previous requirements
-            // check also dates back from the PHP 5.3 era.
-            // @todo: extract into separate method.
-            $requirements = $this->acumulusContainer->getRequirements();
-            $messages = $requirements->check();
-            foreach ($messages as $key => $message) {
-                $severity = str_contains($key, 'warning') ? Severity::Warning : Severity::Error;
-                $this->addMessages([Message::create($message, $severity)]);
-                $this->acumulusContainer->getLog()->log($severity, $message);
-            }
-            if (!empty($messages)) {
-                return false;
-            }
-
-            // Install tables.
+            // Install tables if we are coming from a very old version.
             $result = $this->acumulusContainer->getAcumulusEntryManager()->install();
         } else {
             $result = $this->acumulusContainer->getAcumulusEntryManager()->upgrade($currentDataModelVersion);
@@ -707,5 +685,28 @@ abstract class OcHelper
         /** @var \Opencart\Admin\Model\Setting\Event|\ModelSettingEvent $model */
         $model = $this->registry->getModel('setting/event');
         $model->deleteEventByCode('acumulus');
+    }
+
+    /**
+     * Description.
+     *
+     *
+     * @return string[]
+     *   Description.
+     */
+    private function checkRequirements(): array
+    {
+        $requirements = $this->acumulusContainer->getRequirements();
+        $messages = $requirements->check();
+        foreach ($messages as $key => $message) {
+            $this->addMessages([Message::create($message, Severity::Error)]);
+            if (str_contains($key, 'warning')) {
+                $this->acumulusContainer->getLog()->warning($message);
+                unset($messages[$key]);
+            } else {
+                $this->acumulusContainer->getLog()->error($message);
+            }
+        }
+        return $messages;
     }
 }

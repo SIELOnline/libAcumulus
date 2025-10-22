@@ -1,4 +1,9 @@
 <?php
+/**
+ * @noinspection PhpMultipleClassDeclarationsInspection OC3 has many double class definitions
+ * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
+ * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
+ */
 
 declare(strict_types=1);
 
@@ -213,13 +218,12 @@ class LineCollector extends BaseLineCollector
      * @param array $order
      *   The order.
      * @param string $addressType
-     *   'payment' or 'shipping'.
+     *   One of 'payment' or 'shipping'.
      * @param int $geoZoneId
      *   The id of the geo zone.
      *
      * @return bool
-     *   True if the address of the order lies within the geo zone, false
-     *   otherwise.
+     *   True if the address of the order lies within the geo zone, false otherwise.
      *
      * @throws \Exception
      */

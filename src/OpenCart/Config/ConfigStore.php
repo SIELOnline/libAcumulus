@@ -39,9 +39,9 @@ class ConfigStore extends BaSeConfigStore
     /**
      * @return \Opencart\Admin\Model\Setting\Setting|\Opencart\Catalog\Model\Setting\Setting|\ModelSettingSetting
      *
-     * @noinspection PhpMissingReturnTypeInspection : actually a {@see Proxy} is
-     *   returned that proxies (one of) the setting model(s). So for us, the
-     *   type is a Setting.
+     * @noinspection PhpMissingReturnTypeInspection
+     *   Actually a {@see Proxy} is returned that proxies (one of) the setting model(s).
+     *   So for us, the type is a Setting.
      * @noinspection PhpIncompatibleReturnTypeInspection
      * @noinspection PhpReturnDocTypeMismatchInspection
      */

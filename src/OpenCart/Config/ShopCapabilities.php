@@ -237,7 +237,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
                     'viewed',
                     'date_added',
                     'date_modified',
-                    'langauge_id',
+                    'language_id',
                     'name',
                     'description',
                     'tag',
@@ -381,7 +381,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
      * property can have one of the following values: 'shipping', 'payment', or 'store'.
      *
      * @todo: So, this cannot for all possible situations unambiguously be mapped to the
-     *   way Acumulus handles this. so, we may have to dynamically determine this when
+     *   way Acumulus handles this. So, we may have to dynamically determine this when
      *   collecting an invoice.
      */
     public function getFiscalAddressSetting(): string

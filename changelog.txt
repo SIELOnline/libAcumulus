@@ -3,6 +3,12 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+8.6.6 (2025-10-??) (OC)
+-----------------------
+Bugs:
+- OC4: Changes in OC4 Mail handling.
+- OC4: Changes to composing event names.
+
 8.6.5 (2025-10-21) (PS|HS|VM)
 -----------------------------
 Features:

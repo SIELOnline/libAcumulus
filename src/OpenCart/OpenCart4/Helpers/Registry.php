@@ -20,7 +20,7 @@ class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
             // One of our own routes:
             $route = "extension/$extension/$extensionType/$extension";
             if ($method !== '') {
-                $route .= '|' . $method;
+                $route .= '.' . $method;
             }
         }
         return $route;

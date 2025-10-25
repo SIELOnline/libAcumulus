@@ -17,7 +17,7 @@ use Siel\Acumulus\Invoice\Source;
 class Event implements EventInterface
 {
     public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
+    {   // Results in 'system/extension/module/acumulus/invoiceCreate/before'
         $route = Registry::getInstance()->getAcumulusTrigger('invoiceCreate', 'before');
         $args = compact('invoiceSource', 'localResult');
         $this->getEvent()->trigger($route, $args);
@@ -70,6 +70,8 @@ class Event implements EventInterface
      *
      * @return \Opencart\System\Engine\Event|\Event|\Light_Event
      *   [SIEL #194403]: https://lightning.devs.mx/ defines its own event class.
+     *
+     * @noinspection PhpUndefinedClassInspection \Light_Event is from a 3rd party module.
      */
     protected function getEvent()
     {

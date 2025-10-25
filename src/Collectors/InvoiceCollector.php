@@ -165,24 +165,29 @@ class InvoiceCollector extends Collector
         if ($getInfosMethod === null) {
             $getInfosMethod = "get{$lineType}Infos";
         }
+        // Retrieve info objects: we will create 1 line per object.
         $infos = $source->$getInfosMethod();
         if (count($infos) === 0) {
+            // No info objet => no lines to create: return early, because otherwise we
+            // might try to instantiate an abstract Collector.
             return;
         }
 
         /** @var \Siel\Acumulus\Collectors\LineCollector $lineCollector */
         $lineCollector = $this->getContainer()->getCollector(DataType::Line, $lineType);
         $lineMappings = $this->getMappings()->getFor($lineType);
-        $propertySourceName = $getInfosMethod;
-        if (str_starts_with($propertySourceName, 'get')) {
-            $propertySourceName = substr($propertySourceName, strlen('get'));
+        // Will result in something like shippingInfo, paymentFeeInfo, etc. OR just 'item'
+        // for item lines.
+        $lineInfoName = $getInfosMethod;
+        if (str_starts_with($lineInfoName, 'get')) {
+            $lineInfoName = substr($lineInfoName, strlen('get'));
         }
-        if (str_ends_with($propertySourceName, 's')) {
-            $propertySourceName = substr($propertySourceName, 0, -strlen('s'));
+        if (str_ends_with($lineInfoName, 's')) {
+            $lineInfoName = substr($lineInfoName, 0, -strlen('s'));
         }
-        $propertySourceName = lcfirst($propertySourceName);
+        $lineInfoName = lcfirst($lineInfoName);
         foreach ($infos as $key => $lineInfo) {
-            $propertySources->add($propertySourceName, $lineInfo);
+            $propertySources->add($lineInfoName, $lineInfo);
             $propertySources->add('key', $key);
             $line = $lineCollector->collect($propertySources, $lineMappings);
             if (!$line->metadataGet(Meta::DoNotAdd)) {
@@ -198,7 +203,7 @@ class InvoiceCollector extends Collector
                 $line->removeChildren();
             }
             $propertySources->remove('key');
-            $propertySources->remove($propertySourceName);
+            $propertySources->remove($lineInfoName);
         }
     }
 }

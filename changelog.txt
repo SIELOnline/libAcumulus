@@ -7,7 +7,11 @@ This file contains a historical overview of changes in our code.
 -----------------------
 Bugs:
 - OC4: Changes in OC4 Mail handling.
-- OC4: Changes to composing event names.
+- OC4(.1?): Changes to composing event names (no more '/' or  a '|', but a '.').
+- OC 4.1: fields date_added and date_updated removed from table tax_rate, these fields
+  were queried by us, but not used, so simply changed the query.
+- OC4: doUpdate() did not work correctly, did to much or to few.
+
 
 8.6.5 (2025-10-21) (PS|HS|VM)
 -----------------------------

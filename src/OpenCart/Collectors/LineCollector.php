@@ -203,8 +203,7 @@ class LineCollector extends BaseLineCollector
     {
         /** @var \stdClass $query (documentation error in DB) */
         $query = $this->getDb()->query(
-            'SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id,
-            gz.name AS geo_zone, tr.date_added, tr.date_modified
+            'SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id, gz.name AS geo_zone
             FROM ' . DB_PREFIX . 'tax_rate tr
             LEFT JOIN ' . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id)
             WHERE tr.tax_rate_id = '" . $tax_rate_id . "'"
@@ -297,13 +296,17 @@ class LineCollector extends BaseLineCollector
     {
         $prefix = DB_PREFIX;
         $code = $this->getDb()->escape($code);
-        return "select distinct `value` from {$prefix}setting where `key` = 'total_{$code}_tax_class_id' or `key` like '{$code}_%_tax_class_id'";
+        return "select distinct `value` from {$prefix}setting
+            where `key` = 'total_{$code}_tax_class_id' or `key` like '{$code}_%_tax_class_id'";
     }
 
     /**
      * Wrapper method to get {@see Registry::$db}.
      *
      * @return \Opencart\System\Library\DB|\DB
+     *
+     * @noinspection PhpMissingReturnTypeInspection The 2 different return types are for
+     *   different versions of OC, so 1 wil not exist at runtime.
      */
     protected function getDb()
     {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @noinspection PhpMultipleClassDeclarationsInspection OC3 has many double class definitions
  * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
@@ -16,6 +17,7 @@ use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\OpenCart\Config\ConfigStore;
 use stdClass;
 use Throwable;
 
@@ -31,6 +33,8 @@ use const Siel\Acumulus\Version;
  * However, even if at this moment we are only supporting 1 OC version, we keep
  * this functionality in the library to keep the code in the weird OC structure
  * to a minimum.
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 abstract class OcHelper
 {
@@ -123,14 +127,15 @@ abstract class OcHelper
     /**
      * Uninstall function, called when the module is uninstalled by an admin.
      *
+     * For now, we do not delete data and settings, so we can refresh the events.
+     *
      * @throws \Exception
      */
     public function uninstall(): void
     {
         // "Disable" (delete) events, regardless the confirmation answer.
         $this->uninstallEvents();
-        $this->doUninstall();
-        $this->registry->response->redirect($this->registry->getRouteUrl('extension', 'marketplace', ''));
+//        $this->doUninstall();
     }
 
     /**
@@ -580,7 +585,14 @@ abstract class OcHelper
     }
 
     /**
-     * Upgrades the data and settings for this module if needed.
+     * Upgrades the data and settings for this module, if needed.
+     *
+     * This method gets called in 2 situations:
+     * - Module install (on the extensions page) (but the settings were not removed on
+     *   an earlier uninstall, otherwise doInstall() would have been called).?!
+     * - A GET of one of our forms (including the invoice status overview). OpenCart does
+     *   not have an upgrade mechanism for extensions, so we check each time a page of us
+     *   gets loaded. It is not really computationally intensive, so not a problem.
      *
      * @return bool
      *   Whether the upgrade was successful.
@@ -589,20 +601,16 @@ abstract class OcHelper
      */
     protected function doUpgrade(): bool
     {
-        if (!empty($this->acumulusContainer->getConfig()->get(Config::VersionKey))) {
-            // Config updates are now done in the config itself and, for now, no
-            // data model changes have been made since the introduction of
-            // VersionKey, so we can return.
-            return true;
-        }
-
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->registry->load->model('setting/setting');
-        $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
-        // If 'acumulus_siel_datamodel_version' is not set, we must be coming from a
-        // version before it was introduced. I have no idea when that was, but let's say
-        // we pick every update as of version 4.0:
-        $currentDataModelVersion = $setting['acumulus_siel_datamodel_version'] ?? '4.0.0-beta1';
+        $modelSettingSetting = $this->registry->model_setting_setting;
+        $setting = $modelSettingSetting->getSetting(ConfigStore::$configCode);
+        // If Config version and 'acumulus_siel_datamodel_version' are not set, we must be
+        // coming from a version before these were introduced. I have no idea when that
+        // was, but let's say we pick every update as of version 4.0:
+        $currentDataModelVersion = $setting['acumulus_siel_acumulus'][Config::VersionKey]
+            ?? $setting['acumulus_siel_datamodel_version']
+            ?? '4.0.0-beta1';
 
         // Check requirements anew before we continue upgrading.
         if (count($this->checkRequirements()) > 0) {
@@ -615,6 +623,14 @@ abstract class OcHelper
             $result = $this->acumulusContainer->getAcumulusEntryManager()->upgrade($currentDataModelVersion);
         }
 
+        // Update config values, this should set Config::VersionKey.
+        $result = $this->acumulusContainer->getConfigUpgrade()->upgrade($currentDataModelVersion) && $result;
+        if ($result && isset($setting['acumulus_siel_datamodel_version'])) {
+            // Remove the (very) old 'acumulus_siel_datamodel_version' config setting.
+            unset($setting['acumulus_siel_datamodel_version']);
+            $modelSettingSetting->editSetting(ConfigStore::$configCode, $setting);
+        }
+
         // Install events (just to be sure).
         try {
             $this->installEvents();
@@ -623,22 +639,6 @@ abstract class OcHelper
             $result = false;
         }
 
-        // Update config values, this should set VersionKey.
-        $result = $this->acumulusContainer->getConfigUpgrade()->upgrade($currentDataModelVersion) && $result;
-        if ($result) {
-            // Delete setting 'acumulus_siel_datamodel_version' without
-            // reverting other settings.
-            $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
-            unset($setting['acumulus_siel_datamodel_version']);
-            $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
-        }
-
-        $this->acumulusContainer->getLog()->info(
-            '%s: updated to version = %s, $result = %s',
-            __METHOD__,
-            Version,
-            $result ? 'true' : 'false'
-        );
         return $result;
     }
 

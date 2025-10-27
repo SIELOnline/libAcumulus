@@ -19,20 +19,20 @@ use Siel\Acumulus\OpenCart\Helpers\Registry;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    protected string $configCode = 'acumulus_siel';
+    public static string $configCode = 'acumulus_siel';
 
     public function load(): array
     {
-        $values = $this->getSettings()->getSetting($this->configCode);
-        return $values[$this->configCode . '_' . $this->configKey] ?? [];
+        $values = $this->getSettings()->getSetting(self::$configCode);
+        return $values[self::$configCode . '_' . $this->configKey] ?? [];
     }
 
     public function save(#[SensitiveParameter] array $values): bool
     {
         $modelSettingSetting = $this->getSettings();
-        $setting = $modelSettingSetting->getSetting($this->configCode);
-        $setting[$this->configCode . '_' . $this->configKey] = $values;
-        $modelSettingSetting->editSetting($this->configCode, $setting);
+        $setting = $modelSettingSetting->getSetting(self::$configCode);
+        $setting[self::$configCode . '_' . $this->configKey] = $values;
+        $modelSettingSetting->editSetting(self::$configCode, $setting);
         return true;
     }
 

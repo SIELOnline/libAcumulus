@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @noinspection PhpIncompatibleReturnTypeInspection
  *   The get/create...() methods are strong-typed, but the internal getInstance() not,
@@ -9,7 +10,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '8.6.5';
+const Version = '8.6.6';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -152,6 +153,7 @@ use const Siel\Acumulus\Version;
  * responsible that this class gets autoloaded.
  *
  * @noinspection EfferentObjectCouplingInspection
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class Container
 {
@@ -175,7 +177,7 @@ class Container
         return static::$instance;
     }
 
-    protected const baseNamespace = '\\Siel\\Acumulus';
+    protected const BaseNamespace = '\\Siel\\Acumulus';
 
     /**
      * The namespace for the current shop.
@@ -210,7 +212,7 @@ class Container
     {
         $this->shopNamespace = '';
         if (!str_contains($shopNamespace, 'Acumulus')) {
-            $this->shopNamespace = static::baseNamespace;
+            $this->shopNamespace = static::BaseNamespace;
         }
         $this->shopNamespace .= '\\' . $shopNamespace;
         $this->setLanguage($language);
@@ -219,7 +221,7 @@ class Container
 
     public function getShopNamespace(): string
     {
-        return substr($this->shopNamespace, strlen(static::baseNamespace) + 1);
+        return substr($this->shopNamespace, strlen(static::BaseNamespace) + 1);
     }
 
     public function getLanguage(): string
@@ -902,7 +904,7 @@ class Container
             if (end($namespaces) === 'Acumulus') {
                 // We arrived at the base level (\...\Acumulus),
                 // try the \Siel\Acumulus\ level and stop.
-                $namespace = static::baseNamespace;
+                $namespace = static::BaseNamespace;
                 $namespaces = [];
             } else {
                 $namespace = implode('\\', $namespaces);

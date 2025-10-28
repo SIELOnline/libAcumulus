@@ -22,8 +22,9 @@ class OcHelper extends BaseOcHelper
     protected function addEvents(): void
     {
         // @todo: make them less specific to catch events from other plugins as well, see phpdoc on parent.
-        $this->addEvent('acumulus', 'catalog/model/checkout/order.addOrder/after', 'eventOrderUpdate');
-        $this->addEvent('acumulus', 'catalog/model/checkout/order.addHistory/after', 'eventOrderUpdate');
+        $methodSeparator = version_compare(VERSION, '4.1.0.0', '<') ? '/' : '.';
+        $this->addEvent('acumulus', "catalog/model/checkout/order{$methodSeparator}addOrder/after", 'eventOrderUpdate');
+        $this->addEvent('acumulus', "catalog/model/checkout/order{$methodSeparator}addHistory/after", 'eventOrderUpdate');
         $this->addEvent('acumulus', 'admin/view/common/column_left/before', 'eventViewColumnLeft');
         $this->addEvent('acumulus', 'admin/controller/sale/order.info/before', 'eventControllerSaleOrderInfo');
         $this->addEvent('acumulus', 'admin/view/sale/order_info/before', 'eventViewSaleOrderInfo');

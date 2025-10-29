@@ -3,7 +3,7 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.6.6 (2025-10-??) (OC)
+8.6.6 (2025-10-??)
 -----------------------
 Bugs:
 - OC4: Changes in OC4 Mail handling.
@@ -11,6 +11,11 @@ Bugs:
 - OC4.1: fields date_added and date_updated removed from table tax_rate, these fields
   were queried by us, but not used, so simply changed the query.
 - OC4: doUpdate() did not work correctly, did to much or to few.
+- MA: Error extracting order id in handler for event 'sales_order_invoice_save_after'.
+- MA: incorrect arguments passed to 'acumulus_line_collect_after' event handlers.
+
+Refactorings:
+- ALL: Clearer error message when API call 'lookups/lookup_vatinfo' returns an error.
 
 
 8.6.5 (2025-10-21) (PS|HS|VM)

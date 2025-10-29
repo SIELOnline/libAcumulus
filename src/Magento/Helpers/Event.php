@@ -29,7 +29,7 @@ class Event implements EventInterface
 
     public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
     {
-        $this->getEventManager()->dispatch('acumulus_line_collect_after', compact('line', 'line', 'propertySources'));
+        $this->getEventManager()->dispatch('acumulus_line_collect_after', compact('line', 'propertySources'));
     }
 
     public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void

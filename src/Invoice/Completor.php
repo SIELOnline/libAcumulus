@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Invoice;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\ApiClient\AcumulusErrorException;
 use Siel\Acumulus\Completors\CompletorTaskInterface;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\AcumulusObject;
@@ -1492,6 +1493,9 @@ class Completor
             }
             if ($result->hasRealMessages()) {
                 $this->result->addMessages($result->getMessages(Severity::InfoOrWorse));
+                if ($result->hasError()) {
+                    throw new AcumulusErrorException($result);
+                }
                 $result = [];
             } else {
                 $result = $result->getMainAcumulusResponse();

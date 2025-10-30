@@ -27,8 +27,7 @@ class Environment extends EnvironmentBase
         try {
             $version = $productMetadata->getVersion();
         } catch (Exception) {
-            // In CLI mode (php bin/magento ...) getVersion() throws an
-            // exception.
+            // In CLI mode (php bin/magento ...) getVersion() throws an exception.
             $version = 'UNKNOWN';
         }
         $this->data['moduleVersion'] = Registry::getInstance()->getModuleVersion('Siel_AcumulusMa2');

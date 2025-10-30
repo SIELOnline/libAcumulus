@@ -13,6 +13,7 @@ Bugs:
 - OC4: doUpdate() did not work correctly, did to much or to few.
 - MA: Error extracting order id in handler for event 'sales_order_invoice_save_after'.
 - MA: incorrect arguments passed to 'acumulus_line_collect_after' event handlers.
+- MA: Mail components were swapped in 2.4.8; our mail did no longer work on 2.4.8.
 
 Refactorings:
 - ALL: Clearer error message when API call 'lookups/lookup_vatinfo' returns an error.

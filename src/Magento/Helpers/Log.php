@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Magento\Framework\Filesystem\Driver\File;
+use Monolog\Level;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Siel\Acumulus\Helpers\Severity;
@@ -45,18 +46,18 @@ class Log extends BaseLog
      * @param int $severity
      *   One of the {@see Severity} constants.
      *
-     * @return int
+     * @return Level
      *   The Magento equivalent of the severity.
      */
-    protected function getMagentoSeverity(int $severity): int
+    protected function getMagentoSeverity(int $severity): Level
     {
         return match ($severity) {
-            Severity::Exception => Logger::CRITICAL,
-            Severity::Error => Logger::ERROR,
-            Severity::Warning => Logger::WARNING,
-            Severity::Notice => Logger::NOTICE,
-            Severity::Info => Logger::INFO,
-            default => Logger::DEBUG,
+            Severity::Exception => Level::Critical,
+            Severity::Error => Level::Error,
+            Severity::Warning => Level::Warning,
+            Severity::Notice => Level::Notice,
+            Severity::Info => Level::Info,
+            default => Level::Debug,
         };
     }
 }

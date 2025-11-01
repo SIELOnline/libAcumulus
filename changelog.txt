@@ -19,6 +19,7 @@ Refactorings:
 - ALL: Clearer error message when API call 'lookups/lookup_vatinfo' returns an error.
 - MA: Updated event handling in siel_acumulus_ma2 module.
 - ALL: refactored test utilities
+- MA: Magento deprecated their own log levels in favor of the Monolog levels.
 
 
 8.6.5 (2025-10-21) (PS|HS|VM)

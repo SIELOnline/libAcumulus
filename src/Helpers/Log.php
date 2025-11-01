@@ -30,8 +30,7 @@ class Log
      */
     public const JsonFlags = Meta::JsonFlags | JSON_PRETTY_PRINT;
 
-    private int $logLevel = Severity::Info;
-    private bool $isLogLevelSet = false;
+    private int $logLevel;
     private string $libraryVersion;
     /**
      * @var array[]
@@ -58,10 +57,9 @@ class Log
      */
     public function getLogLevel(): int
     {
-        if (!$this->isLogLevelSet) {
+        if (!isset($this->logLevel)) {
             $pluginSettings = Container::getContainer()->getConfig()->getPluginSettings();
             $this->setLogLevel($pluginSettings['logLevel']);
-            $this->isLogLevelSet = true;
         }
         return $this->logLevel;
     }

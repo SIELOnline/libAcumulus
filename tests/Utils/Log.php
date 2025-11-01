@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Utils;
 
+use Siel\Acumulus\Helpers\Severity;
+
+use function ini_get;
 use function is_array;
 
 /**
@@ -12,6 +15,8 @@ use function is_array;
  *
  * - Saving and retrieving log messages.
  * - Asserting that log messages match.
+ * - Asserting that log messages get logged in the log file, or, depending on the log
+ *   level, do not get logged.
  */
 trait Log
 {
@@ -82,5 +87,46 @@ trait Log
                 static::assertSame($value, $logMessage[$key], "$name-$key");
             }
         }
+    }
+
+    /**
+     * Returns the path to the acumulus log file.
+     *
+     * The default implementation returns the path to the PHP error log, as that is the
+     * default where {@see \Siel\Acumulus\Helpers\Log} to logs. However, as all shops
+     * override this, this method should be overridden by all shops...
+     */
+    protected function getLogPath(): string
+    {
+        return ini_get('error_log');
+    }
+
+    /**
+     * Returns the file size of the given log file (or the
+     * {@see getLogPath() default log file} if none passed), 0 if the log file does not
+     * yet exist.
+     */
+    protected function getLogSize(?string $logFile = null): int
+    {
+        $logFile ??= $this->getLogPath();
+        return file_exists($logFile) ? filesize($logFile) : 0;
+    }
+
+    /**
+     * Tests that the log works as expected.
+     *
+     * 2 messages are logged, the first with a level that should not be logged, whereas
+     * the second should be logged. We check that the log file does not grow after logging
+     * the first message but does so after logging the 2nd message.
+     */
+    protected function _testLog(): void
+    {
+        $size = $this->getLogSize();
+        $logger = self::getContainer()->getLog();
+        $logger->setLogLevel(Severity::Info);
+        $logger->debug('Log::testLog() message 1');
+        static::assertSame($size, $this->getLogSize());
+        $logger->info('Log::testLog() message 2');
+        static::assertGreaterThan($size, $this->getLogSize());
     }
 }

@@ -42,9 +42,9 @@ trait Time
         return (new DateTimeImmutable())->format('H:i:s.u');
     }
 
-    protected function getDiffInSeconds(DateTimeInterface $time1, DateTimeInterface $time2): int
+    protected function getDiffInSeconds(DateTimeInterface $from, DateTimeInterface $to): int
     {
-        $interval = $time1->diff($time2);
+        $interval = $from->diff($to);
         return (int) (new DateTimeImmutable('@0'))->add($interval)->format('U');
     }
 

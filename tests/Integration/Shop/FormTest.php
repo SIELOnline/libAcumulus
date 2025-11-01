@@ -81,25 +81,10 @@ class FormTest extends TestCase
         $renderer = $this->getRenderer();
         $output = $renderer->render($form);
         $name = substr($class, strrpos($class, '\\') + 1);
-        $this->saveTestHtml(lcfirst($name), $output);
+        $this->saveFormHtml(lcfirst($name), $output);
 
         static::assertNotEmpty($output);
 
-        $this->outputContainsFields($form->getFields(), $output);
-    }
-
-    /**
-     * Asserts that for each field in the form field definitions an HTML element with that
-     * id exists in the render output.
-     */
-    private function outputContainsFields(array $expectedFields, string $output): void
-    {
-        foreach ($expectedFields as $id => $field) {
-            $id = $field['id'] ?? $id;
-            static::assertStringContainsString("id=\"$id\"", $output, "id=\"$id\" not found in output");
-            if (isset($field['fields'])) {
-                $this->outputContainsFields($field['fields'], $output);
-            }
-        }
+        $this->formContainsFields($form->getFields(), $output);
     }
 }

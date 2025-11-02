@@ -54,6 +54,10 @@ use Siel\Acumulus\TestWebShop\Config\Environment;
 use Siel\Acumulus\TestWebShop\Config\ShopCapabilities;
 use Siel\Acumulus\TestWebShop\Mail\Mailer;
 
+use function define;
+use function defined;
+use function dirname;
+
 /**
  * ContainerTest tests the Acumulus {@see \Siel\Acumulus\Helpers\Container}.
  */
@@ -162,6 +166,9 @@ class ContainerTest extends TestCase
     {
 //        $container = self::$container;
         $container = new Container('PrestaShop');
+        if (!defined('_PS_ROOT_DIR_')) {
+            define ('_PS_ROOT_DIR_', dirname(__FILE__, 5));
+        }
         $object = $container->getCollector($dataType, $subType);
         /** @noinspection UnnecessaryAssertionInspection  we check for a subtype of the specified return type */
         $this->assertInstanceOf($collectorClass, $object);

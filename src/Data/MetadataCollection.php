@@ -82,9 +82,9 @@ class MetadataCollection
      * @param mixed $value
      *   The value for the metadata field.
      */
-    public function set(string $name, mixed $value): void
+    public function set(string $name, mixed $value, bool $isList = false): void
     {
-        $this->metadata[$name] = (new MetadataValue(false))->add($value);
+        $this->metadata[$name] = (new MetadataValue($isList))->add($value);
     }
 
     /**
@@ -117,7 +117,7 @@ class MetadataCollection
     }
 
     /**
-     * Sets a metadata list field.
+     * Adds values to a metadata field, creating it if it not already exists.
      *
      * @param string $name
      *   The name for the metadata field.

@@ -35,9 +35,7 @@ trait Base
      */
     protected static function createContainer(): Container
     {
-        $container = new Container('TestWebShop', 'nl');
-        $container->addTranslations('Translations', 'Invoice');
-        return $container;
+        return new Container('TestWebShop', 'nl');
     }
 
     /**

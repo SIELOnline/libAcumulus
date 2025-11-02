@@ -27,7 +27,6 @@ class CompleteConceptTest extends TestCase
     protected function setUp(): void
     {
         $this->container = new Container('TestWebShop', 'nl');
-        $this->container->addTranslations('Translations', 'Invoice');
     }
 
     /**

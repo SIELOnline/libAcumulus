@@ -2,7 +2,7 @@
 
 /**
  * @noinspection PhpIncompatibleReturnTypeInspection
- *   The get/create...() methods are strong-typed, but the internal getInstance() not,
+ *   The get/create...() methods are strong-typed while the internal getInstance() isn't,
  *   leading to this warning all over the place.
  */
 
@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '8.6.6';
+const Version = '8.7.0';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -271,6 +271,7 @@ class Container
             $this->addTranslations('SeverityTranslations', 'Helpers');
             $this->addTranslations('ResultTranslations', 'ApiClient');
             $this->addTranslations('ResultTranslations', 'Helpers');
+            $this->addTranslations('Translations', 'Invoice');
         }
         return $translator;
     }

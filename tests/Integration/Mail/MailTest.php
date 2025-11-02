@@ -41,7 +41,6 @@ class MailTest extends TestCase
     protected function setUp(): void
     {
         $this->testException = new RuntimeException('Test exception');
-        static::getContainer()->addTranslations('Translations', 'Invoice');
         $this->examples = ApiRequestResponseExamples::getInstance();
         $this->examples->setOptions([Fld::Lang => static::getContainer()->getLanguage()]);
     }

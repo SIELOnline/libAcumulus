@@ -135,7 +135,7 @@ trait Mail
     protected function assertMailServerReceivedMail(string $subject, ?string $bodyText, ?string $bodyHtml, bool $isBase64 = false): void
     {
         // Give mail serer time to process the mail and save the log file.
-        sleep(2);
+        sleep(1);
         $now = new DateTimeImmutable();
         $papercutLog = $this->getPapercutLogFile();
         $logLines = array_reverse(explode("\n", str_replace(["\r\n", "\r"], "\n", $this->tail($papercutLog, 50))));

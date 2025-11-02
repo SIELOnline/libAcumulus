@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use Siel\Acumulus\Meta;
+
 use function array_key_exists;
 
 /**
@@ -42,6 +44,14 @@ class MetadataCollection
     public function getMetadataValue(string $name): ?MetadataValue
     {
         return $this->metadata[$name] ?? null;
+    }
+
+    /**
+     * Returns the {@see MetadataValue} object for $name, or null if not set.
+     */
+    public function copyMetadataValue(string $name, MetadataValue $metadataValue): void
+    {
+        $this->metadata[$name] = clone $metadataValue;
     }
 
     /**
@@ -123,6 +133,8 @@ class MetadataCollection
      *   The name for the metadata field.
      * @param array $values
      *   The values to add to the metadata field.
+     *
+     * @deprecated: just use {@see add()}
      */
     public function addMultiple(string $name, array $values): void
     {

@@ -27,6 +27,9 @@ trait AcumulusObjectMetadataTrait
         }
     }
 
+    /**
+     * @todo: should this be public? (at least we need a getMetadataValue() or rename this to getMetadataCollection()).
+     */
     public function getMetadata(): MetadataCollection
     {
         $this->metadata ??= new MetadataCollection();
@@ -75,10 +78,17 @@ trait AcumulusObjectMetadataTrait
 
     /**
      * See {@see \Siel\Acumulus\Data\MetadataCollection::addMultiple()}.
+     *
+     * @deprecated just use {@see metadataAdd()}.
      */
     public function metadataAddMultiple(string $name, array $values): void
     {
         $this->getMetadata()->addMultiple($name, $values);
+    }
+
+    public function metadataCopy(string $name, MetadataValue $metadataValue): void
+    {
+        $this->getMetadata()->copyMetadataValue($name, $metadataValue);
     }
 
     /**

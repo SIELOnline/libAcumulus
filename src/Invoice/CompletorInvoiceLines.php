@@ -327,7 +327,7 @@ class CompletorInvoiceLines
                     && (!Number::isZero($price) || !$this->completor->is0VatVatTypePossible())
                 ) {
                     // Filter lookup rate(s) by the rates of the possible vat types.
-                    $line->metadataSet(
+                    $line->metadataAdd(
                         Meta::VatRateLookupMatches,
                         $this->filterVatRateInfosByVatRates($line->metadataGet(Meta::VatRateLookup))
                     );
@@ -338,7 +338,7 @@ class CompletorInvoiceLines
                     if (!$this->getUniqueVatRate($line->metadataGet(Meta::VatRateLookupMatches))
                         && !empty($line->metadataGet(Meta::VatRateRangeMatches))
                     ) {
-                        $line->metadataSet(
+                        $line->metadataAdd(
                             Meta::VatRateLookupMatches,
                             $this->filterVatRateInfosByVatRates(
                                 $line->metadataGet(Meta::VatRateRangeMatches),
@@ -491,7 +491,7 @@ class CompletorInvoiceLines
             }
 
             if (count($fieldsCalculated) > 0) {
-                $line->metadataSet(Meta::FieldsCalculated, $fieldsCalculated);
+                $line->metadataAdd(Meta::FieldsCalculated, $fieldsCalculated);
             }
 
             // Recursively complete the required data.
@@ -836,7 +836,7 @@ class CompletorInvoiceLines
                 }
             }
             if (count($fieldsCalculated) > 0) {
-                $line->metadataSet(Meta::FieldsCalculated, $fieldsCalculated);
+                $line->metadataAdd(Meta::FieldsCalculated, $fieldsCalculated);
             }
         }
     }

@@ -13,6 +13,8 @@ use Siel\Acumulus\Helpers\Severity;
  */
 class Log extends BaseLog
 {
+    public const LogFile = 'acumulus.log.php';
+
     protected string $category;
 
     public function __construct(string $libraryVersion)
@@ -20,7 +22,7 @@ class Log extends BaseLog
         parent::__construct($libraryVersion);
         $this->category = 'com_acumulus_' . $this->getLibraryVersion();
         JoomlaLog::addLogger(
-            ['text_file' => 'acumulus.log.php'],
+            ['text_file' => Log::LogFile],
             JoomlaLog::ALL,
             [$this->category],
         );

@@ -103,15 +103,7 @@ trait Mail
      */
     protected function _testMailer(bool $hasTextPart = true, bool $hasHtmlPart = true, bool $isBase64 = false): void
     {
-        $classParts = explode('\\', get_class($this));
-        // Extract parts between 'Integration' and 'Mail\MailerTest'.
-        array_pop($classParts);
-        array_pop($classParts);
-        $shopName = '';
-        while (($shopNamePart = array_pop($classParts)) !== 'Integration') {
-            $shopName = $shopNamePart . '\\' . $shopName;
-        }
-        $shopName = rtrim($shopName, '\\');
+        $shopName = str_replace('\\', '_', self::getContainer()->getShopNamespace());
         $subject = "___$shopName test mail___";
         $bodyText = 'Text test message';
         $bodyHtml = '<p>HTML Test message</p>';

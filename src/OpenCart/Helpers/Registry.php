@@ -63,21 +63,27 @@ abstract class Registry
     }
 
     /**
-     * Magic method __get must be declared public.
+     * Magic method __get.
      */
-    public function __get(string $key)
+    public function __get(string $key): ?object
     {
         return $this->registry->get($key);
     }
 
     /**
-     * Magic method __set must be declared public.
-     *
-     * @noinspection MagicMethodsValidityInspection
+     * Magic method __set.
      */
-    public function __set(string $key, $value)
+    public function __set(string $key, $value): void
     {
         $this->registry->set($key, $value);
+    }
+
+    /**
+     * Magic method __isset.
+     */
+    public function __isset(string $key): bool
+    {
+        return $this->registry->has($key);
     }
 
     /**

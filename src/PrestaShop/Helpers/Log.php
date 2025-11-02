@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpClassConstantAccessedViaChildClassInspection
- */
 
 declare(strict_types=1);
 
@@ -9,7 +6,6 @@ namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use AbstractLogger;
 use FileLogger;
-use PrestaShop\PrestaShop\Core\Version;
 use Siel\Acumulus\Helpers\Log as BaseLog;
 use Siel\Acumulus\Helpers\Severity;
 
@@ -18,12 +14,17 @@ use Siel\Acumulus\Helpers\Severity;
  */
 class Log extends BaseLog
 {
+    public const LogFolder = _PS_ROOT_DIR_ . '/var/logs';
+    public const LogFile = 'acumulus.log';
+
     protected AbstractLogger $logger;
 
     /**
      * {@inheritdoc}
      *
      * This override uses the PrestaShopLogger.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function write(string $message, int $severity): void
     {
@@ -53,14 +54,8 @@ class Log extends BaseLog
     protected function getLogger(): FileLogger
     {
         if (!isset($this->logger)) {
-
-            if (version_compare(Version::VERSION, '1.7.5', '>=')) {
-                $logDirectory = 'var/logs';
-            } else {
-                $logDirectory = 'app/logs';
-            }
             $this->logger = new FileLogger(AbstractLogger::DEBUG);
-            $this->logger->setFilename(_PS_ROOT_DIR_ . '/'. $logDirectory . '/acumulus.log');
+            $this->logger->setFilename(Log::LogFolder . '/'. Log::LogFile);
         }
         return $this->logger;
     }

@@ -9,6 +9,8 @@ use Language;
 use Mail;
 use Siel\Acumulus\Mail\Mailer as BaseMailer;
 
+use Throwable;
+
 use function is_int;
 
 /**
@@ -20,16 +22,9 @@ class Mailer extends BaseMailer
     protected string $templateName;
 
     /**
-     * Sends an email.
-     *
-     * @return mixed
-     *   Success (true); error message, Throwable object or just false otherwise.
-     *
      * @throws \PrestaShopException
-     * @noinspection PhpMixedReturnTypeCanBeReducedInspection
-     *    @todo: Type can be narrowed to bool|int|string
      */
-    protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed
+    protected function send(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): bool|Throwable
     {
         $this->templateDir = _PS_ROOT_DIR_ . '/mails/';
         $this->templateName = 'acumulus-message';
@@ -39,25 +34,44 @@ class Mailer extends BaseMailer
         $languageId = Language::getIdByIso($this->translator->getLanguage());
         $templateVars = [];
 
-        $result = Mail::send($languageId, $this->templateName, $subject, $templateVars, $to, '', $from, $fromName, null, null, $this->templateDir);
+        try {
+            // Note: result will also be true if sending e-mail is prevented by hook or
+            // config ($configuration['PS_MAIL_METHOD'] === 3). We cannot know this
+            // without a bit of hacking, but we should see this as success anyway.
+            $result = Mail::send(
+                $languageId,
+                $this->templateName,
+                $subject,
+                $templateVars,
+                $to,
+                '',
+                $from,
+                $fromName,
+                null,
+                null,
+                $this->templateDir
+            );
+            if (is_int($result)) {
+                // If PS returns an int, that indicates the number of successful recipients, see Swift::send().
+                $result = true;
+            }
+        } catch (Throwable $e) {
+            $result = $e;
+        }
 
         // Clear the template files as they contain privacy-sensitive data.
         $this->writeTemplateFiles('', '');
 
-        if ($result === true) {
-            $result = 'Emails are deactivated: $configuration[\'PS_MAIL_METHOD\'] == 3';
-        } elseif(is_int($result)) {
-            // If PS returns an int, that indicates the number of successful recipients, see Swift::send().
-            $result = true;
-        }
         return $result;
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function getFrom(): string
     {
         return Configuration::get('PS_SHOP_EMAIL');
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function getFromName(): string
     {
         return Configuration::get('PS_SHOP_NAME');

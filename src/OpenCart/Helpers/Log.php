@@ -17,7 +17,7 @@ use function sprintf;
  */
 abstract class Log extends BaseLog
 {
-    protected string $filename = 'acumulus.log';
+    public const Filename = 'acumulus.log';
 
     /**
      * @return \Opencart\System\Library\Log|\Log

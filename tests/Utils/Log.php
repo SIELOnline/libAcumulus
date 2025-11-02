@@ -108,6 +108,7 @@ trait Log
      */
     protected function getLogSize(?string $logFile = null): int
     {
+        clearstatcache();
         $logFile ??= $this->getLogPath();
         return file_exists($logFile) ? filesize($logFile) : 0;
     }

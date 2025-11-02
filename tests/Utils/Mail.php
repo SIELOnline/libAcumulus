@@ -58,28 +58,6 @@ trait Mail
     }
 
     /**
-     * Tests that mail sending (still) works.
-     */
-    protected function _testMailer(bool $doTextPart = true, bool $doHtmlPart = true): void
-    {
-        $classParts = explode('\\', get_class($this));
-        // Extract parts between 'Integration' and 'Mail\MailerTest'.
-        array_pop($classParts);
-        array_pop($classParts);
-        $shopName = '';
-        while (($shopNamePart = array_pop($classParts)) !== 'Integration') {
-            $shopName = $shopNamePart . '\\' . $shopName;
-        }
-        $shopName = rtrim($shopName, '\\');
-        $subject = "___$shopName test mail___";
-        $bodyText = 'Text test message';
-        $bodyHtml = '<p>HTML Test message</p>';
-        $mailer = self::getContainer()->getMailer();
-        self::assertTrue($mailer->sendAdminMail($subject, $bodyText, $bodyHtml), 'Sending mail failed');
-        $this->assertMailServerReceivedMail($subject, $doTextPart ? $bodyText : null, $doHtmlPart ? $bodyHtml : null);
-    }
-
-    /**
      * Asserts that the contents of the mail sent match the expected contents.
      *
      * It also saves the mail sent using the name and '.latest.mail' as extension.
@@ -121,6 +99,28 @@ trait Mail
     }
 
     /**
+     * Tests that mail sending (still) works.
+     */
+    protected function _testMailer(bool $hasTextPart = true, bool $hasHtmlPart = true, bool $isBase64 = false): void
+    {
+        $classParts = explode('\\', get_class($this));
+        // Extract parts between 'Integration' and 'Mail\MailerTest'.
+        array_pop($classParts);
+        array_pop($classParts);
+        $shopName = '';
+        while (($shopNamePart = array_pop($classParts)) !== 'Integration') {
+            $shopName = $shopNamePart . '\\' . $shopName;
+        }
+        $shopName = rtrim($shopName, '\\');
+        $subject = "___$shopName test mail___";
+        $bodyText = 'Text test message';
+        $bodyHtml = '<p>HTML Test message</p>';
+        $mailer = self::getContainer()->getMailer();
+        self::assertTrue($mailer->sendAdminMail($subject, $bodyText, $bodyHtml), 'Sending mail failed');
+        $this->assertMailServerReceivedMail($subject, $hasTextPart ? $bodyText : null, $hasHtmlPart ? $bodyHtml : null, $isBase64);
+    }
+
+    /**
      * This method checks that a mail has been sent and received by the mail server.
      *
      * It is based on the knowledge that:
@@ -140,7 +140,7 @@ trait Mail
      * Then it checks that the file contains the mail contents: subject and body (2 mime
      * parts for the text and html versions of the body).
      */
-    protected function assertMailServerReceivedMail(string $subject, ?string $bodyText, ?string $bodyHtml): void
+    protected function assertMailServerReceivedMail(string $subject, ?string $bodyText, ?string $bodyHtml, bool $isBase64 = false): void
     {
         // Give mail serer time to process the mail and save the log file.
         sleep(2);
@@ -161,7 +161,7 @@ trait Mail
                     // We want the full file name, so we can check the file contents.
                     $emlFile = substr($line, $logMessageStart + strlen($logMessage) + strlen(': '));
                     $emlFile = substr($emlFile, 0, strpos($emlFile, '.eml') + strlen('.eml'));
-                    $this->assertMailSentContainsParts($emlFile, $bodyText, $bodyHtml);
+                    $this->assertMailSentContainsParts($emlFile, $bodyText, $bodyHtml, $isBase64);
                     return;
                 } else {
                     self::fail('Log mentions a mail being sent, but more then 10 seconds ago.');
@@ -171,13 +171,19 @@ trait Mail
         self::fail('Log does not confirm that the mail was sent');
     }
 
-    protected function assertMailSentContainsParts(string $emlFile, ?string $bodyText, ?string $bodyHtml): void
+    protected function assertMailSentContainsParts(string $emlFile, ?string $bodyText, ?string $bodyHtml, bool $isBase64): void
     {
         $mailMessageContents = file_get_contents($emlFile);
         if ($bodyText !== null) {
+            if ($isBase64) {
+                $bodyText = base64_encode($bodyText);
+            }
             static::assertStringContainsString($bodyText, $mailMessageContents, 'text mime part not found in message');
         }
         if ($bodyHtml !== null) {
+            if ($isBase64) {
+                $bodyHtml = base64_encode($bodyHtml);
+            }
             static::assertStringContainsString($bodyHtml, $mailMessageContents, 'HTML mime part not found in message');
         }
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\OpenCart3\Helpers;
 
+use Log as OpenCartLog;
 use Siel\Acumulus\OpenCart\Helpers\Log as BaseLog;
 
 /**
@@ -11,8 +12,8 @@ use Siel\Acumulus\OpenCart\Helpers\Log as BaseLog;
  */
 class Log extends BaseLog
 {
-    protected function getLog(): \Log
+    protected function getLog(): OpenCartLog
     {
-        return new \Log($this->filename);
+        return new OpenCartLog(Log::Filename);
     }
 }

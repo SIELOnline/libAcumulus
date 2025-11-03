@@ -3,9 +3,13 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.6.6 (2025-10-??)
------------------------
-Bugs:
+8.7.0 (2025-11-04) (ALL)
+------------------------
+Features:
+- All: Updated (and aligned) the acumulus_customise_invoice modules for all supported
+  shops to this version of this library.
+
+- Bugs:
 - OC4: Changes in OC4 Mail handling.
 - OC4.1: Changes to composing event names (no more '/' or  a '|', but a '.').
 - OC4.1: fields date_added and date_updated removed from table tax_rate, these fields
@@ -20,6 +24,7 @@ Refactorings:
 - MA: Updated event handling in siel_acumulus_ma2 module.
 - ALL: Refactored test utilities and added Log and Mail end-to-end checking features.
 - MA: Magento deprecated their own log levels in favor of the Monolog levels.
+- ALL: Refactored metadata handling (adding list arrays, converting to API value).
 
 
 8.6.5 (2025-10-21) (PS|HS|VM)
@@ -38,7 +43,7 @@ Bugs:
   be of type int, string given, called in ItemLineCollector.php on line 90 and ...
 
 Refactorings:
-- ALL: Generalise class totals towards a class Amount (split into part amount and part
+- ALL: Generalised class totals towards a class Amount (split into part amount and part
   VAT) allowing to retrieve its separate parts and which parts were calculated.
 - ALL: BasicSubmit: removed needContract as a parameter and introduced it as a parameter
   during collecting, so we do not collect contract data (and store it in the BasicSubmit

@@ -48,6 +48,8 @@ class MetadataCollection
 
     /**
      * Returns the {@see MetadataValue} object for $name, or null if not set.
+     *
+     * @todo: add tests.
      */
     public function copyMetadataValue(string $name, MetadataValue $metadataValue): void
     {

@@ -6,10 +6,9 @@ even faster. So the quick changelog here should give you an idea of the
 recentness of this information.
 
 Updates:
-- System requirements: valid for our version 8.6
-- Supported shops and versions: August 2025: MA, WC. July 2024 (others)
-- Supported PHP versions: August 2025.
-- Tested PS 9, VM 4.4 and HS 6.1 on Joomla 5.4 up to PHP 8.4: October 2025
+- System requirements: valid for our version 8.7
+- Supported shops and versions: October 2025
+- Supported PHP versions: October 2025.
 
 System Requirements
 -------------------
@@ -31,11 +30,12 @@ shop(s) a change applies (if no tag is mentioned, ALL may be assumed).
 
 Notes:
 
-- The supported versions column is tricky. We only use the latest (locally
-  installed) version of a shop for testing. New features of our module may use
-  features of the shop as were available when our new feature was developed.
-  As it is often not clear when a new API feature became available, this may
-  unknowingly lead to our module failing on older versions of the shop.
+- The supported versions column is tricky. We only use the latest (locally installed)
+  version of a shop for testing. New features of our module may use features of the shop
+  as were available when that new feature of our module was developed. As it is often not
+  clear when a new API feature became available, this may unknowingly lead to our module
+  failing on older versions of the shop.
+- VirtueMart 4.6.0 has not yet been tested but will be in the (near) future.
 - Joomla 6 has not yet been tested but will be in the (near) future.
 
 | Tag | Shop             | Version used for testing | Supported versions                  |

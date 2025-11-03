@@ -279,6 +279,8 @@ class Message
         $messageText = $this->getText();
         if ($isHtml) {
             $messageText = '<span>' .  htmlspecialchars($messageText, ENT_NOQUOTES) . '</span>';
+            // @nth: replace spaces with &nbsp; to retain indentation (i.e. all spaces
+            //   after a <br> (if we do this after the nl2br) or after a /n.
             $messageText = nl2br($messageText, false);
         }
         $text .= $messageText;

@@ -81,6 +81,7 @@ class ItemLineCollector extends LineCollector
             $line->metadataSet(Meta::VatAmount, $sign * ($shopItem['unit_price_tax_incl'] - $shopItem['unit_price_tax_excl']));
             $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
             $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
+            $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
         }
         $taxRulesGroupId = isset($shopItem['id_tax_rules_group']) ? (int) $shopItem['id_tax_rules_group'] : 0;
         // VAT lookup metadata should be based on the address used for VAT calculations.
@@ -92,6 +93,5 @@ class ItemLineCollector extends LineCollector
             : $source->getOrder()->getShopObject()->id_address_delivery);
         $this->addVatRateLookupMetadata($line, $addressId, $taxRulesGroupId);
 
-        $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
     }
 }

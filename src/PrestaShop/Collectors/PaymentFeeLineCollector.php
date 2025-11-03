@@ -42,12 +42,11 @@ class PaymentFeeLineCollector extends LineCollector
         $line->unitPrice = $totals->amountEx;
         if ($totals->isAmountExCalculated()) {
             // PayPal with a fee: inc and vat rate given, ex and vat amount calculated.
-            $line->metadataAdd(Meta::FieldsCalculated, Fld::UnitPrice);
             $line->vatRate = $paymentFeeLineInfo->vatRate;
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact);
             $line->metadataSet(Meta::UnitPriceInc, $totals->amountInc);
             $line->metadataSet(Meta::VatAmount, $totals->amountVat);
-            $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
+            $line->metadataAdd(Meta::FieldsCalculated, [Fld::UnitPrice, Meta::VatAmount]);
         } else {
             // Mollie line: ex and inc given: vat amount and rate (to be) calculated.
             $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);

@@ -60,8 +60,7 @@ class ShippingLineCollector extends LineCollector
         $line->vatRate = $vatRate;
         $line->metadataSet(Meta::VatAmount, $shippingVat);
         $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact);
-        $line->metadataAdd(Meta::FieldsCalculated, Fld::UnitPrice);
-        $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
+        $line->metadataAdd(Meta::FieldsCalculated, [Fld::UnitPrice, Meta::VatAmount]);
         // VAT lookup metadata should be based on the address used for VAT calculations.
         /** @noinspection NullPointerExceptionInspection */
         $vatBasedOn = $invoice->getCustomer()->getMainAddressType();

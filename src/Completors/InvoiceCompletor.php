@@ -13,7 +13,10 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\MessageCollection;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
+
+use function assert;
 
 /**
  * InvoiceCompletor completes an {@see \Siel\Acumulus\Data\Invoice}.
@@ -65,6 +68,7 @@ class InvoiceCompletor extends BaseCompletor
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
         $this->invoice = $acumulusObject;
+        assert($result instanceof InvoiceAddResult);
 
         $this->completeCustomer($result);
         $this->getCompletorTask(DataType::Invoice, 'InvoiceNumber')->complete($this->invoice);
@@ -90,7 +94,7 @@ class InvoiceCompletor extends BaseCompletor
      * Completes the {@see \Siel\Acumulus\Data\Customer} part of the
      * {@see \Siel\Acumulus\Data\Invoice}.
      */
-    protected function completeCustomer(MessageCollection $result): void
+    protected function completeCustomer(InvoiceAddResult $result): void
     {
         $this->getContainer()->getCompletor(DataType::Customer)->complete($this->invoice->getCustomer(), $result);
     }
@@ -99,7 +103,7 @@ class InvoiceCompletor extends BaseCompletor
      * Completes the {@see \Siel\Acumulus\Data\EmailInvoiceAsPdf} part of the
      * {@see \Siel\Acumulus\Data\Invoice}.
      */
-    protected function completeEmailAsPdf(MessageCollection $result): void
+    protected function completeEmailAsPdf(InvoiceAddResult $result): void
     {
         $this->getContainer()->getCompletor(DataType::EmailAsPdf, EmailAsPdfType::Invoice)->complete(
             $this->invoice->getEmailAsPdf(),
@@ -107,8 +111,9 @@ class InvoiceCompletor extends BaseCompletor
         );
     }
 
-    protected function completeLines(MessageCollection $result): void
+    protected function completeLines(InvoiceAddResult $result): void
     {
+        /** @var \Siel\Acumulus\Completors\LineCompletor $lineCompletor */
         $lineCompletor = $this->getContainer()->getCompletor(DataType::Line);
         foreach ($this->invoice->getLines() as $line) {
             $lineCompletor->complete($line, $result);

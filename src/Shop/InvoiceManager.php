@@ -453,7 +453,10 @@ abstract class InvoiceManager
         $emailAsPdf = $collectorManager->collectEmailAsPdf($subType);
         /** @var \Siel\Acumulus\Completors\EmailInvoiceAsPdfCompletor $completor */
         $completor = $this->getContainer()->getCompletor(DataType::EmailAsPdf, $subType);
-        $completor->complete($emailAsPdf, new MessageCollection($this->getTranslator()));
+        $completor->complete(
+            $emailAsPdf,
+            new Result($forInvoice ? 'InvoiceManager::emailInvoiceAsPdf' : 'InvoiceManager::emailPackingSlipAsPdf', $this->getTranslator())
+        );
         return $emailAsPdf;
     }
 

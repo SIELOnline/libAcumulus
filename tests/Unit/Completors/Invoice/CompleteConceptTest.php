@@ -9,9 +9,10 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Completors\Invoice\CompleteConcept;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteConceptTest test {@see CompleteConcept}.
@@ -19,13 +20,7 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteConceptTest extends TestCase
 {
     use AcumulusContainer;
-
-    private function getInvoice(): Invoice
-    {
-        /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = self::getContainer()->createAcumulusObject(DataType::Invoice);
-        return $invoice;
-    }
+    use DataObjectFactory;
 
     public function testComplete(): void
     {
@@ -55,8 +50,7 @@ class CompleteConceptTest extends TestCase
         $completor->complete($invoice);
         $this->assertTrue($invoice->concept);
 
-        /** @var \Siel\Acumulus\Data\Line $line */
-        $line = self::getContainer()->createAcumulusObject(DataType::Line);
+        $line = $this->getLine(LineType::Item);
         $line->metadataAdd(Meta::Warning, 'warning');
 
         // Plugin, warning = true

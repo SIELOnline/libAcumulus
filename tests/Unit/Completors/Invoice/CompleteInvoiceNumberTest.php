@@ -6,10 +6,9 @@ namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteInvoiceNumberTest tests the
@@ -18,13 +17,7 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteInvoiceNumberTest extends TestCase
 {
     use AcumulusContainer;
-
-    private function getInvoice(): Invoice
-    {
-        /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = self::getContainer()->createAcumulusObject(DataType::Invoice);
-        return $invoice;
-    }
+    use DataObjectFactory;
 
     public static function invoiceNumberDataProvider(): array
     {

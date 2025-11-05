@@ -6,9 +6,8 @@ namespace Siel\Acumulus\Tests\Unit\Completors\EmailInvoiceAsPdf;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Data\EmailInvoiceAsPdf;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteByConfigTest tests {@see \Siel\Acumulus\Completors\EmailInvoiceAsPdf\CompleteByConfig}.
@@ -16,13 +15,7 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteByConfigTest extends TestCase
 {
     use AcumulusContainer;
-
-    private function getEmailInvoiceAsPdf(): EmailInvoiceAsPdf
-    {
-        /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $emailInvoiceAsPdf */
-        $emailInvoiceAsPdf = self::getContainer()->createAcumulusObject(DataType::EmailInvoiceAsPdf);
-        return $emailInvoiceAsPdf;
-    }
+    use DataObjectFactory;
 
     public static function emailInvoiceAsPdfConfigDataProvider(): array
     {

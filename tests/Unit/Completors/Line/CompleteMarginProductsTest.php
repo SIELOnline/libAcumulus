@@ -6,12 +6,12 @@ namespace Siel\Acumulus\Tests\Unit\Completors\Line;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteMarginSchemeTest tests {@see \Siel\Acumulus\Completors\Line\CompleteMarginProducts}.
@@ -19,21 +19,14 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteMarginProductsTest extends TestCase
 {
     use AcumulusContainer;
-    
+    use DataObjectFactory;
+
     private const MarginProducts = [
         Config::MarginProducts_Unknown,
         Config::MarginProducts_Both,
         Config::MarginProducts_No,
         Config::MarginProducts_Only,
     ];
-
-    private function getLine(string $lineType): Line
-    {
-        /** @var \Siel\Acumulus\Data\Line $line */
-        $line = self::getContainer()->createAcumulusObject(DataType::Line);
-        $line->setType($lineType);
-        return $line;
-    }
 
     public static function marginProductsConfigDataProvider(): array
     {

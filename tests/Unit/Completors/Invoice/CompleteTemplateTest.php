@@ -6,9 +6,8 @@ namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteTemplateTest tests the
@@ -17,13 +16,7 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteTemplateTest extends TestCase
 {
     use AcumulusContainer;
-
-    private function getInvoice(): Invoice
-    {
-        /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = self::getContainer()->createAcumulusObject(DataType::Invoice);
-        return $invoice;
-    }
+    use DataObjectFactory;
 
     public static function templateDataProvider(): array
     {

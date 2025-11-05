@@ -7,11 +7,9 @@ namespace Siel\Acumulus\Tests\Unit\Completors\Line;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
-use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteByConfigTest tests {@see \Siel\Acumulus\Completors\Line\CompleteByConfig}.
@@ -19,14 +17,7 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteByConfigTest extends TestCase
 {
     use AcumulusContainer;
-
-    private function getLine(string $lineType): Line
-    {
-        /** @var \Siel\Acumulus\Data\Line $line */
-        $line = self::getContainer()->createAcumulusObject(DataType::Line);
-        $line->metadataSet(Meta::SubType, $lineType);
-        return $line;
-    }
+    use DataObjectFactory;
 
     public static function natureConfigDataProvider(): array
     {

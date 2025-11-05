@@ -7,10 +7,9 @@ namespace Siel\Acumulus\Tests\Unit\Completors\Address;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Data\Address;
-use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteByConfigTest tests {@see \Siel\Acumulus\Completors\Address\CompleteByConfig}.
@@ -18,13 +17,7 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteByConfigTest extends TestCase
 {
     use AcumulusContainer;
-
-    private function getAddress(): Address
-    {
-        /** @var \Siel\Acumulus\Data\Address $address */
-        $address = self::getContainer()->createAcumulusObject(DataType::Address);
-        return $address;
-    }
+    use DataObjectFactory;
 
     public static function addressConfigDataProvider(): array
     {

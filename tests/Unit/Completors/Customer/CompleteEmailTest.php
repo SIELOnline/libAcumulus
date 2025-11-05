@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Unit\Completors\Customer;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Data\Customer;
-use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteEmailTest tests {@see \Siel\Acumulus\Completors\Customer\CompleteEmail}.
@@ -15,13 +14,7 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteEmailTest extends TestCase
 {
     use AcumulusContainer;
-
-    private function getCustomer(): Customer
-    {
-        /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = self::getContainer()->createAcumulusObject(DataType::Customer);
-        return $customer;
-    }
+    use DataObjectFactory;
 
     public static function customerEmailDataProvider(): array
     {

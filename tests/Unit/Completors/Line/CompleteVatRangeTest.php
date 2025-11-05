@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Unit\Completors\Line;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteVatRangeTest tests {@see \Siel\Acumulus\Completors\Line\CompleteVatRange}.
@@ -18,14 +17,7 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteVatRangeTest extends TestCase
 {
     use AcumulusContainer;
-
-    private function getLine(string $lineType): Line
-    {
-        /** @var \Siel\Acumulus\Data\Line $line */
-        $line = self::getContainer()->createAcumulusObject(DataType::Line);
-        $line->metadataSet(Meta::SubType, $lineType);
-        return $line;
-    }
+    use DataObjectFactory;
 
     public function testNoCompletionHasVatRate(): void
     {

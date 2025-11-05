@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\Customer;
-use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
+use Siel\Acumulus\Tests\Utils\DataObjectFactory;
 
 /**
  * CompleteAnonymiseTest tests {@see \Siel\Acumulus\Completors\Customer\CompleteAnonymise}.
@@ -17,11 +17,11 @@ use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 class CompleteAnonymiseTest extends TestCase
 {
     use AcumulusContainer;
+    use DataObjectFactory;
 
     public function createCustomer(): Customer
     {
-        /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = self::getContainer()->createAcumulusObject(DataType::Customer);
+        $customer = $this->getCustomer();
         $customer->contactId = 1;
         $customer->type = Api::CustomerType_Debtor;
         $customer->vatTypeId = Api::VatTypeId_Private;
@@ -43,7 +43,7 @@ class CompleteAnonymiseTest extends TestCase
 
     public function createAddress1(): Address
     {
-        $address = new Address();
+        $address = $this->getAddress();
         $address->companyName1 = null;
         $address->companyName2 = null;
         $address->fullName = 'John Doe';
@@ -60,7 +60,7 @@ class CompleteAnonymiseTest extends TestCase
 
     public function createAddress2(): Address
     {
-        $address = new Address();
+        $address = $this->getAddress();
         $address->companyName1 = null;
         $address->companyName2 = null;
         $address->fullName = 'Mary Doe';
@@ -77,8 +77,7 @@ class CompleteAnonymiseTest extends TestCase
 
     public function createAnonymousCustomer(): Customer
     {
-        /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = self::getContainer()->createAcumulusObject(DataType::Customer);
+        $customer = $this->getCustomer();
         $customer->contactId = null;
         $customer->type = null;
         $customer->vatTypeId = null;
@@ -100,7 +99,7 @@ class CompleteAnonymiseTest extends TestCase
 
     public function createAnonymousAddress1(): Address
     {
-        $address = new Address();
+        $address = $this->getAddress();
         $address->companyName1 = null;
         $address->companyName2 = null;
         $address->fullName = null;
@@ -117,7 +116,7 @@ class CompleteAnonymiseTest extends TestCase
 
     public function createAnonymousAddress2(): Address
     {
-        $address = new Address();
+        $address = $this->getAddress();
         $address->companyName1 = null;
         $address->companyName2 = null;
         $address->fullName = null;
@@ -132,7 +131,7 @@ class CompleteAnonymiseTest extends TestCase
         return $address;
     }
 
-    private function getCustomer(): Customer
+    private function getFilledCustomer(): Customer
     {
         $customer = $this->createCustomer();
         $customer->setInvoiceAddress($this->createAddress1());
@@ -153,7 +152,7 @@ class CompleteAnonymiseTest extends TestCase
         $config = self::getContainer()->getConfig();
         $config->set('sendCustomer', true);
         $completor = self::getContainer()->getCompletorTask('Customer', 'Anonymise');
-        $customer = $this->getCustomer();
+        $customer = $this->getFilledCustomer();
         $customerBefore = $customer->toArray();
         $completor->complete($customer);
         $customerAfter = $customer->toArray();
@@ -165,7 +164,7 @@ class CompleteAnonymiseTest extends TestCase
         $config = self::getContainer()->getConfig();
         $config->set('sendCustomer', false);
         $completor = self::getContainer()->getCompletorTask('Customer', 'Anonymise');
-        $customer = $this->getCustomer();
+        $customer = $this->getFilledCustomer();
         $anonymousCustomer = $this->getAnonymousCustomer();
         $completor->complete($customer);
         $customerAfter = $customer->toArray();
@@ -177,7 +176,7 @@ class CompleteAnonymiseTest extends TestCase
         $config = self::getContainer()->getConfig();
         $config->set('sendCustomer', false);
         $completor = self::getContainer()->getCompletorTask('Customer', 'Anonymise');
-        $customer = $this->getCustomer();
+        $customer = $this->getFilledCustomer();
         $customer->vatTypeId = Api::VatTypeId_Business;
         $customer->vatNumber = 'NL123456789';
         $customer->getInvoiceAddress()->companyName1 = 'Company 1';

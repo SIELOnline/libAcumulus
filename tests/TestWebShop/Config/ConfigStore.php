@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  PHP8.2 attribute
+ */
 
 declare(strict_types=1);
 
@@ -7,7 +10,6 @@ namespace Siel\Acumulus\TestWebShop\Config;
 use SensitiveParameter;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Meta;
 
 /**
  * Implements the connection to the TestWebShop config component.

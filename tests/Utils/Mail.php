@@ -6,6 +6,8 @@ namespace Siel\Acumulus\Tests\Utils;
 
 use DateTimeImmutable;
 
+use Siel\Acumulus\Mail\Mailer;
+
 use function is_array;
 use function strlen;
 
@@ -16,16 +18,22 @@ use function strlen;
  */
 trait Mail
 {
+    use AcumulusContainer;
     use Path;
     use Time;
+
+    private function getMailer(): Mailer
+    {
+        return static::getContainer()->getMailer();
+    }
 
     /**
      * Returns a test e-mail.
      */
-    protected function getTestMail(string $name): ?array
+    protected static function getTestMail(string $name): ?array
     {
         $mail = null;
-        $fullFileName = $this->getDataPath() . "/Mail/$name.mail";
+        $fullFileName = self::getDataPath() . "/Mail/$name.mail";
         $phpFileName = "$fullFileName.php";
 
         if (is_readable($phpFileName)) {
@@ -45,14 +53,28 @@ trait Mail
      * @param array $data
      *   The mail data to be saved (in JSON format).
      */
-    protected function saveTestMail(string $name, array $data): void
+    protected static function saveTestMail(string $name, array $data): void
     {
-        $path = $this->getDataPath() . '/Mail';
+        $path = self::getDataPath() . '/Mail';
         $fileName = "$name.mail";
         if (file_exists("$path/$fileName") || file_exists("$path/$fileName.php")) {
             $fileName = "$name.latest.mail";
         }
         file_put_contents("$path/$fileName", var_export($data, true) . "\n");
+    }
+
+    /**
+     * Checks the mail messages.
+     */
+    protected function checkMail(int $mailCount): void
+    {
+        static::assertSame($mailCount + 1, $this->getMailer()->getMailCount());
+        $mailSent = $this->getMailer()->getMailSent($mailCount);
+        static::assertIsArray($mailSent);
+
+        // dataName() returns the key of the actual data set.
+        $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
+        self::assertMailMatches($name, $mailSent);
     }
 
     /**
@@ -65,10 +87,10 @@ trait Mail
      * @param array|null $mailSent
      *   The mail sent, or null if no mail was sent.
      */
-    protected function assertMailMatches(string $name, ?array $mailSent): void
+    protected static function assertMailMatches(string $name, ?array $mailSent): void
     {
-        $this->saveTestMail($name, $mailSent);
-        $expected = $this->getTestMail($name);
+        self::saveTestMail($name, $mailSent);
+        $expected = self::getTestMail($name);
         if (is_array($expected['bodyText'] ?? null) || is_array($expected['bodyHtml'] ?? null)) {
             // Compare mail contents using str_contains (the contents contain version
             // numbers or so).
@@ -107,7 +129,7 @@ trait Mail
         $bodyHtml = '<p>HTML Test message</p>';
         $mailer = self::getContainer()->getMailer();
         self::assertTrue($mailer->sendAdminMail($subject, $bodyText, $bodyHtml), 'Sending mail failed');
-        $this->assertMailServerReceivedMail($subject, $hasTextPart ? $bodyText : null, $hasHtmlPart ? $bodyHtml : null, $isBase64);
+        self::assertMailServerReceivedMail($subject, $hasTextPart ? $bodyText : null, $hasHtmlPart ? $bodyHtml : null, $isBase64);
     }
 
     /**
@@ -130,27 +152,27 @@ trait Mail
      * Then it checks that the file contains the mail contents: subject and body (2 mime
      * parts for the text and html versions of the body).
      */
-    protected function assertMailServerReceivedMail(string $subject, ?string $bodyText, ?string $bodyHtml, bool $isBase64 = false): void
+    protected static function assertMailServerReceivedMail(string $subject, ?string $bodyText, ?string $bodyHtml, bool $isBase64 = false): void
     {
         // Give mail serer time to process the mail and save the log file.
         sleep(1);
         $now = new DateTimeImmutable();
-        $papercutLog = $this->getPapercutLogFile();
-        $logLines = array_reverse(explode("\n", str_replace(["\r\n", "\r"], "\n", $this->tail($papercutLog, 50))));
+        $papercutLog = self::getPapercutLogFile();
+        $logLines = array_reverse(explode("\n", str_replace(["\r\n", "\r"], "\n", self::tail($papercutLog, 50))));
         foreach ($logLines as $line) {
             $logMessage = 'Successfully Saved email message';
             $logMessageStart = strpos($line, $logMessage);
             if ($logMessageStart !== false && str_contains($line, $subject)) {
                 // Line looks like {timestamp} [{level}] {message}
                 $timestamp = substr($line, 0, strpos($line, '[') - 1);
-                $diff = $this->getDiffInSeconds(new DateTimeImmutable($timestamp), $now);
+                $diff = self::getDiffInSeconds(new DateTimeImmutable($timestamp), $now);
                 if (0 <= $diff && $diff < 10) {
                     // Message looks like:
                     // Successfully Saved email message: {log folder}\{eml file name}.eml
                     // We want the full file name, so we can check the file contents.
                     $emlFile = substr($line, $logMessageStart + strlen($logMessage) + strlen(': '));
                     $emlFile = substr($emlFile, 0, strpos($emlFile, '.eml') + strlen('.eml'));
-                    $this->assertMailSentContainsParts($emlFile, $bodyText, $bodyHtml, $isBase64);
+                    self::assertMailSentContainsParts($emlFile, $bodyText, $bodyHtml, $isBase64);
                     return;
                 } else {
                     self::fail('Log mentions a mail being sent, but more then 10 seconds ago.');
@@ -160,7 +182,7 @@ trait Mail
         self::fail('Log does not confirm that the mail was sent');
     }
 
-    protected function assertMailSentContainsParts(string $emlFile, ?string $bodyText, ?string $bodyHtml, bool $isBase64): void
+    protected static function assertMailSentContainsParts(string $emlFile, ?string $bodyText, ?string $bodyHtml, bool $isBase64): void
     {
         $mailMessageContents = file_get_contents($emlFile);
         if ($bodyText !== null) {
@@ -180,16 +202,16 @@ trait Mail
     /**
      * Returns the path to the Papercut Service log file.
      */
-    protected function getPapercutLogFile(): string
+    protected static function getPapercutLogFile(): string
     {
-        return $this->getPapercutFolder() . '/Papercut.Service.log';
+        return self::getPapercutFolder() . '/Papercut.Service.log';
     }
 
     /**
      * Returns the folder where the Papercut SMTP Service log file and saved messages are
      * located.
      */
-    protected function getPapercutFolder(): string
+    protected static function getPapercutFolder(): string
     {
         return 'C:\ProgramData\Changemaker Studios\Papercut SMTP\Incoming';
     }
@@ -203,7 +225,7 @@ trait Mail
      * @link http://stackoverflow.com/a/15025877/995958
      * @license http://creativecommons.org/licenses/by/3.0/
      */
-    private function tail(string $filepath, int $lines = 1, bool $adaptive = true): ?string
+    private static function tail(string $filepath, int $lines = 1, bool $adaptive = true): ?string
     {
         // Open file
         $f = fopen($filepath, 'rb');

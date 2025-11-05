@@ -10,7 +10,6 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\InvoiceAddMail;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
@@ -29,6 +28,7 @@ class MailTest extends TestCase
 {
     use AcumulusTestUtils;
 
+    protected static string $shopNamespace = 'TestWebShop\TestDoubles';
     protected RuntimeException $testException;
     private ApiRequestResponseExamples $examples;
 
@@ -43,11 +43,6 @@ class MailTest extends TestCase
         $this->testException = new RuntimeException('Test exception');
         $this->examples = ApiRequestResponseExamples::getInstance();
         $this->examples->setOptions([Fld::Lang => static::getContainer()->getLanguage()]);
-    }
-
-    protected static function createContainer(): Container
-    {
-        return new Container('TestWebShop\TestDoubles', 'nl');
     }
 
     private function getConfig(): Config

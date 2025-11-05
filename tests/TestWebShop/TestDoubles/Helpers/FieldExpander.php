@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpFuncGetArgCanBeReplacedWithParamInspection
  */
 

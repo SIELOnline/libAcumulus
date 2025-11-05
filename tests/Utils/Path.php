@@ -19,7 +19,7 @@ trait Path
      *
      * To be overridden when used in webshop specific tests
      */
-    protected function getTestsPath(): string
+    protected static function getTestsPath(): string
     {
         return dirname(__FILE__, 2);
     }
@@ -27,7 +27,7 @@ trait Path
     /**
      * Returns the path to the data folder of the actual web shop.
      */
-    protected function getDataPath(): string
+    protected static function getDataPath(): string
     {
         $shopNamespace = self::getContainer()->getShopNamespace();
         if (str_starts_with($shopNamespace, 'TestWebShop')) {
@@ -35,6 +35,6 @@ trait Path
         } elseif (str_ends_with($shopNamespace, '\TestWebShop')) {
             $shopNamespace = substr($shopNamespace, 0, -strlen('\TestWebShop'));
         }
-        return $this->getTestsPath() . "/$shopNamespace/Data";
+        return static::getTestsPath() . "/$shopNamespace/Data";
     }
 }

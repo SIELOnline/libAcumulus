@@ -126,7 +126,7 @@ trait Invoice
      */
     protected function getTestSource(string $type, int $id): mixed
     {
-        $path = $this->getDataPath() . '/Invoice';
+        $path = self::getDataPath() . '/Invoice';
         $filename = "$path/$type$id.json";
         if (!is_readable($filename)) {
             return null;
@@ -143,7 +143,7 @@ trait Invoice
      */
     protected function saveTestSource(string $type, int $id, bool $isNew, mixed $data): void
     {
-        $path = $this->getDataPath() . '/Invoice';
+        $path = self::getDataPath() . '/Invoice';
         $append = $isNew ? '' : '.latest';
         $filename = "$path/$type$id$append.json";
         /** @noinspection JsonEncodingApiUsageInspection  false positive */
@@ -152,7 +152,7 @@ trait Invoice
 
     public function copyLatestTestSources(): void
     {
-        $path = $this->getDataPath();
+        $path = self::getDataPath();
         $files = glob("$path/*.latest.json");
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
@@ -181,7 +181,7 @@ trait Invoice
 
     public function updateTestSources(): void
     {
-        $path = $this->getDataPath();
+        $path = self::getDataPath();
         $files = glob("$path/*.json");
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);

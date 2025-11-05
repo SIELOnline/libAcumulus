@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Utils;
 
+use Siel\Acumulus\Helpers\Log as LogClass;
 use Siel\Acumulus\Helpers\Severity;
 
 use function ini_get;
@@ -19,15 +20,21 @@ use function is_array;
  */
 trait Log
 {
+    use AcumulusContainer;
     use Path;
+
+    protected static function getLog(): LogClass
+    {
+        return static::getContainer()->getLog();
+    }
 
     /**
      * Returns a test log message.
      */
-    protected function getTestLogMessage(string $name): ?array
+    protected static function getTestLogMessage(string $name): ?array
     {
         $logMessage = null;
-        $fullFileName = $this->getDataPath() . "/Log/$name.log";
+        $fullFileName = self::getDataPath() . "/Log/$name.log";
         if (is_readable($fullFileName)) {
             eval('$logMessage = ' . file_get_contents($fullFileName) . ';');
         }
@@ -41,14 +48,27 @@ trait Log
      * @param array $data
      *   The mail data to be saved (in JSON format).
      */
-    protected function saveTestLogMessage(string $name, array $data): void
+    protected static function saveTestLogMessage(string $name, array $data): void
     {
-        $path = $this->getDataPath() . '/Log';
+        $path = self::getDataPath() . '/Log';
         $fileName = "$name.log";
         if (file_exists("$path/$fileName") || file_exists("$path/$fileName.php")) {
             $fileName = "$name.latest.log";
         }
         file_put_contents("$path/$fileName", var_export($data, true) . "\n");
+    }
+
+    /**
+     * Checks the log messages.
+     */
+    protected function checkLog(): void
+    {
+        $loggedMessages = self::getLog()->getLoggedMessages();
+        $logMessage = end($loggedMessages);
+
+        // dataName() returns the key of the actual data set.
+        $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
+        self::assertLogMatches($name, $logMessage);
     }
 
     /**
@@ -62,11 +82,11 @@ trait Log
      *   The mail sent, or false if no log was sent, though false will lead to an
      *   immediate test assertion failure.
      */
-    protected function assertLogMatches(string $name, mixed $logMessage): void
+    protected static function assertLogMatches(string $name, mixed $logMessage): void
     {
-        self::assertIsArray($logMessage);
-        $this->saveTestLogMessage($name, $logMessage);
-        $expected = $this->getTestLogMessage($name);
+        static::assertIsArray($logMessage);
+        static::saveTestLogMessage($name, $logMessage);
+        $expected = static::getTestLogMessage($name);
         foreach ($expected as $key => $value) {
             if ($key === 'values') {
                 foreach ($value as $index => $argument) {

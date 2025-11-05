@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection SpellCheckingInspection
- */
 
 declare(strict_types=1);
 
@@ -82,20 +78,20 @@ class AcumulusTest extends TestCase
     {
         /** @var \Siel\Acumulus\ApiClient\AcumulusResult $result */
         $result = $this->acumulusClient->$method(... $args);
-        $this->assertSame(Severity::Success, $result->getStatus());
+        self::assertSame(Severity::Success, $result->getStatus());
         $response = $result->getMainAcumulusResponse();
         if ($isList) {
-            $this->assertIsArray($response);
-            $this->assertNotEmpty($response);
+            self::assertIsArray($response);
+            self::assertNotEmpty($response);
             $singleResponse = reset($response);
-            $this->assertIsInt(array_key_first($response));
+            self::assertIsInt(array_key_first($response));
         } else {
             $singleResponse = $response;
         }
 
-        $this->assertIsArray($singleResponse);
-        $this->assertNotEmpty($singleResponse);
-        $this->assertEqualsCanonicalizing($expectedKeys, array_keys($singleResponse));
+        self::assertIsArray($singleResponse);
+        self::assertNotEmpty($singleResponse);
+        self::assertEqualsCanonicalizing($expectedKeys, array_keys($singleResponse));
     }
 
     public static function vatInfoProvider(): array
@@ -164,7 +160,7 @@ class AcumulusTest extends TestCase
     public function testGetVatInfo(array $args, array $expected): void
     {
         $result = $this->acumulusClient->getVatInfo(... $args);
-        $this->assertSame(Severity::Success, $result->getStatus());
+        self::assertSame(Severity::Success, $result->getStatus());
 
         $vatRate  = array_column($expected, 'vatrate');
         $vatType = array_column($expected, 'vattype');
@@ -175,7 +171,7 @@ class AcumulusTest extends TestCase
         $vatType = array_column($actual, 'vattype');
         array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $actual);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -184,8 +180,8 @@ class AcumulusTest extends TestCase
     public function testGetVatInfoInvalidCountryCode(): void
     {
         $result = $this->acumulusClient->getVatInfo('ln', '2020-12-01');
-        $this->assertSame(Severity::Error, $result->getStatus());
-        $this->assertNotEmpty($result->getByCodeTag('AA6A45AA'));
+        self::assertSame(Severity::Error, $result->getStatus());
+        self::assertNotEmpty($result->getByCodeTag('AA6A45AA'));
     }
 
     /**
@@ -194,10 +190,10 @@ class AcumulusTest extends TestCase
     public function testReportThresholdEuCommerce(): void
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2021);
-        $this->assertSame(Severity::Success, $result->getStatus());
+        self::assertSame(Severity::Success, $result->getStatus());
         $actual = $result->getMainAcumulusResponse();
         $threshold = $actual['threshold'];
-        $this->assertEquals(10000, $threshold);
+        self::assertEquals(10000, $threshold);
     }
 
     /**
@@ -206,8 +202,8 @@ class AcumulusTest extends TestCase
     public function testReportThresholdEuCommerceOldYear(): void
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2020);
-        $this->assertSame(Severity::Error, $result->getStatus());
-        $this->assertNotEmpty($result->getByCodeTag('AAC37EAA'));
+        self::assertSame(Severity::Error, $result->getStatus());
+        self::assertNotEmpty($result->getByCodeTag('AAC37EAA'));
     }
 
     /**
@@ -216,10 +212,10 @@ class AcumulusTest extends TestCase
     public function testReportThresholdEuCommerceFutureYear(): void
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2099);
-        $this->assertSame(Severity::Success, $result->getStatus());
+        self::assertSame(Severity::Success, $result->getStatus());
         $actual = $result->getMainAcumulusResponse();
         $threshold = $actual['threshold'];
-        $this->assertEquals(10000, $threshold);
+        self::assertEquals(10000, $threshold);
     }
 
     public static function stockTransactionProvider(): array
@@ -249,9 +245,9 @@ class AcumulusTest extends TestCase
     {
         $result = $this->acumulusClient->stockTransaction($stockTransaction);
 
-        $this->assertSame(Severity::Success, $result->getStatus());
+        self::assertSame(Severity::Success, $result->getStatus());
         $actual = $result->getMainAcumulusResponse();
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        self::assertEqualsCanonicalizing($expected, $actual);
     }
 
     /*

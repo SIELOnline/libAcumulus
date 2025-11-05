@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Product\StockTransactionResult;
@@ -24,18 +23,6 @@ use Siel\Acumulus\Mail\Mailer;
 class ProductManagerTest extends TestCase
 {
     use AcumulusTestUtils;
-
-    private int $mailCount;
-
-    private function getLog(): Log
-    {
-        return self::getContainer()->getLog();
-    }
-
-    private function getMailer(): Mailer
-    {
-        return static::getContainer()->getMailer();
-    }
 
     private function getProductManager(): ProductManager
     {
@@ -173,16 +160,16 @@ class ProductManagerTest extends TestCase
     {
         $source = static::getContainer()->createSource(Source::Order, 1);
         $item = static::getContainer()->createItem($itemId, $source);
-        $this->mailCount = $this->getMailer()->getMailCount();
+        $mailCount = $this->getMailer()->getMailCount();
         $productManager = $this->getProductManager();
         $result = $productManager->updateStockForItem($item, $change, 'ProductManagerTest::testUpdateStock');
         $this->checkLog();
         if ($result->isSendingPrevented()) {
             self::assertSame($acumulusProductIdOrError, $result->getSendStatus());
-            $this->checkMail();
+            $this->checkMail($mailCount);
         } elseif ($result->hasError()) {
             self::assertNotNull($result->getByCodeTag($acumulusProductIdOrError));
-            $this->checkMail();
+            $this->checkMail($mailCount);
         } else {
             self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
             self::assertSame(
@@ -200,34 +187,5 @@ class ProductManagerTest extends TestCase
             );
             self::assertSame($stockAmount - $change, (float) $result->getMainApiResponse()[Fld::StockAmount]);
         }
-    }
-
-    /**
-     * Checks the log messages.
-     *
-     * @todo: can this (and checkMail() be moved to test utils?
-     */
-    private function checkLog(): void
-    {
-        $loggedMessages = $this->getLog()->getLoggedMessages();
-        $logMessage = end($loggedMessages);
-
-        // dataName() returns the key of the actual data set.
-        $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
-        self::assertLogMatches($name, $logMessage);
-    }
-
-    /**
-     * Checks the mail messages.
-     */
-    private function checkMail(): void
-    {
-        static::assertSame($this->mailCount + 1, $this->getMailer()->getMailCount());
-        $mailSent = $this->getMailer()->getMailSent($this->mailCount);
-        static::assertIsArray($mailSent);
-
-        // dataName() returns the key of the actual data set.
-        $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
-        self::assertMailMatches($name, $mailSent);
     }
 }

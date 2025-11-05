@@ -1,9 +1,9 @@
 <?php
 /**
- * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpUnused
- * @noinspection PhpUndefinedNamespaceInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\TestWebShop;
 

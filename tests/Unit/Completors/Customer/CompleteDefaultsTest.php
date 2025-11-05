@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -11,33 +8,19 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteDefaultsTest tests {@see \Siel\Acumulus\Completors\Customer\CompleteDefaults}.
  */
 class CompleteDefaultsTest extends TestCase
 {
-    private Container $container;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AcumulusContainer;
 
     private function getCustomer(): Customer
     {
         /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = $this->getContainer()->createAcumulusObject(DataType::Customer);
+        $customer = self::getContainer()->createAcumulusObject(DataType::Customer);
         return $customer;
     }
 
@@ -55,7 +38,7 @@ class CompleteDefaultsTest extends TestCase
      */
     public function testComplete(?string $country, ?string $expectedBefore, string $expectedAfter): void
     {
-        $completor = $this->getContainer()->getCompletorTask('Customer','Defaults');
+        $completor = self::getContainer()->getCompletorTask('Customer','Defaults');
         $customer = $this->getCustomer();
         $customer->setInvoiceAddress(new Address());
         $customer->setShippingAddress(new Address());

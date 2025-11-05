@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -12,19 +9,19 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\Address;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteAnonymiseTest tests {@see \Siel\Acumulus\Completors\Customer\CompleteAnonymise}.
  */
 class CompleteAnonymiseTest extends TestCase
 {
-    private Container $container;
+    use AcumulusContainer;
 
     public function createCustomer(): Customer
     {
         /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = $this->getContainer()->createAcumulusObject(DataType::Customer);
+        $customer = self::getContainer()->createAcumulusObject(DataType::Customer);
         $customer->contactId = 1;
         $customer->type = Api::CustomerType_Debtor;
         $customer->vatTypeId = Api::VatTypeId_Private;
@@ -81,7 +78,7 @@ class CompleteAnonymiseTest extends TestCase
     public function createAnonymousCustomer(): Customer
     {
         /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = $this->getContainer()->createAcumulusObject(DataType::Customer);
+        $customer = self::getContainer()->createAcumulusObject(DataType::Customer);
         $customer->contactId = null;
         $customer->type = null;
         $customer->vatTypeId = null;
@@ -93,7 +90,7 @@ class CompleteAnonymiseTest extends TestCase
         $customer->telephone = null;
         $customer->telephone2 = null;
         $customer->fax = null;
-        $customer->email = $this->getContainer()->getConfig()->get('genericCustomerEmail');
+        $customer->email = self::getContainer()->getConfig()->get('genericCustomerEmail');
         $customer->overwriteIfExists = false;
         $customer->bankAccountNumber = null;
         $customer->mark = null;
@@ -135,20 +132,6 @@ class CompleteAnonymiseTest extends TestCase
         return $address;
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
-
     private function getCustomer(): Customer
     {
         $customer = $this->createCustomer();
@@ -167,9 +150,9 @@ class CompleteAnonymiseTest extends TestCase
 
     public function testCompleteDoNotAnonymise(): void
     {
-        $config = $this->getContainer()->getConfig();
+        $config = self::getContainer()->getConfig();
         $config->set('sendCustomer', true);
-        $completor = $this->getContainer()->getCompletorTask('Customer', 'Anonymise');
+        $completor = self::getContainer()->getCompletorTask('Customer', 'Anonymise');
         $customer = $this->getCustomer();
         $customerBefore = $customer->toArray();
         $completor->complete($customer);
@@ -179,9 +162,9 @@ class CompleteAnonymiseTest extends TestCase
 
     public function testCompleteAnonymise(): void
     {
-        $config = $this->getContainer()->getConfig();
+        $config = self::getContainer()->getConfig();
         $config->set('sendCustomer', false);
-        $completor = $this->getContainer()->getCompletorTask('Customer', 'Anonymise');
+        $completor = self::getContainer()->getCompletorTask('Customer', 'Anonymise');
         $customer = $this->getCustomer();
         $anonymousCustomer = $this->getAnonymousCustomer();
         $completor->complete($customer);
@@ -191,9 +174,9 @@ class CompleteAnonymiseTest extends TestCase
 
     public function testCompleteAnonymiseCompany(): void
     {
-        $config = $this->getContainer()->getConfig();
+        $config = self::getContainer()->getConfig();
         $config->set('sendCustomer', false);
-        $completor = $this->getContainer()->getCompletorTask('Customer', 'Anonymise');
+        $completor = self::getContainer()->getCompletorTask('Customer', 'Anonymise');
         $customer = $this->getCustomer();
         $customer->vatTypeId = Api::VatTypeId_Business;
         $customer->vatNumber = 'NL123456789';

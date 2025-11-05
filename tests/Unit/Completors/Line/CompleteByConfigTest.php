@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -13,34 +10,20 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteByConfigTest tests {@see \Siel\Acumulus\Completors\Line\CompleteByConfig}.
  */
 class CompleteByConfigTest extends TestCase
 {
-    private Container $container;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AcumulusContainer;
 
     private function getLine(string $lineType): Line
     {
         /** @var \Siel\Acumulus\Data\Line $line */
-        $line = $this->getContainer()->createAcumulusObject(DataType::Line);
+        $line = self::getContainer()->createAcumulusObject(DataType::Line);
         $line->metadataSet(Meta::SubType, $lineType);
         return $line;
     }
@@ -65,9 +48,9 @@ class CompleteByConfigTest extends TestCase
      */
     public function testComplete(int $natureShop, string $lineType, ?string $natureBefore, $natureExpected): void
     {
-        $config = $this->getContainer()->getConfig();
+        $config = self::getContainer()->getConfig();
         $config->set('nature_shop', $natureShop);
-        $completor = $this->getContainer()->getCompletorTask('Line','ByConfig');
+        $completor = self::getContainer()->getCompletorTask('Line','ByConfig');
         $line = $this->getLine($lineType);
         $line->nature = $natureBefore;
         $completor->complete($line);

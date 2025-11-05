@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -11,33 +8,19 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteByConfigTest tests {@see \Siel\Acumulus\Completors\Customer\CompleteByConfig}.
  */
 class CompleteByConfigTest extends TestCase
 {
-    private Container $container;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AcumulusContainer;
 
     private function getCustomer(): Customer
     {
         /** @var \Siel\Acumulus\Data\Customer $customer */
-        $customer = $this->getContainer()->createAcumulusObject(DataType::Customer);
+        $customer = self::getContainer()->createAcumulusObject(DataType::Customer);
         return $customer;
     }
 
@@ -61,9 +44,9 @@ class CompleteByConfigTest extends TestCase
      */
     public function testComplete(string $key, int $value, string $property, bool|int $expected): void
     {
-        $config = $this->getContainer()->getConfig();
+        $config = self::getContainer()->getConfig();
         $config->set($key, $value);
-        $completor = $this->getContainer()->getCompletorTask('Customer','ByConfig');
+        $completor = self::getContainer()->getCompletorTask('Customer','ByConfig');
         $customer = $this->getCustomer();
         $completor->complete($customer);
         /** @noinspection PhpVariableVariableInspection */

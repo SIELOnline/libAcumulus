@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -13,41 +10,27 @@ use Siel\Acumulus\Completors\Invoice\CompleteConcept;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteConceptTest test {@see CompleteConcept}.
  */
 class CompleteConceptTest extends TestCase
 {
-    private Container $container;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AcumulusContainer;
 
     private function getInvoice(): Invoice
     {
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $this->getContainer()->createAcumulusObject(DataType::Invoice);
+        $invoice = self::getContainer()->createAcumulusObject(DataType::Invoice);
         return $invoice;
     }
 
     public function testComplete(): void
     {
-        $config = $this->getContainer()->getConfig();
-        $completor = $this->getContainer()->getCompletorTask('Invoice','Concept');
+        $config = self::getContainer()->getConfig();
+        $completor = self::getContainer()->getCompletorTask('Invoice','Concept');
 
         // Plugin, no warning = false
         $config->set('concept', Config::Concept_Plugin);
@@ -73,7 +56,7 @@ class CompleteConceptTest extends TestCase
         $this->assertTrue($invoice->concept);
 
         /** @var \Siel\Acumulus\Data\Line $line */
-        $line = $this->getContainer()->createAcumulusObject(DataType::Line);
+        $line = self::getContainer()->createAcumulusObject(DataType::Line);
         $line->metadataAdd(Meta::Warning, 'warning');
 
         // Plugin, warning = true

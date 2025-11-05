@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -11,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteInvoiceNumberTest tests the
@@ -20,28 +17,12 @@ use Siel\Acumulus\Meta;
  */
 class CompleteInvoiceNumberTest extends TestCase
 {
-    private Container $container;
-
-    /**
-     * @noinspection PhpMissingParentCallCommonInspection
-     */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AcumulusContainer;
 
     private function getInvoice(): Invoice
     {
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $this->getContainer()->createAcumulusObject(DataType::Invoice);
+        $invoice = self::getContainer()->createAcumulusObject(DataType::Invoice);
         return $invoice;
     }
 
@@ -75,9 +56,9 @@ class CompleteInvoiceNumberTest extends TestCase
         ?int $expected,
         ?int $filledIn = null
     ): void {
-        $config = $this->getContainer()->getConfig();
+        $config = self::getContainer()->getConfig();
         $config->set('invoiceNrSource', $sourceToUse);
-        $completor = $this->getContainer()->getCompletorTask('Invoice','InvoiceNumber');
+        $completor = self::getContainer()->getCompletorTask('Invoice','InvoiceNumber');
         $invoice = $this->getInvoice();
         if ($filledIn !== null) {
             $invoice->number = $filledIn;

@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -12,34 +9,20 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Data\VatRateSource;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteVatRangeTest tests {@see \Siel\Acumulus\Completors\Line\CompleteVatRange}.
  */
 class CompleteVatRangeTest extends TestCase
 {
-    private Container $container;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AcumulusContainer;
 
     private function getLine(string $lineType): Line
     {
         /** @var \Siel\Acumulus\Data\Line $line */
-        $line = $this->getContainer()->createAcumulusObject(DataType::Line);
+        $line = self::getContainer()->createAcumulusObject(DataType::Line);
         $line->metadataSet(Meta::SubType, $lineType);
         return $line;
     }
@@ -53,7 +36,7 @@ class CompleteVatRangeTest extends TestCase
         $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);
         $line->metadataSet(Meta::PrecisionVatAmount, 0.01);
 
-        $completor = $this->getContainer()->getCompletorTask('Line', 'VatRange');
+        $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
         self::assertFalse($line->metadataExists(Meta::VatRateSource));
         self::assertFalse($line->metadataExists(Meta::VatRateMin));
@@ -67,7 +50,7 @@ class CompleteVatRangeTest extends TestCase
         $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);
         $line->metadataSet(Meta::PrecisionVatAmount, 0.01);
 
-        $completor = $this->getContainer()->getCompletorTask('Line', 'VatRange');
+        $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
         self::assertFalse($line->metadataExists(Meta::VatRateSource));
         self::assertFalse($line->metadataExists(Meta::VatRateMin));
@@ -81,7 +64,7 @@ class CompleteVatRangeTest extends TestCase
         $line->metadataSet(Meta::VatAmount, 2.1);
         $line->metadataSet(Meta::PrecisionVatAmount, 0.01);
 
-        $completor = $this->getContainer()->getCompletorTask('Line', 'VatRange');
+        $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
         self::assertFalse($line->metadataExists(Meta::VatRateSource));
         self::assertFalse($line->metadataExists(Meta::VatRateMin));
@@ -92,7 +75,7 @@ class CompleteVatRangeTest extends TestCase
         $line->metadataSet(Meta::VatAmount, 2.1);
         $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);
 
-        $completor = $this->getContainer()->getCompletorTask('Line', 'VatRange');
+        $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
         self::assertFalse($line->metadataExists(Meta::VatRateSource));
         self::assertFalse($line->metadataExists(Meta::VatRateMin));
@@ -125,7 +108,7 @@ class CompleteVatRangeTest extends TestCase
         $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);
         $line->metadataSet(Meta::PrecisionVatAmount, 0.01);
 
-        $completor = $this->getContainer()->getCompletorTask('Line', 'VatRange');
+        $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
         self::assertSame($vatRateSource, $line->metadataGet(Meta::VatRateSource));
         if ($min !== null) {
@@ -171,7 +154,7 @@ class CompleteVatRangeTest extends TestCase
         $line->metadataSet(Meta::PrecisionUnitPriceInc, 0.01);
         $line->metadataSet(Meta::PrecisionVatAmount, 0.01);
 
-        $completor = $this->getContainer()->getCompletorTask('Line', 'VatRange');
+        $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
         self::assertSame($vatRateSource, $line->metadataGet(Meta::VatRateSource));
         if ($min !== null) {

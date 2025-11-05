@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -13,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteInvoiceNumberTest tests the
@@ -22,26 +19,12 @@ use Siel\Acumulus\Meta;
  */
 class CompleteIssueDateTest extends TestCase
 {
-    private Container $container;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AcumulusContainer;
 
     private function getInvoice(): Invoice
     {
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $this->getContainer()->createAcumulusObject(DataType::Invoice);
+        $invoice = self::getContainer()->createAcumulusObject(DataType::Invoice);
         return $invoice;
     }
 
@@ -77,9 +60,9 @@ class CompleteIssueDateTest extends TestCase
         ?DateTimeInterface $expected,
         DateTimeInterface|string|null $filledIn = null
     ): void {
-        $config = $this->getContainer()->getConfig();
+        $config = self::getContainer()->getConfig();
         $config->set('dateToUse', $issueDateSource);
-        $completor = $this->getContainer()->getCompletorTask('Invoice','IssueDate');
+        $completor = self::getContainer()->getCompletorTask('Invoice','IssueDate');
         $invoice = $this->getInvoice();
         if ($filledIn !== null) {
             $invoice->issueDate = $filledIn;

@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -13,14 +10,16 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteMarginSchemeTest tests {@see \Siel\Acumulus\Completors\Line\CompleteMarginProducts}.
  */
 class CompleteMarginProductsTest extends TestCase
 {
+    use AcumulusContainer;
+    
     private const MarginProducts = [
         Config::MarginProducts_Unknown,
         Config::MarginProducts_Both,
@@ -28,26 +27,10 @@ class CompleteMarginProductsTest extends TestCase
         Config::MarginProducts_Only,
     ];
 
-    private Container $container;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
-
     private function getLine(string $lineType): Line
     {
         /** @var \Siel\Acumulus\Data\Line $line */
-        $line = $this->getContainer()->createAcumulusObject(DataType::Line);
+        $line = self::getContainer()->createAcumulusObject(DataType::Line);
         $line->setType($lineType);
         return $line;
     }
@@ -74,8 +57,8 @@ class CompleteMarginProductsTest extends TestCase
      */
     public function testComplete(string $lineType, array $lineValues, $lineValuesExpected): void
     {
-        $config = $this->getContainer()->getConfig();
-        $completor = $this->getContainer()->getCompletorTask('Line', 'MarginProducts');
+        $config = self::getContainer()->getConfig();
+        $completor = self::getContainer()->getCompletorTask('Line', 'MarginProducts');
         foreach (self::MarginProducts as $marginProduct) {
             $config->set('marginProducts', $marginProduct);
             $line = $this->getLine($lineType);

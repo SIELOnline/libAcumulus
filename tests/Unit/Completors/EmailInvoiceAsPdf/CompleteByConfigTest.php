@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -11,33 +8,19 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailInvoiceAsPdf;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteByConfigTest tests {@see \Siel\Acumulus\Completors\EmailInvoiceAsPdf\CompleteByConfig}.
  */
 class CompleteByConfigTest extends TestCase
 {
-    private Container $container;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AcumulusContainer;
 
     private function getEmailInvoiceAsPdf(): EmailInvoiceAsPdf
     {
         /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $emailInvoiceAsPdf */
-        $emailInvoiceAsPdf = $this->getContainer()->createAcumulusObject(DataType::EmailInvoiceAsPdf);
+        $emailInvoiceAsPdf = self::getContainer()->createAcumulusObject(DataType::EmailInvoiceAsPdf);
         return $emailInvoiceAsPdf;
     }
 
@@ -61,9 +44,9 @@ class CompleteByConfigTest extends TestCase
         ?bool $expectedValue
     ): void
     {
-        $config = $this->getContainer()->getConfig();
+        $config = self::getContainer()->getConfig();
         $config->set($key, $value);
-        $completor = $this->getContainer()->getCompletorTask('EmailInvoiceAsPdf','ByConfig');
+        $completor = self::getContainer()->getCompletorTask('EmailInvoiceAsPdf','ByConfig');
         $emailAsPdf = $this->getEmailInvoiceAsPdf();
         $completor->complete($emailAsPdf);
 

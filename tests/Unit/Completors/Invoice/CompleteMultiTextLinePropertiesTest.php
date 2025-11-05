@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -10,7 +7,7 @@ namespace Siel\Acumulus\Tests\Unit\Completors\Invoice;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CompleteMultiTextLineInfoTest tests the
@@ -18,32 +15,18 @@ use Siel\Acumulus\Helpers\Container;
  */
 class CompleteMultiTextLinePropertiesTest extends TestCase
 {
-    private Container $container;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AcumulusContainer;
 
     private function getInvoice(): Invoice
     {
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $this->getContainer()->createAcumulusObject(DataType::Invoice);
+        $invoice = self::getContainer()->createAcumulusObject(DataType::Invoice);
         return $invoice;
     }
 
     public function testComplete(): void
     {
-        $completor = $this->getContainer()->getCompletorTask('Invoice','MultiTextLineProperties');
+        $completor = self::getContainer()->getCompletorTask('Invoice','MultiTextLineProperties');
         $invoice = $this->getInvoice();
 
         $invoice->descriptionText = ' ';

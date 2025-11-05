@@ -10,8 +10,7 @@ use function ini_get;
 use function is_array;
 
 /**
- * Log contains log related test functionalities for the various shop-specific test
- * environments.
+ * Log contains log related test functionalities for library and shop tests.
  *
  * - Saving and retrieving log messages.
  * - Asserting that log messages match.
@@ -20,7 +19,7 @@ use function is_array;
  */
 trait Log
 {
-    use Base;
+    use Path;
 
     /**
      * Returns a test log message.

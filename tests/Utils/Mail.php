@@ -6,19 +6,17 @@ namespace Siel\Acumulus\Tests\Utils;
 
 use DateTimeImmutable;
 
-use function get_class;
 use function is_array;
 use function strlen;
 
 /**
- * Mail contains mail related test functionalities for the various shop-specific test
- * environments.
+ * Mail contains mail related test functionalities for library and shop tests.
  *  - Saving and retrieving mail messages.
  *  - Asserting that mail messages match.
  */
 trait Mail
 {
-    use Base;
+    use Path;
     use Time;
 
     /**
@@ -145,7 +143,6 @@ trait Mail
             if ($logMessageStart !== false && str_contains($line, $subject)) {
                 // Line looks like {timestamp} [{level}] {message}
                 $timestamp = substr($line, 0, strpos($line, '[') - 1);
-                /** @noinspection PhpUnhandledExceptionInspection */
                 $diff = $this->getDiffInSeconds(new DateTimeImmutable($timestamp), $now);
                 if (0 <= $diff && $diff < 10) {
                     // Message looks like:

@@ -4,39 +4,15 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Utils;
 
-use Siel\Acumulus\Helpers\Container;
-
 use function dirname;
 use function strlen;
 
 /**
- * Base contains base test features for the various shop-specific test environments.
- *
- * - Container creation and getting.
- * - Path handling (to save and retrieve test data).
+ * Path contains path retrieving  features for library and shop tests.
  */
-trait Base
+trait Path
 {
-    private static Container $container;
-
-    /**
-     * Returns an Acumulus Container instance.
-     */
-    protected static function getContainer(): Container
-    {
-        self::$container ??= self::createContainer();
-        return self::$container;
-    }
-
-    /**
-     * Creates a container for the 'TestWebShop' namespace with 'nl' as language.
-     *
-     * Override if the test needs another container.
-     */
-    protected static function createContainer(): Container
-    {
-        return new Container('TestWebShop', 'nl');
-    }
+    use AcumulusContainer;
 
     /**
      * Returns the path to the 'tests' folder.

@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Tests\Utils;
 
 /**
- * Form contains form related test functionalities for the various shop-specific test
- * environments.
+ * Form contains form related test functionalities for library and shop tests.
  *
  * - Saving rendered form contents.
  * - Asserting that fields appear in the form.
  */
 trait Form
 {
-    use Base;
+    use AcumulusContainer;
+    use Path;
 
     protected static string $htmlStart = <<<LONGSTRING
 <!DOCTYPE html>

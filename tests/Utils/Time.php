@@ -8,8 +8,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 
 /**
- * AcumulusTestUtils contains test functionalities for the various shop-specific test
- * environments.
+ * Time contains date and time related functionalities for library and shop tests.
  */
 trait Time
 {

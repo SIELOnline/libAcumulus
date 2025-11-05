@@ -13,8 +13,8 @@ use function is_float;
 use function is_string;
 
 /**
- * Source contains {@see \Siel\Acumulus\Data\Invoice} related test functionalities for the
- * various shop-specific test environments.
+ * Source contains {@see \Siel\Acumulus\Data\Invoice} related test functionalities
+ * for library and shop tests.
  *
  * - Create an invoice (collect & complete).
  * - Saving and retrieving (created) invoices.
@@ -26,7 +26,7 @@ use function is_string;
  */
 trait Invoice
 {
-    use Base;
+    use Path;
 
     /**
      * Tests the Creation process, i.e. collecting and completing an

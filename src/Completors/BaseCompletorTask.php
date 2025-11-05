@@ -34,8 +34,8 @@ abstract class BaseCompletorTask implements CompletorTaskInterface
      *  The key to get a translation for.
      *
      * @return string
-     *   The translation for the given key or the key itself if no translation
-     *   could be found.
+     *   The translation for the given key, or the key itself if no translation could be
+     *   found.
      */
     protected function t(string $key): string
     {
@@ -52,8 +52,7 @@ abstract class BaseCompletorTask implements CompletorTaskInterface
      *
      * @return mixed
      *   The configured value for this setting, or null if not set, and no default is
-     *   available. Our {@see \Siel\Acumulus\Config\Config configuration} knows the types:
-     *   string, int, float, bool and array.
+     *   available. Our {@see Config} knows the types string, int, float, bool, and array.
      */
     protected function configGet(string $key): mixed
     {

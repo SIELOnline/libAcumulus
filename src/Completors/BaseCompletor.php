@@ -1,8 +1,7 @@
 <?php
 /**
- * @noinspection PhpPrivateFieldCanBeLocalVariableInspection  In the future,
- *   $invoice may be made a local variable, but probably we will need it as a
- *   property.
+ * @noinspection PhpPrivateFieldCanBeLocalVariableInspection  In the future, $invoice may
+ *   be made a local variable, but probably we will need it as a property.
  */
 
 declare(strict_types=1);
@@ -18,8 +17,8 @@ use Siel\Acumulus\Helpers\Translator;
 /**
  * CustomerCompletor completes an {@see \Siel\Acumulus\Data\Customer}.
  *
- * After an invoice has been collected, the shop-specific part, it needs to be
- * completed, also the customer part. Think of things like:
+ * After an invoice has been collected, the shop-specific part, it needs to be completed,
+ * also the customer part. Think of things like:
  * - Adding customer type based on a setting.
  * - Anonymising data.
  */
@@ -43,8 +42,8 @@ abstract class BaseCompletor
      *  The key to get a translation for.
      *
      * @return string
-     *   The translation for the given key or the key itself if no translation
-     *   could be found.
+     *   The translation for the given key, or the key itself if no translation could be
+     *   found.
      */
     protected function t(string $key): string
     {
@@ -70,18 +69,16 @@ abstract class BaseCompletor
     }
 
     /**
-     * Returns a {@see \Siel\Acumulus\Completors\CompletorTaskInterface}.
+     * Returns a {@see CompletorTaskInterface}.
      *
      * @param string $dataType
-     *   The data type it operates on. One of the
-     *   {@see \Siel\Acumulus\Data\DataType} constants. This is used as a
-     *   sub namespace when constructing the class name to load.
+     *   The data type it operates on. One of the {@see \Siel\Acumulus\Data\DataType}
+     *   constants. This is used as a sub namespace when constructing the class name to
+     *   load.
      * @param string $task
-     *   The task to be executed. This is used to construct the class name of a
-     *   class that performs the given task and implements
-     *   {@see \Siel\Acumulus\Completors\CompletorTaskInterface}. Only the task
-     *   name should be provided, not the namespace, nor the 'Complete' at the
-     *   beginning.
+     *   The task to be executed. This is used to construct the class name of a class that
+     *   performs the given task and implements {@see CompletorTaskInterface}. Only the
+     *   task name should be provided, not the namespace, nor the 'Complete' at the start.
      */
     public function getCompletorTask(string $dataType, string $task): CompletorTaskInterface
     {
@@ -97,6 +94,7 @@ abstract class BaseCompletor
      *   The object to complete.
      * @param \Siel\Acumulus\Helpers\MessageCollection $result
      *   A message collection where any message can be added to.
+     *   @todo: can/should this be a Result?
      */
     abstract public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void;
 }

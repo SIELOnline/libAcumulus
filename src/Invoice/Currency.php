@@ -13,27 +13,25 @@ use Siel\Acumulus\Helpers\Number;
  * currency (which should be Euro). If so, all amounts should be converted to euro before
  * sending them to Acumulus. This object contains the necessary information to do so.
  *
- * @todo: PHP8.1: readonly properties. We made all properties public so we don't
- *   need additional code to convert it into a json string. However, please note
- *   that this object should be treated as immutable.
+ * @todo PHP8.2 readonly class
  */
 class Currency
 {
     /**
      * The currency code used with the order/refund: ISO4217, ISO 3166-1.
      */
-    public string $currency;
+    readonly public string $currency;
     /**
      * Conversion rate from the used currency to the shop's default currency:
-     * amount in shop currency = rate * amount in other currency
+     * amount in shop's default currency = rate * amount in order/refund currency
      */
-    public float $rate;
+    readonly public float $rate;
     /**
-     * true if we should use the above info to convert amounts, false if the
-     * amounts are already in the shop's default currency (which should be euro)
-     * and all this info is thus purely informational.
+     * True if we should use the above info to convert amounts, false if the amounts are
+     * already in the shop's default currency (which should be euro) and all this info is
+     * thus purely informational.
      */
-    public bool $doConvert;
+    readonly public bool $doConvert;
 
     public function __construct(string $currency = 'EUR', float $rate = 1.0, bool $doConvert = false)
     {
@@ -47,7 +45,7 @@ class Currency
      */
     public function shouldConvert(): bool
     {
-        return $this->doConvert && !Number::floatsAreEqual($this->rate, 1.0, 0.0001);
+        return $this->currency !== 'EUR' && $this->doConvert && !Number::floatsAreEqual($this->rate, 1.0, 0.00001);
     }
 
     /**

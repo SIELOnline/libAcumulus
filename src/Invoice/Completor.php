@@ -154,6 +154,7 @@ class Completor
 
     public function getCompletorTask(string $dataType, string $task): CompletorTaskInterface
     {
+        /** @noinspection NullPointerExceptionInspection */
         return Container::getContainer()->getCompletorTask($dataType, $task);
     }
 
@@ -174,10 +175,10 @@ class Completor
         $this->source = $source;
         $this->result = $result;
 
-        // Complete lines as far as they can be completed on their own.
         $this->initPossibleVatTypes();
         $this->initPossibleVatRates();
         $this->convertToEuro();
+        // Complete lines as far as they can be completed on their own.
         $this->LineCompletor->complete($invoice, $this->possibleVatTypes, $this->possibleVatRates);
 
         $this->checkMissingAmount();
@@ -698,6 +699,7 @@ class Completor
             }
 
             /** @var \Siel\Acumulus\Data\Line $line */
+            /** @noinspection NullPointerExceptionInspection */
             $line = Container::getContainer()->createAcumulusObject(DataType::Line);
             $line->product = $product;
             $line->quantity = 1;

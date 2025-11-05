@@ -29,21 +29,22 @@ class Totals
      */
     public ?float $amountVat;
     /**
-     * string[]
-     *   Support: which of the above fields were calculated (as opposed to fetched
-     *   from the webshop).
-     *   Typically, a webshop stores 2 out of the 3 amounts, the 3rd to be
-     *   calculated from the other 2;
+     * @var string[]
+     *   Support: which of the above fields were calculated (as opposed to fetched from
+     *   the webshop).
+     *   Typically, a webshop stores 2 out of the 3 amounts, the 3rd to be calculated from
+     *   the other 2. The $amountVat may be passed as a $vatRate, which should be passed
+     *   as a fraction, i.e. value between 0 and 1.
      */
     public array $calculated;
 
     /**
      * Constructor for an amount.
      *
-     * Typically 2 out of the 4 parameters are passed and the others are then calculated.
+     * Typically, 2 out of the 4 parameters are passed and the others are then calculated.
      * This simplifies extracting amounts from webshop data stores: just pass what is
      * directly available, do not try to calculate yourself. This also allows to factor in
-     * some precision as this class keeps track of whic fields were calculated.
+     * some precision as this class keeps track of which fields were calculated.
      *
      */
     public function __construct(?float $amountInc, ?float $amountVat, ?float $amountEx = null, ?float $vatRate = null)

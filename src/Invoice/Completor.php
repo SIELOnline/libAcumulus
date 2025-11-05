@@ -177,7 +177,6 @@ class Completor
 
         $this->initPossibleVatTypes();
         $this->initPossibleVatRates();
-        $this->convertToEuro();
         // Complete lines as far as they can be completed on their own.
         $this->LineCompletor->complete($invoice, $this->possibleVatTypes, $this->possibleVatRates);
 
@@ -483,32 +482,6 @@ class Completor
         }
         // Removing duplicates may have created holes in the indexing: re-index.
         $this->possibleVatRates = array_values($possibleVatRates);
-    }
-
-    /**
-     * Converts amounts to euro if another currency was used.
-     *
-     * This method only converts amounts at the invoice level. When this method
-     * is executed, only the invoice totals are set, the lines totals are not
-     * yet set.
-     *
-     * The line completor handles conversion at the line level and this will be
-     * done before calculating the line totals.
-     */
-    protected function convertToEuro(): void
-    {
-        $invoice = $this->invoice;
-        if ($invoice->metadataExists(Meta::Currency)) {
-            /** @var \Siel\Acumulus\Invoice\Currency $currency */
-            $currency = $invoice->metadataGet(Meta::Currency);
-            if ($currency->shouldConvert()) {
-                /** @var \Siel\Acumulus\Invoice\Totals $totals */
-                $totals = $invoice->metadataGet(Meta::Totals);
-                $totals->amountEx = $currency->convertAmount($totals->amountEx);
-                $totals->amountVat = $currency->convertAmount($totals->amountVat);
-                $totals->amountInc = $currency->convertAmount($totals->amountInc);
-            }
-        }
     }
 
     /**

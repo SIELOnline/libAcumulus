@@ -22,7 +22,7 @@ use function assert;
  * InvoiceCompletor completes an {@see \Siel\Acumulus\Data\Invoice}.
  *
  * After an invoice has been collected, the shop-specific part, it needs to be
- * completed. think of things like:
+ * completed. Think of things like:
  * - Getting vat rates when we have a vat amount and an amount (inc. or ex.).
  * - Determining the cost center, account number and template based on settings
  *   and payment method and status.
@@ -77,6 +77,7 @@ class InvoiceCompletor extends BaseCompletor
         $this->getCompletorTask(DataType::Invoice, 'MultiTextLineProperties')->complete($this->invoice);
         $this->getCompletorTask(DataType::Invoice, 'Template')->complete($this->invoice);
         $this->getCompletorTask(DataType::Invoice, 'AddEmailAsPdfSection')->complete($this->invoice);
+        $this->getCompletorTask(DataType::Invoice, 'ConvertTotalsToEuro')->complete($this->invoice);
         $this->completeEmailAsPdf($result);
         $this->completeLines($result);
 

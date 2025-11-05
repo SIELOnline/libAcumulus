@@ -190,6 +190,6 @@ class MailTest extends TestCase
             $name .= "$description-";
         }
         $name .= static::getContainer()->getLanguage();
-        $this->assertMailMatches($name, $mailSent);
+        self::assertMailMatches($name, $mailSent);
     }
 }

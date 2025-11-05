@@ -24,27 +24,27 @@ class HttpRequestResponseTest extends TestCase
         $response = $httpRequest->get($uri);
 
         // Request and response are linked
-        $this->assertSame($httpRequest, $response->getRequest());
+        self::assertSame($httpRequest, $response->getRequest());
 
         // Properties of request.
-        $this->assertSame('GET', $httpRequest->getMethod());
-        $this->assertSame($uri, $httpRequest->getUri());
-        $this->assertNull($httpRequest->getBody());
+        self::assertSame('GET', $httpRequest->getMethod());
+        self::assertSame($uri, $httpRequest->getUri());
+        self::assertNull($httpRequest->getBody());
 
         // Properties of response.
-        $this->assertSame(200, $response->getHttpStatusCode());
-        $this->assertIsString($response->getHeaders());
-        $this->assertStringEqualsFile(__DIR__ . '/../../../readme.md', $response->getBody());
+        self::assertSame(200, $response->getHttpStatusCode());
+        self::assertIsString($response->getHeaders());
+        self::assertStringEqualsFile(__DIR__ . '/../../../readme.md', $response->getBody());
         /** @noinspection DuplicatedCode */
-        $this->assertIsArray($response->getInfo());
-        $this->assertIsString($response->getRequestHeaders());
+        self::assertIsArray($response->getInfo());
+        self::assertIsString($response->getRequestHeaders());
 
         // Properties that (can) come from info.
         $info = $response->getInfo();
-        $this->assertSame($info['http_code'], $response->getHttpStatusCode());
-        $this->assertSame($info['request_header'], $response->getRequestHeaders());
-        $this->assertArrayHasKey('method_time', $info);
-        $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
+        self::assertSame($info['http_code'], $response->getHttpStatusCode());
+        self::assertSame($info['request_header'], $response->getRequestHeaders());
+        self::assertArrayHasKey('method_time', $info);
+        self::assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
     }
 
     public function testPost(): void
@@ -55,35 +55,35 @@ class HttpRequestResponseTest extends TestCase
         $response = $httpRequest->post($uri, $post);
 
         // Request and response are linked
-        $this->assertSame($httpRequest, $response->getRequest());
+        self::assertSame($httpRequest, $response->getRequest());
 
         // Properties of request.
-        $this->assertSame('POST', $httpRequest->getMethod());
-        $this->assertSame($uri, $httpRequest->getUri());
-        $this->assertSame($post, $httpRequest->getBody());
+        self::assertSame('POST', $httpRequest->getMethod());
+        self::assertSame($uri, $httpRequest->getUri());
+        self::assertSame($post, $httpRequest->getBody());
 
         // Properties of response.
-        $this->assertSame(200, $response->getHttpStatusCode());
-        $this->assertIsString($response->getHeaders());
-        $this->assertStringEqualsFile(__DIR__ . '/../../../resources/siel-logo.png', $response->getBody());
+        self::assertSame(200, $response->getHttpStatusCode());
+        self::assertIsString($response->getHeaders());
+        self::assertStringEqualsFile(__DIR__ . '/../../../resources/siel-logo.png', $response->getBody());
         /** @noinspection DuplicatedCode */
-        $this->assertIsArray($response->getInfo());
-        $this->assertIsString($response->getRequestHeaders());
+        self::assertIsArray($response->getInfo());
+        self::assertIsString($response->getRequestHeaders());
 
         // Properties that (can) come from info.
         $info = $response->getInfo();
-        $this->assertSame($info['http_code'], $response->getHttpStatusCode());
-        $this->assertSame($info['request_header'], $response->getRequestHeaders());
-        $this->assertArrayHasKey('method_time', $info);
-        $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
+        self::assertSame($info['http_code'], $response->getHttpStatusCode());
+        self::assertSame($info['request_header'], $response->getRequestHeaders());
+        self::assertArrayHasKey('method_time', $info);
+        self::assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
 
         // Properties that (can) come from info.
         $info = $response->getInfo();
-        $this->assertSame($info['http_code'], $response->getHttpStatusCode());
-        $this->assertSame($info['request_header'], $response->getRequestHeaders());
-        $this->assertSame('image/png', $info['content_type']);
-        $this->assertArrayHasKey('method_time', $info);
-        $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
+        self::assertSame($info['http_code'], $response->getHttpStatusCode());
+        self::assertSame($info['request_header'], $response->getRequestHeaders());
+        self::assertSame('image/png', $info['content_type']);
+        self::assertArrayHasKey('method_time', $info);
+        self::assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
     }
 
     public function test404(): void
@@ -93,27 +93,27 @@ class HttpRequestResponseTest extends TestCase
         $response = $httpRequest->get($uri);
 
         // Request and response are linked
-        $this->assertSame($httpRequest, $response->getRequest());
+        self::assertSame($httpRequest, $response->getRequest());
 
         // Properties of request.
-        $this->assertSame('GET', $httpRequest->getMethod());
-        $this->assertSame($uri, $httpRequest->getUri());
-        $this->assertNull($httpRequest->getBody());
+        self::assertSame('GET', $httpRequest->getMethod());
+        self::assertSame($uri, $httpRequest->getUri());
+        self::assertNull($httpRequest->getBody());
 
         // Properties of response.
-        $this->assertSame(404, $response->getHttpStatusCode());
-        $this->assertIsString($response->getHeaders());
-        $this->assertStringContainsString('<title>404 Not Found</title>', $response->getBody());
+        self::assertSame(404, $response->getHttpStatusCode());
+        self::assertIsString($response->getHeaders());
+        self::assertStringContainsString('<title>404 Not Found</title>', $response->getBody());
         /** @noinspection DuplicatedCode */
-        $this->assertIsArray($response->getInfo());
-        $this->assertIsString($response->getRequestHeaders());
+        self::assertIsArray($response->getInfo());
+        self::assertIsString($response->getRequestHeaders());
 
         // Properties that (can) come from info.
         $info = $response->getInfo();
-        $this->assertSame($info['http_code'], $response->getHttpStatusCode());
-        $this->assertSame($info['request_header'], $response->getRequestHeaders());
-        $this->assertArrayHasKey('method_time', $info);
-        $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
+        self::assertSame($info['http_code'], $response->getHttpStatusCode());
+        self::assertSame($info['request_header'], $response->getRequestHeaders());
+        self::assertArrayHasKey('method_time', $info);
+        self::assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
     }
 
     public function testInvalidDomain(): void
@@ -133,7 +133,7 @@ class HttpRequestResponseTest extends TestCase
         $response = $httpRequest->post($uri, $post);
 
         // Properties that (can) come from info.
-        $this->assertStringContainsString("User-Agent: $ua", $response->getRequestHeaders());
+        self::assertStringContainsString("User-Agent: $ua", $response->getRequestHeaders());
     }
 
     public function testOverridingOptions(): void
@@ -144,7 +144,7 @@ class HttpRequestResponseTest extends TestCase
         $response = $httpRequest->post($uri, $post);
 
         // Properties that are overridden not to be present.
-        $this->assertEmpty($response->getHeaders());
-        $this->assertEmpty($response->getRequestHeaders());
+        self::assertEmpty($response->getHeaders());
+        self::assertEmpty($response->getRequestHeaders());
     }
 }

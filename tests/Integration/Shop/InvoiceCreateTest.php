@@ -48,16 +48,16 @@ class InvoiceCreateTest extends TestCase
         $result = $invoice->toArray();
 
         // Do some basic tests: at all levels, we just check some key(s) being available.
-        $this->assertCount(1, $result);
-        $this->assertArrayHasKey(Fld::Customer, $result);
+        self::assertCount(1, $result);
+        self::assertArrayHasKey(Fld::Customer, $result);
         $customer = $result[Fld::Customer];
-        $this->assertArrayHasKey(Fld::Email, $customer);
-        $this->assertArrayHasKey(Fld::FullName, $customer);
-        $this->assertArrayHasKey(Fld::AltFullName, $customer);
-        $this->assertArrayHasKey(Fld::Invoice, $customer);
+        self::assertArrayHasKey(Fld::Email, $customer);
+        self::assertArrayHasKey(Fld::FullName, $customer);
+        self::assertArrayHasKey(Fld::AltFullName, $customer);
+        self::assertArrayHasKey(Fld::Invoice, $customer);
         $invoice = $customer[Fld::Invoice];
-        $this->assertArrayHasKey(Fld::Concept, $invoice);
-        $this->assertIsArray($invoice[Fld::Line]);
+        self::assertArrayHasKey(Fld::Concept, $invoice);
+        self::assertIsArray($invoice[Fld::Line]);
     }
 
     /**

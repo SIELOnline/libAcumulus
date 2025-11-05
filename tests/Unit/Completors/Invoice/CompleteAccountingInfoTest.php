@@ -69,7 +69,7 @@ class CompleteAccountingInfoTest extends TestCase
         }
         $invoice->metadataSet(Meta::PaymentMethod, $paymentMethod);
         $completor->complete($invoice);
-        $this->assertSame($expectedCostCenter, $invoice->costCenter);
-        $this->assertSame($expectedAccountNumber, $invoice->accountNumber);
+        self::assertSame($expectedCostCenter, $invoice->costCenter);
+        self::assertSame($expectedAccountNumber, $invoice->accountNumber);
     }
 }

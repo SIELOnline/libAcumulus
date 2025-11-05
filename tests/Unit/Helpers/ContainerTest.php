@@ -91,11 +91,11 @@ class ContainerTest extends TestCase
     {
         $container = self::$container;
         $object = $container->getConfigStore();
-        $this->assertInstanceOf(ConfigStore::class, $object);
+        self::assertInstanceOf(ConfigStore::class, $object);
         $object = $container->getEnvironment();
-        $this->assertInstanceOf(Environment::class, $object);
+        self::assertInstanceOf(Environment::class, $object);
         $object = $container->getShopCapabilities();
-        $this->assertInstanceOf(ShopCapabilities::class, $object);
+        self::assertInstanceOf(ShopCapabilities::class, $object);
         $container->getConfigUpgrade();
         $container->getConfig();
         $container->getMappings();
@@ -134,7 +134,7 @@ class ContainerTest extends TestCase
         $container = self::$container;
         $object = $container->createAcumulusObject($dataType);
         /** @noinspection UnnecessaryAssertionInspection */
-        $this->assertInstanceOf($dataClass, $object);
+        self::assertInstanceOf($dataClass, $object);
     }
 
     public static function collectorNameSpaceDataProvider(): array
@@ -168,7 +168,7 @@ class ContainerTest extends TestCase
         }
         $object = $container->getCollector($dataType, $subType);
         /** @noinspection UnnecessaryAssertionInspection  we check for a subtype of the specified return type */
-        $this->assertInstanceOf($collectorClass, $object);
+        self::assertInstanceOf($collectorClass, $object);
     }
 
     /**
@@ -188,15 +188,15 @@ class ContainerTest extends TestCase
     {
         $container = self::$container;
         $object = $container->getForm('batch');
-        $this->assertInstanceOf(BatchForm::class, $object);
+        self::assertInstanceOf(BatchForm::class, $object);
         $object = $container->getForm('register');
-        $this->assertInstanceOf(RegisterForm::class, $object);
+        self::assertInstanceOf(RegisterForm::class, $object);
         $object = $container->getForm('invoice');
-        $this->assertInstanceOf(InvoiceStatusForm::class, $object);
+        self::assertInstanceOf(InvoiceStatusForm::class, $object);
         $object = $container->getForm('rate');
-        $this->assertInstanceOf(RatePluginForm::class, $object);
+        self::assertInstanceOf(RatePluginForm::class, $object);
         $object = $container->getForm('message');
-        $this->assertInstanceOf(MessageForm::class, $object);
+        self::assertInstanceOf(MessageForm::class, $object);
     }
 
     /**
@@ -206,9 +206,9 @@ class ContainerTest extends TestCase
     {
         $container = self::$container;
         $object = $container->getMailer();
-        $this->assertInstanceOf(Mailer::class, $object);
+        self::assertInstanceOf(Mailer::class, $object);
         $object = $container->getMail('CrashMail', 'Mail');
-        $this->assertInstanceOf(CrashMail::class, $object);
+        self::assertInstanceOf(CrashMail::class, $object);
     }
 
     public function testInvoiceNamespace(): void
@@ -218,7 +218,7 @@ class ContainerTest extends TestCase
         $item = $container->createItem(2, $source);
         $container->createProduct(3, $item);
         $object = $container->getCompletor();
-        $this->assertInstanceOf(Completor::class, $object);
+        self::assertInstanceOf(Completor::class, $object);
         $container->createInvoiceAddResult('ContainerTest::testInvoiceNamespace()');
         $container->getCompletorInvoiceLines();
         $container->getFlattenerInvoiceLines();
@@ -259,6 +259,6 @@ class ContainerTest extends TestCase
     {
         $container = self::$container;
         $object = $container->getCompletor($dataType, $subType);
-        $this->assertInstanceOf($completorClass, $object);
+        self::assertInstanceOf($completorClass, $object);
     }
 }

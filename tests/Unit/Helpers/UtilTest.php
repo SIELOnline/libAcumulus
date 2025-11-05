@@ -42,14 +42,14 @@ class UtilTest extends TestCase
         $object = (new GetTestData())->getJson();
         $json = $this->getUtil()->convertToJson($object);
         $maskedJson = $this->getUtil()->maskJson($json);
-        $this->assertSame($json, $maskedJson);
+        self::assertSame($json, $maskedJson);
 
         $array = $this->getUtil()->convertJsonToArray($json);
         $array['customer']['my_password'] = 'secret';
         $array['address']['my_password'] = 'secret';
         $json = $this->getUtil()->convertToJson($array);
         $maskedJson = $this->getUtil()->maskJson($json);
-        $this->assertStringContainsString('"my_password":"REMOVED FOR SECURITY"', $maskedJson);
+        self::assertStringContainsString('"my_password":"REMOVED FOR SECURITY"', $maskedJson);
         $maskedArray = $this->getUtil()->convertJsonToArray($maskedJson);
         self::assertSame('REMOVED FOR SECURITY', $maskedArray['customer']['my_password']);
         self::assertSame('REMOVED FOR SECURITY', $maskedArray['address']['my_password']);

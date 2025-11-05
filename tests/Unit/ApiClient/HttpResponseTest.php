@@ -23,11 +23,11 @@ class HttpResponseTest extends TestCase
         $info = ['http_code' => $httpCode, 'request_header' => $requestHeaders];
         $response = new HttpResponse($responseHeaders, $responseBody, $info, $request);
 
-        $this->assertSame($httpCode, $response->getHttpStatusCode());
-        $this->assertSame($responseHeaders, $response->getHeaders());
-        $this->assertSame($responseBody, $response->getBody());
-        $this->assertSame($info, $response->getInfo());
-        $this->assertSame($request, $response->getRequest());
-        $this->assertSame($requestHeaders, $response->getRequestHeaders());
+        self::assertSame($httpCode, $response->getHttpStatusCode());
+        self::assertSame($responseHeaders, $response->getHeaders());
+        self::assertSame($responseBody, $response->getBody());
+        self::assertSame($info, $response->getInfo());
+        self::assertSame($request, $response->getRequest());
+        self::assertSame($requestHeaders, $response->getRequestHeaders());
     }
 }

@@ -53,7 +53,7 @@ class CompleteConvertTotalsToEuroTest extends TestCase
         $expected = array_combine(['amountInc', 'amountVat', 'amountEx'], $expected);
         foreach ($expected as $property => $value) {
             /** @noinspection PhpVariableVariableInspection */
-            $this->assertEqualsWithDelta($value, $totals->$property, 1e-6);
+            self::assertEqualsWithDelta($value, $totals->$property, 1e-6);
         }
     }
 }

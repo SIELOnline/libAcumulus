@@ -58,8 +58,8 @@ class CompleteByConfigTest extends TestCase
 
         $completor->complete($address);
 
-        $this->assertSame(strtoupper($countryCode), $address->countryCode);
-        $this->assertSame($expectedCountryAutoName, $address->countryAutoName);
-        $this->assertSame($expectedCountry, $address->country);
+        self::assertSame(strtoupper($countryCode), $address->countryCode);
+        self::assertSame($expectedCountryAutoName, $address->countryAutoName);
+        self::assertSame($expectedCountry, $address->country);
     }
 }

@@ -156,7 +156,7 @@ class CompleteAnonymiseTest extends TestCase
         $customerBefore = $customer->toArray();
         $completor->complete($customer);
         $customerAfter = $customer->toArray();
-        $this->assertEqualsCanonicalizing($customerBefore, $customerAfter);
+        self::assertEqualsCanonicalizing($customerBefore, $customerAfter);
     }
 
     public function testCompleteAnonymise(): void
@@ -168,7 +168,7 @@ class CompleteAnonymiseTest extends TestCase
         $anonymousCustomer = $this->getAnonymousCustomer();
         $completor->complete($customer);
         $customerAfter = $customer->toArray();
-        $this->assertEqualsCanonicalizing($anonymousCustomer->toArray(), $customerAfter);
+        self::assertEqualsCanonicalizing($anonymousCustomer->toArray(), $customerAfter);
     }
 
     public function testCompleteAnonymiseCompany(): void
@@ -186,7 +186,7 @@ class CompleteAnonymiseTest extends TestCase
         $customerBefore = $customer->toArray();
         $completor->complete($customer);
         $customerAfter = $customer->toArray();
-        $this->assertEqualsCanonicalizing($customerBefore, $customerAfter);
+        self::assertEqualsCanonicalizing($customerBefore, $customerAfter);
     }
 
 

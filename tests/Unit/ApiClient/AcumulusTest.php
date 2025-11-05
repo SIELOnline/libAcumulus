@@ -27,14 +27,6 @@ class AcumulusTest extends TestCase
     protected static string $shopNamespace = 'TestWebShop\TestDoubles';
     protected static string $language = 'nl';
 
-    private Acumulus $acumulusClient;
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->acumulusClient = self::getContainer()->getAcumulusApiClient();
-    }
-
     /**
      * Each data array consists of:
      * 0: method (string): the method to call.
@@ -81,16 +73,64 @@ class AcumulusTest extends TestCase
             'InvoiceAdd' => ['invoiceAdd', [$invoice], 'invoices/invoice_add', true, ['customer' => ['invoice' => ['line' => []]]]],
             'ConceptInfo' => ['getConceptInfo', [12345], 'invoices/invoice_concept_info', true, ['conceptid' => 12345]],
             'Entry' => ['getEntry', [12345], 'entry/entry_info', true, ['entryid' => 12345]],
-            'SetDeleteStatus1' => ['setDeleteStatus', [12345, Api::Entry_Delete], 'entry/entry_deletestatus_set', true, ['entryid' => 12345, 'entrydeletestatus' => 1]],
-            'SetDeleteStatus0' => ['setDeleteStatus', [12345, Api::Entry_UnDelete], 'entry/entry_deletestatus_set', true, ['entryid' => 12345, 'entrydeletestatus' => 0]],
+            'SetDeleteStatus1' => [
+                'setDeleteStatus',
+                [12345, Api::Entry_Delete],
+                'entry/entry_deletestatus_set',
+                true,
+                ['entryid' => 12345, 'entrydeletestatus' => 1],
+            ],
+            'SetDeleteStatus0' => [
+                'setDeleteStatus',
+                [12345, Api::Entry_UnDelete],
+                'entry/entry_deletestatus_set',
+                true,
+                ['entryid' => 12345, 'entrydeletestatus' => 0],
+            ],
             'GetPaymentStatus' => ['getPaymentStatus', ['TOKEN'], 'invoices/invoice_paymentstatus_get', true, ['token' => 'TOKEN']],
-            'SetPaymentStatus' => ['setPaymentStatus', ['TOKEN', Api::PaymentStatus_Paid, '2020-02-02'], 'invoices/invoice_paymentstatus_set', true, ['token' => 'TOKEN', 'paymentstatus' => Api::PaymentStatus_Paid, 'paymentdate' => '2020-02-02']],
-            'emailInvoice' => ['emailInvoiceAsPdf', ['TOKEN', $emailInvoiceAsPdf], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']]],
-            'emailInvoiceReminder' => ['emailInvoiceAsPdf', ['TOKEN', $emailInvoiceAsPdf, Api::Email_Reminder], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'invoicetype' => Api::Email_Reminder, 'emailaspdf' => ['emailto' => 'test@example.com']]],
-            'emailInvoiceNotes' => ['emailInvoiceAsPdf', ['TOKEN', $emailInvoiceAsPdf, null, 'my notes'], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com'], 'invoicenotes' => 'my notes']],
-            'emailPackingSlip' => ['emailPackingSlipAsPdf', ['TOKEN', $emailPackingslipAsPdf], 'delivery/packing_slip_mail_pdf', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']]],
+            'SetPaymentStatus' => [
+                'setPaymentStatus',
+                ['TOKEN', Api::PaymentStatus_Paid, '2020-02-02'],
+                'invoices/invoice_paymentstatus_set',
+                true,
+                ['token' => 'TOKEN', 'paymentstatus' => Api::PaymentStatus_Paid, 'paymentdate' => '2020-02-02'],
+            ],
+            'emailInvoice' => [
+                'emailInvoiceAsPdf',
+                ['TOKEN', $emailInvoiceAsPdf],
+                'invoices/invoice_mail',
+                true,
+                ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']],
+            ],
+            'emailInvoiceReminder' => [
+                'emailInvoiceAsPdf',
+                ['TOKEN', $emailInvoiceAsPdf, Api::Email_Reminder],
+                'invoices/invoice_mail',
+                true,
+                ['token' => 'TOKEN', 'invoicetype' => Api::Email_Reminder, 'emailaspdf' => ['emailto' => 'test@example.com']],
+            ],
+            'emailInvoiceNotes' => [
+                'emailInvoiceAsPdf',
+                ['TOKEN', $emailInvoiceAsPdf, null, 'my notes'],
+                'invoices/invoice_mail',
+                true,
+                ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com'], 'invoicenotes' => 'my notes'],
+            ],
+            'emailPackingSlip' => [
+                'emailPackingSlipAsPdf',
+                ['TOKEN', $emailPackingslipAsPdf],
+                'delivery/packing_slip_mail_pdf',
+                true,
+                ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']],
+            ],
             'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, ['signup' => ['companyname' => 'BR']]],
-            'stockTransaction' => ['stockTransaction', [$stockTransaction], 'stock/stock_add', true, ['stock' => ['productid' => 12345, 'stockamount' => 1.0, 'stockdescription' => 'description', 'stockdate' => '2022-02-02']]],
+            'stockTransaction' => [
+                'stockTransaction',
+                [$stockTransaction],
+                'stock/stock_add',
+                true,
+                ['stock' => ['productid' => 12345, 'stockamount' => 1.0, 'stockdescription' => 'description', 'stockdate' => '2022-02-02']],
+            ],
         ];
     }
 
@@ -105,19 +145,11 @@ class AcumulusTest extends TestCase
         // method we mock it.
         $stub = $this->getMockBuilder(Acumulus::class)
             ->onlyMethods(['callApiFunction'])
-            ->setConstructorArgs([
-                self::getContainer(),
-                self::getContainer()->getEnvironment(),
-                self::getContainer()->getLog(),
-            ])
+            ->setConstructorArgs([self::getContainer(), self::getContainer()->getEnvironment(), self::getContainer()->getLog(),])
             ->getMock();
         $stub->expects($this->once())
             ->method('callApiFunction')
-            ->with(
-                $this->equalTo($apiFunction),
-                $this->equalTo($message),
-                $this->equalTo($needContract)
-            );
+            ->with($this->equalTo($apiFunction), $this->equalTo($message), $this->equalTo($needContract));
 
         $stub->$method(... $args);
     }
@@ -132,18 +164,16 @@ class AcumulusTest extends TestCase
     {
         $environment = self::getContainer()->getEnvironment()->toArray();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
-        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN",
-            $this->acumulusClient->getInvoicePdfUri('TOKEN'));
-        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1",
-            $this->acumulusClient->getInvoicePdfUri('TOKEN', true));
-        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=0",
-            $this->acumulusClient->getInvoicePdfUri('TOKEN', false));
-        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=1",
-            $this->acumulusClient->getInvoicePdfUri('TOKEN', null, true));
-        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=0",
-            $this->acumulusClient->getInvoicePdfUri('TOKEN', null, false));
-        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1&gfx=1",
-            $this->acumulusClient->getInvoicePdfUri('TOKEN', true, true));
+        $acumulus = self::getContainer()->getAcumulusApiClient();
+        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN", $acumulus->getInvoicePdfUri('TOKEN'));
+        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1", $acumulus->getInvoicePdfUri('TOKEN', true));
+        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=0", $acumulus->getInvoicePdfUri('TOKEN', false));
+        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=1", $acumulus->getInvoicePdfUri('TOKEN', null, true));
+        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=0", $acumulus->getInvoicePdfUri('TOKEN', null, false));
+        self::assertSame(
+            "$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1&gfx=1",
+            $acumulus->getInvoicePdfUri('TOKEN', true, true)
+        );
     }
 
     /**
@@ -154,6 +184,9 @@ class AcumulusTest extends TestCase
     {
         $environment = self::getContainer()->getEnvironment()->toArray();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
-        $this->assertSame("$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN", $this->acumulusClient->getPackingSlipPdfUri('TOKEN'));
+        self::assertSame(
+            "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN",
+            self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN')
+        );
     }
 }

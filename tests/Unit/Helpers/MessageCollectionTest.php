@@ -28,19 +28,19 @@ class MessageCollectionTest extends TestCase
     public function testCreateMessageCollection(): MessageCollection
     {
         $collection = new MessageCollection($this->translator);
-        $this->assertSame(Severity::Unknown, $collection->getSeverity());
-        $this->assertFalse($collection->hasRealMessages());
-        $this->assertFalse($collection->hasError());
-        $this->assertNull($collection->getByCode(403));
-        $this->assertNull($collection->getByCode('403'));
-        $this->assertNull($collection->getByCodeTag('E2'));
-        $this->assertEmpty($collection->getByField('email'));
-        $this->assertCount(0, $collection->getMessages());
-        $this->assertCount(0, $collection->getMessages(Severity::Log));
-        $this->assertCount(0, $collection->getMessages(Severity::Success));
-        $this->assertCount(0, $collection->getMessages(Severity::Log | Severity::Success));
-        $this->assertCount(0, $collection->getMessages(Severity::Info));
-        $this->assertCount(0, $collection->getMessages(Severity::Error));
+        self::assertSame(Severity::Unknown, $collection->getSeverity());
+        self::assertFalse($collection->hasRealMessages());
+        self::assertFalse($collection->hasError());
+        self::assertNull($collection->getByCode(403));
+        self::assertNull($collection->getByCode('403'));
+        self::assertNull($collection->getByCodeTag('E2'));
+        self::assertEmpty($collection->getByField('email'));
+        self::assertCount(0, $collection->getMessages());
+        self::assertCount(0, $collection->getMessages(Severity::Log));
+        self::assertCount(0, $collection->getMessages(Severity::Success));
+        self::assertCount(0, $collection->getMessages(Severity::Log | Severity::Success));
+        self::assertCount(0, $collection->getMessages(Severity::Info));
+        self::assertCount(0, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -56,19 +56,19 @@ class MessageCollectionTest extends TestCase
     {
         $collection->createAndAddMessage('log', Severity::Log);
 
-        $this->assertSame(Severity::Log, $collection->getSeverity());
-        $this->assertFalse($collection->hasRealMessages());
-        $this->assertFalse($collection->hasError());
-        $this->assertNull($collection->getByCode(403));
-        $this->assertNull($collection->getByCode('403'));
-        $this->assertNull($collection->getByCodeTag('E2'));
-        $this->assertEmpty($collection->getByField('email'));
-        $this->assertCount(1, $collection->getMessages());
-        $this->assertCount(1, $collection->getMessages(Severity::Log));
-        $this->assertCount(0, $collection->getMessages(Severity::Success));
-        $this->assertCount(1, $collection->getMessages(Severity::Log | Severity::Success));
-        $this->assertCount(0, $collection->getMessages(Severity::Info));
-        $this->assertCount(0, $collection->getMessages(Severity::Error));
+        self::assertSame(Severity::Log, $collection->getSeverity());
+        self::assertFalse($collection->hasRealMessages());
+        self::assertFalse($collection->hasError());
+        self::assertNull($collection->getByCode(403));
+        self::assertNull($collection->getByCode('403'));
+        self::assertNull($collection->getByCodeTag('E2'));
+        self::assertEmpty($collection->getByField('email'));
+        self::assertCount(1, $collection->getMessages());
+        self::assertCount(1, $collection->getMessages(Severity::Log));
+        self::assertCount(0, $collection->getMessages(Severity::Success));
+        self::assertCount(1, $collection->getMessages(Severity::Log | Severity::Success));
+        self::assertCount(0, $collection->getMessages(Severity::Info));
+        self::assertCount(0, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -84,19 +84,19 @@ class MessageCollectionTest extends TestCase
     {
         $collection->createAndAddMessage('suc6', Severity::Success);
 
-        $this->assertSame(Severity::Success, $collection->getSeverity());
-        $this->assertFalse($collection->hasRealMessages());
-        $this->assertFalse($collection->hasError());
-        $this->assertNull($collection->getByCode(403));
-        $this->assertNull($collection->getByCode('403'));
-        $this->assertNull($collection->getByCodeTag('E2'));
-        $this->assertEmpty($collection->getByField('email'));
-        $this->assertCount(2, $collection->getMessages());
-        $this->assertCount(1, $collection->getMessages(Severity::Log));
-        $this->assertCount(1, $collection->getMessages(Severity::Success));
-        $this->assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
-        $this->assertCount(0, $collection->getMessages(Severity::Info));
-        $this->assertCount(0, $collection->getMessages(Severity::Error));
+        self::assertSame(Severity::Success, $collection->getSeverity());
+        self::assertFalse($collection->hasRealMessages());
+        self::assertFalse($collection->hasError());
+        self::assertNull($collection->getByCode(403));
+        self::assertNull($collection->getByCode('403'));
+        self::assertNull($collection->getByCodeTag('E2'));
+        self::assertEmpty($collection->getByField('email'));
+        self::assertCount(2, $collection->getMessages());
+        self::assertCount(1, $collection->getMessages(Severity::Log));
+        self::assertCount(1, $collection->getMessages(Severity::Success));
+        self::assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
+        self::assertCount(0, $collection->getMessages(Severity::Info));
+        self::assertCount(0, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -112,22 +112,22 @@ class MessageCollectionTest extends TestCase
     {
         $collection->addMessages([Message::create('Message 702', Severity::Error, '403 Forbidden')]);
 
-        $this->assertSame(Severity::Error, $collection->getSeverity());
-        $this->assertTrue($collection->hasError());
-        $this->assertNull($collection->getByCode(701));
-        $this->assertInstanceOf(Message::class, $collection->getByCode('403 Forbidden'));
-        $this->assertInstanceOf(Message::class, $collection->getByCode('403 forbidden'));
-        $this->assertInstanceOf(Message::class, $collection->getByCode(403));
-        $this->assertInstanceOf(Message::class, $collection->getByCode('403'));
-        $this->assertInstanceOf(Message::class, $collection->getByCode('forbidden'));
-        $this->assertNull($collection->getByCodeTag('E1'));
-        $this->assertEmpty($collection->getByField('email'));
-        $this->assertCount(3, $collection->getMessages());
-        $this->assertCount(1, $collection->getMessages(Severity::Log));
-        $this->assertCount(1, $collection->getMessages(Severity::Success));
-        $this->assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
-        $this->assertCount(0, $collection->getMessages(Severity::Info));
-        $this->assertCount(1, $collection->getMessages(Severity::Error));
+        self::assertSame(Severity::Error, $collection->getSeverity());
+        self::assertTrue($collection->hasError());
+        self::assertNull($collection->getByCode(701));
+        self::assertInstanceOf(Message::class, $collection->getByCode('403 Forbidden'));
+        self::assertInstanceOf(Message::class, $collection->getByCode('403 forbidden'));
+        self::assertInstanceOf(Message::class, $collection->getByCode(403));
+        self::assertInstanceOf(Message::class, $collection->getByCode('403'));
+        self::assertInstanceOf(Message::class, $collection->getByCode('forbidden'));
+        self::assertNull($collection->getByCodeTag('E1'));
+        self::assertEmpty($collection->getByField('email'));
+        self::assertCount(3, $collection->getMessages());
+        self::assertCount(1, $collection->getMessages(Severity::Log));
+        self::assertCount(1, $collection->getMessages(Severity::Success));
+        self::assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
+        self::assertCount(0, $collection->getMessages(Severity::Info));
+        self::assertCount(1, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -149,24 +149,24 @@ class MessageCollectionTest extends TestCase
         ];
         $collection->addMessages($messages, Severity::Warning);
 
-        $this->assertSame(Severity::Error, $collection->getSeverity());
-        $this->assertTrue($collection->hasError());
-        $this->assertInstanceOf(Message::class, $collection->getByCode(700));
-        $this->assertNull($collection->getByCode(701));
-        $this->assertInstanceOf(Message::class, $collection->getByCode(403));
-        $this->assertNull($collection->getByCodeTag('E1'));
-        $this->assertCount(1, $collection->getByField('email'));
-        $this->assertContainsOnlyInstancesOf(Message::class, $collection->getByField('email'));
-        $this->assertCount(7, $collection->getMessages());
-        $this->assertContainsOnlyInstancesOf(Message::class, $collection->getMessages());
-        $this->assertCount(1, $collection->getMessages(Severity::Log));
-        $this->assertCount(1, $collection->getMessages(Severity::Success));
-        $this->assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
-        $this->assertCount(2, $collection->getMessages(Severity::Info));
-        $this->assertCount(1, $collection->getMessages(Severity::Notice));
-        $this->assertCount(1, $collection->getMessages(Severity::Warning));
-        $this->assertCount(2, $collection->getMessages(Severity::WarningOrWorse));
-        $this->assertCount(1, $collection->getMessages(Severity::Error));
+        self::assertSame(Severity::Error, $collection->getSeverity());
+        self::assertTrue($collection->hasError());
+        self::assertInstanceOf(Message::class, $collection->getByCode(700));
+        self::assertNull($collection->getByCode(701));
+        self::assertInstanceOf(Message::class, $collection->getByCode(403));
+        self::assertNull($collection->getByCodeTag('E1'));
+        self::assertCount(1, $collection->getByField('email'));
+        self::assertContainsOnlyInstancesOf(Message::class, $collection->getByField('email'));
+        self::assertCount(7, $collection->getMessages());
+        self::assertContainsOnlyInstancesOf(Message::class, $collection->getMessages());
+        self::assertCount(1, $collection->getMessages(Severity::Log));
+        self::assertCount(1, $collection->getMessages(Severity::Success));
+        self::assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
+        self::assertCount(2, $collection->getMessages(Severity::Info));
+        self::assertCount(1, $collection->getMessages(Severity::Notice));
+        self::assertCount(1, $collection->getMessages(Severity::Warning));
+        self::assertCount(2, $collection->getMessages(Severity::WarningOrWorse));
+        self::assertCount(1, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -180,15 +180,15 @@ class MessageCollectionTest extends TestCase
     {
         $format = $collection->formatMessages(Message::Format_Plain);
 
-        $this->assertCount(7, $format);
-        $this->assertSame('log', $format[0]);
-        $this->assertSame('suc6', $format[1]);
+        self::assertCount(7, $format);
+        self::assertSame('log', $format[0]);
+        self::assertSame('suc6', $format[1]);
 
         $format = $collection->formatMessages(Message::Format_HtmlList);
 
-        $this->assertIsString($format);
-        $this->assertStringStartsWith('<ul>', $format);
-        $this->assertStringEndsWith("</ul>\n", $format);
-        $this->assertCount(8, explode('<li>', $format));
+        self::assertIsString($format);
+        self::assertStringStartsWith('<ul>', $format);
+        self::assertStringEndsWith("</ul>\n", $format);
+        self::assertCount(8, explode('<li>', $format));
     }
 }

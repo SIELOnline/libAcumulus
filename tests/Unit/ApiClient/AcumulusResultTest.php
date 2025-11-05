@@ -52,9 +52,9 @@ class AcumulusResultTest extends TestCase
         $this->acumulusRequest = self::getContainer()->createAcumulusRequest();
         $acumulusResult = $this->acumulusRequest->execute($uri, $submit, $needContract);
 
-        $this->assertSame($this->acumulusRequest, $acumulusResult->getAcumulusRequest());
-        $this->assertNotNull($acumulusResult->getHttpResponse());
-        $this->assertSame($this->acumulusRequest->getHttpRequest(), $acumulusResult->getHttpResponse()->getRequest());
+        self::assertSame($this->acumulusRequest, $acumulusResult->getAcumulusRequest());
+        self::assertNotNull($acumulusResult->getHttpResponse());
+        self::assertSame($this->acumulusRequest->getHttpRequest(), $acumulusResult->getHttpResponse()->getRequest());
 
         return $acumulusResult;
     }
@@ -69,12 +69,12 @@ class AcumulusResultTest extends TestCase
         $uri = 'accounts';
         $result = $this->getAcumulusResult($uri);
 
-        $this->assertSame($this->acumulusRequest, $result->getAcumulusRequest());
-        $this->assertNotNull($result->getHttpResponse());
-        $this->assertSame(Severity::Success, $result->getStatus());
-        $this->assertSame($this->t('message_response_success'), $result->getStatusText());
-        $this->assertSame(Severity::Unknown, $result->getSeverity());
-        $this->assertCount(0, $result->getMessages());
+        self::assertSame($this->acumulusRequest, $result->getAcumulusRequest());
+        self::assertNotNull($result->getHttpResponse());
+        self::assertSame(Severity::Success, $result->getStatus());
+        self::assertSame($this->t('message_response_success'), $result->getStatusText());
+        self::assertSame(Severity::Unknown, $result->getSeverity());
+        self::assertCount(0, $result->getMessages());
 
         return $result;
     }
@@ -85,7 +85,7 @@ class AcumulusResultTest extends TestCase
         $result = $this->getAcumulusResult($uri);
         $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
+        self::assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
     public function testSetMainResponseKeyList(): void
@@ -94,7 +94,7 @@ class AcumulusResultTest extends TestCase
         $result = $this->getAcumulusResult($uri);
         $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
+        self::assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
     public function testSetMainResponseKeyEmptyList(): void
@@ -103,7 +103,7 @@ class AcumulusResultTest extends TestCase
         $result = $this->getAcumulusResult($uri);
         $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
+        self::assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
     public function testNoContract(): void
@@ -112,7 +112,7 @@ class AcumulusResultTest extends TestCase
         $result = $this->getAcumulusResult($uri);
         $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
+        self::assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
     public function testMaskPasswordsRequest(): void
@@ -122,8 +122,8 @@ class AcumulusResultTest extends TestCase
         $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
         $message = $result->getAcumulusRequest()->getMaskedRequest();
-        $this->assertStringNotContainsString('my_secret', $message);
-        $this->assertStringContainsString('REMOVED FOR SECURITY', $message);
+        self::assertStringNotContainsString('my_secret', $message);
+        self::assertStringContainsString('REMOVED FOR SECURITY', $message);
     }
 
     public function testMaskPasswordsResponse(): void
@@ -133,7 +133,7 @@ class AcumulusResultTest extends TestCase
         $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
         $message = $result->getMaskedResponse();
-        $this->assertStringNotContainsString('my_secret', $message);
-        $this->assertStringContainsString('REMOVED FOR SECURITY', $message);
+        self::assertStringNotContainsString('my_secret', $message);
+        self::assertStringContainsString('REMOVED FOR SECURITY', $message);
     }
 }

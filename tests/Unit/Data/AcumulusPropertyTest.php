@@ -54,9 +54,9 @@ class AcumulusPropertyTest extends TestCase
     {
         $pd = ['name' => 'property', 'type' => 'int', 'required' => true, 'allowedValues' => [1, 2]];
         $p = new AcumulusProperty($pd);
-        $this->assertSame('property', $p->getName());
-        $this->assertTrue($p->isRequired());
-        $this->assertNull($p->getValue());
+        self::assertSame('property', $p->getName());
+        self::assertTrue($p->isRequired());
+        self::assertNull($p->getValue());
     }
 
     public static function setValueDataProvider(): array
@@ -81,7 +81,7 @@ class AcumulusPropertyTest extends TestCase
         $pd = ['name' => 'property', 'type' => $type];
         $p = new AcumulusProperty($pd);
         $p->setValue($value);
-        $this->assertSame($propertyValue, $p->getValue());
+        self::assertSame($propertyValue, $p->getValue());
     }
 
     public static function setBoolValueDataProvider(): array
@@ -106,7 +106,7 @@ class AcumulusPropertyTest extends TestCase
         $pd = ['name' => 'property', 'type' => 'bool', 'allowedValues' => $allowedValues];
         $p = new AcumulusProperty($pd);
         $p->setValue($value);
-        $this->assertSame($propertyValue, $p->getValue());
+        self::assertSame($propertyValue, $p->getValue());
     }
 
     public static function setDateValueDataProvider(): array
@@ -128,7 +128,7 @@ class AcumulusPropertyTest extends TestCase
         $pd = ['name' => 'property', 'type' => $type];
         $p = new AcumulusProperty($pd);
         $p->setValue($value);
-        $this->assertEquals($castValue, $p->getValue());
+        self::assertEquals($castValue, $p->getValue());
     }
 
     public static function setValueWrongTypeDataProvider(): array
@@ -190,6 +190,6 @@ class AcumulusPropertyTest extends TestCase
         $pd = ['name' => 'property'] + $propertyDefinition;
         $p = new AcumulusProperty($pd);
         $p->setValue($value);
-        $this->assertSame($expected, $p->getApiValue());
+        self::assertSame($expected, $p->getApiValue());
     }
 }

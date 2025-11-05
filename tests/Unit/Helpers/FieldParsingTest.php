@@ -48,8 +48,8 @@ class FieldParsingTest extends TestCase
         $stopAt = 'expandSpecification';
         $vf = new FieldExpander($log, $stopAt);
         $result = $vf->expand($field, $this->createPropertySources());
-        $this->assertSame($field, $result);
-        $this->assertEmpty($vf->trace);
+        self::assertSame($field, $result);
+        self::assertEmpty($vf->trace);
     }
 
     public static function fieldsProvider2(): array
@@ -72,8 +72,8 @@ class FieldParsingTest extends TestCase
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, $this->createPropertySources());
-        $this->assertCount(1, $vf->trace[$stopAt]);
-        $this->assertSame($match, reset($vf->trace[$stopAt]));
+        self::assertCount(1, $vf->trace[$stopAt]);
+        self::assertSame($match, reset($vf->trace[$stopAt]));
     }
 
     public static function fieldsProvider3(): array
@@ -96,7 +96,7 @@ class FieldParsingTest extends TestCase
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, $this->createPropertySources());
-        $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
+        self::assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
     }
 
     public static function fieldsProvider4(): array
@@ -117,7 +117,7 @@ class FieldParsingTest extends TestCase
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, $this->createPropertySources());
-        $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
+        self::assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
     }
 
     public static function fieldsProvider5(): array
@@ -139,7 +139,7 @@ class FieldParsingTest extends TestCase
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, $this->createPropertySources());
-        $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
+        self::assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
     }
 
     public static function fieldsProvider6(): array
@@ -161,9 +161,9 @@ class FieldParsingTest extends TestCase
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, $this->createPropertySources());
-        $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
+        self::assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
         $logEntry = 'expandSpaceConcatenatedProperty';
-        $this->assertEqualsCanonicalizing($spaceConcatenatedProperties, $vf->trace[$logEntry]);
+        self::assertEqualsCanonicalizing($spaceConcatenatedProperties, $vf->trace[$logEntry]);
     }
 
     public static function fieldsProvider7(): array
@@ -185,8 +185,8 @@ class FieldParsingTest extends TestCase
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, $this->createPropertySources());
-        $this->assertEqualsCanonicalizing($propertiesInObject, $vf->trace['expandPropertyInObject']);
-        $this->assertEqualsCanonicalizing($properties, $vf->trace['expandSinglePropertyName']);
-        $this->assertEqualsCanonicalizing($literals, $vf->trace['getLiteral']);
+        self::assertEqualsCanonicalizing($propertiesInObject, $vf->trace['expandPropertyInObject']);
+        self::assertEqualsCanonicalizing($properties, $vf->trace['expandSinglePropertyName']);
+        self::assertEqualsCanonicalizing($literals, $vf->trace['getLiteral']);
     }
 }

@@ -43,7 +43,7 @@ class CompleteEmailTest extends TestCase
         $customer = $this->getCustomer();
         $customer->email = $email;
         $completor->complete($customer);
-        $this->assertSame($expected, $customer->email);
-        $this->assertSame($expectWarning, $customer->hasWarning());
+        self::assertSame($expected, $customer->email);
+        self::assertSame($expectWarning, $customer->hasWarning());
     }
 }

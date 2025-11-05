@@ -48,10 +48,10 @@ class CollectorTest extends TestCase
         $propertySources = self::getContainer()->createPropertySources();
         $fieldMappings = new ArrayObject();
         $simpleTestObject = $collector->collect($propertySources, $fieldMappings);
-        $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
-        $this->assertNull($simpleTestObject->getItemNumber());
-        $this->assertNull($simpleTestObject->getNature());
-        $this->assertNull($simpleTestObject->getUnitPrice());
+        self::assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
+        self::assertNull($simpleTestObject->getItemNumber());
+        self::assertNull($simpleTestObject->getNature());
+        self::assertNull($simpleTestObject->getUnitPrice());
     }
 
     public function testCollectMappingsOnly(): void
@@ -68,10 +68,10 @@ class CollectorTest extends TestCase
 
         $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->fieldMappings);
-        $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
-        $this->assertSame((string) $itemNumber, $simpleTestObject->getItemNumber());
-        $this->assertSame($nature, $simpleTestObject->getNature());
-        $this->assertSame((float) $unitPrice, $simpleTestObject->getUnitPrice());
+        self::assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
+        self::assertSame((string) $itemNumber, $simpleTestObject->getItemNumber());
+        self::assertSame($nature, $simpleTestObject->getNature());
+        self::assertSame((float) $unitPrice, $simpleTestObject->getUnitPrice());
     }
 
     public function testCollectNullMappingsOnly(): void
@@ -88,10 +88,10 @@ class CollectorTest extends TestCase
 
         $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->nullFieldMappings);
-        $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
-        $this->assertNull($simpleTestObject->getItemNumber());
-        $this->assertNull($simpleTestObject->getNature());
-        $this->assertNull($simpleTestObject->getUnitPrice());
+        self::assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
+        self::assertNull($simpleTestObject->getItemNumber());
+        self::assertNull($simpleTestObject->getNature());
+        self::assertNull($simpleTestObject->getUnitPrice());
     }
 
     public function testCollectWithLogic(): void
@@ -112,10 +112,10 @@ class CollectorTest extends TestCase
 
         $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->fieldMappings);
-        $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
-        $this->assertSame((string) $itemNumber, $simpleTestObject->getItemNumber());
-        $this->assertSame($nature, $simpleTestObject->getNature());
+        self::assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
+        self::assertSame((string) $itemNumber, $simpleTestObject->getItemNumber());
+        self::assertSame($nature, $simpleTestObject->getNature());
         $reductionPrice = (1 - $propertySources->get('customer')['reduction']) * $propertySources->get('line')['field_unit_price'];
-        $this->assertEqualsWithDelta((float) $reductionPrice, $simpleTestObject->getUnitPrice(), 0.000001);
+        self::assertEqualsWithDelta((float) $reductionPrice, $simpleTestObject->getUnitPrice(), 0.000001);
     }
 }

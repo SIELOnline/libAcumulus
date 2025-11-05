@@ -24,23 +24,23 @@ class CompleteMultiTextLinePropertiesTest extends TestCase
 
         $invoice->descriptionText = ' ';
         $completor->complete($invoice);
-        $this->assertSame(' ', $invoice->descriptionText);
-        $this->assertNull($invoice->invoiceNotes);
+        self::assertSame(' ', $invoice->descriptionText);
+        self::assertNull($invoice->invoiceNotes);
 
         $invoice->invoiceNotes = 'a';
-        $this->assertSame('a', $invoice->invoiceNotes);
-        $this->assertSame(' ', $invoice->descriptionText);
+        self::assertSame('a', $invoice->invoiceNotes);
+        self::assertSame(' ', $invoice->descriptionText);
 
         $invoice->descriptionText = '1\r\n2\t2\r\n3\r\n';
         $invoice->invoiceNotes = "\r\n1\r\n2\t2\r\n3\r\n";
         $completor->complete($invoice);
-        $this->assertSame('1\r\n2\t2\r\n3\r\n', $invoice->descriptionText);
-        $this->assertSame('\n1\n2\t2\n3\n', $invoice->invoiceNotes);
+        self::assertSame('1\r\n2\t2\r\n3\r\n', $invoice->descriptionText);
+        self::assertSame('\n1\n2\t2\n3\n', $invoice->invoiceNotes);
 
         $invoice->descriptionText = "1\r\n2\r3\n";
         $invoice->invoiceNotes = "\r\n\n\r1\n\r2\t\t2\t2\r\n\r\n3";
         $completor->complete($invoice);
-        $this->assertSame('1\n2\n3\n', $invoice->descriptionText);
-        $this->assertSame('\n\n\n1\n\n2\t\t2\t2\n\n3', $invoice->invoiceNotes);
+        self::assertSame('1\n2\n3\n', $invoice->descriptionText);
+        self::assertSame('\n\n\n1\n\n2\t\t2\t2\n\n3', $invoice->invoiceNotes);
     }
 }

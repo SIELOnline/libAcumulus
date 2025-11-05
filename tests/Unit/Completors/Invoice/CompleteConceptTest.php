@@ -31,24 +31,24 @@ class CompleteConceptTest extends TestCase
         $config->set('concept', Config::Concept_Plugin);
         $invoice = $this->getInvoice();
         $completor->complete($invoice);
-        $this->assertFalse($invoice->concept);
+        self::assertFalse($invoice->concept);
 
         // No, no warning = false
         $config->set('concept', Api::Concept_No);
         $invoice = $this->getInvoice();
         $completor->complete($invoice);
-        $this->assertFalse($invoice->concept);
+        self::assertFalse($invoice->concept);
 
         // Yes, no warning = true
         $config->set('concept', Api::Concept_Yes);
         $invoice = $this->getInvoice();
         $completor->complete($invoice);
-        $this->assertTrue($invoice->concept);
+        self::assertTrue($invoice->concept);
 
         // Test not overwrite.
         $config->set('concept', Api::Concept_No);
         $completor->complete($invoice);
-        $this->assertTrue($invoice->concept);
+        self::assertTrue($invoice->concept);
 
         $line = $this->getLine(LineType::Item);
         $line->metadataAdd(Meta::Warning, 'warning');
@@ -58,20 +58,20 @@ class CompleteConceptTest extends TestCase
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
         $completor->complete($invoice);
-        $this->assertTrue($invoice->concept);
+        self::assertTrue($invoice->concept);
 
         // No, warning = false
         $config->set('concept', Api::Concept_No);
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
         $completor->complete($invoice);
-        $this->assertFalse($invoice->concept);
+        self::assertFalse($invoice->concept);
 
         // Yes, warning = true
         $config->set('concept', Api::Concept_Yes);
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
         $completor->complete($invoice);
-        $this->assertTrue($invoice->concept);
+        self::assertTrue($invoice->concept);
     }
 }

@@ -85,6 +85,6 @@ class MappingsTest extends TestCase
             ],
         ];
         $actual = $mappings->getOverriddenValues($final, $defaults);
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 }

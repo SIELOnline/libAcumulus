@@ -42,9 +42,9 @@ class AcumulusRequestTest extends TestCase
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->acumulusRequest = self::getContainer()->createAcumulusRequest();
 
-        $this->assertNull($this->acumulusRequest->getUri());
-        $this->assertNull($this->acumulusRequest->getSubmit());
-        $this->assertNull($this->acumulusRequest->getHttpRequest());
+        self::assertNull($this->acumulusRequest->getUri());
+        self::assertNull($this->acumulusRequest->getSubmit());
+        self::assertNull($this->acumulusRequest->getHttpRequest());
     }
 
     private function getAcumulusRequest(string $uri): void
@@ -54,23 +54,23 @@ class AcumulusRequestTest extends TestCase
         $needContract = $this->examples->needContract($uri);
         $this->acumulusResult =  $this->acumulusRequest->execute($uri, $submit, $needContract);
 
-        $this->assertSame($uri, $this->acumulusRequest->getUri());
+        self::assertSame($uri, $this->acumulusRequest->getUri());
         $fullSubmit = $this->acumulusRequest->getSubmit();
-        $this->assertArrayHasKey(Fld::Format, $fullSubmit);
-        $this->assertArrayHasKey(Fld::TestMode, $fullSubmit);
-        $this->assertArrayHasKey(Fld::Lang, $fullSubmit);
-        $this->assertArrayHasKey(Fld::Connector, $fullSubmit);
-        $this->assertEqualsCanonicalizing(
+        self::assertArrayHasKey(Fld::Format, $fullSubmit);
+        self::assertArrayHasKey(Fld::TestMode, $fullSubmit);
+        self::assertArrayHasKey(Fld::Lang, $fullSubmit);
+        self::assertArrayHasKey(Fld::Connector, $fullSubmit);
+        self::assertEqualsCanonicalizing(
             $submit,
             array_intersect_assoc($fullSubmit, $submit)
         );
-        $this->assertNotNull($this->acumulusRequest->getHttpRequest());
-        $this->assertSame('POST', $this->acumulusRequest->getHttpRequest()->getMethod());
-        $this->assertSame($uri, $this->acumulusRequest->getHttpRequest()->getUri());
-        $this->assertIsArray($this->acumulusRequest->getHttpRequest()->getBody());
-        $this->assertCount(1, $this->acumulusRequest->getHttpRequest()->getBody());
-        $this->assertArrayHasKey('xmlstring', $this->acumulusRequest->getHttpRequest()->getBody());
-        $this->assertStringContainsString('<acumulus>', $this->acumulusRequest->getHttpRequest()->getBody()['xmlstring']);
+        self::assertNotNull($this->acumulusRequest->getHttpRequest());
+        self::assertSame('POST', $this->acumulusRequest->getHttpRequest()->getMethod());
+        self::assertSame($uri, $this->acumulusRequest->getHttpRequest()->getUri());
+        self::assertIsArray($this->acumulusRequest->getHttpRequest()->getBody());
+        self::assertCount(1, $this->acumulusRequest->getHttpRequest()->getBody());
+        self::assertArrayHasKey('xmlstring', $this->acumulusRequest->getHttpRequest()->getBody());
+        self::assertStringContainsString('<acumulus>', $this->acumulusRequest->getHttpRequest()->getBody()['xmlstring']);
     }
 
     public function testExecuteNoContract(): void
@@ -78,7 +78,7 @@ class AcumulusRequestTest extends TestCase
         $uri = 'vatinfo';
         $this->getAcumulusRequest($uri);
 
-        $this->assertArrayNotHasKey(Fld::Contract, $this->acumulusRequest->getSubmit());
+        self::assertArrayNotHasKey(Fld::Contract, $this->acumulusRequest->getSubmit());
     }
 
     public function testExecuteContract(): void
@@ -86,7 +86,7 @@ class AcumulusRequestTest extends TestCase
         $uri = 'accounts';
         $this->getAcumulusRequest($uri);
 
-        $this->assertArrayHasKey(Fld::Contract, $this->acumulusRequest->getSubmit());
+        self::assertArrayHasKey(Fld::Contract, $this->acumulusRequest->getSubmit());
     }
 
     public function testIsTestMode(): void
@@ -94,14 +94,14 @@ class AcumulusRequestTest extends TestCase
         $uri = 'accounts';
         $this->examples->setOptions([Fld::TestMode => Api::TestMode_Normal]);
         $this->getAcumulusRequest($uri);
-        $this->assertFalse($this->acumulusRequest->isTestMode());
+        self::assertFalse($this->acumulusRequest->isTestMode());
 
         $this->examples->setOptions([Fld::TestMode => Api::TestMode_Test]);
         $this->getAcumulusRequest($uri);
-        $this->assertTrue($this->acumulusRequest->isTestMode());
+        self::assertTrue($this->acumulusRequest->isTestMode());
 
         $this->examples->setOptions([Fld::TestMode => Api::TestMode_Test]);
         $this->createAcumulusRequest();
-        $this->assertNull($this->acumulusRequest->isTestMode());
+        self::assertNull($this->acumulusRequest->isTestMode());
     }
 }

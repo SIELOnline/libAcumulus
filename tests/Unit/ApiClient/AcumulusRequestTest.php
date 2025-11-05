@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- */
 
 declare(strict_types=1);
 
@@ -13,12 +9,12 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * Features to test with the {@see AcumulusRequest}:
  * - execute
- * and before/after that the getters
+ * and before/after that the getters:
  * - getUri
  * - getSubmitMessage (constructSubmitMessage, getBasicSubmit, convertArrayToXml)
  * - getHttpRequest?
@@ -26,23 +22,25 @@ use Siel\Acumulus\Helpers\Container;
  */
 class AcumulusRequestTest extends TestCase
 {
+    use AcumulusContainer;
+
+    protected static string $shopNamespace = 'TestWebShop\TestDoubles';
+    protected static string $language = 'en';
+
     protected \Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\AcumulusRequest $acumulusRequest;
     protected AcumulusResult $acumulusResult;
-    private Container $container;
     private ApiRequestResponseExamples $examples;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        $language = 'nl';
-        $this->container = new Container('TestWebShop\TestDoubles', $language);
         $this->examples = ApiRequestResponseExamples::getInstance();
     }
 
     private function createAcumulusRequest(): void
     {
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
-        $this->acumulusRequest = $this->container->createAcumulusRequest();
+        $this->acumulusRequest = self::getContainer()->createAcumulusRequest();
 
         $this->assertNull($this->acumulusRequest->getUri());
         $this->assertNull($this->acumulusRequest->getSubmit());
@@ -60,7 +58,7 @@ class AcumulusRequestTest extends TestCase
         $fullSubmit = $this->acumulusRequest->getSubmit();
         $this->assertArrayHasKey(Fld::Format, $fullSubmit);
         $this->assertArrayHasKey(Fld::TestMode, $fullSubmit);
-        $this->assertArrayHasKey(fld::Lang, $fullSubmit);
+        $this->assertArrayHasKey(Fld::Lang, $fullSubmit);
         $this->assertArrayHasKey(Fld::Connector, $fullSubmit);
         $this->assertEqualsCanonicalizing(
             $submit,

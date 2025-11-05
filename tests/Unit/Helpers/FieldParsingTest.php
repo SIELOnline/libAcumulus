@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- */
 
 declare(strict_types=1);
 
@@ -10,7 +6,7 @@ namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Collectors\PropertySources;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 use Siel\Acumulus\TestWebShop\TestDoubles\Helpers\FieldExpander;
 
 /**
@@ -23,16 +19,14 @@ use Siel\Acumulus\TestWebShop\TestDoubles\Helpers\FieldExpander;
  */
 class FieldParsingTest extends TestCase
 {
-    private static Container $container;
+    use AcumulusContainer;
+
+    protected static string $shopNamespace = 'TestWebShop\TestDoubles';
+    protected static string $language = 'en';
 
     private function createPropertySources(): PropertySources
     {
-        return self::$container->createPropertySources();
-    }
-
-    public static function setUpBeforeClass(): void
-    {
-        self::$container = new Container('TestWebShop\TestDoubles', 'en');
+        return self::getContainer()->createPropertySources();
     }
 
     public static function fieldsProvider1(): array
@@ -50,7 +44,7 @@ class FieldParsingTest extends TestCase
      */
     public function testExpandNoExpansionSpecifications(string $field): void
     {
-        $log = self::$container->getLog();
+        $log = self::getContainer()->getLog();
         $stopAt = 'expandSpecification';
         $vf = new FieldExpander($log, $stopAt);
         $result = $vf->expand($field, $this->createPropertySources());
@@ -73,7 +67,7 @@ class FieldParsingTest extends TestCase
      */
     public function testExpand1ExpansionSpecification(string $field, string $match): void
     {
-        $log = self::$container->getLog();
+        $log = self::getContainer()->getLog();
         $stopAt = 'expandSpecification';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -97,7 +91,7 @@ class FieldParsingTest extends TestCase
      */
     public function testExpandMultipleExpansionSpecifications(string $field, array $parts): void
     {
-        $log = self::$container->getLog();
+        $log = self::getContainer()->getLog();
         $stopAt = 'expandSpecification';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -118,7 +112,7 @@ class FieldParsingTest extends TestCase
      */
     public function testExpandPropertyAlternatives(string $field, array $parts): void
     {
-        $log = self::$container->getLog();
+        $log = self::getContainer()->getLog();
         $stopAt = 'expandAlternative';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -140,7 +134,7 @@ class FieldParsingTest extends TestCase
      */
     public function testExpandSpaceConcatenatedProperties(string $field, array $parts): void
     {
-        $log = self::$container->getLog();
+        $log = self::getContainer()->getLog();
         $stopAt = 'expandSpaceConcatenatedProperty';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -162,7 +156,7 @@ class FieldParsingTest extends TestCase
      */
     public function testExpandSingleProperties(string $field, array $parts, array $spaceConcatenatedProperties): void
     {
-        $log = self::$container->getLog();
+        $log = self::getContainer()->getLog();
         $stopAt = 'expandProperty';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -186,7 +180,7 @@ class FieldParsingTest extends TestCase
      */
     public function testExpandPropertiesAndLiterals(string $field, array $propertiesInObject, array $properties, array $literals): void
     {
-        $log = self::$container->getLog();
+        $log = self::getContainer()->getLog();
         $stopAt = '';
         $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */

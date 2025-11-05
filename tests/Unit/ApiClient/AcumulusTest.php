@@ -1,9 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- * @noinspection SpellCheckingInspection
- */
 
 declare(strict_types=1);
 
@@ -19,22 +14,25 @@ use Siel\Acumulus\Data\EmailInvoiceAsPdf;
 use Siel\Acumulus\Data\EmailPackingSlipAsPdf;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\StockTransaction;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * Test the {@see Acumulus} class without connecting to the API itself.
  */
 class AcumulusTest extends TestCase
 {
-    private Container $container;
+    use AcumulusContainer;
+
+    // Use the TestWebShop test doubles.
+    protected static string $shopNamespace = 'TestWebShop\TestDoubles';
+    protected static string $language = 'nl';
+
     private Acumulus $acumulusClient;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        // Use the TestWebShop test doubles.
-        $this->container = new Container('TestWebShop\TestDoubles', 'nl');
-        $this->acumulusClient = $this->container->getAcumulusApiClient();
+        $this->acumulusClient = self::getContainer()->getAcumulusApiClient();
     }
 
     /**
@@ -44,6 +42,8 @@ class AcumulusTest extends TestCase
      * 2: apiFunction (string): the api function to call.
      * 3: needContract (bool): whether authorisation is required.
      * 4: message (array): submit as expected by Acumulus, created from args.
+     *
+     * @noinspection SpellCheckingInspection
      */
     public static function argumentsPassed(): array
     {
@@ -106,9 +106,9 @@ class AcumulusTest extends TestCase
         $stub = $this->getMockBuilder(Acumulus::class)
             ->onlyMethods(['callApiFunction'])
             ->setConstructorArgs([
-                $this->container,
-                $this->container->getEnvironment(),
-                $this->container->getLog(),
+                self::getContainer(),
+                self::getContainer()->getEnvironment(),
+                self::getContainer()->getLog(),
             ])
             ->getMock();
         $stub->expects($this->once())
@@ -125,10 +125,12 @@ class AcumulusTest extends TestCase
     /**
      * Tests that the correct arguments are passed to ApiCommunicator::getUri
      * and that the correct query arguments are concatenated.
+     *
+     * @noinspection SpellCheckingInspection
      */
     public function testGetInvoicePdfUri(): void
     {
-        $environment = $this->container->getEnvironment()->toArray();
+        $environment = self::getContainer()->getEnvironment()->toArray();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
         $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN",
             $this->acumulusClient->getInvoicePdfUri('TOKEN'));
@@ -150,7 +152,7 @@ class AcumulusTest extends TestCase
      */
     public function testGetPackingSlipPdfUri(): void
     {
-        $environment = $this->container->getEnvironment()->toArray();
+        $environment = self::getContainer()->getEnvironment()->toArray();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
         $this->assertSame("$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN", $this->acumulusClient->getPackingSlipPdfUri('TOKEN'));
     }

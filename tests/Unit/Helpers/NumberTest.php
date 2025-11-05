@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- */
 
 declare(strict_types=1);
 

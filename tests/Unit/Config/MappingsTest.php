@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -12,32 +9,21 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * MappingsTest tests the {@see \Siel\Acumulus\Config\Mappings} class.
  */
 class MappingsTest extends TestCase
 {
-    private const Language = 'en';
+    use AcumulusContainer;
 
-    private static Container $container;
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Container
-     */
-    private function getContainer(): Container
-    {
-        if (!isset(self::$container)) {
-            self::$container = new Container('TestWebShop', self::Language);
-        }
-        return self::$container;
-    }
+    protected static string $language = 'en';
 
     private function getMappings(): Mappings
     {
-        return $this->getContainer()->getMappings();
+        return self::getContainer()->getMappings();
     }
 
     public function testGetOverriddenValues(): void

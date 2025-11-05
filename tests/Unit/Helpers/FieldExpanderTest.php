@@ -1,19 +1,15 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use Siel\Acumulus\Collectors\PropertySources;
-use Siel\Acumulus\Helpers\Container;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\FormRenderer;
 use Siel\Acumulus\Tests\Data\GetTestData;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 use stdClass;
 
 /**
@@ -21,26 +17,20 @@ use stdClass;
  */
 class FieldExpanderTest extends TestCase
 {
-    public const Language = 'en';
+    use AcumulusContainer;
 
-    private static Container $container;
+    private const Language = 'nl';
 
-    public function getContainer(): Container
-    {
-        if (!isset(self::$container)) {
-            self::$container = new Container('TestWebShop', self::Language);
-        }
-        return self::$container;
-    }
+    protected static string $language = self::Language;
 
     private function createPropertySources(): PropertySources
     {
-        return $this->getContainer()->createPropertySources();
+        return self::getContainer()->createPropertySources();
     }
 
     public function getFieldExpander(): FieldExpander
     {
-        return $this->getContainer()->getFieldExpander();
+        return self::getContainer()->getFieldExpander();
     }
 
     /**
@@ -243,7 +233,7 @@ class FieldExpanderTest extends TestCase
      */
     public function testObjects(string $fieldDefinition, $expected): void
     {
-        $objects = $this->createPropertySources()->add('container', $this->getContainer());
+        $objects = $this->createPropertySources()->add('container', self::getContainer());
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $objects);
         $this->assertSame($expected, $result);
@@ -305,7 +295,7 @@ class FieldExpanderTest extends TestCase
      */
     public function testParameterPassing(): void
     {
-        $objects = $this->createPropertySources()->add('container', $this->getContainer());
+        $objects = $this->createPropertySources()->add('container', self::getContainer());
         $field = $this->getFieldExpander();
         $result1 = $field->expand('[container::getFormRenderer(true)]', $objects);
         $this->assertInstanceOf(FormRenderer::class, $result1);

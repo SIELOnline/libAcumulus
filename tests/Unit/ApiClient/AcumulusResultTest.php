@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- */
 
 declare(strict_types=1);
 
@@ -10,12 +6,12 @@ namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\ApiClient\AcumulusRequest;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\SeverityTranslations;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\ApiClient\ResultTranslations;
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * An {@see AcumulusResult} has the following features that we want to test:
@@ -31,17 +27,19 @@ use Siel\Acumulus\Helpers\Translator;
  */
 class AcumulusResultTest extends TestCase
 {
+    use AcumulusContainer;
+
+    protected static string $shopNamespace = 'TestWebShop\TestDoubles';
+    protected static string $language = 'nl';
+
     protected AcumulusRequest $acumulusRequest;
-    private Container $container;
     private Translator $translator;
     private ApiRequestResponseExamples $examples;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        $language = 'nl';
-        $this->container = new Container('TestWebShop\TestDoubles', $language);
-        $this->translator = $this->container->getTranslator();
+        $this->translator = self::getContainer()->getTranslator();
         $this->translator->add(new SeverityTranslations());
         $this->translator->add(new ResultTranslations());
         $this->examples =  ApiRequestResponseExamples::getInstance();
@@ -51,7 +49,7 @@ class AcumulusResultTest extends TestCase
     {
         $submit = $this->examples->getSubmit($uri);
         $needContract = $this->examples->needContract($uri);
-        $this->acumulusRequest = $this->container->createAcumulusRequest();
+        $this->acumulusRequest = self::getContainer()->createAcumulusRequest();
         $acumulusResult = $this->acumulusRequest->execute($uri, $submit, $needContract);
 
         $this->assertSame($this->acumulusRequest, $acumulusResult->getAcumulusRequest());
@@ -124,7 +122,7 @@ class AcumulusResultTest extends TestCase
         $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
         $message = $result->getAcumulusRequest()->getMaskedRequest();
-        $this->assertStringNotContainsString('mysecret', $message);
+        $this->assertStringNotContainsString('my_secret', $message);
         $this->assertStringContainsString('REMOVED FOR SECURITY', $message);
     }
 
@@ -135,7 +133,7 @@ class AcumulusResultTest extends TestCase
         $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
         $message = $result->getMaskedResponse();
-        $this->assertStringNotContainsString('mysecret', $message);
+        $this->assertStringNotContainsString('my_secret', $message);
         $this->assertStringContainsString('REMOVED FOR SECURITY', $message);
     }
 }

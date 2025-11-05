@@ -40,7 +40,7 @@ class CompleteTemplateTest extends TestCase
      * @param ?int $filledIn
      *
      * @todo: add cases where template has already been filled in.
-     *    and do the same for all other completors...
+     *    And do the same for all other completors...
      */
     public function testComplete(
         int $paymentStatus,

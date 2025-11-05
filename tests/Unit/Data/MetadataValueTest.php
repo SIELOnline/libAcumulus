@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- */
 
 declare(strict_types=1);
 
@@ -159,7 +155,6 @@ class MetadataValueTest extends TestCase
         $this->assertSame([$value1, $value2], $mdv->get());
         $this->assertNull($mdv->get(1));
         $this->assertSame("['value1',2]", $mdv->getApiValue());
-        $mdv = (new MetadataValue(false))->add($value);
     }
 
     /**

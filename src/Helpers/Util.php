@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection PHP8.2 attribute.
+ */
 
 declare(strict_types=1);
 
@@ -168,8 +171,6 @@ class Util
      * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   The parameter is not an object or an array, or an error occurred during
      *   conversion.
-     *
-     * @noinspection PhpRedundantCatchClauseInspection JSON_THROW_ON_ERROR is part of Meta::JsonFlags
      */
     public function convertToJson(object|array $objectOrArray): string
     {
@@ -194,8 +195,6 @@ class Util
      *   - The $json string is not valid JSON.
      *   - The $json string could not be converted to an (associative) array
      *     because it is either not an object, or it is too deep.
-     *
-     * @noinspection PhpRedundantCatchClauseInspection JSON_THROW_ON_ERROR is part of Meta::JsonFlags
      */
     public function convertJsonToArray(string $json): array
     {
@@ -303,9 +302,8 @@ class Util
     public function maskXml(#[SensitiveParameter] string $subject): string
     {
         // Mask all values that have 'password' in their tag.
-        // @todo: use back reference in closing tag, but test it (is this still used, is it tested?)
         return preg_replace(
-            '|<([a-z]*)password>.*</\1password>|s',
+            '|<([a-z_]*)password>.*</\1password>|s',
             '<$1password>REMOVED FOR SECURITY</$1password>',
             $subject
         );
@@ -320,7 +318,7 @@ class Util
     {
         // Mask all values that have 'password' in their key.
         return preg_replace(
-            '!"([a-z]*)password"(\s*):(\s*)"(((\\\\.)|[^\\\\"])*)"!',
+            '!"([a-z_]*)password"(\s*):(\s*)"(((\\\\.)|[^\\\\"])*)"!',
             '"$1password"$2:$3"REMOVED FOR SECURITY"',
             $subject
         );
@@ -334,7 +332,7 @@ class Util
     public function maskHtml(#[SensitiveParameter] string $subject): string
     {
         // Mask all "value"s of input elements of type ='password'.
-        // @todo: use back reference in closing tag, but test it (is this still used, is it tested?)
+        // @error: order of attributes does not have to be as checked for here.
         return preg_replace(
             '|name="password" value="[^"]*"|',
             'name="password" value="REMOVED FOR SECURITY"',

@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- */
 
 declare(strict_types=1);
 
@@ -23,41 +19,19 @@ class ConnectionHandlerTest extends TestCase
 
     public function testCreate(): void
     {
-        $isPhp8 = version_compare(phpversion(), '8', '>=');
-
         $connectionHandler = $this->getConnectionHandler();
         $ch1 = $connectionHandler->get('https://www.example.com/example-resource');
-        if ($isPhp8) {
-            $this->assertInstanceOf('CurlHandle', $ch1);
-        } else {
-            $this->assertIsResource($ch1);
-        }
         $this->assertSame(1, $connectionHandler->getCount());
 
         $ch2 = $connectionHandler->get('https://www.example.com/example-resource2');
-        if ($isPhp8) {
-            $this->assertInstanceOf('CurlHandle', $ch2);
-        } else {
-            $this->assertIsResource($ch2);
-        }
         $this->assertSame($ch1, $ch2);
         $this->assertSame(1, $connectionHandler->getCount());
 
         $ch3 = $connectionHandler->get('https://www.example.com:80/example-resource');
-        if ($isPhp8) {
-            $this->assertInstanceOf('CurlHandle', $ch3);
-        } else {
-            $this->assertIsResource($ch3);
-        }
         $this->assertNotSame($ch1, $ch3);
         $this->assertSame(2, $connectionHandler->getCount());
 
         $ch4 = $connectionHandler->get('https://example.com/example-resource');
-        if ($isPhp8) {
-            $this->assertInstanceOf('CurlHandle', $ch4);
-        } else {
-            $this->assertIsResource($ch4);
-        }
         $this->assertNotSame($ch1, $ch4);
         $this->assertNotSame($ch3, $ch4);
         $this->assertSame(3, $connectionHandler->getCount());

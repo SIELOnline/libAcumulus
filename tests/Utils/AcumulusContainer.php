@@ -21,7 +21,7 @@ trait AcumulusContainer
      */
     protected static function createContainer(): Container
     {
-        return new Container('TestWebShop', 'nl');
+        return new Container(static::$shopNamespace ?? 'TestWebShop', static::$language ?? 'nl');
     }
 
     /**

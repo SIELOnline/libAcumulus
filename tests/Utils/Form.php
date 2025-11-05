@@ -15,7 +15,7 @@ trait Form
     use AcumulusContainer;
     use Path;
 
-    protected static string $htmlStart = <<<LONGSTRING
+    private static string $htmlStart = <<<LONGSTRING
 <!DOCTYPE html>
 <!--suppress GrazieInspection, HtmlUnknownTarget -->
 <html lang="en">
@@ -26,7 +26,7 @@ trait Form
 <body>
 
 LONGSTRING;
-    protected static string $htmlEnd = <<<LONGSTRING
+    private static string $htmlEnd = <<<LONGSTRING
 
 </body>
 </html>

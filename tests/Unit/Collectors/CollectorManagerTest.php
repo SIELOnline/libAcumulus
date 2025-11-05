@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -12,10 +9,10 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\EmailAsPdfType;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tests\Data\GetTestData;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * CollectorManagerTest test the CollectorManager and the various collectors
@@ -23,32 +20,21 @@ use Siel\Acumulus\Tests\Data\GetTestData;
  */
 class CollectorManagerTest extends TestCase
 {
-    private Container $container;
+    use AcumulusContainer;
 
     private function getInvoiceSource(): Source
     {
         $objects = (new GetTestData())->getJson();
         $order = $objects->order;
-        return $this->getContainer()->createSource(Source::Order, $order);
-    }
-
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
-    {
-        $this->container = new Container('TestWebShop', 'nl');
-    }
-
-    private function getContainer(): Container
-    {
-        return $this->container;
+        return self::getContainer()->createSource(Source::Order, $order);
     }
 
     public function testCollectInvoice(): void
     {
-        $manager = $this->getContainer()->getCollectorManager();
+        $manager = self::getContainer()->getCollectorManager();
         $invoice = $manager->collectInvoiceForSource(
             $this->getInvoiceSource(),
-            $this->getContainer()->createInvoiceAddResult('CollectorManagerTest::testCollectInvoice()')
+            self::getContainer()->createInvoiceAddResult('CollectorManagerTest::testCollectInvoice()')
         );
 
         $this->assertNull($invoice->concept);
@@ -94,7 +80,7 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectCustomer(): void
     {
-        $collectorManager = $this->getContainer()->getCollectorManager();
+        $collectorManager = self::getContainer()->getCollectorManager();
         $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
         $customer = $collectorManager->collectCustomer();
 
@@ -123,7 +109,7 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectAddress(): void
     {
-        $collectorManager = $this->getContainer()->getCollectorManager();
+        $collectorManager = self::getContainer()->getCollectorManager();
         $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
         $invoiceAddress = $collectorManager->collectAddress(AddressType::Invoice);
 
@@ -139,7 +125,7 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($invoiceAddress->countryAutoName);
         $this->assertNull($invoiceAddress->countryAutoNameLang);
 
-        $shippingAddress = $this->getContainer()->getCollectorManager()
+        $shippingAddress = self::getContainer()->getCollectorManager()
             ->collectAddress(AddressType::Shipping);
         $this->assertSame('Buro RaDer', $shippingAddress->companyName1);
         $this->assertNull($shippingAddress->companyName2);
@@ -154,7 +140,7 @@ class CollectorManagerTest extends TestCase
 
     public function testCollectEmailAsPdf(): void
     {
-        $collectorManager = $this->getContainer()->getCollectorManager();
+        $collectorManager = self::getContainer()->getCollectorManager();
         $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
         /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $invoiceEmailAsPdf */
         $invoiceEmailAsPdf = $collectorManager->collectEmailAsPdf(EmailAsPdfType::Invoice);
@@ -168,7 +154,7 @@ class CollectorManagerTest extends TestCase
         $this->assertNull($invoiceEmailAsPdf->ubl);
 
         /** @var \Siel\Acumulus\Data\EmailPackingSlipAsPdf $packingSlipEmailAsPdf */
-        $packingSlipEmailAsPdf = $this->getContainer()->getCollectorManager()
+        $packingSlipEmailAsPdf = self::getContainer()->getCollectorManager()
             ->collectEmailAsPdf(EmailAsPdfType::PackingSlip);
 
         $this->assertNull($packingSlipEmailAsPdf->emailFrom);

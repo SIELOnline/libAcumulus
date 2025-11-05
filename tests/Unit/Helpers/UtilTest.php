@@ -45,14 +45,14 @@ class UtilTest extends TestCase
         $this->assertSame($json, $maskedJson);
 
         $array = $this->getUtil()->convertJsonToArray($json);
-        $array['customer']['mypassword'] = 'secret';
-        $array['address']['mypassword'] = 'secret';
+        $array['customer']['my_password'] = 'secret';
+        $array['address']['my_password'] = 'secret';
         $json = $this->getUtil()->convertToJson($array);
         $maskedJson = $this->getUtil()->maskJson($json);
-        $this->assertStringContainsString('"mypassword":"REMOVED FOR SECURITY"', $maskedJson);
+        $this->assertStringContainsString('"my_password":"REMOVED FOR SECURITY"', $maskedJson);
         $maskedArray = $this->getUtil()->convertJsonToArray($maskedJson);
-        self::assertSame('REMOVED FOR SECURITY', $maskedArray['customer']['mypassword']);
-        self::assertSame('REMOVED FOR SECURITY', $maskedArray['address']['mypassword']);
+        self::assertSame('REMOVED FOR SECURITY', $maskedArray['customer']['my_password']);
+        self::assertSame('REMOVED FOR SECURITY', $maskedArray['address']['my_password']);
     }
 
 //    public function testConvertArrayToXml(): void
@@ -72,11 +72,11 @@ class UtilTest extends TestCase
         $object = (new GetTestData())->getJson();
         $json = $this->getUtil()->convertToJson($object);
         $array = $this->getUtil()->convertJsonToArray($json);
-        $array['customer']['mypassword'] = 'secret';
-        $array['address']['mypassword'] = 'secret';
+        $array['customer']['my_password'] = 'secret';
+        $array['address']['my_password'] = 'secret';
         $maskedArray = $this->getUtil()->maskArray($array);
-        self::assertSame('REMOVED FOR SECURITY', $maskedArray['customer']['mypassword']);
-        self::assertSame('REMOVED FOR SECURITY', $maskedArray['address']['mypassword']);
+        self::assertSame('REMOVED FOR SECURITY', $maskedArray['customer']['my_password']);
+        self::assertSame('REMOVED FOR SECURITY', $maskedArray['address']['my_password']);
     }
 
     public function testMaskHtml(): void

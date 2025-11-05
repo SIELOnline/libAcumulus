@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PropertyCanBeStaticInspection
  * @noinspection SpellCheckingInspection
  */
 
@@ -327,17 +326,17 @@ class ApiRequestResponseExamples
                 Fld::City => 'Amsterdam',
                 Fld::Email => 'john.doe@example.com',
             ],
-            'response body' => '{"signup:":{"contractcode":"123456","contractloginname":"myuser","contractpassword":"mysecret","contractstartdate":"2022-02-22","contractenddate":"","contractapiuserloginname":"myapiuser","contractapiuserpassword":"mysecret"},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'response body' => '{"signup:":{"contractcode":"123456","contractloginname":"my_user","contractpassword":"my_secret","contractstartdate":"2022-02-22","contractenddate":"","contractapiuserloginname":"my_api_user","contractapiuserpassword":"mysecret"},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
             'mainResponseKey' => 'signup',
             'isList' => false,
             'main response' => [
                 'contractcode' => '123456',
-                'contractloginname' => 'myuser',
-                'contractpassword' => 'mysecret',
+                'contractloginname' => 'my_user',
+                'contractpassword' => 'my_secret',
                 'contractstartdate' => '2022-02-22',
                 'contractenddate' => '',
-                'contractapiuserloginname' => 'myapiuser',
-                'contractapiuserpassword' => 'mysecret',
+                'contractapiuserloginname' => 'my_api_user',
+                'contractapiuserpassword' => 'my_secret',
             ],
         ],
 
@@ -497,7 +496,7 @@ class ApiRequestResponseExamples
         $contract = new Contract();
         $contract->contractCode = '123456';
         $contract->userName = 'User123456';
-        $contract->password = 'mysecret';
+        $contract->password = 'my_secret';
         $contract->emailOnError = 'test@example.com';
         $contract->emailOnWarning = 'test@example.com';
         return $contract;

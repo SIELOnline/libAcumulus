@@ -1,9 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- * @noinspection PropertyCanBeStaticInspection
- */
 
 declare(strict_types=1);
 
@@ -13,7 +8,7 @@ use ArrayObject;
 use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Collectors\CollectorInterface;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
 
 /**
@@ -21,20 +16,20 @@ use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
  */
 class CollectorTest extends TestCase
 {
-    protected Container $container;
+    use AcumulusContainer;
+
     protected ArrayObject $fieldMappings;
     protected ArrayObject $nullFieldMappings;
 
 
     public function getCollector(): CollectorInterface
     {
-        return $this->container->getCollector('SimpleTestObject');
+        return self::getContainer()->getCollector('SimpleTestObject');
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        $this->container = new Container('TestWebShop', 'nl');
         $this->fieldMappings = new ArrayObject([
             'itemNumber' => '[field_item_number]',
             'nature' => '[field_nature]',
@@ -50,7 +45,7 @@ class CollectorTest extends TestCase
     public function testCollectAllEmpty(): void
     {
         $collector = $this->getCollector();
-        $propertySources = $this->container->createPropertySources();
+        $propertySources = self::getContainer()->createPropertySources();
         $fieldMappings = new ArrayObject();
         $simpleTestObject = $collector->collect($propertySources, $fieldMappings);
         $this->assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
@@ -65,7 +60,7 @@ class CollectorTest extends TestCase
         $nature = Api::Nature_Product;
         $unitPrice = '4.99';
 
-        $propertySources = $this->container->createPropertySources()->add('line', [
+        $propertySources = self::getContainer()->createPropertySources()->add('line', [
             'field_item_number' => $itemNumber,
             'field_nature' => $nature,
             'field_unit_price' => $unitPrice,
@@ -85,7 +80,7 @@ class CollectorTest extends TestCase
         $nature = Api::Nature_Product;
         $unitPrice = '4.99';
 
-        $propertySources = $this->container->createPropertySources()->add('line', [
+        $propertySources = self::getContainer()->createPropertySources()->add('line', [
             'field_item_number' => $itemNumber,
             'field_nature' => $nature,
             'field_unit_price' => $unitPrice,
@@ -105,7 +100,7 @@ class CollectorTest extends TestCase
         $nature = Api::Nature_Product;
         $unitPrice = '4.99';
 
-        $propertySources = $this->container->createPropertySources()
+        $propertySources = self::getContainer()->createPropertySources()
             ->add('line', [
                 'field_item_number' => $itemNumber,
                 'field_nature' => $nature,

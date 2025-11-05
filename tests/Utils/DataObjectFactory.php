@@ -23,27 +23,27 @@ trait DataObjectFactory
 {
     use AcumulusContainer;
 
-    private function getAddress(): Address
+    protected function getAddress(): Address
     {
         return self::getContainer()->createAcumulusObject(DataType::Address);
     }
 
-    private function getCustomer(): Customer
+    protected function getCustomer(): Customer
     {
         return self::getContainer()->createAcumulusObject(DataType::Customer);
     }
 
-    private function getEmailInvoiceAsPdf(): EmailInvoiceAsPdf
+    protected function getEmailInvoiceAsPdf(): EmailInvoiceAsPdf
     {
         return self::getContainer()->createAcumulusObject(DataType::EmailInvoiceAsPdf);
     }
 
-    private function getInvoice(): Invoice
+    protected function getInvoice(): Invoice
     {
         return self::getContainer()->createAcumulusObject(DataType::Invoice);
     }
 
-    private function getLine(string $lineType): Line
+    protected function getLine(string $lineType): Line
     {
         /** @var \Siel\Acumulus\Data\Line $line */
         $line = self::getContainer()->createAcumulusObject(DataType::Line);

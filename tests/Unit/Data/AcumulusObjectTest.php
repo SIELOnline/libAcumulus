@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection DuplicatedCode
- */
 
 declare(strict_types=1);
 
@@ -129,18 +125,16 @@ class AcumulusObjectTest extends TestCase
     {
         $this->expectException(LogicException::class);
         $ao = new SimpleTestObject();
-        /** @noinspection PhpUnusedLocalVariableInspection */
         /** @noinspection PhpParamsInspection */
-        $v = $ao->setUnitPrice();
+        $ao->setUnitPrice();
     }
 
     public function testArgumentsException3(): void
     {
         $this->expectException(LogicException::class);
         $ao = new SimpleTestObject();
-        /** @noinspection PhpUnusedLocalVariableInspection */
         /** @noinspection PhpMethodParametersCountMismatchInspection */
-        $v = $ao->setUnitPrice(19.99, PropertySet::Always, true);
+        $ao->setUnitPrice(19.99, PropertySet::Always, true);
     }
 
     public function testToArray(): void

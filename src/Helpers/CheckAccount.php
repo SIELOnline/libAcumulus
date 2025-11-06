@@ -6,7 +6,7 @@ namespace Siel\Acumulus\Helpers;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\ApiClient\AcumulusResponseException;
+use Siel\Acumulus\ApiClient\AcumulusException;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Fld;
 
@@ -82,7 +82,7 @@ class CheckAccount extends MessageCollection
                                 break;
                         }
                     }
-                } catch (AcumulusResponseException $e) {
+                } catch (AcumulusException $e) {
                     $this->message = 'message_error_comm';
                     $this->addException($e);
                 }

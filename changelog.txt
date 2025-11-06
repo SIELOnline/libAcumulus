@@ -3,10 +3,20 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.7.1 (202?-??-??)
-------------------
+8.7.1 (2025-11-06) (MA)
+-----------------------
+Bugs:
+- Magento QA did not accept errors when the module is installed and enabled but not
+  correctly configured. We should hide the error.
+
+Features:
+- Catch more (types of) runtime errors when sending messages to the API and try to handle
+  them with the CrashReporter
+- Try to display an admin message during crash reporting, even when mail sending failed.
+
 Refactorings:
 - Extracted some Invoice and Line completors from the legacy Completor.
+- Refactored test code.
 
 
 8.7.0 (2025-11-04) (ALL)

@@ -79,7 +79,10 @@ class CrashReporter
     public function logAndMail(Throwable $e): string
     {
         $message = $this->log->exception($e, true);
-        $this->mailException($e);
+        try {
+            $this->mailException($e);
+        } catch (Throwable) {
+        }
         return $this->toAdminMessage($message);
     }
 

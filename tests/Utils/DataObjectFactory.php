@@ -25,28 +25,28 @@ trait DataObjectFactory
 
     protected function getAddress(): Address
     {
-        return self::getContainer()->createAcumulusObject(DataType::Address);
+        return static::getContainer()->createAcumulusObject(DataType::Address);
     }
 
     protected function getCustomer(): Customer
     {
-        return self::getContainer()->createAcumulusObject(DataType::Customer);
+        return static::getContainer()->createAcumulusObject(DataType::Customer);
     }
 
     protected function getEmailInvoiceAsPdf(): EmailInvoiceAsPdf
     {
-        return self::getContainer()->createAcumulusObject(DataType::EmailInvoiceAsPdf);
+        return static::getContainer()->createAcumulusObject(DataType::EmailInvoiceAsPdf);
     }
 
     protected function getInvoice(): Invoice
     {
-        return self::getContainer()->createAcumulusObject(DataType::Invoice);
+        return static::getContainer()->createAcumulusObject(DataType::Invoice);
     }
 
     protected function getLine(string $lineType): Line
     {
         /** @var \Siel\Acumulus\Data\Line $line */
-        $line = self::getContainer()->createAcumulusObject(DataType::Line);
+        $line = static::getContainer()->createAcumulusObject(DataType::Line);
         $line->metadataSet(Meta::SubType, $lineType);
         return $line;
     }

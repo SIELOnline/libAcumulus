@@ -34,7 +34,7 @@ trait Log
     protected static function getTestLogMessage(string $name): ?array
     {
         $logMessage = null;
-        $fullFileName = self::getDataPath() . "/Log/$name.log";
+        $fullFileName = static::getDataPath() . "/Log/$name.log";
         if (is_readable($fullFileName)) {
             eval('$logMessage = ' . file_get_contents($fullFileName) . ';');
         }
@@ -50,7 +50,7 @@ trait Log
      */
     protected static function saveTestLogMessage(string $name, array $data): void
     {
-        $path = self::getDataPath() . '/Log';
+        $path = static::getDataPath() . '/Log';
         $fileName = "$name.log";
         if (file_exists("$path/$fileName") || file_exists("$path/$fileName.php")) {
             $fileName = "$name.latest.log";
@@ -63,12 +63,12 @@ trait Log
      */
     protected function checkLog(): void
     {
-        $loggedMessages = self::getLog()->getLoggedMessages();
+        $loggedMessages = static::getLog()->getLoggedMessages();
         $logMessage = end($loggedMessages);
 
         // dataName() returns the key of the actual data set.
         $name = str_replace(' ', '-', $this->dataName()) . '-' . static::getContainer()->getLanguage();
-        self::assertLogMatches($name, $logMessage);
+        static::assertLogMatches($name, $logMessage);
     }
 
     /**
@@ -142,7 +142,7 @@ trait Log
     protected function _testLog(): void
     {
         $size = $this->getLogSize();
-        $logger = self::getContainer()->getLog();
+        $logger = static::getContainer()->getLog();
         $logger->setLogLevel(Severity::Info);
         $logger->debug('Log::testLog() message 1');
         static::assertSame($size, $this->getLogSize());

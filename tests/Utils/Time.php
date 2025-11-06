@@ -26,7 +26,7 @@ trait Time
      */
     protected static function eTime(string $location = '', bool $doEcho = true): string
     {
-        $line = self::getTime() . ' ' . $location . PHP_EOL;
+        $line = static::getTime() . ' ' . $location . PHP_EOL;
         if ($doEcho) {
             echo $line;
         }

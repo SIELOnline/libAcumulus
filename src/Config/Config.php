@@ -352,9 +352,9 @@ class Config
      * Returns the value of the specified configuration value.
      *
      * @param string $key
-     *   The requested configuration value. Due to the conversion from {@see Tag}::...
-     *   constants to {@see Fld}::... constants, existence of the key is also checked in
-     *   its all-lowercase version.
+     *   The requested configuration value. Due to the conversion from {@see Tag} to
+     *   {@see Fld} constants, existence of the key should also be checked in its
+     *   all-lowercase version.
      *
      * @return mixed
      *   The value of the given configuration value or null if not defined. This

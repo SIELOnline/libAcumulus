@@ -42,7 +42,7 @@ LONGSTRING;
      */
     protected function saveFormHtml(string $name, string $data): void
     {
-        $path = self::getDataPath() . '/Form';
+        $path = static::getDataPath() . '/Form';
         $fileName = "$name.html";
         if (file_exists("$path/$fileName")) {
             $fileName = "$name.latest.html";

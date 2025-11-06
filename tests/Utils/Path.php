@@ -29,7 +29,7 @@ trait Path
      */
     protected static function getDataPath(): string
     {
-        $shopNamespace = self::getContainer()->getShopNamespace();
+        $shopNamespace = static::getContainer()->getShopNamespace();
         if (str_starts_with($shopNamespace, 'TestWebShop')) {
             $shopNamespace = '';
         } elseif (str_ends_with($shopNamespace, '\TestWebShop')) {

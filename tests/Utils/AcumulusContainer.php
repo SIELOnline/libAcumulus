@@ -29,7 +29,7 @@ trait AcumulusContainer
      */
     protected static function getContainer(): Container
     {
-        self::$container ??= self::createContainer();
+        self::$container ??= static::createContainer();
         return self::$container;
     }
 }

@@ -36,9 +36,9 @@ trait Invoice
      */
     protected function _testCreate(string $type, int $id, array $excludeFields = []): void
     {
-        $invoiceSource = self::getContainer()->createSource($type, $id);
-        $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceSource = static::getContainer()->createSource($type, $id);
+        $invoiceAddResult = static::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = static::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
         $result = $invoice->toArray();
         // Get order from Order{id}.json.
         $expected = $this->getTestSource($type, $id);
@@ -126,7 +126,7 @@ trait Invoice
      */
     protected function getTestSource(string $type, int $id): mixed
     {
-        $path = self::getDataPath() . '/Invoice';
+        $path = static::getDataPath() . '/Invoice';
         $filename = "$path/$type$id.json";
         if (!is_readable($filename)) {
             return null;
@@ -143,7 +143,7 @@ trait Invoice
      */
     protected function saveTestSource(string $type, int $id, bool $isNew, mixed $data): void
     {
-        $path = self::getDataPath() . '/Invoice';
+        $path = static::getDataPath() . '/Invoice';
         $append = $isNew ? '' : '.latest';
         $filename = "$path/$type$id$append.json";
         /** @noinspection JsonEncodingApiUsageInspection  false positive */
@@ -152,7 +152,7 @@ trait Invoice
 
     public function copyLatestTestSources(): void
     {
-        $path = self::getDataPath();
+        $path = static::getDataPath();
         $files = glob("$path/*.latest.json");
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
@@ -181,7 +181,7 @@ trait Invoice
 
     public function updateTestSources(): void
     {
-        $path = self::getDataPath();
+        $path = static::getDataPath();
         $files = glob("$path/*.json");
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);

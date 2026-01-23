@@ -28,6 +28,7 @@ use function get_class;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
+    // @todo: this is a duplication of AcumulusEntry?!
     public static string $keyEntryId = '_acumulus_entry_id';
     public static string $keyToken = '_acumulus_token';
     // Note: the following 2 meta keys are not stored, as the post/order id and

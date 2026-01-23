@@ -13,5 +13,5 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  */
 class AcumulusEntry extends BaseAcumulusEntry
 {
-    protected static string $keyEntryId = 'id_entry';
+    public static string $keyEntryId = 'id_entry';
 }

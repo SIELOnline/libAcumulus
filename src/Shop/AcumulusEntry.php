@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection
+ *   \DateException was introduced in PHP 8.3.
+ */
 
 declare(strict_types=1);
 
@@ -23,7 +27,7 @@ use function is_object;
  * Acumulus identifies entries by their entry id (Dutch: boekstuknummer) or,
  * for a number of API calls, a token. Both the entry id and token are stored
  * together with information that identifies the shop invoice source (order or
- * credit note) and create and last updated timestamps.
+ * credit note) and created and last updated timestamps.
  *
  * Concepts do not have a token, they only have a concept id. As this feature
  * was added after this class and the underlying storage had been created, we
@@ -74,17 +78,19 @@ class AcumulusEntry
     /**
      * Access to the fields may differ per webshop as we follow db naming
      * conventions from the web shop.
+     *
+     * @todo: make them public so that install and update methods from the manager have access.
      */
-    protected static string $keyEntryId = 'entry_id';
-    protected static string $keyToken = 'token';
-    protected static string $keySourceType = 'source_type';
-    protected static string $keySourceId = 'source_id';
-    protected static string $keyCreated = 'created';
-    protected static string $keyUpdated = 'updated';
+    public static string $keyEntryId = 'entry_id';
+    public static string $keyToken = 'token';
+    public static string $keySourceType = 'source_type';
+    public static string $keySourceId = 'source_id';
+    public static string $keyCreated = 'created';
+    public static string $keyUpdated = 'updated';
     /**
      * The format of the created and updated timestamps, when saved as a string.
      */
-    protected static string $timestampFormat = Api::Format_TimeStamp;
+    public static string $timestampFormat = Api::Format_TimeStamp;
     /**
      * Constants to enable some kind of locking and thereby preventing sending
      * invoices twice.
@@ -258,7 +264,7 @@ class AcumulusEntry
     /**
      * Returns the default time zone as used by the shop.
      *
-     * The default implementation returns the default time zone of the web server.
+     * The base implementation returns the default time zone of the web server.
      *
      * @throws \DateInvalidTimeZoneException
      */
@@ -282,6 +288,7 @@ class AcumulusEntry
 
     /**
      * Returns the value of the given field in the given acumulus entry record.
+     *
      * As different web shops may use different field and property names in
      * their tables and models, we abstracted accessing a field of a record into
      * this method.

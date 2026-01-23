@@ -42,9 +42,11 @@ abstract class AcumulusEntryManager
      *
      * @return AcumulusEntry|AcumulusEntry[]|null
      *   Acumulus entry record for the given entry id or null if the entry id is
-     *   unknown.
-          *@todo: remove the possibility to pass null as $entryId, which also simplifies the return type.
+     *   unknown. If $entryId = null, multiple records may be returned.
      *
+     * @todo: remove the possibility to pass null as $entryId, which also simplifies the return type.
+     * @todo: change timestamp parameters to DateTimeInterface.
+     * @todo: use the now public field names from AcumulusEntry.
      */
     abstract public function getByEntryId(?int $entryId): AcumulusEntry|array|null;
 
@@ -132,7 +134,7 @@ abstract class AcumulusEntryManager
      *   - AcumulusEntry::Lock_BecameRealEntry: (probably) the process that held
      *     the lock was successful after all
      *   - AcumulusEntry::Lock_NoLongerExists: another process deleted it or the
-     *     process that created the lock finished unsuccessful after all.
+     *     process that created the lock finished unsuccessfully after all.
      */
     public function deleteLock(Source $invoiceSource): int
     {
@@ -209,6 +211,7 @@ abstract class AcumulusEntryManager
      * @param int|string $created
      *   The creation time (= current time), in the format as the actual
      *   database layer expects for a timestamp.
+     * @todo: change to DateTimeInterface.
      *
      * @return bool
      *   Success.
@@ -227,6 +230,7 @@ abstract class AcumulusEntryManager
      * @param int|string $updated
      *   The update time (= current time), in the format as the actual database
      *   layer expects for a timestamp.
+     *   @todo: change to DateTimeInterface.
      * @param \Siel\Acumulus\Invoice\Source|null $invoiceSource
      *    The source object for which the invoice was updated.
      *
@@ -286,6 +290,10 @@ abstract class AcumulusEntryManager
 
     /**
      * Upgrades the data model. Called when the module gets updated.
+     *
+     * Override this method if your webshop does not provide its own upgrade mechanisms in
+     * specific locations, like, e.g, PrestaShop's install-x.y.z.php files in the
+     * /modules/<module_name>/upgrade folder.
      *
      * @param string $currentVersion
      *   The current version we are updating from.

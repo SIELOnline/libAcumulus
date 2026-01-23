@@ -225,6 +225,7 @@ Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelli
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relatiebeheer',
+        // @todo: "De meeste velden hieronder kunnen opgenomen worden in uw factuursjablonen. ..." moet naar mappings scherm
         'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd wordt, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren. De meeste velden hieronder kunnen opgenomen worden in uw factuursjablonen. Daarom is het handig om hier controle te hebben over wat er in die velden komt te staan.',
 
         'relationMappingsHeader' => 'Brongegevens voor de klantgegevens',
@@ -756,6 +757,7 @@ Field references are denoted by placing the name of the property between square 
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relation management',
+        // @todo: "Most fields below can be added to your invoice templates. ..." moet naar mappings scherm
         'desc_relationSettingsHeader' => 'With each invoice sent to Acumulus, its client data is sent as well. With these settings you can influence how this is done. Most fields below can be added to your invoice templates. That is why you can control its contents here.',
 
         'relationMappingsHeader' => 'Customer source fields',

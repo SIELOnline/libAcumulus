@@ -17,6 +17,9 @@ use function sprintf;
  * This base class will log to the PHP error file. It should be overridden per
  * web shop to integrate with the web shop's specific way of logging.
  *
+ * @todo: separate method for logging API calls, this would allow to use WHMCS' logModuleCall()
+ * .
+ *
  * @todo: log a Message
  * @todo: log a Message[]
  * @todo: log a MessageCollection
@@ -25,8 +28,8 @@ use function sprintf;
 class Log
 {
     /**
-     * Set of json_encode flags we use to improve the readability of log messages.
-     * See {@see \Siel\Acumulus\Meta::JsonFlags}.
+     * Set of {@see json_encode()} flags we use to improve the readability of log
+     * messages. See {@see \Siel\Acumulus\Meta::JsonFlags}.
      */
     public const JsonFlags = Meta::JsonFlags | JSON_PRETTY_PRINT;
 
@@ -58,7 +61,7 @@ class Log
     public function getLogLevel(): int
     {
         if (!isset($this->logLevel)) {
-            $pluginSettings = Container::getContainer()->getConfig()->getPluginSettings();
+            $pluginSettings = Container::getContainer()?->getConfig()->getPluginSettings();
             $this->setLogLevel($pluginSettings['logLevel']);
         }
         return $this->logLevel;
@@ -278,8 +281,7 @@ class Log
     protected function write(string $message, int $severity): void
     {
         $message = sprintf('Acumulus %s: %s - %s', $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
-        /** @noinspection ForgottenDebugOutputInspection */
-        error_log($message);
+        $this->logCompleteMessage($message);
     }
 
     /**
@@ -315,5 +317,18 @@ class Log
             $this->write($message, $severity);
         }
         return $message;
+    }
+
+    /**
+     * Logs a formatted and completed message.
+     *
+     * @param string $message
+     *   The formatted message to log, including things like date, time, severity,
+     *   version, etc.
+     */
+    protected function logCompleteMessage(string $message): void
+    {
+        /** @noinspection ForgottenDebugOutputInspection */
+        error_log($message);
     }
 }

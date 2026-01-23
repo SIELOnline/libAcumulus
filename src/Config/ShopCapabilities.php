@@ -46,9 +46,9 @@ abstract class ShopCapabilities
     /**
      * Returns an array with shop specific configuration defaults.
      *
-     * Any key defined in {@see getKeyInfo()} that can be
-     * given a more logical value given that the library is running in a given
-     * web shop software, should be returned here.
+     * Any key defined in {@see Config::getKeyInfo()} that can be given a more logical
+     * value, given that the library is running in a specific webshop, should be returned
+     * here.
      *
      * With most keys susceptible to have a shop specific default now moved to the
      * mappings, this base method, which was abstract before, now returns an empty array.
@@ -61,8 +61,8 @@ abstract class ShopCapabilities
     /**
      * Returns an array with shop specific property mapping defaults.
      *
-     * This base method is abstract, because mappings are almost per definition
-     * shop dependent.
+     * This base method is abstract, because mappings are almost per definition shop
+     * dependent.
      *
      * See the {@see \Siel\Acumulus\Data\_Documentation Data namespace} to get
      * all the possible {@see \Siel\Acumulus\Data\AcumulusObject} types and
@@ -195,7 +195,11 @@ abstract class ShopCapabilities
      *
      * @legacy: old way of showing field references.
      */
-    abstract protected function getTokenInfoSource(): array;
+    protected function getTokenInfoSource(): array
+    {
+        return [];
+    }
+
 
     /**
      * Returns shop specific token info for the 'refund' property.
@@ -232,7 +236,10 @@ abstract class ShopCapabilities
      *
      * @legacy: old way of showing field references.
      */
-    abstract protected function getTokenInfoShopProperties(): array;
+    protected function getTokenInfoShopProperties(): array
+    {
+        return [];
+    }
 
     /**
      * Returns an option list of all shop order statuses.

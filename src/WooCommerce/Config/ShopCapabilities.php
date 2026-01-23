@@ -227,7 +227,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getDefaultShopMappings(): array
     {
-        // WooCommerce: The properties for both addresses are always filled.
+        // WooCommerce: The properties for both addresses are always filled, though I did
+        // receive some messages indicating that address fields were not sent to Acumulus.
         return [
             DataType::Invoice => [
             ],

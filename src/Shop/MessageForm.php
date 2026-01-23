@@ -78,7 +78,7 @@ class MessageForm extends Form
     /**
      * {@inheritdoc}
      *
-     * Performs the given action on the Acumulus invoice for the given Source.
+     * Performs the given action for the posted message form.
      */
     protected function execute(): bool
     {

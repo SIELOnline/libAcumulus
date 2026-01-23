@@ -159,7 +159,7 @@ class Customer extends AcumulusObject
 
     /**
      * @param string|null $vatAddressType
-     *   Either AddressType::Invoice, AddressType::Shipping, or null.
+     *   One of the {@see AddressType} constants or null.
      */
     public function setMainAddressType(?string $vatAddressType): void
     {

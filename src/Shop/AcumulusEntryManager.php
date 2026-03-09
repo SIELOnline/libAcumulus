@@ -62,6 +62,8 @@ abstract class AcumulusEntryManager
      * @return AcumulusEntry|null
      *   Acumulus entry record for the given invoice source or null if no
      *   invoice has yet been created in Acumulus for this invoice source.
+     *
+     * @todo: have the overrides return their more specialised AcumulusEntry.
      */
     abstract public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry;
 
@@ -75,6 +77,8 @@ abstract class AcumulusEntryManager
      *   it (true).
      *
      * @return AcumulusEntry|AcumulusEntry[]|null
+     *
+     * @todo: add a separate convertDbResultToAcumulusEntry() (or createAcumulusEntryFromResult() or something like that)
      */
     protected function convertDbResultToAcumulusEntries(object|array $result, bool $ignoreLock = true): AcumulusEntry|array|null
     {
@@ -242,6 +246,7 @@ abstract class AcumulusEntryManager
         ?int $entryId,
         ?string $token,
         int|string $updated,
+        // @todo: is this parameter necessary? (logically not)
         ?Source $invoiceSource = null
     ): bool;
 

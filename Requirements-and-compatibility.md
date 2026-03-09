@@ -15,8 +15,8 @@ System Requirements
 
 - PHP:
     * Minimum version: 8.1, older versions WILL fail.
-    * Recommended version: 8.3, soon, probably plugin version 8.8, this will become the
-      minimally required version, and older versions WILL fail.
+    * Recommended version: 8.3 or newer, soon, probably plugin version 8.8, 8.2 will
+      become the minimally required version, and older versions WILL fail.
     * See the PHP versions table further below for which PHP versions can be used for
       which shop (version).
 - Database:
@@ -49,6 +49,7 @@ Notes:
 | PS  | PrestaShop       | 9.0.0                    | >= 8.1                              |
 | VM  | VirtueMart (JOO) | 4.4.4                    | >= 4.0.5                            |
 | JOO | Joomla (+ VM)    | 5.4.0                    | >= 4.2.5                            |
+| WHM | WHMCS            | 8.13.1                   | >= 8.13.1                           |
 | WC  | WooCommerce      | 10.3.3                   | >= 5.0 (9.1 for stock management!)  |
 |     | WordPress        | 6.8.3                    | >= 5.9 (earlier versions WILL fail) |
 
@@ -57,7 +58,7 @@ Supported PHP versions
 This is an overview of which PHP versions can be used with the supported shops.
 
 Notes:
-
+- PHP 8.5 has not yet been considered
 - Last, or almost last, point releases are used of the listed PHP versions.
 - WooCommerce is listed in combination with the WordPress version used at that moment.
   Note that most warnings on PHP 8.4 came from other (popular) plugins, though WooCommerce
@@ -83,4 +84,5 @@ Notes:
 |     | 4.1.0.3           | ✅   | ✅   | ✅   | ❓   |                                               |
 | PS  | 9.0               | ✅   | ✅   | ✅   | ✅   | Warnings on PHP 8.4 (Implicit nullable types) |
 | VM  | 4.4.8             | ✅   | ✅   | ✅   | ✅   | Warnings on PHP 8.4 (Implicit nullable types) |
+| WHM | 8.13.1            | ❌   | ✅   | ✅   | ✅   |
 | WC  | 10.3.3            | ✅   | ✅   | ✅   | ✅   | Warnings on PHP 8.4 (Implicit nullable types) |

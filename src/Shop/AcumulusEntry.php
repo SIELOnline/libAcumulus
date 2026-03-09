@@ -78,8 +78,6 @@ class AcumulusEntry
     /**
      * Access to the fields may differ per webshop as we follow db naming
      * conventions from the web shop.
-     *
-     * @todo: make them public so that install and update methods from the manager have access.
      */
     public static string $keyEntryId = 'entry_id';
     public static string $keyToken = 'token';
@@ -112,6 +110,18 @@ class AcumulusEntry
     public function __construct(object|array $record)
     {
         $this->record = $record;
+    }
+
+    /**
+     * Returns the id (The technical, auto-increment, key) for this Acumulus entry.
+     *
+     * @return int
+     *   The id of this Acumulus entry.
+     */
+    public function getId(): int
+    {
+        // Is it a real entry id or a concept id?
+        return $this->get(static::$keyId);
     }
 
     /**

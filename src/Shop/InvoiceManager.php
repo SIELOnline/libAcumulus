@@ -15,7 +15,6 @@ use Siel\Acumulus\Data\EmailAsPdf;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Result;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
@@ -30,7 +29,6 @@ use function sprintf;
 
 /**
  * InvoiceManager provides functionality to manage invoices.
- *
  * The features of this class include:
  * - Retrieval of web shop invoice sources (orders or refunds).
  * - Handle order status changes.
@@ -38,6 +36,9 @@ use function sprintf;
  * - Handle batch sending
  * - Create and send an invoice to Acumulus for a given invoice source,
  *   including triggering our own events and processing the result.
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
+ * @noinspection EfferentObjectCouplingInspection
  */
 abstract class InvoiceManager
 {
@@ -206,15 +207,14 @@ abstract class InvoiceManager
     /**
      * Creates a set of Invoice Sources given their ids or shop-specific sources.
      *
-     * @param string $sourceType
-     * @param array $idsOrSources
-     *   An array with shop-specific orders or credit notes, or just their ids (possibly
-     *   as numeric strings).
+     * @param iterable $idsOrSources
+     *   An array with shop-specific orders, credit notes, or invoices, or just their ids
+     *   (possibly as numeric strings).
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non-keyed array with invoice Sources.
      */
-    public function getSourcesByIdsOrSources(string $sourceType, array $idsOrSources): array
+    public function getSourcesByIdsOrSources(string $sourceType, iterable $idsOrSources): array
     {
         $results = [];
         foreach ($idsOrSources as $sourceId) {

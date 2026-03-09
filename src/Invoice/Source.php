@@ -28,6 +28,7 @@ abstract class Source implements WrapperInterface, Stringable
     // Invoice source type constants.
     public const Order = 'Order';
     public const CreditNote = 'CreditNote';
+    public const Invoice = 'Invoice';
     public const Other = 'Other';
 
     protected string $type;

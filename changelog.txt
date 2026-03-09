@@ -3,14 +3,11 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.8.0 (2026-02-??) (WHM)
-------------------------
-Features:
-- WHM: Added support for WHMCS. This version now replaces the former Acumulus
-  Connect add-on.
-
-Refactorings:
-- ALL: Made static fields in AcumulusEntry public so that the manager can use them.
+8.7.2 (2026-03-09) (WC)
+-----------------------
+Bugs:
+- WC: TypeError: strtoupper(): Argument #1 ($string) must be of type string, null given
+  in Completors/Address/CompleteByConfig.php:41.
 
 
 8.7.1 (2025-11-06) (MA)

@@ -3,7 +3,7 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.7.2 (2026-03-09) (WC)
+8.7.2 (2026-03-??) (WC, others?)
 -----------------------
 Bugs:
 - WC: TypeError: strtoupper(): Argument #1 ($string) must be of type string, null given

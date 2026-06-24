@@ -9,6 +9,8 @@ Bugs:
 - WC: TypeError: strtoupper(): Argument #1 ($string) must be of type string, null given
   in Completors/Address/CompleteByConfig.php:41.
 
+Features:
+- New Acumulus logo is now used.
 
 8.7.1 (2025-11-06) (MA)
 -----------------------

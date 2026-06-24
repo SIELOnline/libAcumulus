@@ -358,7 +358,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return Context::getContext()->link->getAdminLink('AdminTaxes') . '#form';
             case 'logo':
                 /** @noinspection PhpUndefinedConstantInspection  Defined in config,inc.php, line 130 or 132. */
-                return  __PS_BASE_URI__ . 'modules/acumulus/views/img/siel-logo.svg';
+                return  __PS_BASE_URI__ . 'modules/acumulus/views/img/Acumulus-Online-Boekhouden_icon_150.png';
             case 'pro-support-image':
                 /** @noinspection PhpUndefinedConstantInspection  Defined in config,inc.php, line 130 or 132. */
                 return  __PS_BASE_URI__ . 'modules/acumulus/views/img/pro-support-prestashop.png';

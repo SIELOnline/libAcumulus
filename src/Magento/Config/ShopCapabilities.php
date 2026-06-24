@@ -601,7 +601,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return $urlInterface->getUrl('admin/system_config/edit/section/tax');
             case 'logo':
                 $repository = Registry::getInstance()->get(AssetRepository::class);
-                return $repository->getUrl('Siel_AcumulusMa2::images/siel-logo.svg');
+                return $repository->getUrl('Siel_AcumulusMa2::images/Acumulus-Online-Boekhouden_icon_150.png');
             case 'pro-support-image':
                 $repository = Registry::getInstance()->get(AssetRepository::class);
                 return $repository->getUrl('Siel_AcumulusMa2::images/pro-support-magento.png');

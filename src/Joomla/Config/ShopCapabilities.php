@@ -17,7 +17,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     {
         return match ($linkType) {
             'register', 'activate', 'settings', 'mappings', 'batch', 'invoice' => Route::_("index.php?option=com_acumulus&task=$linkType"),
-            'logo' => Uri::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg',
+            'logo' => Uri::root(true) . '/administrator/components/com_acumulus/media/Acumulus-Online-Boekhouden_icon_150.png',
             default => parent::getLink($linkType, $parameter),
         };
     }

@@ -18,7 +18,7 @@ Bugs:
 
 Features:
 - Catch more (types of) runtime errors when sending messages to the API and try to handle
-  them with the CrashReporter
+  them with the CrashReporter.
 - Try to display an admin message during crash reporting, even when mail sending failed.
 
 Refactorings:

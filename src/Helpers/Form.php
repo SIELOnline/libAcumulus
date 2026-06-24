@@ -365,7 +365,6 @@ abstract class Form extends MessageCollection
                 $result[$id] = $field['value'];
             }
             if (!empty($field['fields'])) {
-                /** @noinspection SlowArrayOperationsInLoopInspection */
                 $result = array_merge($result, $this->getFieldValues($field['fields']));
             }
         }

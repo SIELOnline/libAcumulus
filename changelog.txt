@@ -3,11 +3,13 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.7.2 (2026-03-??) (WC, others?)
+8.7.2 (2026-06-??) (WC)
 -----------------------
 Bugs:
 - WC: TypeError: strtoupper(): Argument #1 ($string) must be of type string, null given
   in Completors/Address/CompleteByConfig.php:41.
+- WC: Specified too much precision for shipping costs components in a credit note,
+  possibly leading to a vat range not containing the actual vat rate.
 
 Features:
 - New Acumulus logo is now used.

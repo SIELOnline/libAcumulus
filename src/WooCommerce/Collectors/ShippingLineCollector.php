@@ -88,7 +88,8 @@ class ShippingLineCollector extends LineCollector
                 $cost = (float) $cost;
                 if (Number::floatsAreEqual($cost, $shippingEx)) {
                     $shippingEx = $cost;
-                    $precisionShippingEx = 0.001;
+                    // [SIEL #256239]: we better not increase the precision.
+                    //$precisionShippingEx = 0.001;
                 }
             }
         }
@@ -108,6 +109,8 @@ class ShippingLineCollector extends LineCollector
             $line->metadataSet(Meta::PrecisionVatAmount, $precisionVat);
         }
 
+        // [SIEL #256239]: We leave the code for now but it looks that the condition can
+        // not evaluate to true anymore.
         if ($line->metadataGet(Meta::PrecisionUnitPrice) < 0.009 && $line->metadataGet(Meta::PrecisionVatAmount) < 0.009) {
             // We have a more precise unit price and vat amount, but as this line will be
             // rounded in the end anyway, we should add the rounded inc price and
@@ -132,6 +135,12 @@ class ShippingLineCollector extends LineCollector
      * - Meta::VatRateLookup (*)
      * - Meta::VatRateLookupLabel (*)
      * - Meta::VatRateLookupSource (*)
+     * - Meta::PrecisionVatAmount (see NOTE below)
+     *
+     * NOTE:
+     * [SIEL #256239]: increasing the precision lead to a vat range not containing the
+     * actual vat rate: so we do no longer increase it. For the typical price range of
+     * shipping costs this is not necessary anyway.
      *
      * @param array|array[]|null $taxes
      *   The taxes applied to a shipping line.
@@ -142,8 +151,7 @@ class ShippingLineCollector extends LineCollector
         if (is_array($taxes)) {
             // Since version ?.?, $taxes has an indirection by key 'total'.
             if (is_string(array_key_first($taxes))) {
-                /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-                $taxes = current($taxes);
+                $taxes = $taxes[array_key_first($taxes)];
             }
             if (is_array($taxes)) {
                 foreach ($taxes as $taxRateId => $amount) {
@@ -152,7 +160,7 @@ class ShippingLineCollector extends LineCollector
                         if ($taxRate) {
                             if (!$taxRateFound) {
                                 $line->metadataSet(Meta::VatAmount, ((float) $amount) / $line->quantity);
-                                $line->metadataSet(Meta::PrecisionVatAmount, 0.001);
+                                //$line->metadataSet(Meta::PrecisionVatAmount, 0.001);
                                 $line->metadataAdd(Meta::VatRateLookup, null, true);
                                 $line->metadataAdd(Meta::VatRateLookupLabel, null, true);
                                 $line->metadataSet(

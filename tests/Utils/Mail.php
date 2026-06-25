@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Tests\Utils;
 
 use DateTimeImmutable;
 
+use Exception;
 use Siel\Acumulus\Mail\Mailer;
 
 use function is_array;
@@ -150,37 +151,41 @@ trait Mail
      *   {log folder}\20251030150706091 Invoice sent to Acumulus in test mode_ c62f22.eml
      * and checks that the subject appears in the mentioned file name.
      * Then it checks that the file contains the mail contents: subject and body (2 mime
-     * parts for the text and html versions of the body).
+     * parts for the text and HTML versions of the body).
      */
     protected static function assertMailServerReceivedMail(string $subject, ?string $bodyText, ?string $bodyHtml, bool $isBase64 = false): void
     {
         // Give mail serer time to process the mail and save the log file.
         sleep(1);
         $now = new DateTimeImmutable();
-        $papercutLog = static::getPapercutLogFile();
-        $logLines = array_reverse(explode("\n", str_replace(["\r\n", "\r"], "\n", static::tail($papercutLog, 50))));
-        foreach ($logLines as $line) {
-            $logMessage = 'Successfully Saved email message';
-            $logMessageStart = strpos($line, $logMessage);
-            if ($logMessageStart !== false && str_contains($line, $subject)) {
-                // Line looks like {timestamp} [{level}] {message}
-                $timestamp = substr($line, 0, strpos($line, '[') - 1);
-                $diff = static::getDiffInSeconds(new DateTimeImmutable($timestamp), $now);
-                if (0 <= $diff && $diff < 10) {
-                    // Message looks like:
-                    // Successfully Saved email message: {log folder}\{eml file name}.eml
-                    // We want the full file name, so we can check the file contents.
-                    $emlFile = substr($line, $logMessageStart + strlen($logMessage) + strlen(': '));
-                    $emlFile = substr($emlFile, 0, strpos($emlFile, '.eml') + strlen('.eml'));
-                    $emlFile = static::getEmlFileLink($emlFile);
-                    static::assertMailSentContainsParts($emlFile, $bodyText, $bodyHtml, $isBase64);
-                    return;
-                } else {
-                    static::fail('Log mentions a mail being sent, but more then 10 seconds ago.');
+        $papercutLogs = static::getPapercutLogFiles();
+        foreach ($papercutLogs as $papercutLog) {
+            $logLines = array_reverse(explode("\n", str_replace(["\r\n", "\r"], "\n", static::tail($papercutLog, 50))));
+            foreach ($logLines as $line) {
+                $logMessage = 'Successfully Saved email message';
+                $logMessageStart = strpos($line, $logMessage);
+                if ($logMessageStart !== false && str_contains($line, $subject)) {
+                    // Line looks like {timestamp} [{level}] {message}
+                    $timestamp = substr($line, 0, strpos($line, '[') - 1);
+                    try {
+                        $diff = static::getDiffInSeconds(new DateTimeImmutable($timestamp), $now);
+                    } catch (Exception) {
+                        static::fail("Log does not contain valid timestamp: '$timestamp'");
+                    }
+                    if (0 <= $diff && $diff < 10) {
+                        // Message looks like:
+                        // Successfully Saved email message: {log folder}\{eml file name}.eml
+                        // We want the full file name, so we can check the file contents.
+                        $emlFile = substr($line, $logMessageStart + strlen($logMessage) + strlen(': '));
+                        $emlFile = substr($emlFile, 0, strpos($emlFile, '.eml') + strlen('.eml'));
+                        $emlFile = static::getEmlFileLink($emlFile);
+                        static::assertMailSentContainsParts($emlFile, $bodyText, $bodyHtml, $isBase64);
+                        return;
+                    }
                 }
             }
         }
-        static::fail('Log does not confirm that the mail was sent');
+        static::fail('Logs do not confirm that the email was sent');
     }
 
     /**
@@ -210,18 +215,47 @@ trait Mail
     }
 
     /**
+     * Returns the paths to the Papercut log files (UI and SMTP).
+     *
+     * @return string[]
+     */
+    protected static function getPapercutLogFiles(): array
+    {
+        return [
+            static::getPapercutLogFileUI(),
+            static::getPapercutLogFileService(),
+        ];
+    }
+
+    /**
+     * Returns the path to the Papercut UI log file.
+     */
+    protected static function getPapercutLogFileUI(): string
+    {
+        return static::getPapercutFolderUI() . '/Papercut SMTP.log';
+    }
+
+    /**
+     * Returns the folder where the Papercut UI saves the log and messages.
+     */
+    protected static function getPapercutFolderUI(): string
+    {
+        return 'C:\Users\erwin\AppData\Roaming\Changemaker Studios\Papercut SMTP';
+    }
+
+    /**
      * Returns the path to the Papercut Service log file.
      */
-    protected static function getPapercutLogFile(): string
+    protected static function getPapercutLogFileService(): string
     {
-        return static::getPapercutFolder() . '/Papercut.Service.log';
+        return static::getPapercutFolderService() . '/Papercut.Service.log';
     }
 
     /**
      * Returns the folder where the Papercut SMTP Service log file and saved messages are
      * located.
      */
-    protected static function getPapercutFolder(): string
+    protected static function getPapercutFolderService(): string
     {
         return 'C:\ProgramData\Changemaker Studios\Papercut SMTP\Incoming';
     }

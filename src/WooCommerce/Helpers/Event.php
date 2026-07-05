@@ -4,50 +4,20 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
-use Siel\Acumulus\Collectors\PropertySources;
-use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Helpers\Event as EventInterface;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Helpers\Event as BaseEvent;
 
 /**
- * Event implements the {@see \Siel\Acumulus\Helpers\Event} interface for WooCommerce.
+ * Event implements {@see \Siel\Acumulus\Helpers\Event} for WooCommerce.
  */
-class Event implements EventInterface
+class Event extends BaseEvent
 {
-    public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
+    protected function getEventName(string $methodName): string
     {
-        do_action('acumulus_invoice_create_before', $invoiceSource, $localResult);
+        return 'acumulus' . strtolower(preg_replace('/([A-Z])/', '_$1', $methodName));
     }
 
-    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
+    protected function triggerEvent(string $eventName, array $args): void
     {
-        do_action('acumulus_line_collect_before', $line, $propertySources);
-    }
-
-    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
-    {
-        do_action('acumulus_line_collect_after', $line, $propertySources);
-    }
-
-    public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        do_action('acumulus_invoice_collect_after', $invoice, $invoiceSource, $localResult);
-    }
-
-    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        do_action('acumulus_invoice_create_after', $invoice, $invoiceSource, $localResult);
-    }
-
-    public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
-    {
-        do_action('acumulus_invoice_send_before', $invoice, $localResult);
-    }
-
-    public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
-    {
-        do_action('acumulus_invoice_send_after', $invoice, $invoiceSource, $result);
+        do_action($eventName, ...array_values($args));
     }
 }

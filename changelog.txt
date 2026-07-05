@@ -14,6 +14,9 @@ Bugs:
 Features:
 - New Acumulus logo is now used.
 
+Refactorings:
+- Refactored the Event classes by extracting similar code into a base Event class.
+
 8.7.1 (2025-11-06) (MA)
 -----------------------
 Bugs:

@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpStaticAsDynamicMethodCallInspection
- */
 
 declare(strict_types=1);
 
@@ -73,7 +70,7 @@ class InvoiceCreateTest extends TestCase
         // Verify that the normal vat type has been set
         self::assertSame(Api::VatType_National, $invoice->vatType);
 
-        Event::registerHook(Event::INVOICE_COLLECT_AFTER, static function (Invoice $invoice) {
+        Event::registerHook('triggerInvoiceCollectAfter', static function (Invoice $invoice) {
             $invoice->setWarehouseCountry('BE');
         });
         $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');

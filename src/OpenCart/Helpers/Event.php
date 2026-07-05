@@ -4,64 +4,25 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Helpers;
 
-use Siel\Acumulus\Collectors\PropertySources;
-use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Helpers\Event as EventInterface;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Helpers\Event as BaseEvent;
+
+use function strlen;
 
 /**
- * Event implements the {@see \Siel\Acumulus\Helpers\Event} interface for OpenCart.
+ * Event implements {@see \Siel\Acumulus\Helpers\Event} for OpenCart.
  */
-class Event implements EventInterface
+class Event extends BaseEvent
 {
-    public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
-    {   // Results in 'system/extension/module/acumulus/invoiceCreate/before'
-        $route = Registry::getInstance()->getAcumulusTrigger('invoiceCreate', 'before');
-        $args = compact('invoiceSource', 'localResult');
-        $this->getEvent()->trigger($route, $args);
+    protected function getEventName(string $methodName): string
+    {
+        return lcfirst(substr($methodName, strlen('trigger')));
     }
 
-    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
+    protected function triggerEvent(string $eventName, array $args): void
     {
-        $route = Registry::getInstance()->getAcumulusTrigger('lineCollect', 'before');
-        $args = compact('line', 'propertySources');
-        $this->getEvent()->trigger($route, $args);
-    }
-
-    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
-    {
-        $route = Registry::getInstance()->getAcumulusTrigger('lineCollect', 'after');
-        $args = compact('line', 'propertySources');
-        $this->getEvent()->trigger($route, $args);
-    }
-
-    public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $route = Registry::getInstance()->getAcumulusTrigger('invoiceCollect', 'after');
-        $args = compact('invoice', 'invoiceSource', 'localResult');
-        $this->getEvent()->trigger($route, $args);
-    }
-
-    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $route = Registry::getInstance()->getAcumulusTrigger('invoiceCreate', 'after');
-        $args = compact('invoice', 'invoiceSource', 'localResult');
-        $this->getEvent()->trigger($route, $args);
-    }
-
-    public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
-    {
-        $route = Registry::getInstance()->getAcumulusTrigger('invoiceSend', 'before');
-        $args = compact('invoice', 'localResult');
-        $this->getEvent()->trigger($route, $args);
-    }
-
-    public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
-    {
-        $route = Registry::getInstance()->getAcumulusTrigger('invoiceSend', 'after');
-        $args = compact('invoice', 'invoiceSource', 'result');
+        $moment = str_ends_with($eventName,'Before') ? 'before' : 'after';
+        $eventName = substr($eventName, -strlen($moment));
+        $route = Registry::getInstance()->getAcumulusTrigger($eventName, $moment);
         $this->getEvent()->trigger($route, $args);
     }
 
@@ -72,6 +33,7 @@ class Event implements EventInterface
      *   [SIEL #194403]: https://lightning.devs.mx/ defines its own event class.
      *
      * @noinspection PhpUndefinedClassInspection \Light_Event is from a 3rd party module.
+     * @noinspection PhpMissingReturnTypeInspection: return type differs for OC3 and OC4.
      */
     protected function getEvent()
     {

@@ -33,9 +33,9 @@ use Siel\Acumulus\Invoice\Source;
  * // From here on the invoice source (object from your web shop) is no longer available
  * - event InvoiceSendBefore
  * - send to Acumulus
- * - event InvoiceSendAfter (only when the inmvoice has really been sent)
+ * - event InvoiceSendAfter (only when the invoice has really been sent)
  */
-interface Event
+abstract class Event
 {
     /**
      * Triggers an event that an invoice for Acumulus is to be created and sent.
@@ -57,7 +57,10 @@ interface Event
      *   Contains any earlier generated messages and the initial send-status.
      *   You can add your own messages and/or change the send-status.
      */
-    public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void;
+    public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
+        $this->triggerEventByMethodName(__FUNCTION__, compact('invoiceSource', 'localResult'));
+    }
 
     /**
      * Triggers an event that a main line and its possible children are to be "collected".
@@ -99,7 +102,10 @@ interface Event
      *     {@see \lcfirst()} value of a {@see \Siel\Acumulus\Data\LineType} constant, e.g:
      *     'shippingLineInfo', 'giftWrappingFeeLineInfo', etc.
      */
-    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void;
+    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
+    {
+        $this->triggerEventByMethodName(__FUNCTION__, compact('line', 'propertySources'));
+    }
 
     /**
      * Triggers an event that a main line and its possible children have been "collected".
@@ -119,7 +125,10 @@ interface Event
      *   The set of "objects" that can be used to collect data from.
      *   See {@see triggerLineCollectBefore()} for which values will be available.
      */
-    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void;
+    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
+    {
+        $this->triggerEventByMethodName(__FUNCTION__, compact('line', 'propertySources'));
+    }
 
     /**
      * Triggers an event that an invoice for Acumulus has been "collected" and is ready to
@@ -145,7 +154,10 @@ interface Event
      *   Contains any earlier generated messages and the initial send-status.
      *   You can add your own messages and/or change the send-status.
      */
-    public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void;
+    public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
+        $this->triggerEventByMethodName(__FUNCTION__, compact('invoice', 'invoiceSource', 'localResult'));
+    }
 
     /**
      * Triggers an event that an invoice for Acumulus has been created, that is
@@ -168,7 +180,10 @@ interface Event
      *   Contains any earlier generated messages and the initial send-status.
      *   You can add your own messages and/or change the send-status.
      */
-    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void;
+    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    {
+        $this->triggerEventByMethodName(__FUNCTION__, compact('invoice', 'invoiceSource', 'localResult'));
+    }
 
     /**
      * Triggers an event that an invoice for Acumulus is ready to be sent.
@@ -187,7 +202,10 @@ interface Event
      *   Contains any earlier generated messages and the initial send-status.
      *   You can add your own messages and/or change the send-status.
      */
-    public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void;
+    public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
+    {
+        $this->triggerEventByMethodName(__FUNCTION__, compact('invoice', 'localResult'));
+    }
 
     /**
      * Triggers an event after an invoice for Acumulus has been sent.
@@ -207,5 +225,39 @@ interface Event
      *   The result, response, status, and any messages, as sent back by
      *   Acumulus (or set earlier locally).
      */
-    public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void;
+    public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
+    {
+        $this->triggerEventByMethodName(__FUNCTION__, compact('invoice', 'invoiceSource', 'result'));
+    }
+
+    /**
+     * Triggers the event implied by the method name.
+     */
+    protected function triggerEventByMethodName(string $methodName, array $args): void
+    {
+        $eventName = $this->getEventName($methodName);
+        $args = $this->massageArgs($args);
+        $this->triggerEvent($eventName, $args);
+    }
+
+    /**
+     * Returns the event name according to the shop specific naming guidelines.
+     */
+    abstract protected function getEventName(string $methodName): string;
+
+    /**
+     * Massages the arguments according to shop specific argument naming guidelines.
+     *
+     * The basic implementation returns the $args unaltered., override if your shop
+     * implies some naming guidelines,
+     */
+    protected function massageArgs(array $args): array
+    {
+        return $args;
+    }
+
+    /**
+     * Triggers the given event using the shop's event system passing the given arguments.
+     */
+    abstract protected function triggerEvent(string $eventName, array $args): void;
 }

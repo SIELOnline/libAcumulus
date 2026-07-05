@@ -8,66 +8,37 @@ use Joomla\CMS\Application\CMSApplicationInterface;
 use Joomla\CMS\Event\AbstractEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
-use Siel\Acumulus\Collectors\PropertySources;
-use Siel\Acumulus\Data\Invoice;
-use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Helpers\Event as EventInterface;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
-use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Helpers\Event as BaseEvent;
 use Siel\Joomla\Component\Acumulus\Administrator\Extension\AcumulusComponent;
 
 /**
- * Event implements the {@see \Siel\Acumulus\Helpers\Event} interface for Joomla.
+ * Event implements {@see \Siel\Acumulus\Helpers\Event} for Joomla.
  */
-class Event implements EventInterface
+class Event extends BaseEvent
 {
-    public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
+
+    protected function getEventName(string $methodName): string
     {
-        $this->triggerEvent('onAcumulusInvoiceCreateBefore', compact('invoiceSource', 'localResult'));
+        return str_replace('trigger', 'onAcumulus', $methodName);
     }
 
-    public function triggerLineCollectBefore(Line $line, PropertySources $propertySources): void
-    {
-        $this->triggerEvent('onAcumulusLineCollectBefore', compact('line', 'propertySources'));
-    }
-
-    public function triggerLineCollectAfter(Line $line, PropertySources $propertySources): void
-    {
-        $this->triggerEvent('onAcumulusLineCollectAfter', compact('line', 'propertySources'));
-    }
-
-    public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $this->triggerEvent('onAcumulusInvoiceCollectAfter', compact('invoice', 'invoiceSource', 'localResult'));
-    }
-
-    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        $this->triggerEvent('onAcumulusInvoiceCreateAfter', compact('invoice', 'invoiceSource', 'localResult'));
-    }
-
-    public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
-    {
-        $this->triggerEvent('onAcumulusInvoiceSendBefore', compact('invoice', 'localResult'));
-    }
-
-    public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
+    protected function massageArgs(array $args): array
     {
         // \Joomla\CMS\Plugin\CMSPlugin::registerLegacyListener(), line 308:
         //   "Extract any old results; they must not be part of the method call."
-        // Thus: a parameter with a name result is unset
-        $this->triggerEvent('onAcumulusInvoiceSendAfter', [
-            'invoice' => $invoice,
-            'invoiceSource' => $invoiceSource,
-            'invoiceAddResult' => $result,
-        ]);
+        // Thus: a parameter with a name result is unset.
+        if (isset($args['result'])) {
+            $args['invoiceAddResult'] = $args['result'];
+            unset($args['result']);
+        }
+        return $args;
     }
 
-    private function triggerEvent(string $eventName, array $params): void
+    protected function triggerEvent(string $eventName, array $args): void
     {
         PluginHelper::importPlugin('acumulus');
-        $params['subject'] = $this->getAcumulusComponent();
-        $event = AbstractEvent::create($eventName, $params);
+        $args['subject'] = $this->getAcumulusComponent();
+        $event = AbstractEvent::create($eventName, $args);
         // @todo: in Joomla 6 interface CMSApplicationInterface will no longer extend
         //   EventAwareInterface. Replacement is not yet clear to me.
         $this->getCMSApplication()->getDispatcher()->dispatch($eventName, $event);

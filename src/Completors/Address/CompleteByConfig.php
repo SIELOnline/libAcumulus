@@ -38,9 +38,13 @@ class CompleteByConfig extends BaseCompletorTask
             case Config::Country_ForeignFromShop:
             case Config::Country_FromShop:
                 $acumulusObject->setCountryAutoName(Api::CountryAutoName_No, PropertySet::NotOverwrite);
-                $countryName = $countryAutoName === Config::Country_ForeignFromShop && strtoupper($acumulusObject->countryCode) === 'NL'
-                    ? ''
-                    : $acumulusObject->metadataGet(Meta::ShopCountryName);
+                if ($countryAutoName === Config::Country_ForeignFromShop
+                    && (empty($acumulusObject->countryCode) || strtoupper($acumulusObject->countryCode) === 'NL')
+                ) {
+                    $countryName = null;
+                } else {
+                    $countryName = $acumulusObject->metadataGet(Meta::ShopCountryName);
+                }
                 $acumulusObject->setCountry($countryName, PropertySet::NotOverwrite);
                 break;
             default:

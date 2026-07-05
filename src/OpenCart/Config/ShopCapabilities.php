@@ -367,7 +367,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         return match ($linkType) {
             'settings', 'register', 'activate', 'mappings', 'batch', 'invoice' => $registry->getRouteUrl($linkType),
             'fiscal-address-setting' => $registry->getRouteUrl('tax_class', 'localisation', ''),
-            'logo' => $registry->getFileUrl('view/image/acumulus/siel-logo.png'),
+            'logo' => $registry->getFileUrl('view/image/acumulus/Acumulus-Online-Boekhouden_icon_150.png'),
             'pro-support-image' => $registry->getFileUrl('view/image/acumulus/pro-support-opencart.png'),
             'pro-support-link' => 'https://pay.siel.nl/?p=0nKmWpoNV0wtqeac43dqc5YUAcaHFJkldwy1alKD1G3EJHmC',
             default => parent::getLink($linkType, $parameter),

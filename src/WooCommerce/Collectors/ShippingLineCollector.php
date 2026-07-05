@@ -88,7 +88,8 @@ class ShippingLineCollector extends LineCollector
                 $cost = (float) $cost;
                 if (Number::floatsAreEqual($cost, $shippingEx)) {
                     $shippingEx = $cost;
-                    $precisionShippingEx = 0.001;
+                    // [SIEL #256239]: we better not increase the precision.
+                    //$precisionShippingEx = 0.001;
                 }
             }
         }
@@ -98,7 +99,7 @@ class ShippingLineCollector extends LineCollector
         // record which contains the non-rounded tax amounts. For shipping this is
         // normally just 1 amount.
         $taxes = $shippingItem->get_taxes();
-        $this->addShippingVatRateDataBasedOnTaxes($line, $taxes, $propertySources);
+        $shippingTaxesFound = $this->addShippingVatRateDataBasedOnTaxes($line, $taxes, $propertySources);
 
         $line->unitPrice = $shippingEx;
         $line->metadataSet(Meta::PrecisionUnitPrice, $precisionShippingEx);
@@ -108,7 +109,10 @@ class ShippingLineCollector extends LineCollector
             $line->metadataSet(Meta::PrecisionVatAmount, $precisionVat);
         }
 
-        if ($line->metadataGet(Meta::PrecisionUnitPrice) < 0.009 && $line->metadataGet(Meta::PrecisionVatAmount) < 0.009) {
+        // [SIEL #256239]: we do not change the precision anymore but now use the return
+        // value of the method call.
+        //if ($line->metadataGet(Meta::PrecisionUnitPrice) < 0.009 && $line->metadataGet(Meta::PrecisionVatAmount) < 0.009) {
+        if ($shippingTaxesFound) {
             // We have a more precise unit price and vat amount, but as this line will be
             // rounded in the end anyway, we should add the rounded inc price and
             // recalculate the unit price later ...
@@ -132,18 +136,23 @@ class ShippingLineCollector extends LineCollector
      * - Meta::VatRateLookup (*)
      * - Meta::VatRateLookupLabel (*)
      * - Meta::VatRateLookupSource (*)
+     * - Meta::PrecisionVatAmount (see NOTE below)
+     *
+     * NOTE:
+     * [SIEL #256239]: increasing the precision lead to a vat range not containing the
+     * actual vat rate: so we do no longer increase it. For the typical price range of
+     * shipping costs this is not necessary anyway.
      *
      * @param array|array[]|null $taxes
      *   The taxes applied to a shipping line.
      */
-    protected function addShippingVatRateDataBasedOnTaxes(Line $line, ?array $taxes, PropertySources $propertySources): void
+    protected function addShippingVatRateDataBasedOnTaxes(Line $line, ?array $taxes, PropertySources $propertySources): bool
     {
         $taxRateFound = false;
         if (is_array($taxes)) {
             // Since version ?.?, $taxes has an indirection by key 'total'.
             if (is_string(array_key_first($taxes))) {
-                /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-                $taxes = current($taxes);
+                $taxes = $taxes[array_key_first($taxes)];
             }
             if (is_array($taxes)) {
                 foreach ($taxes as $taxRateId => $amount) {
@@ -152,7 +161,7 @@ class ShippingLineCollector extends LineCollector
                         if ($taxRate) {
                             if (!$taxRateFound) {
                                 $line->metadataSet(Meta::VatAmount, ((float) $amount) / $line->quantity);
-                                $line->metadataSet(Meta::PrecisionVatAmount, 0.001);
+                                $line->metadataSet(Meta::PrecisionVatAmount, 0.01);
                                 $line->metadataAdd(Meta::VatRateLookup, null, true);
                                 $line->metadataAdd(Meta::VatRateLookupLabel, null, true);
                                 $line->metadataSet(
@@ -204,5 +213,7 @@ class ShippingLineCollector extends LineCollector
                 }
             }
         }
+
+        return $taxRateFound;
     }
 }

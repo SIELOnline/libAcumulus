@@ -28,6 +28,9 @@ class CompleteByConfigTest extends TestCase
             ['countryAutoName', Config::Country_FromShop, 'NL', 'Nederland', Api::CountryAutoName_No, 'Nederland'],
             // @todo: change to '' when "clearing" values is supported.
             ['countryAutoName', Config::Country_ForeignFromShop, 'nl', 'Nederland', Api::CountryAutoName_No, null],
+            ['countryAutoName', Config::Country_ForeignFromShop, '', 'Nederland', Api::CountryAutoName_No, null],
+            ['countryAutoName', Config::Country_ForeignFromShop, null, 'Nederland', Api::CountryAutoName_No, null],
+            ['countryAutoName', Config::Country_ForeignFromShop, null, null, Api::CountryAutoName_No, null],
 
             ['countryAutoName', Api::CountryAutoName_No, 'FR', 'Frankrijk', Api::CountryAutoName_No, null],
             ['countryAutoName', Api::CountryAutoName_Yes, 'fr', 'Frankrijk', Api::CountryAutoName_Yes, null],
@@ -47,18 +50,21 @@ class CompleteByConfigTest extends TestCase
         ?string $shopCountryName,
         ?int $expectedCountryAutoName,
         ?string $expectedCountry
-    ): void
-    {
+    ): void {
         $config = self::getContainer()->getConfig();
         $config->set($key, $value);
-        $completor = self::getContainer()->getCompletorTask('Address','ByConfig');
+        $completor = self::getContainer()->getCompletorTask('Address', 'ByConfig');
         $address = $this->getAddress();
         $address->countryCode = $countryCode;
         $address->metadataSet(Meta::ShopCountryName, $shopCountryName);
 
         $completor->complete($address);
 
-        self::assertSame(strtoupper($countryCode), $address->countryCode);
+        if (empty($countryCode)) {
+            self::assertNull($address->countryCode);
+        } else {
+            self::assertSame(strtoupper($countryCode), $address->countryCode);
+        }
         self::assertSame($expectedCountryAutoName, $address->countryAutoName);
         self::assertSame($expectedCountry, $address->country);
     }

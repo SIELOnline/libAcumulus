@@ -50,7 +50,7 @@ class HttpRequestResponseTest extends TestCase
     public function testPost(): void
     {
         $httpRequest = new HttpRequest();
-        $uri = 'http://localhost/lib-acumulus/resources/siel-logo.png';
+        $uri = 'http://localhost/lib-acumulus/resources/Acumulus-Online-Boekhouden_icon_150.png';
         $post = ['my_post' => 'my_value'];
         $response = $httpRequest->post($uri, $post);
 
@@ -65,7 +65,7 @@ class HttpRequestResponseTest extends TestCase
         // Properties of response.
         self::assertSame(200, $response->getHttpStatusCode());
         self::assertIsString($response->getHeaders());
-        self::assertStringEqualsFile(__DIR__ . '/../../../resources/siel-logo.png', $response->getBody());
+        self::assertStringEqualsFile(__DIR__ . '/../../../resources/Acumulus-Online-Boekhouden_icon_150.png', $response->getBody());
         /** @noinspection DuplicatedCode */
         self::assertIsArray($response->getInfo());
         self::assertIsString($response->getRequestHeaders());
@@ -128,7 +128,7 @@ class HttpRequestResponseTest extends TestCase
     {
         $ua = 'my_useragent/1.0';
         $httpRequest = new HttpRequest([CURLOPT_USERAGENT => $ua]);
-        $uri = 'http://localhost/lib-acumulus/resources/siel-logo.png';
+        $uri = 'http://localhost/lib-acumulus/resources/Acumulus-Online-Boekhouden_icon_150.png';
         $post = ['my_post' => 'my_value'];
         $response = $httpRequest->post($uri, $post);
 
@@ -139,7 +139,7 @@ class HttpRequestResponseTest extends TestCase
     public function testOverridingOptions(): void
     {
         $httpRequest = new HttpRequest([CURLOPT_HEADER => false, CURLINFO_HEADER_OUT => false]);
-        $uri = 'http://localhost/lib-acumulus/resources/siel-logo.png';
+        $uri = 'http://localhost/lib-acumulus/resources/Acumulus-Online-Boekhouden_icon_150.png';
         $post = ['my_post' => 'my_value'];
         $response = $httpRequest->post($uri, $post);
 

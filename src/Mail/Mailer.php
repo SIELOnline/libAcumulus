@@ -70,7 +70,7 @@ abstract class Mailer
      * Sends an email.
      *
      * @return mixed
-     *   Success (true); error message, result (hopefully Stringable), Throwable or just
+     *   Success (true); error message, result (hopefully a Stringable), Throwable or just
      *   false otherwise.
      */
     public function sendMail(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml): mixed

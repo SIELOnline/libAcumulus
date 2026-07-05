@@ -117,7 +117,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return match ($linkType) {
             'register', 'activate', 'batch', 'settings', 'mappings', 'fiscal-address-setting' => "admin.php?page=acumulus_$linkType",
-            'logo' => 'acumulus/siel-logo.svg',
+            'logo' => 'acumulus/Acumulus-Online-Boekhouden_icon_150.png',
             'pro-support-image' => 'acumulus/pro-support-woocommerce.png',
             'pro-support-link' => 'https://pay.siel.nl/?p=3t0EasGQCcX0lPlraqMiGkTxFRmRo3zicBbhMtmD69bGozBl',
             default => parent::getLink($linkType, $parameter),

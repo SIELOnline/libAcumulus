@@ -3,15 +3,16 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.8.0 (2026-02-??) (WHM)
-------------------------
+8.7.2 (2026-06-??) (WC)
+-----------------------
+Bugs:
+- WC: TypeError: strtoupper(): Argument #1 ($string) must be of type string, null given
+  in Completors/Address/CompleteByConfig.php:41.
+- WC: Specified too much precision for shipping costs components in a credit note,
+  possibly leading to a vat range not containing the actual vat rate.
+
 Features:
-- WHM: Added support for WHMCS. This version now replaces the former Acumulus
-  Connect add-on.
-
-Refactorings:
-- ALL: Made static fields in AcumulusEntry public so that the manager can use them.
-
+- New Acumulus logo is now used.
 
 8.7.1 (2025-11-06) (MA)
 -----------------------
@@ -21,7 +22,7 @@ Bugs:
 
 Features:
 - Catch more (types of) runtime errors when sending messages to the API and try to handle
-  them with the CrashReporter
+  them with the CrashReporter.
 - Try to display an admin message during crash reporting, even when mail sending failed.
 
 Refactorings:

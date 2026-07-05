@@ -379,7 +379,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'register', 'activate', 'batch' => admin_url("admin.php?page=acumulus_$linkType"),
             'settings', 'mappings' => admin_url("options-general.php?page=acumulus_$linkType"),
             'fiscal-address-setting' => admin_url('admin.php?page=wc-settings&tab=tax'),
-            'logo' => home_url('wp-content/plugins/acumulus/siel-logo.svg'),
+            'logo' => home_url('wp-content/plugins/acumulus/Acumulus-Online-Boekhouden_icon_150.png'),
             'pro-support-image' => home_url('wp-content/plugins/acumulus/pro-support-woocommerce.png'),
             'pro-support-link' => 'https://pay.siel.nl/?p=3t0EasGQCcX0lPlraqMiGkTxFRmRo3zicBbhMtmD69bGozBl',
             'product' =>  admin_url("post.php?post=$parameter&action=edit"),

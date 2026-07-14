@@ -19,8 +19,7 @@ class Mailer extends BaseMailer
             'custommessage' => $bodyHtml,
             'type' => 'system',
         ];
-        $adminUsername = 'ADMIN_USERNAME';
-        $results = localAPI($command, $postData, $adminUsername);
+        $results = localAPI($command, $postData);
         return $results['result'] === 'success' ? true : $results['message'];
     }
 }

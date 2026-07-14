@@ -266,25 +266,6 @@ class Log
     }
 
     /**
-     * Writes the message to the actual log sink.
-     *
-     * This base implementation adds the name Acumulus, the version of this
-     * library, and the severity and then sends the message to error_log().
-     *
-     * Override if the web shop offers its own log mechanism.
-     *
-     * @param string $message
-     *   The message to log.
-     * @param int $severity
-     *   One of the {@see Severity} constants.
-     */
-    protected function write(string $message, int $severity): void
-    {
-        $message = sprintf('Acumulus %s: %s - %s', $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
-        $this->logCompleteMessage($message);
-    }
-
-    /**
      * Formats and logs the message if the log level indicates so.
      *
      * Errors, warnings, and notices are always logged, other levels only if the
@@ -317,6 +298,25 @@ class Log
             $this->write($message, $severity);
         }
         return $message;
+    }
+
+    /**
+     * Writes the message to the actual log sink.
+     *
+     * This base implementation adds the name Acumulus, the version of this
+     * library, and the severity and then sends the message to error_log().
+     *
+     * Override if the web shop offers its own log mechanism.
+     *
+     * @param string $message
+     *   The message to log.
+     * @param int $severity
+     *   One of the {@see Severity} constants.
+     */
+    protected function write(string $message, int $severity): void
+    {
+        $message = sprintf('Acumulus %s: %s - %s', $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
+        $this->logCompleteMessage($message);
     }
 
     /**

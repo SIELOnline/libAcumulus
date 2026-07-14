@@ -279,10 +279,10 @@ trait Mail
 
         // Sets buffer size, according to the number of lines to retrieve.
         // This gives a performance boost when reading a few lines from the file.
-        if (!$adaptive) {
-            $buffer = 4096;
-        } else {
+        if ($adaptive) {
             $buffer = ($lines < 2 ? 64 : ($lines < 10 ? 512 : 4096));
+        } else {
+            $buffer = 4096;
         }
 
         // Jump to last character

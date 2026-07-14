@@ -14,7 +14,7 @@ use SensitiveParameter;
  *
  * All CMSs and webshop software packages offer some way of storing settings.
  * LibAcumulus uses this configuration subsystem of the host environment it is
- * running in to store its own settings.
+ * running in, to store its own settings.
  *
  * Only values that are set and that differ from the default value are stored.
  * As all settings are queried at once, it makes sense to store all libAcumulus

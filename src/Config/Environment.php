@@ -156,7 +156,7 @@ abstract class Environment
      *   - 'phpVersion'
      *   - 'os'
      *   - 'curlVersion'
-     *   - 'db'
+     *   - 'dbName'
      *   - 'dbVersion'
      *   - 'supportEmail'
      */

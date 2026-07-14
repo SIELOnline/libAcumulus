@@ -23,6 +23,7 @@ class ConfigStore extends BaseConfigStore
                 ->where('setting', $this->configKey)
                 ->first(['setting', 'value'])
                 ?->value ?? '{}',
+            true,
             flags: Meta::JsonFlags
         );
     }

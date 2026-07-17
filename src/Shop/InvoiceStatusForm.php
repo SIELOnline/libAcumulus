@@ -697,7 +697,7 @@ class InvoiceStatusForm extends Form
                     $statusSeverity = static::Status_Error;
                     // To prevent this error in the future, we delete the
                     // local entry.
-                    $this->acumulusEntryManager->delete($localEntry, $source);
+                    $this->acumulusEntryManager->delete($localEntry);
                 } elseif (empty($entry)) {
                     // Other error.
                     $invoiceStatus = static::Invoice_CommunicationError;

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Shop;
 
+use DateTimeInterface;
 use Db;
 use Exception;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
@@ -21,7 +23,7 @@ use function sprintf;
  * SECURITY REMARKS
  * ----------------
  * In PrestaShop saving and querying acumulus entries is done via self-constructed
- * queries. Therefore, this class takes care of sanitizing itself.
+ * queries. Therefore, this class takes care of sanitising itself.
  * - Numbers are cast by using numeric formatters (like %u, %d, %f) with
  *   sprintf().
  * - Strings are escaped using pSQL(), unless they are hard coded or are
@@ -42,19 +44,21 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $this->tableName = _DB_PREFIX_ . 'acumulus_entry';
     }
 
-    public function getByEntryId(?int $entryId): AcumulusEntry|array|null
+    /**
+     * @throws \PrestaShopDatabaseException
+     */
+    public function getByEntryId(int $entryId): ?AcumulusEntry
     {
-        $operator = $entryId === null ? 'is' : '=';
-        $value = $entryId === null ? 'null' : (string) $entryId;
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $result = $this->getDb()->executeS("SELECT * FROM `$this->tableName` WHERE id_entry $operator $value");
-        return $this->convertDbResultToAcumulusEntries($result);
+        $result = $this->getDb()->getRow("SELECT * FROM `$this->tableName` WHERE id_entry = $entryId");
+        return $this->convertDbResultToAcumulusEntry($result);
     }
 
-    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
+    /**
+     * @throws \PrestaShopDatabaseException
+     */
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $result = $this->getDb()->executeS(
+        $result = $this->getDb()->getRow(
             sprintf(
                 "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
                 $this->tableName,
@@ -62,11 +66,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 $invoiceSource->getId()
             )
         );
-        return $this->convertDbResultToAcumulusEntries($result, $ignoreLock);
+        return $this->convertDbResultToAcumulusEntry($result, $ignoreLock);
     }
 
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, DateTimeInterface $created): bool
     {
+        $timeStamp = $created->format(Api::Format_TimeStamp);
         if ($invoiceSource->getType() === Source::Order) {
             $shopId = $invoiceSource->getShopObject()->id_shop;
             $shopGroupId = $invoiceSource->getShopObject()->id_shop_group;
@@ -76,7 +81,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         }
         return $this->getDb()->execute(
             sprintf(
-                "INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES (%u, %u, %s, %s, '%s', %u, '%s')",
+                "INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES (%u, %u, %s, %s, '%s', %u, '%s', '%s')",
                 $this->tableName,
                 $shopId,
                 $shopGroupId,
@@ -84,18 +89,14 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 $token === null ? 'null' : ("'" . pSQL($token) . "'"),
                 pSQL($invoiceSource->getType()),
                 $invoiceSource->getId(),
-                pSQL($created)
+                pSQL($timeStamp),
+                pSQL($timeStamp),
             )
         );
     }
 
-    protected function update(
-        BaseAcumulusEntry $entry,
-        ?int $entryId,
-        ?string $token,
-        int|string $updated,
-        ?Source $invoiceSource = null
-    ): bool {
+    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, DateTimeInterface $updated): bool
+    {
         $record = $entry->getRecord();
         return $this->getDb()->execute(
             sprintf(
@@ -103,16 +104,15 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 $this->tableName,
                 $entryId === null ? 'null' : (string) $entryId,
                 $token === null ? 'null' : ("'" . pSQL($token) . "'"),
-                pSQL($updated),
+                pSQL($updated->format(Api::Format_TimeStamp)),
                 $record['id']
             )
         );
     }
 
-    public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
+    public function delete(BaseAcumulusEntry $entry): bool
     {
         $record = $entry->getRecord();
-        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->getDb()->execute(
             sprintf(
                 'DELETE FROM `%s` WHERE id = %u',
@@ -120,11 +120,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 $record['id']
             )
         );
-    }
-
-    protected function sqlNow(): string
-    {
-        return date(Api::Format_TimeStamp);
     }
 
     /**

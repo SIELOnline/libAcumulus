@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
-
-use function count;
-use function is_object;
 
 /**
  * Manages {@see AcumulusEntry} records/objects.
@@ -36,19 +35,14 @@ abstract class AcumulusEntryManager
     /**
      * Returns the Acumulus entry record for the given entry id.
      *
-     * @param int|null $entryId
-     *   The entry id to look up. If $entryId === null, multiple records may be
-     *   found, in which case a numerically indexed array will be returned.
+     * @param int $entryId
+     *   The entry id to look up.
      *
-     * @return AcumulusEntry|AcumulusEntry[]|null
+     * @return AcumulusEntry|null
      *   Acumulus entry record for the given entry id or null if the entry id is
-     *   unknown. If $entryId = null, multiple records may be returned.
-     *
-     * @todo: remove the possibility to pass null as $entryId, which also simplifies the return type.
-     * @todo: change timestamp parameters to DateTimeInterface.
-     * @todo: use the now public field names from AcumulusEntry.
+     *   unknown.
      */
-    abstract public function getByEntryId(?int $entryId): AcumulusEntry|array|null;
+    abstract public function getByEntryId(int $entryId): ?AcumulusEntry;
 
     /**
      * Returns the Acumulus entry record for the given invoice source.
@@ -62,47 +56,28 @@ abstract class AcumulusEntryManager
      * @return AcumulusEntry|null
      *   Acumulus entry record for the given invoice source or null if no
      *   invoice has yet been created in Acumulus for this invoice source.
-     *
-     * @todo: have the overrides return their more specialised AcumulusEntry.
      */
     abstract public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry;
 
     /**
-     * Converts the results of a DB query to AcumulusEntries.
+     * Converts the (single) result of a DB query to an {@see AcumulusEntry}.
      *
-     * @param object|array[]|object[] $result
-     *   The DB query result.
+     * @param object|array $result
+     *   The DB query result. An empty arry as result is seen as no result (OpenCart).
      * @param bool $ignoreLock
-     *   Whether to return an entry that serves as a send-lock (false) or ignore
-     *   it (true).
-     *
-     * @return AcumulusEntry|AcumulusEntry[]|null
-     *
-     * @todo: add a separate convertDbResultToAcumulusEntry() (or createAcumulusEntryFromResult() or something like that)
+     *   Whether to return an entry that serves as send-lock (false) or ignore it (true).
      */
-    protected function convertDbResultToAcumulusEntries(object|array $result, bool $ignoreLock = true): AcumulusEntry|array|null
+    protected function convertDbResultToAcumulusEntry(object|array $result, bool $ignoreLock = true): ?AcumulusEntry
     {
         if (empty($result)) {
-            $result = null;
+            $acumulusEntry = null;
         } else {
-            if (is_object($result)) {
-                $result = [$result];
-            }
-            // Now, it's a non-empty array of results.
-            foreach ($result as &$record) {
-                $record = $this->container->createAcumulusEntry($record);
-                if ($ignoreLock && $record->isSendLock()) {
-                    $record = null;
-                }
-            }
-            array_filter($result);
-            if (empty($result)) {
-                $result = null;
-            } elseif (count($result) === 1) {
-                $result = reset($result);
+            $acumulusEntry = $this->container->createAcumulusEntry($result);
+            if ($ignoreLock && $acumulusEntry->isSendLock()) {
+                $acumulusEntry = null;
             }
         }
-        return $result;
+        return $acumulusEntry;
     }
 
     /**
@@ -122,7 +97,7 @@ abstract class AcumulusEntryManager
      */
     public function lockForSending(Source $invoiceSource): bool
     {
-        return $this->insert($invoiceSource, AcumulusEntry::lockEntryId, AcumulusEntry::lockToken, $this->sqlNow());
+        return $this->insert($invoiceSource, AcumulusEntry::lockEntryId, AcumulusEntry::lockToken, new DateTimeImmutable());
     }
 
     /**
@@ -152,7 +127,7 @@ abstract class AcumulusEntryManager
         }
         if ($entry->isSendLock()) {
             // The lock is still there: remove it.
-            $this->delete($entry, $invoiceSource);
+            $this->delete($entry);
             return AcumulusEntry::Lock_Deleted;
         }
         // The AcumulusEntry became a real entry: apparently the process which
@@ -181,26 +156,17 @@ abstract class AcumulusEntryManager
      */
     public function save(Source $invoiceSource, int|string|null $entryId, ?string $token): bool
     {
-        $now = $this->sqlNow();
         if ($entryId !== null) {
             $entryId = (int) $entryId;
         }
         $record = $this->getByInvoiceSource($invoiceSource, false);
         if ($record === null) {
-            $result = $this->insert($invoiceSource, $entryId, $token, $now);
+            $result = $this->insert($invoiceSource, $entryId, $token, new DateTimeImmutable());
         } else {
-            $result = $this->update($record, $entryId, $token, $now, $invoiceSource);
+            $result = $this->update($record, $entryId, $token, new DateTimeImmutable());
         }
         return $result;
     }
-
-    /**
-     * Returns the current time in a format accepted by the actual db layer.
-     *
-     * @return int|string
-     *   Timestamp
-     */
-    abstract protected function sqlNow(): int|string;
 
     /**
      * Inserts an Acumulus entry for the given order in the web shop's database.
@@ -212,15 +178,13 @@ abstract class AcumulusEntryManager
      * @param string|null $token
      *   The Acumulus token to be used to access the invoice for this order via
      *   the Acumulus API.
-     * @param int|string $created
-     *   The creation time (= current time), in the format as the actual
-     *   database layer expects for a timestamp.
-     * @todo: change to DateTimeInterface.
+     * @param DateTimeInterface $created
+     *   The creation time (null = current time).
      *
      * @return bool
      *   Success.
      */
-    abstract protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool;
+    abstract protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, DateTimeInterface $created): bool;
 
     /**
      * Updates the Acumulus entry for the given invoice source.
@@ -231,24 +195,13 @@ abstract class AcumulusEntryManager
      *   The new Acumulus entry id for the invoice source.
      * @param string|null $token
      *   The new Acumulus token for the invoice source.
-     * @param int|string $updated
-     *   The update time (= current time), in the format as the actual database
-     *   layer expects for a timestamp.
-     *   @todo: change to DateTimeInterface.
-     * @param \Siel\Acumulus\Invoice\Source|null $invoiceSource
-     *    The source object for which the invoice was updated.
+     * @param DateTimeInterface $updated
+     *   The update time (null = current time).
      *
      * @return bool
      *   Success.
      */
-    abstract protected function update(
-        AcumulusEntry $entry,
-        ?int $entryId,
-        ?string $token,
-        int|string $updated,
-        // @todo: is this parameter necessary? (logically not)
-        ?Source $invoiceSource = null
-    ): bool;
+    abstract protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, DateTimeInterface $updated): bool;
 
     /**
      * Deletes the Acumulus entry for the given entry id.
@@ -277,13 +230,12 @@ abstract class AcumulusEntryManager
      *
      * @param \Siel\Acumulus\Shop\AcumulusEntry $entry
      *   The Acumulus entry to delete.
-     * @param \Siel\Acumulus\Invoice\Source|null $invoiceSource
      *   The source object for which to delete the {@see \Siel\Acumulus\Shop\AcumulusEntry}.
      *
      * @return bool
      *   Success.
      */
-    abstract public function delete(AcumulusEntry $entry, ?Source $invoiceSource = null): bool;
+    abstract public function delete(AcumulusEntry $entry): bool;
 
     /**
      * Installs the data model. Called when the module gets installed.
@@ -316,6 +268,9 @@ abstract class AcumulusEntryManager
      *
      * @return bool
      *   Success.
+     *
+     * @todo: should we delete any data and table created? If so, should we pass a bool
+     *   parameter to guide that?
      */
     abstract public function uninstall(): bool;
 }

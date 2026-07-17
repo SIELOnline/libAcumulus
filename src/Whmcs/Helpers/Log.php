@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Whmcs\Helpers;
 
 use Siel\Acumulus\Helpers\Log as BaseLog;
-use Siel\Acumulus\Helpers\Severity;
 
 /**
  * Extends the base log class to log any library logging to the WHMCS activity log.

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\Shop;
 
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use Joomla\CMS\Date\Date;
 use Joomla\CMS\Factory;
 use RuntimeException;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Joomla\Component\Acumulus\Administrator\Extension\AcumulusComponent;
@@ -22,7 +23,7 @@ use Siel\Joomla\Component\Acumulus\Administrator\Table\AcumulusEntryTable;
  * SECURITY REMARKS
  * ----------------
  * In Joomla (VirtueMart/HikaShop) saving and querying acumulus entries is done
- * via the Joomla table classes which take care of sanitizing.
+ * via the Joomla table classes which take care of sanitising.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
@@ -48,11 +49,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table;
     }
 
-    public function getByEntryId(?int $entryId): AcumulusEntry|array|null
+    public function getByEntryId(int $entryId): ?AcumulusEntry
     {
         $table = $this->newTable();
-        $result = $table->loadMultiple(['entry_id' => $entryId]);
-        return $this->convertDbResultToAcumulusEntries($result);
+        $result = $table->load(['entry_id' => $entryId]);
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $result ? $this->convertDbResultToAcumulusEntry($table) : null;
     }
 
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
@@ -62,39 +64,43 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         // or delete it later.
         $table->id = null;
         $result = $table->load(['source_type' => $invoiceSource->getType(), 'source_id' => $invoiceSource->getId()], true);
-        return $result ? $this->convertDbResultToAcumulusEntries($table, $ignoreLock) : null;
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $result ? $this->convertDbResultToAcumulusEntry($table, $ignoreLock) : null;
     }
 
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool
+    /**
+     * @throws \DateInvalidTimeZoneException
+     */
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, DateTimeInterface $created): bool
     {
+        $timestamp = $this->toSql($created);
         // Start with new table class to not overwrite any loaded record.
         $table = $this->newTable();
         $table->entry_id = $entryId;
         $table->token = $token;
         $table->source_type = $invoiceSource->getType();
         $table->source_id = $invoiceSource->getId();
-        $table->created = $created;
-        $table->updated = $created;
+        $table->created = $timestamp;
+        $table->updated = $timestamp;
         return $table->store(true);
     }
 
-    protected function update(
-        BaseAcumulusEntry $entry,
-        ?int $entryId,
-        ?string $token,
-        int|string $updated,
-        ?Source $invoiceSource = null
-    ): bool {
+    /**
+     * @throws \DateInvalidTimeZoneException
+     */
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, DateTimeInterface $updated): bool
+    {
+        $timestamp = $this->toSql($updated);
         // Continue with existing table object with already loaded record.
         /** @var AcumulusEntryTable $table */
         $table = $entry->getRecord();
         $table->entry_id = $entryId;
         $table->token = $token;
-        $table->updated = $updated;
+        $table->updated = $timestamp;
         return $table->store(true);
     }
 
-    public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
+    public function delete(BaseAcumulusEntry $entry): bool
     {
         /** @var AcumulusEntryTable $table */
         $table = $entry->getRecord();
@@ -103,12 +109,11 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * @throws \DateInvalidTimeZoneException
-     * @throws \Exception
      */
-    protected function sqlNow(): int|string
+    protected function toSql(DateTimeInterface $date): string
     {
-        /** @noinspection NullPointerExceptionInspection */
-        return (new Date('now', new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
+        /** @noinspection NullPointerExceptionInspection, PhpUnhandledExceptionInspection */
+        return (new Date($date->format(Api::Format_TimeStamp), new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 
     /**

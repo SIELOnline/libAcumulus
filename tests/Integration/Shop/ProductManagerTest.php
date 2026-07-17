@@ -13,7 +13,6 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Product\StockTransactionResult;
 use Siel\Acumulus\Shop\ProductManager;
 use Siel\Acumulus\Tests\AcumulusTestUtils;
-use Siel\Acumulus\Mail\Mailer;
 
 /**
  * ProductManagerTest tests the {@see ProductManager}.

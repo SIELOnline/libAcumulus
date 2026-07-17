@@ -24,6 +24,7 @@ class CollectorManagerTest extends TestCase
 
     private function getInvoiceSource(): Source
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $objects = (new GetTestData())->getJson();
         $order = $objects->order;
         return self::getContainer()->createSource(Source::Order, $order);

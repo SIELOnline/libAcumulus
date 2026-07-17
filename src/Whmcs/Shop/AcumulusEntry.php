@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Whmcs\Shop;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
 /**

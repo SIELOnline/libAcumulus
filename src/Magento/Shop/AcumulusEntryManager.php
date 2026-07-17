@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Shop;
 
+use DateTimeInterface;
 use Exception;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
@@ -21,7 +23,7 @@ use Siel\AcumulusMa2\Model\ResourceModel\Entry\Collection;
  * SECURITY REMARKS
  * ----------------
  * In Magento saving and querying acumulus entries is done via the Magento DB API,
- * which takes care of sanitizing.
+ * which takes care of sanitising.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
@@ -40,23 +42,25 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return Registry::getInstance()->create(Collection::class);
     }
 
-    public function getByEntryId(?int $entryId): AcumulusEntry|array|null
+    public function getByEntryId(int $entryId): ?AcumulusEntry
     {
-        /** @var \Siel\AcumulusMa2\Model\Entry[] $result */
+        /** @var \Siel\AcumulusMa2\Model\Entry $result */
         $result = $this->getResourceCollection()
             ->addFieldToFilter('entry_id', $entryId)
-            ->getItems();
-        return $this->convertDbResultToAcumulusEntries($result);
+            ->getFirstItem();
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->convertDbResultToAcumulusEntry($result);
     }
 
-    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $result */
         $result = $this->getResourceCollection()
             ->addFieldToFilter('source_type', $invoiceSource->getType())
             ->addFieldToFilter('source_id', $invoiceSource->getId())
-            ->getItems();
-        return $this->convertDbResultToAcumulusEntries($result, $ignoreLock);
+            ->getFirstItem();
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->convertDbResultToAcumulusEntry($result, $ignoreLock);
     }
 
     /**
@@ -64,15 +68,17 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @throws \Exception
      */
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, DateTimeInterface $created): bool
     {
         try {
+            $timestamp = $created->format(Api::Format_TimeStamp);
             $record = $this->getModel()
                 ->setEntryId($entryId)
                 ->setToken($token)
                 ->setSourceType($invoiceSource->getType())
                 ->setSourceId($invoiceSource->getId())
-                ->setUpdated($created);
+                ->setCreated($timestamp)
+                ->setUpdated($timestamp);
             $this->getResourceModel()->save($record);
         } catch (Exception $e) {
             $this->log->error(__METHOD__ . ': '. $e->getMessage());
@@ -86,7 +92,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @throws \Exception
      */
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, DateTimeInterface $updated): bool
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $record */
         try {
@@ -94,7 +100,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 ->getRecord()
                 ->setEntryId($entryId)
                 ->setToken($token)
-                ->setUpdated($updated);
+                ->setUpdated($updated->format(Api::Format_TimeStamp));
             $this->getResourceModel()->save($record);
         } catch (Exception $e) {
             $this->log->error(__METHOD__ . ': '. $e->getMessage());
@@ -105,28 +111,19 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * @inheritDoc
-     *
-     * @noinspection BadExceptionsProcessingInspection
      */
-    public function delete(BaseAcumulusEntry $entry, ?Source $invoiceSource = null): bool
+    public function delete(BaseAcumulusEntry $entry): bool
     {
         $result = true;
         /** @var \Siel\AcumulusMa2\Model\Entry $record */
         $record = $entry->getRecord();
         try {
             $this->getResourceModel()->delete($record);
-        } catch (Exception) {
-            // @todo: log exception?
+        } catch (Exception $e) {
+            $this->log->error(__METHOD__ . ': '. $e->getMessage());
             $result = false;
         }
-
         return $result;
-    }
-
-
-    protected function sqlNow(): int
-    {
-        return time();
     }
 
     /**

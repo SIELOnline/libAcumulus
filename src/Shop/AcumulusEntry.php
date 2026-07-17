@@ -52,12 +52,10 @@ use function is_object;
  * - Prevent that an invoice for a given order or credit note is sent twice.
  * - Show additional information on order or order list screens.
  * - Update payment status.
- * - Show or resend(*) Acumulus invoice PDF.
+ * - Show or send Acumulus invoice PDF.
  *
- * Note: some of these features are only implemented in the Acumulus
- *   WooCommerce plugin.
- *
- * @noinspection PhpLackOfCohesionInspection
+ * @todo: should we use unique lock id's where a request adds a unique suffix to the lock
+ *   token?
  */
 class AcumulusEntry
 {
@@ -79,6 +77,7 @@ class AcumulusEntry
      * Access to the fields may differ per webshop as we follow db naming
      * conventions from the web shop.
      */
+    public static string $keyId = 'id';
     public static string $keyEntryId = 'entry_id';
     public static string $keyToken = 'token';
     public static string $keySourceType = 'source_type';
@@ -157,25 +156,24 @@ class AcumulusEntry
     }
 
     /**
-     * Returns the entry id for this Acumulus entry.
+     * Returns the token for this Acumulus entry.
      *
      * @return string|null
-     *   The token for this Acumulus entry or null if it was stored as a
-     *   concept.
+     *   The token for this Acumulus entry, or null if it was stored as a concept.
      */
     public function getToken(): ?string
     {
         $token = $this->get(static::$keyToken);
-        // WorDPress cannot store null as meta value, so we store(d) '' for an empty
-        // token, although the meta-key can also be just not set.
+        // WordPress cannot store null as meta value, so we store '' for an empty token,
+        // although the meta-key can also be just not set.
         return !empty($token) ? $token : null;
     }
 
     /**
-     * Return the type of shop source this Acumulus entry was created for.
+     * Returns the type of shop source this Acumulus entry was created for.
      *
      * @return string
-     *   The type of the shop {@see Source}: {@see Source::Order} or {@see Source::CreditNote).
+     *   The type of the shop {@see Source}::{@see Source::Order} or ::{@see Source::CreditNote}.
      *
      * @noinspection PhpUnused
      */
@@ -198,60 +196,39 @@ class AcumulusEntry
     /**
      * Returns the time when this record was created.
      *
-     * @param bool $raw
-     *   Whether to return the raw value as stored in the database or a DateTimeInterface
-     *   object. The raw value will differ per web shop.
-     *
-     * @return string|int|\DateTimeInterface
+     * @return \DateTimeInterface
      *   The timestamp when this record was created.
      *
      * @throws \DateException|\RuntimeException (PHP8.3: DateException)
      */
-    public function getCreated(bool $raw = false): DateTimeInterface|string|int
+    public function getCreated(): DateTimeInterface
     {
-        $result = $this->get(static::$keyCreated);
-        if (!$raw) {
-            $result = $this->toDateTime($result);
-        }
-        return $result;
+        return $this->toDateTime($this->get(static::$keyCreated));
     }
 
     /**
      * Returns the time when this record was last updated.
      *
-     * @param bool $raw
-     *   Whether to return the raw value as stored in the database or a DatetimeInterface
-     *   object. The raw value will differ per web shop.
-     *
-     * @return string|int|\DateTimeInterface
+     * @return \DateTimeInterface
      *   The timestamp when this record was last updated.
      *
      * @throws \DateException|\RuntimeException (PHP8.3: DateException)
      */
-    public function getUpdated(bool $raw = false): DateTimeInterface|string|int
+    public function getUpdated(): DateTimeInterface
     {
         $result = $this->get(static::$keyUpdated);
         // [SIEL #207319]: TypeError: DateTime::createFromFormat() expects parameter 2 to
         // be string, null given in src/Shop/AcumulusEntry.php:230. No idea how or why
         // this can occur, but let's just take the created value for the updated value.
-        if (empty($result)) {
-            $result = $this->getCreated($raw);
-        } elseif (!$raw) {
-            $result = $this->toDateTime($result);
-        }
-        return $result;
+        return empty($result) ? $this->getCreated() : $this->toDateTime($result);
     }
 
     /**
      * Returns a DateTimeInterface object based on the timestamp in database format.
      *
-     * @param float|int|string $timestamp
-     *
-     * @return bool|\DateTimeInterface
-     *
-     * @throws \DateException|\RuntimeException (PHP8.3: DateException)
+     * @throws \DateException|\RuntimeException (DateException as of PHP8.3)
      */
-    protected function toDateTime(float|int|string $timestamp): DateTimeInterface|bool
+    protected function toDateTime(float|int|string $timestamp): DateTimeInterface
     {
         $timestamp = (string) $timestamp;
         if (ctype_digit($timestamp)) {
@@ -264,9 +241,9 @@ class AcumulusEntry
             // Formatted timestamp, e.g. yyyy-mm-dd hh:mm:ss. Is assumed to be in the
             // timezone of the webshop if no timezone is specified in the string to parse.
             $result = DateTimeImmutable::createFromFormat(static::$timestampFormat, $timestamp, $this->getDefaultTimeZone());
-            if ($result === false) {
-                throw new RuntimeException("Failed to convert timestamp string '$timestamp'.");
-            }
+        }
+        if ($result === false) {
+            throw new RuntimeException("Failed to convert timestamp string '$timestamp'.");
         }
         return $result;
     }
@@ -363,7 +340,7 @@ class AcumulusEntry
     public function hasLockExpired(): bool
     {
         try {
-            return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTimeS;
+            return $this->isSendLock() && time() - $this->getUpdated()->getTimestamp() > static::$maxLockTimeS;
         } catch (DateException|RuntimeException) {
             return false;
         }

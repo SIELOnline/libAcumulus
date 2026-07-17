@@ -1,12 +1,14 @@
 <?php
 /**
- * @noinspection PhpUndefinedClassInspection OC3 or OC4 classes
+ * @noinspection PhpUndefinedNamespaceInspection OC3 or OC4 namespaces.
+ * @noinspection PhpUndefinedClassInspection OC3 or OC4 classes.
  */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Shop;
 
+use DateTimeInterface;
 use DB as OC3DB;
 use Opencart\System\Library\DB;
 use Siel\Acumulus\Api;
@@ -15,6 +17,7 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\AcumulusEntry;
+use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 use function sprintf;
@@ -25,7 +28,7 @@ use function sprintf;
  * SECURITY REMARKS
  * ----------------
  * In OpenCart saving and querying acumulus entries is done via self
- * constructed queries, therefore this class takes care of sanitizing itself.
+ * constructed queries, therefore this class takes care of sanitising itself.
  * - Numbers are cast by using numeric formatters (like %u, %d, %f) with
  *   sprintf().
  * - Strings are escaped using the escape() method of the DB driver class
@@ -46,13 +49,11 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $this->tableName = DB_PREFIX . 'acumulus_entry';
     }
 
-    public function getByEntryId(?int $entryId): AcumulusEntry|array|null
+    public function getByEntryId(int $entryId): ?AcumulusEntry
     {
-        $operator = $entryId === null ? 'is' : '=';
-        $value = $entryId === null ? 'null' : (string) $entryId;
         /** @var \stdClass $result (documentation error in DB) */
-        $result = $this->getDb()->query("SELECT * FROM `$this->tableName` WHERE entry_id $operator $value");
-        return $this->convertDbResultToAcumulusEntries($result->rows);
+        $result = $this->getDb()->query("SELECT * FROM `$this->tableName` WHERE entry_id = $entryId");
+        return $this->convertDbResultToAcumulusEntry($result->row);
     }
 
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
@@ -66,11 +67,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 $invoiceSource->getId()
             )
         );
-        return $this->convertDbResultToAcumulusEntries($result->rows, $ignoreLock);
+        return $this->convertDbResultToAcumulusEntry($result->row, $ignoreLock);
     }
 
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, int|string $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, DateTimeInterface $created): bool
     {
+        $timestamp = $this->getDb()->escape($created->format(Api::Format_TimeStamp));
         if ($invoiceSource->getType() === Source::Order) {
             $order = $invoiceSource->getShopObject();
             $storeId = $order['store_id'];
@@ -79,19 +81,20 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         }
         return (bool) $this->getDb()->query(
             sprintf(
-                "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%u, %s, %s, '%s', %u, '%s')",
+                "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, created, updated) VALUES (%u, %s, %s, '%s', %u, '%s', '%s')",
                 $this->tableName,
                 $storeId,
                 $entryId === null ? 'null' : (string) $entryId,
                 $token === null ? 'null' : ("'" . $this->getDb()->escape($token) . "'"),
                 $this->getDb()->escape($invoiceSource->getType()),
                 $invoiceSource->getId(),
-                $this->getDb()->escape($created)
+                $timestamp,
+                $timestamp
             )
         );
     }
 
-    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, int|string $updated, ?Source $invoiceSource = null): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, DateTimeInterface $updated): bool
     {
         $record = $entry->getRecord();
         return (bool) $this->getDb()->query(
@@ -100,13 +103,13 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 $this->tableName,
                 $entryId === null ? 'null' : (string) $entryId,
                 $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'",
-                $this->getDb()->escape($updated),
+                $this->getDb()->escape($updated->format(Api::Format_TimeStamp)),
                 $record['id']
             )
         );
     }
 
-    public function delete(AcumulusEntry $entry, ?Source $invoiceSource = null): bool
+    public function delete(BaseAcumulusEntry $entry): bool
     {
         $record = $entry->getRecord();
         return (bool) $this->getDb()->query(
@@ -118,11 +121,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         );
     }
 
-    protected function sqlNow(): string
-    {
-        return date(Api::Format_TimeStamp);
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -131,11 +129,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function install(): bool
     {
         $queryResult = $this->getDb()->query("show tables like '$this->tableName'");
-        $tableExists = !empty($queryResult->num_rows);
-        if (!$tableExists) {
+        $doCreateTable = empty($queryResult->num_rows);
+        if ($doCreateTable) {
             // Table does not exist: create it.
             $result = $this->createTable();
         } else {
+            $result = true;
             // Table does exist: but in old or current data model?
             $columnExists = $this->getDb()->query("show columns from `$this->tableName` like 'source_type'");
             $columnExists = !empty($columnExists->num_rows);
@@ -160,9 +159,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
                 // Delete old table.
                 $result = $result && $this->getDb()->query("DROP TABLE `$oldTableName`");
-            } else {
-                // Table exists in current data model.
-                $result = true;
             }
         }
         return $result;

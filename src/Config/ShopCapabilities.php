@@ -120,7 +120,7 @@ abstract class ShopCapabilities
      * @return array[]
      *   A multi-level array of token infos keyed by the "property source" name.
      *
-     * @legacy: old way of showing field references.
+     * @noinspection PhpUnused @legacy: old way of showing field references.
      */
     public function getTokenInfo(): array
     {
@@ -130,7 +130,7 @@ abstract class ShopCapabilities
             'class' => Source::class,
             'properties' => [
                 'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ', ' .
-                    $this->t('internal_not_label') . ')',
+                $this->t('internal_not_label') . ')',
                 'id (' . $this->t('internal_id') . ')',
                 'reference (' . $this->t('external_id') . ')',
                 'date',
@@ -199,7 +199,6 @@ abstract class ShopCapabilities
     {
         return [];
     }
-
 
     /**
      * Returns shop specific token info for the 'refund' property.
@@ -276,14 +275,13 @@ abstract class ShopCapabilities
     /**
      * Returns an option list of all shop invoice related events.
      *
-     * This list represents the shop initiated events that may trigger the
-     * sending of the invoice to Acumulus.
+     * This list represents the shop initiated events that may trigger the sending of the
+     * invoice to Acumulus.
      *
      * @return string[]
-     *   An array of all shop invoice related events, with the key being the ID
-     *   for the dropdown item, 1 of the
-     *  {@see \Siel\Acumulus\Config}::TriggerInvoiceEvent_... constants,
-     *  and the value being the label for the dropdown item.
+     *   An array of all shop invoice related events, with the key being the ID for the
+     *   dropdown item, 1 of the {@see \Siel\Acumulus\Config}::TriggerInvoiceEvent_...
+     *   constants, and the value being the (translated) label for the dropdown item.
      */
     public function getTriggerInvoiceEventOptions(): array
     {

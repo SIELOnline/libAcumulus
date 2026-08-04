@@ -20,18 +20,18 @@ class Currency
     /**
      * The currency code used with the order/refund: ISO4217, ISO 3166-1.
      */
-    readonly public string $currency;
+    public readonly string $currency;
     /**
      * Conversion rate from the used currency to the shop's default currency:
      * amount in shop's default currency = rate * amount in order/refund currency
      */
-    readonly public float $rate;
+    public readonly float $rate;
     /**
      * True if we should use the above info to convert amounts, false if the amounts are
      * already in the shop's default currency (which should be euro) and all this info is
      * thus purely informational.
      */
-    readonly public bool $doConvert;
+    public readonly bool $doConvert;
 
     public function __construct(string $currency = 'EUR', float $rate = 1.0, bool $doConvert = false)
     {
@@ -53,10 +53,6 @@ class Currency
      */
     public function convertAmount(float $amount): float
     {
-        if ($this->currency === 'EUR') {
-            return $amount / $this->rate;
-        } else {
-            return $amount * $this->rate;
-        }
+        return $this->currency === 'EUR' ? $amount / $this->rate : $amount * $this->rate;
     }
 }

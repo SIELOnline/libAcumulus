@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection
+ *   Place function declaration on 1 line when we require 8.2.
+ */
 
 declare(strict_types=1);
 
@@ -14,7 +18,6 @@ use WHMCS\Database\Capsule;
  */
 class ConfigStore extends BaseConfigStore
 {
-
     public function load(): array
     {
         return json_decode(
@@ -28,8 +31,10 @@ class ConfigStore extends BaseConfigStore
         );
     }
 
-    public function save(#[SensitiveParameter] array $values): bool
-    {
+    public function save(
+        #[SensitiveParameter]
+        array $values
+    ): bool {
         return Capsule::table('tbladdonmodules')->updateOrInsert(
             ['module' => $this->configKey, 'setting' => $this->configKey],
             ['value' => json_encode($values, Meta::JsonFlags)]

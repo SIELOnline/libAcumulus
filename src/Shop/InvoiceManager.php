@@ -144,14 +144,10 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\Source[]
      *   An array of invoice sources of the given source type.
      *
-     * @todo: don't let overrides have to call parent when no results are found.
+     * @todo: don't let overrides have to call parent when no results are found (introduce getInvoiceSourcesByReferenceRangeOnly)
      */
-    public function getInvoiceSourcesByReferenceRange(
-        string $sourceType,
-        string $referenceFrom,
-        string $referenceTo,
-        bool $fallbackToId
-    ): array {
+    public function getInvoiceSourcesByReferenceRange(string $sourceType, string $referenceFrom, string $referenceTo, bool $fallbackToId): array
+    {
         return $fallbackToId ? $this->getInvoiceSourcesByIdRange($sourceType, (int) $referenceFrom, (int) $referenceTo) : [];
     }
 
@@ -161,11 +157,7 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\Source[]
      *   An array of invoice sources of the given source type.
      */
-    abstract public function getInvoiceSourcesByDateRange(
-        string $sourceType,
-        DateTimeInterface $dateFrom,
-        DateTimeInterface $dateTo
-    ): array;
+    abstract public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array;
 
     /**
      * Returns a list of existing invoice sources for the given filters.

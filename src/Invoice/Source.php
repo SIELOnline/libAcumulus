@@ -383,7 +383,7 @@ abstract class Source implements WrapperInterface, Stringable
      *   One of the Source constants used to define the type of the source
      *   (Order, CreditNote, Invoice (future)).
      *
-     * @return \Siel\Acumulus\Invoice\Source|null
+     * @return Source|null
      *   $this if the current object is of the given type, null otherwise.
      */
     protected function isType(string $type): ?Source

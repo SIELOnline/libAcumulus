@@ -25,7 +25,7 @@ trait WrapperTrait
     protected object|array $shopObject;
 
     /**
-     * Initializes the references to the wrapped object.
+     * Initialises the references to the wrapped object.
      *
      * @throw RuntimeException
      */
@@ -119,6 +119,7 @@ trait WrapperTrait
         }
         return $label;
     }
+
     public function getLabelReference(int $case = -1): string
     {
         $class = $this->getLabel($case);

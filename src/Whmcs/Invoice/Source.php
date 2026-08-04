@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpMissingParentCallCommonInspection  Most parent methods are base/no-op implementations.
+ * @noinspection SpellCheckingInspection Too many compound words in (all lowercase) array keys.
+ */
 
 declare(strict_types=1);
 
@@ -10,305 +14,181 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Totals;
-use WC_Abstract_Order;
-use WC_Coupon;
+use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
 
-use function count;
+use function is_array;
 use function sprintf;
 use function strlen;
 
 /**
- * Wraps a WooCommerce order in an invoice source object.
+ * Wraps a WHMCS invoice in an invoice source object.
  *
- * Since WC 2.2.0 multiple order types can be defined, @see
- * wc_register_order_type() and wc_get_order_types(). WooCommerce itself defines
- * 'shop_order' and 'shop_order_refund'. The base class for all these types of
- * orders is WC_Abstract_Order
+ * For now, we only accept Invoices. In WHMCS, invoices are fully detailed data objects
+ * not mere PDF's. Orders are so as well, but orders do not store tax and will (always?)
+ * refer to an invoice anyway. Whereas, an invoice does not refer to an Order, probably
+ * because of recurring payments due to automatic renewals which only will add an invoice,
+ * not an order.
  *
- * @method WC_Abstract_Order getShopObject()
+ * @todo: WHMCS 9 supports credit notes, but support is yet to be added.
+ * @todo: Check for the following methods if WHMCS can have these and, if so, how to
+ *   recognise and retrieve them:
+ *   - getShippingLineInfos() (probably not ...)
+ *   - getGiftWrappingFeeLineInfos()
+ *   - getPaymentFeeLineInfos()
+ *   - getOtherLineInfos()
+ *   - getDiscountLineInfos()
+ *   - getManualLineInfos()
+ *   - etVoucherLineInfos()
+ *
+ * @method array getShopObject()
  */
 class Source extends BaseSource
 {
+    use LocalApiTrait;
+
     /**
-     * Loads an Order or refund source for the set id.
+     * Loads an invoice for the set id.
      *
      * @throws  \RuntimeException
-     *   If $idOrSource is empty or not a valid source.
+     *   If source type is an invalid type or the id does not point to a valid source.
      */
     protected function setShopObject(): void
     {
-        $order = wc_get_order($this->getId());
-        if (!$order instanceof WC_Abstract_Order) {
-            throw new RuntimeException(sprintf('Not a valid source id (%s %d)', $this->type, $this->id));
+        if ($this->type === Source::Invoice) {
+            $this->shopObject = $this->localApi()->getInvoice($this->id);
+        } else {
+            throw new RuntimeException(sprintf('Not (yet) a supported source type (%s)', $this->type));
         }
-        $this->shopObject = $order;
     }
 
     /**
-     * Sets the id based on the loaded Order or Order refund.
+     * Sets the id based on the loaded invoice.
      *
      * @throws \RuntimeException
      *   If $idOrSource is empty or not a valid source.
      */
     protected function setId(): void
     {
-        if (!$this->shopObject instanceof WC_Abstract_Order) {
+        if (!is_array($this->shopObject)) {
             $type = get_debug_type($this->shopObject);
-            throw new RuntimeException("'$type' is not a WC_Abstract_Order");
+            throw new RuntimeException("'$type' is not an array");
         }
-        /** @noinspection PhpUndefinedMethodInspection */
-        $this->id = $this->getShopObject()->get_id();
+        if (!isset($this->shopObject['id'])) {
+            throw new RuntimeException('Shop object does not an id');
+        }
+        $this->id = $this->shopObject['id'];
     }
 
     /**
      * Returns the user facing reference for the web shop's invoice source.
      *
-     * Method get_order_number() is used for when other plugins are installed that add an
-     * order number that differs from the ID. Known plugins that do so:
-     * - woocommerce-sequential-order-numbers(-pro)
-     * - wc-sequential-order-numbers
-     * - custom-order-numbers-for-woocommerce(-pro)
-     *
-     * @return string|int
-     *   The user facing id for the web shop's invoice source. This is not
-     *   necessarily the internal id.
+     * @return int
+     *   The user facing id for the web shop's invoice source.
+     *   This is not necessarily the internal id.
      */
-    public function getReference(): string|int
+    public function getReference(): int
     {
-        if ($this->getType() === Source::Order) {
-            /** @var \WC_Order $order */
-            $order = $this->shopObject;
-            return $order->get_order_number();
+        if ($this->getType() === Source::Invoice) {
+            return !empty($this->getShopObject()['invoicenum']) ? $this->getShopObject()['invoicenum'] : $this->getId();
         }
         return parent::getReference();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getDate(): string
     {
-        // get_date_created() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->getShopObject()->get_date_created(), 0, strlen('2000-01-01'));
+        return substr((string) $this->shopObject['date'], 0, strlen('2000-01-01'));
     }
 
-    /**
-     * @inheritDoc
-     *
-     * @return string|null
-     *   The slug of the status (e.g. wc-completed).
-     */
-    public function getStatus(): string|null
+    public function getStatus(): ?string
     {
-        /** @noinspection PhpUndefinedMethodInspection false positive */
-        return $this->getShopObject()->get_status();
+        return !empty($this->getShopObject()['status']) ? $this->getShopObject()['status'] : null;
+    }
+
+    public function getPaymentMethod(): ?string
+    {
+        return !empty($this->getShopObject()['paymentmethod']) ? $this->getShopObject()['paymentmethod'] : null;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @return ?string
-     *   This override returns the slug/id of a WC_Payment_Gateway.
+     * In WHMCS, the invoice's status is the payment statuses: 'Paid" or 'Unpaid'. The
+     * payment status is stored in the, optional, originating order as 'paymentstatus'.
      */
-    public function getPaymentMethod(): ?string
+    public function getPaymentStatus(): int
     {
-        // Payment method is not stored for credit notes, so it is expected to
-        // be the same as for its order.
-        /** @var \WC_Order $order */
-        $order = $this->getOrder()->getShopObject();
-        return $order->get_payment_method();
+        return ($this->getShopObject()['status'] ?? null) === 'Paid' ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     /**
-     * Returns whether the order has been paid or not.
+     * Returns the payment date of the invoice source.
      *
-     * @return int
-     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Api::PaymentStatus_Due
-     *
-     * @noinspection PhpUnused : called via getPaymentStatus().
+     * @return string|null
+     *   The payment date of the invoice source (yyyy-mm-dd).
      */
-    protected function getPaymentStatusOrder(): int
+    public function getPaymentDate(): ?string
     {
-        /** @var \WC_Order $order */
-        $order = $this->getShopObject();
-        return $order->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
-    }
-
-    /**
-     * Returns whether the order refund has been paid or not.
-     *
-     * For now, we assume that a refund is paid back on creation.
-     *
-     * @return int
-     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Api::PaymentStatus_Due
-     *
-     * @noinspection PhpUnused Called via callTypeSpecificMethod().
-     */
-    protected function getPaymentStatusCreditNote(): int
-    {
-        return Api::PaymentStatus_Paid;
-    }
-
-    /**
-     * Returns the payment date of the order.
-     *
-     * @return string
-     *   The payment date of the order (yyyy-mm-dd).
-     *
-     * @noinspection PhpUnused : called via getPaymentDate().
-     */
-    protected function getPaymentDateOrder(): string
-    {
-        // get_date_paid() returns a WC_DateTime which has a _toString() method.
-        /** @noinspection PhpUndefinedMethodInspection false positive */
-        return substr((string) $this->getShopObject()->get_date_paid(), 0, strlen('2000-01-01'));
-    }
-
-    /**
-     * Returns the payment date of the order refund.
-     * We take the last modified date as pay date.
-     *
-     * @return string
-     *   The payment date of the order refund (yyyy-mm-dd).
-     *
-     * @noinspection PhpUnused : called via getPaymentDate().
-     */
-    protected function getPaymentDateCreditNote(): string
-    {
-        // get_date_modified() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->getShopObject()->get_date_modified(), 0, strlen('2000-01-01'));
+        if ($this->getPaymentStatus() === Api::PaymentStatus_Due) {
+            return null;
+        }
+        return !empty($this->getInvoice()['datepaid']) ? substr($this->getInvoice()['datepaid'], 0, strlen('2000-01-01')) : null;
     }
 
     public function getCountryCode(): string
     {
-        // Billing information is not stored for credit notes, so it is expected
-        // to be the same as for its order.
-        /** @var \WC_Order $order */
-        $order = $this->getOrder()->getShopObject();
-        $tax_based_on = get_option('woocommerce_tax_based_on');
-        $result = '';
-        if ($tax_based_on === 'shipping') {
-            $result = $order->get_shipping_country();
-        }
-        if (empty($result)) {
-            $result = $order->get_billing_country();
-        }
-        return $result;
+        $contact = $this->localApi()->getClient($this->getShopObject()['userid']);
+        return $contact['country'];
     }
 
+    /**
+     * @todo: I have no idea if currency suffix is always filled and is unique. If not,
+     *   we must use the amounts in the invoice (that do not have a currency! =? default
+     *   configured currency?) and always return 'EUR' here.
+     */
     public function getCurrency(): Currency
     {
-        /** @noinspection PhpUndefinedMethodInspection false positive */
-        return new Currency($this->getShopObject()->get_currency());
+        $currency = $this->localApi()->getCurrencyBySuffix($this->getShopObject()['currencysuffix']);
+        return new Currency($currency['code'], $currency['rate'], true);
     }
 
     /**
      * {@inheritdoc}
      *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-vatamount.
-     *
-     * @noinspection PhpCastIsUnnecessaryInspection
-     *   WooCommerce is not so strict when it comes to documenting its "@return"
-     *   types. So many return values advertised as float, will be strings
-     *   representing a float.
+     * I doubt that tax2 is ever filled in the Dutch situation, but add it anyway,
+     * even if it is always 0.0.
      */
     public function getTotals(): Totals
     {
-        return new Totals((float) $this->getShopObject()->get_total(), (float) $this->getShopObject()->get_total_tax());
+        return new Totals((float) $this->getShopObject()['total'], (float) $this->getShopObject()['tax'] + (float) $this->getShopObject()['tax2']);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return int
-     */
-    protected function getShopOrderOrId(): int
+    protected function setInvoice(): void
     {
-        /** @var \WC_Order_Refund $refund */
-        $refund = $this->shopObject;
-        /** @noinspection PhpCastIsUnnecessaryInspection numeric string will be returned */
-        return (int) $refund->get_parent_id();
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return \WC_Order_Refund[]
-     */
-    protected function getShopCreditNotesOrIds(): array
-    {
-        /** @var \WC_Order $order */
-        $order = $this->shopObject;
-        return $order->get_refunds();
+        if ($this->getType() === Source::Order && !empty($this->getShopObject()['invoiceid'])) {
+            $this->invoice = $this->localApi()->getInvoice($this->getShopObject()['invoiceid']);
+        }
     }
 
     /**
      * This WooCommerce override wraps {@see \WC_Order_Item_Product}s in Items,
      * ignoring empty lines, that is, lines with 0 quantity and total ("comment" lines?).
+     *
+     * @return array[]
      */
     protected function createItems(): array
     {
         $result = [];
 
-        /** @var \WC_Order_Item_Product[] $items */
-        $items = $this->getShopObject()->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        /** @var array[] $items */
+        $items = $this->getShopObject()['items']['item'] ?? [];
         foreach ($items as $item) {
             // Only add when this is not an empty line.
-            if (!Number::isZero((float) $item->get_quantity()) || !Number::isZero((float) $item->get_total())) {
+            // @todo: does WHMCS have other items? How to recognise? Only add when a product/service item.
+            if (!Number::isZero((float) $item['amount'])) {
                 $result[] = $this->getContainer()->createItem($item, $this);
             }
         }
 
-        return $result;
-    }
-
-    /**
-     * @return \WC_Order_Item_Shipping[]
-     */
-    public function getShippingLineInfos(): array
-    {
-        return $this->getShopObject()->get_shipping_methods();
-    }
-
-    /**
-     * WooCommerce has general fee lines, so we override this method to add all fees at
-     * once. As the type is unknown to us, it might include payment fees().
-     *
-     * @return \WC_Order_Item_Fee[]
-     */
-    public function getOtherLineInfos(): array
-    {
-        return $this->getShopObject()->get_fees();
-    }
-
-
-    /**
-     * {@inheritdoc}
-     *
-     * In WooCommerce, discount amounts are distributed over the applicable item lines, so
-     * we do not have to add discount lines. However, we still do add them for
-     * completeness, but they will get a unit price of 0.
-     *
-     * For refunds without any articles (probably just a manual refund) we don't need to
-     * know what discounts were applied on the original order. So we do not add lines for
-     * them.
-     */
-    public function getDiscountLineInfos(): array
-    {
-        $result = [];
-
-        if ($this->getType() !== Source::CreditNote || count($this->getItems()) > 0) {
-            // Add a line for all coupons applied. Coupons are only stored on the order,
-            // not on refunds, so use the order.
-            /** @var \WC_Order $order */
-            $order = $this->getOrder()->getShopObject();
-            foreach ($order->get_coupon_codes() as $couponCode) {
-                $result[] = new WC_Coupon($couponCode);
-            }
-        }
         return $result;
     }
 }

@@ -7,21 +7,42 @@ namespace Siel\Acumulus\Whmcs\Shop;
 use DateTimeInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-
-use Traversable;
 use WHMCS\Database\Capsule;
-
-use function count;
-use function sprintf;
-use function strlen;
 
 /**
  * Implements the WHMCS specific parts of the invoice manager.
  */
 class InvoiceManager extends BaseInvoiceManager
 {
+    protected static array $sourceTypeTableInfo = [
+        Source::Order => [
+            'table' => 'tblorders',
+            'idField' => 'id',
+            'refField' => 'ordernum',
+            'dateField' => 'date',
+        ],
+        Source::CreditNote => [ // @todo: add support for credit notes.
+            'table' => 'tblinvoices',
+            'idField' => 'id',
+            'refField' => 'invoicenum',
+            'dateField' => 'date_refunded',
+        ],
+        Source::Invoice => [
+            'table' => 'tblinvoices',
+            'idField' => 'id',
+            'refField' => 'invoicenum',
+            'dateField' => 'date',
+        ],
+    ];
+
     public function getInvoiceSourcesByIdRange(string $sourceType, int $idFrom, int $idTo): array
     {
+        $tableInfo = static::$sourceTypeTableInfo[$sourceType];
+        $records = Capsule::table($tableInfo['table'])
+            ->whereBetween($tableInfo['idField'], [$idFrom, $idTo])
+            ->orderBy($tableInfo['idField'])
+            ->get();
+        return $this->getSourcesByIdsOrSources($sourceType, $records);
     }
 
     /**
@@ -52,41 +73,28 @@ class InvoiceManager extends BaseInvoiceManager
      */
     public function getInvoiceSourcesByReferenceRange(string $sourceType, string $referenceFrom, string $referenceTo, bool $fallbackToId): array
     {
+        $results = [];
+        $tableInfo = static::$sourceTypeTableInfo[$sourceType];
+        if (!empty($tableInfo['refField'])) {
+            $records = Capsule::table($tableInfo['table'])
+                ->whereBetween($tableInfo['refField'], [$referenceFrom, $referenceTo])
+                ->orderBy($tableInfo['refField'])
+                ->get();
+            $results = $this->getSourcesByIdsOrSources($sourceType, $records);
+        }
+        if (empty($results) && $fallbackToId) {
+            $results = parent::getInvoiceSourcesByReferenceRange($sourceType, $referenceFrom, $referenceTo, $fallbackToId);
+        }
+        return $results;
     }
 
     public function getInvoiceSourcesByDateRange(string $sourceType, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): array
     {
-        switch ($sourceType) {
-            case Source::Order:
-                $tableName = 'tblorders';
-                $dateField = 'date';
-                break;
-            case Source::CreditNote:
-                $tableName = 'tbl';
-                $dateField = 'date';
-                break;
-            case Source::Invoice:
-                $tableName = 'tblinvoices';
-                $dateField = 'updated_at';
-                break;
-            default:
-                $this->getLog()->error('InvoiceManager::getInvoiceSourcesByDateRange(%s): unknown Source type', $sourceType);
-                return [];
-        }
-        $records = Capsule::table($tableName)
-            ->whereBetween($dateField, [$dateFrom, $dateTo])
-            ->orderBy($dateField)
+        $tableInfo = static::$sourceTypeTableInfo[$sourceType];
+        $records = Capsule::table($tableInfo['table'])
+            ->whereBetween($tableInfo['dateField'], [$dateFrom, $dateTo])
+            ->orderBy($tableInfo['dateField'])
             ->get();
-        return $this->records2Sources($records, $sourceType);
-    }
-
-    /**
-     * Helper method to get a list of Sources given a set of query arguments.
-     *
-     * @return \Siel\Acumulus\Invoice\Source[]
-     */
-    protected function records2Sources(iterable $records, string $invoiceSourceType): array
-    {
-        return $this->getSourcesByIdsOrSources($invoiceSourceType, $records);
+        return $this->getSourcesByIdsOrSources($sourceType, $records);
     }
 }

@@ -89,8 +89,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 static::$tableName,
                 function (Blueprint $table) {
                     $table->increments('id');
-                    $table->unsignedInteger(AcumulusEntry::$keyEntryId);
-                    $table->char(AcumulusEntry::$keyToken, 32);
+                    $table->unsignedInteger(AcumulusEntry::$keyEntryId)->nullable(true);
+                    $table->char(AcumulusEntry::$keyToken, 32)->nullable(true);
                     $table->string(AcumulusEntry::$keySourceType, 32);
                     $table->unsignedInteger(AcumulusEntry::$keySourceId);
                     // Creates timestamp fields created_at and updated_at.

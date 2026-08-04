@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpMissingParentCallCommonInspection  Most parent methods are base/no-op implementations.
+ */
 
 declare(strict_types=1);
 
@@ -10,14 +13,14 @@ use Siel\Acumulus\Product\Product as BaseProduct;
 /**
  * Product is a wrapper/adapter around a WHMCS specific product (appearing on an Item).
  *
+ * As we use Products for synchronising stock keeping, we do, for now, not implement this
+ * in WHMCS (methods getAcumulusId() and setAcumulusId()).
+ *
  * @property array $shopObject
  * @method array getShopObject()
  */
 class Product extends BaseProduct
 {
-
-    // @todo: generalize to AcumulusProductIdField and move to BaseProduct?
-    public static string $acumulusProductIdField = '_acumulus_product_id';
 
     protected function setShopObject(): void
     {
@@ -26,8 +29,7 @@ class Product extends BaseProduct
 
     protected function setId(): void
     {
-        /** @noinspection PhpUndefinedMethodInspection false positive */
-        $this->id = $this->getShopObject()['id'];
+        $this->id = $this->getShopObject()['pid'];
     }
 
     public function getReference(): string
@@ -43,30 +45,4 @@ class Product extends BaseProduct
     {
         return $this->getShopObject()['name'];
     }
-
-    public function getAcumulusId(): ?int
-    {
-        /** @noinspection PhpUndefinedMethodInspection false positive */
-        $metaValue = $this->getShopObject()->get_meta(static::$acumulusProductIdField);
-
-        return !empty($metaValue) ? (int) $metaValue : null;
-    }
-
-    public function setAcumulusId(?int $acumulusId): void
-    {
-        if ($acumulusId !== null) {
-            /** @noinspection PhpUndefinedMethodInspection false positive */
-            $this->getShopObject()->add_meta_data(static::$acumulusProductIdField, $acumulusId, true);
-        } else {
-            /** @noinspection PhpUndefinedMethodInspection false positive */
-            $this->getShopObject()->delete_meta_data(static::$acumulusProductIdField);
-        }
-        /** @noinspection PhpUndefinedMethodInspection false positive */
-        $this->getShopObject()->save_meta_data();
-    }
-
-    //    public function getVatClass(): string
-    //    {
-    //        return $this->shopObject->get_tax_class();
-    //    }
 }

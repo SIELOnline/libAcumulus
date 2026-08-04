@@ -62,12 +62,12 @@ abstract class AcumulusEntryManager
     /**
      * Converts the (single) result of a DB query to an {@see AcumulusEntry}.
      *
-     * @param object|array $result
-     *   The DB query result. An empty arry as result is seen as no result (OpenCart).
+     * @param object|array|null $result
+     *   The DB query result. An empty array as result is seen as no result (OpenCart).
      * @param bool $ignoreLock
      *   Whether to return an entry that serves as send-lock (false) or ignore it (true).
      */
-    protected function convertDbResultToAcumulusEntry(object|array $result, bool $ignoreLock = true): ?AcumulusEntry
+    protected function convertDbResultToAcumulusEntry(object|array|null $result, bool $ignoreLock = true): ?AcumulusEntry
     {
         if (empty($result)) {
             $acumulusEntry = null;

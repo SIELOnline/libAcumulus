@@ -21,14 +21,15 @@ class Translations extends TranslationCollection
     protected array $nl = [
         Source::Order => 'bestelling',
         Source::CreditNote => 'creditnota',
+        Source::Invoice => 'factuur',
         Source::Other => 'overig',
 
-        'plural_Order'  => 'bestellingen',
+        'plural_Order' => 'bestellingen',
         'plural_CreditNote' => 'creditnota\'s',
         'plural_Other' => 'overige',
-        'plural_Order_ref'  => 'bestellingreferenties',
+        'plural_Order_ref' => 'bestellingreferenties',
         'plural_CreditNote_ref' => 'creditnota-referenties',
-        'plural_Order_id'  => 'bestelnummers',
+        'plural_Order_id' => 'bestelnummers',
         'plural_CreditNote_id' => 'creditnotanummers',
 
         'for' => 'voor',
@@ -87,14 +88,15 @@ class Translations extends TranslationCollection
     protected array $en = [
         Source::Order => 'order',
         Source::CreditNote => 'credit note',
+        Source::Invoice => 'invoice',
         Source::Other => 'other',
 
-        'plural_Order'  => 'orders',
+        'plural_Order' => 'orders',
         'plural_CreditNote' => 'credit notes',
         'plural_Other' => 'other',
-        'plural_Order_ref'  => 'order references',
+        'plural_Order_ref' => 'order references',
         'plural_CreditNote_ref' => 'credit note references',
-        'plural_Order_id'  => 'order numbers',
+        'plural_Order_id' => 'order numbers',
         'plural_CreditNote_id' => 'credit note numbers',
 
         'for' => 'for',

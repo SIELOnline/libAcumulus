@@ -39,10 +39,10 @@ class ConfigFormTranslations extends TranslationCollection
         'mappings_form_header' => 'Acumulus veldverwijzingen',
         'mappings_form_link_text' => 'Acumulus veldverwijzingen',
 
-        'button_submit_config'=> 'Instellingen opslaan',
-        'button_submit_advanced'=> 'Instellingen opslaan',
-        'button_submit_settings'=> 'Instellingen opslaan',
-        'button_submit_mappings'=> 'Veldverwijzingen opslaan',
+        'button_submit_config' => 'Instellingen opslaan',
+        'button_submit_advanced' => 'Instellingen opslaan',
+        'button_submit_settings' => 'Instellingen opslaan',
+        'button_submit_mappings' => 'Veldverwijzingen opslaan',
         'button_cancel' => 'Terug',
 
         'message_form_config_success' => 'De instellingen zijn opgeslagen.',
@@ -573,10 +573,10 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'mappings_form_header' => 'Acumulus mappings',
         'mappings_form_link_text' => 'Acumulus mappings',
 
-        'button_submit_config'=> 'Save settings',
-        'button_submit_advanced'=> 'Save settings',
-        'button_submit_settings'=> 'Save settings',
-        'button_submit_mappings'=> 'Save mappings',
+        'button_submit_config' => 'Save settings',
+        'button_submit_advanced' => 'Save settings',
+        'button_submit_settings' => 'Save settings',
+        'button_submit_mappings' => 'Save mappings',
         'button_cancel' => 'Back',
 
         'message_form_config_success' => 'The settings are saved.',
@@ -689,7 +689,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',
-        'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order or credit note should be sent to Acumulus. If you select multiple instants, the invoice will be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created, unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
+        'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order or credit note should be sent to Acumulus. If you select multiple instants, the invoice will be sent as soon as the order reaches one of the selected statuses. Note that an invoice still will only be sent once to Acumulus. This setting only uses order data, so you may select any status, the webshop invoice does not already have to be created, unless you want to use the webshop\'s invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
 
         'field_triggerOrderStatus' => 'Order',
         'desc_triggerOrderStatus' => 'Using the "Ctrl" key, you can select/deselect multiple items.',
@@ -714,7 +714,7 @@ Field references are denoted by placing the name of the property between square 
 <p>To handle some special situations, field references can be combined as follows:</p>
 <dl class="property-list">
 <dt>[property]:</dt><dd>Simplest form, replaced by the value of the property or method (without arguments). All available objects are searched for the given property.</dd>
-<dt>[property(arguments)]:</dt><dd>Replaced by the return value of the method. "arguments" is a comma-separated list of arguments to pass to the method. Do not use quotes around strings.</dd>
+<dt>[method(arguments)]:</dt><dd>Replaced by the return value of the method. "Arguments" is a comma-separated list of arguments to pass to the method. Do not use quotes around strings.</dd>
 <dt>[object::property]:</dt><dd>Replaced by the value of the property but only if that property is part of the given object (see the list below). Use this to get the value from the correct object if multiple objects have a property with the same name (e.g. id).</dd>
 <dt>[object::property<i>1</i>::...::property<i>n</i>]:</dt><dd>This is the recommended way. Travers the chain of objects/properties/methods to retrieve the value. If one of the intermediate results does not exist, the empty string will be returned.</dd>
 <dt>[property<i>1</i>|property<i>2</i>|...]:</dt><dd>Replaced by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR landline number.</dd>
@@ -879,11 +879,11 @@ Use the third option to deactivate duplicate customer accounts (based on similar
 
         'field_eu_commerce_threshold_percentage' => 'EU Commerce percentage',
         'desc_eu_commerce_threshold_percentage' => 'Acumulus keeps track of how many sales you already have made within the EU aggregated over all your sales channels. '
-                                                   . 'This %1$s can give you a warning when you are nearing the threshold above which you have to charge EU VAT. If you are passing that threshold, it will send all new invoices as a concept.<br>'
-                                                   . '• Enter a percentage as of which Acumulus should start warning you. use a decimal point if you wish to enter a fraction. The %%-sign is optional.<br>'
-                                                   . '• Enter 100 if you don\'t want a warning, but want to send invoices as "concept" as soon as you are passing or already past the threshold.<br>'
-                                                   . '• Enter 0 if you use EU VAT as of the start of the year and want to receive a warning when some misconfigured articles are sold.<br>'
-                                                   . '• Leave empty if you do not want to use this feature.',
+            . 'This %1$s can give you a warning when you are nearing the threshold above which you have to charge EU VAT. If you are passing that threshold, it will send all new invoices as a concept.<br>'
+            . '• Enter a percentage as of which Acumulus should start warning you. Use a decimal point if you wish to enter a fraction. The %%-sign is optional.<br>'
+            . '• Enter 100 if you don\'t want a warning, but want to send invoices as "concept" as soon as you are passing or already past the threshold.<br>'
+            . '• Enter 0 if you use EU VAT as of the start of the year and want to receive a warning when some misconfigured articles are sold.<br>'
+            . '• Leave empty if you do not want to use this feature.',
         'message_validate_percentage_0' => 'Enter a percentage (a number between 0 and 100) in the field "%s".',
 
         'field_missing_amount' => 'Missing amount',
@@ -1038,7 +1038,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         Fld::Product => 'All fields',
         Meta::MatchShopFieldSpecification => 'Custom product property',
         'message_validate_product_match_shop_field_0' => 'The field "Product property in your web shop" is required, please select a property.',
-        'message_validate_product_match_shop_field_1' => 'For the field "Product property in your web shop" you have chosen "%1$s". However, the mapping "%2$s" has not been defined yet, Remember to define it! you can do so on the "<a href="%4$s" target="_blank">%3$s form</a>".',
+        'message_validate_product_match_shop_field_1' => 'For the field "Product property in your web shop" you have chosen "%1$s". However, the mapping "%2$s" has not been defined yet, Remember to define it! You can do so on the "<a href="%4$s" target="_blank">%3$s form</a>".',
         'message_validate_product_match_acumulus_field_0' => 'The field "Product property in Acumulus" is required, please select a property.',
 
         // Stock management mapping.

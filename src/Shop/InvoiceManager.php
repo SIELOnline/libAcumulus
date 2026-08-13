@@ -318,6 +318,39 @@ abstract class InvoiceManager
     }
 
     /**
+     * Processes an invoice source changed event.
+     *
+     * For now, only WHMCS will use this, to mimic its old behaviour where invoices were
+     * directly sent on creation and automatically updated later on (notably on change of
+     * paid status and/or payment method change).
+     *
+     * @param \Siel\Acumulus\Invoice\Source $source
+     *   The source that has changed.
+     * @param mixed[] $changes
+     *    A list of new values keyed by property name (properties from the Shop source).
+     *
+     * @return \Siel\Acumulus\Invoice\InvoiceSendResult
+     *   The result of updating (or not) the invoice.
+     * @todo: do we need this list? (e.g. to use it to decide on which API method to call?).
+     *
+     */
+    public function sourceChange(Source $source, array $changes): InvoiceSendResult
+    {
+        $result = $this->createInvoiceSendResult('InvoiceManager::sourceChange()');
+        $arguments = [];
+        $acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($source);
+        if ($acumulusEntry !== null) {
+            $result = $this->createAndUpdate($acumulusEntry, $source, $changes, $result);
+            $sendStatus = $result->getSendStatus();
+        } else {
+            $sendStatus = InvoiceSendResult::NotSent_NotYetSent;
+        }
+        $result->setSendStatus($sendStatus, $arguments);
+        $this->getLog()->notice($this->getSendResultLogText($source, $result));
+        return $result;
+    }
+
+    /**
      * Processes an invoice create event.
      *
      * @param \Siel\Acumulus\Invoice\Source $source
@@ -395,17 +428,30 @@ abstract class InvoiceManager
         return $this->getAcumulusApiClient()->emailInvoiceAsPdf($token, $emailAsPdf);
     }
 
-    protected function createAndSend(
-        Source $source,
-        InvoiceSendResult $result,
-        bool $forceSend = false,
-        bool $dryRun = false
-    ): InvoiceSendResult {
+    protected function createAndSend(Source $source, InvoiceSendResult $result, bool $forceSend = false, bool $dryRun = false): InvoiceSendResult
+    {
         $this->getInvoiceSend()->setBasicSendStatus($source, $result, $forceSend);
         $invoice = $this->getInvoiceCreate()->create($source, $result);
         if ($invoice !== null && !$result->isSendingPrevented()) {
             $this->getInvoiceSend()->send($invoice, $source, $result, $dryRun);
         }
+        return $result;
+    }
+
+    protected function createAndUpdate(
+        AcumulusEntry $entry,
+        Source $source,
+        array $changes,
+        InvoiceSendResult $result,
+        bool $dryRun = false
+    ): InvoiceSendResult {
+        // @todo: determine which API call to make, create the submit; send it; and process the results.
+        // @todo: $changes can contain Meta::PaymentMethod, this should be replaced by
+        //   updates to Fld::AccountNumber and Fld::CostCenterId.
+        // Possible API calls:
+        // - Payment status: set (payment status & date)
+        // - Update entry (account number; template; cost center; contact; payment status & date)
+        // - Partial payment registration: payment amount & date; account; (description)
         return $result;
     }
 
@@ -471,11 +517,8 @@ abstract class InvoiceManager
      *   Whether to add the raw request and response.
      *   One of the {@see Result}::AddReqResp_... constants.
      */
-    protected function getSendResultLogText(
-        Source $source,
-        InvoiceSendResult $result,
-        int $addReqResp = Result::AddReqResp_WithOther
-    ): string {
+    protected function getSendResultLogText(Source $source, InvoiceSendResult $result, int $addReqResp = Result::AddReqResp_WithOther): string
+    {
         $invoiceSourceText = sprintf(
             $this->t('message_invoice_source'),
             $this->t($source->getType()),

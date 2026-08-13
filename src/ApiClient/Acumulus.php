@@ -18,6 +18,9 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
+use Siel\Acumulus\Shop\AcumulusEntry;
+
+use function array_key_exists;
 
 /**
  * Acumulus provides an easy interface towards the different API calls of the
@@ -33,6 +36,8 @@ use Siel\Acumulus\Helpers\Severity;
  * The ApiClient API call wrappers return their information as a keyed array,
  * which is a simplified version of the call-specific part of the response
  * structure.
+ *
+ * @noinspection EfferentObjectCouplingInspection
  */
 class Acumulus
 {
@@ -242,8 +247,6 @@ class Acumulus
      *   - -1: Vervallen (discontinued)
      *   - 0: Actief (active/available)
      *   - 1000: Favoriet (Favorite)
-     * @param int|null $offset
-     * @param int|null $rowcount
      *
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -595,6 +598,59 @@ class Acumulus
     }
 
     /**
+     * Updates an (already existing) invoice.
+     *
+     * See {@link https://www.siel.nl/acumulus/API/Entry/Update_Entry_Details/}
+     *
+     * @param AcumulusEntry $entry
+     *   The (local) entry to update.
+     * @param mixed[] $changes
+     *   A keyed array with the fields to update (key) and their new values (value).
+     *
+     * @return AcumulusResult
+     *   The result of the webservice call. The structured response will contain
+     *   1 "entry" array, being a keyed array with keys:
+     *   - 'entryid',
+     *   - 'entryproc',
+     *   - 'entryfile',
+     *   - 'entryfileaccepted',
+     *   - 'entryfilename',
+     *   - 'entryfiletype',
+     *   - 'entrypaymentdate',
+     *   - 'entrypaymentstatus',
+     *   - 'entrycontactid',
+     *   - 'entryinvoicelayoutid',
+     *   - 'entryaccountnumber',
+     *   Possible errors:
+     *   - @todo: find out
+     *
+     * @todo: add tests
+     * @throws AcumulusException|AcumulusResponseException
+     */
+    public function updateEntry(AcumulusEntry $entry, array $changes): AcumulusResult
+    {
+        $allowedFields = [
+            Fld::PaymentDate,
+            Fld::PaymentStatus,
+            Fld::AccountNumber,
+            Fld::TemplateId,
+            Fld::CostCenterId,
+            Fld::ContactId,
+            Fld::EntryFileName,
+            Fld::EntryFile,
+        ];
+        $message = [
+            Fld::Entry => $entry->getEntryId(),
+        ];
+        foreach ($allowedFields as $allowedField) {
+            if (array_key_exists($allowedField, $changes)) {
+                $message[$allowedField] = $changes[$allowedField];
+            }
+        }
+        return $this->callApiFunction('entry/entry_update', $message)->setMainAcumulusResponseKey('entry');
+    }
+
+    /**
      * Signs up for a 30-day trial and receive credentials.
      *
      * See {@link https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/}
@@ -777,7 +833,6 @@ class Acumulus
      * @param ?bool $applyGraphics
      *   False to prevent any embedded graphics from being applied to the
      *   document; true, null, or absent otherwise.
-     *   @todo: not used for now, will become part of emailAsPdf structure?
      *
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -793,6 +848,8 @@ class Acumulus
      * @throws AcumulusException|AcumulusResponseException
      *
      * @noinspection PhpUnusedParameterInspection
+     * @todo: not used for now, will become part of emailAsPdf structure?
+     *
      */
     public function emailInvoiceAsPdf(
         string $token,
@@ -800,8 +857,7 @@ class Acumulus
         ?int $invoiceType = null,
         string $invoiceNotes = '',
         ?bool $applyGraphics = null
-    ): AcumulusResult
-    {
+    ): AcumulusResult {
         $message = [
             Fld::Token => $token,
             Fld::EmailAsPdf => $emailAsPdf->toArray(),
@@ -863,7 +919,6 @@ class Acumulus
      * @param ?bool $applyGraphics
      *   False to prevent any embedded graphics from being applied to the
      *   document; true, null, or absent otherwise.
-     *   @todo: not used for now, will become part of emailAsPdf structure?
      *
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -873,6 +928,8 @@ class Acumulus
      * @throws AcumulusException|AcumulusResponseException
      *
      * @noinspection PhpUnusedParameterInspection
+     * @todo: not used for now, will become part of emailAsPdf structure?
+     *
      */
     public function emailPackingSlipAsPdf(
         string $token,
@@ -957,8 +1014,6 @@ class Acumulus
 
     /**
      * Wrapper around the factory method that creates an AcumulusRequest.
-     *
-     * @return \Siel\Acumulus\ApiClient\AcumulusRequest
      */
     protected function createAcumulusRequest(): AcumulusRequest
     {

@@ -1,7 +1,7 @@
 <?php
 /**
  * @noinspection SpellCheckingInspection
- *   The Acumulus API uses all lowercase field names, leading to a lot of "typo"s.
+ *   The Acumulus API uses all lowercase field names, leading to a lot of highlighted "typos".
  * @noinspection PhpUnused
  *   Not all constants may have actual usages, in that case they are here for
  *   completeness and future use/auto-completion.
@@ -102,6 +102,8 @@ interface Fld
     public const VatType = 'vattype';
     public const IssueDate = 'issuedate';
     public const CostCenter = 'costcenter';
+    // Used in update entry:
+    public const CostCenterId = 'costcenterid';
     public const AccountNumber = 'accountnumber';
     public const PaymentStatus = 'paymentstatus';
     public const PaymentDate = 'paymentdate';
@@ -109,6 +111,8 @@ interface Fld
     public const Description = 'description';
     public const DescriptionText = 'descriptiontext';
     public const Template = 'template';
+    // Used in update entry:
+    public const TemplateId = 'invoicelayoutid';
     public const Notes = 'notes';
     public const InvoiceNotes = 'invoicenotes';
 
@@ -159,4 +163,9 @@ interface Fld
     public const StockAmount = 'stockamount';
     public const StockDescription = 'stockdescription';
     public const StockDate = 'stockdate';
+
+    // Entry
+    public const Entry = 'entry';
+    public const EntryFile = 'entryfile';
+    public const EntryFileName = 'entryfilename';
 }

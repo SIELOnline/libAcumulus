@@ -35,7 +35,7 @@ class CollectorManagerTest extends TestCase
         $manager = self::getContainer()->getCollectorManager();
         $invoice = $manager->collectInvoiceForSource(
             $this->getInvoiceSource(),
-            self::getContainer()->createInvoiceAddResult('CollectorManagerTest::testCollectInvoice()')
+            self::getContainer()->createInvoiceSendResult('CollectorManagerTest::testCollectInvoice()')
         );
 
         self::assertNull($invoice->concept);

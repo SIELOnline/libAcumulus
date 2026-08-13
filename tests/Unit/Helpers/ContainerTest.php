@@ -219,7 +219,7 @@ class ContainerTest extends TestCase
         $container->createProduct(3, $item);
         $object = $container->getCompletor();
         self::assertInstanceOf(Completor::class, $object);
-        $container->createInvoiceAddResult('ContainerTest::testInvoiceNamespace()');
+        $container->createInvoiceSendResult('ContainerTest::testInvoiceNamespace()');
         $container->getCompletorInvoiceLines();
         $container->getFlattenerInvoiceLines();
     }

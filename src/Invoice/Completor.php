@@ -91,7 +91,7 @@ class Completor
     protected Log $log;
     protected Acumulus $acumulusApiClient;
     protected Countries $countries;
-    protected InvoiceAddResult $result;
+    protected InvoiceSendResult $result;
     protected Invoice $invoice;
     protected Source $source;
     /**
@@ -166,10 +166,10 @@ class Completor
      *   The invoice to complete.
      * @param Source $source
      *   The source object for which this invoice was created.
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
+     * @param \Siel\Acumulus\Invoice\InvoiceSendResult $result
      *   A Result object where local errors and warnings can be added.
      */
-    public function complete(Invoice $invoice, Source $source, InvoiceAddResult $result): void
+    public function complete(Invoice $invoice, Source $source, InvoiceSendResult $result): void
     {
         $this->invoice = $invoice;
         $this->source = $source;

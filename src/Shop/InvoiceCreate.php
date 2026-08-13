@@ -10,7 +10,7 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Event;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\InvoiceSendResult;
 use Siel\Acumulus\Invoice\Source;
 
 /**
@@ -62,13 +62,13 @@ class InvoiceCreate
      *    invoice should not be sent, we trigger the InvoiceCreateBefore event anyway to
      *    allow custom code to change that decision.
      * - We encounter local errors, we do not set the
-     *   {@see InvoiceAddResult::getSendStatus()} to
+     *   {@see InvoiceSendResult::getSendStatus()} to
      *   {@see Result::NotSent_LocalErrors}. The {@see Invoice} will be passed
      *   to {@see \Siel\Acumulus\Shop\InvoiceCreate} anyway, which will first trigger the
      *    InvoiceSendBefore event, to allow custom code to solve errors and continue the
      *    sending. Only after that event further sending may be prevented.
      */
-    public function create(Source $invoiceSource, InvoiceAddResult $result): ?Invoice
+    public function create(Source $invoiceSource, InvoiceSendResult $result): ?Invoice
     {
         $this->getEvent()->triggerInvoiceCreateBefore($invoiceSource, $result);
         if (!$result->isSendingPrevented()) {

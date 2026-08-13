@@ -12,7 +12,7 @@ namespace Siel\Acumulus\Completors;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Helpers\MessageCollection;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\InvoiceSendResult;
 
 use function assert;
 
@@ -34,12 +34,12 @@ class CustomerCompletor extends BaseCompletor
      * This phase is executed after the collecting phase.
      *
      * @param Customer $acumulusObject
-     * @param InvoiceAddResult $result
+     * @param InvoiceSendResult $result
      */
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
         $this->customer = $acumulusObject;
-        assert($result instanceof InvoiceAddResult);
+        assert($result instanceof InvoiceSendResult);
 
         $this->completeAddresses($result);
         $this->getContainer()->getCompletorTask('Customer', 'Defaults')->complete($this->customer);

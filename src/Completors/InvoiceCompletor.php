@@ -13,7 +13,7 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\MessageCollection;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\InvoiceSendResult;
 use Siel\Acumulus\Invoice\Source;
 
 use function assert;
@@ -63,12 +63,12 @@ class InvoiceCompletor extends BaseCompletor
      * This phase is executed after the collecting phase.
      *
      * @param \Siel\Acumulus\Data\Invoice $acumulusObject
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
+     * @param \Siel\Acumulus\Invoice\InvoiceSendResult $result
      */
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
         $this->invoice = $acumulusObject;
-        assert($result instanceof InvoiceAddResult);
+        assert($result instanceof InvoiceSendResult);
 
         $this->completeCustomer($result);
         $this->getCompletorTask(DataType::Invoice, 'InvoiceNumber')->complete($this->invoice);
@@ -95,7 +95,7 @@ class InvoiceCompletor extends BaseCompletor
      * Completes the {@see \Siel\Acumulus\Data\Customer} part of the
      * {@see \Siel\Acumulus\Data\Invoice}.
      */
-    protected function completeCustomer(InvoiceAddResult $result): void
+    protected function completeCustomer(InvoiceSendResult $result): void
     {
         $this->getContainer()->getCompletor(DataType::Customer)->complete($this->invoice->getCustomer(), $result);
     }
@@ -104,7 +104,7 @@ class InvoiceCompletor extends BaseCompletor
      * Completes the {@see \Siel\Acumulus\Data\EmailInvoiceAsPdf} part of the
      * {@see \Siel\Acumulus\Data\Invoice}.
      */
-    protected function completeEmailAsPdf(InvoiceAddResult $result): void
+    protected function completeEmailAsPdf(InvoiceSendResult $result): void
     {
         $this->getContainer()->getCompletor(DataType::EmailAsPdf, EmailAsPdfType::Invoice)->complete(
             $this->invoice->getEmailAsPdf(),
@@ -112,7 +112,7 @@ class InvoiceCompletor extends BaseCompletor
         );
     }
 
-    protected function completeLines(InvoiceAddResult $result): void
+    protected function completeLines(InvoiceSendResult $result): void
     {
         /** @var \Siel\Acumulus\Completors\LineCompletor $lineCompletor */
         $lineCompletor = $this->getContainer()->getCompletor(DataType::Line);

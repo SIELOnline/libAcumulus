@@ -10,7 +10,7 @@ use Siel\Acumulus\Mail\Mail;
 /**
  * InvoiceAddMail creates and send the mail following an invoice add request.
  *
- * @method InvoiceAddResult getResult();
+ * @method InvoiceSendResult getResult();
  * @method Source getSource();
  */
 class InvoiceAddMail extends Mail

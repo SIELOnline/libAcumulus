@@ -59,7 +59,7 @@ class Collector3rdPartyPluginSupport
     /**
      * See {@see \Siel\Acumulus\Helpers\Event::triggerInvoiceCollectAfter()}
      */
-    public function acumulusInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource/*, InvoiceAddResult $localResult*/): void
+    public function acumulusInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource/*, InvoiceSendResult $localResult*/): void
     {
         $this->supportBundleProducts($invoice, $invoiceSource);
         $this->supportTMExtraProductOptions($invoice, $invoiceSource);

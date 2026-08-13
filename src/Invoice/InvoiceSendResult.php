@@ -15,7 +15,7 @@ use function count;
  *
  * @noinspection PhpLackOfCohesionInspection
  */
-class InvoiceAddResult extends Result
+class InvoiceSendResult extends Result
 {
     // InvoiceAdd handling related constants.
     // Reasons for not sending.
@@ -36,7 +36,7 @@ class InvoiceAddResult extends Result
     public const Sent_Forced = 0x10;
     public const Sent_LockExpired = 0x20;
 
-   /**
+    /**
      * @var \Siel\Acumulus\Data\Invoice|null
      *   The invoice (attempted to) being sent to Acumulus, or null if not yet set.
      */
@@ -45,26 +45,26 @@ class InvoiceAddResult extends Result
     protected function getStatusMessages(): array
     {
         return [
-            self::NotSent_AlreadySent => 'reason_not_sent_alreadySent',
-            self::NotSent_WrongStatus => count($this->sendStatusArguments) === 0
-                ? 'reason_not_sent_triggerCreditNoteEvent_None'
-                : 'reason_not_sent_wrongStatus',
-            self::NotSent_EmptyInvoice => 'reason_not_sent_empty_invoice',
-            self::NotSent_TriggerInvoiceCreateNotEnabled => 'reason_not_sent_not_enabled_triggerInvoiceCreate',
-            self::NotSent_TriggerInvoiceSentNotEnabled => 'reason_not_sent_not_enabled_triggerInvoiceSent',
-            self::NotSent_TriggerCreditNoteEventNotEnabled => 'reason_not_sent_not_enabled_triggerCreditNoteEvent',
-            self::NotSent_AlreadyLocked => 'reason_not_sent_alreadySending',
-            self::NotSent_LockNotAcquired => 'reason_not_sent_lockNotAcquired',
-            self::NotSent_NoInvoiceLines => 'reason_not_sent_no_invoice_lines',
-            self::NotSent_EventInvoiceCreateBefore => 'reason_not_sent_prevented_invoiceCreated',
-            self::NotSent_EventInvoiceCreateAfter => 'reason_not_sent_prevented_invoiceCreated',
-            self::NotSent_EventInvoiceSendBefore => 'reason_not_sent_prevented_invoiceCompleted',
-            self::Sent_New => count($this->sendStatusArguments) === 0
-                        ? 'reason_sent_new'
-                        : 'reason_sent_new_status_change',
-            self::Sent_Forced => 'reason_sent_forced',
-            self::Sent_LockExpired => 'reason_sent_lock_expired',
-        ] + parent::getStatusMessages();
+                self::NotSent_AlreadySent => 'reason_not_sent_alreadySent',
+                self::NotSent_WrongStatus => count($this->sendStatusArguments) === 0
+                    ? 'reason_not_sent_triggerCreditNoteEvent_None'
+                    : 'reason_not_sent_wrongStatus',
+                self::NotSent_EmptyInvoice => 'reason_not_sent_empty_invoice',
+                self::NotSent_TriggerInvoiceCreateNotEnabled => 'reason_not_sent_not_enabled_triggerInvoiceCreate',
+                self::NotSent_TriggerInvoiceSentNotEnabled => 'reason_not_sent_not_enabled_triggerInvoiceSent',
+                self::NotSent_TriggerCreditNoteEventNotEnabled => 'reason_not_sent_not_enabled_triggerCreditNoteEvent',
+                self::NotSent_AlreadyLocked => 'reason_not_sent_alreadySending',
+                self::NotSent_LockNotAcquired => 'reason_not_sent_lockNotAcquired',
+                self::NotSent_NoInvoiceLines => 'reason_not_sent_no_invoice_lines',
+                self::NotSent_EventInvoiceCreateBefore => 'reason_not_sent_prevented_invoiceCreated',
+                self::NotSent_EventInvoiceCreateAfter => 'reason_not_sent_prevented_invoiceCreated',
+                self::NotSent_EventInvoiceSendBefore => 'reason_not_sent_prevented_invoiceCompleted',
+                self::Sent_New => count($this->sendStatusArguments) === 0
+                    ? 'reason_sent_new'
+                    : 'reason_sent_new_status_change',
+                self::Sent_Forced => 'reason_sent_forced',
+                self::Sent_LockExpired => 'reason_sent_lock_expired',
+            ] + parent::getStatusMessages();
     }
 
     /**

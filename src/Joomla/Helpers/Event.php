@@ -28,7 +28,7 @@ class Event extends BaseEvent
         //   "Extract any old results; they must not be part of the method call."
         // Thus: a parameter with a name result is unset.
         if (isset($args['result'])) {
-            $args['invoiceAddResult'] = $args['result'];
+            $args['invoiceSendResult'] = $args['result'];
             unset($args['result']);
         }
         return $args;

@@ -377,9 +377,9 @@ class InvoiceStatusForm extends Form
 
                 case 'invoice_add':
                     $forceSend = (bool) $this->getSubmittedValue($idPrefix . 'force_send');
-                    $invoiceAddResult = $this->invoiceManager->send1($source, $forceSend);
-                    $this->addMessages($invoiceAddResult->getMessages());
-                    $success = !$invoiceAddResult->hasError();
+                    $invoiceSendResult = $this->invoiceManager->send1($source, $forceSend);
+                    $this->addMessages($invoiceSendResult->getMessages());
+                    $success = !$invoiceSendResult->hasError();
                     break;
 
                 case 'invoice_paymentstatus_set':

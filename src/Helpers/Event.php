@@ -7,7 +7,7 @@ namespace Siel\Acumulus\Helpers;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\InvoiceSendResult;
 use Siel\Acumulus\Invoice\Source;
 
 /**
@@ -42,10 +42,10 @@ abstract class Event
      *
      * This event allows you to:
      * - Prevent the invoice from being created and sent at all. To do so,
-     *   change the send-status using {@see InvoiceAddResult::setSendStatus()}
+     *   change the send-status using {@see InvoiceSendResult::setSendStatus()}
      *   on the $localResult parameter.
      *   <code>
-     *       $localResult->setSendStatus(InvoiceAddResult::NotSent_LocalErrors);
+     *       $localResult->setSendStatus(InvoiceSendResult::NotSent_LocalErrors);
      *       $localResult->addMessage(Message::create('My message', Severity::Error));
      *   </code>
      * - Inject custom behaviour before the invoice is created (collected and completed)
@@ -53,11 +53,11 @@ abstract class Event
      *
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice was created.
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
+     * @param \Siel\Acumulus\Invoice\InvoiceSendResult $localResult
      *   Contains any earlier generated messages and the initial send-status.
      *   You can add your own messages and/or change the send-status.
      */
-    public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceAddResult $localResult): void
+    public function triggerInvoiceCreateBefore(Source $invoiceSource, InvoiceSendResult $localResult): void
     {
         $this->triggerEventByMethodName(__FUNCTION__, compact('invoiceSource', 'localResult'));
     }
@@ -150,11 +150,11 @@ abstract class Event
      *   The invoice that has been collected.
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice is created.
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
+     * @param \Siel\Acumulus\Invoice\InvoiceSendResult $localResult
      *   Contains any earlier generated messages and the initial send-status.
      *   You can add your own messages and/or change the send-status.
      */
-    public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    public function triggerInvoiceCollectAfter(Invoice $invoice, Source $invoiceSource, InvoiceSendResult $localResult): void
     {
         $this->triggerEventByMethodName(__FUNCTION__, compact('invoice', 'invoiceSource', 'localResult'));
     }
@@ -176,11 +176,11 @@ abstract class Event
      *   The invoice that has been created.
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice is created.
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
+     * @param \Siel\Acumulus\Invoice\InvoiceSendResult $localResult
      *   Contains any earlier generated messages and the initial send-status.
      *   You can add your own messages and/or change the send-status.
      */
-    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
+    public function triggerInvoiceCreateAfter(Invoice $invoice, Source $invoiceSource, InvoiceSendResult $localResult): void
     {
         $this->triggerEventByMethodName(__FUNCTION__, compact('invoice', 'invoiceSource', 'localResult'));
     }
@@ -198,11 +198,11 @@ abstract class Event
      *
      * @param \Siel\Acumulus\Data\Invoice $invoice
      *   The invoice that has been created.
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
+     * @param \Siel\Acumulus\Invoice\InvoiceSendResult $localResult
      *   Contains any earlier generated messages and the initial send-status.
      *   You can add your own messages and/or change the send-status.
      */
-    public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceAddResult $localResult): void
+    public function triggerInvoiceSendBefore(Invoice $invoice, InvoiceSendResult $localResult): void
     {
         $this->triggerEventByMethodName(__FUNCTION__, compact('invoice', 'localResult'));
     }
@@ -221,11 +221,11 @@ abstract class Event
      *   The invoice that has been sent.
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice was sent.
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
+     * @param \Siel\Acumulus\Invoice\InvoiceSendResult $result
      *   The result, response, status, and any messages, as sent back by
      *   Acumulus (or set earlier locally).
      */
-    public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceAddResult $result): void
+    public function triggerInvoiceSendAfter(Invoice $invoice, Source $invoiceSource, InvoiceSendResult $result): void
     {
         $this->triggerEventByMethodName(__FUNCTION__, compact('invoice', 'invoiceSource', 'result'));
     }

@@ -328,7 +328,7 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * Helper method to add a message to an InvoiceAddResult.
+     * Helper method to add a message to an InvoiceSendResult.
      *
      * The message is placed under the meta-key passed as severity. If no message is set
      * yet, the message is added as a string. Otherwise, it becomes an array of messages

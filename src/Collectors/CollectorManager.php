@@ -14,7 +14,7 @@ use Siel\Acumulus\Data\StockTransaction;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\InvoiceSendResult;
 use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Product\Product;
@@ -81,7 +81,7 @@ class CollectorManager
     /**
      * Collects an invoice for the given {@see \Siel\Acumulus\Invoice\Source}.
      */
-    public function collectInvoiceForSource(Source $source, InvoiceAddResult $localResult): Invoice
+    public function collectInvoiceForSource(Source $source, InvoiceSendResult $localResult): Invoice
     {
         $this->getPropertySources()
             ->clear()

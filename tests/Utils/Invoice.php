@@ -37,8 +37,8 @@ trait Invoice
     protected function _testCreate(string $type, int $id, array $excludeFields = []): void
     {
         $invoiceSource = static::getContainer()->createSource($type, $id);
-        $invoiceAddResult = static::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = static::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceSendResult = static::getContainer()->createInvoiceSendResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = static::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceSendResult);
         $result = $invoice->toArray();
         // Get order from Order{id}.json.
         $expected = $this->getTestSource($type, $id);

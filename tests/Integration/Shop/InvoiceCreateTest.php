@@ -40,8 +40,8 @@ class InvoiceCreateTest extends TestCase
     public function testCreate(): void
     {
         $invoiceSource = $this->getInvoiceSource();
-        $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceSendResult = self::getContainer()->createInvoiceSendResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceSendResult);
         $result = $invoice->toArray();
 
         // Do some basic tests: at all levels, we just check some key(s) being available.
@@ -65,16 +65,16 @@ class InvoiceCreateTest extends TestCase
     public function testCreateWithWarehouseCountry(): void
     {
         $invoiceSource = $this->getInvoiceSource();
-        $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceSendResult = self::getContainer()->createInvoiceSendResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceSendResult);
         // Verify that the normal vat type has been set
         self::assertSame(Api::VatType_National, $invoice->vatType);
 
         Event::registerHook('triggerInvoiceCollectAfter', static function (Invoice $invoice) {
             $invoice->setWarehouseCountry('BE');
         });
-        $invoiceAddResult = self::getContainer()->createInvoiceAddResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
-        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceAddResult);
+        $invoiceSendResult = self::getContainer()->createInvoiceSendResult('SendInvoiceTest::testCreateAndCompleteInvoice()');
+        $invoice = self::getContainer()->getInvoiceCreate()->create($invoiceSource, $invoiceSendResult);
         // Verify that the warehouse country has been taken into account.
         self::assertSame(Api::VatType_EuVat, $invoice->vatType);
     }

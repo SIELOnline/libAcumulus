@@ -11,7 +11,7 @@ use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\InvoiceAddMail;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\InvoiceSendResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Mail\CrashMail;
 use Siel\Acumulus\Mail\Mail;
@@ -99,8 +99,8 @@ class MailTest extends TestCase
         $namespace = 'Invoice';
         $class = InvoiceAddMail::class;
         $invoiceSource = $this->getInvoiceSource();
-        $invoiceAddResult = static::getContainer()->createInvoiceAddResult(__METHOD__ . "($name)");
-        $invoiceAddResult->setSendStatus(InvoiceAddResult::Sent_New);
+        $invoiceSendResult = static::getContainer()->createInvoiceSendResult(__METHOD__ . "($name)");
+        $invoiceSendResult->setSendStatus(InvoiceSendResult::Sent_New);
 
         $oldDebug = $this->getConfig()->set('debug', $debug);
         $oldEmailAsPdf = $this->getConfig()->set('emailAsPdf', $emailAsPdf);
@@ -108,10 +108,10 @@ class MailTest extends TestCase
             $this->examples->setOptions([Fld::TestMode => $debug === Config::Send_TestMode ? Api::TestMode_Test : Api::TestMode_Normal]);
             $apiResult = $this->getAcumulusResult($uri);
             $apiResult->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
-            $invoiceAddResult->setAcumulusResult($apiResult);
+            $invoiceSendResult->setAcumulusResult($apiResult);
             $args = [
                 'source' => $invoiceSource,
-                'result' => $invoiceAddResult,
+                'result' => $invoiceSendResult,
             ];
             $this->createAndSendMail($type, $namespace, $class, $args, $name);
         } finally {

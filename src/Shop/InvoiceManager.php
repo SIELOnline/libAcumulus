@@ -17,7 +17,7 @@ use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Result;
 use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\InvoiceSendResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Config\Config;
 
@@ -124,9 +124,9 @@ abstract class InvoiceManager
      *   A human-readable text explaining the reason why this invoice should or
      *   should not be sent.
      */
-    protected function createInvoiceAddResult(string $trigger): InvoiceAddResult
+    protected function createInvoiceSendResult(string $trigger): InvoiceSendResult
     {
-        return $this->getContainer()->createInvoiceAddResult($trigger);
+        return $this->getContainer()->createInvoiceSendResult($trigger);
     }
 
     /**
@@ -250,7 +250,7 @@ abstract class InvoiceManager
                 $canResetTimer = false;
             }
 
-            $result = $this->createInvoiceAddResult('InvoiceManager::sendMultiple()');
+            $result = $this->createInvoiceSendResult('InvoiceManager::sendMultiple()');
             $result = $this->createAndSend($source, $result, $forceSend, $dryRun);
             $success = $success && !$result->hasError();
             $this->getLog()->notice($this->getSendResultLogText($source, $result));
@@ -268,12 +268,12 @@ abstract class InvoiceManager
      *   If true, force sending the invoices even if an invoice has already been
      *   sent for a given invoice source.
      *
-     * @return InvoiceAddResult
-     *   The InvoiceAddResult of sending the invoice for this Source to Acumulus.
+     * @return InvoiceSendResult
+     *   The result of sending the invoice for this Source to Acumulus.
      */
-    public function send1(Source $source, bool $forceSend): InvoiceAddResult
+    public function send1(Source $source, bool $forceSend): InvoiceSendResult
     {
-        $result = $this->createInvoiceAddResult('InvoiceManager::send1()');
+        $result = $this->createInvoiceSendResult('InvoiceManager::send1()');
         $result = $this->createAndSend($source, $result, $forceSend);
         $this->getLog()->notice($this->getSendResultLogText($source, $result));
         return $result;
@@ -287,12 +287,12 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\Source $source
      *   The source whose status has changed.
      *
-     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
+     * @return \Siel\Acumulus\Invoice\InvoiceSendResult
      *   The result of sending (or not sending) the invoice.
      */
-    public function sourceStatusChange(Source $source): InvoiceAddResult
+    public function sourceStatusChange(Source $source): InvoiceSendResult
     {
-        $result = $this->createInvoiceAddResult('InvoiceManager::sourceStatusChange()');
+        $result = $this->createInvoiceSendResult('InvoiceManager::sourceStatusChange()');
         $status = $source->getStatus();
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($source->getType() === Source::Order) {
@@ -301,12 +301,12 @@ abstract class InvoiceManager
             $arguments = [$status, implode(',', $shopEventSettings['triggerOrderStatus'])];
             $sendStatus = in_array($status, $shopEventSettings['triggerOrderStatus'], false)
                 ? Result::SendStatus_Unknown
-                : InvoiceAddResult::NotSent_WrongStatus;
+                : InvoiceSendResult::NotSent_WrongStatus;
         } else {
             $arguments = [];
             $sendStatus = $shopEventSettings['triggerCreditNoteEvent'] === Config::TriggerCreditNoteEvent_Create
                 ? Result::SendStatus_Unknown
-                : InvoiceAddResult::NotSent_TriggerCreditNoteEventNotEnabled;
+                : InvoiceSendResult::NotSent_TriggerCreditNoteEventNotEnabled;
         }
         if ($sendStatus === Result::SendStatus_Unknown) {
             $result = $this->createAndSend($source, $result);
@@ -323,19 +323,19 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\Source $source
      *   The source for which a shop invoice was created.
      *
-     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
+     * @return \Siel\Acumulus\Invoice\InvoiceSendResult
      *   The result of sending (or not sending) the invoice.
      *
      * @noinspection PhpUnused
      */
-    public function invoiceCreate(Source $source): InvoiceAddResult
+    public function invoiceCreate(Source $source): InvoiceSendResult
     {
-        $result = $this->createInvoiceAddResult('InvoiceManager::invoiceCreate()');
+        $result = $this->createInvoiceSendResult('InvoiceManager::invoiceCreate()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] === Config::TriggerInvoiceEvent_Create) {
             $result = $this->createAndSend($source, $result);
         } else {
-            $result->setSendStatus(InvoiceAddResult::NotSent_TriggerInvoiceCreateNotEnabled);
+            $result->setSendStatus(InvoiceSendResult::NotSent_TriggerInvoiceCreateNotEnabled);
         }
         $this->getLog()->notice($this->getSendResultLogText($source, $result));
         return $result;
@@ -350,19 +350,19 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\Source $source
      *   The source for which a shop invoice was created.
      *
-     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
+     * @return \Siel\Acumulus\Invoice\InvoiceSendResult
      *   The result of sending (or not sending) the invoice.
      *
      * @noinspection PhpUnused
      */
-    public function invoiceSend(Source $source): InvoiceAddResult
+    public function invoiceSend(Source $source): InvoiceSendResult
     {
-        $result = $this->createInvoiceAddResult('InvoiceManager::invoiceSend()');
+        $result = $this->createInvoiceSendResult('InvoiceManager::invoiceSend()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] === Config::TriggerInvoiceEvent_Send) {
             $result = $this->createAndSend($source, $result);
         } else {
-            $result->setSendStatus(InvoiceAddResult::NotSent_TriggerInvoiceSentNotEnabled);
+            $result->setSendStatus(InvoiceSendResult::NotSent_TriggerInvoiceSentNotEnabled);
         }
         $this->getLog()->notice($this->getSendResultLogText($source, $result));
         return $result;
@@ -397,10 +397,10 @@ abstract class InvoiceManager
 
     protected function createAndSend(
         Source $source,
-        InvoiceAddResult $result,
+        InvoiceSendResult $result,
         bool $forceSend = false,
         bool $dryRun = false
-    ): InvoiceAddResult {
+    ): InvoiceSendResult {
         $this->getInvoiceSend()->setBasicSendStatus($source, $result, $forceSend);
         $invoice = $this->getInvoiceCreate()->create($source, $result);
         if ($invoice !== null && !$result->isSendingPrevented()) {
@@ -473,7 +473,7 @@ abstract class InvoiceManager
      */
     protected function getSendResultLogText(
         Source $source,
-        InvoiceAddResult $result,
+        InvoiceSendResult $result,
         int $addReqResp = Result::AddReqResp_WithOther
     ): string {
         $invoiceSourceText = sprintf(

@@ -29,12 +29,12 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_dry_run' => 'verzenden tegengehouden door optie om niet daadwerkelijk te versturen',
         'reason_unknown' => 'onbekende reden: %d',
         'reason_sent_test_mode' => 'test modus',
-        /** {@see \Siel\Acumulus\Invoice\InvoiceAddResult::getStatusMessages()} */
+        /** {@see \Siel\Acumulus\Invoice\InvoiceSendResult::getStatusMessages()} */
         'reason_sent_new' => 'nieuwe verzending',
         'reason_sent_new_status_change' => 'nieuwe verzending en %1$s in [%2$s]',
         'reason_sent_forced' => 'geforceerd',
         'reason_sent_lock_expired' => 'nieuwe verzending omdat de vorige poging is mislukt',
-        /** {@see \Siel\Acumulus\Invoice\InvoiceAddResult::getStatusMessages()} */
+        /** {@see \Siel\Acumulus\Invoice\InvoiceSendResult::getStatusMessages()} */
         'reason_not_sent_alreadySent' => 'is al eerder verzonden',
         'reason_not_sent_triggerCreditNoteEvent_None' => 'optie om creditfactuur automatisch te verzenden niet aangezet',
         'reason_not_sent_wrongStatus' => 'verkeerde status: %1$s niet in [%2$s]',
@@ -76,12 +76,12 @@ class ResultTranslations extends TranslationCollection
         'reason_unknown' => 'unknown reason: %d',
         'reason_not_sent_local_errors' => 'sending prevented by local errors',
         'reason_sent_test_mode' => 'test mode',
-        /** {@see \Siel\Acumulus\Invoice\InvoiceAddResult::getStatusMessages()} */
+        /** {@see \Siel\Acumulus\Invoice\InvoiceSendResult::getStatusMessages()} */
         'reason_sent_new' => 'not yet sent',
         'reason_sent_new_status_change' => 'not yet sent and %1$s in [%2$s]',
         'reason_sent_forced' => 'forced',
         'reason_sent_lock_expired' => 'not yet sent because the previous attempt failed',
-        /** {@see \Siel\Acumulus\Invoice\InvoiceAddResult::getStatusMessages()} */
+        /** {@see \Siel\Acumulus\Invoice\InvoiceSendResult::getStatusMessages()} */
         'reason_not_sent_alreadySent' => 'has already been sent',
         'reason_not_sent_triggerCreditNoteEvent_None' => 'option to automatically send credit notes not enabled',
         'reason_not_sent_wrongStatus' => 'wrong status: %1$s not in [%2$s]',

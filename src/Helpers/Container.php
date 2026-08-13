@@ -37,7 +37,7 @@ use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
-use Siel\Acumulus\Invoice\InvoiceAddResult;
+use Siel\Acumulus\Invoice\InvoiceSendResult;
 use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Mail\Mail;
@@ -483,13 +483,13 @@ class Container
      *   A string indicating the situation that triggered the need to get a new instance.
      *   Typically, the name of the calling method.
      *
-     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
-     *   A wrapper object around an Acumulus invoice-add service result.
+     * @return \Siel\Acumulus\Invoice\InvoiceSendResult
+     *   A wrapper object around an Acumulus invoice-add/update service result.
      */
-    public function createInvoiceAddResult(string $trigger): InvoiceAddResult
+    public function createInvoiceSendResult(string $trigger): InvoiceSendResult
     {
         return $this->getInstance(
-            'InvoiceAddResult',
+            'InvoiceSendResult',
             'Invoice',
             [$trigger, $this->getTranslator(), $this->getLog()],
             true

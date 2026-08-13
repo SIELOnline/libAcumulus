@@ -20,7 +20,7 @@ namespace Siel\Acumulus\Invoice;
  *   invoice structure based on a {@see Source}.
  * - {@see Completor}: The class that completes the Acumulus invoice structure
  *   given a raw version as created by the {@see Creator}.
- * - {@see InvoiceAddResult}: A class that contains and handles the result of
+ * - {@see InvoiceSendResult}: A class that contains and handles the result of
  *   sending an Invoice over the Acumulus API. So, even if it does not inherit
  *   from, it can be seen as a superset of
  *   {@see \Siel\Acumulus\ApiClient\AcumulusResult}.

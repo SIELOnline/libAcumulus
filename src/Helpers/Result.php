@@ -34,7 +34,8 @@ class Result extends MessageCollection
     // Reasons for sending.
     public const Send_Mask = 0xf0;
     public const Sent_New = 0xf0;
-    public const Sent_TestMode = 0xe0;
+    public const Sent_Update = 0xe0;
+    public const Sent_TestMode = 0xd0;
 
     /**
      * A string indicating the function that triggered the sending, e.g.
@@ -43,8 +44,8 @@ class Result extends MessageCollection
     private string $trigger;
     /**
      * A status indicating if and why an invoice was or was not sent. It will
-     * contain 1 of the {@see InvoiceAddResult}::Send_... or
-     * {@see InvoiceAddResult}::NotSent_... constants.
+     * contain 1 of the {@see InvoiceSendResult}::Send_... or
+     * {@see InvoiceSendResult}::NotSent_... constants.
      */
     private int $sendStatus;
     /**
@@ -261,7 +262,7 @@ class Result extends MessageCollection
      *
      * @param int $addReqResp
      *   Whether to add the raw request and response.
-     *   One of the {@see InvoiceAddResult}::AddReqResp_... constants
+     *   One of the {@see InvoiceSendResult}::AddReqResp_... constants
      */
     public function getLogText(int $addReqResp): string
     {

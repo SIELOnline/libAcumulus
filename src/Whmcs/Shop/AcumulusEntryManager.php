@@ -85,19 +85,21 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function install(): bool
     {
         try {
-            Capsule::schema()->create(
-                static::$tableName,
-                function (Blueprint $table) {
-                    $table->increments('id');
-                    $table->unsignedInteger(AcumulusEntry::$keyEntryId)->nullable(true);
-                    $table->char(AcumulusEntry::$keyToken, 32)->nullable(true);
-                    $table->string(AcumulusEntry::$keySourceType, 32);
-                    $table->unsignedInteger(AcumulusEntry::$keySourceId);
-                    // Creates timestamp fields created_at and updated_at.
-                    $table->timestamps();
-                }
-            );
-            $this->copyOldData();
+            if (!Capsule::schema()->hasTable(static::$tableName)) {
+                Capsule::schema()->create(
+                    static::$tableName,
+                    function (Blueprint $table) {
+                        $table->increments('id');
+                        $table->unsignedInteger(AcumulusEntry::$keyEntryId)->nullable(true);
+                        $table->char(AcumulusEntry::$keyToken, 32)->nullable(true);
+                        $table->string(AcumulusEntry::$keySourceType, 32);
+                        $table->unsignedInteger(AcumulusEntry::$keySourceId);
+                        // Creates timestamp fields created_at and updated_at.
+                        $table->timestamps();
+                    }
+                );
+                $this->copyOldData();
+            }
             return true;
         } catch (Throwable $e) {
             $this->log->exception($e);

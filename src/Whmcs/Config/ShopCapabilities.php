@@ -35,34 +35,23 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             DataType::Customer => [
                 // Customer defaults.
-                Fld::ContactYourId => '[source::getOrder()::...]',
-                Fld::VatNumber => '[source::getOrder()::getShopObject()::...]',
-                Fld::Telephone => '[source::getOrder()::getShopObject()::get_billing_phone()]',
-                Fld::Telephone2 => '[source::getOrder()::getShopObject()::get_shipping_phone()]',
-                Fld::Email => '[source::getOrder()::getShopObject()::get_billing_email()]',
+                Fld::ContactYourId => '[source::getClient()::getShopObject()::id]',
+                Fld::VatNumber => '[source::getClient()::getShopObject()::tax_id]',
+                Fld::Telephone => '[source::getClient()::getShopObject()::phonenumber]',
+                Fld::Email => '[source::getClient()::getShopObject()::email]',
             ],
             AddressType::Invoice => [
-                Fld::CompanyName1 => '[source::getOrder()::getShopObject()::get_billing_company()]',
+                Fld::CompanyName1 => '[source::getClient()::companyname]',
                 Fld::FullName =>
-                    '[source::getOrder()::getShopObject()::get_billing_first_name()+source::getOrder()::getShopObject()::get_billing_last_name()]',
-                Fld::Address1 => '[source::getOrder()::getShopObject()::get_billing_address_1()]',
-                Fld::Address2 => '[source::getOrder()::getShopObject()::get_billing_address_2()]',
-                Fld::PostalCode => '[source::getOrder()::getShopObject()::get_billing_postcode()]',
-                Fld::City => '[source::getOrder()::getShopObject()::get_billing_city()]',
-                Fld::CountryCode => '[source::getOrder()::getShopObject()::get_billing_country()]',
-            ],
-            AddressType::Shipping => [
-                Fld::CompanyName1 => '[source::getOrder()::getShopObject()::get_shipping_company()]',
-                Fld::FullName =>
-                    '[source::getOrder()::getShopObject()::get_shipping_first_name()+source::getOrder()::getShopObject()::get_shipping_last_name()]',
-                Fld::Address1 => '[source::getOrder()::getShopObject()::get_shipping_address_1()]',
-                Fld::Address2 => '[source::getOrder()::getShopObject()::get_shipping_address_2()]',
-                Fld::PostalCode => '[source::getOrder()::getShopObject()::get_shipping_postcode()]',
-                Fld::City => '[source::getOrder()::getShopObject()::get_shipping_city()]',
-                Fld::CountryCode => '[source::getOrder()::getShopObject()::get_shipping_country()]',
+                    '[source::getClient()::getShopObject()::firstname+source::getClient()::getShopObject()::lastname]',
+                Fld::Address1 => '[source::getClient()::getShopObject()::address1]',
+                Fld::Address2 => '[source::getClient()::getShopObject()::address2]',
+                Fld::PostalCode => '[source::getClient()::getShopObject()::postcode]',
+                Fld::City => '[source::getClient()::getShopObject()::city]',
+                Fld::CountryCode => '[source::getClient()::getShopObject()::country]',
             ],
             EmailAsPdfType::Invoice => [
-                Fld::EmailTo => '[source::getOrder()::getShopObject()::get_billing_email()]',
+                Fld::EmailTo => '[source::getClient()::getShopObject()::email]',
             ],
             // Property sources for LineType::Item:
             // - source: Source
@@ -71,15 +60,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // - product (or item::getProduct()): Product
             // - product::getShopObject(): ?WC_Product
             LineType::Item => [
-                Fld::ItemNumber => '[product::getShopObject()::get_sku()|product::getShopObject()::get_global_unique_id()'
-                    . '|"#".product::getShopObject()::get_id()]',
-                Fld::Product => '[item::getShopObject()::get_name()]',
-                // In refunds, the quantity will be negative and prices will be positive,
-                // so no further need for us to correct with sign (unless quantity appears
-                // to be 0).
-                Fld::Quantity => '[item::getShopObject()::get_quantity()|source::getSign()]',
-                Fld::UnitPrice => '[item::getShopObject()::unit_price_tax_excl]',
-                Meta::UnitPriceInc => '[item::getShopObject()::unit_price_tax_incl]',
+                Fld::Product => '[item::getShopObject()::description]',
+                Fld::Quantity => '[source::getSign()]',
+                Meta::UnitPriceInc => '[item::getShopObject()::amount]',
+                Meta::Taxed => '[item::getShopObject()::taxed]',
             ],
         ];
     }

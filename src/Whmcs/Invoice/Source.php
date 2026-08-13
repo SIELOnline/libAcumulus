@@ -46,6 +46,9 @@ class Source extends BaseSource
 {
     use LocalApiTrait;
 
+    // @todo: move property to Shop namespace so all shops can use it.
+    protected ?Client $client = null;
+
     /**
      * Loads an invoice for the set id.
      *
@@ -92,6 +95,22 @@ class Source extends BaseSource
             return !empty($this->getShopObject()['invoicenum']) ? $this->getShopObject()['invoicenum'] : $this->getId();
         }
         return parent::getReference();
+    }
+
+    protected function createClient(): ?Client
+    {
+        // @todo: move code to Container and method to Shop namespace so all shops can use it.
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getContainer()->getInstance('Client', 'Shop', [$this->getShopObject()['userid']], true);
+    }
+
+    public function getClient(): Client
+    {
+        // @todo: move method to Shop namespace so all shops can use it.
+        if (!isset($this->client)) {
+            $this->client = $this->createClient();
+        }
+        return $this->client;
     }
 
     public function getDate(): string

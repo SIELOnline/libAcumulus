@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection LongLine
  * @noinspection HtmlUnknownTarget
  */
 
@@ -18,25 +17,31 @@ use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTransl
 class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected array $nl = [
-        'button_link' => '<a href="%2$s" class="button button-primary button-large">%1$s</a>',
+        'module' => 'addon',
+        'desc_module' => 'The Acumulus addon koppelt uw WHMCS site aan uw Acumulus online financiële administratie.',
 
-        // @todo: Address used for vat calculations.
-        'fiscal_address_setting' => 'Instellingen » tab Belasting » Bereken belasting gebaseerd op',
-
-//        'custom_field' => \__('Custom Field', 'woocommerce'),
+        'button_link' => '<a href="%2$s" class="btn btn-default"><span class="icon-cog"></span> %1$s</a>',
+        'button_class' => 'btn btn-primary',
         // Rate our plugin message.
         'review_on_marketplace' => 'Zou jij ons een review willen geven op de WHMCS marketplace?',
-        // These are the same for English thus no need to copy them.
-        'module' => 'addon',
         'review_url' => 'https://marketplace.whmcs.com/product/6765-siel-acumulus#reviews',
+
+        'install_success' => 'The Acumulus addon has been installed successfully, please continue by filling in the configuration data.',
+        'install_failure' => 'Installing the addon failed: %1$s',
+
+        'uninstall_success' => 'The Acumulus addon has been deactivated successfully, the addon specific data has been deleted.',
+        'uninstall_failure' => 'Deactivating the Acumulus addon failed: %1$s',
+
+        'menu_advancedSettings' => 'Componenten → Acumulus → Geavanceerde instellingen',
+        'menu_basicSettings' => 'Componenten → Acumulus → Instellingen',
     ];
 
     protected array $en = [
-
-        // @todo: Address used for vat calculations.
-        'fiscal_address_setting' => 'Settings » tab Tax » Calculate tax based on',
-
+        'desc_module' => 'The Acumulus addon connects your WHMCS site to your Acumulus online financial administration.',
         // Rate our plugin message.
         'review_on_marketplace' => 'Would you please give us a review on the WHMCS marketplace?',
+
+        'menu_advancedSettings' => 'Components → Acumulus → Mappings',
+        'menu_basicSettings' => 'Components → Acumulus → Settings',
     ];
 }

@@ -115,6 +115,10 @@ interface Meta
      */
     public const UnitPriceInc = 'unitpriceinc';
     /**
+     * WHMCS Creator -> Completor/Strategy: Unit price inc does contain tax?.
+     */
+    public const Taxed = 'taxed';
+    /**
      * Creator -> Completor/Strategy: Amount of vat (per unit) (in addition to
      * vatrate).
      */

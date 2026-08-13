@@ -164,9 +164,9 @@ class Config
             $this->isConfigurationLoaded = true;
 
             // Update the config if it is outdated.
-            if (!empty($this->values[Config::VersionKey])
+            if (!isset($this->isUpgrading)
+                && !empty($this->values[Config::VersionKey])
                 && version_compare($this->values[Config::VersionKey], Version, '<')
-                && !isset($this->isUpgrading)
             ) {
                 // ConfigUpgrade will ensure that upgraded config values are saved. This
                 // can be done multiple times, so prevent recursively calling this upgrade
@@ -190,6 +190,8 @@ class Config
      *
      * @return bool
      *   Success.
+     *
+     * @throws \JsonException
      */
     public function save(#[SensitiveParameter] array $values): bool
     {
@@ -303,6 +305,9 @@ class Config
         return $result;
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function getAccountMessage(): ?string
     {
         $result = $this->get('cachedAccountMessage');
@@ -318,6 +323,8 @@ class Config
      *
      * @noinspection PhpUnused
      *    Called from shop-specific code outside this library.
+     *
+     * @throws \JsonException
      */
     public function getShowRatePluginMessage(): int
     {
@@ -326,6 +333,8 @@ class Config
 
     /**
      * Returns the Plugin V8 Message config setting.
+     *
+     * @throws \JsonException
      *
      * @deprecated: use get()
      * @noinspection PhpUnused
@@ -341,6 +350,8 @@ class Config
      *
      * @return array
      *   An array with all configuration values keyed by their name.
+     *
+     * @throws \JsonException
      */
     public function getAll(): array
     {
@@ -360,6 +371,8 @@ class Config
      *   The value of the given configuration value or null if not defined. This
      *   will be a scalar type (string, int, bool) or a keyed array with scalar
      *   values.
+     *
+     * @throws \JsonException
      */
     public function get(string $key): mixed
     {
@@ -379,6 +392,8 @@ class Config
      *
      * @return mixed
      *   The old value, or null if it was not yet set.
+     *
+     * @throws \JsonException
      */
     public function set(string $key, mixed $value): mixed
     {
@@ -398,6 +413,8 @@ class Config
      *   - 'password'
      *   - 'emailonerror'
      *   - 'emailonwarning'
+     *
+     * @throws \JsonException
      */
     public function getCredentials(): array
     {
@@ -415,6 +432,8 @@ class Config
      *   - 'debug'
      *   - 'logLevel'
      *   - 'outputFormat'
+     *
+     * @throws \JsonException
      */
     public function getPluginSettings(): array
     {
@@ -430,6 +449,8 @@ class Config
      *   - 'triggerInvoiceEvent'
      *   - 'triggerCreditNoteEvent'
      *   - 'sendEmptyInvoice'
+     *
+     * @throws \JsonException
      */
     public function getShopEventSettings(): array
     {
@@ -450,6 +471,8 @@ class Config
      *   - 'zeroVatClass'
      *   - 'invoiceNrSource'
      *   - 'dateToUse'
+     *
+     * @throws \JsonException
      */
     public function getShopSettings(): array
     {
@@ -470,6 +493,8 @@ class Config
      *   - 'contactStatus'
      *   - 'overwriteIfExists'
      *   - 'disableDuplicates'
+     *
+     * @throws \JsonException
      */
     public function getCustomerSettings(): array
     {
@@ -496,6 +521,8 @@ class Config
      *   - 'optionsAllOn1Line'
      *   - 'optionsAllOnOwnLine'
      *   - 'optionsMaxLength'
+     *
+     * @throws \JsonException
      */
     public function getInvoiceSettings(): array
     {
@@ -513,6 +540,8 @@ class Config
      *   - 'subject'
      *   - 'confirmReading'
      *   - 'packingSlipEmailTo'
+     *
+     * @throws \JsonException
      */
     public function getEmailAsPdfSettings(): array
     {
@@ -525,6 +554,8 @@ class Config
      * @return array
      *   A keyed array with the keys:
      *   - 'showInvoiceStatus'
+     *
+     * @throws \JsonException
      */
     public function getInvoiceStatusSettings(): array
     {
@@ -539,6 +570,8 @@ class Config
      *   - 'stockManagementEnabled'
      *   - 'productMatchShopField'
      *   - 'productMatchAcumulusField'
+     *
+     * @throws \JsonException
      */
     public function getProductSettings(): array
     {
@@ -558,6 +591,8 @@ class Config
      *   - 'mailInvoiceList'
      *   - 'showPackingSlipList'
      *   - 'mailPackingSlipList'
+     *
+     * @throws \JsonException
      */
     public function getDocumentsSettings(): array
     {
@@ -567,10 +602,10 @@ class Config
     /**
      * Get all settings belonging to the same group.
      *
-     * @param string $group
-     *
      * @return array
      *   An array with all settings belonging to the given group.
+     *
+     * @throws \JsonException
      */
     protected function getSettingsByGroup(string $group): array
     {

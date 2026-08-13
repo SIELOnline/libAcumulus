@@ -261,7 +261,6 @@ class InvoiceSend
         $acumulusEntryManager = $this->getAcumulusEntryManager();
         $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource);
 
-        /** @noinspection NullPointerExceptionInspection  will be set when we arrive here. */
         $invoiceInfo = $invoiceSendResult->getAcumulusResult()->getMainAcumulusResponse();
         /** @noinspection DuplicatedCode */
         if (!empty($invoiceInfo['token']) && !empty('entryid')) {

@@ -19,19 +19,21 @@ class InvoiceSendResult extends Result
 {
     // InvoiceAdd handling related constants.
     // Reasons for not sending.
+    /** Used when wanting to send a new entry that already exists. */
     public const NotSent_AlreadySent = 0x1;
-    public const NotSent_WrongStatus = 0x2;
-    public const NotSent_EmptyInvoice = 0x3;
-    public const NotSent_TriggerInvoiceCreateNotEnabled = 0x4;
-    public const NotSent_TriggerInvoiceSentNotEnabled = 0x5;
-    public const NotSent_TriggerCreditNoteEventNotEnabled = 0x6;
-    public const NotSent_AlreadyLocked = 0x7;
-    public const NotSent_LockNotAcquired = 0x8;
-    public const NotSent_NoInvoiceLines = 0x9;
-    // @todo: waarom wordt deze niet gebruikt: kloppen deze events nog wel?
-    public const NotSent_EventInvoiceCreateBefore = 0xa;
-    public const NotSent_EventInvoiceCreateAfter = 0xb;
-    public const NotSent_EventInvoiceSendBefore = 0xc;
+    /** Used when wanting to send an update that does not already exist. */
+    public const NotSent_NotYetSent = 0x2;
+    public const NotSent_WrongStatus = 0x3;
+    public const NotSent_EmptyInvoice = 0x4;
+    public const NotSent_TriggerInvoiceCreateNotEnabled = 0x5;
+    public const NotSent_TriggerInvoiceSentNotEnabled = 0x6;
+    public const NotSent_TriggerCreditNoteEventNotEnabled = 0x7;
+    public const NotSent_AlreadyLocked = 0x8;
+    public const NotSent_LockNotAcquired = 0x9;
+    public const NotSent_NoInvoiceLines = 0xa;
+    public const NotSent_EventInvoiceCreateBefore = 0xb;
+    public const NotSent_EventInvoiceCreateAfter = 0xc;
+    public const NotSent_EventInvoiceSendBefore = 0xd;
     // Reasons for sending.
     public const Sent_Forced = 0x10;
     public const Sent_LockExpired = 0x20;
@@ -46,6 +48,7 @@ class InvoiceSendResult extends Result
     {
         return [
                 self::NotSent_AlreadySent => 'reason_not_sent_alreadySent',
+                self::NotSent_NotYetSent => 'reason_not_sent_notYetSent',
                 self::NotSent_WrongStatus => count($this->sendStatusArguments) === 0
                     ? 'reason_not_sent_triggerCreditNoteEvent_None'
                     : 'reason_not_sent_wrongStatus',
@@ -56,9 +59,9 @@ class InvoiceSendResult extends Result
                 self::NotSent_AlreadyLocked => 'reason_not_sent_alreadySending',
                 self::NotSent_LockNotAcquired => 'reason_not_sent_lockNotAcquired',
                 self::NotSent_NoInvoiceLines => 'reason_not_sent_no_invoice_lines',
-                self::NotSent_EventInvoiceCreateBefore => 'reason_not_sent_prevented_invoiceCreated',
-                self::NotSent_EventInvoiceCreateAfter => 'reason_not_sent_prevented_invoiceCreated',
-                self::NotSent_EventInvoiceSendBefore => 'reason_not_sent_prevented_invoiceCompleted',
+                self::NotSent_EventInvoiceCreateBefore => 'reason_not_sent_prevented_invoiceCreateBefore',
+                self::NotSent_EventInvoiceCreateAfter => 'reason_not_sent_prevented_invoiceCreateAfter',
+                self::NotSent_EventInvoiceSendBefore => 'reason_not_sent_prevented_invoiceSendBefore',
                 self::Sent_New => count($this->sendStatusArguments) === 0
                     ? 'reason_sent_new'
                     : 'reason_sent_new_status_change',

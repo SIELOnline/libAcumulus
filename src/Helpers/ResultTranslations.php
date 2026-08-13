@@ -36,6 +36,7 @@ class ResultTranslations extends TranslationCollection
         'reason_sent_lock_expired' => 'nieuwe verzending omdat de vorige poging is mislukt',
         /** {@see \Siel\Acumulus\Invoice\InvoiceSendResult::getStatusMessages()} */
         'reason_not_sent_alreadySent' => 'is al eerder verzonden',
+        'reason_not_sent_notYetSent' => 'kan niet bijwerken: is nog niet verzonden',
         'reason_not_sent_triggerCreditNoteEvent_None' => 'optie om creditfactuur automatisch te verzenden niet aangezet',
         'reason_not_sent_wrongStatus' => 'verkeerde status: %1$s niet in [%2$s]',
         'reason_not_sent_empty_invoice' => '0-bedrag factuur',
@@ -44,8 +45,9 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_alreadySending' => 'andere verzending aan de gang',
         'reason_not_sent_lockNotAcquired' => 'kon geen lock bemachtigen',
         'reason_not_sent_no_invoice_lines' => 'factuur heeft geen regels',
-        'reason_not_sent_prevented_invoiceCreated' => 'verzenden tegengehouden door het event "AcumulusInvoiceCreated"',
-        'reason_not_sent_prevented_invoiceCompleted' => 'verzenden tegengehouden door het event "AcumulusInvoiceSendBefore"',
+        'reason_not_sent_prevented_invoiceCreateBefore' => 'verzenden tegengehouden door het Acumulus event "InvoiceCreateBefore"',
+        'reason_not_sent_prevented_invoiceCreateAfter' => 'verzenden tegengehouden door het Acumulus event "Invoice[Collect|Create]After"',
+        'reason_not_sent_prevented_invoiceSendBefore' => 'verzenden tegengehouden door het Acumulus event "InvoiceSendBefore"',
         /** {@see \Siel\Acumulus\Product\StockTransactionResult::getStatusMessages()} */
         'reason_not_sent_not_enabled' => 'voorraadbeheer niet actief',
         'reason_not_sent_disabled_product' => 'Geen voorraadbeheer voor dit product',
@@ -83,6 +85,7 @@ class ResultTranslations extends TranslationCollection
         'reason_sent_lock_expired' => 'not yet sent because the previous attempt failed',
         /** {@see \Siel\Acumulus\Invoice\InvoiceSendResult::getStatusMessages()} */
         'reason_not_sent_alreadySent' => 'has already been sent',
+        'reason_not_sent_notYetSent' => 'cannot update: not yet sent',
         'reason_not_sent_triggerCreditNoteEvent_None' => 'option to automatically send credit notes not enabled',
         'reason_not_sent_wrongStatus' => 'wrong status: %1$s not in [%2$s]',
         'reason_not_sent_empty_invoice' => '0-amount invoice',
@@ -91,8 +94,9 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_alreadySending' => 'already sending',
         'reason_not_sent_lockNotAcquired' => 'could not acquire lock',
         'reason_not_sent_no_invoice_lines' => 'invoice has no lines',
-        'reason_not_sent_prevented_invoiceCreated' => 'sending prevented by event "AcumulusInvoiceCreated"',
-        'reason_not_sent_prevented_invoiceCompleted' => 'sending prevented by event "AcumulusInvoiceSendBefore"',
+        'reason_not_sent_prevented_invoiceCreateBefore' => 'sending prevented by Acumulus event "InvoiceCreateBefore"',
+        'reason_not_sent_prevented_invoiceCreateAfter' => 'sending prevented by Acumulus event "Invoice[Collect|Create]After"',
+        'reason_not_sent_prevented_invoiceSendBefore' => 'sending prevented by Acumulus event "AcumulusInvoiceSendBefore"',
         /** {@see \Siel\Acumulus\Product\StockTransactionResult::getStatusMessages()} */
         'reason_not_sent_not_enabled' => 'stock management not enabled',
         'reason_not_sent_disabled_product' => 'No stock managed for this product',

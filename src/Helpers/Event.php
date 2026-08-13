@@ -44,8 +44,12 @@ abstract class Event
      * - Prevent the invoice from being created and sent at all. To do so,
      *   change the send-status using {@see InvoiceSendResult::setSendStatus()}
      *   on the $localResult parameter.
+     *   Use one of the {@see InvoiceSendResult}::NotSent_... statuses,
+     *   preferrably {@see InvoiceSendResult::NotSent_EventInvoiceCreateBefore},
+     *   unless a more specific reason has been defined, e.g.
+     *   {@see InvoiceSendResult::NotSent_LocalErrors}.
      *   <code>
-     *       $localResult->setSendStatus(InvoiceSendResult::NotSent_LocalErrors);
+     *       $localResult->setSendStatus(InvoiceSendResult::NotSent_EventInvoiceCreateBefore);
      *       $localResult->addMessage(Message::create('My message', Severity::Error));
      *   </code>
      * - Inject custom behaviour before the invoice is created (collected and completed)
@@ -142,7 +146,8 @@ abstract class Event
      *       }
      *   </code>
      * - Prevent the invoice from being completed and sent.
-     *   See example code {@see Event::triggerInvoiceCreateBefore() above}.
+     *   See the example code at {@see Event::triggerInvoiceCreateBefore()}. The preferred
+     *   status to use is {@see InvoiceSendResult::NotSent_EventInvoiceCreateAfter}.
      * - Inject custom behaviour after the invoice has been created (collected),
      *   but before it is completed and sent.
      *
@@ -168,7 +173,8 @@ abstract class Event
      *   place to do so if you need access to the data from the shop environment this
      *   library is running in.
      * - Prevent the invoice from being completed and sent.
-     *   See example code {@see Event::triggerInvoiceCreateBefore() above}.
+     *   See the example code at {@see Event::triggerInvoiceCreateBefore()}. The preferred
+     *   status to use is {@see InvoiceSendResult::NotSent_EventInvoiceCreateAfter}.
      * - Inject custom behaviour after the invoice has been created,
      *   but before it is sent.
      *
@@ -193,7 +199,8 @@ abstract class Event
      *   do so if you need access to the complete invoice itself just before sending.
      *   Note that no Shop order or credit note objects are passed to this event.
      * - Prevent the invoice from being completed and sent.
-     *   See example code {@see Event::triggerInvoiceCreateBefore() above}.
+     *   See the example code at {@see Event::triggerInvoiceCreateBefore()}. The preferred
+     *   status to use is {@see InvoiceSendResult::NotSent_EventInvoiceSendBefore}.
      * - Inject custom behaviour just before sending.
      *
      * @param \Siel\Acumulus\Data\Invoice $invoice
@@ -215,7 +222,7 @@ abstract class Event
      * error that prevented sending, or the dry-run modus.
      *
      * This event allows you to:
-     * - Inject custom behavior to react to the result of sending the invoice.
+     * - Inject custom behaviour to react to the result of sending the invoice.
      *
      * @param \Siel\Acumulus\Data\Invoice $invoice
      *   The invoice that has been sent.

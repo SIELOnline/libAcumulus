@@ -32,6 +32,9 @@ class StockTransactionResult extends Result
      */
     protected ?StockTransaction $stockTransaction = null;
 
+    /**
+     * @noinspection PhpMissingParentCallCommonInspection
+     */
     public function hasLocalErrors(): bool
     {
         return in_array($this->getSendStatus(), [

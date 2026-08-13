@@ -28,11 +28,11 @@ use const Siel\Acumulus\Version;
 
 /**
  * Class OcHelper contains functionality shared between the controllers and
- * models of the different OC versions, for both admin and catalog.
+ * models of the different OC versions, for both 'admin' and 'catalog'.
  *
- * However, even if at this moment we are only supporting 1 OC version, we keep
- * this functionality in the library to keep the code in the weird OC structure
- * to a minimum.
+ * Due to the somewhat weird OC folder structure, not providing a logical place for
+ * additional files, we keep this functionality in the library, even while it should be
+ * outside of it..
  *
  * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
@@ -45,7 +45,6 @@ abstract class OcHelper
 
     /**
      * @param \Opencart\System\Engine\Registry|\Registry $registry
-     * @param \Siel\Acumulus\Helpers\Container $acumulusContainer
      *
      * @noinspection PhpMissingParamTypeInspection
      *    Types differ per version and don't exist in the other version. Moreover,

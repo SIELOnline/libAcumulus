@@ -169,7 +169,7 @@ abstract class Registry
     /**
      * Returns a full URL to the given $file.
      *
-     * This will typically be an image, css, or js file.
+     * This will typically be an image, CSS, or JS file.
      *
      * @param string $file
      *   The sub-path of the file within the extension folder. Will typically
@@ -250,7 +250,7 @@ abstract class Registry
     }
 
     /**
-     * Indicates whether we are in Admin (true) or Catalog (false).
+     * Indicates whether we are in 'Admin' (true) or 'Catalog' (false).
      */
     abstract protected function inAdmin(): bool;
 }

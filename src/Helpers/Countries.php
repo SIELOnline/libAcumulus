@@ -20,8 +20,6 @@ class Countries
      *
      * @param string $countryCode
      *   Case-insensitive ISO 3166-1 alpha-2 country code.
-     *
-     * @return bool
      */
     public function isNl(string $countryCode): bool
     {
@@ -39,6 +37,9 @@ class Countries
      *
      * @return string
      *   The ISO country code.
+     *
+     * @noinspection PhpUnused May be called by code in shop specific projects
+     *   (outside this project).
      */
     public function convertEuCountryCode(string $countryCode): string
     {
@@ -62,6 +63,9 @@ class Countries
      *   not be looked up.
      * @todo: deprecate by replacing it with using 'countryautoname' or calling
      *   https://www.siel.nl/acumulus/API/Picklists/Countries/ (cache results).
+     *
+     * @noinspection PhpUnused May be called by code in shop specific projects
+     *    (outside this project). Is this still so, or can it be removed?
      */
     public function getCountryName(string $countryCode): string
     {

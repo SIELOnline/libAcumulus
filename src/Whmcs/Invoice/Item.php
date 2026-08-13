@@ -9,7 +9,7 @@ use Siel\Acumulus\Invoice\Item as BaseItem;
 use Siel\Acumulus\Product\Product;
 
 /**
- * Item is the WooCommerce specific class to wrap an order/refund item.
+ * Item is the WHMCS specific class to wrap a Source item.
  *
  * @property array $shopObject
  * @method array getShopObject()

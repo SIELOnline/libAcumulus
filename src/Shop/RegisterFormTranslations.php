@@ -89,7 +89,7 @@ class RegisterFormTranslations extends TranslationCollection
         'register_form_success_configure_acumulus' => 'U kunt <strong>Acumulus verder instellen</strong> door o.a. rekeningen, kostenplaatsen en factuursjablonen toe te voegen.',
         'register_form_success_login_button' => '<a class="%1$s" target="_blank" href="https://www.sielsystems.nl/">Nu inloggen op Acumulus</a> (opent in een nieuwe tab en gaat naar de Acumulus website).',
         'register_form_success_configure_module' => 'U dient <strong>deze %1$s verder in te stellen</strong> op de "instellingen" en "geavanceerde instellingen" schermen.',
-        'register_form_success_config_button' => '<a class="%3$s" target="_blank" href="%2$s">Acumulus %1$s instellen</a> (opent in een nieuwe tab maar blijft in uw webwinkel).',
+        'register_form_success_config_button' => '<a class="%3$s" target="_blank" href="%2$s">Acumulus %1$s instellen</a> (opent in een nieuwe tab, maar blijft in uw webwinkel).',
         'register_form_success_batch' => 'Nadat u deze %1$s heeft ingeregeld worden de factuurgegevens van uw nieuwe bestellingen automatisch naar Acumulus verstuurd.
            Om al afgeronde bestellingen alsnog toe te voegen aan uw administratie, kunt u het batchverzendformulier van deze %1$s gebruiken.',
     ];

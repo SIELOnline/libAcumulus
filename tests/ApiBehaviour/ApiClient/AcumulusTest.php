@@ -65,7 +65,7 @@ class AcumulusTest extends TestCase
             'ContactTypes' => ['getPicklistContactTypes', [], true, ['contacttypeid', 'contacttypename', 'contacttypenamenl']],
             'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid', 'costcentername']],
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid', 'invoicetemplatename']],
-            'Products' => ['getPicklistProducts', [], true, ['productid', 'productnature', 'productdescription', 'producttagid', 'productcontactid', 'productprice', 'productvatrate', 'productsku', 'productstockamount', 'productean', 'producthash', 'productnotes']],
+            'Products' => ['getPicklistProducts', [], true, ['productid', 'productnature', 'productdescription', 'productdetails', 'producttagid', 'productcontactid', 'productprice', 'productvatrate', 'productsku', 'productstockamount', 'productean', 'producthash', 'producths', 'productnotes', 'productorigin', 'productunitweight']],
             'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype', 'vatrate', 'countryregion']],
             'ThresholdEuCommerce' => ['reportThresholdEuCommerce', [], false, ['year', 'threshold', 'nltaxed', 'reached']],
         ];
@@ -114,7 +114,6 @@ class AcumulusTest extends TestCase
                     ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '2'],
                     ['vattype' => 'reduced', 'vatrate' => '9.0000', 'countryregion' => '2'],
                     ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '2'],
-                    ['vattype' => 'reduced', 'vatrate' => '-1.0000', 'countryregion' => '2'],
                 ],
             ],
             'eu' => [['be', DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, '2015-12-01')],

@@ -10,18 +10,21 @@ use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\SeverityTranslations;
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Tests\Utils\AcumulusContainer;
 
 /**
  * Tests for the {@see MessageCollection} class.
  */
 class MessageCollectionTest extends TestCase
 {
+    use AcumulusContainer;
+
     protected Translator $translator;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        $this->translator = new Translator('nl');
+        $this->translator = new Translator('nl', self::getContainer()->getLog());
         $this->translator->add(new SeverityTranslations());
     }
 

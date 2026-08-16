@@ -21,8 +21,6 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'module' => 'extensie',
         'button_link' => '<a href="%2$s" class="action-secondary">%1$s</a>',
         'button_class' => 'action-secondary',
-        'menu_advancedSettings' => 'Winkels → Overige instellingen → Acumulus Advanced Config',
-        'menu_basicSettings' => 'Winkels → Overige instellingen → Acumulus Config',
 
         // Config form.
         'field_triggerOrderStatus' => 'Bestelling, op basis van bestelstatus(sen)',
@@ -45,8 +43,6 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 
     protected array $en = [
         'module' => 'extension',
-        'menu_advancedSettings' => 'Stores → Other settings → Acumulus Advanced Config',
-        'menu_basicSettings' => 'Stores → Other settings → Acumulus Config',
 
         // Config form.
         'field_triggerOrderStatus' => 'Order, based on status(es)',
@@ -54,7 +50,6 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'vat_classes' => 'tax classes',
         // Address used for vat calculations.
         'fiscal_address_setting' => 'Configuration » Sales » Taxes » Calculation Settings » Tax Calculation Method Based On',
-
 
         // Advanced config form.
         'see_billing_address' => 'Shipping address, contains the same properties as the "billingAddress" object above',

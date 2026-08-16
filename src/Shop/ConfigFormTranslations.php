@@ -538,13 +538,6 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'option_logLevel_5' => 'Log foutmeldingen, waarschuwingen, mededelingen, en communicatieberichten.',
         'desc_logLevel' => 'U kunt hier een logniveau kiezen. Kies voor de 1e of 2e optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
 
-        // Link to the other config form.
-        'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u op het "%1$s" formulier onder "%2$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
-        'menu_advancedSettings' => 'Instellingen → Acumulus geavanceerde instellingen',
-
-        'desc_basicSettings' => 'U bevindt zich nu op het formulier met geavanceerde, ofwel minder gebruikte, instellingen. De basisinstellingen vindt u op het "%1$s" formulier onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
-        'menu_basicSettings' => 'Instellingen → Acumulus',
-
         // Link to other settings/mappings form.
         'desc_mappings' => 'Om de factuurgegevens te verzamelen, haalt de plugin veel informatie uit de data van de webwinkel. Welk veld uit die data gebruikt wordt voor de velden van een Acumulus-factuur is grotendeels vastgelegd in de plugin, maar op het formulier "%1$s" onder "%2$s" kunt u dit waar nodig aanpassen. Nadat u hier de gegevens hebt ingevuld <strong>en opgeslagen</strong>, kunt u het andere formulier bezoeken:',
         // @todo: translate this for other shops (this is WP/WC specific...).
@@ -1066,13 +1059,6 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'option_logLevel_4' => 'Log error messages, warnings, and operational and informational notices.',
         'option_logLevel_5' => 'Log error messages, warnings, notices, and communication messages.',
         'desc_logLevel' => 'Select a log level. Choose for the 1st or 2nd option unless otherwise instructed by support staff.',
-
-        // Link to the other config form.
-        'desc_advancedSettings' => 'This plugin is highly configurable and therefore this form does not contain all settings. You can find the other settings in the "%1$s" under "%2$s". Once you have completed and saved the settings over here, you can visit that form to fill in the advanced settings.',
-        'menu_advancedSettings' => 'Settings → Acumulus advanced settings',
-
-        'desc_basicSettings' => 'This is the form with advanced, i.e. less commonly used, settings. You can find the basic settings in the "%1$s" under "%2$s", or via the button below. Note: if you click on this button, changes you made to this page will NOT be saved!',
-        'menu_basicSettings' => 'Settings → Acumulus',
 
         // Link to other settings/mappings form.
         'desc_mappings' => 'To collect the invoice data, the plugin accesses the web shop data. Which field of the shop is used for each field in the Acumulus invoice is largely defined by the plugin itself. However, with the "%1$s" form at "%2$s" you can overrule this where necessary. After you have completed <strong>and saved</strong> the data here, you can visit the other form:',

@@ -15,7 +15,8 @@ class FormMapper extends \Siel\Acumulus\Helpers\FormMapper
     /**
      * @inheritDoc
      */
-    public function map(Form $form): void
+    public function map(Form $form): null
     {
+        return null;
     }
 }

@@ -38,10 +38,11 @@ class FormMapper extends BaseFormMapper
         return $this;
     }
 
-    public function map(Form $form): void
+    public function map(Form $form): AbstractForm
     {
         $this->isFirstElement = true;
         $this->fields($this->magentoForm, $form->getFields());
+        return $this->magentoForm;
     }
 
     /**

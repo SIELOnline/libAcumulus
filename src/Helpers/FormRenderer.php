@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpUnused wrapper classes and tags are accessed via variable variables.
+ */
 
 declare(strict_types=1);
 
@@ -12,7 +15,7 @@ use function is_array;
  * Provides form element rendering functionality. This basic implementation renders the
  * elements as wrapped HTML input elements. To comply with shop-specific styling, it is
  * supposed to be overridden per shop that uses this way of rendering. For now those are:
- * HikaShop/VirtueMart (Joomla), OpenCart, and WooCommerce (WordPress).
+ * HikaShop/VirtueMart (Joomla), OpenCart, WHMCS, and WooCommerce (WordPress).
  *
  * SECURITY REMARKS
  * ----------------
@@ -38,7 +41,7 @@ class FormRenderer
     public const RequiredMarkup = '<span class="required">*</span>';
 
     protected bool $html5 = true;
-   protected string $elementWrapperTag = 'div';
+    protected string $elementWrapperTag = 'div';
     /** @var string|string[] */
     protected string|array $elementWrapperClass = 'form-element';
     protected string $fieldsetWrapperTag = 'fieldset';
@@ -660,13 +663,11 @@ class FormRenderer
      */
     protected function getCloseTag(string $tag): string
     {
-        return '</' . htmlspecialchars($tag, ENT_QUOTES, 'ISO-8859-1') .'>';
+        return '</' . htmlspecialchars($tag, ENT_QUOTES, 'ISO-8859-1') . '>';
     }
 
     /**
      * Renders a list of attributes.
-     *
-     * @param array $attributes
      *
      * @return string
      *   html string with the rendered attributes and 1 space in front of it.
@@ -799,7 +800,7 @@ class FormRenderer
      */
     protected function isOptionSelected(int|string|array $selectedValues, int|string $option): bool
     {
-        return is_array($selectedValues) ? in_array((string) $option, $selectedValues,false) : (string) $option === (string) $selectedValues;
+        return is_array($selectedValues) ? in_array((string) $option, $selectedValues, false) : (string) $option === (string) $selectedValues;
     }
 
     /**

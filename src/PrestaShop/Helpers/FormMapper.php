@@ -38,7 +38,6 @@ class FormMapper extends BaseFormMapper
      */
     protected function fields(array $fields): array
     {
-        /** @noinspection DuplicatedCode */
         $result = [];
         foreach ($fields as $id => $field) {
             if (!isset($field['id'])) {

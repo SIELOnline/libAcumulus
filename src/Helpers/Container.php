@@ -166,11 +166,6 @@ class Container
      * instance should be passed to the constructor if a class needs access. The current
      * exception is the separate "Acumulus Customise Invoice" module that may not get the
      * instance passed via a constructor.
-     *
-     * @return ?static
-     *
-     * @noinspection PhpUnused
-     *   Should only be used in module own code, not in the library itself.
      */
     public static function getContainer(): ?static
     {
@@ -262,7 +257,7 @@ class Container
     public function getTranslator(): Translator
     {
         /** @var \Siel\Acumulus\Helpers\Translator $translator */
-        $translator = $this->getInstance('Translator', 'Helpers', fn() => [$this->getLanguage()]);
+        $translator = $this->getInstance('Translator', 'Helpers', fn() => [$this->getLanguage(), $this->getLog()]);
         if (!$this->baseTranslationsAdded) {
             // Add some basic translations that are hard to add just-in-time.
             $this->baseTranslationsAdded = true;

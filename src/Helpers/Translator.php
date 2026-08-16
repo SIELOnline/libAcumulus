@@ -51,6 +51,7 @@ namespace Siel\Acumulus\Helpers;
  */
 class Translator
 {
+    protected Log $log;
     protected string $language;
     protected array $translations;
 
@@ -58,9 +59,10 @@ class Translator
      * @param string $language
      *   The 2-character language code.
      */
-    public function __construct(string $language)
+    public function __construct(string $language, Log $log)
     {
         $this->language = $language;
+        $this->log = $log;
         $this->translations = [];
     }
 
@@ -78,6 +80,11 @@ class Translator
         $this->translations = $overwrite
             ? $translationCollection->get($this->getLanguage()) + $this->translations
             : $this->translations + $translationCollection->get($this->getLanguage());
+    }
+
+    protected function getLog(): Log
+    {
+        return $this->log;
     }
 
     /**
@@ -102,6 +109,14 @@ class Translator
      */
     public function get(string $key): string
     {
-        return ($this->translations[$key] ?? $key);
+        if (isset($this->translations[$key])) {
+            return $this->translations[$key];
+        } else {
+            // All keys are supposed to hve translations, they are not human-readable
+            // phrases for some default language. So not finding a translation is handled
+            // as a missing translation (minor) bug to be solved, so we log it.
+            $this->getLog()->info("Translation key '$key' not found");
+            return $key;
+        }
     }
 }

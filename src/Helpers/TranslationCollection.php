@@ -20,15 +20,26 @@ abstract class TranslationCollection
      * Dutch translations if no translation for the given language for some key
      * was defined.
      *
+     * Module (Shop) specific translations, which are rare and are normally stored in the
+     * class {@see ModuleSpecificTranslations}, can have "base translations". These are to
+     * be added without overwriting shop specific translations, thus using the + array
+     * operator.
+     *
      * @return string[]
      *   A keyed array with translations.
+     *
+     * @noinspection PhpVariableVariableInspection
      */
     public function get(string $language): array
     {
-        /** @noinspection PhpVariableVariableInspection */
+        $baseLanguage = 'base' . ucfirst($language);
         $result = $this->$language ?? [];
-        if ($language !== 'nl' && isset($this->nl)) {
-            $result += $this->nl;
+        if ($language !== 'nl') {
+            $result += $this->nl ?? [];
+        }
+        $result += $this->$baseLanguage ?? [];
+        if ($language !== 'nl') {
+            $result += $this->baseNl ?? [];
         }
         return $result;
     }

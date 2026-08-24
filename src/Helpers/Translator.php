@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Helpers;
 
+use function in_array;
+
 /**
  * Translator provides a simple way of providing translated texts.
  *

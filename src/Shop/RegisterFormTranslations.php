@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection LongLine
  * @noinspection HtmlUnknownTarget
  */
 
@@ -10,18 +11,18 @@ namespace Siel\Acumulus\Shop;
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
- * Class RegisterFormTranslations
+ * Class RegisterFormTranslations contains translations for the Register form.
  */
 class RegisterFormTranslations extends TranslationCollection
 {
     protected array $nl = [
         'register_form_title' => 'Acumulus | Vrijblijvend proefaccount aanmaken',
         'register_form_header' => 'Een vrijblijvend Acumulus proefaccount aanmaken',
-        'button_submit_register'=> 'Gratis account aanmaken',
+        'button_submit_register' => 'Gratis account aanmaken',
         'message_form_register_success' => 'Uw tijdelijke proefaccount is met succes aangemaakt.',
         'button_cancel' => 'Terug',
 
-        'introHeader' => 'Een Acumulus proefaccount aanmaken',
+        'introHeader' => 'Een Acumulus (proef)account aanmaken',
         'register_form_intro' => '<p>Door dit formulier in te vullen kunt u een gratis en vrijblijvend proefaccount aanmaken bij Acumulus.</p>
             <p>Het gratis proefaccount is 30 dagen geldig en volledig functioneel (met een maximum van 50 boekingen).
             Zodra u het proefaccount omzet in een abonnement is het aantal boekingen onbeperkt en de al gedane instellingen en boekingen blijven behouden.
@@ -97,7 +98,7 @@ class RegisterFormTranslations extends TranslationCollection
     protected array $en = [
         'register_form_title' => 'Acumulus | Apply for a free trial account',
         'register_form_header' => 'Apply for a free trial account for Acumulus',
-        'button_submit_register'=> 'Create free account',
+        'button_submit_register' => 'Create free account',
         'message_form_register_success' => 'Your temporary account has been created successfully.',
         'button_cancel' => 'Back',
 

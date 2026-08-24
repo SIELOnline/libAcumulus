@@ -28,6 +28,13 @@ class ModuleTranslations extends TranslationCollection
         'module_name' => 'Acumulus',
         'module_description' => 'Verstuurt uw facturen automatisch naar Acumulus',
         'text_home' => 'Home',
+
+        // Environment info
+        'OS' => 'OS',
+        'Server' => 'Server',
+        'Database' => 'Database',
+        'PHP' => 'PHP',
+
         // @todo: which ones are still used?
         'button_settings' => 'Instellingen',
         'button_advanced_settings' => 'Geavanceerde Instellingen',

@@ -334,7 +334,8 @@ class AboutForm
             }
 
             $mySupportItems = array_filter($mySupportItems, static function ($mySupportItem) {
-                return $mySupportItem['enddate'] >= '2024-09-24';
+                $today = date_format(new DateTimeImmutable(), 'Y-m-d');
+                return $mySupportItem['enddate'] >= $today;
             });
             if (count($mySupportItems) === 0) {
                 $proSupportList[] = $this->t('no_more_pro_support');
@@ -451,10 +452,9 @@ class AboutForm
 
     /**
      * @param null|bool|string $accountStatus
-     *   - null: (some) credentials are empty
-     *   - true: credentials are correct
-     *   - false: credentials are incorrect: no message demanded
-     *   - string: credentials are incorrect: error message
+     *   - null: (some) credentials are empty.
+     *   - true: credentials are correct.
+     *   - false|string: credentials are incorrect.
      *
      * @return null|bool|string|array
      *   If $accountStatus = true, the my_data array as returned from the

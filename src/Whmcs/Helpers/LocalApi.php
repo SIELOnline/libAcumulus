@@ -58,15 +58,7 @@ class LocalApi
     {
         $results = localAPI($command, $values);
         if ($results['result'] !== 'success') {
-            $callingFunction = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
-            $mainArg = '';
-            if (count($values) >= 1) {
-                reset($values);
-                $value = current($values);
-                $mainArg = is_scalar($value) ? key($values) . ': ' . $value : '...';
-            }
-            $message = "$callingFunction($mainArg): localApi command '$command' failed: {$results['result']}: {$results['message']}";
-            logActivity($message);
+            $message = "localApi('$command') failed: {$results['result']}: {$results['message']}";
             throw new RuntimeException($message);
         }
         return $results;

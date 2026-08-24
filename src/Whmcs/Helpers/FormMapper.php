@@ -15,6 +15,7 @@ use function in_array;
  * The "Admin Area Content/Output" (via "top menu - Modules - Acumulus") expects rendered
  * HTML, see https://developers.whmcs.com/addon-modules/admin-area-output/ and, as such,
  * will be handled by the {@see \Siel\Acumulus\Whmcs\Helpers\FormRenderer}.
+ *
  * However, the inline "Configuration" form for an addon (via "🔧 (Tools) - Settings -
  * Modules - Configure") is based on simple field definitions, see
  * https://developers.whmcs.com/addon-modules/configuration/ : defined types are “text”,
@@ -25,6 +26,9 @@ use function in_array;
  * Example return field:
  * "option_name" => ["FriendlyName" => "My Label", "Type" => "text", "Size" => "25",
  * "Description" => "My Help", "Default" => "Example", ]
+ *
+ * We do not really use that part, but this mapper was easy enough to develop, so we can
+ * use some simple form fields over there.
  */
 class FormMapper extends BaseFormMapper
 {
@@ -37,7 +41,7 @@ class FormMapper extends BaseFormMapper
      *   The Acumulus form-definition to map.
      *
      * @return array[]
-     *   The PrestaShop form definition for the given Acumulus form.
+     *   The WHMCS form definition for the given Acumulus form.
      */
     public function map(Form $form): array
     {
@@ -78,17 +82,18 @@ class FormMapper extends BaseFormMapper
      *
      * @return array[]
      *   The WHMCS field definition(s) for the given Acumulus form field.
-     *   If this is a fieldset, an array with multiple field-arrays will be returned,
-     *   otherwise an array with 1 field-array.
+     *   If this is a fieldset or a checkbox element, an array with multiple field-arrays
+     *   will be returned, otherwise an array with 1 field-array.
      */
     protected function field(array $field): array
     {
         if (!empty($field['fields'])) {
-            $result = $this->fieldset($field);
+            return $this->fieldset($field);
+        } elseif ($field['type'] === 'checkbox') {
+            return $this->element($field);
         } else {
-            $result = $this->element($field);
+            return $this->element($field);
         }
-        return $result;
     }
 
     /**
@@ -102,11 +107,7 @@ class FormMapper extends BaseFormMapper
      */
     protected function fieldset(array $field): array
     {
-        $result = [];
-        foreach ($field['fields'] as $childField) {
-            $result += $this->field($childField);
-        }
-        return $result;
+        return $this->fields($field['fields']);
     }
 
     /**
@@ -123,7 +124,6 @@ class FormMapper extends BaseFormMapper
      */
     protected function element(array $field): array
     {
-        // @todo: multiple checkboxes should result into multiple fields.
         $result = [
             'Type' => $this->getWhmcsType($field['type']),
             'FriendlyName' => $field['label'] ?? '',
@@ -146,6 +146,10 @@ class FormMapper extends BaseFormMapper
         // Set options for fields with multiple choices.
         if (in_array($field['type'], ['radio', 'select'])) {
             $result['options'] = $this->getWhmcsOptions($field['options']);
+        } elseif ($field['type'] === 'checkbox') {
+            // Ignore multiple options, we only use this mapper on the simple inline
+            // config form, so we don't bother with all possible cases.
+            $result['FriendlyName'] = reset($field['options']);
         }
 
         // Set value.
@@ -155,21 +159,28 @@ class FormMapper extends BaseFormMapper
     }
 
     /**
-     * Returns the PrestaShop form element type for the given Acumulus type.
+     * Returns the WHMCS form element type for the given Acumulus type.
      */
     protected function getWhmcsType(string $type): string
     {
         return match ($type) {
             'checkbox' => 'yesno',
+            'radio' => 'radio',
             'select' => 'dropdown',
-            // 'text', 'password', 'textarea', 'radio', but also 'email', 'date', ...
-            default => $type,
+            'password' => 'password',
+            'textarea' => 'textarea',
+            default => 'text',
         };
     }
 
     /**
-     * Converts a list of Acumulus field options to a list of PrestaShop radio
+     * Converts a list of Acumulus field options to a list of WHMCS radio
      * button values.
+     *
+     * The WHMCS form field definition does not allow for separate values and labels.
+     * As this is only used on the inline config forms on the Modules page, we don't
+     * bother about this not being able to cater for all features that our form field
+     * specification language uses.
      */
     protected function getWhmcsOptions(array $options): string
     {

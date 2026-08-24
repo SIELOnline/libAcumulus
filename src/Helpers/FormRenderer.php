@@ -560,7 +560,6 @@ class FormRenderer
 
         // Div tag.
         $attributes = $field['attributes'];
-//?        unset($attributes['required']);
 
         $output .= $this->getWrapper('input', $attributes);
         $output .= $this->getWrapper('checkbox', $attributes + ['id' => $field['id']]);
@@ -670,7 +669,7 @@ class FormRenderer
      * Renders a list of attributes.
      *
      * @return string
-     *   html string with the rendered attributes and 1 space in front of it.
+     *   HTML string with the rendered attributes and 1 space in front of it.
      */
     protected function renderAttributes(array $attributes): string
     {

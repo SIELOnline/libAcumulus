@@ -66,6 +66,8 @@ abstract class BaseConfigForm extends Form
      * {@inheritdoc}
      *
      * This is the set of values as are stored in the config.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function getDefaultFormValues(): array
     {

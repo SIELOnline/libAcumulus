@@ -24,7 +24,7 @@ use function sprintf;
  * Provides basic form handling.
  *
  * Most web shop and CMS software provide their own sort of form API. To be able
- * to generalize or abstract our form handling, this class defines our own
+ * to generalise or abstract our form handling, this class defines our own
  * minimal form API. This allows us to define our form handing in a cross-webshop
  * compatible way. The web shop/CMS-specific part should then define a
  * renderer/mapper to the webshop-specific way of form handling.
@@ -178,7 +178,7 @@ abstract class Form extends MessageCollection
 
     /**
      * Returns whether this form is a full page form, thus surrounded by a
-     * <form> tag and having a possibly standardized 'submit' button.
+     * <form> tag and having a possibly standardised 'submit' button.
      *
      * @noinspection PhpUnused
      *   Used in shop webshop specific projects.
@@ -558,7 +558,7 @@ abstract class Form extends MessageCollection
      *   - false: credentials are incorrect and $returnMessage = false
      *   - string: credentials are incorrect and $returnMessage = true
      *
-     *  @ntodo  $accountStatus is being too complex (null|bool|string) => refactor into a
+     * @todo  $accountStatus is being too complex (null|bool|string) => refactor into a
      *    small object/array
      */
     protected function getAccountStatus(bool $returnMessage = false): null|bool|string

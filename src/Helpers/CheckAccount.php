@@ -98,17 +98,18 @@ class CheckAccount extends MessageCollection
      *
      * @param bool $returnMessage
      *   Whether to return the error message or false when the account settings are not
-     *   correct/complete. Sometimes we just want to know whether the account settings
-     *   are correct or not, sometimes we want to inform the user what is not correct.
-     *   A second meaning of this parameter is whether to force a recheck or just use the
-     *   cached status.
+     *   correct/complete. Sometimes we just want to know whether the account settings are
+     *   correct or not, sometimes we want to inform the user what is not correct.
+     *   A second meaning of this parameter is whether to force a recheck (true) or just
+     *   use the cached status (false).
      *
      * @return null|bool|string
-     *   - null: (some) credentials are empty
-     *   - true: credentials are correct
-     *   - false: credentials are incorrect: no message demanded
-     *   - string: credentials are incorrect: error message
-     *
+     *   - null: (some) credentials are empty.
+     *   - true: credentials are correct.
+     *   - false: credentials are incorrect (and $returnMessage = false):
+     *     no message requested.
+     *   - string: credentials are incorrect (and $returnMessage = true):
+     *     error message (translation key).
      */
     public function getAccountStatus(bool $returnMessage = false): null|bool|string
     {

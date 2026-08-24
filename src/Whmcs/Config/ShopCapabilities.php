@@ -172,13 +172,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     public function getLink(string $linkType, mixed $parameter = null): string
     {
+        // @todo: find "correct" place for helper code like below.
         $addOnName = 'acumulus';
-        $rootUri = $this->localApi()->getConfig('SystemURL');
-        $addOnAdminPage = "$rootUri/admin/addonmodules.php/?module=$addOnName"; // @todo: test
+        $rootUri = rtrim($this->localApi()->getConfig('SystemURL'), '/');
+        $addOnAdminPage = "$rootUri/admin/addonmodules.php?module=$addOnName";
         $addOnFolderUri = "$rootUri/modules/addons/$addOnName";
         return match ($linkType) {
             'settings', 'mappings', 'batch', 'register', 'activate' => "$addOnAdminPage&page=$linkType",
             'fiscal-address-setting' => AddressType::Invoice,
+            'modulePage' => $addOnAdminPage,
+            'moduleUri' => $addOnFolderUri,
             'logo' => "$addOnFolderUri/Acumulus-Online-Boekhouden_icon_150.png",
             'pro-support-image' => "$addOnFolderUri/pro-support-whmcs.png",
             'pro-support-link' => 'https://pay.siel.nl/?p=1qCi6ERRazteSIOHWDR4t3fpMIc2N9fuOL3bQdfxYsq7TywW',

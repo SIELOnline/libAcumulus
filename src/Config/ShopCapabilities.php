@@ -428,6 +428,9 @@ abstract class ShopCapabilities
      * @param string $linkType
      *   The form or resource to get the link to: 'settings', 'mappings', 'batch',
      *   'activate', 'register', 'logo', 'pro-support-link', 'pro-support-img'.
+     * @param mixed|null $parameter
+     *   Any parameter to add to the link. Used to get a product specific page (thus,
+     *   $parameter being a product id).
      */
     public function getLink(string $linkType, mixed $parameter = null): string
     {

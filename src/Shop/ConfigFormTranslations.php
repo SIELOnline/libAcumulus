@@ -611,7 +611,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'desc_accountSettings_N' => 'If you already do have an Acumulus account, you can fill in your details below.',
         'desc_accountSettings_F' => 'The entered account details are not correct, please correct them.',
         'desc_accountSettings_auth' => 'If you do not have an account yet, you can <a href="%1$s">register a free trial account</a>.',
-        'desc_accountSettings_T' => 'This %s could successfully connect to Acumulus with these details.',
+        'desc_accountSettings_T' => 'This %s successfully connected to Acumulus with these details.',
 
         'field_code' => 'Contract code',
         'field_username' => 'User name',
@@ -769,7 +769,7 @@ Field references are denoted by placing the name of the property between square 
         'field_telephone1' => 'Phone 1',
         'field_telephone2' => 'Phone 2',
         'desc_telephone12' => 'The phone numbers you want to store in Acumulus.',
-        'desc_fax1' => 'Most web shop do not store fax numbers anymore.',
+        'desc_fax1' => 'Most webshops do not store fax numbers anymore.',
 
         'field_defaultCustomerType' => 'Create customers as',
 
@@ -778,7 +778,7 @@ Field references are denoted by placing the name of the property between square 
         'option_contactStatus_Active' => 'Yes',
         'option_contactStatus_Disabled' => 'No',
 
-        'field_contactYourId' => 'Web shop customer reference',
+        'field_contactYourId' => 'Webshop customer reference',
         'desc_contactYourId' => 'If you want to search the customer data of the webshop for a relation in Acumulus, it can be handy to have its unique reference as used by your webshop ready in Acumulus. Use this field to define which field the web shop uses as customer reference.',
         'field_companyName1' => 'Company name 1',
         'field_companyName2' => 'Company name 2',
@@ -874,13 +874,13 @@ Use the third option to deactivate duplicate customer accounts (based on similar
         'desc_eu_commerce_threshold_percentage' => 'Acumulus keeps track of how many sales you already have made within the EU aggregated over all your sales channels. '
             . 'This %1$s can give you a warning when you are nearing the threshold above which you have to charge EU VAT. If you are passing that threshold, it will send all new invoices as a concept.<br>'
             . '• Enter a percentage as of which Acumulus should start warning you. Use a decimal point if you wish to enter a fraction. The %%-sign is optional.<br>'
-            . '• Enter 100 if you don\'t want a warning, but want to send invoices as "concept" as soon as you are passing or already past the threshold.<br>'
+            . '• Enter 100 if you don\'t want a warning, but want to send invoices as "concept" as soon as you are passing or already passed the threshold.<br>'
             . '• Enter 0 if you use EU VAT as of the start of the year and want to receive a warning when some misconfigured articles are sold.<br>'
             . '• Leave empty if you do not want to use this feature.',
         'message_validate_percentage_0' => 'Enter a percentage (a number between 0 and 100) in the field "%s".',
 
         'field_missing_amount' => 'Missing amount',
-        'desc_missing_amount' => 'Indicate what to do when the invoice total and the total of the invoice lines differ. Normally, the 1st option will do fine. However, if this happens often and the missing amounts are always correct (e.g. payment fees for a specific payment provider that are not recognised as a separate invoice line), you\'d better use the 2nd option. This will already add an invoice line to the invoice, so you only have to make it final. Use the 3rd option if a setting or another plugin causes this difference but the invoice turns out to be correct anyway.',
+        'desc_missing_amount' => 'Indicate what to do when the invoice total and the total of the invoice lines differ. Normally, the 1st option will do fine. However, if this happens often and the missing amounts are always correct (e.g. payment fees for a specific payment provider that are not recognised as a separate invoice line), you\'d better use the 2nd option. This will add an invoice line to the invoice, so you only have to make it final. Use the 3rd option if a setting or another plugin causes this difference but the invoice turns out to be correct anyway.',
         'option_missing_amount_2' => 'Send a warning, the invoice will be sent as concept.',
         'option_missing_amount_3' => 'Add a correction line, note that the invoice will still be sent as concept.',
         'option_missing_amount_1' => 'Ignore.',
@@ -1064,7 +1064,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'desc_mappings' => 'To collect the invoice data, the plugin accesses the web shop data. Which field of the shop is used for each field in the Acumulus invoice is largely defined by the plugin itself. However, with the "%1$s" form at "%2$s" you can overrule this where necessary. After you have completed <strong>and saved</strong> the data here, you can visit the other form:',
         'menu_mappings' => 'Settings → Acumulus mappings',
 
-        'desc_settings' => 'You are on the mappings form that defines the relations between the web shop data and the Acumulus invoice. The "real" settings can be found on the "%1$s" form at "%2$s", or via the button below. Note: if you click on this button, any completed or changed values will be lost! Save first!',
+        'desc_settings' => 'You are on the mappings form that defines the relations between the web shop data and the Acumulus invoice. The "real" settings can be found on the "%1$s" form at "%2$s", or via the button below. Note: if you click on this button, any changes will be lost! Save first!',
         'menu_settings' => 'Settings → Acumulus settings',
     ];
 }

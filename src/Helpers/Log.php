@@ -61,7 +61,7 @@ class Log
     public function getLogLevel(): int
     {
         if (!isset($this->logLevel)) {
-            $pluginSettings = Container::getContainer()?->getConfig()->getPluginSettings();
+            $pluginSettings = Container::getContainer()->getConfig()->getPluginSettings();
             $this->setLogLevel($pluginSettings['logLevel']);
         }
         return $this->logLevel;

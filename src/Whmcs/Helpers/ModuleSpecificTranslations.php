@@ -20,6 +20,9 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'module' => 'addon',
         'desc_module' => 'The Acumulus addon koppelt uw WHMCS site aan uw Acumulus online financiële administratie.',
 
+        'menu_settings' => 'Modules → Acumulus → Settings',
+        'menu_mappings' => 'Modules → Acumulus → Mappings',
+
         'button_link' => '<a href="%2$s" class="btn btn-primary">%1$s</a>',
         'button_class' => 'btn btn-primary',
 

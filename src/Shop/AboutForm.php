@@ -75,33 +75,21 @@ class AboutForm
         return $this->translator->get($key);
     }
 
-    /**
-     * @return \Siel\Acumulus\Config\ShopCapabilities
-     */
     protected function getShopCapabilities(): ShopCapabilities
     {
         return $this->shopCapabilities;
     }
 
-    /**
-     * @return \Siel\Acumulus\Config\Config
-     */
     protected function getAcumulusConfig(): Config
     {
         return $this->acumulusConfig;
     }
 
-    /**
-     * @return \Siel\Acumulus\ApiClient\Acumulus
-     */
     protected function getAcumulusApiClient(): Acumulus
     {
         return $this->acumulusApiClient;
     }
 
-    /**
-     * @return \Siel\Acumulus\Config\Environment
-     */
     protected function getEnvironment(): Environment
     {
         return $this->environment;
@@ -333,8 +321,9 @@ class AboutForm
                 $mySupportItems = [$mySupportItems];
             }
 
-            $mySupportItems = array_filter($mySupportItems, static function ($mySupportItem) {
-                $today = date_format(new DateTimeImmutable(), 'Y-m-d');
+            /** @var @noinspection PhpUnhandledExceptionInspection */
+            $today = date_format(new DateTimeImmutable(), 'Y-m-d');
+            $mySupportItems = array_filter($mySupportItems, static function ($mySupportItem) use ($today) {
                 return $mySupportItem['enddate'] >= $today;
             });
             if (count($mySupportItems) === 0) {
@@ -363,8 +352,6 @@ class AboutForm
      *   - true: credentials are correct
      *   - false: credentials are incorrect: no message demanded
      *   - string: credentials are incorrect: error message
-     *
-     * @return array
      */
     protected function getEuCommerceInfo(null|bool|string $accountStatus): array
     {
@@ -427,8 +414,6 @@ class AboutForm
      *   100), or 'unknown'.
      * @param string $status
      *   'OK', 'warning', or 'error'.
-     *
-     * @return string
      */
     protected function addProgressBar(string $nlTaxed, string $threshold, string $percentage, string $status): string
     {
@@ -456,13 +441,13 @@ class AboutForm
      *   - true: credentials are correct.
      *   - false|string: credentials are incorrect.
      *
-     * @return null|bool|string|array
+     * @return null|false|string|array
      *   If $accountStatus = true, the my_data array as returned from the
      *   my_acumulus web API call, the $accountStatus otherwise.
      *
      * @todo: PHP 8.2 change bool to false in return type.
      */
-    public function getMyData(null|bool|string $accountStatus): null|bool|string|array
+    public function getMyData(null|bool|string $accountStatus): null|false|string|array
     {
         static $myData = null;
         if ($myData === null) {

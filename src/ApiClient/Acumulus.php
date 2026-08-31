@@ -1001,6 +1001,7 @@ class Acumulus
             $exception = $e;
             throw $e;
         } finally {
+            // @todo: to use WHMCS logModuleCall we should add a Log::logRequestResponse() method
             $logLevel = $logLevel ?? Severity::Exception;
             $this->log->log($logLevel, $acumulusRequest->getMaskedRequest());
             if (isset($acumulusResult)) {

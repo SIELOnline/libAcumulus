@@ -227,8 +227,6 @@ class AcumulusResult extends MessageCollection
 
     /**
      * Returns a textual translated representation of the status.
-     *
-     * @return string
      */
     public function getStatusText(): string
     {
@@ -394,7 +392,6 @@ class AcumulusResult extends MessageCollection
             && (!in_array($code, $this->possiblyValidHttpStatusCodes, true)
                 || $this->getContentFormat() !== $this->getRequestedFormat())
         ) {
-
             if ($body === '') {
                 $body = '[Empty response body]';
             } elseif ($this->getContentFormat() === 'html') {
@@ -560,10 +557,6 @@ class AcumulusResult extends MessageCollection
 
     /**
      * Simplify the response by removing the main key.
-     *
-     * @param array $response
-     *
-     * @return array
      */
     protected function simplifyMainResponse(array $response): array
     {
@@ -625,12 +618,11 @@ class AcumulusResult extends MessageCollection
     public function isNotFound(): bool
     {
         // This is a bit ugly, but the alternative is to spread this code knowledge over
-        // the calling code, which is inevitable for other errors, but the "not found" is
-        // the most common error, and in some cases it is not an error in the first place,
-        // and should be easy to recognise on the calling side.
+        // the calling code, which is inevitable for other errors. However, the "not
+        // found" is the most common error, and in some cases it is not an error in the
+        // first place, and should be easy to recognise on the calling side.
         $result = false;
-        if ($this->hasError())
-        {
+        if ($this->hasError()) {
             if ($this->getHttpResponse()->getHttpStatusCode() === 404) {
                 $result = true;
             } elseif ($this->getHttpResponse()->getHttpStatusCode() === 400) {

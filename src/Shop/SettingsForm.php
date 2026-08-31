@@ -178,8 +178,7 @@ class SettingsForm extends BaseConfigForm
             );
             return;
         }
-        if (empty($this->submittedValues['stockManagementEnabled']))
-        {
+        if (empty($this->submittedValues['stockManagementEnabled'])) {
             unset(
                 $this->submittedValues['productMatchShopField'],
                 $this->submittedValues['productMatchAcumulusField'],
@@ -219,12 +218,29 @@ class SettingsForm extends BaseConfigForm
         $fields = [];
 
         $accountStatus = $this->getAccountStatus(true);
+        $desc2 = '';
+        if ($accountStatus === null) {
+            $description = 'desc_accountSettings_N';
+        } elseif ($accountStatus === true) {
+            $description = 'desc_accountSettings_T';
+        } else {
+            $description = 'desc_accountSettings_F';
+            if ($accountStatus === 'message_error_auth') {
+                $desc2 = 'desc_accountSettings_auth';
+            }
+        }
+        // 'desc_accountSettings_T' uses plugin/module/extension in its message.
+        $description = sprintf($this->t($description), $this->t('module'));
+        if (!empty($desc2)) {
+            $description .= ' ' . sprintf($this->t($desc2), $this->shopCapabilities->getLink('register'));
+        }
 
         //  Acumulus account settings.
         $fields['accountSettings'] = [
             'type' => 'fieldset',
             'legend' => $this->t('accountSettingsHeader'),
-            'fields' => $this->getAccountFields($accountStatus),
+            'description' => $description,
+            'fields' => $this->getAccountFields($accountStatus === null),
         ];
 
         if (is_string($accountStatus)) {
@@ -341,43 +357,20 @@ class SettingsForm extends BaseConfigForm
      * - 'password'
      * - 'emailonerror'
      *
-     * @param null|bool|string $accountStatus
-     *   Null: no account settings filled in yet.
-     *   True: account settings OK.
-     *   String: message describing the authentication error that occurred using the given
-     *     account settings.
+     * @param bool $addRegisterFields
+     *   Whether to add the register fields. These fields are added when the accunt data
+     *   is absent.
      *
      * @return array[]
      *   The set of account-related fields.
      */
-    protected function getAccountFields(null|bool|string $accountStatus): array
+    protected function getAccountFields(bool $addRegisterFields): array
     {
-        $desc2 = '';
-        if ($accountStatus === null) {
-            $description = 'desc_accountSettings_N';
-        } elseif ($accountStatus === true) {
-            $description = 'desc_accountSettings_T';
-        } else {
-            $description = 'desc_accountSettings_F';
-            if ($accountStatus === 'message_error_auth') {
-                $desc2 = 'desc_accountSettings_auth';
-            }
-        }
-        // 'desc_accountSettings_T' uses plugin/module/extension in its message.
-        $description = sprintf($this->t($description), $this->t('module'));
-        if (!empty($desc2)) {
-            $description .= ' ' . sprintf($this->t($desc2), $this->shopCapabilities->getLink('register'));
-        }
-
         $fields = [];
-        if ($accountStatus === null) {
+        if ($addRegisterFields) {
             $fields += $this->getRegisterFields();
         }
         $fields += [
-            'descAccountSettings' => [
-                'type' => 'markup',
-                'value' => $description,
-            ],
             Fld::ContractCode => [
                 'type' => 'text',
                 'label' => $this->t('field_code'),

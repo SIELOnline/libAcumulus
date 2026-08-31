@@ -19,6 +19,7 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
 use WHMCS\Billing\Tax;
+use WHMCS\Database\Capsule;
 
 /**
  * Defines the WooCommerce web shop specific capabilities.
@@ -49,6 +50,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::PostalCode => '[source::getClient()::getShopObject()::postcode]',
                 Fld::City => '[source::getClient()::getShopObject()::city]',
                 Fld::CountryCode => '[source::getClient()::getShopObject()::country]',
+            ],
+            AddressType::Shipping => [
+                Fld::CountryCode => '',
             ],
             EmailAsPdfType::Invoice => [
                 Fld::EmailTo => '[source::getClient()::getShopObject()::email]',
@@ -82,6 +86,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * {@inheritdoc}
      *
      * WHMCS only supports invoices as source. Orders do not contain tax-info.
+     *
      * @todo: what about credit notes in WHMCS 9?
      */
     public function getSupportedInvoiceSourceTypes(): array
@@ -133,10 +138,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getVatClasses(): array
     {
         $result = [];
-        $taxRates = Tax::all();
-        foreach ($taxRates as $tax) {
-            $result[$tax->name] = $tax->name;
-        }
+        Capsule::table('tbltax')
+            ->select('name')
+            ->distinct()
+            ->get()
+            ->each(function ($tax) use (&$result) {
+                $result[$tax->name] = $tax->name;
+            });
+        file_put_contents('C:/Projecten/Acumulus/WHMCS/www/modules/addons/acumulus/vat.json', json_encode($result));
         return $result;
     }
 
@@ -172,18 +181,15 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     public function getLink(string $linkType, mixed $parameter = null): string
     {
-        // @todo: find "correct" place for helper code like below.
         $addOnName = 'acumulus';
         $rootUri = rtrim($this->localApi()->getConfig('SystemURL'), '/');
-        $addOnAdminPage = "$rootUri/admin/addonmodules.php?module=$addOnName";
-        $addOnFolderUri = "$rootUri/modules/addons/$addOnName";
         return match ($linkType) {
-            'settings', 'mappings', 'batch', 'register', 'activate' => "$addOnAdminPage&page=$linkType",
+            'settings', 'mappings', 'batch', 'register', 'activate' => $this->getLink('modulePage') . "&page=$linkType",
             'fiscal-address-setting' => AddressType::Invoice,
-            'modulePage' => $addOnAdminPage,
-            'moduleUri' => $addOnFolderUri,
-            'logo' => "$addOnFolderUri/Acumulus-Online-Boekhouden_icon_150.png",
-            'pro-support-image' => "$addOnFolderUri/pro-support-whmcs.png",
+            'modulePage' => "$rootUri/admin/addonmodules.php?module=$addOnName",
+            'moduleUri' => "$rootUri/modules/addons/$addOnName",
+            'logo' => $this->getLink('moduleUri') . '/Acumulus-Online-Boekhouden_icon_150.png',
+            'pro-support-image' => $this->getLink('moduleUri') . '/pro-support-whmcs.png',
             'pro-support-link' => 'https://pay.siel.nl/?p=1qCi6ERRazteSIOHWDR4t3fpMIc2N9fuOL3bQdfxYsq7TywW',
             default => parent::getLink($linkType, $parameter),
         };

@@ -168,7 +168,7 @@ abstract class BaseConfigForm extends Form
             $field = [
                 'type' => $type,
                 'label' => $this->t("field_$name"),
-                'description' => $this->t($this->t("desc_$name")),
+                'description' => $this->t("desc_$name"),
                 'options' => $options,
                 'attributes' => [
                     'required' => $required,

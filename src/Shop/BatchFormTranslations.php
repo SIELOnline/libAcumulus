@@ -1,4 +1,8 @@
-<?php
+<?php /** @noinspection IncorrectFormatting */
+
+/**
+ * @noinspection LongLine
+ */
 
 declare(strict_types=1);
 
@@ -27,7 +31,7 @@ class BatchFormTranslations extends TranslationCollection
         'desc_invoice_source_reference_from_to_2' => 'Vul de reeks bestel of creditnota-referenties of nummers in die u naar Acumulus wilt verzenden. Als u slechts 1 factuur wilt verzenden hoeft u alleen het \'# van\' in te vullen. Laat beide velden leeg als u niet op referentie of nummer wilt filteren.',
         'field_date_from' => 'Datum van',
         'field_date_to' => 'Datum tot',
-        'desc_date_from_to' => 'Vul de periode in waarvan u de facturen naar Acumulus wilt verzenden. <strong>NB De selectie vindt plaats op basis van de datum van de meest recente wijziging aan de bestelling of creditnota.</strong> Als u slechts de facturen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u niet op datum wilt filteren.',
+        'desc_date_from_to' => 'Vul de periode in waarvan u de facturen naar Acumulus wilt verzenden. <strong>N.B. De selectie vindt plaats op basis van de datum van de meest recente wijziging aan de bestelling of creditnota.</strong> Als u slechts de facturen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u niet op datum wilt filteren.',
         'field_order_statuses' => 'Bestelstatus',
         'desc_order_statuses' => 'Selecteer de statussen die een bestelling nu moet hebben. M.b.v. de "Ctrl" toets kunt u meerdere statussen kiezen. Dit veld wordt genegeerd als u creditnota\'s wilt versturen. Selecteer "%1$s" als u niet op bestelstatus wilt filteren.',
         'option_empty_order_statuses' => 'Niet filteren op bestelstatus',
@@ -35,8 +39,8 @@ class BatchFormTranslations extends TranslationCollection
         'option_send_normal' => 'Verzend alleen indien nog niet verzonden',
         'option_send_force' => 'Altijd verzenden, als de factuur al is verzonden wordt de bestaande factuur verwijderd in Acumulus',
         'option_send_test_mode' => 'Verzend in testmodus',
-        'desc_send_mode' => 'Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Dit is de 1e optie. Door de 2e optie te selecteren forceert u het nogmaals versturen van deze facturen. Indien nog aanwezig, wordt de oude boeking in Acumulus naar de prullenbak verplaatst. Let op: dit kan tot gaten in uw reeks van factuurnummers leiden.<br><br>
-                                 Met de 3e optie worden de facturen in testmodus naar Acumulus verstuurd. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan, zodat uw administratie niet in de war raakt. U ontvangt altijd een mail met de resultaten. Deze optie is gelijk aan de optie "Testmodus" van de instelling "Factuur verzendmodus" van het instellingenformulier, maar geldt alleen voor deze batchverzending. Gebruik deze optie om de mail die u ontvangt mee te kunnen sturen met een supportverzoek.',
+        'desc_send_mode' => 'Facturen die binnen de reeks vallen, maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Dit is de 1e optie. Door de 2e optie te selecteren forceert u het nogmaals versturen van deze facturen. Indien nog aanwezig, wordt de oude boeking in Acumulus naar de prullenbak verplaatst. Let op: dit kan tot gaten in uw reeks van factuurnummers leiden.<br><br>
+                                 Met de 3e optie worden de facturen in testmodus naar Acumulus verstuurd. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen, maar zal deze niet opslaan, zodat uw administratie niet in de war raakt. U ontvangt altijd een mail met de resultaten. Deze optie is gelijk aan de optie "Testmodus" van de instelling "Factuur verzendmodus" van het instellingenformulier, maar geldt alleen voor deze batchverzending. Gebruik deze optie om de mail die u ontvangt mee te kunnen sturen met een supportverzoek.',
         'field_dry_run' => 'Dry run',
         'option_dry_run' => 'Laat alleen de lijst van facturen zien die verstuurd zouden worden, zonder daadwerkelijk te versturen.',
         'desc_dry_run' => '<p>De filters die u hierboven heeft opgegeven kunnen in bepaalde gevallen voor verrassingen zorgen. Door deze optie aan te vinken krijgt u in het resultatenoverzicht een lijst te zien van facturen die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',

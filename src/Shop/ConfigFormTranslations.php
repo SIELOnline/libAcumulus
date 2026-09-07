@@ -135,8 +135,8 @@ class ConfigFormTranslations extends TranslationCollection
 • Kies de 1e optie als u die altijd, dus al vanaf het begin van het jaar, berekent.<br>
 • Kies de 2e optie als u die pas berekent zodra u de drempel passeert.<br>
 • Kies de 3e optie als u tot nu toe, en om wat voor een reden dan ook, nog geen EU-btw hebt berekend.<br>
-Deze waarde wordt gebruikt als er twijfel is omdat het land van de klant hetzelfde btw-tarief heeft als Nederland (bijv. België).
-Het gaat dus niet zozeer om de actuele instelling, want deze waarde wordt ook gebruikt voor het versturen van gegevens van oudere facturen.',
+• NB 1: Deze waarde wordt alleen gebruikt als er twijfel is omdat het land van de klant hetzelfde btw-tarief heeft als Nederland (bijv. België).<br>
+• NB 2: Het gaat dus niet zozeer om de actuele instelling, want deze waarde wordt ook gebruikt bij het versturen van gegevens van oudere facturen.',
         'option_euVat_1' => 'Altijd, dus vanaf het begin van het jaar',
         'option_euVat_2' => 'Zodra wij de drempel passeren',
         'option_euVat_3' => 'Nee, nog nooit gebruikt',
@@ -145,14 +145,14 @@ Het gaat dus niet zozeer om de actuele instelling, want deze waarde wordt ook ge
         'desc_vatFreeClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst btw-vrij is.<br>
 • Kies de 1e optie ("%2$s") als u geen btw-vrije producten of diensten aanbiedt.<br>
 • Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten het veld %1$s leeg laat.<br>
-• LET OP: het gaat erom of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank">KOR</a> heeft gekozen, of een btw-vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
-Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
+• LET OP 1: Het gaat erom of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank">KOR</a> heeft gekozen, of een btw-vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.<br>
+• LET OP 2: Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
         'field_zeroVatClass' => 'Welke %1$s definieert het 0%% btw-tarief?',
         'desc_zeroVatClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst onder het 0%%-tarief valt.<br>
 • Kies de 1e optie ("%2$s") als u geen producten of diensten aan aanbiedt die onder het 0%%-tarief vallen.<br>
-• LET OP 1: het 0%%-tarief is wat anders dan het btw-vrije tarief van hierboven en is in Nederland niet gebruikelijk. Momenteel (begin 2021) geldt er bijv. een uitzondering voor mondkapjes.<br>
-• LET OP 2: het gaat er om of het product of de dienst onder het 0%%-tarief valt, niet of u 0%% btw op een factuur mag noteren vanwege bijv. verkoop aan het buitenland of een factuur met verlegde btw.',
+• LET OP 1: Het 0%%-tarief is wat anders dan het btw-vrije tarief van hierboven en is in Nederland niet gebruikelijk. Momenteel (begin 2021) geldt er bijv. een uitzondering voor mondkapjes.<br>
+• LET OP 2: Het gaat er om of het product of de dienst onder het 0%%-tarief valt, niet of u 0%% btw op een factuur mag noteren vanwege bijv. verkoop aan het buitenland of een factuur met verlegde btw.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'Wanneer wilt u uw facturen automatisch naar Acumulus laten versturen',
@@ -250,7 +250,7 @@ Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelli
         'field_defaultCustomerType' => 'Importeer klanten als',
 
         'field_contactStatus' => 'Actief',
-        'desc_contactStatus' => 'Geef aan of relaties als actief of inactief opgeslagen moeten worden.',
+        'desc_contactStatus' => 'Geef aan of relaties als actief of inactief opgeslagen moeten worden. Inactieve relaties worden niet getoond in zoekresultaten.',
         'option_contactStatus_Active' => 'Ja',
         'option_contactStatus_Disabled' => 'Nee',
 
@@ -267,7 +267,7 @@ Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelli
         'desc_fullName' => 'De volledige naam, meestal opgebouwd uit de voornaam, achternaam en evt. een tussenvoegsel.',
 
         'field_salutation' => 'Volledige aanhef',
-        'desc_salutation' => 'U kunt hier de aanhef specificeren zoals u die wilt gebruiken als u communiceert met deze klant. Plaats geen komma aan het eind.',
+        'desc_salutation' => 'U kunt hier de aanhef specificeren zoals u die wilt gebruiken als u communiceert met deze klant, bijv. e.g. "Geachte heer van der Molen" or "Beste Peter". Plaats geen komma aan het eind. Als dit niet is ingesteld, wordt voor een bestaande klant standaard de tekst gebruikt die in de contactgegevens in Acumulus is opgegeven, of, als die gegevens niet zijn ingesteld, "Geachte mevrouw/heer".',
 
         'field_address1' => 'Adresregel 1',
         'field_address2' => 'Adresregel 2',
@@ -463,8 +463,8 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'desc_subject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om hier naar dat factuurnummer te verwijzen, u kunt wel naar het bestelnummer verwijzen',
 
         //  Email packing slip settings.
-        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mailopties voor de pakbon hebt aangevinkt.',
-        'desc_packingSlipEmailBcc' => 'Vul extra e-mailadressen in waar naartoe u de pakbon wilt sturen. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mailopties voor de pakbon hebt aangevinkt.',
+        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mail opties voor de pakbon hebt aangevinkt.',
+        'desc_packingSlipEmailBcc' => 'Vul extra e-mailadressen in waar naartoe u de pakbon wilt sturen. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mail opties voor de pakbon hebt aangevinkt.',
         'desc_packingSlipSubject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Pakbon voor bestelling [nummer]" gebruikt.',
         'message_validate_packing_slip_email_0' => 'Als u de optie "Toon een link om de pdf te mailen." kiest voor de pakbon, is het veld "E-mailadres voor de pakbon" verplicht. Vul een e-mailadres in.',
         'message_validate_packing_slip_email_1' => 'Het veld "E-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
@@ -661,8 +661,8 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 • Select the 1st option if you always charge it, thus as of the start of the year.<br>
 • Select the 2nd option if you charge it only when you pass the threshold.<br>
 • Select the 3rd option if, until now, you never charged it.<br>
-• NOTE: This is not about the actual state of charging it, as this setting is also used for sending data for older invoices.<br>
-• NB1: This value is only used in case of conflict, i.e. when the country of the customer uses the same VAT rate as the Netherlands.',
+• NOTE 1: This is not about the actual state of charging it, as this setting is also used for sending data for older invoices.<br>
+• NOTE 2: This value is only used in case of conflict, i.e. when the country of the customer uses the same VAT rate as the Netherlands.',
         'option_euVat_1' => 'Always, thus as of the start of the year',
         'option_euVat_2' => 'When we pass the threshold',
         'option_euVat_3' => 'No, so far we never used it',
@@ -671,14 +671,14 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'desc_vatFreeClass' => 'Indicate which %1$s you use to indicate that a product or service is VAT free.<br>
 • Select the 1st option ("%2$s") if you do not sell VAT-free goods or services.<br>
 • Select the 2nd option ("%3$s") if you leave the field %1$s empty on VAT free products.<br>
-• NOTE: this setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.
-• Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
+• NOTE 1: This setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.<br>
+• NOTE 2: That VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
 
         'field_zeroVatClass' => 'Which %1$s defines the 0%% vat rate?',
         'desc_zeroVatClass' => 'Indicate which %1$s you use to indicate that a product or service is subject to the 0%% vat rate.<br>
 • Select the 1st option ("%2$s") if you do not sell goods or services at the 0%% rate.<br>
-• NOTE 1: the 0%% rate differs from vat free as above and is not common in the Netherlands. E.g. early 2021, masks fell under the 0%% vat rate.<br>
-• NOTE 2: this setting concerns whether the products or services you offer are inherently subject to the 0%% vat rate, not if you make invoices without vat (e.g. sometimes when selling abroad) or reversed vat.',
+• NOTE 1: The 0%% rate differs from vat free as above and is not common in the Netherlands. E.g. early 2021, masks fell under the 0%% vat rate.<br>
+• NOTE 2: This setting concerns whether the products or services you offer are inherently subject to the 0%% vat rate, not if you make invoices without vat (e.g. when selling abroad) or reversed vat.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',
@@ -774,7 +774,7 @@ Field references are denoted by placing the name of the property between square 
         'field_defaultCustomerType' => 'Create customers as',
 
         'field_contactStatus' => 'Active',
-        'desc_contactStatus' => 'Indicate whether relations should be saved as active or inactive',
+        'desc_contactStatus' => 'Indicate whether relations should be saved as active or inactive. Inactive contacts are not shown in search results.',
         'option_contactStatus_Active' => 'Yes',
         'option_contactStatus_Disabled' => 'No',
 
@@ -790,7 +790,7 @@ Field references are denoted by placing the name of the property between square 
         'desc_fullName' => 'The full name, normally constructed using the first, middle and last name and any pre or suffix. What and how this is stored, depends on the web shop you use.',
 
         'field_salutation' => 'Full salutations',
-        'desc_salutation' => 'Specify the salutations you want to use when communicating with this client. Do not use a comma at the end.',
+        'desc_salutation' => 'Specify the salutations you want to use when communicating with this client, e.g. "dear sir van der Molen" or "Dear Peter". Do not use a comma at the end. When not set it defaults to the content set in the contact details in Acumulus or when those details are not set to: "Geachte mevrouw/heer".',
 
         'field_address1' => 'Address 1',
         'field_address2' => 'Address 2',
@@ -817,7 +817,7 @@ If you don\'t want this, uncheck this option.
 All consumer invoices will be booked on one and the same fictitious client.
 You should uncheck the second option if you edit customer address data manually in Acumulus.
 If you unchecked the first option, the second option only applies to business clients.
-Use the third option to deactivate duplicate customer accounts (based on similar e-mail address).',
+Use the third option to deactivate duplicate customer accounts (based on e-mail address).',
 
         // Invoice settings.
         'invoiceSettingsHeader' => 'Your invoice settings',

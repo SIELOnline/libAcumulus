@@ -24,28 +24,28 @@ class ModuleSpecificTranslations extends TranslationCollection
 {
     protected array $baseNl = [
         'settings_form_link_text' => 'Instellingen',
-        'config_form_link_text' => 'Instellingen',
+        'settings_form_description' => 'Configureer de Acumulus addon',
         'mappings_form_link_text' => 'Veldverwijzingen',
-        'advanced_form_link_text' => 'Geavanceerde instellingen',
-        'activate_form_link_text' => 'Activeer Pro-support',
+        'mappings_form_description' => 'Benoem de relaties tussen velden van de WHMCS en Acumulus facturen',
+        'activate_form_link_text' => 'Activeer Acumulus Pro-support',
         'batch_form_link_text' => 'Batchverzending',
         'register_form_link_text' => 'Registreer',
 
         'activate_new' => 'Activeer Pro-support voor deze site',
-        'activate_renew' => 'Vernieuw Pro-support voor deze site',
+        'activate_renew' => 'Koop/Hernieuw Pro-support voor deze site',
     ];
 
     protected array $baseEn = [
         'settings_form_link_text' => 'Settings',
-        'config_form_link_text' => 'Settings',
+        'settings_form_description' => 'Setup and Configure the Acumulus addon',
         'mappings_form_link_text' => 'Mappings',
-        'advanced_form_link_text' => 'Advanced settings',
+        'mappings_form_description' => 'Specify relations between fields from the WHMCS and Acumulus invoices',
         'batch_form_link_text' => 'Send batch',
-        'activate_form_link_text' => 'Activate Pro-support',
+        'activate_form_link_text' => 'Activate Acumulus Pro-support',
         'register_form_link_text' => 'Register',
 
         'activate_new' => 'Activate Pro-support for this site',
-        'activate_renew' => 'Renew Pro-support for this site',
+        'activate_renew' => 'Buy/Renew Pro-support for this site',
     ];
 
 }

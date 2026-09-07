@@ -56,6 +56,7 @@ class ActivateSupportForm extends Form
         $this->translator->add(new ActivateSupportFormTranslations());
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function validate(): void
     {
         $hostName = $this->environment->get('hostName');
@@ -118,6 +119,9 @@ class ActivateSupportForm extends Form
 
         // 2nd fieldset: About.
         $accountStatus = $this->getAccountStatus();
+        // @todo: the "pro support" part from the About block should always be visible on
+        //   this form (extracted into its own fieldset or added to the 'activateFields'
+        //   fieldset).
         $fields['versionInformation'] = $this->getAboutBlock($accountStatus);
 
         return $fields;

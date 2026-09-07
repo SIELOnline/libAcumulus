@@ -37,6 +37,8 @@ use Siel\Acumulus\Product\StockTransactionResult;
  * - Populates the propertySources parameter.
  * - Executes the Collector.
  * - Returns the resulting {@see AcumulusObject}.
+ *
+ * @noinspection EfferentObjectCouplingInspection
  */
 class CollectorManager
 {
@@ -126,8 +128,12 @@ class CollectorManager
     /**
      * Collects a stock transaction for the given {@see \Siel\Acumulus\Product\Product} and change.
      */
-    public function collectStockTransactionForItemLine(Product $product, int|float $change, ?Item $item, StockTransactionResult $localResult): StockTransaction
-    {
+    public function collectStockTransactionForItemLine(
+        Product $product,
+        int|float $change,
+        ?Item $item,
+        StockTransactionResult $localResult
+    ): StockTransaction {
         $this->getPropertySources()
             ->clear()
             ->add('localResult', $localResult)

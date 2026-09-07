@@ -235,6 +235,8 @@ class AboutForm
      *   - set of info lines keyed by their label.
      *   - last index: name known for the contract or a general string like
      *     '[your name]'.
+     *
+     * @noinspection OffsetOperationsInspection false positives on accessing $myData.
      */
     protected function getContractList(null|bool|string $accountStatus): array
     {
@@ -245,7 +247,6 @@ class AboutForm
         } elseif ($myData === false || is_string($myData)) {
             $contract = [$this->t('no_contract_data')];
         } else {
-            /** @var array $myData */
             $contract = [''];
             $contract[$this->t('field_code')] = $myData['mycontractcode'] ?? $this->t('unknown');
             $contract[$this->t('field_companyName')] = $myData['mycompanyname'] ?? $this->t('unknown');
@@ -303,6 +304,8 @@ class AboutForm
      *   from 2022-06-03 to 2023-06-05."
      *
      * @todo: expired support seems to be present in the mysupport response value anyway.
+     *
+     * @noinspection OffsetOperationsInspection false positives on accessing $myData.
      */
     protected function getProSupportList(null|bool|string $accountStatus): array
     {
@@ -441,13 +444,13 @@ class AboutForm
      *   - true: credentials are correct.
      *   - false|string: credentials are incorrect.
      *
-     * @return null|false|string|array
+     * @return null|bool|string|array
      *   If $accountStatus = true, the my_data array as returned from the
      *   my_acumulus web API call, the $accountStatus otherwise.
      *
      * @todo: PHP 8.2 change bool to false in return type.
      */
-    public function getMyData(null|bool|string $accountStatus): null|false|string|array
+    public function getMyData(null|bool|string $accountStatus): null|bool|string|array
     {
         static $myData = null;
         if ($myData === null) {

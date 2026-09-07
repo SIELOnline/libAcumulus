@@ -263,7 +263,7 @@ class FormRenderer
     /**
      * Renders a form field itself, i.e. without label and description.
      */
-    protected function renderElement($field): string
+    protected function renderElement(array $field): string
     {
         $type = $field['type'];
         return match ($type) {
@@ -696,9 +696,8 @@ class FormRenderer
 
     /**
      * Adds (or overwrites) an attribute.
-     * If the attribute already exists and $multiple is false, the existing
-     * value will be overwritten. If it is true, or null while $attribute is
-     * 'class', it will be added.
+     * If the attribute already exists and $multiple is false, the existing value will be
+     * overwritten. If it is true, or null when $attribute ='class', it will be added.
      *
      * @param array $attributes
      *   The array of attributes to add the value to.

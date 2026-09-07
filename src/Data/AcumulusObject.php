@@ -92,8 +92,6 @@ abstract class AcumulusObject
      *   An array of property definitions, a property definition being a keyed
      *   array with keys 'name', 'type', 'required' (optional), and
      *   'allowedValues' (optional).
-     *
-     * @todo: make static? => lighter objects?
      */
     abstract protected function getPropertyDefinitions(): array;
 

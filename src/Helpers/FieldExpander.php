@@ -707,10 +707,6 @@ class FieldExpander
      * by "imploding" and/or calling __toString().
      *
      * Known usages: Magento2 street value is an array of street lines.
-     *
-     * @param mixed $value
-     *
-     * @return string
      */
     protected function valueToString(mixed $value): string
     {

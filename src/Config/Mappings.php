@@ -232,6 +232,9 @@ class Mappings
             ],
             DataType::Customer => [
             ],
+            // @todo: not sure that we should extract these 2 via source, should really be
+            //   on client/address. On the other hand: often, quite some code is needed to
+            //   to get from an internal country id to the country code.
             AddressType::Invoice => [
                 Fld::CountryCode => '[source::getCountryCode()|"nl"]',
             ],

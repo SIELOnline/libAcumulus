@@ -73,7 +73,7 @@ class FormHelper
     protected function getMeta(): array
     {
         if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
-            /** @noinspection JsonEncodingApiUsageInspection  Fail silently: tampering  */
+            /** @noinspection JsonEncodingApiUsageInspection  Fail silently: tampering */
             $meta = json_decode($_POST[static::Meta], false);
             if (is_object($meta) || is_array($meta)) {
                 $this->setMeta($meta);
@@ -106,9 +106,9 @@ class FormHelper
     /**
      * Adds the meta-field to the form fields.
      *
-     * To prevent problems with rendering (CSS using + or ~ selector) or with
-     * PrestaShop that only allows <fieldset>s at the top, the meta-field is added
-     * to the first fieldset or details element, or placed at the end.
+     * To prevent problems with rendering (CSS using + or ~ selector) or with PrestaShop
+     * that only allows <fieldset> tags at the top, the meta-field is added to the first
+     * fieldset or details element, or placed at the end.
      *
      * @param array[] $fields
      *

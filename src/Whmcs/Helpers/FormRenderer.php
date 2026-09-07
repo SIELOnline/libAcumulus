@@ -16,5 +16,6 @@ class FormRenderer extends BaseFormRenderer
      */
     public function __construct()
     {
+        $this->renderEmptyLabel = false;
     }
 }

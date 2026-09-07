@@ -8,6 +8,8 @@ use RuntimeException;
 
 use Siel\Acumulus\Helpers\Container;
 
+use Siel\Acumulus\Meta;
+
 use function count;
 use function is_scalar;
 
@@ -126,6 +128,18 @@ class LocalApi
     }
 
     /**
+     * Returns whether the product prices include vat or not.
+     *
+     * Note that at the time that older invoices were created, this setting may have been
+     * different. So try to use the invoice subtotal and total to determine if vat is
+     * missing on the item lines.
+     */
+    public function productPricesIncludeTax(): bool
+    {
+        return ($this->getConfig('TaxType') === 'Inclusive');
+    }
+
+    /**
      * Returns the invoice for the given id.
      */
     public function getInvoice(int $id): array
@@ -157,7 +171,7 @@ class LocalApi
     public function getCurrencyBySuffix(string $currencySuffix): ?array
     {
         $currencySuffix = trim($currencySuffix);
-        $currencies = $this->getList('Currencies', [], 'currencies', 'currency');
+        $currencies = $this->getList('GetCurrencies', [], 'currencies', 'currency');
         foreach ($currencies as $currency) {
             if ($currency['code'] === $currencySuffix) {
                 return $currency;

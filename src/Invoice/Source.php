@@ -52,7 +52,8 @@ abstract class Source implements WrapperInterface, Stringable
      * Returns the type of the wrapped source.
      *
      * @return string
-     *   One of the constants {@see Source::Order} or {@see Source::CreditNote}.
+     *   One of the constants {@see Source::Order}, {@see Source::CreditNote},
+     *   or {@see Source::Invoice}.
      */
     public function getType(): string
     {
@@ -408,6 +409,14 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
+     * @noinspection PhpUnused  May be called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     */
+    public function isInvoice(): ?Source
+    {
+        return $this->isType(Source::Invoice);
+    }
+
+    /**
      * Returns the original order or order id for this credit note.
      *
      * This method will only be called when $this represents a credit note.
@@ -503,7 +512,7 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * Creates the {@see Item}s ordered on this {@see Source}.
+     * Creates the {@see Item}s that were ordered with this {@see Source}.
      *
      * Overrides can use the {@see getShopObject()} method to get the shop order and
      * retrieve the item lines. If no item lines exist, which is highly unlikely, an empty

@@ -116,7 +116,7 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * Returns the field specifications to use.
+     * Returns the field specifications (aka mappings) to use.
      *
      * @return ArrayObject
      *   See return value of {@see \Siel\Acumulus\Config\Mappings::getFor()}.
@@ -158,8 +158,6 @@ abstract class Collector implements CollectorInterface
      *   A set of field specifications keyed by the target field name (property or
      *   metadata field in the target {@see AcumulusObject}).
      *
-     * @return \Siel\Acumulus\Data\AcumulusObject
-     *
      * @todo: Refactor string[]|null $fieldSpecifications like PropertySources.
      */
     public function collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null): AcumulusObject
@@ -167,10 +165,18 @@ abstract class Collector implements CollectorInterface
         $fieldSpecifications = $this->getFieldSpecifications($fieldSpecifications);
         $acumulusObject = $this->createAcumulusObject();
         $this->collectBefore($acumulusObject, $propertySources, $fieldSpecifications);
-        $this->collectMappedFields($acumulusObject, $propertySources, $fieldSpecifications);
-        $this->collectLogicFields($acumulusObject, $propertySources);
+        $this->collectFields($acumulusObject, $propertySources, $fieldSpecifications);
         $this->collectAfter($acumulusObject, $propertySources);
         return $acumulusObject;
+    }
+
+    /**
+     * Collects the fields of the object.
+     */
+    protected function collectFields(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
+    {
+        $this->collectMappedFields($acumulusObject, $propertySources, $fieldSpecifications);
+        $this->collectLogicFields($acumulusObject, $propertySources);
     }
 
     /**
@@ -178,6 +184,8 @@ abstract class Collector implements CollectorInterface
      * collect has been constructed, but before the real collecting starts.
      *
      * This base implementation does nothing, it is only meant for subclasses.
+     *
+     * Subclasses can e.g. add property sources
      *
      * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      *   The newly constructed object to collect values for.
@@ -187,11 +195,8 @@ abstract class Collector implements CollectorInterface
      *   The set of mappings that will be used for the "automatic" part of the collection
      *   phase.
      */
-    protected function collectBefore(
-        AcumulusObject $acumulusObject,
-        PropertySources $propertySources,
-        ArrayObject $fieldSpecifications
-    ): void {
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
+    {
     }
 
     /**
@@ -199,6 +204,9 @@ abstract class Collector implements CollectorInterface
      * been collected.
      *
      * This base implementation does nothing, it is only meant for subclasses.
+     *
+     * Subclasses can e.g. remove property sources that it added in the
+     * {@see Collector::collectBefore()} phase.
      *
      * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      *   The object on which the collected values have been set.
@@ -216,11 +224,8 @@ abstract class Collector implements CollectorInterface
      *   A set of field mapping specifications to fill properties of the
      *   $acumulusObject with.
      */
-    protected function collectMappedFields(
-        AcumulusObject $acumulusObject,
-        PropertySources $propertySources,
-        ArrayObject $fieldSpecifications
-    ): void {
+    protected function collectMappedFields(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
+    {
         foreach ($fieldSpecifications as $field => $pattern) {
             $this->collectMappedField($acumulusObject, $propertySources, $field, $pattern);
         }
@@ -232,7 +237,7 @@ abstract class Collector implements CollectorInterface
      * This base implementation does nothing as it cannot contain any (shop-specific)
      * logic about the properties. Override if the actual data object does have properties
      * that cannot be set with a simple mapping and depend on shop data (thus not
-     * configuration only).
+     * Acumulus configuration only).
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
@@ -243,7 +248,6 @@ abstract class Collector implements CollectorInterface
      *
      * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      *   An object to set the property on.
-     * @param \Siel\Acumulus\Collectors\PropertySources $propertySources
      * @param string $field
      *   The name of the property or metadata key to set.
      * @param mixed $value
@@ -266,7 +270,8 @@ abstract class Collector implements CollectorInterface
         if ($acumulusObject->isProperty($field)) {
             $result = $value !== null && $acumulusObject->set($field, $this->expandValue($value, $propertySources), $mode);
         } elseif ($this->isMetadata($field)) {
-            $acumulusObject->metadataSet($field, $this->expandValue($value, $propertySources));
+            $value1 = $this->expandValue($value, $propertySources);
+            $acumulusObject->metadataSet($field, $value1);
             $result = true;
         } else {
             $this->getLog()->notice(
@@ -315,8 +320,6 @@ abstract class Collector implements CollectorInterface
 
     /**
      * Returns whether $field indicates a metadata name.
-     *
-     * @param string $field
      *
      * @return bool
      *   True if the field indicates a metadata name, false otherwise.

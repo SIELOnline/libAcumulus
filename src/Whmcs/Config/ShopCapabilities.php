@@ -14,11 +14,11 @@ use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
-use WHMCS\Billing\Tax;
 use WHMCS\Database\Capsule;
 
 /**
@@ -30,7 +30,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     public function getDefaultShopMappings(): array
     {
-        // @todo: implement.
         return [
             DataType::Invoice => [
             ],
@@ -50,6 +49,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::PostalCode => '[source::getClient()::getShopObject()::postcode]',
                 Fld::City => '[source::getClient()::getShopObject()::city]',
                 Fld::CountryCode => '[source::getClient()::getShopObject()::country]',
+                Meta::ShopCountryName => '[source::getClient()::getShopObject()::getCountryNameAttribute()]',
             ],
             AddressType::Shipping => [
                 Fld::CountryCode => '',
@@ -65,13 +65,28 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // - product::getShopObject(): ?WC_Product
             LineType::Item => [
                 Fld::Product => '[item::getShopObject()::description]',
-                Fld::Quantity => '[source::getSign()]',
+                Fld::Quantity => '[source::getSign()]', // WHMCS has always quantity 1 (or -1 on return: @todo check the latter)
+                Fld::VatRate => '[source::getShopObject()::taxrate]',
+                Meta::VatRateSource => VatRateSource::Exact,
                 Meta::UnitPriceInc => '[item::getShopObject()::amount]',
                 Meta::Taxed => '[item::getShopObject()::taxed]',
             ],
         ];
     }
 
+    /**
+     * @todo: WHMCS knows the following invoice statuses (see Payments - Invoices submenu)
+     *   - Paid
+     *   - Draft
+     *   - Unpaid
+     *   - Overdue
+     *   - Cancelled
+     *   - Refunded
+     *   - Collections (???)
+     *   - Payment_Pending
+     *   Should/can we do something with that? Or should we only look at the available
+     *   hooks (as there does not seem to be a general "invoice status change" hook anyway)
+     */
     public function getShopOrderStatuses(): array
     {
         $result = [];
@@ -145,7 +160,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ->each(function ($tax) use (&$result) {
                 $result[$tax->name] = $tax->name;
             });
-        file_put_contents('C:/Projecten/Acumulus/WHMCS/www/modules/addons/acumulus/vat.json', json_encode($result));
         return $result;
     }
 
@@ -162,9 +176,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDefaultShopConfig(): array
     {
         return [
-            'sendEmptyShipping' => false,
+            // Shop
             'nature_shop' => Config::Nature_Services,
             'marginProducts' => Config::MarginProducts_No,
+            'vatFreeClass' => Config::VatClass_Null, // hidden
+            'zeroVatClass' => Config::VatClass_Null, // hidden
+            // Triggers
+            'triggerOrderStatus' => [], // hidden
+            // Customer setings.
+            'mainAddress' => Config::MainAddress_Invoice, // Shipping address will be hidden.
+            // Invoice show/mail buttons. @todo: decide if and what we can and want to show
             'showInvoiceDetail' => false,
             'mailInvoiceDetail' => false,
             'showPackingSlipDetail' => false,
@@ -174,6 +195,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'showPackingSlipList' => false,
             'mailPackingSlipList' => false,
             'emailAsPdf' => false,
+
+            'sendEmptyShipping' => false, // hidden
+
             'showPluginV84Message' => PHP_INT_MAX,
             'showPluginV8Message' => PHP_INT_MAX,
         ];

@@ -161,24 +161,35 @@ class Source extends BaseSource
 
     /**
      * @todo: I have no idea if currency suffix is always filled and is unique. If not,
-     *   we must use the amounts in the invoice (that do not have a currency! =? default
+     *   we must use the amounts in the invoice (that do not have a currency! => default
      *   configured currency?) and always return 'EUR' here.
      */
     public function getCurrency(): Currency
     {
-        $currency = $this->localApi()->getCurrencyBySuffix($this->getShopObject()['currencysuffix']);
-        return new Currency($currency['code'], $currency['rate'], true);
+        $currencyCode = $this->getShopObject()['currencysuffix'] ?? 'EUR';
+        if ($currencyCode !== 'EUR') {
+            $currency = $this->localApi()->getCurrencyBySuffix($currencyCode);
+            $result = new Currency($currency['code'], $currency['rate'], true);
+        } else {
+            $result = new Currency('EUR');
+        }
+        return $result;
     }
 
     /**
      * {@inheritdoc}
      *
-     * I doubt that tax2 is ever filled in the Dutch situation, but add it anyway,
-     * even if it is always 0.0.
+     * I doubt that the field 'tax2' is ever filled in the Dutch situation, but add it
+     * anyway, even if it is always 0.0. The same holds for the field 'credit', but as
+     * that is not a tax, perhaps 'subtotal' should not be passed as price ex at all.
      */
     public function getTotals(): Totals
     {
-        return new Totals((float) $this->getShopObject()['total'], (float) $this->getShopObject()['tax'] + (float) $this->getShopObject()['tax2']);
+        return new Totals(
+            (float) $this->getShopObject()['total'],
+            (float) $this->getShopObject()['tax'] + (float) $this->getShopObject()['tax2'],
+            (float) $this->getShopObject()['subtotal']
+        );
     }
 
     protected function setInvoice(): void

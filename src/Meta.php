@@ -27,7 +27,7 @@ namespace Siel\Acumulus;
 interface Meta
 {
     /**
-     * Set of json_encode flags we use to improve readability of metadata in xml messages.
+     * Set of JSON_encode flags we use to improve readability of metadata in XML messages.
      * Also see {@see \Siel\Acumulus\Helpers\Log::JsonFlags}.
      */
     public const JsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION;
@@ -60,16 +60,13 @@ interface Meta
     public const ShopCountryName = 'meta-shop-country-name';
     public const SubType = 'meta-sub-type';
 
-
-    // Invoice
+    // Invoice:
     public const SourceType = 'meta-source-type';
     public const SourceId = 'meta-source-id';
     public const SourceReference = 'meta-source-reference';
     public const SourceStatus = 'meta-source-status';
     public const SourceDate = 'meta-source-date';
     public const PricesIncludeVat = 'meta-prices-include-vat';
-    public const PrecisionPrice = 'meta-precision-price';
-    public const PrecisionVat = 'meta-precision-vat';
 
     // Shop invoice linked to this source (if existing).
     public const ShopInvoiceId = 'meta-shop-invoice-id';
@@ -89,7 +86,7 @@ interface Meta
      */
     public const Totals = 'meta-totals';
     /**
-     * Invoice: Source vat breakdown (usage: Opencart?, ???).
+     * Invoice: Source vat breakdown (usage: OpenCart?, ???).
      */
     public const VatBreakdown = 'meta-vat-breakdown';
     /**
@@ -110,14 +107,13 @@ interface Meta
 
     // Line: Price and vat related meta tags.
     /**
-     * Creator -> Completor/Strategy: Unit price inc vat (in addition to
-     * unitpriceinc).
+     * Creator -> Completor/Strategy: Unit price inc (in addition to field unitprice).
      */
     public const UnitPriceInc = 'unitpriceinc';
     /**
-     * WHMCS Creator -> Completor/Strategy: Unit price inc does contain tax?.
+     * WHMCS Creator -> Completor/Strategy: VAT was applied to the line?.
      */
-    public const Taxed = 'taxed';
+    public const Taxed = 'meta-taxed';
     /**
      * Creator -> Completor/Strategy: Amount of vat (per unit) (in addition to
      * vatrate).

@@ -93,6 +93,8 @@ use function strlen;
  *     - Possibly hierarchically structured.
  *     - Does not have to be complete or correct.
  *     - In the used currency, so not necessarily Euro.
+ *
+ * @method Invoice collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null)
  */
 class InvoiceCollector extends Collector
 {
@@ -102,19 +104,15 @@ class InvoiceCollector extends Collector
      * {@see \Siel\Acumulus\Data\EmailInvoiceAsPdf} and all its
      * {@see \Siel\Acumulus\Data\Line}s.
      *
-     * @return \Siel\Acumulus\Data\Invoice
+     * @param Invoice $acumulusObject
      */
-    public function collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null): AcumulusObject
+    protected function collectFields(AcumulusObject $acumulusObject, PropertySources $propertySources, ?ArrayObject $fieldSpecifications): void
     {
-        /** @var Invoice $invoice */
-        $invoice = parent::collect($propertySources, $fieldSpecifications);
-
-        $propertySources->add('invoice', $invoice);
-        $invoice->setCustomer($this->collectCustomer($propertySources));
-        $invoice->setEmailAsPdf($this->collectEmailAsPdf(EmailAsPdfType::Invoice, $propertySources));
-        $this->collectLines($invoice, $propertySources);
-
-        return $invoice;
+        parent::collectFields($acumulusObject, $propertySources, $fieldSpecifications);
+        $propertySources->add('invoice', $acumulusObject);
+        $acumulusObject->setCustomer($this->collectCustomer($propertySources));
+        $acumulusObject->setEmailAsPdf($this->collectEmailAsPdf(EmailAsPdfType::Invoice, $propertySources));
+        $this->collectLines($acumulusObject, $propertySources);
     }
 
     protected function collectCustomer(PropertySources $propertySources): Customer
@@ -158,8 +156,13 @@ class InvoiceCollector extends Collector
      * @param string $lineType
      *   The type of line to collect. One of the {@see LineType} constants.
      */
-    protected function collectLinesForType(Invoice $invoice, string $lineType, PropertySources $propertySources, bool $flattenChildren = true, ?string $getInfosMethod = null): void
-    {
+    protected function collectLinesForType(
+        Invoice $invoice,
+        string $lineType,
+        PropertySources $propertySources,
+        bool $flattenChildren = true,
+        ?string $getInfosMethod = null
+    ): void {
         /** @var Source $source */
         $source = $propertySources->get('source');
         if ($getInfosMethod === null) {

@@ -89,8 +89,6 @@ class Util
      * @param DOMDocument|DOMElement $element
      *   The element to append the values to.
      *
-     * @return DOMDocument|DOMElement
-     *
      * @throws \DOMException
      */
     protected function convertToDom(mixed $values, DOMDocument|DOMElement $element): DOMDocument|DOMElement
@@ -162,8 +160,6 @@ class Util
 
     /**
      * Converts an object or array to JSON.
-     *
-     * @param object|array $objectOrArray
      *
      * @return string
      *   The JSON representation for the given object or array.
@@ -243,8 +239,6 @@ class Util
      *   Return HTML or plain text.
      * @param callable $t
      *   Translate function.
-     *
-     * @return string
      */
     public function arrayToList(array $list, bool $isHtml, callable $t): string
     {

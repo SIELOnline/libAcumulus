@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Invoice;
 use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Product\Product;
+use Siel\Acumulus\Whmcs\Invoice\Client;
 use Stringable;
 
 use function count;
@@ -35,6 +36,7 @@ abstract class Source implements WrapperInterface, Stringable
     protected Source $orderSource;
     protected object|array|null $invoice;
     protected ?array $items;
+    protected ?Client $client;
 
     /**
      * Constructor.
@@ -527,6 +529,28 @@ abstract class Source implements WrapperInterface, Stringable
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
+
+    /**
+     * Returns the Client for this Source.
+     */
+    public function getClient(): Client
+    {
+        if (!isset($this->client)) {
+            $this->client = $this->createClient();
+        }
+        return $this->client;
+    }
+
+    /**
+     * Creates a {@see Client} for this {@see Source}.
+     *
+     * Overrides can use the {@see getShopObject()} method to get the shop source and
+     * retrieve the client. If no separate client object exist, null should be returned.
+     *
+     * Normally, this method will be called only once by the public method
+     * {@see getClient()}, so it is correct to create a new instance.
+     */
+    abstract protected function createClient(): ?Client;
 
     /**
      * Returns a set of "shipping-infos".

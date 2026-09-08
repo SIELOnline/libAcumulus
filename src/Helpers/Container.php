@@ -33,6 +33,7 @@ use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Invoice\Client;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
@@ -451,6 +452,23 @@ class Container
     public function createItem(int|string|object|array $itemOrId, Source $source): Item
     {
         return $this->getInstance('Item', 'Invoice', [$itemOrId, $source, $this], true);
+    }
+
+    /**
+     * Creates a new adapter/wrapper object for the given client of a source.
+     *
+     * @param int|string|object|array $clientOrId
+     *   The shop-specific client or its id to create an
+     *    {@see \Siel\Acumulus\Invoice\Client} instance for.
+     * @param Source $source
+     *   The invoice source to which the client belongs.
+     *
+     * @return \Siel\Acumulus\Invoice\Client
+     *   A wrapper object around a shop-specific invoice item line object.
+     */
+    public function createClient(int|string|object|array $clientOrId, Source $source): Client
+    {
+        return $this->getInstance('Client', 'Invoice', [$clientOrId, $source, $this], true);
     }
 
     /**

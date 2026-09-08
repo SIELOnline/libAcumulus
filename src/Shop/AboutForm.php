@@ -248,21 +248,21 @@ class AboutForm
             $contract = [$this->t('no_contract_data')];
         } else {
             $contract = [''];
-            $contract[$this->t('field_code')] = $myData['mycontractcode'] ?? $this->t('unknown');
-            $contract[$this->t('field_companyName')] = $myData['mycompanyname'] ?? $this->t('unknown');
+            $contract['field_code'] = $myData['mycontractcode'] ?? $this->t('unknown');
+            $contract['field_companyName'] = $myData['mycompanyname'] ?? $this->t('unknown');
             if (!empty($myData['mycontractenddate'])) {
                 $endDate = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $myData['mycontractenddate']);
                 if ($endDate) {
                     $now = new DateTimeImmutable();
                     $days = $now->diff($endDate)->days;
                     if ($days < 40) {
-                        $contract[$this->t('contract_end_date')] = $endDate->format('j F Y');
+                        $contract['contract_end_date'] = $endDate->format('j F Y');
                     }
                 }
             }
             /** @noinspection TypeUnsafeComparisonInspection */
             if ($myData['mymaxentries'] != -1) {
-                $contract[$this->t('entries_about')] = sprintf(
+                $contract['entries_about'] = sprintf(
                     $this->t('entries_numbers'),
                     $myData['myentries'],
                     $myData['mymaxentries'],
@@ -279,9 +279,9 @@ class AboutForm
                 } else {
                     $reason = '';
                 }
-                $contract[$this->t('email_status_label')] = !empty($reason)
+                $contract['email_status_label'] = !empty($reason)
                     ? sprintf($this->t('email_status_text_reason'), $reason)
-                    : $contract[$this->t('email_status_label')] = $this->t('email_status_text');
+                    : $this->t('email_status_text');
             }
             if (!empty($myData['mycontactperson'])) {
                 $contractContact = $myData['mycontactperson'];
@@ -428,8 +428,7 @@ class AboutForm
      * Converts an array with texts to a(n HTML) list.
      *
      * @param string[] $list
-     *   List of strings, if the key is s a string, it serves as a
-     *   (translatable) label.
+     *   List of strings, if the key is a string, it serves as a (translatable) label.
      * @param bool $isHtml
      *   Return HTML or plain text.
      */

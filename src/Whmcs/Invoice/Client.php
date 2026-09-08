@@ -13,6 +13,10 @@ use WHMCS\User\Client as WhmcsClient;
 /**
  * Client implements the WHMCS specific parts of a {@see \Siel\Acumulus\Invoice\Client} of
  * a {@see Source}.
+ *
+ * See https://developers.whmcs.com/classes/whmcs/user/client for the methods, and
+ * https://developers.whmcs.com/api-reference/getclientsdetails for the properties
+ * the shop object has.
  */
 class Client extends BaseClient
 {

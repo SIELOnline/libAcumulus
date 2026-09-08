@@ -148,21 +148,6 @@ class LocalApi
     }
 
     /**
-     * Returns the client details for the given user id.
-     *
-     * Notes:
-     * - The old code and Claude seem to suggest that user id and client id are the same.
-     * - The result contains the real values under an indirection with key 'client'.
-     *   This is unlike e.g. GetInvoice (no indirection) and GetOrders (2 indirections).
-     *
-     * See https://developers.whmcs.com/api-reference/getclientsdetails/
-     */
-    public function getClient(int $userId): array
-    {
-        return $this->exec('GetClientsDetails', ['clientid' => $userId, 'stats' => false])['client'];
-    }
-
-    /**
      * Returns a currency for the given suffix.
      *
      * An order only contains the currency prefix and suffix, so if we want currency info,

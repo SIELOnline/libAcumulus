@@ -14,18 +14,19 @@ abstract class Client
     use WrapperTrait;
 
     /**
-     * @var Source
-     *   A Source for this Client.
+     * @var ?Source
+     *   A Source for this Client, may be left empty if we need a Client object outside a
+     *   Source context.
      */
-    protected Source $source;
+    protected ?Source $source;
 
-    public function __construct(int|string|object|array|null $clientOrId, Source $source, Container $container)
+    public function __construct(int|string|object|array|null $clientOrId, ?Source $source, Container $container)
     {
         $this->source = $source;
         $this->initializeWrapper($clientOrId, $container);
     }
 
-    public function getSource(): Source
+    public function getSource(): ?Source
     {
         return $this->source;
     }

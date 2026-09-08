@@ -136,8 +136,7 @@ class Source extends BaseSource
 
     public function getCountryCode(): string
     {
-        $contact = $this->localApi()->getClient($this->getShopObject()['userid']);
-        return $contact['country'];
+        $this->getClient()->getShopObject()->country;
     }
 
     /**

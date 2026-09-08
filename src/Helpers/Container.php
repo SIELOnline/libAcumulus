@@ -460,13 +460,14 @@ class Container
      * @param int|string|object|array $clientOrId
      *   The shop-specific client or its id to create an
      *    {@see \Siel\Acumulus\Invoice\Client} instance for.
-     * @param Source $source
-     *   The invoice source to which the client belongs.
+     * @param ?Source $source
+     *   The invoice source to which the client belongs, may be left empty if we need a
+     *   Client object outside a Source context.
      *
      * @return \Siel\Acumulus\Invoice\Client
      *   A wrapper object around a shop-specific invoice item line object.
      */
-    public function createClient(int|string|object|array $clientOrId, Source $source): Client
+    public function createClient(int|string|object|array $clientOrId, ?Source $source = null): Client
     {
         return $this->getInstance('Client', 'Invoice', [$clientOrId, $source, $this], true);
     }

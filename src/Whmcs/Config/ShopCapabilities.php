@@ -42,14 +42,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             AddressType::Invoice => [
                 Fld::CompanyName1 => '[source::getClient()::companyname]',
-                Fld::FullName =>
-                    '[source::getClient()::getShopObject()::firstname+source::getClient()::getShopObject()::lastname]',
+                Fld::FullName => '[source::getClient()::getShopObject()::fullname]',
                 Fld::Address1 => '[source::getClient()::getShopObject()::address1]',
                 Fld::Address2 => '[source::getClient()::getShopObject()::address2]',
                 Fld::PostalCode => '[source::getClient()::getShopObject()::postcode]',
                 Fld::City => '[source::getClient()::getShopObject()::city]',
                 Fld::CountryCode => '[source::getClient()::getShopObject()::country]',
-                Meta::ShopCountryName => '[source::getClient()::getShopObject()::getCountryNameAttribute()]',
+                Meta::ShopCountryName => '[source::getClient()::getShopObject()::countryName]',
             ],
             AddressType::Shipping => [
                 Fld::CountryCode => '',

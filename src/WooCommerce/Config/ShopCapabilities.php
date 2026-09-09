@@ -15,6 +15,7 @@ use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Shop\ConfigFormTranslations;
 use WC_Tax;
 
 use function function_exists;
@@ -357,6 +358,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     public function getProductMatchShopFields(): array
     {
+        // 'field_productName' comes from the config form translation and these are not
+        // always loaded when we arrive here: @todo: why is that: only with a unit test?
+        $this->translator->add(new ConfigFormTranslations());
+
         return [
             '[product::getShopObject()::get_sku()]' => __('SKU', 'woocommerce'),
             '[product::getShopObject()::get_global_unique_id()]' => __('GTIN, UPC, EAN or ISBN.', 'woocommerce'),

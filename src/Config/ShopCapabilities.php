@@ -405,7 +405,9 @@ abstract class ShopCapabilities
      * Returns an option list of fields that can be used to match with Acumulus products.
      *
      * This basis implementation returns an empty array for shops that do not (yet)
-     * implement stock management. Should be overridden by shops that do implement this.
+     * implement stock management and throws a runtime exception for those that do,
+     * but have not overridden this method. Thus: must be overridden by shops that do
+     * implement stock management.
      *
      * @return string[]
      *   An array of product fields, with the key being a mapping,

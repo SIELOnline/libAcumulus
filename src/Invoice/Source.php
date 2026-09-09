@@ -550,7 +550,10 @@ abstract class Source implements WrapperInterface, Stringable
      * Normally, this method will be called only once by the public method
      * {@see getClient()}, so it is correct to create a new instance.
      */
-    abstract protected function createClient(): ?Client;
+    protected function createClient(): ?Client
+    {
+        throw new RuntimeException('Source::createClient() not implemented for ' . get_class($this));
+    }
 
     /**
      * Returns a set of "shipping-infos".

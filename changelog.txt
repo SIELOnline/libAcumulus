@@ -3,6 +3,13 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+8.8.0 (2026-09-??) (ALL?)
+-------------------------
+
+Refactorings:
+- Refactored Metadata and its "derived" classes": removed the deprecated addMultiple().
+
+
 8.7.2 (2026-06-??) (WC)
 -----------------------
 Bugs:

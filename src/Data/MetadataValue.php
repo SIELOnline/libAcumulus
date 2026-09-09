@@ -24,7 +24,7 @@ use function is_string;
  *
  * The Acumulus API will ignore any additional values that are sent as part of the message
  * structure. Additional values are fields that Acumulus does not know.
- * We use this to add additional information - metadata - to these structures for the
+ * We use this to add extra information - metadata - to these structures for the
  * following reasons:
  * - Processing: {@see \Siel\Acumulus\Collectors\Collector Collectors} collect all
  *   information from the webshop that is needed to create a complete and correct Acumulus
@@ -48,7 +48,7 @@ use function is_string;
  * - Will typically be rendered in JSON notation by using {@see json_encode()}. However,
  *   dates and times will be converted to ISO8601 notation and {@see Stringable} objects
  *   will be cast to strings.
- * - Note that objects that contain circular references will lead to failure.
+ * - Note that objects that contain circular references may lead to failure.
  */
 class MetadataValue
 {
@@ -102,7 +102,7 @@ class MetadataValue
      *
      * @param mixed $value
      *   The value to add to this property. If this is a
-     *   {@see array_is_list() numerically indexed array}:
+     *   {@see array_is_list() consecutively numerically indexed array}:
      *   - The property $isList is set to true (to correctly handle adding an empty array)
      *   - And each value is added separately
      *
@@ -137,14 +137,13 @@ class MetadataValue
                 $result = Number::castNumericValue($value);
             }
         } elseif (is_array($value)) {
-            // Recursively simplify values, but prevent endless loops.
+            // Recursively simplify values, but prevent endless loops (reference chains).
             if ($recursionLevel > 4) {
                 $result = get_debug_type($value);
             } else {
-                $result = [];
-                foreach ($value as $key => $singleValue) {
-                    $result[$key] = $this->simplifyValue($singleValue, $recursionLevel + 1);
-                }
+                $result = array_map(function ($singleValue) use ($recursionLevel) {
+                    return $this->simplifyValue($singleValue, $recursionLevel + 1);
+                }, $value);
             }
         } else {
             // $value is null, a scalar (but not a string), or an object: add as is.

@@ -138,7 +138,40 @@ class MetadataCollectionTest extends TestCase
         $mdc = new MetadataCollection();
         $mdc->add($name1, null, false);
         self::assertTrue($mdc->exists($name1));
-        self::assertNull( $mdc->get($name1));
+        self::assertNull($mdc->get($name1));
+    }
+
+    public function testMetadataCollectionAddArray(): void
+    {
+        $name1 = 'my_metadata1';
+        $data1 = ['a', 'b', 'c'];
+        $data2 = ['d', 'e', 'f'];
+
+        // Test list creation.
+        $mdc = new MetadataCollection();
+        $mdc->add($name1, $data1, true);
+        self::assertTrue($mdc->exists($name1));
+        self::assertCount(3, $mdc->get($name1));
+        $mdc->add($name1, $data2);
+        self::assertCount(6, $mdc->get($name1));
+
+        // Test list creation with $isList = false.
+        $mdc = new MetadataCollection();
+        $mdc->add($name1, $data1, false);
+        self::assertTrue($mdc->exists($name1));
+        self::assertCount(3, $mdc->get($name1));
+        $mdc->add($name1, $data2, false);
+        self::assertCount(6, $mdc->get($name1));
+
+        // Test not a list creation.
+        $data1 = array_combine($data1, $data1);
+        $data2 = array_combine($data2, $data2);
+        $mdc = new MetadataCollection();
+        $mdc->add($name1, $data1);
+        self::assertTrue($mdc->exists($name1));
+        self::assertCount(1, $mdc->get($name1));
+        $mdc->add($name1, $data2);
+        self::assertCount(2, $mdc->get($name1));
     }
 
     public function testToArray(): void

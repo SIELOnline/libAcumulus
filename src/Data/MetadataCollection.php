@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
-use Siel\Acumulus\Meta;
-
 use function array_key_exists;
 
 /**
@@ -111,11 +109,10 @@ class MetadataCollection
      * @param string $name
      *   The name for the metadata field.
      * @param mixed $value
-     *   The value to add to (or set for) the metadata field. If $isList = true and this
-     *   is a new metadata value and $value is null: an empty list is created (not a list
-     *   with null as its first value).
+     *   The value to add to (or set for) the metadata field.
      * @param bool $isList
-     *   Whether to handle this metadata field as a list (if it has only 1 value).
+     *   If $isList = true and this is a new metadata value and $value = null: an empty
+     *   list is created (not a list with null as its first value).
      */
     public function add(string $name, mixed $value, bool $isList = true): void
     {
@@ -126,25 +123,6 @@ class MetadataCollection
             }
         }
         $this->metadata[$name]->add($value);
-    }
-
-    /**
-     * Adds values to a metadata field, creating it if it not already exists.
-     *
-     * @param string $name
-     *   The name for the metadata field.
-     * @param array $values
-     *   The values to add to the metadata field.
-     *
-     * @deprecated: just use {@see add()}
-     */
-    public function addMultiple(string $name, array $values): void
-    {
-        // Creates an empty list (if $values is empty).
-        $this->add($name, null, true);
-        foreach ($values as $value) {
-            $this->add($name, $value, true);
-        }
     }
 
     public function toArray(): array

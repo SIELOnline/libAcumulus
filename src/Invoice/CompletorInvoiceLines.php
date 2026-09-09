@@ -249,7 +249,7 @@ class CompletorInvoiceLines
      */
     public function correctVatRateByRange(Line $line): void
     {
-        $line->metadataAddMultiple(
+        $line->metadataAdd(
             Meta::VatRateRangeMatches,
             $this->filterVatRateInfosByRange($line->metadataGet(Meta::VatRateMin), $line->metadataGet(Meta::VatRateMax))
         );

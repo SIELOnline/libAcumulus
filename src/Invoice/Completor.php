@@ -546,7 +546,7 @@ class Completor
         $this->invoice->metadataSet(Meta::LinesVatAmount, $linesVatAmount);
         if (!empty($this->lineTotalsStates['incomplete'])) {
             sort($this->lineTotalsStates['incomplete']);
-            $this->invoice->metadataAddMultiple(Meta::LinesIncomplete, $this->lineTotalsStates['incomplete']);
+            $this->invoice->metadataAdd(Meta::LinesIncomplete, array_values($this->lineTotalsStates['incomplete']));
         }
     }
 
@@ -920,9 +920,9 @@ class Completor
                     : 'message_warning_multiple_vattypes';
                 $this->changeInvoiceToConcept($invoice, $message, $code, $this->t($startSentence));
             }
-            $invoice->metadataAddMultiple(Meta::VatTypesPossibleInvoice, $this->possibleVatTypes);
-            $invoice->metadataAddMultiple(Meta::VatTypesPossibleInvoiceLinesIntersection, $vatTypeInfo['intersection']);
-            $invoice->metadataAddMultiple(Meta::VatTypesPossibleInvoiceLinesUnion, $vatTypeInfo['union']);
+            $invoice->metadataAdd(Meta::VatTypesPossibleInvoice, $this->possibleVatTypes);
+            $invoice->metadataAdd(Meta::VatTypesPossibleInvoiceLinesIntersection, $vatTypeInfo['intersection']);
+            $invoice->metadataAdd(Meta::VatTypesPossibleInvoiceLinesUnion, $vatTypeInfo['union']);
         }
     }
 
@@ -1022,7 +1022,7 @@ class Completor
                 }
                 // Add meta info to Acumulus invoice.
                 $possibleLineVatTypes = array_values($possibleLineVatTypes);
-                $line->metadataAddMultiple(Meta::VatTypesPossible, $possibleLineVatTypes);
+                $line->metadataAdd(Meta::VatTypesPossible, $possibleLineVatTypes);
                 // Add to result, union and intersection.
                 $list[$index] = $possibleLineVatTypes;
                 /** @noinspection SlowArrayOperationsInLoopInspection */

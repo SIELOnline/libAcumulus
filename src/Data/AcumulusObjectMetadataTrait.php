@@ -76,16 +76,6 @@ trait AcumulusObjectMetadataTrait
         $this->getMetadata()->add($name, $value, $isList);
     }
 
-    /**
-     * See {@see \Siel\Acumulus\Data\MetadataCollection::addMultiple()}.
-     *
-     * @deprecated just use {@see metadataAdd()}.
-     */
-    public function metadataAddMultiple(string $name, array $values): void
-    {
-        $this->getMetadata()->addMultiple($name, $values);
-    }
-
     public function metadataCopy(string $name, MetadataValue $metadataValue): void
     {
         $this->getMetadata()->copyMetadataValue($name, $metadataValue);
@@ -104,8 +94,6 @@ trait AcumulusObjectMetadataTrait
 
     /**
      * Adds a warning to the object (in its metadata).
-     *
-     * @param string|\Siel\Acumulus\Helpers\Message $message
      */
     public function addWarning(string|Message $message): void
     {

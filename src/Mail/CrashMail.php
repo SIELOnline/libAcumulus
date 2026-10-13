@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpMissingParentCallCommonInspection
+ */
 
 declare(strict_types=1);
 
@@ -36,6 +39,6 @@ class CrashMail extends Mail
     protected function getSupportMessageList(): array
     {
         $lines = (string) $this->args['exception'];
-        return $this->toParagraph(explode("\n", $lines));
+        return $this->toParagraph(explode("\n", $lines), false);
     }
 }

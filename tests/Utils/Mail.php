@@ -126,8 +126,8 @@ trait Mail
     {
         $shopName = str_replace('\\', '_', static::getContainer()->getShopNamespace());
         $subject = "___$shopName test mail___";
-        $bodyText = 'Text test message';
-        $bodyHtml = '<p>HTML Test message</p>';
+        $bodyText = 'Text test message met {accolades}.';
+        $bodyHtml = '<p>HTML Test message met {accolades}.</p>';
         $mailer = static::getContainer()->getMailer();
         self::assertTrue($mailer->sendAdminMail($subject, $bodyText, $bodyHtml), 'Sending mail failed');
         static::assertMailServerReceivedMail($subject, $hasTextPart ? $bodyText : null, $hasHtmlPart ? $bodyHtml : null, $isBase64);
@@ -200,6 +200,7 @@ trait Mail
     protected static function assertMailSentContainsParts(string $emlFile, ?string $bodyText, ?string $bodyHtml, bool $isBase64): void
     {
         $mailMessageContents = file_get_contents($emlFile);
+        $mailMessageContents = str_replace("=\r\n", '', $mailMessageContents);
         if ($bodyText !== null) {
             if ($isBase64) {
                 $bodyText = base64_encode($bodyText);

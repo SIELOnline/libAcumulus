@@ -28,6 +28,12 @@ use function strlen;
  */
 abstract class Mail
 {
+    /** @noinspection PhpUnused */
+    public const Translate_None = 0;
+    public const Translate_Label = 1;
+    public const Translate_Value = 2;
+    public const Translate_Both = Mail::Translate_Label | Mail::Translate_Value;
+
     private Mailer $mailer;
     private Config $config;
     private Environment $environment;
@@ -290,7 +296,7 @@ abstract class Mail
     {
         return $this->concatenateTextTuples(
             $this->toHeader('mail_about_header'),
-            $this->toTable($this->getAboutLines())
+            $this->toTable($this->getAboutLines(), Mail::Translate_Label)
         );
     }
 
@@ -329,7 +335,6 @@ abstract class Mail
 
     protected function getMessageList(): array
     {
-        /** @noinspection NullPointerExceptionInspection  Only called by getMessages() that checked getResult() */
         return [
             'text' => $this->getResult()->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages),
             'html' => $this->getResult()->formatMessages(Message::Format_HtmlListWithSeverity, Severity::RealMessages),
@@ -387,7 +392,6 @@ abstract class Mail
     {
         /**
          * @var \Siel\Acumulus\ApiClient\AcumulusResult $acumulusResult
-         * @noinspection NullPointerExceptionInspection existence checked in doAddSupport()
          */
         $acumulusResult = $this->getResult()->getAcumulusResult();
         $logMessages = new MessageCollection($this->translator);
@@ -417,9 +421,13 @@ abstract class Mail
      * @return string[]
      *   Description.
      */
-    protected function toParagraph(string|array $sentences): array
+    protected function toParagraph(string|array $sentences, bool $doTranslate = true): array
     {
-        $sentences = $this->replacePlaceholders($this->translatePhrases((array) $sentences));
+        $sentences = (array) $sentences;
+        if ($doTranslate) {
+            $sentences = $this->translatePhrases($sentences);
+        }
+        $sentences = $this->replacePlaceholders($sentences);
         return [
             'text' => wordwrap(implode(' ', $sentences), 70) . "\n",
             'html' => '<p>' . htmlspecialchars(implode("\n", $sentences), ENT_NOQUOTES) . "</p>\n",
@@ -434,16 +442,22 @@ abstract class Mail
         ];
     }
 
-    protected function toTable(array $rows): array
+    protected function toTable(array $rows, int $translate = Mail::Translate_Both): array
     {
         $tableRows = [];
         $maxLabelLength = 0;
         foreach ($rows as $label => $value) {
             // We need to translate and replace placeholders here, to get the correct
             // maximum header length.
-            $tableHeader = $this->t(strtr($label, $this->translatedPlaceholders));
+            $tableHeader = strtr($label, $this->translatedPlaceholders);
+            if (($translate & Mail::Translate_Label) !== 0) {
+                $tableHeader = $this->t($tableHeader);
+            }
             $maxLabelLength = max($maxLabelLength, strlen($tableHeader) + 2);
-            $tableCell = $this->t(strtr($value, $this->translatedPlaceholders));
+            $tableCell = strtr($value, $this->translatedPlaceholders);
+            if (($translate & Mail::Translate_Value) !== 0) {
+                $tableCell = $this->t($tableCell);
+            }
             $tableRows[$tableHeader] = $tableCell;
         }
         $tableText = '';

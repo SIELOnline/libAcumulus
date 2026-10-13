@@ -1,4 +1,7 @@
 <?php
+/**
+ * s@noinspection LongLine
+ */
 
 declare(strict_types=1);
 

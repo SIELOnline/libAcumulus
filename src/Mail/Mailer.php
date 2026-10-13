@@ -37,6 +37,7 @@ abstract class Mailer
         $this->config = $config;
         $this->environment = $environment;
         $this->translator = $translator;
+        $this->translator->add(new MailTranslations());
     }
 
     /**

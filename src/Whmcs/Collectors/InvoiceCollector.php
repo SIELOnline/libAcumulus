@@ -8,6 +8,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Collectors\InvoiceCollector as BaseInvoiceCollector;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
 
@@ -21,11 +22,14 @@ use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
  *   - The 'TaxType' config setting, but if that setting was ever changed, you're in
  *     trouble.
  *   - Whether the 'subtotal' or 'total' column of 'tblinvoices' equals the 'amount'
- *     totals of 'tblinvoiceitems', but this may not be fool-proof due to the 'credit' and
- *     'tax2' columns in 'tblinvoices'.
+ *     totals of 'tblinvoiceitems'. However, this may not be fool-proof due to the
+ *     'credit' and 'tax2' columns in 'tblinvoices'.
  * - The 'amount' column is the only amount stored in rows of this table! The table has a
  *   boolean column 'taxed' indicating whether vat was applied on this item or not. If vat
  *   was applied, the vat rate can be found at the invoice level in the column 'taxrate'.
+ *
+ * @todo: find out when and how the columns 'credit' and 'tax2' are used, so we can
+ *   correct the comparison.
  */
 class InvoiceCollector extends BaseInvoiceCollector
 {
@@ -37,6 +41,9 @@ class InvoiceCollector extends BaseInvoiceCollector
      */
     protected float $precision = 0.0001;
 
+    /**
+     * Returns whether the setting 'TaxType' equals 'Inclusive' (true) or 'Exclusive' (false).
+     */
     protected function productPricesIncludeTax(): bool
     {
         return $this->localApi()->productPricesIncludeTax();
@@ -80,6 +87,7 @@ class InvoiceCollector extends BaseInvoiceCollector
     {
         parent::collectAfter($acumulusObject, $propertySources);
 
+        $pricesIncludeVat = $this->invoicePricesIncludeTax($acumulusObject);
         foreach ($acumulusObject->getLines() as $line) {
             // Move amounts from Meta::UnitPriceInc to UnitPrice
             // Move amount to Meta::AmountInc if they are vat inclusive.
@@ -96,7 +104,7 @@ class InvoiceCollector extends BaseInvoiceCollector
             } else {
                 // Taxed line: move amount if the wrong amount was set.
                 // We do not assume which of the 2 fields was set.
-                if ($this->productPricesIncludeTax()) {
+                if ($pricesIncludeVat) {
                     // Move value from unit-price to unit-price inc.
                     if (!$line->metadataExists(Meta::UnitPriceInc) && isset($line->unitPrice)) {
                         $line->metadataSet(Meta::UnitPriceInc, $line->unitPrice);
@@ -119,5 +127,44 @@ class InvoiceCollector extends BaseInvoiceCollector
                 $line->metadataSet(Meta::PrecisionUnitPriceInc, $this->precision);
             }
         }
+    }
+
+    /**
+     * Returns whether the invoice item prices include tax or not.
+     *
+     * In WHMCS invoice items, the 'amount' column of the 'tblinvoiceitems' table is the
+     * amount as entered by the admin (which was either excluding or including vat).
+     * To determine if it is the amount ex or inc vat, we look at:
+     *  - Whether the 'subtotal' or 'total' column of 'tblinvoices' equals the 'amount'
+     *    totals of 'tblinvoiceitems'. However, this may not be fool-proof due to the
+     *    'credit' and 'tax2' columns in 'tblinvoices'.
+     * Therefore, if we cannot decide this based on the comparison above, we fall back to:
+     * - The 'TaxType' config setting.
+     * But, if that setting has been changed since the creation of the invoice at hand,
+     * we're in trouble. However, we cannot detect this, but nor is this likely to have
+     * happened, so the fall-back is pretty sure.
+     */
+    protected function invoicePricesIncludeTax(Invoice $invoice): bool
+    {
+        /** @var \Siel\Acumulus\Invoice\Totals|null $totals */
+        $totals = $invoice->metadataGet(Meta::Totals);
+        if ($totals !== null) {
+            $linesTotal = 0.0;
+            foreach ($invoice->getLines() as $line) {
+                if (!empty($line->unitPrice)) {
+                    $linesTotal += $line->unitPrice;
+                }
+                if ($line->metadataExists(Meta::UnitPriceInc)) {
+                    $linesTotal += $line->metadataGet(Meta::UnitPriceInc);
+                }
+            }
+            if ($linesTotal === $totals->amountEx) {
+                return false;
+            }
+            if ($linesTotal === $totals->amountInc) {
+                return true;
+            }
+        }
+        return $this->productPricesIncludeTax();
     }
 }

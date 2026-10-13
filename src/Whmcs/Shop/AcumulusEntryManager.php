@@ -155,7 +155,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             AcumulusEntry::$keyEntryId,
             'token',
             AcumulusEntry::$keyToken,
-            Source::Order, // literal value
+            Source::Invoice, // literal value
             AcumulusEntry::$keySourceType,
             'id',
             AcumulusEntry::$keySourceId,

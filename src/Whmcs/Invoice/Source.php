@@ -10,6 +10,7 @@ namespace Siel\Acumulus\Whmcs\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Currency;
 use Siel\Acumulus\Invoice\Source as BaseSource;
@@ -17,6 +18,7 @@ use Siel\Acumulus\Invoice\Totals;
 use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
 
 use function is_array;
+use function is_object;
 use function sprintf;
 use function strlen;
 
@@ -26,8 +28,12 @@ use function strlen;
  * For now, we only accept Invoices. In WHMCS, invoices are fully detailed data objects
  * not mere PDF's. Orders are so as well, but orders do not store tax and will (always?)
  * refer to an invoice anyway. Whereas, an invoice does not refer to an Order, probably
- * because of recurring payments due to automatic renewals which only will add an invoice,
- * not an order.
+ * because of recurring invoices/payments due to automatic renewals which only will add an
+ * invoice, not an order.
+ *
+ * WHMCS uses the (Laravel) Illuminate library for db-access. This library returns
+ * stdClass objects instead of arrays, like the local API does. So when a stdClass is
+ * passed to the constructor we convert it to an array.
  *
  * @todo: WHMCS 9 supports credit notes, but support is yet to be added.
  * @todo: Check for the following methods if WHMCS can have these and, if so, how to
@@ -45,6 +51,14 @@ use function strlen;
 class Source extends BaseSource
 {
     use LocalApiTrait;
+
+    public function __construct(string $type, object|array|int|string|null $idOrObject, Container $container)
+    {
+        if (is_object($idOrObject)) {
+            $idOrObject = (array) $idOrObject;
+        }
+        parent::__construct($type, $idOrObject, $container);
+    }
 
     /**
      * Loads an invoice for the set id.
@@ -89,7 +103,7 @@ class Source extends BaseSource
     public function getReference(): int
     {
         if ($this->getType() === Source::Invoice) {
-            return !empty($this->getShopObject()['invoicenum']) ? $this->getShopObject()['invoicenum'] : $this->getId();
+            return !empty($this->getShopObject()['invoicenum']) ? (int) $this->getShopObject()['invoicenum'] : $this->getId();
         }
         return parent::getReference();
     }
@@ -136,7 +150,7 @@ class Source extends BaseSource
 
     public function getCountryCode(): string
     {
-        $this->getClient()->getShopObject()->country;
+        return $this->getClient()->getShopObject()->country;
     }
 
     /**
@@ -180,7 +194,7 @@ class Source extends BaseSource
     }
 
     /**
-     * This WooCommerce override wraps {@see \WC_Order_Item_Product}s in Items,
+     * This WHMCS override wraps invoice items in Items,
      * ignoring empty lines, that is, lines with 0 quantity and total ("comment" lines?).
      *
      * @return array[]

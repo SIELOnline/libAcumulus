@@ -17,6 +17,8 @@ use WHMCS\User\Client as WhmcsClient;
  * See https://developers.whmcs.com/classes/whmcs/user/client for the methods, and
  * https://developers.whmcs.com/api-reference/getclientsdetails for the properties
  * the shop object has.
+ *
+ * @method Client getShopObject()
  */
 class Client extends BaseClient
 {
@@ -24,7 +26,6 @@ class Client extends BaseClient
 
     protected function setShopObject(): void
     {
-//        $this->shopObject = $this->localApi()->getClient($this->getId());
         $this->shopObject = WhmcsClient::find($this->getId());
     }
 

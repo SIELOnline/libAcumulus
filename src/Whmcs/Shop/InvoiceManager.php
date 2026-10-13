@@ -15,12 +15,6 @@ use WHMCS\Database\Capsule;
 class InvoiceManager extends BaseInvoiceManager
 {
     protected static array $sourceTypeTableInfo = [
-        Source::Order => [
-            'table' => 'tblorders',
-            'idField' => 'id',
-            'refField' => 'ordernum',
-            'dateField' => 'date',
-        ],
         Source::CreditNote => [ // @todo: add support for credit notes.
             'table' => 'tblinvoices',
             'idField' => 'id',
@@ -45,32 +39,6 @@ class InvoiceManager extends BaseInvoiceManager
         return $this->getSourcesByIdsOrSources($sourceType, $records);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * We support:
-     * - "WooCommerce Sequential Order Numbers (Pro)", see
-     *   https://wordpress.org/plugins/woocommerce-sequential-order-numbers/ and
-     *   http://docs.woothemes.com/document/sequential-order-numbers/.
-     * - "WC Sequential Order Numbers", see
-     *   https://wordpress.org/plugins/wc-sequential-order-numbers/ and
-     *   http://plugins.dualcube.com/product/wc-sequential-order-numbers/.
-     * - "Custom Order Numbers for WooCommerce (pro)", see
-     *   https://wordpress.org/plugins/custom-order-numbers-for-woocommerce and
-     *   https://wpfactory.com/item/custom-order-numbers-woocommerce/.
-     *
-     * If you know of other plugins, please let us know.
-     *
-     * These plugins mostly only store the number part, not the prefix, suffix
-     * or date part. If so, you will have to search for the number part only.
-     *
-     * To be able to define the query we need to know under which meta-key
-     * the order number/reference is stored.
-     * - WooCommerce Sequential Order Numbers: _order_number.
-     * - WooCommerce Sequential Order Numbers Pro: _order_number or _order_number_formatted.
-     * - WC Sequential Order Numbers: _order_number or _order_number_formatted.
-     * - Custom Order Numbers for WooCommerce (Pro): _alg_wc_custom_order_number.
-     */
     public function getInvoiceSourcesByReferenceRange(string $sourceType, string $referenceFrom, string $referenceTo, bool $fallbackToId): array
     {
         $results = [];

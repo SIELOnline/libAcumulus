@@ -22,7 +22,7 @@ use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
 use WHMCS\Database\Capsule;
 
 /**
- * Defines the WooCommerce web shop specific capabilities.
+ * Defines the WHMCS web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
@@ -106,7 +106,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getSupportedInvoiceSourceTypes(): array
     {
         return [
-            Source::Invoice,
+            Source::Invoice => ucfirst($this->t(Source::Invoice)),
         ];
     }
 
@@ -218,10 +218,15 @@ class ShopCapabilities extends ShopCapabilitiesBase
         };
     }
 
-    public function hasOrderList(): bool
+    public function hasInvoiceStatusScreen(): bool
     {
-        return true;
+        return false;
     }
+
+//    public function hasOrderList(): bool
+//    {
+//        return false;
+//    }
 
     public function getFiscalAddressSetting(): string
     {

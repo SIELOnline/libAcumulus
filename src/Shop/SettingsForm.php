@@ -785,18 +785,20 @@ class SettingsForm extends BaseConfigForm
         $fields['emailAsPdf_cb'] = [
             'type' => 'checkbox',
             'label' => $this->t('field_emailAsPdf'),
-            'description' => $this->t('desc_emailAsPdf'),
+            'description' => sprintf($this->t('desc_emailAsPdf'), $this->t('option_sendCustomer')),
             'options' => [
                 'emailAsPdf' => $this->t('option_emailAsPdf'),
                 'ubl' => $this->t('option_ubl'),
             ],
         ];
-        $fields['detailInvoice'] = [
-            'type' => 'checkbox',
-            'label' => $this->t('field_detailPage'),
-            'description' => $this->t('desc_detailPage'),
-            'options' => $this->getDocumentsOptions('Detail', 'invoice'),
-        ];
+        if ($this->shopCapabilities->hasInvoiceStatusScreen()) {
+            $fields['detailInvoice'] = [
+                'type' => 'checkbox',
+                'label' => $this->t('field_detailPage'),
+                'description' => $this->t('desc_detailPage'),
+                'options' => $this->getDocumentsOptions('Detail', 'invoice'),
+            ];
+        }
         if ($this->shopCapabilities->hasOrderList()) {
             $fields['listInvoice'] = [
                 'type' => 'checkbox',
@@ -816,23 +818,27 @@ class SettingsForm extends BaseConfigForm
     protected function getPackingSlipDocumentFields(): array
     {
         $fields = [];
-        $fields['packingSlipSubHeader'] = [
-            'type' => 'markup',
-            'value' => '<h3>' . ucfirst($this->t('document_packing_slip')) . '</h3>',
-        ];
-        $fields['detailPackingSlip'] = [
-            'type' => 'checkbox',
-            'label' => $this->t('field_detailPage'),
-            'description' => $this->t('desc_detailPage'),
-            'options' => $this->getDocumentsOptions('Detail', 'packing_slip'),
-        ];
-        if ($this->shopCapabilities->hasOrderList()) {
-            $fields['listPackingSlip'] = [
-                'type' => 'checkbox',
-                'label' => $this->t('field_listPage'),
-                'description' => $this->t('desc_listPage'),
-                'options' => $this->getDocumentsOptions('List', 'packing_slip'),
+        if ($this->shopCapabilities->hasInvoiceStatusScreen() || $this->shopCapabilities->hasOrderList()) {
+            $fields['packingSlipSubHeader'] = [
+                'type' => 'markup',
+                'value' => '<h3>' . ucfirst($this->t('document_packing_slip')) . '</h3>',
             ];
+            if ($this->shopCapabilities->hasInvoiceStatusScreen()) {
+                $fields['detailPackingSlip'] = [
+                    'type' => 'checkbox',
+                    'label' => $this->t('field_detailPage'),
+                    'description' => $this->t('desc_detailPage'),
+                    'options' => $this->getDocumentsOptions('Detail', 'packing_slip'),
+                ];
+            }
+            if ($this->shopCapabilities->hasOrderList()) {
+                $fields['listPackingSlip'] = [
+                    'type' => 'checkbox',
+                    'label' => $this->t('field_listPage'),
+                    'description' => $this->t('desc_listPage'),
+                    'options' => $this->getDocumentsOptions('List', 'packing_slip'),
+                ];
+            }
         }
         return $fields;
     }

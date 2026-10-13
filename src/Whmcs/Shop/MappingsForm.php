@@ -17,10 +17,10 @@ class MappingsForm extends BaseMappingsForm
 
     protected function getFieldDefinitions(): array
     {
-        $this->hidden = [
+        return $this->removeHiddenFields(parent::getFieldDefinitions(), [
             'configHeader',
             'shippingAddressMappingsHeader',
-        ];
-        return $this->removeHiddenFields(parent::getFieldDefinitions());
+            'emailPackingSlipPdfMappingsHeader',
+        ]);
     }
 }

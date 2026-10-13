@@ -16,20 +16,25 @@ use function in_array;
  */
 trait FormHandlingTrait
 {
-    /** @var string[] */
-    protected array $hidden = [];
-
-    protected function removeHiddenFields(array $fields): array
+    /**
+     * Removes hidden fields from a set of form fields.
+     *
+     * @param array[] $fields
+     *   List of form fields keyed by field name.
+     * @param string[] $hiddenFields
+     *   List of field names that are to be hidden (i.e. removed from $fields).
+     */
+    protected function removeHiddenFields(array $fields, array $hiddenFields): array
     {
         $result = [];
         foreach ($fields as $id => $field) {
-            if (!in_array($id, $this->hidden, true)) {
+            if (!in_array($id, $hiddenFields, true)) {
                 if (isset($field['fields'])) {
-                    $field['fields'] = $this->removeHiddenFields($field['fields']);
+                    $field['fields'] = $this->removeHiddenFields($field['fields'], $hiddenFields);
                 } elseif ($field['type'] === 'checkbox') {
                     // Remove individual checkboxes that are in the $hiddenFields list.
-                    $field['options'] = array_filter($field['options'], function ($optionId) {
-                        return !in_array($optionId, $this->hidden, true);
+                    $field['options'] = array_filter($field['options'], static function ($optionId) use ($hiddenFields) {
+                        return !in_array($optionId, $hiddenFields, true);
                     }, ARRAY_FILTER_USE_KEY);
                 }
                 $result[$id] = $field;

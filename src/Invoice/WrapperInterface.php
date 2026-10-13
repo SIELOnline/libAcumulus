@@ -34,6 +34,7 @@ interface WrapperInterface
      * be returned.
      */
     public function getReference(): int|string;
+
     /**
      * The translated {@see WrapperInterface::getType() type} of the wrapped object.
      *

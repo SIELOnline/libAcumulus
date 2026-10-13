@@ -36,6 +36,8 @@ use function sprintf;
  *
  * @nth: to prevent problems, add an additional confirmation step, including a list of
  *   sources that will be sent (with check boxes?).
+ *
+ * @noinspection EfferentObjectCouplingInspection
  */
 class BatchForm extends Form
 {
@@ -103,6 +105,7 @@ class BatchForm extends Form
         }
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function validate(): void
     {
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();

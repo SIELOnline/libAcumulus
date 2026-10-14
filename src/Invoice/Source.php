@@ -443,7 +443,7 @@ abstract class Source implements WrapperInterface, Stringable
      *
      * @return Source[]
      *   If this invoice source is a(n):
-     *   - Order: a - possibly empty - array of credit notes of this order.
+     *   - Order: a, possibly empty, array of credit notes of this order.
      *   - Credit note: an array with this credit note as the only element.
      */
     public function getCreditNotes(): array
@@ -471,7 +471,7 @@ abstract class Source implements WrapperInterface, Stringable
      * available.
      *
      * @return \iterable
-     *   The - possibly empty - set of refunds or refund-ids for this order.
+     *   The, possibly empty, set of refunds or refund-ids for this order.
      */
     protected function getShopCreditNotesOrIds(): iterable
     {
@@ -561,7 +561,7 @@ abstract class Source implements WrapperInterface, Stringable
      * A shipping-info is an "object" that contains information about a shipping line for
      * this invoice source. What this info looks like is shop-dependent, e.g.:
      * - In many shops shipping info is stored at the order level, so that is
-     *   returned as one and only array value, but only if shipping took place.
+     *   returned as an array with one array value, but only if shipping took place.
      * - In other shops, shipments may be stored as "total lines", "cart rules", or
      *   something like that, and this method would return an array of those "total lines"
      *   (or whatever they are called) that represent a shipment.
@@ -581,7 +581,7 @@ abstract class Source implements WrapperInterface, Stringable
      * getShippingLineInfosOrder() and getShippingLineInfosCreditNote().
      *
      * @return array
-     *   The - possibly empty - set of shipping-infos. The type of the array entries
+     *   The, possibly empty, set of shipping-infos. The type of the array entries
      *   differs per shop and may even differ within the list of 1 shop.
      *
      * @noinspection PhpUnused  called via
@@ -622,11 +622,8 @@ abstract class Source implements WrapperInterface, Stringable
     /**
      * Returns a set of "discount infos".
      *
-     * Comparable with shipping infos, see {@see Source::getShippingLineInfos()} for more
-     * explanation.
-     *
      * @return array
-     *   The - possibly empty - set of discount infos. The type of the array entries
+     *   The, possibly empty, set of discount infos. The type of the array entries
      *   differs per shop and may even differ within the list of 1 shop.
      *
      * @noinspection PhpUnused  called via

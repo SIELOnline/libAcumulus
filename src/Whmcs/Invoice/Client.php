@@ -18,7 +18,7 @@ use WHMCS\User\Client as WhmcsClient;
  * https://developers.whmcs.com/api-reference/getclientsdetails for the properties
  * the shop object has.
  *
- * @method Client getShopObject()
+ * @method WhmcsClient getShopObject()
  */
 class Client extends BaseClient
 {

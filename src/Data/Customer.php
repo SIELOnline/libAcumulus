@@ -196,7 +196,6 @@ class Customer extends AcumulusObject
     /**
      * @throws Error
      *   No address is set.
-     * @noinspection NullPointerExceptionInspection
      */
     public function toArray(): array
     {

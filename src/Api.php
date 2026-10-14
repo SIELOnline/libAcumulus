@@ -70,12 +70,12 @@ interface Api
     public const VatTypeId_Private = 1; // or vat exempt business.
     public const VatTypeId_Business = 2;
 
-    public const CountryAutoName_No  = 0;
-    public const CountryAutoName_OnlyForeign  = 1;
-    public const CountryAutoName_Yes  = 2;
+    public const CountryAutoName_No = 0;
+    public const CountryAutoName_OnlyForeign = 1;
+    public const CountryAutoName_Yes = 2;
 
-    public const DisableDuplicates_No  = 0;
-    public const DisableDuplicates_Yes  = 1;
+    public const DisableDuplicates_No = 0;
+    public const DisableDuplicates_Yes = 1;
 
     public const Region_NotSet = 0;
     public const Region_Netherlands = 1;

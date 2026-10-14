@@ -39,7 +39,6 @@ class Item extends BaseItem
             $product = $this->getRegistry()->create(MagentoProduct::class);
             $this->getRegistry()->get($product->getResourceName())->load($product, $this->shopObject->getProductId());
             return !empty($product->getId()) ? $this->getContainer()->createProduct($product, $this) : null;
-
         }
     }
 

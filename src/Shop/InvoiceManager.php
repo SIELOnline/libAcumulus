@@ -162,10 +162,15 @@ abstract class InvoiceManager
     /**
      * Returns a list of existing invoice sources for the given filters.
      *
+     * The filters mimic the form fields on the batch form.
+     *
      * @return \Siel\Acumulus\Invoice\Source[]
-     *   An array of invoice sources of the given source type.
+     *   A, possibly empty, array of invoice sources of the given source type that match
+     *   the filters.
      *
      * @todo: can we indicate whether we filtered on references or ids?
+     * @todo: can we optimise the database interaction (possibly 2 queries, intersecting
+     *   here in code, instead of in the database, then further filtering on status).
      */
     public function getInvoiceSourcesByFilters(string $sourceType, array $filters): array
     {
@@ -183,14 +188,11 @@ abstract class InvoiceManager
                     true
                 );
             }
-            if (array_key_exists('statuses', $filter)) {
-                $statuses = $filter['statuses'];
-            }
         }
         $list = array_intersect(...$lists);
-        if (isset($statuses)) {
-            $list = array_filter($list, static function (Source $item) use ($statuses) {
-                return array_key_exists($item->getStatus(), $statuses);
+        if (array_key_exists('statuses', $filter)) {
+            $list = array_filter($list, static function (Source $item) use ($filter) {
+                return array_key_exists($item->getStatus(), $filter['statuses']);
             });
         }
         return $list;
@@ -331,8 +333,8 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\InvoiceSendResult
      *   The result of updating (or not) the invoice.
-     * @todo: do we need this list? (e.g. to use it to decide on which API method to call?).
      *
+     * @todo: do we need the $changes list? (e.g. to use it to decide on which API method to call?).
      */
     public function sourceChange(Source $source, array $changes): InvoiceSendResult
     {
@@ -340,7 +342,7 @@ abstract class InvoiceManager
         $arguments = [];
         $acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($source);
         if ($acumulusEntry !== null) {
-            $result = $this->createAndUpdate($acumulusEntry, $source, $changes, $result);
+            $result = $this->updateAndSend($acumulusEntry, $source, $changes, $result);
             $sendStatus = $result->getSendStatus();
         } else {
             $sendStatus = InvoiceSendResult::NotSent_NotYetSent;
@@ -358,8 +360,6 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\InvoiceSendResult
      *   The result of sending (or not sending) the invoice.
-     *
-     * @noinspection PhpUnused
      */
     public function invoiceCreate(Source $source): InvoiceSendResult
     {
@@ -428,6 +428,9 @@ abstract class InvoiceManager
         return $this->getAcumulusApiClient()->emailInvoiceAsPdf($token, $emailAsPdf);
     }
 
+    /**
+     * Creates an Acumulus invoice-add object and sends it to Acumulus.
+     */
     protected function createAndSend(Source $source, InvoiceSendResult $result, bool $forceSend = false, bool $dryRun = false): InvoiceSendResult
     {
         $this->getInvoiceSend()->setBasicSendStatus($source, $result, $forceSend);
@@ -438,7 +441,13 @@ abstract class InvoiceManager
         return $result;
     }
 
-    protected function createAndUpdate(
+    /**
+     * Creates an Acumulus message to update an entry/invoice and sends it.
+     *
+     * @todo: implement
+     * @noinspection PhpUnusedParameterInspection
+     */
+    protected function updateAndSend(
         AcumulusEntry $entry,
         Source $source,
         array $changes,

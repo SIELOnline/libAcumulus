@@ -450,7 +450,7 @@ abstract class Mail
             // We need to translate and replace placeholders here, to get the correct
             // maximum header length.
             $tableHeader = strtr($label, $this->translatedPlaceholders);
-            if (($translate & Mail::Translate_Label) !== 0) {
+            if (($translate & Mail::Translate_Label) !== 0 && !str_contains($tableHeader, ' ')) {
                 $tableHeader = $this->t($tableHeader);
             }
             $maxLabelLength = max($maxLabelLength, strlen($tableHeader) + 2);

@@ -252,6 +252,7 @@ class Mappings
 // @todo: The adapter part of Product has been stalled temporarily: first move code from
 //    the Creators to ItemLineCollectors without changing it, only then refactor that
 //    code to use this.
+// @todo: use item::getProduct() instead of product:: in the mappings
 //                Fld::ItemNumber => '[product::getReference()]',
 //                Fld::Product => '[product::getName()]',
 //                Fld::Quantity => '[product::getQuantity()]',
@@ -259,7 +260,7 @@ class Mappings
 //                Meta::VatClassId => '[product::getVatClassId()]',
 //                Meta::VatClassName => '[product::getVatClassName()]',
                 Meta::Id => '[item::getId()]',
-                Meta::ProductId => '[product::getId()]',
+                Meta::ProductId => '[item::getProduct()::getId()]',
             ],
             DataType::StockTransaction => [
                 Fld::ProductId => '[product::getAcumulusId()]',

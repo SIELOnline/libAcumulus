@@ -5,13 +5,9 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Whmcs\Helpers;
 
 use RuntimeException;
-
 use Siel\Acumulus\Helpers\Container;
 
-use Siel\Acumulus\Meta;
-
 use function count;
-use function is_scalar;
 
 /**
  * Contains wrapper methods around WHMCS's {@see localApi()} call.
@@ -120,6 +116,8 @@ class LocalApi
 
     /**
      * Returns the value for the given setting.
+     *
+     * See https://developers.whmcs.com/api-reference/getconfigurationvalue
      */
     public function getConfig(string $setting): string
     {
@@ -141,6 +139,8 @@ class LocalApi
 
     /**
      * Returns the invoice for the given id.
+     *
+     * See https://developers.whmcs.com/api-reference/getinvoice
      */
     public function getInvoice(int $id): array
     {
@@ -152,6 +152,8 @@ class LocalApi
      *
      * An order only contains the currency prefix and suffix, so if we want currency info,
      * code and rate, we need to look it up via the suffix (hoping that it is unique).
+     *
+     * See https://developers.whmcs.com/api-reference/getcurrencies
      */
     public function getCurrencyBySuffix(string $currencySuffix): ?array
     {
@@ -168,5 +170,10 @@ class LocalApi
             }
         }
         return null;
+    }
+
+    public function getProduct(int $id): ?array
+    {
+        return $this->exec('GetProducts', ['pid' => $id]);
     }
 }

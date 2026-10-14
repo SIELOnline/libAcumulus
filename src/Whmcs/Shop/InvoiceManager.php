@@ -47,7 +47,7 @@ class InvoiceManager extends BaseInvoiceManager
             $records = Capsule::table($tableInfo['table'])
                 ->whereBetween($tableInfo['refField'], [$referenceFrom, $referenceTo])
                 ->orderBy($tableInfo['refField'])
-                ->get();
+                ->get('id');
             $results = $this->getSourcesByIdsOrSources($sourceType, $records);
         }
         if (empty($results) && $fallbackToId) {

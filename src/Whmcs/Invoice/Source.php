@@ -19,7 +19,6 @@ use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
 
 use function is_array;
 use function is_object;
-use function sprintf;
 use function strlen;
 
 /**
@@ -32,8 +31,9 @@ use function strlen;
  * invoice, not an order.
  *
  * WHMCS uses the (Laravel) Illuminate library for db-access. This library returns
- * stdClass objects instead of arrays, like the local API does. So when a stdClass is
- * passed to the constructor we convert it to an array.
+ * stdClass objects instead of arrays as the local API does. Moreover, it also doesn't
+ * contain the items. So when a stdClass is passed to the constructor we extract the id
+ * and pass that to the localApi to get thinvocie as an array with its items.
  *
  * @todo: WHMCS 9 supports credit notes, but support is yet to be added.
  * @todo: Check for the following methods if WHMCS can have these and, if so, how to
@@ -44,9 +44,10 @@ use function strlen;
  *   - getOtherLineInfos()
  *   - getDiscountLineInfos()
  *   - getManualLineInfos()
- *   - etVoucherLineInfos()
+ *   - getVoucherLineInfos()
  *
  * @method array getShopObject()
+ * @method array getInvoice()
  */
 class Source extends BaseSource
 {
@@ -55,7 +56,7 @@ class Source extends BaseSource
     public function __construct(string $type, object|array|int|string|null $idOrObject, Container $container)
     {
         if (is_object($idOrObject)) {
-            $idOrObject = (array) $idOrObject;
+            $idOrObject = $this->localApi()->getInvoice($idOrObject->id);
         }
         parent::__construct($type, $idOrObject, $container);
     }
@@ -68,11 +69,7 @@ class Source extends BaseSource
      */
     protected function setShopObject(): void
     {
-        if ($this->type === Source::Invoice) {
-            $this->shopObject = $this->localApi()->getInvoice($this->id);
-        } else {
-            throw new RuntimeException(sprintf('Not (yet) a supported source type (%s)', $this->type));
-        }
+        $this->shopObject = $this->localApi()->getInvoice($this->id);
     }
 
     /**
@@ -87,25 +84,22 @@ class Source extends BaseSource
             $type = get_debug_type($this->shopObject);
             throw new RuntimeException("'$type' is not an array");
         }
-        if (!isset($this->shopObject['id'])) {
-            throw new RuntimeException('Shop object does not an id');
+        if (!isset($this->shopObject['invoiceid'])) {
+            throw new RuntimeException('Shop object does not have an invoice id');
         }
-        $this->id = $this->shopObject['id'];
+        $this->id = $this->shopObject['invoiceid'];
     }
 
     /**
      * Returns the user facing reference for the web shop's invoice source.
      *
-     * @return int
-     *   The user facing id for the web shop's invoice source.
+     * @return string
+     *   The user facing reference for the web shop's invoice source.
      *   This is not necessarily the internal id.
      */
-    public function getReference(): int
+    public function getReference(): string
     {
-        if ($this->getType() === Source::Invoice) {
-            return !empty($this->getShopObject()['invoicenum']) ? (int) $this->getShopObject()['invoicenum'] : $this->getId();
-        }
-        return parent::getReference();
+        return $this->getShopObject()['invoicenum'] ?: (string) $this->getId();
     }
 
     public function getDate(): string
@@ -115,18 +109,18 @@ class Source extends BaseSource
 
     public function getStatus(): ?string
     {
-        return !empty($this->getShopObject()['status']) ? $this->getShopObject()['status'] : null;
+        return $this->getShopObject()['status'] ?: null;
     }
 
     public function getPaymentMethod(): ?string
     {
-        return !empty($this->getShopObject()['paymentmethod']) ? $this->getShopObject()['paymentmethod'] : null;
+        return $this->getShopObject()['paymentmethod'] ?: null;
     }
 
     /**
      * {@inheritdoc}
      *
-     * In WHMCS, the invoice's status is the payment statuses: 'Paid" or 'Unpaid'. The
+     * In WHMCS, the invoice's status is the payment status: 'Paid" or 'Unpaid'. The
      * payment status is stored in the, optional, originating order as 'paymentstatus'.
      */
     public function getPaymentStatus(): int
@@ -150,23 +144,56 @@ class Source extends BaseSource
 
     public function getCountryCode(): string
     {
-        return $this->getClient()->getShopObject()->country;
+        return $this->getClient()->getShopObject()->getCountryNameAttribute();
     }
 
     /**
-     * @todo: I have no idea if currency suffix is always filled and is unique. If not,
-     *   we must use the amounts in the invoice (that do not have a currency! => default
-     *   configured currency?) and always return 'EUR' here.
+     * {@inheritdoc}
+     *
+     * For WHMCS, only invoices are supported as sources, thus the invoice id
+     * is the source id.
+     */
+    public function getInvoiceId(): int
+    {
+        return $this->getId();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For WHMCS, only invoices are supported as sources, thus the invoice reference
+     * is the source reference.
+     */
+    public function getInvoiceReference(): string
+    {
+        return $this->getReference();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For WHMCS, only invoices are supported as sources, thus the invoice reference
+     * is the source reference.
+     */
+    public function getInvoiceDate(): string
+    {
+        return $this->getDate();
+    }
+
+    /**
+     * @todo: non Euro currencies: as soon as we have a test order with that.
      */
     public function getCurrency(): Currency
     {
-        $currencyCode = $this->getShopObject()['currencysuffix'] ?? 'EUR';
-        if ($currencyCode !== 'EUR') {
-            $currency = $this->localApi()->getCurrencyBySuffix($currencyCode);
-            $result = new Currency($currency['code'], $currency['rate'], true);
-        } else {
-            $result = new Currency('EUR');
-        }
+//        $currencyCode = $this->getShopObject()['currencysuffix'] ?? 'EUR';
+//        if ($currencyCode !== 'EUR') {
+//            $currency = $this->localApi()->getCurrencyBySuffix($currencyCode);
+//            $result = new Currency($currency['code'], $currency['rate'], true);
+//        } else {
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
+        /** @noinspection OneTimeUseVariablesInspection */
+        $result = new Currency('EUR');
+//        }
         return $result;
     }
 
@@ -176,6 +203,8 @@ class Source extends BaseSource
      * I doubt that the field 'tax2' is ever filled in the Dutch situation, but add it
      * anyway, even if it is always 0.0. The same holds for the field 'credit', but as
      * that is not a tax, perhaps 'subtotal' should not be passed as price ex at all.
+     *
+     * @todo: find out what the field 'credit' contains.
      */
     public function getTotals(): Totals
     {
@@ -188,9 +217,7 @@ class Source extends BaseSource
 
     protected function setInvoice(): void
     {
-        if ($this->getType() === Source::Order && !empty($this->getShopObject()['invoiceid'])) {
-            $this->invoice = $this->localApi()->getInvoice($this->getShopObject()['invoiceid']);
-        }
+        $this->invoice = $this->getShopObject();
     }
 
     /**

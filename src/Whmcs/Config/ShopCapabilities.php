@@ -66,6 +66,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::Product => '[item::getShopObject()::description]',
                 Fld::Quantity => '[source::getSign()]', // WHMCS has always quantity 1 (or -1 on return: @todo check the latter)
                 Fld::VatRate => '[source::getShopObject()::taxrate]',
+                Meta::ProductId => '[null]', // Product id is not available on an invoice item
                 Meta::VatRateSource => VatRateSource::Exact,
                 Meta::UnitPriceInc => '[item::getShopObject()::amount]',
                 Meta::Taxed => '[item::getShopObject()::taxed]',

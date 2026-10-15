@@ -253,7 +253,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             DataType::Invoice => [
                 // In PrestaShop you can enter a price with or without vat, the other being
                 // automatically updated. So we can not know how prices where entered.
-                Meta::PricesIncludeVat => null,
+                Meta::ProductPricesIncludeVat => null,
             ],
             DataType::Customer => [
                 // Customer defaults.

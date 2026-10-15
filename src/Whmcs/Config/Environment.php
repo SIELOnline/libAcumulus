@@ -7,6 +7,8 @@ namespace Siel\Acumulus\Whmcs\Config;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 use WHMCS\Database\Capsule;
 
+use function acumulus_get;
+
 /**
  * Defines the WHMCS web shop specific environment.
  */

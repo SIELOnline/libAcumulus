@@ -9,6 +9,7 @@ use Siel\Acumulus\Collectors\InvoiceCollector as BaseInvoiceCollector;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
 
@@ -64,7 +65,7 @@ class InvoiceCollector extends BaseInvoiceCollector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $acumulusObject->metadataSet(Meta::PricesIncludeVat, $this->productPricesIncludeTax());
+        $acumulusObject->metadataSet(Meta::ProductPricesIncludeVat, $this->productPricesIncludeTax());
     }
 
     /**
@@ -88,6 +89,7 @@ class InvoiceCollector extends BaseInvoiceCollector
         parent::collectAfter($acumulusObject, $propertySources);
 
         $pricesIncludeVat = $this->invoicePricesIncludeTax($acumulusObject);
+        $acumulusObject->metadataSet(Meta::InvoicePricesIncludeVat, $pricesIncludeVat);
         foreach ($acumulusObject->getLines() as $line) {
             // Move amounts from Meta::UnitPriceInc to UnitPrice
             // Move amount to Meta::AmountInc if they are vat inclusive.
@@ -158,13 +160,14 @@ class InvoiceCollector extends BaseInvoiceCollector
                     $linesTotal += $line->metadataGet(Meta::UnitPriceInc);
                 }
             }
-            if ($linesTotal === $totals->amountEx) {
+            if (Number::floatsAreEqual($linesTotal, $totals->amountEx)) {
                 return false;
             }
-            if ($linesTotal === $totals->amountInc) {
+            if (Number::floatsAreEqual($linesTotal, $totals->amountInc)) {
                 return true;
             }
         }
         return $this->productPricesIncludeTax();
     }
+
 }

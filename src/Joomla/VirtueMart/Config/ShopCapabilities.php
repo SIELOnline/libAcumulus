@@ -165,7 +165,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return [
             DataType::Invoice => [
-                Meta::PricesIncludeVat => false,
+                Meta::ProductPricesIncludeVat => false,
             ],
             DataType::Customer => [
                 // Customer defaults.

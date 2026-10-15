@@ -255,7 +255,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         return [
             DataType::Invoice => [
                 Meta::VatBreakdown => '[source::getVatBreakdown()]',
-                Meta::PricesIncludeVat => false,
+                Meta::ProductPricesIncludeVat => false,
             ],
             DataType::Customer => [
                 // Customer defaults.

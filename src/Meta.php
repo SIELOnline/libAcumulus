@@ -66,7 +66,22 @@ interface Meta
     public const SourceReference = 'meta-source-reference';
     public const SourceStatus = 'meta-source-status';
     public const SourceDate = 'meta-source-date';
-    public const PricesIncludeVat = 'meta-prices-include-vat';
+    /**
+     * We store the current value of this setting, or null if the shop does not have such
+     * a setting, like PrestaShop and HikaShop which let users enter one of the prices and
+     * then compute the other.
+     */
+    public const ProductPricesIncludeVat = 'meta-product-prices-include-vat';
+    /**
+     * WHMCS invoice items contain 1 amount column, which contains the product price at
+     * the moment of ordering/renewing it. Whether that price includes tax or not depends
+     * on the value of the ProductPricesIncludeVat setting at the moment of the order was
+     * placed which is not necessarily the current value. Therefore, we determine so based
+     * on comparing the totals and store that in this separate meta value.
+     *
+     * Only used in WHMCS.
+     */
+    public const InvoicePricesIncludeVat = 'meta-invoice-prices-include-vat';
 
     // Shop invoice linked to this source (if existing).
     public const ShopInvoiceId = 'meta-shop-invoice-id';

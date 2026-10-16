@@ -43,14 +43,6 @@ class InvoiceCollector extends BaseInvoiceCollector
     protected float $precision = 0.0001;
 
     /**
-     * Returns whether the setting 'TaxType' equals 'Inclusive' (true) or 'Exclusive' (false).
-     */
-    protected function productPricesIncludeTax(): bool
-    {
-        return $this->localApi()->productPricesIncludeTax();
-    }
-
-    /**
      * {@inheritdoc}
      *
      * This override adds the metadata field Meta::PricesIncludeVat. In WHMCS this is
@@ -88,8 +80,7 @@ class InvoiceCollector extends BaseInvoiceCollector
     {
         parent::collectAfter($acumulusObject, $propertySources);
 
-        $pricesIncludeVat = $this->invoicePricesIncludeTax($acumulusObject);
-        $acumulusObject->metadataSet(Meta::InvoicePricesIncludeVat, $pricesIncludeVat);
+        $acumulusObject->metadataSet(Meta::InvoicePricesIncludeVat, $this->invoicePricesIncludeTax($acumulusObject));
         foreach ($acumulusObject->getLines() as $line) {
             // Move amounts from Meta::UnitPriceInc to UnitPrice
             // Move amount to Meta::AmountInc if they are vat inclusive.
@@ -106,7 +97,7 @@ class InvoiceCollector extends BaseInvoiceCollector
             } else {
                 // Taxed line: move amount if the wrong amount was set.
                 // We do not assume which of the 2 fields was set.
-                if ($pricesIncludeVat) {
+                if ($acumulusObject->metadataGet(Meta::InvoicePricesIncludeVat)) {
                     // Move value from unit-price to unit-price inc.
                     if (!$line->metadataExists(Meta::UnitPriceInc) && isset($line->unitPrice)) {
                         $line->metadataSet(Meta::UnitPriceInc, $line->unitPrice);
@@ -170,4 +161,11 @@ class InvoiceCollector extends BaseInvoiceCollector
         return $this->productPricesIncludeTax();
     }
 
+    /**
+     * Returns whether the setting 'TaxType' equals 'Inclusive' (true) or 'Exclusive' (false).
+     */
+    protected function productPricesIncludeTax(): bool
+    {
+        return $this->localApi()->productPricesIncludeTax();
+    }
 }

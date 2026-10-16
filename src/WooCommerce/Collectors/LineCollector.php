@@ -45,7 +45,8 @@ class LineCollector extends BaseLineCollector
      *   The tax class of the product. For the default tax class it can be
      *   'standard' or the empty string. For no tax class at all, it will be
      *   PluginConfig::VatClass_Null.
-     *   @todo: Can it be null?
+     *
+     * @todo: Can $taxClassId be null?
      */
     protected function addVatRateLookupMetadataByTaxClass(Line $line, ?string $taxClassId, Invoice $invoice): void
     {

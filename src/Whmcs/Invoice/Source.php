@@ -224,6 +224,14 @@ class Source extends BaseSource
      * This WHMCS override wraps invoice items in Items,
      * ignoring empty lines, that is, lines with 0 quantity and total ("comment" lines?).
      *
+     * Note: WHMCS does have other item types:
+     * - If the 'type' starts with 'Promo' it is a reduction.
+     *
+     * However, these discounts are stored as proper item lines, so they are created here
+     * as well. This works corectly, but will give the lines an incorrect meta-sub-type
+     * that will be corrected afterwards in
+     * {@see \Siel\Acumulus\Whmcs\Collectors\LineCollector::collectAfter()}.
+     *
      * @return array[]
      */
     protected function createItems(): array
@@ -234,7 +242,6 @@ class Source extends BaseSource
         $items = $this->getShopObject()['items']['item'] ?? [];
         foreach ($items as $item) {
             // Only add when this is not an empty line.
-            // @todo: does WHMCS have other items? How to recognise? Only add when a product/service item.
             if (!Number::isZero((float) $item['amount'])) {
                 $result[] = $this->getContainer()->createItem($item, $this);
             }

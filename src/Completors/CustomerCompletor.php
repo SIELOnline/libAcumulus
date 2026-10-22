@@ -46,6 +46,7 @@ class CustomerCompletor extends BaseCompletor
         $this->getContainer()->getCompletorTask('Customer', 'ByConfig')->complete($this->customer);
         $this->getContainer()->getCompletorTask('Customer', 'Email')->complete($this->customer);
         $this->getContainer()->getCompletorTask('Customer', 'Anonymise')->complete($this->customer);
+        $this->getContainer()->getCompletorTask('Customer', 'Addresses')->complete($this->customer);
     }
 
     /**

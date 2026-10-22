@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
 
+use function in_array;
 use function is_string;
 
 /**
@@ -46,6 +48,8 @@ use function is_string;
  */
 class Address extends AcumulusObject
 {
+    protected ?string $addressType = null;
+
     protected function getPropertyDefinitions(): array
     {
         return [
@@ -73,5 +77,81 @@ class Address extends AcumulusObject
             $value = strtoupper($value);
         }
         return parent::set($name, $value, $mode);
+    }
+
+    public function setAddressType(?string $addressType): void
+    {
+        if (!in_array($addressType, [null, AddressType::Invoice, AddressType::Shipping, AddressType::Store], true)) {
+            throw new RuntimeException('Invalid address type');
+        }
+        $this->addressType = $addressType;
+    }
+
+    public function getAddressType(): ?string
+    {
+        return $this->addressType;
+    }
+
+    /**
+     * Returns whether 2 addresses are equal.
+     *
+     * To determine equalness we do a strict comparison of all the address parts, thus not
+     * on the properties countryAutoName, countryAutoNameLang, and addressType. For the
+     * country part we only look at the countryCode property, thus not the country
+     * property.
+     *
+     * Using strict comparison and not e.g. comparing sanitised parts (lower cased, excess
+     * spaces removed) is OK here as we mainly want to catch alt addresses that came from
+     * the same shop data because the shop only stores 1 address or the client chose to
+     * use the same address for shipping and invoicing.
+     */
+    public function equals(?Address $address): bool
+    {
+        return $address !== null
+            && $this->companyName1 === $address->companyName1
+            && $this->companyName2 === $address->companyName2
+            && $this->fullName === $address->fullName
+            && $this->address1 === $address->address1
+            && $this->address2 === $address->address2
+            && $this->postalCode === $address->postalCode
+            && $this->city === $address->city
+            && $this->countryCode === $address->countryCode;
+    }
+
+    /**
+     * Returns whether the address is being considered empty.
+     *
+     * A minimal fiscal or invoice address should have at least:
+     * - A name part: company name 1 or full name should be set
+     * - A location part: postal code or city should be set
+     * - The country should be set, but as this defaults to NL this will always be the case.
+     *
+     * A minimal shipping address constitutes:
+     * - A location part: postal code or city should be set
+     * - Premise/House Number: so address1 should be set
+     * - The country should be set, but as this defaults to NL this will always be the case.
+     *
+     * Address types and where it can be used for:
+     * - null: invoice, fiscal and shipping.
+     * - {@see AddressType::Invoice}: invoice, fiscal
+     * - {@see AddressType::Shipping}: shipping
+     * - {@see AddressType::Store}: invoice, fiscal, shipping
+     *
+     * This method can be used to prevent adding an alt address when only some country
+     * related fields are set (due to completion).
+     */
+    public function isEmpty(): bool
+    {
+        if (in_array($this->getAddressType(), [null, AddressType::Invoice, AddressType::Store], true)) {
+            if ((empty($this->fullName) && empty($this->companyName1)) || (empty($this->postalCode) && empty($this->city))) {
+                return true;
+            }
+        }
+        if (in_array($this->getAddressType(), [null, AddressType::Shipping, AddressType::Store], true)) {
+            if (empty($this->address1) || (empty($this->postalCode) && empty($this->city))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -83,7 +83,7 @@ class Customer extends AcumulusObject
     {
         parent::__clone();
         if (isset($this->invoiceAddress)) {
-            $this->invoice = clone $this->invoiceAddress;
+            $this->invoiceAddress = clone $this->invoiceAddress;
         }
         if (isset($this->shippingAddress)) {
             $this->shippingAddress = clone $this->shippingAddress;
@@ -131,9 +131,12 @@ class Customer extends AcumulusObject
         return $this->invoiceAddress;
     }
 
-    public function setInvoiceAddress(?Address $invoiceAddress): void
+    public function setInvoiceAddress(?Address $address): void
     {
-        $this->invoiceAddress = $invoiceAddress;
+        if ($address?->getAddressType() === AddressType::Shipping) {
+            $address->setAddressType(AddressType::Invoice);
+        }
+        $this->invoiceAddress = $address;
     }
 
     public function getShippingAddress(): ?Address
@@ -141,9 +144,12 @@ class Customer extends AcumulusObject
         return $this->shippingAddress;
     }
 
-    public function setShippingAddress(?Address $shippingAddress): void
+    public function setShippingAddress(?Address $address): void
     {
-        $this->shippingAddress = $shippingAddress;
+        if ($address?->getAddressType() === AddressType::Invoice) {
+            $address->setAddressType(AddressType::Shipping);
+        }
+        $this->shippingAddress = $address;
     }
 
     /**

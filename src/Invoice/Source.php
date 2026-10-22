@@ -256,6 +256,9 @@ abstract class Source implements WrapperInterface, Stringable
      * @return object|array|null
      *   The webshop invoice linked to this source,
      *   or null if no (separate) invoice is linked to this source.
+     *
+     * @todo: change this to return a Source object with type is Source::Invoice.
+     *   Then implement it in WHMCS.
      */
     protected function getInvoice(): object|array|null
     {
@@ -352,7 +355,7 @@ abstract class Source implements WrapperInterface, Stringable
      *   If the invoice source is a credit note, its original order is returned,
      *   otherwise, the invoice source is an order itself and $this is returned.
      */
-    public function getOrder(): Source
+    public function getOrder(): ?Source
     {
         if (!isset($this->orderSource)) {
             $this->orderSource = $this->getType() === Source::Order
@@ -428,7 +431,7 @@ abstract class Source implements WrapperInterface, Stringable
      * Do not do any object loading here if only the id is readily available.
      *
      * @return array|object|int
-     *   The original order itself, if readily available, or the ID of the
+     *   The original order itself, if already available, or the ID of the
      *   original order for this credit note.
      */
     protected function getShopOrderOrId(): object|array|int

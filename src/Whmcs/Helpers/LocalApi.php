@@ -8,6 +8,8 @@ use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
 
 use function count;
+use function is_array;
+use function is_int;
 
 /**
  * Contains wrapper methods around WHMCS's {@see localApi()} call.
@@ -148,24 +150,56 @@ class LocalApi
     }
 
     /**
-     * Returns a currency for the given suffix.
+     * Returns the client for the given id.
      *
-     * An order only contains the currency prefix and suffix, so if we want currency info,
-     * code and rate, we need to look it up via the suffix (hoping that it is unique).
+     * See https://developers.whmcs.com/api-reference/getclientsdetails
+     *
+     * @param int|array $id
+     *   The user/client id or, if it is an array, an data object that has a reference to
+     *   a user/client in a field 'userid', 'clientid', 'user_id, 'client_id' or 'id'. The
+     *   latter is dangerous as it will always return a value, but is used in the result
+     *   of the API call GetClients that returns summary info ofthe user and thus might be
+     *   used to get more detailed info.
+     */
+    public function getClient(int|array $id): array
+    {
+        if (is_array($id)) {
+            $id = $id['userid'] ?? $id['clientid'] ?? $id['user_id'] ?? $id['client_id'] ?? $id['id'];
+        }
+        return $this->exec('GetClientsDetails', ['clientid' => $id])['client'];
+    }
+
+    /**
+     * Returns a currency for the given id, code or suffix.
+     *
+     * - An invoice does NOT contain currency info, so we have to look that up via the
+     *   client (that has a currency id property).
+     * - An order only contains the currency prefix and suffix, so we need to look it up
+     *   via the suffix (hoping that it is unique).
      *
      * See https://developers.whmcs.com/api-reference/getcurrencies
      */
-    public function getCurrencyBySuffix(string $currencySuffix): ?array
+    public function getCurrency(int|string $currencyIdOrCode): ?array
     {
-        $currencySuffix = trim($currencySuffix);
+        if (is_int($currencyIdOrCode)) {
+            $field = 'id';
+            $value = $currencyIdOrCode;
+        } elseif (ctype_digit($currencyIdOrCode)) {
+            $field = 'id';
+            $value = (int) trim($currencyIdOrCode);
+        } else {
+            $field = 'code';
+            $value = trim($currencyIdOrCode);
+        }
         $currencies = $this->getList('GetCurrencies', [], 'currencies', 'currency');
         foreach ($currencies as $currency) {
-            if ($currency['code'] === $currencySuffix) {
+            if ($currency[$field] === $value) {
                 return $currency;
             }
         }
+        // Fallback on suffix
         foreach ($currencies as $currency) {
-            if (trim($currency['suffix']) === $currencySuffix) {
+            if (trim($currency['suffix']) === $value) {
                 return $currency;
             }
         }

@@ -144,14 +144,14 @@ class Source extends BaseSource
 
     public function getCountryCode(): string
     {
-        return $this->getClient()->getShopObject()->getCountryNameAttribute();
+        return $this->getClient()->getShopObject()['countrycode'];
     }
 
     /**
      * {@inheritdoc}
      *
-     * For WHMCS, only invoices are supported as sources, thus the invoice id
-     * is the source id.
+     * For WHMCS, only invoices are supported as sources,
+     * thus the invoice id is the source id.
      */
     public function getInvoiceId(): int
     {
@@ -161,8 +161,8 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * For WHMCS, only invoices are supported as sources, thus the invoice reference
-     * is the source reference.
+     * For WHMCS, only invoices are supported as sources,
+     * thus the invoice reference is the source reference.
      */
     public function getInvoiceReference(): string
     {
@@ -172,8 +172,8 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * For WHMCS, only invoices are supported as sources, thus the invoice reference
-     * is the source reference.
+     * For WHMCS, only invoices are supported as sources,
+     * thus the invoice date is the source date.
      */
     public function getInvoiceDate(): string
     {
@@ -181,20 +181,35 @@ class Source extends BaseSource
     }
 
     /**
-     * @todo: non Euro currencies: as soon as we have a test order with that.
+     * @todo: the original order, if any, can be considered the parent.
+     */
+    public function getParent(): ?Source
+    {
+        return null;
+    }
+
+    /**
+     * @todo: the original order, if any, can be considered the order.
+     */
+    public function getOrder(): ?Source
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * WHMCS does NOT store currency info with invoices (and only its suffix with orders,
+     * but I doubt that will be unique). So, we have to fetch this from the
+     * client, meaning that it may be incorrect if the invoice is not recent!.
+     * getCurrency
      */
     public function getCurrency(): Currency
     {
-//        $currencyCode = $this->getShopObject()['currencysuffix'] ?? 'EUR';
-//        if ($currencyCode !== 'EUR') {
-//            $currency = $this->localApi()->getCurrencyBySuffix($currencyCode);
-//            $result = new Currency($currency['code'], $currency['rate'], true);
-//        } else {
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        /** @noinspection OneTimeUseVariablesInspection */
-        $result = new Currency('EUR');
-//        }
-        return $result;
+        $currency = $this->localApi()->getCurrency($this->getClient()->getShopObject()['currency']);
+        return $currency !== null && $currency['code'] !== 'EUR'
+            ? new Currency($currency['code'], 1.0 / $currency['rate'], true)
+            : new Currency();
     }
 
     /**

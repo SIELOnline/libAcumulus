@@ -41,17 +41,17 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::Email => '[source::getClient()::getShopObject()::email]',
             ],
             AddressType::Invoice => [
-                Fld::CompanyName1 => '[source::getClient()::companyname]',
+                Fld::CompanyName1 => '[source::getClient()::getShopObject()::companyname]',
                 Fld::FullName => '[source::getClient()::getShopObject()::fullname]',
                 Fld::Address1 => '[source::getClient()::getShopObject()::address1]',
                 Fld::Address2 => '[source::getClient()::getShopObject()::address2]',
                 Fld::PostalCode => '[source::getClient()::getShopObject()::postcode]',
                 Fld::City => '[source::getClient()::getShopObject()::city]',
                 Fld::CountryCode => '[source::getClient()::getShopObject()::country]',
-                Meta::ShopCountryName => '[source::getClient()::getShopObject()::countryName]',
+                Meta::ShopCountryName => '[source::getClient()::getShopObject()::countryname]',
             ],
             AddressType::Shipping => [
-                Fld::CountryCode => '',
+                Fld::CountryCode => '[null]',
             ],
             EmailAsPdfType::Invoice => [
                 Fld::EmailTo => '[source::getClient()::getShopObject()::email]',
@@ -59,16 +59,15 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // Property sources for LineType::Item:
             // - source: Source
             // - item: Item,
-            // - item::getShopObject(): WC_Order_Item_product
-            // - product (or item::getProduct()): Product
-            // - product::getShopObject(): ?WC_Product
+            // - item::getShopObject(): array
+            // - product (or item::getProduct()): null
             LineType::Item => [
                 Fld::Product => '[item::getShopObject()::description]',
                 Fld::Quantity => '[source::getSign()]', // WHMCS has always quantity 1 (or -1 on return: @todo check the latter)
+                Fld::UnitPrice => '[item::getShopObject()::amount]',
                 Fld::VatRate => '[source::getShopObject()::taxrate]',
                 Meta::ProductId => '[null]', // Product id is not available on an invoice item
                 Meta::VatRateSource => VatRateSource::Exact,
-                Meta::UnitPriceInc => '[item::getShopObject()::amount]',
                 Meta::Taxed => '[item::getShopObject()::taxed]',
             ],
         ];
@@ -179,8 +178,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // Shop
             'nature_shop' => Config::Nature_Services,
             'marginProducts' => Config::MarginProducts_No,
-            'vatFreeClass' => Config::VatClass_Null, // hidden
-            'zeroVatClass' => Config::VatClass_Null, // hidden
+            'vatFreeClass' => Config::VatClass_NotApplicable,
+            'zeroVatClass' => Config::VatClass_NotApplicable,
             // Triggers
             'triggerOrderStatus' => [], // hidden
             // Customer setings.

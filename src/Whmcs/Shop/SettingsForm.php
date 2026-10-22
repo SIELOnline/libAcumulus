@@ -18,8 +18,6 @@ class SettingsForm extends BaseSettingsForm
     protected function getFieldDefinitions(): array
     {
         return $this->removeHiddenFields(parent::getFieldDefinitions(), [
-            'vatFreeClass',
-            'zeroVatClass',
             'triggerOrderStatus',
             'mainAddress',
             'sendEmptyShipping',

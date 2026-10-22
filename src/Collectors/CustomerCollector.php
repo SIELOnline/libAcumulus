@@ -82,6 +82,8 @@ class CustomerCollector extends Collector
 
     /**
      * @param \Siel\Acumulus\Data\Customer $acumulusObject
+     *
+     * @noinspection PhpMissingParentCallCommonInspection empty parent method.
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {

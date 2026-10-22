@@ -13,8 +13,9 @@ use Siel\Acumulus\Data\DataType;
 use function assert;
 
 /**
- * CompleteAnonymiseClient completes the {@see \Siel\Acumulus\Data\Customer::$template}
- * property of an {@see \Siel\Acumulus\Data\Customer}.
+ * CompleteAnonymise anonymises the data of the {@see \Siel\Acumulus\Data\Address} parts
+ * of the {@see \Siel\Acumulus\Data\Customer} object when the "Send customer data' setting
+ * is not checked.
  *
  * @todo: does this option work well with counting EU tax?
  * @todo: may we anonymise vat type = 6 invoices?

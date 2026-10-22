@@ -188,6 +188,4 @@ class CompleteAnonymiseTest extends TestCase
         $customerAfter = $customer->toArray();
         self::assertEqualsCanonicalizing($customerBefore, $customerAfter);
     }
-
-
 }

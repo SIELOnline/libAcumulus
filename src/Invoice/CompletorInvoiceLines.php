@@ -139,8 +139,6 @@ class CompletorInvoiceLines
 
     /**
      * Completes the invoice lines after they have been flattened.
-     *
-     * @param \Siel\Acumulus\Data\Invoice $invoice
      */
     protected function completeInvoiceLines(Invoice $invoice): void
     {
@@ -187,10 +185,6 @@ class CompletorInvoiceLines
 
     /**
      * Helper method to convert an amount field to euros.
-     *
-     * @param \Siel\Acumulus\Data\Line $line
-     * @param string $key
-     * @param Currency $currency
      *
      * @return bool
      *   Whether the amount was converted.
@@ -242,7 +236,7 @@ class CompletorInvoiceLines
      * This method is public to allow a 2nd call to just this method for a
      * single line (a missing amount line) added after a 1st round of
      * correcting. Do not use unless $this->possibleVatRates has been
-     * initialized.
+     * initialised.
      *
      * @param Line $line
      *   An invoice line with a calculated vat rate.

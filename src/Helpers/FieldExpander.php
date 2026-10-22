@@ -74,7 +74,7 @@ use function strlen;
  *         - null: empty string.
  *         - number: string representation of the number. (@todo: precision?)
  *         - array: imploded with glue = ' ' (a space).
- *         - object: if the _toString() method exists, it will be called, otherwise
+ *         - object: if the __toString() method exists, it will be called, otherwise
  *           {@see json_encode()} will be used.
  *
  * The syntax specification below formalizes the description above:
@@ -254,8 +254,9 @@ class FieldExpander
      */
     public function expand(string $fieldSpecification, PropertySources $propertySources): mixed
     {
-        // @todo: Recursively calling expand while already expanding failed because this
-        //   class had "call state". Pass $objects along all methods or keep this solution?
+        // Recursively calling expand while already expanding failed because this
+        // class/method has "call state". We don't want to pass $objects along all methods
+        // so we put it on the stack here and remove it at the end of this method.
         $oldObjects = $this->objects;
         $this->objects = $propertySources->toArray();
         // If the specification contains exactly 1 field expansion specification,
@@ -320,16 +321,16 @@ class FieldExpander
         foreach ($propertyAlternatives as $propertyAlternative) {
             $value = $this->expandAlternative($propertyAlternative);
             // Stop as soon as an alternative resulted in a non-empty value.
-            if (!empty($value)) {
+            if (!$this->isEmpty($value)) {
                 break;
             }
         }
 
-        if (empty($value)) {
+        if ($this->isEmpty($value) && !$this->isConstant($expansionSpecification)) {
             $this->log->debug("Field::expandSpecification('%s'): not found", $expansionSpecification);
         }
 
-        if ($sign !== null && !empty($value)) {
+        if ($sign !== null && !$this->isEmpty($value)) {
             $value = $sign * $value;
         }
         return $value;
@@ -568,8 +569,9 @@ class FieldExpander
     protected function getValueFromMethod(object $object, string $method, array $args): mixed
     {
         try {
-            return is_callable([$object, $method]) ? @$object->$method(...$args) : null;
-        } catch (Throwable) {
+            return is_callable([$object, $method]) ? $object->$method(...$args) : null;
+        } catch (Throwable $e) {
+            $this->log->debug($e->getMessage());
             return null;
         }
     }
@@ -656,7 +658,7 @@ class FieldExpander
             if ($value['type'] === self::TypeLiteral) {
                 // Literal value: set aside and only add if the next property value
                 // is not empty.
-                if (!empty($previous)) {
+                if ($previous !== '') {
                     // Multiple literals after each other: treat as 1 literal
                     // but do glue them together.
                     $previous .= $separator;
@@ -666,14 +668,14 @@ class FieldExpander
                 // Property value: if it is not empty, add any previous literal
                 // and the property value itself. If it is empty, discard any
                 // previous literal value.
-                if (!empty($valueStr)) {
-                    if (!empty($previous)) {
-                        if (!empty($result)) {
+                if ($valueStr !== '') {
+                    if ($previous !== '') {
+                        if ($result !== '') {
                             $result .= $separator;
                         }
                         $result .= $previous;
                     }
-                    if (!empty($result)) {
+                    if ($result !== '') {
                         $result .= $separator;
                     }
                     $result .= $valueStr;
@@ -687,8 +689,8 @@ class FieldExpander
 
         // Add a (set of) literal value(s) that came without property or if they
         // came as last value(s) and the result so far is not empty.
-        if (!empty($previous) && (!$hasProperty || !empty($result))) {
-            if (!empty($result)) {
+        if ($previous !== '' && (!$hasProperty || $result !== '')) {
+            if ($result !== '') {
                 $result .= $separator;
             }
             $result .= $previous;
@@ -746,5 +748,10 @@ class FieldExpander
             $value = '';
         }
         return $value;
+    }
+
+    protected function isEmpty(mixed $value): bool
+    {
+        return $value === null || $value === '';
     }
 }

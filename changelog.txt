@@ -3,8 +3,15 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.8.0 (2026-09-??) (ALL?)
--------------------------
+8.8.0 (2026-10-??) (ALL)
+------------------------
+Features:
+- Mapping shop fields to Acumulus invoice fields:
+  - 0-values (0, 0.0, '0', '0.0000') are no longer considered empty.
+    Only null and the empty string are considered empty.
+  - Exceptions that occur while trying to extract values are still ignored but are logged
+    at low priority (DEBUG level).
+- Created a module for the WHMCS platform that is based on this library.
 
 Refactorings:
 - Refactored Metadata and its "derived" classes": removed the deprecated addMultiple().

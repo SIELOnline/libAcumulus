@@ -263,9 +263,9 @@ class FieldExpanderTest extends TestCase
             ['[order::lines::0::product]', 'Buro'],
             ['[order::lines::2::product]', 'Comment'],
             ['[order::lines::2::qty]', 0],
-            ['[order::lines::2::qty|source::getSign()]', 1],
+            ['[order::lines::2::qty|source::getSign()]', 0],
             ['[order::lines::2::price]', 0.0],
-            ['[order::lines::2::price|source::getSign()]', 1],
+            ['[order::lines::2::price|source::getSign()]', 0.0],
             ['[order::lines::3::qty]', 0],
             ['[order::lines::3::price]', 0.0],
         ];

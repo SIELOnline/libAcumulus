@@ -1163,7 +1163,7 @@ class Completor
         if (empty($this->invoice->getCustomer()->vatTypeId)) {
             $vatTypeId = $this->isCompany() ? Api::VatTypeId_Business : Api::VatTypeId_Private;
             if ($this->isCompany()
-                && $this->isEu()
+                && ($this->isNl() || $this->isEu())
                 && !empty($this->invoice->vatType)
                 && $this->invoice->vatType !== Api::VatType_EuReversed
                 && !$this->isVatFreeInvoice()
@@ -1570,9 +1570,8 @@ class Completor
      */
     protected function isCompany(): bool
     {
-        // Note: companies outside EU must also fill in their vat number!? Even
-        // if there's no way to check it with a webservice like VIES.
-        /** @noinspection NullPointerExceptionInspection */
+        // @todo: companies outside EU/UK should not have to fill in a vat number to be
+        //   considered a company.
         return !empty($this->invoice->getCustomer()->getFiscalAddress()->companyName1) && !empty($this->invoice->getCustomer()->vatNumber);
     }
 

@@ -16,6 +16,11 @@ Features:
   compared for equality and "emptiness" (required address parts are missing).
   This allows to remove them or replace them by the other Address object.
 
+Bugs:
+- ALL: Telephone numbers formatted like '+33.612345678' where converted to a float value
+  (when used via field mappings).
+- ALL: Digital services to UK consumers are to be taxed with UK VAT (vat type = 7).
+
 Refactorings:
 - Refactored Metadata and its "derived" classes": removed the deprecated addMultiple().
 

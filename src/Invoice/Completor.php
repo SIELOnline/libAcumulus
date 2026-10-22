@@ -48,6 +48,7 @@ use function sprintf;
  * - Calls the strategy line completor.
  *
  * @noinspection PhpLackOfCohesionInspection
+ * @noinspection EfferentObjectCouplingInspection
  */
 class Completor
 {
@@ -154,7 +155,6 @@ class Completor
 
     public function getCompletorTask(string $dataType, string $task): CompletorTaskInterface
     {
-        /** @noinspection NullPointerExceptionInspection */
         return Container::getContainer()->getCompletorTask($dataType, $task);
     }
 
@@ -218,7 +218,7 @@ class Completor
     }
 
     /**
-     * Initializes the list of possible vat types for this invoice.
+     * Initialises the list of possible vat types for this invoice.
      *
      * The list of possible vat types depends on:
      * - Whether the vat type already has been set.
@@ -275,7 +275,6 @@ class Completor
                 if ($this->isNorthernIreland()) {
                     if (($nature & Config::Nature_Products) !== 0) {
                         // Nature = Products => treat Northern Ireland as EU.
-                        /** @noinspection NullPointerExceptionInspection will be set at this point */
                         $this->invoice->getCustomer()->getFiscalAddress()->countryCode = 'XI';
                         // @nth: remove duplication (with case isEu()).
                         // Can it be Dutch vat?
@@ -304,10 +303,12 @@ class Completor
                     $possibleVatTypes[] = Api::VatType_RestOfWorld;
                 }
                 if (($nature & Config::Nature_Services) !== 0) {
-                    // Nature = Services => treat Northern Ireland as the UK, i.e.
-                    // as rest of world.
-                    // Services should use vat type = 1 with vat free.
+                    // Nature = Services => treat Northern Ireland as the UK, i.e. as
+                    // rest of world. Use vat type = 1. However, digital services should
+                    // be taxed with UK VAT or reversed charge for companies.
                     $possibleVatTypes[] = Api::VatType_National;
+                    $possibleVatTypes[] = Api::VatType_OtherForeignVat;
+                    $possibleVatTypes[] = Api::VatType_RestOfWorld;
                 }
             } elseif ($this->isOutsideEu()) {
                 // Can it be national vat? Services should use vat type = 1 with
@@ -335,7 +336,7 @@ class Completor
     }
 
     /**
-     * Initializes the list of possible vat rates.
+     * Initialises the list of possible vat rates.
      *
      * The possible vat rates depend on:
      * - the possible vat types.
@@ -672,7 +673,6 @@ class Completor
             }
 
             /** @var \Siel\Acumulus\Data\Line $line */
-            /** @noinspection NullPointerExceptionInspection */
             $line = Container::getContainer()->createAcumulusObject(DataType::Line);
             $line->product = $product;
             $line->quantity = 1;
@@ -1267,10 +1267,10 @@ class Completor
      * - Reversed vat invoices, EU or national (vat type = 2 or 3).
      * - Products outside the EU (vat type = 4).
      * Vat free should be used for:
-     * - Small companies that use the KOR: All products in their catalog should
+     * - Small companies that use the KOR: All products in their catalogue should
      *   use the vat free tax class.
      * - Vat free products and services, e.g. care, education (vat type = 1 or
-     *   5): The vat free products in their catalog should use the vat free tax
+     *   5): The vat free products in their catalogue should use the vat free tax
      *   class.
      * - Services outside the EU, consumers or companies (vat type = 1): The
      *   product/service should have a "normal" vat class, but the rate should
@@ -1369,7 +1369,7 @@ class Completor
                     $this->changeInvoiceToConcept($invoice, 'eu_commerce_threshold_will_pass', 831);
                     break;
                 case Completor::EuSales_Warning:
-                    // Send mail with notice, xml message will not be added if
+                    // Send mail with notice, XML message will not be added if
                     // there are no warnings or worse.
                     $this->result->createAndAddMessage($this->t('eu_commerce_threshold_warning'), Severity::Notice, 832);
                     break;
@@ -1547,7 +1547,6 @@ class Completor
      *   distinguish NI within country code UK:
      *   {@link https://www.webmasterworld.com/forum22/4514.htm}.
      *
-     * @noinspection NullPointerExceptionInspection
      *   Customer and fiscal address will be set at this point.
      */
     protected function isNorthernIreland(): bool
@@ -1796,7 +1795,6 @@ class Completor
                 $message = sprintf($message, ...$args);
             }
             $this->result->createAndAddMessage($message, Severity::Warning, $code);
-            /** @noinspection NullPointerExceptionInspection */
             $this->addWarning($acumulusObject, $this->result->getByCode($code)->format(Message::Format_Plain));
         }
     }
@@ -1814,8 +1812,6 @@ class Completor
     }
 
     /**
-     * @param int $year
-     *
      * @return int
      *   One of the {@see Completor}::EuSales_... constants.
      */

@@ -32,19 +32,15 @@ class Number
     /**
      * Tries to cast a numeric string value to an int or float.
      *
-     * Note that we don't want to cast phone numbers that often start with a 0 or +. So we
-     * check that the first digit is not a zero, and we only allow a minus sign before the
+     * Note that we don't want to cast phone numbers.
+     * Those often start with a 0 or +. So we check that the first digit is not a zero, and we only allow a minus sign before the
      * number, not a (redundant) plus sign.
      */
     public static function castNumericValue(mixed $value): mixed
     {
-        if (is_string($value) && is_numeric($value)) {
+        if (is_string($value) && is_numeric($value) && strpbrk($value, '0+') !== $value) {
             // Is it a float or an int? Check integers for phone number.
-            if (strpbrk($value, '.eE') !== false) {
-                $value = (float) $value;
-            } elseif (strpbrk($value, '0+') !== $value || strlen($value) <= 4) {
-                $value = (int) $value;
-            }
+            $value = strpbrk($value, '.eE') !== false ? (float) $value : (int) $value;
         }
         return $value;
     }

@@ -37,7 +37,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 // Customer defaults.
                 Fld::ContactYourId => '[source::getClient()::getShopObject()::id]',
                 Fld::VatNumber => '[source::getClient()::getShopObject()::tax_id]',
-                Fld::Telephone => '[source::getClient()::getShopObject()::phonenumber]',
+                Fld::Telephone => '[source::getClient()::getShopObject()::phonenumberformatted]',
                 Fld::Email => '[source::getClient()::getShopObject()::email]',
             ],
             AddressType::Invoice => [

@@ -12,9 +12,6 @@ use Siel\Acumulus\Helpers\Number;
  */
 class NumberTest extends TestCase
 {
-    /**
-     * Note that we test with both DateTime and DateTimeImmutable.
-     */
     public static function getCastNumericValueDataProvider(): array
     {
         return [
@@ -26,18 +23,22 @@ class NumberTest extends TestCase
             [1.25, 1.25],
             ['test', 'test'],
             ['+33012345678', '+33012345678'],
+            ['+33.012345678', '+33.012345678'],
+            ['33.012345678', '33.012345678'],
+            ['33 12345678', '33 12345678'],
             ['012345678', '012345678'],
             ['0.12', 0.12],
             ['0.12e-3', 0.12e-3],
             ['0.12 test', '0.12 test'],
-            [['1', 2], ['1',2]],
+            [['1', 2], ['1', 2]],
         ];
     }
 
     /**
      * @dataProvider getCastNumericValueDataProvider
+     *
+     * Note: this method also tests {@see Number::isPossiblyPhoneNumber()}.
      */
-
     public function testCastNumericValue(mixed $value, mixed $expected): void
     {
         self::assertSame($expected, Number::castNumericValue($value));
@@ -61,5 +62,4 @@ class NumberTest extends TestCase
         self::assertLessThanOrEqual(0.21, $test4['min']);
         self::assertGreaterThanOrEqual(0.21, $test4['max']);
     }
-
 }

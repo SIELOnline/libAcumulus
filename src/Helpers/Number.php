@@ -32,17 +32,30 @@ class Number
     /**
      * Tries to cast a numeric string value to an int or float.
      *
-     * Note that we don't want to cast phone numbers.
-     * Those often start with a 0 or +. So we check that the first digit is not a zero, and we only allow a minus sign before the
-     * number, not a (redundant) plus sign.
+     * Note that we don't want to cast phone numbers, so we check for that if we find a
+     * numeric string value.
      */
     public static function castNumericValue(mixed $value): mixed
     {
-        if (is_string($value) && is_numeric($value) && strpbrk($value, '0+') !== $value) {
+        if (is_string($value) && is_numeric($value) && !Number::isPossiblyPhoneNumber($value)) {
             // Is it a float or an int? Check integers for phone number.
             $value = strpbrk($value, '.eE') !== false ? (float) $value : (int) $value;
         }
         return $value;
+    }
+
+    /**
+     * Returns whether a numeric string might be a phone number.
+     * - integer  string starting with 0: 0123456789.
+     * - numeric string starting with a +: +33123456789 or +31.123456789
+     *   \+[1-9][0-9]{0-2}\.?[0-9]{1-}
+     *
+     * @param string $value
+     *   A {@see is_numeric() numeric} string.
+     */
+    public static function isPossiblyPhoneNumber(string $value): bool
+    {
+        return !strpbrk($value, 'eE') && strlen($value) > 5 && preg_match('/(\+?[1-9]\d{0,2}\.?)?\d+/', $value);
     }
 
     /**

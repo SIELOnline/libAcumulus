@@ -15,6 +15,7 @@ Features:
 - The 2 Addresses data objects that are part of the Customer data object can now be
   compared for equality and "emptiness" (required address parts are missing).
   This allows to remove them or replace them by the other Address object.
+- Improved checking for phone numbers so they don't end up as a fully numeric value.
 
 Bugs:
 - ALL: Telephone numbers formatted like '+33.612345678' where converted to a float value

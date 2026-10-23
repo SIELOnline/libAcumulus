@@ -17,9 +17,6 @@ use function sprintf;
  * This base class will log to the PHP error file. It should be overridden per
  * web shop to integrate with the web shop's specific way of logging.
  *
- * @todo: separate method for logging API calls, this would allow to use WHMCS' logModuleCall()
- * .
- *
  * @todo: log a Message
  * @todo: log a Message[]
  * @todo: log a MessageCollection

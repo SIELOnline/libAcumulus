@@ -929,7 +929,6 @@ class Acumulus
      *
      * @noinspection PhpUnusedParameterInspection
      * @todo: not used for now, will become part of emailAsPdf structure?
-     *
      */
     public function emailPackingSlipAsPdf(
         string $token,
@@ -999,17 +998,16 @@ class Acumulus
         } catch (AcumulusException $e) {
             // Situation 1 or 2. We will log the situation and rethrow.
             $exception = $e;
+            $logLevel = Severity::Exception;
             throw $e;
         } finally {
-            // @todo: to use WHMCS logModuleCall we should add a Log::logRequestResponse() method
-            $logLevel = $logLevel ?? Severity::Exception;
-            $this->log->log($logLevel, $acumulusRequest->getMaskedRequest());
-            if (isset($acumulusResult)) {
-                $this->log->log($logLevel, $acumulusResult->getMaskedResponse());
-            }
-            if (isset($exception)) {
-                $this->log->exception($exception);
-            }
+            /** @noinspection ProperNullCoalescingOperatorUsageInspection, PhpUndefinedVariableInspection */
+            $this->log->apiCall(
+                $apiFunction,
+                $acumulusRequest->getMaskedRequest(),
+                $acumulusResult?->getMaskedResponse() ?? $exception,
+                $logLevel
+            );
         }
     }
 

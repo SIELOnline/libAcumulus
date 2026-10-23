@@ -22,7 +22,9 @@ Bugs:
 - ALL: Digital services to UK consumers are to be taxed with UK VAT (vat type = 7).
 
 Refactorings:
-- Refactored Metadata and its "derived" classes": removed the deprecated addMultiple().
+- API calls now have their own direct log method apiCall(...) like exception($e).
+  This to support WHMCS's module log.
+- Metadata and its "derived" classes": removed the deprecated addMultiple().
 
 8.7.2 (2026-06-??) (WC)
 -----------------------

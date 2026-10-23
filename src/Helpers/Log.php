@@ -103,7 +103,7 @@ class Log
     protected function hasBeenLogged(string $message): bool
     {
         foreach ($this->loggedMessages as $loggedMessage) {
-            if ($loggedMessage['message'] === $message || $loggedMessage['format'] === $message) {
+            if (str_starts_with($loggedMessage['message'], $message) || $loggedMessage['format'] === $message) {
                 return true;
             }
         }
@@ -246,6 +246,18 @@ class Log
      */
     public function exception(Throwable $e, bool $includeTrace = false): string
     {
+        $message = $this->exceptionToMessage($e, false);
+        if (!$this->hasBeenLogged($message)) {
+            if ($includeTrace) {
+                $message = $this->exceptionToMessage($e, $includeTrace);
+            }
+            $this->log(Severity::Exception, $message);
+        }
+        return $message;
+    }
+
+    protected function exceptionToMessage(Throwable $e, bool $includeTrace): string
+    {
         $callingFunction = $e->getTrace()[0]['function'];
         $callingLine = $e->getLine();
         $class = get_class($e);
@@ -256,13 +268,40 @@ class Log
         $code = !empty($e->getCode()) && !str_contains($e->getMessage(), (string) $e->getCode()) ? $e->getCode() . ': ' : '';
         $message = $e->getMessage();
         $fullMessage = "$class: $code$message in $callingFunction:$callingLine";
-        if (!$this->hasBeenLogged($fullMessage)) {
-            $this->log(Severity::Exception, $fullMessage);
-            if ($includeTrace) {
-                $this->log(Severity::Exception, $e->getTraceAsString());
-            }
+        if ($includeTrace) {
+            $fullMessage .= "\n" . $e->getTraceAsString();
         }
         return $fullMessage;
+    }
+
+    /**
+     * Logs an API request and response.
+     *
+     * @param string $service
+     *   The service (endpoint) that was called.
+     * @param string $request
+     *   The request that was sent. Sensitive information should be masked, so that it
+     *   does not appear in the log. The request should not contain formatting syntax as
+     *   no additional arguments can be passed
+     * @param string|Throwable $response
+     *   The response that was received or the exception that was thrwon in case of a
+     *   failure. Sensitive information should be masked, so that it does not appear in
+     *   the log. The request should not contain formatting syntax as no additional
+     *   arguments can be passed.
+     * @param int $logLevel
+     *   The log level to use, one of the {@see Severity} constants. This typically
+     *   depends on the result.
+     *
+     * @return string[]
+     *   The 2 messages as they were logged.
+     */
+    public function apiCall(string $service, string $request, string|Throwable $response, int $logLevel): array
+    {
+        $msg1 = $this->log($logLevel, $request);
+        $msg2 = $response instanceof Throwable
+            ? $this->exception($response)
+            : $this->log($logLevel, $response);
+        return [$msg1, $msg2];
     }
 
     /**
@@ -287,7 +326,7 @@ class Log
      * @return string
      *   The formatted message whether it got logged or not.
      */
-    public function log(int $severity, string $message, ... $values): string
+    public function log(int $severity, string $message, ...$values): string
     {
         $format = $message;
         if (count($values) > 0) {
@@ -303,10 +342,12 @@ class Log
     /**
      * Writes the message to the actual log sink.
      *
-     * This base implementation adds the name Acumulus, the version of this
-     * library, and the severity and then sends the message to error_log().
+     * This base implementation adds context, the name and the version of this library as
+     * well as the severity and then sends the message to {@see Log::logContextCompletedMessage()}.
      *
-     * Override if the web shop offers its own log mechanism.
+     * Override if the webshop's own log mechanism:
+     * - Does not add date and time itself.
+     * - Allows to specify this context (module and severity) via separate arguments.
      *
      * @param string $message
      *   The message to log.
@@ -316,17 +357,20 @@ class Log
     protected function write(string $message, int $severity): void
     {
         $message = sprintf('Acumulus %s: %s - %s', $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
-        $this->logCompleteMessage($message);
+        $this->logContextCompletedMessage($message);
     }
 
     /**
-     * Logs a formatted and completed message.
+     * Logs a formatted and with context completed message.
+     *
+     * Override this method if the webshop's own log mechanism does not provide separate
+     * arguments for the context.
      *
      * @param string $message
-     *   The formatted message to log, including things like date, time, severity,
-     *   version, etc.
+     *   The formatted message to log, including things like severity, module, version,
+     *   and even date and time, if the webshop's log mechanism does not add that itself.
      */
-    protected function logCompleteMessage(string $message): void
+    protected function logContextCompletedMessage(string $message): void
     {
         /** @noinspection ForgottenDebugOutputInspection */
         error_log($message);

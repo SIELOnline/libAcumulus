@@ -8,8 +8,8 @@ This file contains a historical overview of changes in our code.
 Features:
 - Added support to remove graphics from documents (invoice and packing slip).
   - Added a setting on the settings form under the heading "Documents".
-  - Allow for query parameters in request uri's for the Acumulus API, notably the gfx
-    parameter (apply graphics in an invoice or packing slip PDF).
+  - Allow for query parameters in request uri's for the Acumulus API: notably the gfx
+    parameter (apply graphics in an invoice or packing slip PDF) is now supported.
 
 - Mapping shop fields to Acumulus invoice fields:
   - 0-values (0, 0.0, '0', '0.0000') are no longer considered empty.
@@ -32,6 +32,7 @@ Refactorings:
 - API calls now have their own direct log method apiCall(...) like exception($e).
   This to support WHMCS's module log.
 - Metadata and its "derived" classes": removed the deprecated addMultiple().
+- Address::setAddressType() and getAddressType() renamed to setType() and getType().
 
 8.7.2 (2026-06-??) (WC)
 -----------------------

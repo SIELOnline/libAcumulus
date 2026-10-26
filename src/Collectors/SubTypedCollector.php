@@ -41,8 +41,9 @@ abstract class SubTypedCollector extends Collector
     }
 
     /**
-     * This override returns the subtype, a {@see \Siel\Acumulus\Data\LineType} constant
-     * as mappings differ per subtype (address type, line type, emailAsPdf type).
+     * This override returns the subtype, a {@see \Siel\Acumulus\Data\AddressType},
+     * {@see \Siel\Acumulus\Data\LineType}, or {@see \Siel\Acumulus\Data\EmailAsPdfType}
+     * constant, as mappings differ per subtype.
      *
      * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */

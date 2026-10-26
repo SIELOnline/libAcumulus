@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Completors\Customer;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Completors\BaseCompletorTask;
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Data\DataType;
 
@@ -17,21 +18,20 @@ use function assert;
  * {@see \Siel\Acumulus\Data\Customer}.
  *
  * A Customer object has fields for 2 addresses, the main address and the alt address.
- * The mapping phase has mapped the invoice and/or shipping address from the shop's
- * customer data to these addresses but these may be empty or equal.
+ * Webshops often have an invoice and a shipping address. The mapping phase has created
+ * these 2 addresses (invoice and shipping) as well as mete data that determines which
+ * address is to be used as the main address and which one as the alt address.
  *
- * - Empty addresses are removed. If the main address is empty, the alt address is set as
- *   main address.
- * - If the addresses are equal the alt address is removed.
+ * This completor ensures that:
+ * - If the address that will be used as main address is empty, the other address is
+ *   copied to the to be main address.
+ * - If the addresses are equal the address that will be used as alt address is unset.
+ * - If the address that will be used as alt address is empty, it is unset.
  */
 class CompleteAddresses extends BaseCompletorTask
 {
     /**
-     * Removes customer data (if set so).
-     *
-     * If you have lots of one-time customers, you may not want to add the
-     * customer data to your administration but instead link all those orders to
-     * one fictitious client.
+     * Completes address data.
      *
      * @param \Siel\Acumulus\Data\Customer $acumulusObject
      * @param int ...$args
@@ -40,14 +40,26 @@ class CompleteAddresses extends BaseCompletorTask
     public function complete(AcumulusObject $acumulusObject, ...$args): void
     {
         assert($acumulusObject instanceof Customer);
-        if ($acumulusObject->getInvoiceAddress()?->isEmpty()) {
-            $acumulusObject->setInvoiceAddress(null);
-        }
-        if ($acumulusObject->getShippingAddress()?->isEmpty()) {
-            $acumulusObject->setShippingAddress(null);
-        }
-        if ($acumulusObject->getInvoiceAddress()?->equals($acumulusObject->getShippingAddress())) {
-            $acumulusObject->setShippingAddress(null);
+        if ($acumulusObject->getMainAddressType() === AddressType::Invoice) {
+            if ($acumulusObject->getInvoiceAddress()?->isEmpty() && !$acumulusObject->getShippingAddress()?->isEmpty()) {
+                $acumulusObject->setInvoiceAddress($acumulusObject->getShippingAddress());
+            }
+            if ($acumulusObject->getShippingAddress()?->isEmpty()) {
+                $acumulusObject->setShippingAddress(null);
+            }
+            if ($acumulusObject->getShippingAddress()?->equals($acumulusObject->getInvoiceAddress())) {
+                $acumulusObject->setShippingAddress(null);
+            }
+        } else {
+            if ($acumulusObject->getShippingAddress()?->isEmpty() && !$acumulusObject->getInvoiceAddress()?->isEmpty()) {
+                $acumulusObject->setShippingAddress($acumulusObject->getInvoiceAddress());
+            }
+            if ($acumulusObject->getInvoiceAddress()?->isEmpty()) {
+                $acumulusObject->setInvoiceAddress(null);
+            }
+            if ($acumulusObject->getInvoiceAddress()?->equals($acumulusObject->getShippingAddress())) {
+                $acumulusObject->setInvoiceAddress(null);
+            }
         }
     }
 }

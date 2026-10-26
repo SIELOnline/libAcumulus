@@ -8,6 +8,8 @@ use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Fld;
 
+use Siel\Acumulus\Meta;
+
 use function in_array;
 use function is_string;
 
@@ -48,8 +50,6 @@ use function is_string;
  */
 class Address extends AcumulusObject
 {
-    protected ?string $addressType = null;
-
     protected function getPropertyDefinitions(): array
     {
         return [
@@ -79,17 +79,17 @@ class Address extends AcumulusObject
         return parent::set($name, $value, $mode);
     }
 
-    public function setAddressType(?string $addressType): void
+    public function setType(?string $addressType): void
     {
         if (!in_array($addressType, [null, AddressType::Invoice, AddressType::Shipping, AddressType::Store], true)) {
             throw new RuntimeException('Invalid address type');
         }
-        $this->addressType = $addressType;
+        $this->metadataSet(Meta::SubType, $addressType);
     }
 
-    public function getAddressType(): ?string
+    public function getType(): ?string
     {
-        return $this->addressType;
+        return $this->metadataGet(Meta::SubType);
     }
 
     /**
@@ -142,12 +142,12 @@ class Address extends AcumulusObject
      */
     public function isEmpty(): bool
     {
-        if (in_array($this->getAddressType(), [null, AddressType::Invoice, AddressType::Store], true)) {
+        if (in_array($this->getType(), [null, AddressType::Invoice, AddressType::Store], true)) {
             if ((empty($this->fullName) && empty($this->companyName1)) || (empty($this->postalCode) && empty($this->city))) {
                 return true;
             }
         }
-        if (in_array($this->getAddressType(), [null, AddressType::Shipping, AddressType::Store], true)) {
+        if (in_array($this->getType(), [null, AddressType::Shipping, AddressType::Store], true)) {
             if (empty($this->address1) || (empty($this->postalCode) && empty($this->city))) {
                 return true;
             }

@@ -75,20 +75,20 @@ class AddressTest extends TestCase
         self::assertFalse($this->createAddress1()->isEmpty());
         $address3 = $this->createAddress3();
         self::assertTrue($address3->isEmpty());
-        $address3->setAddressType(AddressType::Invoice);
+        $address3->setType(AddressType::Invoice);
         self::assertTrue($address3->isEmpty());
-        $address3->setAddressType(AddressType::Shipping);
+        $address3->setType(AddressType::Shipping);
         self::assertFalse($address3->isEmpty());
-        $address3->setAddressType(AddressType::Store);
+        $address3->setType(AddressType::Store);
         self::assertTrue($address3->isEmpty());
 
         $address4 = $this->createAddress4();
         self::assertTrue($address4->isEmpty());
-        $address4->setAddressType(AddressType::Invoice);
+        $address4->setType(AddressType::Invoice);
         self::assertFalse($address4->isEmpty());
-        $address4->setAddressType(AddressType::Shipping);
+        $address4->setType(AddressType::Shipping);
         self::assertTrue($address4->isEmpty());
-        $address4->setAddressType(AddressType::Store);
+        $address4->setType(AddressType::Store);
         self::assertTrue($address4->isEmpty());
     }
 }

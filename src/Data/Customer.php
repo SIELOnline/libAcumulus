@@ -133,8 +133,8 @@ class Customer extends AcumulusObject
 
     public function setInvoiceAddress(?Address $address): void
     {
-        if ($address?->getAddressType() === AddressType::Shipping) {
-            $address->setAddressType(AddressType::Invoice);
+        if ($address?->getType() === AddressType::Shipping) {
+            $address->setType(AddressType::Invoice);
         }
         $this->invoiceAddress = $address;
     }
@@ -146,8 +146,8 @@ class Customer extends AcumulusObject
 
     public function setShippingAddress(?Address $address): void
     {
-        if ($address?->getAddressType() === AddressType::Invoice) {
-            $address->setAddressType(AddressType::Shipping);
+        if ($address?->getType() === AddressType::Invoice) {
+            $address->setType(AddressType::Shipping);
         }
         $this->shippingAddress = $address;
     }
@@ -182,9 +182,9 @@ class Customer extends AcumulusObject
      */
     public function getFiscalAddress(): ?Address
     {
-        return $this->getMainAddressType() === AddressType::Shipping
-            ? $this->getShippingAddress()
-            : $this->getInvoiceAddress();
+        return $this->getMainAddressType() === AddressType::Invoice
+            ? ($this->getInvoiceAddress() ?? $this->getShippingAddress())
+            : ($this->getShippingAddress() ?? $this->getInvoiceAddress());
     }
 
     public function hasWarning(): bool

@@ -954,6 +954,11 @@ class Config
                     'type' => 'bool',
                     'default' => false,
                 ],
+                'packingSlip_gfx' => [
+                    'group' => 'documents',
+                    'type' => 'bool',
+                    'default' => true,
+                ],
                 'showPackingSlipList' => [
                     'group' => 'documents',
                     'type' => 'bool',
@@ -973,6 +978,11 @@ class Config
                     'group' => Fld::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
+                ],
+                'invoice_gfx' => [
+                    'group' => Fld::EmailAsPdf,
+                    'type' => 'bool',
+                    'default' => true,
                 ],
                 'showRatePluginMessage' => [
                     'group' => 'other',

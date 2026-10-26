@@ -425,7 +425,8 @@ abstract class InvoiceManager
         }
         /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $emailAsPdf */
         $emailAsPdf = $this->createEmailAsPdf($source);
-        return $this->getAcumulusApiClient()->emailInvoiceAsPdf($token, $emailAsPdf);
+        $gfx = $this->getConfig()->get('invoice_gfx') ? null : false;
+        return $this->getAcumulusApiClient()->emailInvoiceAsPdf($token, $emailAsPdf, applyGraphics: $gfx);
     }
 
     /**
@@ -489,7 +490,8 @@ abstract class InvoiceManager
 
         /** @var \Siel\Acumulus\Data\EmailPackingSlipAsPdf $emailAsPdf */
         $emailAsPdf = $this->createEmailAsPdf($source, false);
-        return $this->getAcumulusApiClient()->emailPackingSlipAsPdf($token, $emailAsPdf);
+        $gfx = $this->getConfig()->get('invoice_gfx') ? null : false;
+        return $this->getAcumulusApiClient()->emailPackingSlipAsPdf($token, $emailAsPdf, applyGraphics: $gfx);
     }
 
     protected function createEmailAsPdf(Source $source, bool $forInvoice = true): EmailAsPdf

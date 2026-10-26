@@ -6,8 +6,11 @@ This file contains a historical overview of changes in our code.
 8.8.0 (2026-10-??) (ALL)
 ------------------------
 Features:
-- Added support for query parameters in request uri's for the Acumulus API,
-  notably the gfx parameter (apply graphics in an invoice or packing slip PDF).
+- Added support to remove graphics from documents (invoice and packing slip).
+  - Added a setting on the settings form under the heading "Documents".
+  - Allow for query parameters in request uri's for the Acumulus API, notably the gfx
+    parameter (apply graphics in an invoice or packing slip PDF).
+
 - Mapping shop fields to Acumulus invoice fields:
   - 0-values (0, 0.0, '0', '0.0000') are no longer considered empty.
     Only null and the empty string are considered empty.

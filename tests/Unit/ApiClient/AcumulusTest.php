@@ -207,6 +207,10 @@ class AcumulusTest extends TestCase
             self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN')
         );
         self::assertSame(
+            "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN",
+            self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN', null)
+        );
+        self::assertSame(
             "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN&gfx=1",
             self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN', true)
         );

@@ -21,6 +21,9 @@ use Siel\Acumulus\Meta;
  */
 class ConfigFormTranslations extends TranslationCollection
 {
+    private const desc_gfx_partial_nl = 'geeft u de mogelijkheid om grafische elementen in uw documenten niet in de pdf te plaatsen. Dit zal de bestandsgrootte kleiner maken en het printen kan sneller en volledig in zwart-wit gedaan worden';
+    private const desc_gfx_partial_en = 'allows you to remove any graphical elements from your documents. This will reduce the file size of your documents and printing can be faster and be done in black and white only.';
+
     protected array $nl = [
         // Titles, headers, links, buttons and messages.
         'config_form_title' => 'Acumulus | Instellingen',
@@ -442,10 +445,14 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'option_document_mail' => 'te mailen',
 
         // Email invoice settings.
-        'field_emailAsPdf' => 'Factuur automatisch versturen',
+        'field_emailAsPdf' => 'Factuur pdf',
         'option_emailAsPdf' => 'Laat Acumulus de pdf van de factuur automatisch mailen, direct nadat de factuurgegevens naar Acumulus verzonden zijn.',
         'option_ubl' => 'Voeg een e-factuur toe aan de pdf.',
-        'desc_emailAsPdf' => 'Geef aan of u Acumulus een pdf van de factuur wilt laten versturen (1e vinkje), al dan niet inclusief een e-factuur in de vorm van een <a href="https://nl.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL-document</a> (2e vinkje). Het bericht in de e-mail body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (instelling "%1$s"), Acumulus geen factuur-pdf kan versturen.',
+        'option_invoice_gfx' => 'Voeg grafische elementen toe aan de pdf.',
+        'desc_emailAsPdf' => 'Geef aan of u Acumulus een pdf van de factuur wilt laten versturen (1e vinkje), al dan niet inclusief een e-factuur in de vorm van een <a href="https://nl.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL-document</a> (2e vinkje). '
+            . 'De 3e optie ' . self::desc_gfx_partial_nl . '. '
+            . 'Het bericht in de e-mail body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". '
+            . 'Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (instelling "%1$s"), Acumulus geen factuur-pdf kan versturen.',
 
         'field_emailTo' => 'Aan',
         'desc_emailTo' => 'Het e-mailadres waar naartoe de factuur verstuurd moet worden. Als u dit leeg laat wordt het e-mailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
@@ -463,6 +470,9 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'desc_subject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om hier naar dat factuurnummer te verwijzen, u kunt wel naar het bestelnummer verwijzen',
 
         //  Email packing slip settings.
+        'field_packingSlip' => 'Pdf generatie',
+        'desc_packingSlip' =>  'Deze optie ' . self::desc_gfx_partial_nl . '.',
+        'option_packingSlip_gfx' => 'Voeg grafische elementen toe',
         'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mail opties voor de pakbon hebt aangevinkt.',
         'desc_packingSlipEmailBcc' => 'Vul extra e-mailadressen in waar naartoe u de pakbon wilt sturen. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u e-mail opties voor de pakbon hebt aangevinkt.',
         'desc_packingSlipSubject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Pakbon voor bestelling [nummer]" gebruikt.',
@@ -966,7 +976,11 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'field_emailAsPdf' => 'Send invoice automatically',
         'option_emailAsPdf' => 'Have Acumulus send the invoice, as a PDF, to your customer, directly after sending the invoice data to Acumulus.',
         'option_ubl' => 'Add an e-invoice to the PDF.',
-        'desc_emailAsPdf' => 'Indicate whether you want Acumulus to send the invoice as PDF (first checkbox), with optionally an e-invoice added in <a href="https://en.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL format</a> (second checkbox). Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to the menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (setting "%1$s"), Acumulus cannot send invoice-pdfs.',
+        'option_invoice_gfx' => 'Add graphical elements to the PDF.',
+        'desc_emailAsPdf' => 'Indicate whether you want Acumulus to send the invoice as PDF (first checkbox), with optionally an e-invoice added in <a href="https://en.wikipedia.org/wiki/Universal_Business_Language" target="_blank">UBL format</a> (second checkbox). '
+            . 'The 3rd option ' . self::desc_gfx_partial_en . '. '
+            . 'The message in the mail body cannot be changed here, you can do that in Acumulus by going to the menu-item "Beheer - Factuur-sjablonen". '
+            . 'Please note that if you don\'t send customer data to Acumulus (setting "%1$s"), Acumulus cannot send invoice-pdfs.',
 
         'field_emailTo' => 'To',
         'desc_emailTo' => 'The e-mail address to send the invoice to. If you leave this empty the e-mail address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;).',
@@ -984,6 +998,9 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'message_validate_email_4' => 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.',
 
         //  Email packing slip settings.
+        'field_packingSlip' => 'Pdf generation',
+        'desc_packingSlip' =>  'This option ' . self::desc_gfx_partial_en . '.',
+        'option_packingSlip_gfx' => 'Add graphical elements',
         'desc_packingSlipEmailTo' => 'Fill in the e-mail address to which you want to send the packing slip, e.g. someone or a printer at your warehouse. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
         'desc_packingSlipEmailBcc' => 'Fill in additional e-mail addresses to which you want to send the packing slip, e.g. someone or a printer at your warehouse. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
         'desc_packingSlipSubject' => 'The subject line of the e-mail. If you leave this empty "Packing slip for order [number]" will be used.',

@@ -1099,7 +1099,8 @@ class InvoiceStatusForm extends Form
 
         $document = ucfirst($this->t('document_invoice'));
         if ($documentsSettings['showInvoiceDetail']) {
-            $uri = $this->acumulusApiClient->getInvoicePdfUri($token);
+            $gfx = $this->acumulusConfig->get('invoice_gfx') ? null : false;
+            $uri = $this->acumulusApiClient->getInvoicePdfUri($token, applyGraphics: $gfx);
             $text = sprintf($this->t('document_show'), $document);
             $title = sprintf($this->t('document_show_title'), $document);
             /** @noinspection HtmlUnknownTarget */
@@ -1122,7 +1123,8 @@ class InvoiceStatusForm extends Form
 
         $document = ucfirst($this->t('document_packing_slip'));
         if ($documentsSettings['showPackingSlipDetail']) {
-            $uri = $this->acumulusApiClient->getPackingSlipPdfUri($token);
+            $gfx = $this->acumulusConfig->get('packingSlip_gfx') ? null : false;
+            $uri = $this->acumulusApiClient->getPackingSlipPdfUri($token, $gfx);
             $text = sprintf($this->t('document_show'), $document);
             $title = sprintf($this->t('document_show_title'), $document);
             /** @noinspection HtmlUnknownTarget */

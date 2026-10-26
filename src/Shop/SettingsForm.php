@@ -778,6 +778,7 @@ class SettingsForm extends BaseConfigForm
     protected function getInvoiceDocumentFields(): array
     {
         $fields = [];
+
         $fields['invoiceSubHeader'] = [
             'type' => 'markup',
             'value' => '<h3>' . ucfirst($this->t('document_invoice')) . '</h3>',
@@ -789,6 +790,7 @@ class SettingsForm extends BaseConfigForm
             'options' => [
                 'emailAsPdf' => $this->t('option_emailAsPdf'),
                 'ubl' => $this->t('option_ubl'),
+                'invoice_gfx' => $this->t('option_invoice_gfx'),
             ],
         ];
         if ($this->shopCapabilities->hasInvoiceStatusScreen()) {
@@ -823,6 +825,16 @@ class SettingsForm extends BaseConfigForm
                 'type' => 'markup',
                 'value' => '<h3>' . ucfirst($this->t('document_packing_slip')) . '</h3>',
             ];
+            if ($this->shopCapabilities->hasInvoiceStatusScreen() || $this->shopCapabilities->hasOrderList()) {
+                $fields['packingSlip_cb'] = [
+                    'type' => 'checkbox',
+                    'label' => $this->t('field_packingSlip'),
+                    'description' => $this->t('desc_packingSlip'),
+                    'options' => [
+                        'packingSlip_gfx' => $this->t('option_packingSlip_gfx'),
+                    ],
+                ];
+            }
             if ($this->shopCapabilities->hasInvoiceStatusScreen()) {
                 $fields['detailPackingSlip'] = [
                     'type' => 'checkbox',

@@ -57,6 +57,8 @@ class BasicSubmitCollector extends Collector
 
     /**
      * @param \Siel\Acumulus\Data\BasicSubmit $acumulusObject
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {

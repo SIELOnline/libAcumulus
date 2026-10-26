@@ -90,7 +90,9 @@ class CollectorManager
             ->add('localResult', $localResult)
             ->add('source', $source);
         $this->addShopPropertySources();
-        return $this->collectInvoice();
+        $invoice = $this->collectInvoice();
+        $this->getPropertySources()->clear();
+        return $invoice;
     }
 
     public function collectInvoice(): Invoice
@@ -142,7 +144,9 @@ class CollectorManager
             ->add('item', $item)
             ->add('environment', $this->getContainer()->getEnvironment()->toArray());
         $this->addShopPropertySources();
-        return $this->collectStockTransaction();
+        $stockTransaction = $this->collectStockTransaction();
+        $this->getPropertySources()->clear();
+        return $stockTransaction;
     }
 
     public function collectStockTransaction(): StockTransaction
@@ -161,7 +165,7 @@ class CollectorManager
         /** @var \Siel\Acumulus\Collectors\BasicSubmitCollector $basicSubmitCollector */
         $basicSubmitCollector = $this->getContainer()->getCollector(DataType::BasicSubmit);
         $basicSubmit = $basicSubmitCollector->collect($this->getPropertySources());
-        $this->getPropertySources()->remove('environment')->remove('config');
+        $this->getPropertySources()->remove('environment')->remove('config')->remove('needContact');
         return $basicSubmit;
     }
 }

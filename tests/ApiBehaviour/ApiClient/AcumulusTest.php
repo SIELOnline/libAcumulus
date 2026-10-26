@@ -29,6 +29,29 @@ class AcumulusTest extends TestCase
         $this->acumulusClient = $this->container->getAcumulusApiClient();
     }
 
+    public function testConstructUri(): void
+    {
+        $apiFunction = 'test';
+        $parameters = ['var1' => 'value1', 'var2' => 2, 'var3' => '', 'var4' => true, 'var5' => null];
+        $environment = $this->container->getEnvironment()->toArray();
+        $baseUri = "{$environment['baseUri']}/{$environment['apiVersion']}";
+        static::assertSame(
+            "$baseUri/$apiFunction.php", (function (string $apiFunction, array $parameters = []) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            return $this->constructUri($apiFunction, $parameters);
+        })->call($this->acumulusClient, $apiFunction));
+        static::assertSame(
+            "$baseUri/$apiFunction.php", (function (string $apiFunction, array $parameters = []) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            return $this->constructUri($apiFunction, $parameters);
+        })->call($this->acumulusClient, $apiFunction, []));
+        static::assertSame(
+            "$baseUri/$apiFunction.php?var1=value1&var2=2&var3=&var4=1", (function (string $apiFunction, array $parameters = []) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            return $this->constructUri($apiFunction, $parameters);
+        })->call($this->acumulusClient, $apiFunction, $parameters));
+    }
+
     /**
      * Kunnen we hier nog wat mee?
      *
@@ -47,10 +70,34 @@ class AcumulusTest extends TestCase
             'InvoiceAdd' => ['invoiceAdd', [['customer' => []]], 'invoices/invoice_add', true, 'invoice', false, ['customer' => []]],
             'ConceptInfo' => ['getConceptInfo', [12345], 'invoices/invoice_concept_info', true, 'concept', false, ['conceptid' => 12345]],
             'Entry' => ['getEntry', [12345], 'entry/entry_info', true, 'entry', false, ['entryid' => 12345]],
-            'SetDeleteStatus1' => ['setDeleteStatus', [12345, true], 'entry/entry_deletestatus_set', true, 'entry', false, ['entryid' => 12345, 'entrydeletestatus' => 1]],
-            'SetDeleteStatus0' => ['setDeleteStatus', [12345, false], 'entry/entry_deletestatus_set', true, 'entry', false, ['entryid' => 12345, 'entrydeletestatus' => 0]],
+            'SetDeleteStatus1' => [
+                'setDeleteStatus',
+                [12345, true],
+                'entry/entry_deletestatus_set',
+                true,
+                'entry',
+                false,
+                ['entryid' => 12345, 'entrydeletestatus' => 1],
+            ],
+            'SetDeleteStatus0' => [
+                'setDeleteStatus',
+                [12345, false],
+                'entry/entry_deletestatus_set',
+                true,
+                'entry',
+                false,
+                ['entryid' => 12345, 'entrydeletestatus' => 0],
+            ],
             'GetPaymentStatus' => ['getPaymentStatus', ['TOKEN'], 'invoices/invoice_paymentstatus_get', true, 'invoice', false, ['token' => 'TOKEN']],
-            'SetPaymentStatus' => ['setPaymentStatus', ['TOKEN', Api::PaymentStatus_Paid, '2020-02-02'], 'invoices/invoice_paymentstatus_set', true, 'invoice', false, ['token' => 'TOKEN', 'paymentstatus' => Api::PaymentStatus_Paid, 'paymentdate' => '2020-02-02']],
+            'SetPaymentStatus' => [
+                'setPaymentStatus',
+                ['TOKEN', Api::PaymentStatus_Paid, '2020-02-02'],
+                'invoices/invoice_paymentstatus_set',
+                true,
+                'invoice',
+                false,
+                ['token' => 'TOKEN', 'paymentstatus' => Api::PaymentStatus_Paid, 'paymentdate' => '2020-02-02'],
+            ],
             'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, 'signup', false, ['signup' => ['companyname' => 'BR']]],
         ];
     }
@@ -59,13 +106,67 @@ class AcumulusTest extends TestCase
     {
         return [
             'About' => ['getAbout', [], false, ['about', 'role', 'roleapi', 'roleid', 'rolenl']],
-            'MyAcumulus' => ['getMyAcumulus', [], false, ['myaddress', 'mycity', 'mycompanyname', 'mycontactperson', 'mycontractcode', 'mycontractenddate', 'mydebt', 'myemail', 'myemailstatusid', 'myemailstatusreferenceid', 'myentries', 'myentriesleft', 'myiban', 'mymaxentries', 'mypostalcode', 'mysalutation', 'mysepamandatenr', 'mystatusid', 'mysupport', 'mytelephone', 'myvatnumber']],
-            'Accounts enabled' => ['getPicklistAccounts', [true], true, ['accountid', 'accountnumber', 'accountdescription', 'accountorderid', 'accountstatus', 'accounttypeid']],
+            'MyAcumulus' => [
+                'getMyAcumulus',
+                [],
+                false,
+                [
+                    'myaddress',
+                    'mycity',
+                    'mycompanyname',
+                    'mycontactperson',
+                    'mycontractcode',
+                    'mycontractenddate',
+                    'mydebt',
+                    'myemail',
+                    'myemailstatusid',
+                    'myemailstatusreferenceid',
+                    'myentries',
+                    'myentriesleft',
+                    'myiban',
+                    'mymaxentries',
+                    'mypostalcode',
+                    'mysalutation',
+                    'mysepamandatenr',
+                    'mystatusid',
+                    'mysupport',
+                    'mytelephone',
+                    'myvatnumber',
+                ],
+            ],
+            'Accounts enabled' => [
+                'getPicklistAccounts',
+                [true],
+                true,
+                ['accountid', 'accountnumber', 'accountdescription', 'accountorderid', 'accountstatus', 'accounttypeid'],
+            ],
             'CompanyTypes' => ['getPicklistCompanyTypes', [], true, ['companytypeid', 'companytypename', 'companytypenamenl']],
             'ContactTypes' => ['getPicklistContactTypes', [], true, ['contacttypeid', 'contacttypename', 'contacttypenamenl']],
             'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid', 'costcentername']],
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid', 'invoicetemplatename']],
-            'Products' => ['getPicklistProducts', [], true, ['productid', 'productnature', 'productdescription', 'productdetails', 'producttagid', 'productcontactid', 'productprice', 'productvatrate', 'productsku', 'productstockamount', 'productean', 'producthash', 'producths', 'productnotes', 'productorigin', 'productunitweight']],
+            'Products' => [
+                'getPicklistProducts',
+                [],
+                true,
+                [
+                    'productid',
+                    'productnature',
+                    'productdescription',
+                    'productdetails',
+                    'producttagid',
+                    'productcontactid',
+                    'productprice',
+                    'productvatrate',
+                    'productsku',
+                    'productstockamount',
+                    'productean',
+                    'producthash',
+                    'producths',
+                    'productnotes',
+                    'productorigin',
+                    'productunitweight',
+                ],
+            ],
             'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype', 'vatrate', 'countryregion']],
             'ThresholdEuCommerce' => ['reportThresholdEuCommerce', [], false, ['year', 'threshold', 'nltaxed', 'reached']],
         ];
@@ -97,7 +198,8 @@ class AcumulusTest extends TestCase
     public static function vatInfoProvider(): array
     {
         return [
-            'nl' => [['nl', '2015-01-01'],
+            'nl' => [
+                ['nl', '2015-01-01'],
                 [
                     ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '1'],
                     ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '1'],
@@ -106,7 +208,8 @@ class AcumulusTest extends TestCase
                     ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '2'],
                 ],
             ],
-            'nl-no-date' => [['nl'],
+            'nl-no-date' => [
+                ['nl'],
                 [
                     ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '1'],
                     ['vattype' => 'reduced', 'vatrate' => '9.0000', 'countryregion' => '1'],
@@ -116,7 +219,8 @@ class AcumulusTest extends TestCase
                     ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '2'],
                 ],
             ],
-            'eu' => [['be', DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, '2015-12-01')],
+            'eu' => [
+                ['be', DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, '2015-12-01')],
                 [
                     ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '2'],
                     ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => '2'],
@@ -125,7 +229,8 @@ class AcumulusTest extends TestCase
                     ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '2'],
                 ],
             ],
-            'eu-no-date' => [['be'],
+            'eu-no-date' => [
+                ['be'],
                 [
                     ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '2'],
                     ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => '2'],
@@ -135,14 +240,16 @@ class AcumulusTest extends TestCase
                 ],
             ],
             'eu-wrong-date' => [['be', '2014-12-01'], []],
-            'gb-eu' => [['gb', '2020-12-01'],
+            'gb-eu' => [
+                ['gb', '2020-12-01'],
                 [
                     ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '2'],
                     ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => '2'],
                     ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => '2'],
                 ],
             ],
-            'gb-no-eu' => [['gb', '2021-01-01'],
+            'gb-no-eu' => [
+                ['gb', '2021-01-01'],
                 [
                     ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '3'],
                     ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => '3'],
@@ -161,12 +268,12 @@ class AcumulusTest extends TestCase
         $result = $this->acumulusClient->getVatInfo(... $args);
         self::assertSame(Severity::Success, $result->getStatus());
 
-        $vatRate  = array_column($expected, 'vatrate');
+        $vatRate = array_column($expected, 'vatrate');
         $vatType = array_column($expected, 'vattype');
         array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $expected);
 
         $actual = $result->getMainAcumulusResponse();
-        $vatRate  = array_column($actual, 'vatrate');
+        $vatRate = array_column($actual, 'vatrate');
         $vatType = array_column($actual, 'vattype');
         array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $actual);
 
@@ -233,7 +340,7 @@ class AcumulusTest extends TestCase
 
         return [
             'buy' => [$stockTransaction1, ['productid' => $productId, 'stockamount' => 30.0]],
-            'refund' => [$stockTransaction2, ['productid' => $productId, 'stockamount' => 32.0]]
+            'refund' => [$stockTransaction2, ['productid' => $productId, 'stockamount' => 32.0]],
         ];
     }
 

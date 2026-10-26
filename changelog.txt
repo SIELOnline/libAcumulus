@@ -6,11 +6,14 @@ This file contains a historical overview of changes in our code.
 8.8.0 (2026-10-??) (ALL)
 ------------------------
 Features:
+- Added support for query parameters in request uri's for the Acumulus API,
+  notably the gfx parameter (apply graphics in an invoice or packing slip PDF).
 - Mapping shop fields to Acumulus invoice fields:
   - 0-values (0, 0.0, '0', '0.0000') are no longer considered empty.
     Only null and the empty string are considered empty.
-  - Exceptions that occur while trying to extract values are still ignored but are logged
-    at low priority (DEBUG level).
+  - Exceptions that occur while trying to extract values (in the field expander) were
+    completely ignored. Now they are logged at low priority (DEBUG level) but execution
+    still continues,
 - Created a module for the WHMCS platform that is based on this library.
 - The 2 Addresses data objects that are part of the Customer data object can now be
   compared for equality and "emptiness" (required address parts are missing).

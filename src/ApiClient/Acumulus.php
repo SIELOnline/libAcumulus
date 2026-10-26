@@ -21,6 +21,7 @@ use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Shop\AcumulusEntry;
 
 use function array_key_exists;
+use function count;
 
 /**
  * Acumulus provides an easy interface towards the different API calls of the
@@ -312,7 +313,9 @@ class Acumulus
     {
         // For picklists, the main result is found under the name of the
         // picklist but in singular form, i.e. without the s at the end.
-        return $this->callApiFunction("picklists/picklist_$picklist", $filters, $needContract)->setMainAcumulusResponseKey($picklist, true);
+        return $this
+            ->callApiFunction("picklists/picklist_$picklist", $filters, needContract: $needContract)
+            ->setMainAcumulusResponseKey($picklist, true);
     }
 
     /**
@@ -622,10 +625,10 @@ class Acumulus
      *   - 'entryinvoicelayoutid',
      *   - 'entryaccountnumber',
      *   Possible errors:
-     *   - @todo: find out
+     *   - @throws AcumulusException|AcumulusResponseException
      *
      * @todo: add tests
-     * @throws AcumulusException|AcumulusResponseException
+     * @todo: find out which error codes may ome back
      */
     public function updateEntry(AcumulusEntry $entry, array $changes): AcumulusResult
     {
@@ -706,7 +709,7 @@ class Acumulus
         $message = [
             'signup' => $signUp,
         ];
-        return $this->callApiFunction('signup/signup', $message, false)->setMainAcumulusResponseKey('signup');
+        return $this->callApiFunction('signup/signup', $message, needContract: false)->setMainAcumulusResponseKey('signup');
     }
 
     /**
@@ -743,7 +746,7 @@ class Acumulus
     public function registerSupport(string $token, string $location): AcumulusResult
     {
         $message = compact('token', 'location');
-        return $this->callApiFunction('support/register', $message, true)->setMainAcumulusResponseKey('support');
+        return $this->callApiFunction('support/register', $message, needContract: true)->setMainAcumulusResponseKey('support');
     }
 
     /**
@@ -796,15 +799,7 @@ class Acumulus
      */
     public function getInvoicePdfUri(string $token, ?bool $reminder = null, ?bool $applyGraphics = null): string
     {
-        $uri = $this->constructUri('invoices/invoice_get_pdf');
-        $uri .= "?token=$token";
-        if ($reminder !== null) {
-            $uri .= '&invoicetype=' . ($reminder ? '1' : '0');
-        }
-        if ($applyGraphics !== null) {
-            $uri .= '&gfx=' . ($applyGraphics ? '1' : '0');
-        }
-        return $uri;
+        return $this->constructUri('invoices/invoice_get_pdf', ['token' => $token, 'invoicetype' => $reminder, 'gfx' => $applyGraphics]);
     }
 
     /**
@@ -846,10 +841,6 @@ class Acumulus
      *     Unable to proceed."
      *
      * @throws AcumulusException|AcumulusResponseException
-     *
-     * @noinspection PhpUnusedParameterInspection
-     * @todo: not used for now, will become part of emailAsPdf structure?
-     *
      */
     public function emailInvoiceAsPdf(
         string $token,
@@ -868,7 +859,8 @@ class Acumulus
         if (!empty($invoiceNotes)) {
             $message['invoicenotes'] = $invoiceNotes;
         }
-        return $this->callApiFunction('invoices/invoice_mail', $message)->setMainAcumulusResponseKey('invoice');
+        $parameters = ['gfx' => $applyGraphics];
+        return $this->callApiFunction('invoices/invoice_mail', $message, $parameters)->setMainAcumulusResponseKey('invoice');
     }
 
     /**
@@ -890,12 +882,7 @@ class Acumulus
      */
     public function getPackingSlipPdfUri(string $token, ?bool $applyGraphics = null): string
     {
-        $uri = $this->constructUri('delivery/packing_slip_get_pdf');
-        $uri .= "?token=$token";
-        if ($applyGraphics !== null) {
-            $uri .= '&gfx=' . ($applyGraphics ? '1' : '0');
-        }
-        return $uri;
+        return $this->constructUri('delivery/packing_slip_get_pdf', ['token' => $token, 'gfx' => $applyGraphics]);
     }
 
     /**
@@ -926,9 +913,6 @@ class Acumulus
      *   - 'token'
      *
      * @throws AcumulusException|AcumulusResponseException
-     *
-     * @noinspection PhpUnusedParameterInspection
-     * @todo: not used for now, will become part of emailAsPdf structure?
      */
     public function emailPackingSlipAsPdf(
         string $token,
@@ -943,7 +927,8 @@ class Acumulus
         if (!empty($deliveryNotes)) {
             $message['deliverynotes'] = $deliveryNotes;
         }
-        return $this->callApiFunction('delivery/packing_slip_mail_pdf', $message)->setMainAcumulusResponseKey('packingslip');
+        $parameters = ['gfx' => $applyGraphics];
+        return $this->callApiFunction('delivery/packing_slip_mail_pdf', $message, $parameters)->setMainAcumulusResponseKey('packingslip');
     }
 
     /**
@@ -951,14 +936,23 @@ class Acumulus
      *
      * @param string $apiFunction
      *   The api service to get the uri for.
+     * @param array $parameters
+     *   A set of query parameters to add to the uri, the key being the parameter name,
+     *   the value the value for that parameter. Parameters with a null value will not be
+     *   output; boolean values will be output as 0 or 1; empty strings as an empty
+     *   string, i.e. "param=".
      *
      * @return string
      *   The uri to the requested API service.
      */
-    protected function constructUri(string $apiFunction): string
+    protected function constructUri(string $apiFunction, array $parameters = []): string
     {
         $environment = $this->environment->toArray();
-        return "{$environment['baseUri']}/{$environment['apiVersion']}/$apiFunction.php";
+        $query = http_build_query($parameters);
+        if ($query !== '') {
+            $query = '?' . $query;
+        }
+        return "{$environment['baseUri']}/{$environment['apiVersion']}/$apiFunction.php$query";
     }
 
     /**
@@ -987,10 +981,10 @@ class Acumulus
      *   - {@see HttpResponse} might be set or not;
      *   - {@see AcumulusResult} will not be set.
      */
-    protected function callApiFunction(string $apiFunction, array $message, bool $needContract = true): AcumulusResult
+    protected function callApiFunction(string $apiFunction, array $message, array $parameters = [], bool $needContract = true): AcumulusResult
     {
         $acumulusRequest = $this->createAcumulusRequest();
-        $uri = $this->constructUri($apiFunction);
+        $uri = $this->constructUri($apiFunction, $parameters);
         try {
             $acumulusResult = $acumulusRequest->execute($uri, $message, $needContract);
             $logLevel = $acumulusResult->getStatus();
@@ -1003,7 +997,7 @@ class Acumulus
         } finally {
             /** @noinspection ProperNullCoalescingOperatorUsageInspection, PhpUndefinedVariableInspection */
             $this->log->apiCall(
-                $apiFunction,
+                count(array_filter($parameters, static fn ($v) => $v !== null)) > 0 ? $uri : $apiFunction,
                 $acumulusRequest->getMaskedRequest(),
                 $acumulusResult?->getMaskedResponse() ?? $exception,
                 $logLevel

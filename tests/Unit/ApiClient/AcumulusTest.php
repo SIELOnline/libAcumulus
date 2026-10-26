@@ -56,80 +56,92 @@ class AcumulusTest extends TestCase
         $stockTransaction->stockDate = new DateTimeImmutable('2022-02-02');
 
         return [
-            'About' => ['getAbout', [], 'general/general_about', true, []],
-            'MyAcumulus' => ['getMyAcumulus', [], 'general/my_acumulus', true, []],
-            'Accounts' => ['getPicklistAccounts', [], 'picklists/picklist_accounts', true, ['accountstatus' => 1]],
-            'CompanyTypes' => ['getPicklistCompanyTypes', [], 'picklists/picklist_companytypes', false, []],
-            'ContactTypes' => ['getPicklistContactTypes', [], 'picklists/picklist_contacttypes', true, []],
-            'CostCenters' => ['getPicklistCostCenters', [], 'picklists/picklist_costcenters', true, []],
-            'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], 'picklists/picklist_invoicetemplates', true, []],
-            'Products' => ['getPicklistProducts', [], 'picklists/picklist_products', true, []],
-            'ProductsFilter' => ['getPicklistProducts', ['test'], 'picklists/picklist_products', true, ['filter' => 'test']],
-            'ProductsTag' => ['getPicklistProducts', [null, null, null, 0], 'picklists/picklist_products', true, ['producttagid' => 0]],
-            'ProductsSegment' => ['getPicklistProducts', [null, 40, 10], 'picklists/picklist_products', true, ['offset' => 40, 'rowcount' => 10]],
-            'VatInfo' => ['getVatInfo', ['nl'], 'lookups/lookup_vatinfo', true, ['vatcountry' => 'nl', 'vatdate' => date(Api::DateFormat_Iso)]],
-            'EuThreshold' => ['reportThresholdEuCommerce', [], 'reports/report_threshold_eu_ecommerce', true, []],
-            'EuThresholdYear' => ['reportThresholdEuCommerce', [2021], 'reports/report_threshold_eu_ecommerce', true, ['year' => 2021]],
-            'InvoiceAdd' => ['invoiceAdd', [$invoice], 'invoices/invoice_add', true, ['customer' => ['invoice' => ['line' => []]]]],
-            'ConceptInfo' => ['getConceptInfo', [12345], 'invoices/invoice_concept_info', true, ['conceptid' => 12345]],
-            'Entry' => ['getEntry', [12345], 'entry/entry_info', true, ['entryid' => 12345]],
+            'About' => ['getAbout', [], 'general/general_about', [], true],
+            'MyAcumulus' => ['getMyAcumulus', [], 'general/my_acumulus', [], true],
+            'Accounts' => ['getPicklistAccounts', [], 'picklists/picklist_accounts', ['accountstatus' => 1], true],
+            'CompanyTypes' => ['getPicklistCompanyTypes', [], 'picklists/picklist_companytypes', [], false],
+            'ContactTypes' => ['getPicklistContactTypes', [], 'picklists/picklist_contacttypes', [], true],
+            'CostCenters' => ['getPicklistCostCenters', [], 'picklists/picklist_costcenters', [], true],
+            'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], 'picklists/picklist_invoicetemplates', [], true],
+            'Products' => ['getPicklistProducts', [], 'picklists/picklist_products', [], true],
+            'ProductsFilter' => ['getPicklistProducts', ['test'], 'picklists/picklist_products', ['filter' => 'test'], true],
+            'ProductsTag' => ['getPicklistProducts', [null, null, null, 0], 'picklists/picklist_products', ['producttagid' => 0], true],
+            'ProductsSegment' => ['getPicklistProducts', [null, 40, 10], 'picklists/picklist_products', ['offset' => 40, 'rowcount' => 10], true],
+            'VatInfo' => ['getVatInfo', ['nl'], 'lookups/lookup_vatinfo', ['vatcountry' => 'nl', 'vatdate' => date(Api::DateFormat_Iso)], true],
+            'EuThreshold' => ['reportThresholdEuCommerce', [], 'reports/report_threshold_eu_ecommerce', [], true],
+            'EuThresholdYear' => ['reportThresholdEuCommerce', [2021], 'reports/report_threshold_eu_ecommerce', ['year' => 2021], true],
+            'InvoiceAdd' => ['invoiceAdd', [$invoice], 'invoices/invoice_add', ['customer' => ['invoice' => ['line' => []]]], true],
+            'ConceptInfo' => ['getConceptInfo', [12345], 'invoices/invoice_concept_info', ['conceptid' => 12345], true],
+            'Entry' => ['getEntry', [12345], 'entry/entry_info', ['entryid' => 12345], true],
             'SetDeleteStatus1' => [
                 'setDeleteStatus',
                 [12345, Api::Entry_Delete],
                 'entry/entry_deletestatus_set',
-                true,
                 ['entryid' => 12345, 'entrydeletestatus' => 1],
+                true,
             ],
             'SetDeleteStatus0' => [
                 'setDeleteStatus',
                 [12345, Api::Entry_UnDelete],
                 'entry/entry_deletestatus_set',
-                true,
                 ['entryid' => 12345, 'entrydeletestatus' => 0],
+                true,
             ],
-            'GetPaymentStatus' => ['getPaymentStatus', ['TOKEN'], 'invoices/invoice_paymentstatus_get', true, ['token' => 'TOKEN']],
+            'GetPaymentStatus' => ['getPaymentStatus', ['TOKEN'], 'invoices/invoice_paymentstatus_get', ['token' => 'TOKEN'], true],
             'SetPaymentStatus' => [
                 'setPaymentStatus',
                 ['TOKEN', Api::PaymentStatus_Paid, '2020-02-02'],
                 'invoices/invoice_paymentstatus_set',
-                true,
                 ['token' => 'TOKEN', 'paymentstatus' => Api::PaymentStatus_Paid, 'paymentdate' => '2020-02-02'],
+                true,
             ],
             'emailInvoice' => [
                 'emailInvoiceAsPdf',
                 ['TOKEN', $emailInvoiceAsPdf],
                 'invoices/invoice_mail',
-                true,
                 ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']],
+                true,
+                ['gfx' => null,]
             ],
             'emailInvoiceReminder' => [
                 'emailInvoiceAsPdf',
                 ['TOKEN', $emailInvoiceAsPdf, Api::Email_Reminder],
                 'invoices/invoice_mail',
-                true,
                 ['token' => 'TOKEN', 'invoicetype' => Api::Email_Reminder, 'emailaspdf' => ['emailto' => 'test@example.com']],
+                true,
+                ['gfx' => null,]
             ],
             'emailInvoiceNotes' => [
                 'emailInvoiceAsPdf',
-                ['TOKEN', $emailInvoiceAsPdf, null, 'my notes'],
+                ['TOKEN', $emailInvoiceAsPdf, 'invoiceNotes' => 'my notes'],
                 'invoices/invoice_mail',
-                true,
                 ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com'], 'invoicenotes' => 'my notes'],
+                true,
+                ['gfx' => null,]
+            ],
+            'emailNoGraphics' => [
+                'emailInvoiceAsPdf',
+                ['TOKEN', $emailInvoiceAsPdf, 'applyGraphics' => false],
+                'invoices/invoice_mail',
+                ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']],
+                true,
+                ['gfx' => 0],
             ],
             'emailPackingSlip' => [
                 'emailPackingSlipAsPdf',
                 ['TOKEN', $emailPackingslipAsPdf],
                 'delivery/packing_slip_mail_pdf',
-                true,
                 ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']],
+                true,
+                ['gfx' => null,]
             ],
-            'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, ['signup' => ['companyname' => 'BR']]],
+            'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', ['signup' => ['companyname' => 'BR']], false],
             'stockTransaction' => [
                 'stockTransaction',
                 [$stockTransaction],
                 'stock/stock_add',
-                true,
                 ['stock' => ['productid' => 12345, 'stockamount' => 1.0, 'stockdescription' => 'description', 'stockdate' => '2022-02-02']],
+                true,
             ],
         ];
     }
@@ -139,8 +151,14 @@ class AcumulusTest extends TestCase
      *
      * @dataProvider argumentsPassed
      */
-    public function testArgumentPassingToCallApiFunction(string $method, array $args, string $apiFunction, $needContract, array $message): void
-    {
+    public function testArgumentPassingToCallApiFunction(
+        string $method,
+        array $args,
+        string $apiFunction,
+        array $message,
+        $needContract,
+        array $parameters = []
+    ): void {
         // To test the arguments passed to the protected callApiFunction()
         // method we mock it.
         $stub = $this->getMockBuilder(Acumulus::class)
@@ -149,7 +167,7 @@ class AcumulusTest extends TestCase
             ->getMock();
         $stub->expects($this->once())
             ->method('callApiFunction')
-            ->with($this->equalTo($apiFunction), $this->equalTo($message), $this->equalTo($needContract));
+            ->with($this->equalTo($apiFunction), $this->equalTo($message), $this->equalTo($parameters), $this->equalTo($needContract));
 
         $stub->$method(... $args);
     }
@@ -171,8 +189,8 @@ class AcumulusTest extends TestCase
         self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=1", $acumulus->getInvoicePdfUri('TOKEN', null, true));
         self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=0", $acumulus->getInvoicePdfUri('TOKEN', null, false));
         self::assertSame(
-            "$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1&gfx=1",
-            $acumulus->getInvoicePdfUri('TOKEN', true, true)
+            "$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1&gfx=0",
+            $acumulus->getInvoicePdfUri('TOKEN', true, false)
         );
     }
 
@@ -187,6 +205,14 @@ class AcumulusTest extends TestCase
         self::assertSame(
             "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN",
             self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN')
+        );
+        self::assertSame(
+            "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN&gfx=1",
+            self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN', true)
+        );
+        self::assertSame(
+            "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN&gfx=0",
+            self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN', false)
         );
     }
 }

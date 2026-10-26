@@ -21,7 +21,7 @@ class Acumulus extends BaseAcumulus
      */
     public function timeout($entryId): AcumulusResult
     {
-        return $this->callApiFunction('entry/timeout', ['entryid' => $entryId], true)->setMainAcumulusResponseKey('entry');
+        return $this->callApiFunction('entry/timeout', ['entryid' => $entryId], needContract: true)->setMainAcumulusResponseKey('entry');
     }
 
     /**
@@ -29,17 +29,17 @@ class Acumulus extends BaseAcumulus
      */
     public function notExisting(): AcumulusResult
     {
-        return $this->callApiFunction('invoices/not_existing', [], true)->setMainAcumulusResponseKey('not_existing');
+        return $this->callApiFunction('invoices/not_existing', [], needContract: true)->setMainAcumulusResponseKey('not_existing');
     }
 
     public function noEmailOnError(int $entryId): AcumulusResult
     {
-        return $this->callApiFunction('entry/noemailonerror', ['entryid' => $entryId], true)->setMainAcumulusResponseKey('entry');
+        return $this->callApiFunction('entry/noemailonerror', ['entryid' => $entryId], needContract: true)->setMainAcumulusResponseKey('entry');
     }
 
     public function noEmailOnWarning(int $entryId): AcumulusResult
     {
-        return $this->callApiFunction('entry/noemailonwarning', ['entryid' => $entryId], true)->setMainAcumulusResponseKey('entry');
+        return $this->callApiFunction('entry/noemailonwarning', ['entryid' => $entryId], needContract: true)->setMainAcumulusResponseKey('entry');
     }
 
     /**
@@ -47,7 +47,7 @@ class Acumulus extends BaseAcumulus
      */
     public function noContract(): AcumulusResult
     {
-        return $this->getPicklist('invoicetemplates', [], false);
+        return $this->getPicklist('invoicetemplates', [], needContract: false);
     }
 
     /**
@@ -55,6 +55,6 @@ class Acumulus extends BaseAcumulus
      */
     public function getPicklistDiscountProfiles(): AcumulusResult
     {
-        return $this->getPicklist('discountprofiles', [], true);
+        return $this->getPicklist('discountprofiles', [], needContract: true);
     }
 }

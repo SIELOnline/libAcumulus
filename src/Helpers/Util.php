@@ -56,7 +56,7 @@ class Util
      *   {@see \Siel\Acumulus\ApiClient\AcumulusException} which will not be
      *   caught during the request-response cycle.
      */
-    public function convertArrayToXml(array $values): string
+    public function convertArrayToXml(#[SensitiveParameter] array $values): string
     {
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->xmlStandalone = true;
@@ -91,7 +91,7 @@ class Util
      *
      * @throws \DOMException
      */
-    protected function convertToDom(mixed $values, DOMDocument|DOMElement $element): DOMDocument|DOMElement
+    protected function convertToDom(#[SensitiveParameter] mixed $values, DOMDocument|DOMElement $element): DOMDocument|DOMElement
     {
         /** @var DOMDocument $document */
         static $document = null;
@@ -144,7 +144,7 @@ class Util
      *     (we use json_encode() and json_decode() to convert to an array, so
      *     this would probably mean a structure that is too deep).
      */
-    public function convertXmlToArray(string $xml): array
+    public function convertXmlToArray(#[SensitiveParameter] string $xml): array
     {
         // Convert the response to an array via a 3-way conversion:
         // - create a simplexml object
@@ -168,7 +168,7 @@ class Util
      *   The parameter is not an object or an array, or an error occurred during
      *   conversion.
      */
-    public function convertToJson(object|array $objectOrArray): string
+    public function convertToJson(#[SensitiveParameter] object|array $objectOrArray): string
     {
         try {
             return json_encode($objectOrArray, Meta::JsonFlags);
@@ -192,7 +192,7 @@ class Util
      *   - The $json string could not be converted to an (associative) array
      *     because it is either not an object, or it is too deep.
      */
-    public function convertJsonToArray(string $json): array
+    public function convertJsonToArray(#[SensitiveParameter] string $json): array
     {
         try {
             $result = json_decode($json, true, 512, Meta::JsonFlags);
@@ -319,7 +319,7 @@ class Util
     }
 
     /**
-     * Masks passwords in an XML string
+     * Masks passwords in an HTML string
      *
      * Acumulus API specific: password-fields end with 'password'.
      */
@@ -328,8 +328,8 @@ class Util
         // Mask all "value"s of input elements of type ='password'.
         // @error: order of attributes does not have to be as checked for here.
         return preg_replace(
-            '|name="password" value="[^"]*"|',
-            'name="password" value="REMOVED FOR SECURITY"',
+            '|name="([^"]*)password" value="[^"]*"|',
+            'name="$1password" value="REMOVED FOR SECURITY"',
             $subject
         );
     }

@@ -156,7 +156,7 @@ class AcumulusTest extends TestCase
         array $args,
         string $apiFunction,
         array $message,
-        $needContract,
+        bool $needContract,
         array $parameters = []
     ): void {
         // To test the arguments passed to the protected callApiFunction()

@@ -407,16 +407,15 @@ class AcumulusResult extends MessageCollection
      * Converts the HTTP body to a full Acumulus response.
      *
      * @throws AcumulusException
-     *   Errors during JSON or XML conversion without access to the http
-     *   response to add the http body to the message.
+     *   Errors during JSON or XML conversion without access to the HTTP response to add
+     *   the http body to the message.
      * @throws AcumulusResponseException
-     *   Errors during converting the http response to an AcumulusResponse,
-     *   with access to the http response, so the http body could be added to the
-     *   message.
+     *   Errors during converting the http response to an AcumulusResponse, with access to
+     *   the http response, so the http body could be added to the message.
      */
     protected function convertHttpBodyToFullAcumulusResponse(): void
     {
-        // @todo: redo and test error handling now we throw json errors. (after utils.php is converted)
+        // @nth: add tests for error handling.
         $body = $this->getHttpResponse()->getBody();
         $contentFormat = $this->getContentFormat();
         if ($contentFormat === 'json') {

@@ -21,14 +21,17 @@ class AcumulusTest extends TestCase
     protected Container $container;
     protected Acumulus $acumulusClient;
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        // Using TestWebShop would give us test classes, but we want real ones
-        // here.
         $this->container = new Container('TestWebShop', 'nl');
         $this->acumulusClient = $this->container->getAcumulusApiClient();
     }
 
+    /**
+     * @noinspection PhpUndefinedMethodInspection call() on a closure can set $this and
+     *   thereby allow access to private and protected properties and methods.
+     */
     public function testConstructUri(): void
     {
         $apiFunction = 'test';
@@ -36,20 +39,23 @@ class AcumulusTest extends TestCase
         $environment = $this->container->getEnvironment()->toArray();
         $baseUri = "{$environment['baseUri']}/{$environment['apiVersion']}";
         static::assertSame(
-            "$baseUri/$apiFunction.php", (function (string $apiFunction, array $parameters = []) {
-            /** @noinspection PhpUndefinedMethodInspection */
-            return $this->constructUri($apiFunction, $parameters);
-        })->call($this->acumulusClient, $apiFunction));
+            "$baseUri/$apiFunction.php",
+            (function (string $apiFunction, array $parameters = []) {
+                return $this->constructUri($apiFunction, $parameters);
+            })->call($this->acumulusClient, $apiFunction)
+        );
         static::assertSame(
-            "$baseUri/$apiFunction.php", (function (string $apiFunction, array $parameters = []) {
-            /** @noinspection PhpUndefinedMethodInspection */
-            return $this->constructUri($apiFunction, $parameters);
-        })->call($this->acumulusClient, $apiFunction, []));
+            "$baseUri/$apiFunction.php",
+            (function (string $apiFunction, array $parameters = []) {
+                return $this->constructUri($apiFunction, $parameters);
+            })->call($this->acumulusClient, $apiFunction, [])
+        );
         static::assertSame(
-            "$baseUri/$apiFunction.php?var1=value1&var2=2&var3=&var4=1", (function (string $apiFunction, array $parameters = []) {
-            /** @noinspection PhpUndefinedMethodInspection */
-            return $this->constructUri($apiFunction, $parameters);
-        })->call($this->acumulusClient, $apiFunction, $parameters));
+            "$baseUri/$apiFunction.php?var1=value1&var2=2&var3=&var4=1",
+            (function (string $apiFunction, array $parameters = []) {
+                return $this->constructUri($apiFunction, $parameters);
+            })->call($this->acumulusClient, $apiFunction, $parameters)
+        );
     }
 
     /**

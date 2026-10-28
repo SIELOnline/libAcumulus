@@ -75,7 +75,7 @@ abstract class Collector implements CollectorInterface
      *   The key for the set of mappings to be used, (the $forType parameter to
      *   {@see \Siel\Acumulus\Config\Mappings::getFor()}).
      */
-    protected function getMappingsGetForKey(): string
+    protected function getMappingsKey(): string
     {
         return $this->getAcumulusObjectType();
     }
@@ -123,7 +123,7 @@ abstract class Collector implements CollectorInterface
      */
     protected function getFieldSpecifications(?ArrayObject $fieldSpecifications): ArrayObject
     {
-        return $fieldSpecifications ?? new ArrayObject($this->getMappings()->getFor($this->getMappingsGetForKey()));
+        return $fieldSpecifications ?? new ArrayObject($this->getMappings()->getFor($this->getMappingsKey()));
     }
 
     /**

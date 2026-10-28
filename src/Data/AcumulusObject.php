@@ -98,11 +98,11 @@ abstract class AcumulusObject
     /**
      * Implements direct property get access for the
      * {@see AcumulusProperty}s of this object, thus not
-     * properties referring to another {@see Acumulusobject}, nor
+     * properties referring to another {@see AcumulusObject}, nor
      * {@see MetadataCollection} properties.
      *
      * @throws \RuntimeException
-     *   $name is not an existing name of an {@see AcumulusProperty}.
+     *   $name is not the name of an existing {@see AcumulusProperty}.
      */
     public function __get(string $name)
     {

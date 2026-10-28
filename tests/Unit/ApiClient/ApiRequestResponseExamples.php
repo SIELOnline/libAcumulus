@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection LongLine
  * @noinspection SpellCheckingInspection
  */
 
@@ -40,7 +41,7 @@ class ApiRequestResponseExamples
     {
     }
 
-    private array $sets = [
+    protected static array $sets = [
         'accounts' => [
             'needContract' => true,
             'submit' => [],
@@ -458,37 +459,37 @@ class ApiRequestResponseExamples
 
     public function needContract(string $key): bool
     {
-        return $this->sets[$key]['needContract'];
+        return static::$sets[$key]['needContract'];
     }
 
     public function getSubmit(string $key): array
     {
-        return $this->sets[$key]['submit'];
+        return static::$sets[$key]['submit'];
     }
 
     public function getHttpStatusCode(string $key): int
     {
-        return $this->sets[$key]['http status code'] ?? 200;
+        return static::$sets[$key]['http status code'] ?? 200;
     }
 
     public function getResponseBody(string $key): string
     {
-        return $this->sets[$key]['response body'];
+        return static::$sets[$key]['response body'];
     }
 
     public function getMainResponseKey(string $key): string
     {
-        return $this->sets[$key]['mainResponseKey'];
+        return static::$sets[$key]['mainResponseKey'];
     }
 
     public function isList(string $key): bool
     {
-        return $this->sets[$key]['isList'];
+        return static::$sets[$key]['isList'];
     }
 
     public function getMainResponse(string $key): array
     {
-        return $this->sets[$key]['main response'];
+        return static::$sets[$key]['main response'];
     }
 
     private function getContract(): Contract

@@ -47,7 +47,7 @@ abstract class SubTypedCollector extends Collector
      *
      * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
-    protected function getMappingsGetForKey(): string
+    protected function getMappingsKey(): string
     {
         return $this->subType;
     }

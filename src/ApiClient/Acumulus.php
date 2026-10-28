@@ -624,11 +624,9 @@ class Acumulus
      *   - 'entrycontactid',
      *   - 'entryinvoicelayoutid',
      *   - 'entryaccountnumber',
-     *   Possible errors:
-     *   - @throws AcumulusException|AcumulusResponseException
+     *   Possible errors: todo
      *
-     * @todo: add tests
-     * @todo: find out which error codes may ome back
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function updateEntry(AcumulusEntry $entry, array $changes): AcumulusResult
     {
@@ -997,7 +995,7 @@ class Acumulus
         } finally {
             /** @noinspection ProperNullCoalescingOperatorUsageInspection, PhpUndefinedVariableInspection */
             $this->log->apiCall(
-                count(array_filter($parameters, static fn ($v) => $v !== null)) > 0 ? $uri : $apiFunction,
+                count(array_filter($parameters, static fn($v) => $v !== null)) > 0 ? $uri : $apiFunction,
                 $acumulusRequest->getMaskedRequest(),
                 $acumulusResult?->getMaskedResponse() ?? $exception,
                 $logLevel

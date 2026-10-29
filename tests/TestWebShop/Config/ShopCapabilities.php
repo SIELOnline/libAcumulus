@@ -19,22 +19,6 @@ use Siel\Acumulus\Fld;
 class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
-     * @inheritDoc
-     */
-    protected function getTokenInfoSource(): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function getTokenInfoShopProperties(): array
-    {
-        return [];
-    }
-
-    /**
      * @noinspection PhpMissingParentCallCommonInspection parent method returns empty array.
      */
     public function getDefaultShopMappings(): array

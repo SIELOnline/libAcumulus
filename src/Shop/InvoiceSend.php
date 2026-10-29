@@ -337,8 +337,8 @@ class InvoiceSend
         }
         // - If the invoice has a 0 total amount, and the user does not want to
         //   send those.
-        $shopEventSettings = $this->getConfig()->getShopEventSettings();
-        if (!$shopEventSettings['sendEmptyInvoice'] && $invoice->isZeroAmount()) {
+        $invoiceSettings = $this->getConfig()->getInvoiceSettings();
+        if (!$invoiceSettings['sendEmptyInvoice'] && $invoice->isZeroAmount()) {
             $result->setSendStatus(InvoiceSendResult::NotSent_EmptyInvoice);
         }
     }

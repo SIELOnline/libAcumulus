@@ -61,11 +61,6 @@ class CustomerCollector extends Collector
         $customer->setInvoiceAddress($this->collectAddress(AddressType::Invoice, $propertySources));
         $customer->setShippingAddress($this->collectAddress(AddressType::Shipping, $propertySources));
 
-        // @todo: what to do if we have an "empty" address? (see OC examples)
-        //   - When to consider an address as being empty?
-        //   - Copy all fields or copy only empty fields (the latter seems to contradict
-        //     the concept of what an "empty" address constitutes).
-
         return $customer;
     }
 
@@ -87,9 +82,6 @@ class CustomerCollector extends Collector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        // @todo: in fact, this is not the correct place to retrieve and store this. This
-        //   should be either "global" metadata (except in OC) or at the invoice level
-        //   where it is used for checking valid vat rates.
         $taxBasedOn = $this->getVatBasedOn();
         $acumulusObject->metadataSet(Meta::ShopVatBasedOn, $taxBasedOn);
         $taxBasedOnMapping = $this->getVatBasedOnMapping();

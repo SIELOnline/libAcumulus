@@ -41,6 +41,8 @@ Refactorings:
   regarding copying/cloning metadata values.
 - Address::setAddressType() and getAddressType() renamed to setType() and getType().
 - Refactored the Event classes by extracting similar code into a base Event class.
+- The 'SendEmptyInvoice' setting is now part of the Invoice related settings (instead of
+  the Event related settings). Get via: Config::getInvoiceSettings()['SendEmptyInvoice'];
 
 
 8.7.1 (2025-11-06) (MA)

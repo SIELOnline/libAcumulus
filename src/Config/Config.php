@@ -33,7 +33,6 @@ use const Siel\Acumulus\Version;
  * Configuration is stored in the host environment bridged via the ConfigStore class.
  *
  * @todo: New settings:
- *   - EmailAsPdf: gfx
  *   - Invoice: concept type???
  * @todo: Create list of config keys as enum or constants and extract key info into
  *   a separate class, including allowed values (when not user or shop dependent like
@@ -448,7 +447,6 @@ class Config
      *   - 'triggerOrderStatus'
      *   - 'triggerInvoiceEvent'
      *   - 'triggerCreditNoteEvent'
-     *   - 'sendEmptyInvoice'
      *
      * @throws \JsonException
      */
@@ -515,6 +513,7 @@ class Config
      *   - 'defaultInvoicePaidTemplate'
      *   - 'paymentMethodAccountNumber'
      *   - 'paymentMethodCostCenter'
+     *   - 'sendEmptyInvoice'
      *   - 'sendEmptyShipping'
      *   - 'description'
      *   - 'optionsShow'
@@ -823,6 +822,11 @@ class Config
                     'type' => 'array',
                     'default' => [],
                 ],
+                'sendEmptyInvoice' => [
+                    'group' => Fld::Invoice,
+                    'type' => 'bool',
+                    'default' => true,
+                ],
                 'sendEmptyShipping' => [
                     'group' => Fld::Invoice,
                     'type' => 'bool',
@@ -912,12 +916,6 @@ class Config
                     'group' => 'event',
                     'type' => 'int',
                     'default' => Config::TriggerCreditNoteEvent_Create,
-                ],
-                'sendEmptyInvoice' => [
-                    // @todo: why is this an event, should be invoice?
-                    'group' => 'event',
-                    'type' => 'bool',
-                    'default' => true,
                 ],
                 'showInvoiceStatus' => [
                     'group' => 'status',

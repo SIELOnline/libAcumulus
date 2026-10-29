@@ -172,7 +172,7 @@ abstract class Product implements WrapperInterface
      */
     private function getProductPropertySources(): PropertySources
     {
-        return $this->getContainer()->createPropertySources()->add('product', $this);
+        return $this->getContainer()->createPropertySources(['product' => $this]);
     }
 
     private function getFieldExpander(): FieldExpander

@@ -585,9 +585,9 @@ class Container
         return $this->getInstance('CompletorStrategyLines', 'Invoice', fn() => [$this->getConfig(), $this->getTranslator()]);
     }
 
-    public function createPropertySources(): PropertySources
+    public function createPropertySources(array $values = []): PropertySources
     {
-        return $this->getInstance('PropertySources', 'Collectors', [], true);
+        return $this->getInstance('PropertySources', 'Collectors', [$values], true);
     }
 
     public function getCollectorManager(): CollectorManager

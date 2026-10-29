@@ -38,7 +38,7 @@ class OtherLineCollector extends LineCollector
         /**
          * @var \WC_Order_Item_Fee $fee
          */
-        $fee = $propertySources->get('otherLineInfo');
+        $fee = $propertySources['otherLineInfo'];
 
         $quantity = $fee->get_quantity();
         $feeEx = $fee->get_total() / $quantity;

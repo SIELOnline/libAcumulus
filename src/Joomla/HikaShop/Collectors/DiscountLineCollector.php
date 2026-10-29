@@ -60,7 +60,7 @@ class DiscountLineCollector extends LineCollector
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
         $order = $source->getShopObject();
 
         $discountInc = (float) $order->order_discount_price;

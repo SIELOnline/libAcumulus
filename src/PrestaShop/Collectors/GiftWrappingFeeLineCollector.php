@@ -50,7 +50,7 @@ class GiftWrappingFeeLineCollector extends LineCollector
     protected function collectGiftWrappingFeeLine(Line $line, PropertySources $propertySources): void
     {
         /** @var Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
 
         $wrappingEx = $source->getShopObject()->total_wrapping_tax_excl;
         $wrappingExLookedUp = (float) Configuration::get('PS_GIFT_WRAPPING_PRICE');

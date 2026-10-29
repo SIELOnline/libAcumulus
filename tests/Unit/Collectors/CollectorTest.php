@@ -21,7 +21,6 @@ class CollectorTest extends TestCase
     protected ArrayObject $fieldMappings;
     protected ArrayObject $nullFieldMappings;
 
-
     public function getCollector(): CollectorInterface
     {
         return self::getContainer()->getCollector('SimpleTestObject');
@@ -34,7 +33,7 @@ class CollectorTest extends TestCase
             'itemNumber' => '[field_item_number]',
             'nature' => '[field_nature]',
             'unitPrice' => '[field_unit_price]',
-            ]);
+        ]);
         $this->nullFieldMappings = new ArrayObject([
             'itemNumber' => '["null"]',
             'nature' => '[null]',
@@ -60,10 +59,8 @@ class CollectorTest extends TestCase
         $nature = Api::Nature_Product;
         $unitPrice = '4.99';
 
-        $propertySources = self::getContainer()->createPropertySources()->add('line', [
-            'field_item_number' => $itemNumber,
-            'field_nature' => $nature,
-            'field_unit_price' => $unitPrice,
+        $propertySources = self::getContainer()->createPropertySources([
+            'line' => ['field_item_number' => $itemNumber, 'field_nature' => $nature, 'field_unit_price' => $unitPrice,],
         ]);
 
         $collector = $this->getCollector();
@@ -80,12 +77,9 @@ class CollectorTest extends TestCase
         $nature = Api::Nature_Product;
         $unitPrice = '4.99';
 
-        $propertySources = self::getContainer()->createPropertySources()->add('line', [
-            'field_item_number' => $itemNumber,
-            'field_nature' => $nature,
-            'field_unit_price' => $unitPrice,
+        $propertySources = self::getContainer()->createPropertySources([
+            'line' => ['field_item_number' => $itemNumber, 'field_nature' => $nature, 'field_unit_price' => $unitPrice,],
         ]);
-
         $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->nullFieldMappings);
         self::assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
@@ -100,22 +94,17 @@ class CollectorTest extends TestCase
         $nature = Api::Nature_Product;
         $unitPrice = '4.99';
 
-        $propertySources = self::getContainer()->createPropertySources()
-            ->add('line', [
-                'field_item_number' => $itemNumber,
-                'field_nature' => $nature,
-                'field_unit_price' => $unitPrice,
-            ])
-            ->add('customer', [
-                'reduction' => 0.05,
-            ]);
+        $propertySources = self::getContainer()->createPropertySources([
+            'line' => ['field_item_number' => $itemNumber, 'field_nature' => $nature, 'field_unit_price' => $unitPrice,],
+            'customer' => ['reduction' => 0.05,],
+        ]);
 
         $collector = $this->getCollector();
         $simpleTestObject = $collector->collect($propertySources, $this->fieldMappings);
         self::assertInstanceOf(SimpleTestObject::class, $simpleTestObject);
         self::assertSame((string) $itemNumber, $simpleTestObject->getItemNumber());
         self::assertSame($nature, $simpleTestObject->getNature());
-        $reductionPrice = (1 - $propertySources->get('customer')['reduction']) * $propertySources->get('line')['field_unit_price'];
+        $reductionPrice = (1 - $propertySources['customer']['reduction']) * $propertySources['line']['field_unit_price'];
         self::assertEqualsWithDelta((float) $reductionPrice, $simpleTestObject->getUnitPrice(), 0.000001);
     }
 }

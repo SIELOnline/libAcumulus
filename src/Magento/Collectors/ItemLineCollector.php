@@ -47,9 +47,9 @@ class ItemLineCollector extends LineCollector
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
         /** @var \Siel\Acumulus\Magento\Invoice\Item $item */
-        $item = $propertySources->get('item');
+        $item = $propertySources['item'];
         /** @var OrderItemInterface|CreditmemoItemInterface $shopItem */
         $shopItem = $item->getShopObject();
 

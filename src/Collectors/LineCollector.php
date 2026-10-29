@@ -102,18 +102,14 @@ class LineCollector extends SubTypedCollector
      *
      * @noinspection PhpMissingParentCallCommonInspection Base method does not what we want.
      */
-    protected function collectBefore(
-        AcumulusObject $acumulusObject,
-        PropertySources $propertySources,
-        ArrayObject $fieldSpecifications
-    ): void {
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
+    {
         $acumulusObject->setType($this->subType);
         // ItemLineCollectors only: add the {@see Product} as a property source.
-        if ($propertySources->get('item') instanceof Item) {
-            /** @var Item $item */
-            $item = $propertySources->get('item');
+        $item = $propertySources->item ?? null;
+        if ($item instanceof Item) {
             /** @deprecated use item::getProduct()::... */
-            $propertySources->add('product', $item->getProduct());
+            $propertySources['product'] = $item->getProduct();
         }
         $this->getContainer()->getEvent()->triggerLineCollectBefore($acumulusObject, $propertySources);
     }

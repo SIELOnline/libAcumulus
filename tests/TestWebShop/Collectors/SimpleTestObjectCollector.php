@@ -20,7 +20,7 @@ class SimpleTestObjectCollector extends Collector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $reduction = $propertySources->get('customer')['reduction'] ?? 0.0;
+        $reduction = $propertySources['customer']['reduction'] ?? 0.0;
         if (isset($acumulusObject->unitPrice)) {
             $acumulusObject->unitPrice = (1 - $reduction) * $acumulusObject->unitPrice;
         }

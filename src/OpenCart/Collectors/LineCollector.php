@@ -33,13 +33,10 @@ class LineCollector extends BaseLineCollector
     protected float $precision = 0.001;
     private array $order;
 
-    protected function collectBefore(
-        AcumulusObject $acumulusObject,
-        PropertySources $propertySources,
-        ArrayObject $fieldSpecifications
-    ): void {
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
+    {
         parent::collectBefore($acumulusObject, $propertySources, $fieldSpecifications);
-        $this->order = $propertySources->get('source')->getShopObject();
+        $this->order = $propertySources['source']->getShopObject();
     }
 
     /**
@@ -284,13 +281,14 @@ class LineCollector extends BaseLineCollector
      *   total_low_order_fee_tax_class_id.
      * - key = '{$code}_{module}_tax_class_id', e.g. shipping_flat_tax_class_id
      *   or shipping_weight_tax_class_id.
-     * @todo: What about OC4?
      *
      * @param string $code
      *   The type of total line, e.g. shipping, handling or low_order_fee.
      *
      * @return string
      *   The query to execute.
+     * @todo: What about OC4?
+     *
      */
     protected function getTotalLineTaxClassLookupQuery(string $code): string
     {

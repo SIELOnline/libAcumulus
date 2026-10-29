@@ -84,12 +84,12 @@ class ShippingLineCollector extends LineCollector
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
         $order = $source->getShopObject();
         /** @var object $shippingInfo */
-        $shippingInfo = $propertySources->get('shippingLineInfo');
+        $shippingInfo = $propertySources['shippingLineInfo'] ?? null;
         /** @var string $key */
-        $key = $propertySources->get('key');
+        $key = $propertySources['key'];
 
         if ($shippingInfo === null) {
             $this->getFreeShippingLine($line, $propertySources);
@@ -104,7 +104,7 @@ class ShippingLineCollector extends LineCollector
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
 
         if ($source->getType() === Source::CreditNote) {
             // Free (or no) shipping: do not add on a credit note.

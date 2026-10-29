@@ -6,11 +6,11 @@ This file contains a historical overview of changes in our code.
 8.8.0 (2026-10-??) (ALL)
 ------------------------
 Features:
+- New Acumulus logo is now used.
 - Added support to remove graphics from documents (invoice and packing slip).
   - Added a setting on the settings form under the heading "Documents".
   - Allow for query parameters in request uri's for the Acumulus API: notably the gfx
     parameter (apply graphics in an invoice or packing slip PDF) is now supported.
-
 - Mapping shop fields to Acumulus invoice fields:
   - 0-values (0, 0.0, '0', '0.0000') are no longer considered empty.
     Only null and the empty string are considered empty.
@@ -18,34 +18,26 @@ Features:
     completely ignored. Now they are logged at low priority (DEBUG level) but execution
     still continues,
 - Created a module for the WHMCS platform that is based on this library.
-- The 2 Addresses data objects that are part of the Customer data object can now be
-  compared for equality and "emptiness" (required address parts are missing).
-  This allows to remove them or replace them by the other Address object.
+- The 2 Address data objects that are part of the Customer data object can now be compared
+  for equality and "emptiness" (required address parts are missing). This allows to remove
+  them or replace them by the other Address object.
 - Improved checking for phone numbers so they don't end up as a fully numeric value.
 
 Bugs:
 - ALL: Telephone numbers formatted like '+33.612345678' where converted to a float value
   (when used via field mappings).
 - ALL: Digital services to UK consumers are to be taxed with UK VAT (vat type = 7).
-
-Refactorings:
-- API calls now have their own direct log method apiCall(...) like exception($e).
-  This to support WHMCS's module log.
-- Metadata and its "derived" classes": removed the deprecated addMultiple().
-- Address::setAddressType() and getAddressType() renamed to setType() and getType().
-
-8.7.2 (2026-06-??) (WC)
------------------------
-Bugs:
 - WC: TypeError: strtoupper(): Argument #1 ($string) must be of type string, null given
   in Completors/Address/CompleteByConfig.php:41.
 - WC: Specified too much precision for shipping costs components in a credit note,
   possibly leading to a vat range not containing the actual vat rate.
 
-Features:
-- New Acumulus logo is now used.
-
 Refactorings:
+- API calls now have their own direct log method log::apiCall() (like Log::exception($e)).
+  This to support WHMCS's module log.
+- Refactored class PropertySources to be a (slightly extended) ArrayObject.
+- Metadata and its "derived" classes/traits": removed the deprecated addMultiple().
+- Address::setAddressType() and getAddressType() renamed to setType() and getType().
 - Refactored the Event classes by extracting similar code into a base Event class.
 
 

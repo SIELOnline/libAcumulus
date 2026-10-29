@@ -39,10 +39,10 @@ class DiscountLineCollector extends LineCollector
     protected function collectDiscountLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
 
         /** @var array $calcRule A record from the order_cart_rule table. */
-        $calcRule = $propertySources->get('discountLineInfo');
+        $calcRule = $propertySources['discountLineInfo'];
 
         // Amounts in cart rules are always positive, so negate the sign.
         $sign = $source->getSign();

@@ -29,7 +29,7 @@ class InvoiceCreateTest extends TestCase
     private function getInvoiceSource(): Source
     {
         $objects = (new GetTestData())->getJson();
-        $order = $objects->order;
+        $order = json_decode(json_encode($objects['order']), FALSE);
         return self::getContainer()->createSource(Source::Order, $order);
     }
 

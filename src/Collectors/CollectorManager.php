@@ -85,13 +85,10 @@ class CollectorManager
      */
     public function collectInvoiceForSource(Source $source, InvoiceSendResult $localResult): Invoice
     {
-        $this->getPropertySources()
-            ->clear()
-            ->add('localResult', $localResult)
-            ->add('source', $source);
+        $this->getPropertySources()->exchangeArray(compact('localResult', 'source'));
         $this->addShopPropertySources();
         $invoice = $this->collectInvoice();
-        $this->getPropertySources()->clear();
+        $this->getPropertySources()->exchangeArray([]);
         return $invoice;
     }
 
@@ -136,16 +133,11 @@ class CollectorManager
         ?Item $item,
         StockTransactionResult $localResult
     ): StockTransaction {
-        $this->getPropertySources()
-            ->clear()
-            ->add('localResult', $localResult)
-            ->add('product', $product)
-            ->add('change', $change)
-            ->add('item', $item)
-            ->add('environment', $this->getContainer()->getEnvironment()->toArray());
+        $environment = $this->getContainer()->getEnvironment()->toArray();
+        $this->getPropertySources()->exchangeArray(compact('localResult', 'product', 'change', 'item', 'environment'));
         $this->addShopPropertySources();
         $stockTransaction = $this->collectStockTransaction();
-        $this->getPropertySources()->clear();
+        $this->getPropertySources()->exchangeArray([]);
         return $stockTransaction;
     }
 
@@ -158,14 +150,15 @@ class CollectorManager
 
     public function collectBasicSubmit(bool $needContract): BasicSubmit
     {
-        $this->getPropertySources()
-            ->add('needContract', $needContract)
-            ->add('config', $this->getContainer()->getConfig())
-            ->add('environment', $this->getContainer()->getEnvironment()->toArray());
+        $this->getPropertySources()->add([
+            'needContract' => $needContract,
+            'config' => $this->getContainer()->getConfig(),
+            'environment' => $this->getContainer()->getEnvironment()->toArray(),
+        ]);
         /** @var \Siel\Acumulus\Collectors\BasicSubmitCollector $basicSubmitCollector */
         $basicSubmitCollector = $this->getContainer()->getCollector(DataType::BasicSubmit);
         $basicSubmit = $basicSubmitCollector->collect($this->getPropertySources());
-        $this->getPropertySources()->remove('environment')->remove('config')->remove('needContact');
+        $this->getPropertySources()->remove('environment', 'config', 'needContact');
         return $basicSubmit;
     }
 }

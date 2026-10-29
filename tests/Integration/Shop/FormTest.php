@@ -35,8 +35,8 @@ class FormTest extends TestCase
     private function getInvoiceSource(): Source
     {
         $objects = (new GetTestData())->getJson();
-        $order = $objects->order;
-        return static::getContainer()->createSource(Source::Order, $order);
+        $order = json_decode(json_encode($objects['order']), FALSE);
+        return self::getContainer()->createSource(Source::Order, $order);
     }
 
     private function getForm(string $type): Form

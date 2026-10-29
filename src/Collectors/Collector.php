@@ -118,6 +118,9 @@ abstract class Collector implements CollectorInterface
     /**
      * Returns the field specifications (aka mappings) to use.
      *
+     * The mappings that will be used are either the ones passed in via the parameter or
+     * the default mappings for the @see getAcumulusObjectType()} this collector collects.
+     *
      * @return ArrayObject
      *   See return value of {@see \Siel\Acumulus\Config\Mappings::getFor()}.
      */
@@ -155,10 +158,10 @@ abstract class Collector implements CollectorInterface
      *   {@see FieldExpander} for use in {@see collectMappedFields()} or just pass
      *   information for use in {@see collectLogicFields()}.
      * @param ArrayObject|null $fieldSpecifications
-     *   A set of field specifications keyed by the target field name (property or
+     *   A set of field specifications keyed by the target field name (a property or
      *   metadata field in the target {@see AcumulusObject}).
-     *
-     * @todo: Refactor string[]|null $fieldSpecifications like PropertySources.
+     *   When null is passed, this parameter will be initialised with the default mappings
+     *   for the {@see getAcumulusObjectType()} this collector collects.
      */
     public function collect(PropertySources $propertySources, ?ArrayObject $fieldSpecifications = null): AcumulusObject
     {
@@ -221,8 +224,7 @@ abstract class Collector implements CollectorInterface
      * Collects the fields that can be extracted using simple field mappings.
      *
      * @param ArrayObject $fieldSpecifications
-     *   A set of field mapping specifications to fill properties of the
-     *   $acumulusObject with.
+     *   A set of field mapping specifications to fill properties of the $acumulusObject.
      */
     protected function collectMappedFields(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
     {
@@ -254,8 +256,7 @@ abstract class Collector implements CollectorInterface
      *   The value to set the property to, or a pattern to expand and set the
      *   resulting value to the property.
      * @param int $mode
-     *   The mode to use when setting the property. One of the
-     *   {@see PropertySet} constants.
+     *   The mode to use setting the property, one of the {@see PropertySet} constants.
      *
      * @return bool
      *   Whether the value was set.

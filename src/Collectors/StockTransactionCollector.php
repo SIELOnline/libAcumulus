@@ -43,7 +43,7 @@ class StockTransactionCollector extends Collector
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Product\StockTransactionResult $localResult */
-        $localResult = $propertySources->get('localResult');
+        $localResult = $propertySources['localResult'];
         if (empty($acumulusObject->productId)) {
             $reference = $acumulusObject->metadataGet(Meta::MatchShopValue);
             if (!empty($reference)) {
@@ -55,7 +55,7 @@ class StockTransactionCollector extends Collector
                         $acumulusObject->productId = $productId;
                         $acumulusObject->metadataSet(Meta::AcumulusProductIdSource, 'remote');
                         /** @var \Siel\Acumulus\Product\Product $product */
-                        $product = $propertySources->get('product');
+                        $product = $propertySources['product'];
                         $product->setAcumulusId($productId);
                     } else {
                         $localResult->createAndAddMessage(

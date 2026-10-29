@@ -40,7 +40,7 @@ class ManualLineCollector extends LineCollector
     protected function collectManualLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
 
         $line->product = $this->t('refund_adjustment');
         $line->unitPrice = $source->getShopObject()->getBaseAdjustment();

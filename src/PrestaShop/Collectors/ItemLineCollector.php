@@ -46,12 +46,12 @@ class ItemLineCollector extends LineCollector
     protected function getItemLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $propertySources->get('invoice');
+        $invoice = $propertySources['invoice'];
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
         $sign = $source->getSign();
         /** @var \Siel\Acumulus\Invoice\Item $item */
-        $item = $propertySources->get('item');
+        $item = $propertySources['item'];
         /** @var array $shopItem */
         $shopItem = $item->getShopObject();
 

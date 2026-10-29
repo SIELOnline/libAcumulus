@@ -38,9 +38,9 @@ class ShippingLineCollector extends LineCollector
     protected function getShippingLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $propertySources->get('invoice');
+        $invoice = $propertySources['invoice'];
         /** @var \Siel\Acumulus\PrestaShop\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
         $sign = $source->getSign();
 
         $carrier = new Carrier($source->getOrder()->getShopObject()->id_carrier);

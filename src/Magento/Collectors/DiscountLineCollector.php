@@ -44,7 +44,7 @@ class DiscountLineCollector extends LineCollector
     protected function collectDiscountLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
 
         $line->itemNumber = '';
         $line->product = $this->getDiscountDescription($source);

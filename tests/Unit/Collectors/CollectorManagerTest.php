@@ -24,9 +24,8 @@ class CollectorManagerTest extends TestCase
 
     private function getInvoiceSource(): Source
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $objects = (new GetTestData())->getJson();
-        $order = $objects->order;
+        $order = json_decode(json_encode($objects['order']), FALSE);
         return self::getContainer()->createSource(Source::Order, $order);
     }
 
@@ -82,7 +81,7 @@ class CollectorManagerTest extends TestCase
     public function testCollectCustomer(): void
     {
         $collectorManager = self::getContainer()->getCollectorManager();
-        $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
+        $collectorManager->getPropertySources()->exchangeArray(['source' => $this->getInvoiceSource()]);
         $customer = $collectorManager->collectCustomer();
 
         self::assertNull($customer->contactId);
@@ -111,7 +110,7 @@ class CollectorManagerTest extends TestCase
     public function testCollectAddress(): void
     {
         $collectorManager = self::getContainer()->getCollectorManager();
-        $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
+        $collectorManager->getPropertySources()->exchangeArray(['source' => $this->getInvoiceSource()]);
         $invoiceAddress = $collectorManager->collectAddress(AddressType::Invoice);
 
         self::assertSame('Buro RaDer', $invoiceAddress->companyName1);
@@ -142,7 +141,7 @@ class CollectorManagerTest extends TestCase
     public function testCollectEmailAsPdf(): void
     {
         $collectorManager = self::getContainer()->getCollectorManager();
-        $collectorManager->getPropertySources()->clear()->add('source', $this->getInvoiceSource());
+        $collectorManager->getPropertySources()->exchangeArray(['source' => $this->getInvoiceSource()]);
         /** @var \Siel\Acumulus\Data\EmailInvoiceAsPdf $invoiceEmailAsPdf */
         $invoiceEmailAsPdf = $collectorManager->collectEmailAsPdf(EmailAsPdfType::Invoice);
 

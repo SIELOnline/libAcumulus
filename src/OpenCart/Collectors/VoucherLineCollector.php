@@ -40,7 +40,7 @@ class VoucherLineCollector extends LineCollector
          * @var array $totalLine
          *   A record from the order_total table + an ex/inc vat indication.
          */
-        $totalLine = $propertySources->get('voucherLineInfo');
+        $totalLine = $propertySources['voucherLineInfo'];
         $this->collectTotalLine($line, $totalLine, $totalLine['vat']);
     }
 }

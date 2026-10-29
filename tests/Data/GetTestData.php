@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Data;
 
+use Siel\Acumulus\Helpers\Util;
+
 /**
  * GetData provides test data to test Field and Collectors.
  */
 class GetTestData
 {
-    public function getJson(bool $decode = true): mixed
+    public function getJson(bool $decode = true): array|string
     {
         $data = file_get_contents(__DIR__ . '/data.json');
         if ($decode) {
-            $data = json_decode($data, false, flags: JSON_THROW_ON_ERROR);
-            $data->order->customer = $data->customer;
-            $data->invoiceSource = $data->order;
+            $data = (new Util())->convertJsonToArray($data);
+            $data['order']['customer'] = $data['customer'];
+            $data['invoiceSource'] = $data['order'];
         }
         return $data;
     }

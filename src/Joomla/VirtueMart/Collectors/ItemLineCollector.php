@@ -45,7 +45,7 @@ class ItemLineCollector extends LineCollector
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Joomla\VirtueMart\Invoice\Item $item */
-        $item = $propertySources->get('item');
+        $item = $propertySources['item'];
         $shopItem = $item->getShopObject();
 
         $productPriceEx = (float) $shopItem->product_discountedPriceWithoutTax;

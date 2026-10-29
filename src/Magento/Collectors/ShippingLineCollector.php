@@ -39,7 +39,7 @@ class ShippingLineCollector extends LineCollector
     protected function getShippingLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $shopSource */
         $shopSource = $source->getShopObject();
 

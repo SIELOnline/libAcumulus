@@ -42,7 +42,7 @@ class ShippingLineCollector extends LineCollector
     protected function collectShippingLine(Line $line, PropertySources $propertySources): void
     {
         /** @var \WC_Order_Item_Shipping $shippingItem */
-        $shippingItem = $propertySources->get('shippingLineInfo');
+        $shippingItem = $propertySources['shippingLineInfo'];
         $line->metadataSet(Meta::Id, $shippingItem->get_id());
 
         $line->product = $shippingItem->get_name();
@@ -190,9 +190,9 @@ class ShippingLineCollector extends LineCollector
             $shippingTaxClass = get_option('woocommerce_shipping_tax_class');
             if (is_string($shippingTaxClass)) {
                 /** @var \Siel\Acumulus\Data\Invoice $invoice */
-                $invoice = $propertySources->get('invoice');
+                $invoice = $propertySources['invoice'];
                 /** @var \Siel\Acumulus\WooCommerce\Invoice\Source $source */
-                $source = $propertySources->get('source');
+                $source = $propertySources['source'];
                 /** @var \WC_Order $order */
                 $order = $source->getOrder()->getShopObject();
 

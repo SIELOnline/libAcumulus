@@ -41,7 +41,7 @@ class ShippingLineCollector extends LineCollector
     protected function collectShippingLine(Line $line, PropertySources $propertySources): void
     {
         /** @var array $totalLine a record from the order_total table + a vat indication */
-        $totalLine = $propertySources->get('shippingLineInfo');
+        $totalLine = $propertySources['shippingLineInfo'];
         $this->collectTotalLine($line, $totalLine, $totalLine['vat']);
     }
 }

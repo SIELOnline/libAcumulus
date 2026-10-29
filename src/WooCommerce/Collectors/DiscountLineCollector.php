@@ -41,7 +41,7 @@ class DiscountLineCollector extends LineCollector
         /**
          * @var \WC_Coupon $coupon
          */
-        $coupon = $propertySources->get('discountLineInfo');
+        $coupon = $propertySources['discountLineInfo'];
         $this->CollectCouponDiscountLine($line, $coupon, $propertySources);
     }
 
@@ -59,7 +59,7 @@ class DiscountLineCollector extends LineCollector
     protected function CollectCouponDiscountLine(Line $line, WC_Coupon $coupon, PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\WooCommerce\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
 
         // Get a description for the value of this coupon. Entered discount
         // amounts follow the productPricesIncludeTax() setting. Use that info

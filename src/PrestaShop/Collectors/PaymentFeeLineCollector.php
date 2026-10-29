@@ -27,7 +27,7 @@ class PaymentFeeLineCollector extends LineCollector
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $paymentFeeLineInfo = $propertySources->get('paymentFeeLineInfo');
+        $paymentFeeLineInfo = $propertySources['paymentFeeLineInfo'];
         $line = $acumulusObject;
 
         $totals = new Totals(

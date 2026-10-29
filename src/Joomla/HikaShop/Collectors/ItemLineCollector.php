@@ -52,12 +52,12 @@ class ItemLineCollector extends LineCollector
     {
         // Set some often used variables.
         /** @var \Siel\Acumulus\Data\Invoice $invoice */
-        $invoice = $propertySources->get('invoice');
+        $invoice = $propertySources['invoice'];
         /** @var \Siel\Acumulus\Invoice\Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
         $order = $source->getShopObject();
         /** @var \Siel\Acumulus\Joomla\HikaShop\Invoice\Item $item */
-        $item = $propertySources->get('item');
+        $item = $propertySources['item'];
         $shopItem = $item->getShopObject();
 
         // Remove html with variant info from product name, we'll add that later

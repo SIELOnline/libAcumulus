@@ -109,7 +109,7 @@ class InvoiceCollector extends Collector
     protected function collectFields(AcumulusObject $acumulusObject, PropertySources $propertySources, ?ArrayObject $fieldSpecifications): void
     {
         parent::collectFields($acumulusObject, $propertySources, $fieldSpecifications);
-        $propertySources->add('invoice', $acumulusObject);
+        $propertySources->invoice = $acumulusObject;
         $acumulusObject->setCustomer($this->collectCustomer($propertySources));
         $acumulusObject->setEmailAsPdf($this->collectEmailAsPdf(EmailAsPdfType::Invoice, $propertySources));
         $this->collectLines($acumulusObject, $propertySources);
@@ -164,7 +164,7 @@ class InvoiceCollector extends Collector
         ?string $getInfosMethod = null
     ): void {
         /** @var Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
         if ($getInfosMethod === null) {
             $getInfosMethod = "get{$lineType}Infos";
         }
@@ -190,8 +190,8 @@ class InvoiceCollector extends Collector
         }
         $lineInfoName = lcfirst($lineInfoName);
         foreach ($infos as $key => $lineInfo) {
-            $propertySources->add($lineInfoName, $lineInfo);
-            $propertySources->add('key', $key);
+            $propertySources[$lineInfoName] = $lineInfo;
+            $propertySources->key = $key;
             $line = $lineCollector->collect($propertySources, $lineMappings);
             if (!$line->metadataGet(Meta::DoNotAdd)) {
                 $invoice->addLine($line);
@@ -205,8 +205,7 @@ class InvoiceCollector extends Collector
                 }
                 $line->removeChildren();
             }
-            $propertySources->remove('key');
-            $propertySources->remove($lineInfoName);
+            $propertySources->remove('key', $lineInfoName);
         }
     }
 }

@@ -40,7 +40,7 @@ class OtherLineCollector extends LineCollector
          * @var array $totalLine
          *   A record from the order_total table + an ex/inc vat indication.
          */
-        $totalLine = $propertySources->get('otherLineInfo');
+        $totalLine = $propertySources['otherLineInfo'];
         $this->collectTotalLine($line, $totalLine, $totalLine['vat']);
     }
 }

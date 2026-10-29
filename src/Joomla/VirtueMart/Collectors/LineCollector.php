@@ -32,13 +32,10 @@ class LineCollector extends BaseLineCollector
     protected float $precision = 0.001;
     private array $order;
 
-    protected function collectBefore(
-        AcumulusObject $acumulusObject,
-        PropertySources $propertySources,
-        ArrayObject $fieldSpecifications
-    ): void {
+    protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
+    {
         parent::collectBefore($acumulusObject, $propertySources, $fieldSpecifications);
-        $this->order = $propertySources->get('source')->getShopObject();
+        $this->order = $propertySources['source']->getShopObject();
     }
 
     /**

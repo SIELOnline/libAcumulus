@@ -216,12 +216,11 @@ class FieldExpander
      *   facilitates the recursive search algorithm when searching for a mapping
      *   like object1::object2::property.
      */
-    protected array $objects;
+    protected array $objects = [];
 
     public function __construct(Log $log)
     {
         $this->log = $log;
-        $this->objects = [];
     }
 
     /**
@@ -258,7 +257,7 @@ class FieldExpander
         // class/method has "call state". We don't want to pass $objects along all methods
         // so we put it on the stack here and remove it at the end of this method.
         $oldObjects = $this->objects;
-        $this->objects = $propertySources->toArray();
+        $this->objects = array_reverse($propertySources->getArrayCopy());
         // If the specification contains exactly 1 field expansion specification,
         // we return the direct result of {@see extractField()} so that the type
         // of that property is retained.
@@ -563,8 +562,6 @@ class FieldExpander
      * handled by the magic
      * {@link https://www.php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.methods __call()}
      * function.
-     *
-     * @noinspection PhpUsageOfSilenceOperatorInspection
      */
     protected function getValueFromMethod(object $object, string $method, array $args): mixed
     {
@@ -591,7 +588,8 @@ class FieldExpander
     {
         try {
             return $array[$index] ?? null;
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            $this->log->debug($e->getMessage());
             return null;
         }
     }
@@ -616,12 +614,11 @@ class FieldExpander
             ) {
                 /**
                  * @noinspection PhpVariableVariableInspection
-                 * @noinspection PhpUsageOfSilenceOperatorInspection  There are still ways
-                 *   that the statement below can fail, especially via the __get() variant.
                  */
-                $value = @$object->$property;
+                $value = $object->$property ?? null;
             }
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            $this->log->debug($e->getMessage());
         }
         return $value;
     }

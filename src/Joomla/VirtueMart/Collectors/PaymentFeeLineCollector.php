@@ -40,7 +40,7 @@ class PaymentFeeLineCollector extends LineCollector
     protected function collectPaymentFeeLine(Line $line, PropertySources $propertySources): void
     {
         /** @var Source $source */
-        $source = $propertySources->get('source');
+        $source = $propertySources['source'];
 
         $paymentEx = (float) $source->getShopObject()['details']['BT']->order_payment;
         $paymentVat = (float) $source->getShopObject()['details']['BT']->order_payment_tax;

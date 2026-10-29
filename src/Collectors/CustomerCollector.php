@@ -57,7 +57,7 @@ class CustomerCollector extends Collector
         /** @var Customer $customer */
         $customer = parent::collect($propertySources, $fieldSpecifications);
 
-        $propertySources->add('customer', $customer);
+        $propertySources->customer = $customer;
         $customer->setInvoiceAddress($this->collectAddress(AddressType::Invoice, $propertySources));
         $customer->setShippingAddress($this->collectAddress(AddressType::Shipping, $propertySources));
 

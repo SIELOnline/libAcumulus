@@ -9,7 +9,6 @@ use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Invoice\Item;
-use Siel\Acumulus\Meta;
 
 /**
  * LineCollector adds WHMCS line collecting logic.
@@ -21,7 +20,7 @@ class LineCollector extends BaseLineCollector
      */
     protected function collectAfter(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
-        $item = $propertySources->get('item');
+        $item = $propertySources['item'];
         if ($item instanceof Item) {
             if (str_starts_with($item->getShopObject()['type'], 'Promo')) {
                 $acumulusObject->setType(LineType::Discount);

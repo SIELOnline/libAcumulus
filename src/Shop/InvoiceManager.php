@@ -498,7 +498,7 @@ abstract class InvoiceManager
     {
         $subType = $forInvoice ? EmailAsPdfType::Invoice : EmailAsPdfType::PackingSlip;
         $collectorManager = $this->getContainer()->getCollectorManager();
-        $collectorManager->getPropertySources()->add('source', $source);
+        $collectorManager->getPropertySources()->source = $source;
         $emailAsPdf = $collectorManager->collectEmailAsPdf($subType);
         /** @var \Siel\Acumulus\Completors\EmailInvoiceAsPdfCompletor $completor */
         $completor = $this->getContainer()->getCompletor(DataType::EmailAsPdf, $subType);

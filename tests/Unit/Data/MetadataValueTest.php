@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataValue;
+use stdClass;
 use Stringable;
 
 /**
@@ -155,6 +156,24 @@ class MetadataValueTest extends TestCase
         self::assertSame([$value1, $value2], $mdv->get());
         self::assertNull($mdv->get(1));
         self::assertSame("['value1',2]", $mdv->getApiValue());
+    }
+
+    public function testClone(): void
+    {
+        $value1 = 'value1';
+        $value2 =  new stdClass();
+        $value2->s2 = 'value2';
+        $value2->s3 = 'value3';
+        $mdv = (new MetadataValue())->add($value1)->add($value2);
+        $clone = clone $mdv;
+        self::assertSame($mdv->get(0), $clone->get(0));
+        self::assertNotSame($mdv->get(1), $clone->get(1));
+        self::assertEquals($mdv->get(1), $clone->get(1));
+        $value2->s4 = 'value4';
+        $value2->s3 = 'value5';
+        self::assertSame($value2, $mdv->get(1));
+        self::assertNotSame($mdv->get(1), $clone->get(1));
+        self::assertNotEquals($mdv->get(1), $clone->get(1));
     }
 
     /**

@@ -29,6 +29,7 @@ class CollectorManagerTest extends TestCase
         return self::getContainer()->createSource(Source::Order, $order);
     }
 
+    /** @noinspection PhpUndefinedMethodInspection */
     public function testCollectInvoice(): void
     {
         $manager = self::getContainer()->getCollectorManager();
@@ -51,25 +52,25 @@ class CollectorManagerTest extends TestCase
         self::assertNull($invoice->descriptionText);
         self::assertNull($invoice->invoiceNotes);
 
-        $meta = $invoice->getMetadata();
-        self::assertSame(Source::Order, $meta->get(Meta::SourceType));
-        self::assertSame(3, $meta->get(Meta::SourceId));
-        self::assertSame(3, $meta->get(Meta::SourceReference));
-        self::assertEquals('2022-12-01', $meta->get(Meta::SourceDate));
-        self::assertSame('pending', $meta->get(Meta::SourceStatus));
-        self::assertSame('paypal', $meta->get(Meta::PaymentMethod));
-        self::assertNull($meta->get(Meta::ShopInvoiceId));
-        self::assertNull($meta->get(Meta::ShopInvoiceReference));
-        self::assertNull($meta->get(Meta::ShopInvoiceDate));
+        $metadataCollection = (fn () => $this->getMetadataCollection())->call($invoice);
+        self::assertSame(Source::Order, $metadataCollection->get(Meta::SourceType));
+        self::assertSame(3, $metadataCollection->get(Meta::SourceId));
+        self::assertSame(3, $metadataCollection->get(Meta::SourceReference));
+        self::assertEquals('2022-12-01', $metadataCollection->get(Meta::SourceDate));
+        self::assertSame('pending', $metadataCollection->get(Meta::SourceStatus));
+        self::assertSame('paypal', $metadataCollection->get(Meta::PaymentMethod));
+        self::assertNull($metadataCollection->get(Meta::ShopInvoiceId));
+        self::assertNull($metadataCollection->get(Meta::ShopInvoiceReference));
+        self::assertNull($metadataCollection->get(Meta::ShopInvoiceDate));
 
         /** @var \Siel\Acumulus\Invoice\Currency $currency */
-        $currency = $meta->get(Meta::Currency);
+        $currency = $metadataCollection->get(Meta::Currency);
         self::assertSame('EUR', $currency->currency);
         self::assertEqualsWithDelta(1.0, $currency->rate, 0.000001);
         self::assertFalse($currency->doConvert);
 
         /** @var \Siel\Acumulus\Invoice\Totals $totals */
-        $totals = $meta->get(Meta::Totals);
+        $totals = $metadataCollection->get(Meta::Totals);
         self::assertEqualsWithDelta(50.4, $totals->amountInc, 0.001);
         self::assertEqualsWithDelta(8.75, $totals->amountVat, 0.001);
         self::assertEqualsWithDelta(41.65, $totals->amountEx, 0.001);

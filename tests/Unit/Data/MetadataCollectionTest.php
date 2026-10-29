@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Tests\Unit\Data;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataCollection;
 use Siel\Acumulus\Data\MetadataValue;
+use stdClass;
 
 /**
  * Tests for the {@see MetadataCollection} class.
@@ -172,6 +173,31 @@ class MetadataCollectionTest extends TestCase
         self::assertCount(1, $mdc->get($name1));
         $mdc->add($name1, $data2);
         self::assertCount(2, $mdc->get($name1));
+    }
+
+    public function testCopy(): void
+    {
+        $name1 = 'my_metadata1';
+        $value1 = 'value1';
+        $name2 = 'my_metadata2';
+        $value2 =  new stdClass();
+        $value2->s2 = 'value2';
+        $value2->s3 = 'value3';
+        $mdc = new MetadataCollection();
+        $mdc->set($name1, $value1);
+        $mdc->set($name2, $value2);
+
+        $copy1 = $mdc->copy($name1);
+        $copy2 = $mdc->copy($name2);
+
+        self::assertSame($mdc->get($name1), $copy1->get());
+        self::assertNotSame($mdc->get($name2), $copy2->get());
+        self::assertEquals($mdc->get($name2), $copy2->get());
+
+        $value2->s4 = 'value4';
+        $value2->s3 = 'value5';
+        self::assertEquals($value2, $mdc->get($name2));
+        self::assertNotEquals($mdc->get($name2), $copy2->get());
     }
 
     public function testToArray(): void

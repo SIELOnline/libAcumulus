@@ -35,8 +35,10 @@ Bugs:
 Refactorings:
 - API calls now have their own direct log method log::apiCall() (like Log::exception($e)).
   This to support WHMCS's module log.
-- Refactored class PropertySources to be a (slightly extended) ArrayObject.
+- Class PropertySources is now a (slightly extended) ArrayObject.
 - Metadata and its "derived" classes/traits": removed the deprecated addMultiple().
+- Renamed and slightly changed the MetadataTrait and the MetadataCollection class
+  regarding copying/cloning metadata values.
 - Address::setAddressType() and getAddressType() renamed to setType() and getType().
 - Refactored the Event classes by extracting similar code into a base Event class.
 

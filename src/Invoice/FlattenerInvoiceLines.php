@@ -429,9 +429,7 @@ class FlattenerInvoiceLines
                 // correct the children.
                 $child->metadataSet(Meta::VatRateSource, $parent->metadataGet(Meta::VatRateSource));
                 foreach ($vatMetaInfoTags as $tag) {
-                    if ($parent->metadataExists($tag)) {
-                        $child->metadataCopy($tag, $parent->getMetadata()->getMetadataValue($tag));
-                    }
+                    $child->metadataCopy($parent, $tag);
                 }
             }
 

@@ -9,28 +9,14 @@ use Siel\Acumulus\Meta;
 
 /**
  * Wraps the {@see \Siel\Acumulus\Data\MetadataCollection} methods in methods
- * for an {@see \Siel\Acumulus\Data\AcumulusObject}.
+ * for an {@see \Siel\Acumulus\Data\AcumulusObject}, or any ther object, that wants to
+ * contain a MetadataCollection.
  */
-trait AcumulusObjectMetadataTrait
+trait MetadataTrait
 {
     private MetadataCollection $metadata;
 
-    /**
-     * Completes the shallow clone that PHP automatically performs.
-     *
-     * This implementation (deep) clones the {@see MetadataCollection}.
-     */
-    public function cloneMetadata(): void
-    {
-        if (isset($this->metadata)) {
-            $this->metadata = clone $this->metadata;
-        }
-    }
-
-    /**
-     * @todo: should this be public? (at least we need a getMetadataValue() or rename this to getMetadataCollection()).
-     */
-    public function getMetadata(): MetadataCollection
+    protected function getMetadataCollection(): MetadataCollection
     {
         $this->metadata ??= new MetadataCollection();
         return $this->metadata;
@@ -41,7 +27,7 @@ trait AcumulusObjectMetadataTrait
      */
     public function metadataExists(string $name): bool
     {
-        return $this->getMetadata()->exists($name);
+        return $this->getMetadataCollection()->exists($name);
     }
 
     /**
@@ -49,7 +35,7 @@ trait AcumulusObjectMetadataTrait
      */
     public function metadataGet(string $name): mixed
     {
-        return $this->getMetadata()->get($name);
+        return $this->getMetadataCollection()->get($name);
     }
 
     /**
@@ -57,7 +43,7 @@ trait AcumulusObjectMetadataTrait
      */
     public function metadataRemove(string $name): void
     {
-        $this->getMetadata()->remove($name);
+        $this->getMetadataCollection()->remove($name);
     }
 
     /**
@@ -65,7 +51,7 @@ trait AcumulusObjectMetadataTrait
      */
     public function metadataSet(string $name, $value): void
     {
-        $this->getMetadata()->set($name, $value);
+        $this->getMetadataCollection()->set($name, $value);
     }
 
     /**
@@ -73,12 +59,21 @@ trait AcumulusObjectMetadataTrait
      */
     public function metadataAdd(string $name, $value, bool $isList = true): void
     {
-        $this->getMetadata()->add($name, $value, $isList);
+        $this->getMetadataCollection()->add($name, $value, $isList);
     }
 
-    public function metadataCopy(string $name, MetadataValue $metadataValue): void
+    /**
+     * Creates ad deep clone of the metadata value with the given name form the given
+     * AcumulusObject and adds it to this metadata collection.
+     *
+     * If no metadata value exists with the given name in the given AcumulusObject nothing
+     * is done.
+     */
+    public function metadataCopy(AcumulusObject $source, string $name): void
     {
-        $this->getMetadata()->copyMetadataValue($name, $metadataValue);
+        if ($source->metadataExists($name)) {
+            $this->getMetadataCollection()->set($name, $source->getMetadataCollection()->copy($name));
+        }
     }
 
     /**
@@ -89,7 +84,7 @@ trait AcumulusObjectMetadataTrait
      */
     protected function metadataToArray(): array
     {
-        return $this->getMetadata()->toArray();
+        return $this->getMetadataCollection()->toArray();
     }
 
     /**

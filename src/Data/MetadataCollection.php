@@ -45,13 +45,11 @@ class MetadataCollection
     }
 
     /**
-     * Returns the {@see MetadataValue} object for $name, or null if not set.
-     *
-     * @todo: add tests.
+     * Returns a clone of the {@see MetadataValue} for the given name, or null if not set.
      */
-    public function copyMetadataValue(string $name, MetadataValue $metadataValue): void
+    public function copy(string $name): ?MetadataValue
     {
-        $this->metadata[$name] = clone $metadataValue;
+        return $this->exists($name) ? clone $this->getMetadataValue($name) : null;
     }
 
     /**

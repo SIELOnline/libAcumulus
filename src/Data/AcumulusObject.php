@@ -60,7 +60,7 @@ use function strlen;
  */
 abstract class AcumulusObject
 {
-    use AcumulusObjectMetadataTrait;
+    use MetadataTrait;
 
     /** @var \Siel\Acumulus\Data\AcumulusProperty[] */
     private array $data = [];
@@ -76,7 +76,7 @@ abstract class AcumulusObject
     /**
      * Completes the shallow clone that PHP automatically performs.
      *
-     * This base implementation (deep) clones all
+     * This base implementation deep clones all
      * {@see AcumulusProperty AcumulusProperties} and the {@see MetadataCollection}.
      */
     public function __clone(): void
@@ -84,7 +84,9 @@ abstract class AcumulusObject
         foreach ($this->data as &$acumulusProperty) {
             $acumulusProperty = clone $acumulusProperty;
         }
-        $this->cloneMetadata();
+        if (isset($this->metadata)) {
+            $this->metadata = clone $this->metadata;
+        }
     }
 
     /**

@@ -1,15 +1,15 @@
 {
     "source": {
-            "info": "An Acumulus wrapper around the webshop order or credit note. It defines some helper methods to extract info from those webshop specific sources, but it also defines methods to access those webshop specific data structures and traverse its data model.",
-        "getLabel(2)": "'Order' or 'Credit note' (translated)",
-        "getId()": "The (technical) id",
-        "getReference()": "The (external) reference",
-        "getDate()": "The creation date",
-        "getStatus()": "The (internal) status (not necessarily a human readable and translated text)",
-        "getPaymentMethod()": "The (internal) status (not necessarily a human readable and translated text)",
+        "info": "An Acumulus wrapper around the webshop order, credit note, or invoice. It defines some helper methods to extract info from those webshop specific sources, but it also defines methods to access those webshop specific data structures and traverse its data model.",
+        "getLabel(2)": "'Order', 'Credit note', or 'Invoice' (translated).",
+        "getId()": "The (technical) id.",
+        "getReference()": "The (external) reference.",
+        "getDate()": "The creation date.",
+        "getStatus()": "The (internal) status (not necessarily a human readable and translated text).",
+        "getPaymentMethod()": "The (internal) payment method used to pay (not necessarily a human readable and translated text).",
         "getPaymentStatus()": "2 for 'paid', 1 for 'due'",
-        "getPaymentDate()": "The payment date, or null if not yet paid",
-        "getCountryCode()": "2-character country code of this client",
+        "getPaymentDate()": "The payment date, or null if not yet paid.",
+        "getCountryCode()": "2-character country code of this client.",
         "getCurrency()": {
             "currency": "",
             "rate": ""
@@ -19,7 +19,7 @@
             "amountInc": "",
             "amountVat": ""
         },
-        "getShopObject()": "The webshop order or credit note for this Source. See the PHP code from the webshop to find out what properties and methods are available",
+        "getShopObject()": "The webshop order or credit note for this Source. See the PHP code from the webshop to find out what properties and methods are available.",
         "getOrder()": "If this Source object wraps an order, this Source object itself, otherwise the Source wrapper for the originating Order of this credit note.",
         "getParent()": "The Source wrapper around the originating Order for this credit note, or null if this Source wraps an Order. Can be used if you only want a value from the originating order for credit notes.",
         "getCreditNote(index)": "The credit note (type = Source) for this order, if this source is an order and has a credit note; this Source object itself it this source is a credit note, null otherwise.",
@@ -30,7 +30,7 @@
         "getInvoiceReference()": "The reference from the web shop's invoice, if an invoice exists for this Order in the web shop.",
         "getInvoiceDate()": "The date from the web shop's invoice, if an invoice exists for this Order in the web shop."
     },
-    "item" : {
+    "item": {
         "info": "Typically contains a webshop specific order item line, defining the things like quantity, price, and tax. Only available when an item line is being processed."
     },
     "product": {

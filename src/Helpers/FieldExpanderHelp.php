@@ -10,7 +10,7 @@ use function count;
 use function is_array;
 
 /**
- * FieldExpanderHelp formats the field references help.
+ * FieldExpanderHelp formats the field mappings help.
  */
 class FieldExpanderHelp
 {

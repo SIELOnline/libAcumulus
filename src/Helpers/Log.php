@@ -20,7 +20,6 @@ use function sprintf;
  * @todo: log a Message
  * @todo: log a Message[]
  * @todo: log a MessageCollection
- * @todo: start using logging an exception?
  */
 class Log
 {

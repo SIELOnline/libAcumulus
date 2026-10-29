@@ -34,39 +34,36 @@ use function strlen;
 /**
  * FieldExpander expands a field definition that can contain field mappings.
  *
- * When creating an Acumulus API message, the values that go in that message
- * can come from various sources:
+ * When creating an Acumulus API message, the values that go in that message can come from
+ * various sources:
  * - Settings: e.g. always define a customer as active.
- * - Logic: further split into "simple" mapping logic or "complex" computational
- *   logic:
- *   - Mappings: e.g. 'city' comes from the field 'city' from the customer's
- *     address, or 'full_name' is the concatenation of 'first_name' and
- *      'last_name' from the customer object.
- *    - Complex logic: often involving navigating relations in a database, with
- *     edge case handling, fallback values, and such.
- * - Combination from settings and logic: e.g. based on the setting "invoice
- *   number source", the invoice number is either defined by Acumulus or comes
- *   from the invoice for a given order with fallback to the order number itself
- *   if no invoice is available.
+ * - Logic: further split into "simple" mapping logic or "complex" computational logic:
+ *   - Mappings: e.g. 'city' comes from the field 'city' from the customer's address, or
+ *     'full_name' is the concatenation of 'first_name' and 'last_name' from the customer
+ *     object.
+ *   - Complex logic: often involving navigating relations in a database, with edge case
+ *     handling, fallback values, and such.
+ * - Combination from settings and logic: e.g. based on the setting "invoice number
+ *   source", the invoice number is either defined by Acumulus or comes from the invoice
+ *   for a given order with fallback to the order number itself if no invoice is
+ *   available.
  *
  * FieldExpander expands values based on a "field expansion specification":
- * - A "field expansion specification" is a string that specifies how to
- *   assemble the resulting value based on a mix of (possibly multiple) free
- *   text parts and "field extraction specifications".
- * - A "field extraction definition" is enclosed by square brackets, i.e. '['
- *   and ']' and can refer to multiple properties, either as an alternative
- *   (fallback) or for concatenation.
- * - A property specification is a specification that specifies where a value
- *   should come from. Typically, it refers to a "property" of an "object".
- * - "Objects" are "data structures", in our domain typically the shop order, an
- *   order line, the customer, or an address. Depending on the webshop, these
- *   "objects" may actually be (keyed) arrays.
- * - "Properties" are the values of these "objects". All elements that have or
- *   can return a value can be used: properties on real objects, key names on
- *   arrays, or (getter) methods on real objects. Even methods with parameters
- *   can be used.
- * - A "field expansion specification" that consists of a single property
- *   specification:
+ * - A "field expansion specification" is a string that specifies how to assemble the
+ *   resulting value based on a mix of (possibly multiple) free text parts and "field
+ *   extraction specifications".
+ * - A "field extraction definition" is enclosed by square brackets, i.e. '[' and ']' and
+ *   can refer to multiple properties, either as an alternative (fallback) or for
+ *   concatenation.
+ * - A property specification is a specification that specifies where a value should come
+ *   from. Typically, it refers to a "property" of an "object".
+ * - "Objects" are "data structures", in our domain typically the shop order, an order
+ *   line, the customer, or an address. Depending on the webshop, these "objects" may
+ *   actually be (keyed) arrays.
+ * - "Properties" are the values of these "objects". All elements that have or can return
+ *   a value can be used: properties on real objects, key names on arrays, or (getter)
+ *   methods on real objects. Even methods with parameters can be used.
+ * - A "field expansion specification" that consists of a single property specification:
  *     - Can be signed by placing sign* directly after the '[' opening bracket.
  *     - Is returned in the type of the property, but as soon as properties get
  *       concatenated they are converted to a string:
@@ -88,33 +85,33 @@ use function strlen;
  * - object-name = text
  * - single-property-name = text
  * - literal-text = "text"
- * - constant = 'true'|'false'|'null'  @todo: numeric constants?
+ * - constant = 'true'|'false'|'null'|numeric-constant
+ * - numeric-constant = -?[0-9][0-9]*(.[0-9][0-9]*)? @todo: add tests.
  *
  * Notes:
  * - This syntax is quite simple. The following features are not possible:
  *     - Grouping, e.g. by using brackets, to override operator precedence.
- *     - Translation of literal strings. Use methods like {@see Source::getLabel()}
- *       to allow getting translated texts.
+ *     - Translation of literal strings. Use methods like {@see Source::getLabel()} to
+ *       allow getting translated texts.
  *     - Lookup based on a value of a property.
- * - The parsing is quite simple: the special symbols - ], |, &, and " - cannot
+ * - The parsing is quite simple: the special symbols - ']', '|', '&', and '"' - cannot
  *   appear otherwise:
- *     - Not as part of object or property names. This is not restricting as
- *       this is not normal for PHP object or property names, or array keys.
- *     - Not as part of literal strings. This is not considered restricting, as
- *       they will hardly be used given where this class will be used. Moreover,
- *       in most cases these characters can be placed outside variable field
- *       definitions with (mostly) the same results.
- * - Alternatives are expanded left to right until a property alternative is
- *   found that is not empty.
- * - Properties that are joined with a '+' are all expanded where the '+' gets
- *   replaced with a space if and only if the property directly following it
- *   is not empty (and we already have a non-empty intermediate result).
- * - Properties that are joined with a '&' are all expanded and concatenated
- *   directly, thus not with a space between them like with a '+'.
- * - Literal text that is joined with "real" properties using '&' or '+' only
- *   gets returned when at least 1 of the "real" properties has a non-empty
- *   value. (Otherwise, you could just place it outside the variable-field
- *   definition.)
+ *     - Not as part of object or property names. This is not restricting as this is not
+ *       normal for PHP object or property names, or array keys.
+ *     - Not as part of literal strings. This is not considered restricting, as they will
+ *       hardly be used given where this class will be used. Moreover, in most cases these
+ *       characters can be placed outside variable field definitions with (mostly) the
+ *       same results.
+ * - Alternatives are expanded left to right until a property alternative is found that is
+ *   not empty.
+ * - Properties that are joined with a '+' are all expanded where the '+' gets replaced
+ *   with a space if and only if the property directly following it is not empty (and we
+ *   already have a non-empty intermediate result).
+ * - Properties that are joined with a '&' are all expanded and concatenated directly,
+ *   thus not with a space between them like with a '+'.
+ * - Literal text that is joined with "real" properties using '&' or '+' only gets
+ *   returned when at least 1 of the "real" properties has a non-empty value. (Otherwise,
+ *   you could just place it outside the variable-field definition.)
  *
  * Example 1: Alternatives:
  * <pre>
@@ -139,13 +136,12 @@ use function strlen;
  *   Result6: 'For Doe'
  * </pre>
  *
- * A full property name may contain the "object" name followed by '::' to
- * distinguish it from the "property" name itself. This allows specifying which
- * object the property should be taken from. This is useful when multiple
- * "objects" have some equally named "properties" (e.g. 'id'). This also allows
- * traversing deeper into related objects, in which case this syntax is a
- * necessity, as plain properties are only searched for in the "top level"
- * "objects".
+ * A full property name may contain the "object" name followed by '::' to distinguish it
+ * from the "property" name itself. This allows specifying which object the property
+ * should be taken from. This is useful when multiple "objects" have some equally named
+ * "properties" (e.g. 'id'). This also allows traversing deeper into related objects, in
+ * which case this syntax is a necessity, as plain properties are only searched for in the
+ * "top level" "objects".
  *
  * Example 3:
  * <pre>
@@ -178,9 +174,8 @@ use function strlen;
  *
  * A property name may also be:
  * - Any method name that does not have required parameters.
- * - Or a name of a method that accepts scalar parameters, in which case literal
- *   arguments may be added between brackets, string arguments should not be
- *   quoted.
+ * - Or a name of a method that accepts scalar parameters, in which case literal arguments
+ *   may be added between brackets, string arguments should not be quoted.
  *
  * An "object" is:
  * - An array.
@@ -188,8 +183,8 @@ use function strlen;
  * - An object that implements ArrayAccess in which case both ways to retrieve the value
  *   are tried.
  *
- * FieldExpander will not throw on non-existing properties or methods but return null
- * and will try to prevent non-fatal error or warning messages from being logged.
+ * FieldExpander will not throw on non-existing properties or methods but return null and
+ * will try to prevent non-fatal error or warning messages from being logged.
  */
 class FieldExpander
 {
@@ -205,16 +200,14 @@ class FieldExpander
 
     /**
      * @var array
-     *   A keyed array of "objects". The key indicates the name of the "object",
-     *   typically the class name (with a lower cased 1st character) or the
-     *   variable name typically used in the shop software. The "objects" are
-     *   structures that contain information related to an order or associated
-     *   objects like customer, shipping address, order line, credit note, ...,
-     *   "Objects" can be objects or arrays.
-     *   Internally, we see this list of "objects" as a super "object"
-     *   containing all "objects" as (named) properties. In this sense, it
-     *   facilitates the recursive search algorithm when searching for a mapping
-     *   like object1::object2::property.
+     *   A keyed array of "objects". The key indicates the name of the "object", typically
+     *   the class name (with a lower cased 1st character) or the variable name typically
+     *   used in the shop software. The "objects" are structures that contain information
+     *   related to an order or associated objects like customer, shipping address, order
+     *   line, credit note, .... "Objects" can be objects or arrays. Internally, we see
+     *   this list of "objects" as a super "object" containing all "objects" as (named)
+     *   properties. In this sense, it facilitates the recursive search algorithm when
+     *   searching for a mapping like object1::object2::property.
      */
     protected array $objects = [];
 
@@ -226,9 +219,8 @@ class FieldExpander
     /**
      * Extracts a value based on the field mapping.
      *
-     * Mapping definitions are found using a regular expression. Each mapping
-     * is expanded by searching the given "objects" for the referenced property
-     * or properties.
+     * Mapping definitions are found using a regular expression. Each mapping is expanded
+     * by searching the given "objects" for the referenced property or properties.
      *
      * FieldExpander will not throw on non-existing properties or methods but return null
      * and will try to prevent non-fatal error or warning messages from being logged.
@@ -236,10 +228,10 @@ class FieldExpander
      * @param string $fieldSpecification
      *   The field expansion specification.
      * @param PropertySources $propertySources
-     *   The "objects" to search for the properties that are referenced in the
-     *   variable field parts. The key indicates the name of the "object",
-     *   typically the class name (with a lower cased 1st character) or the
-     *   variable name typically used in the shop software.
+     *   The "objects" to search for the properties that are referenced in the variable
+     *   field parts. The key indicates the name of the "object", typically the class name
+     *   (with a lower cased 1st character) or the variable name typically used in the
+     *   shop software.
      *
      * @return mixed
      *   The expanded field expansion specification, which may be empty if the properties
@@ -259,8 +251,8 @@ class FieldExpander
         $oldObjects = $this->objects;
         $this->objects = array_reverse($propertySources->getArrayCopy());
         // If the specification contains exactly 1 field expansion specification,
-        // we return the direct result of {@see extractField()} so that the type
-        // of that property is retained.
+        // we return the direct result of {@see extractField()} so that the type of that
+        // property is retained.
         $value = str_starts_with($fieldSpecification, '[')
         && strpos($fieldSpecification, ']') === strlen($fieldSpecification) - 1
             ? $this->expandSpecification(substr($fieldSpecification, 1, -1))
@@ -276,9 +268,8 @@ class FieldExpander
      * This callback expands the expansion specification found in $matches[1].
      *
      * @param array $matches
-     *   Array containing match information, $matches[0] contains the match
-     *   including the [ and ]., $matches[1] contains the part between the [
-     *   and ].
+     *   Array containing match information, $matches[0] contains the match including the
+     *   [ and ]., $matches[1] contains the part between the [ and ].
      *
      * @return string
      *   The expanded value (converted to a string if necessary).
@@ -303,8 +294,8 @@ class FieldExpander
      *   The specification to expand (without [ and ]).
      *
      * @return mixed
-     *   The expanded value of the specification. This may result in null or the
-     *   empty string if the referenced property(ies) is (are all) empty.
+     *   The expanded value of the specification. This may result in null or the empty
+     *   string if the referenced property(ies) is (are all) empty.
      */
     protected function expandSpecification(string $expansionSpecification): mixed
     {
@@ -359,8 +350,8 @@ class FieldExpander
      *   Returns an array with 2 keys:
      *   - 'type' = self:: TypeLiteral or self::TypeProperty
      *   - 'value': the value of the single space-concatenated-property.
-     *     If this space-concatenated-property contains exactly 1 single
-     *     property, the type of this value is that of the single property.
+     *     If this space-concatenated-property contains exactly 1 single property,
+     *     the type of this value is that of the single property.
      */
     protected function expandSpaceConcatenatedProperty(string $spaceConcatenatedProperty): array
     {
@@ -385,8 +376,8 @@ class FieldExpander
      * @return array
      *   Returns an array with 2 keys:
      *   - 'type' = self::TypeLiteral or self::TypeProperty
-     *   - 'value': the value of a single-property.
-     *     The type of this value is that of the single property.
+     *   - 'value': the value of a single-property. The type of this value is that of the
+     *     single property.
      */
     protected function expandProperty(string $property): array
     {
@@ -426,20 +417,30 @@ class FieldExpander
 
     protected function isConstant(string $singleProperty): bool
     {
-        return array_key_exists($singleProperty, static::Constants);
+        return array_key_exists($singleProperty, static::Constants) || $this->isLiteral($singleProperty);
+    }
+
+    protected function isNumericConstant(string $singleProperty): bool
+    {
+        return preg_match('/^-?\d+(\.\d+)?$/', $singleProperty) === 1;
     }
 
     /**
      * Gets a constant value.
      *
-     * - constant = 'true'|'false'|'null'
+     * - constant = 'true'|'false'|'null'|numeric-constant
+     * - numeric-constant = int|float (not with a + sign nor scientific notation)
      *
      * @return mixed
-     *   The value 'implied' by the constant, for now a bool or null.
+     *   The value 'implied' by the constant, a bool, null, or a numeric value.
      */
     protected function getConstant(string $singleProperty): mixed
     {
-        return static::Constants[$singleProperty];
+        if ($this->isNumericConstant($singleProperty)) {
+            return str_contains($singleProperty, '.') ? (float) $singleProperty : (int) $singleProperty;
+        } else {
+            return static::Constants[$singleProperty];
+        }
     }
 
     /**
@@ -450,12 +451,11 @@ class FieldExpander
      * - property-name = text
      *
      * @param string $propertyInObject
-     *   The object names and property name to search for, e.g.:
-     *   object1::object2::property.
+     *   The object names and property name to search for, e.g.: obj1::obj2::property.
      *
      * @return mixed
-     *   the value of the property, or the empty string or null if the property
-     *   was not found (or equals null or the empty string).
+     *   the value of the property, or the empty string or null if the property was not
+     *   found (or equals null or the empty string).
      */
     protected function expandPropertyInObject(string $propertyInObject): mixed
     {
@@ -508,8 +508,8 @@ class FieldExpander
      * This default implementation looks for the property in the following ways:
      * 1. If $property ends with '([args])':
      *    - Return the value of the call to method $object->$property(...$args)
-     *    - [we could accept string functions if $object is a string, or array functions if
-     *      $object is an array, but that is too risky: e.g. unlink()]
+     *    - [we could accept string functions if $object is a string, or array functions
+     *       if $object is an array, but that is too risky: e.g. unlink()]
      * 2. If the passed variable is an array or implements ArrayAccess:
      *    - Return the value of $object[$property] if it exists.
      * 3. If the passed variable is an object:
@@ -625,9 +625,9 @@ class FieldExpander
 
     /**
      * Concatenates a list of values using a separator between them.
-     * Literal strings are only used if they are followed by a non-empty
-     * property value. A literal string at the end is only used if the result so
-     * far is not empty.
+     *
+     * Literal strings are only used if they are followed by a non-empty property value.
+     * A literal string at the end is only used if the result so far is not empty.
      *
      * @param array[] $values
      *   A list of type-value pairs.
@@ -635,14 +635,13 @@ class FieldExpander
      * @return array
      *   Returns an array with 2 keys:
      *   - 'type' = self:: TypeLiteral or self::TypeProperty
-     *   - 'value': the concatenation of all the values with the separator string
-     *     between each value. If $values contains exactly 1 value, that value
-     *     is returned unaltered. So the type of 'value' is not necessarily a string.
+     *   - 'value': the concatenation of all the values with the separator string between
+     *     each value. If $values contains exactly 1 value, that value is returned
+     *     unaltered. So the type of 'value' is not necessarily a string.
      */
     protected function implodeValues(string $separator, array $values): array
     {
-        // Shortcut: if we have only 1 value, directly return it, so the type
-        // may be retained.
+        // If we have only 1 value, directly return it, so its type can be retained.
         if (count($values) === 1) {
             return reset($values);
         }
@@ -653,18 +652,18 @@ class FieldExpander
         foreach ($values as $value) {
             $valueStr = $this->valueToString($value['value']);
             if ($value['type'] === self::TypeLiteral) {
-                // Literal value: set aside and only add if the next property value
-                // is not empty.
+                // Literal value: set aside and only add if the next property value is not
+                // empty.
                 if ($previous !== '') {
-                    // Multiple literals after each other: treat as 1 literal
-                    // but do glue them together.
+                    // Multiple literals after each other: treat as 1 literal but do glue
+                    // them together.
                     $previous .= $separator;
                 }
                 $previous .= $valueStr;
             } else { // $value['type'] === self::TypeProperty
-                // Property value: if it is not empty, add any previous literal
-                // and the property value itself. If it is empty, discard any
-                // previous literal value.
+                // Property value: if it is not empty, add any previous literal and the
+                // property value itself. If it is empty, discard any previous literal
+                // value.
                 if ($valueStr !== '') {
                     if ($previous !== '') {
                         if ($result !== '') {
@@ -684,8 +683,8 @@ class FieldExpander
             }
         }
 
-        // Add a (set of) literal value(s) that came without property or if they
-        // came as last value(s) and the result so far is not empty.
+        // Add a (set of) literal value(s) that came without property or if they came as
+        // last value(s) and the result so far is not empty.
         if ($previous !== '' && (!$hasProperty || $result !== '')) {
             if ($result !== '') {
                 $result .= $separator;
@@ -702,8 +701,8 @@ class FieldExpander
     /**
      * Converts a property to a string.
      *
-     * Some properties may be arrays or objects: try to convert to a string
-     * by "imploding" and/or calling __toString().
+     * Some properties may be arrays or objects: try to convert to a string by "imploding"
+     * and/or calling __toString().
      *
      * Known usages: Magento2 street value is an array of street lines.
      */

@@ -14,9 +14,8 @@ System Requirements
 -------------------
 
 - PHP:
-    * Minimum version: 8.1, older versions WILL fail.
-    * Recommended version: 8.3 or newer, soon, probably plugin version 8.8, 8.2 will
-      become the minimally required version, and older versions WILL fail.
+    * Minimum version: 8.2, older versions WILL fail.
+    * Recommended version: 8.3 or newer.
     * See the PHP versions table further below for which PHP versions can be used for
       which shop (version).
 - Database:
@@ -49,16 +48,16 @@ Notes:
 | PS  | PrestaShop       | 9.0.0                    | >= 8.1                              |
 | VM  | VirtueMart (JOO) | 4.4.4                    | >= 4.0.5                            |
 | JOO | Joomla (+ VM)    | 5.4.0                    | >= 4.2.5                            |
-| WHM | WHMCS            | 8.13.1                   | >= 8.13.1                           |
-| WC  | WooCommerce      | 10.3.3                   | >= 5.0 (9.1 for stock management!)  |
-|     | WordPress        | 6.8.3                    | >= 5.9 (earlier versions WILL fail) |
+| WHM | WHMCS            | 9.0.8                    | >= 9.0.8                            |
+| WC  | WooCommerce      | 11.2.1                   | >= 5.0 (9.1 for stock management!)  |
+|     | WordPress        | 7.1.4                    | >= 5.9 (earlier versions WILL fail) |
 
 Supported PHP versions
 ----------------------
 This is an overview of which PHP versions can be used with the supported shops.
 
 Notes:
-- PHP 8.5 has not yet been considered
+- PHP 8.5 has not yet been considered.
 - Last, or almost last, point releases are used of the listed PHP versions.
 - WooCommerce is listed in combination with the WordPress version used at that moment.
   Note that most warnings on PHP 8.4 came from other (popular) plugins, though WooCommerce
@@ -66,23 +65,21 @@ Notes:
 - Other installed plugins/modules may not have been updated to the latest PHP version as
   supported by the shop or our plugin, or may already require a newer version than the
   shop does. This table cannot keep track of that.
-- HikaShop forum: "4.4.3 fully supports PHP 8.0"
-- HikaShop changelog: 4.6.0 first fix mentioning 8.1; 5.0.1 last fix mentioning 8.1
 - HikaShop changelog: 4.7.2 first fix mentioning 8.2; 5.1.0 last fix mentioning 8.2
 - HikaShop changelog: 5.1.1 first fix mentioning 8.3; 6.0.0 last fix mentioning 8.3
 - HikaShop changelog: 6.0.0 first fix mentioning 8.4;
 - Joomla 5.4 still emits quite some warnings on 8.4
 
-| Tag | Shop Version      | 8.1 | 8.2 | 8.3 | 8.4 | Remarks                                       |
+| Tag | Shop Version      | 8.2 | 8.3 | 8.4 | 8.5 | Remarks                                       |
 |-----|-------------------|-----|-----|-----|-----|-----------------------------------------------|
-| JOO | 4.4.6             | ✅   | ❓   | ❓   | ❓   |                                               |
-| JOO | 5.4               | ✅   | ✅   | ✅   | ❌   | Warnings on PHP 8.4 (Implicit nullable types) |
-| HS  | 6.1.0 (starter)   | ✅   | ✅   | ✅   | ❌   |                                               |
-| MA  | 2.4.6 (community) | ✅   | ✅   | ✅   | ✅   |                                               |
-| OC  | 3.0.3.9           | ✅   | ❌   | ❌   | ❌   | 3.0.3.9 is said to be compatible with PHP 8.1 |
-|     | 4.0.2.3           | ✅   | ❓   | ❓   | ❓   |                                               |
-|     | 4.1.0.3           | ✅   | ✅   | ✅   | ❓   |                                               |
-| PS  | 9.0               | ✅   | ✅   | ✅   | ✅   | Warnings on PHP 8.4 (Implicit nullable types) |
-| VM  | 4.4.8             | ✅   | ✅   | ✅   | ✅   | Warnings on PHP 8.4 (Implicit nullable types) |
-| WHM | 8.13.1            | ❌   | ✅   | ✅   | ✅   |
-| WC  | 10.3.3            | ✅   | ✅   | ✅   | ✅   | Warnings on PHP 8.4 (Implicit nullable types) |
+| JOO | 4.4.6             | ❓   | ❓   | ❓   | ❓  |                                               |
+| JOO | 5.4               | ✅   | ✅   | ❌   | ❓  | Warnings on PHP 8.4 (Implicit nullable types) |
+| HS  | 6.1.0 (starter)   | ✅   | ✅   | ❌   | ❓  |                                               |
+| MA  | 2.4.6 (community) | ✅   | ✅   | ✅   | ❓  |                                               |
+| OC  | 3.0.3.9           | ❌   | ❌   | ❌   | ❓  | 3.0.3.9 is said to be compatible with PHP 8.1 |
+|     | 4.0.2.3           | ❓   | ❓   | ❓   | ❓  |                                               |
+|     | 4.1.0.3           | ✅   | ✅   | ❓   | ❓  |                                               |
+| PS  | 9.0               | ✅   | ✅   | ✅   | ❓  | Warnings on PHP 8.4 (Implicit nullable types) |
+| VM  | 4.4.8             | ✅   | ✅   | ✅   | ❓  | Warnings on PHP 8.4 (Implicit nullable types) |
+| WHM | 9.0.8             | ✅   | ✅   | ✅   | ❓  |
+| WC  | 10.3.3            | ✅   | ✅   | ✅   | ❓  | Warnings on PHP 8.4 (Implicit nullable types) |

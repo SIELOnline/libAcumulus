@@ -31,8 +31,8 @@ class Requirements
     {
         $result = [];
 
-        if (version_compare(phpversion(), '8.1', '<')) {
-            $result['message_error_req_php'] = 'The minimally required PHP version for the Acumulus module is PHP 8.1 (and soon to become 8.3).';
+        if (version_compare(phpversion(), '8.2', '<')) {
+            $result['message_error_req_php'] = 'The minimally required PHP version for the Acumulus module is PHP 8.2 (and soon to become 8.3).';
         } elseif (version_compare(phpversion(), '8.3', '<')) {
             $result['message_warning_req_php'] = 'The minimally required PHP version for the Acumulus module will soon be raised to PHP 8.3. Start upgrading your PHP version now.';
         }

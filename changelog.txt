@@ -3,25 +3,29 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.8.0 (2026-10-??) (ALL)
-------------------------
+8.7.2 (2026-10-30) (WC)
+-----------------------
+This is an intermediate release, while we are working towards a full 8.8.0 for all
+supported webshops, including the newly supported WHMCS, and will have removed some
+technical debt.
+
 Features:
-- New Acumulus logo is now used.
-- Added support to remove graphics from documents (invoice and packing slip).
+- ALL: New Acumulus logo is now used.
+- ALL: Added support to remove graphics from documents (invoice and packing slip).
   - Added a setting on the settings form under the heading "Documents".
   - Allow for query parameters in request uri's for the Acumulus API: notably the gfx
     parameter (apply graphics in an invoice or packing slip PDF) is now supported.
-- Mapping shop fields to Acumulus invoice fields:
+- ALL: Mapping shop fields to Acumulus invoice fields:
   - 0-values (0, 0.0, '0', '0.0000') are no longer considered empty.
     Only null and the empty string are considered empty.
   - Exceptions that occur while trying to extract values (in the field expander) were
     completely ignored. Now they are logged at low priority (DEBUG level) but execution
     still continues,
-- Created a module for the WHMCS platform that is based on this library.
-- The 2 Address data objects that are part of the Customer data object can now be compared
-  for equality and "emptiness" (required address parts are missing). This allows to remove
-  them or replace them by the other Address object.
-- Improved checking for phone numbers so they don't end up as a fully numeric value.
+- NOT OPERATIONAL YET: WHM: Created a module for the WHMCS platform based on this library.
+- ALL: The 2 Address data objects that are part of the Customer data object can now be
+  compared for equality and "emptiness" (required address parts are missing). This allows
+  to remove them or replace them by the other Address object.
+- ALL: Improved checking for phone numbers so they don't end up as a fully numeric value.
 
 Bugs:
 - ALL: Telephone numbers formatted like '+33.612345678' where converted to a float value

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use hikashopOrderClass;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
@@ -55,9 +57,9 @@ class Source extends BaseSource
         return $this->getShopObject()->order_number;
     }
 
-    public function getDate(): string
+    public function getDate(): DateTimeInterface
     {
-        return date(Api::DateFormat_Iso, $this->getShopObject()->order_created);
+        return new DateTimeImmutable('@' . $this->getShopObject()->order_created);
     }
 
     /**
@@ -95,7 +97,7 @@ class Source extends BaseSource
             : Api::PaymentStatus_Paid;
     }
 
-    public function getPaymentDate(): ?string
+    public function getPaymentDate(): ?DateTimeInterface
     {
         // Scan through the history and look for a non-empty
         // 'history_payment_id'. The order of this array is by 'history_created'
@@ -120,7 +122,7 @@ class Source extends BaseSource
                 }
             }
         }
-        return $date ? date(Api::DateFormat_Iso, $date) : $date;
+        return $date ? new DateTimeImmutable("@$date") : $date;
     }
 
     public function getCountryCode(): string
@@ -198,10 +200,10 @@ class Source extends BaseSource
             : parent::getInvoiceReference();
     }
 
-    public function getInvoiceDate(): ?string
+    public function getInvoiceDate(): DateTimeInterface
     {
         return !empty($this->getShopObject()->order_invoice_created)
-            ? date(Api::DateFormat_Iso, (int) $this->getShopObject()->order_invoice_created)
+            ? new DateTimeImmutable('@' . $this->getShopObject()->order_invoice_created)
             : parent::getInvoiceDate();
     }
 

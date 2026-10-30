@@ -85,10 +85,10 @@ class CollectorManager
      */
     public function collectInvoiceForSource(Source $source, InvoiceSendResult $localResult): Invoice
     {
-        $this->getPropertySources()->exchangeArray(compact('localResult', 'source'));
+        $oldPropertySources = $this->getPropertySources()->exchangeArray(compact('localResult', 'source'));
         $this->addShopPropertySources();
         $invoice = $this->collectInvoice();
-        $this->getPropertySources()->exchangeArray([]);
+        $this->getPropertySources()->exchangeArray($oldPropertySources);
         return $invoice;
     }
 
@@ -134,10 +134,10 @@ class CollectorManager
         StockTransactionResult $localResult
     ): StockTransaction {
         $environment = $this->getContainer()->getEnvironment()->toArray();
-        $this->getPropertySources()->exchangeArray(compact('localResult', 'product', 'change', 'item', 'environment'));
+        $oldPropertySources =  $this->getPropertySources()->exchangeArray(compact('localResult', 'product', 'change', 'item', 'environment'));
         $this->addShopPropertySources();
         $stockTransaction = $this->collectStockTransaction();
-        $this->getPropertySources()->exchangeArray([]);
+        $this->getPropertySources()->exchangeArray($oldPropertySources);
         return $stockTransaction;
     }
 

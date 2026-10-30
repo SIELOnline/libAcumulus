@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Whmcs\Invoice;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
@@ -19,7 +21,6 @@ use Siel\Acumulus\Whmcs\Helpers\LocalApiTrait;
 
 use function is_array;
 use function is_object;
-use function strlen;
 
 /**
  * Wraps a WHMCS invoice in an invoice source object.
@@ -102,9 +103,9 @@ class Source extends BaseSource
         return $this->getShopObject()['invoicenum'] ?: (string) $this->getId();
     }
 
-    public function getDate(): string
+    public function getDate(): DateTimeInterface
     {
-        return substr((string) $this->shopObject['date'], 0, strlen('2000-01-01'));
+        return new DateTimeImmutable($this->shopObject['date']);
     }
 
     public function getStatus(): ?string
@@ -131,15 +132,15 @@ class Source extends BaseSource
     /**
      * Returns the payment date of the invoice source.
      *
-     * @return string|null
+     * @return \DateTimeInterface|null
      *   The payment date of the invoice source (yyyy-mm-dd).
      */
-    public function getPaymentDate(): ?string
+    public function getPaymentDate(): ?DateTimeInterface
     {
         if ($this->getPaymentStatus() === Api::PaymentStatus_Due) {
             return null;
         }
-        return !empty($this->getInvoice()['datepaid']) ? substr($this->getInvoice()['datepaid'], 0, strlen('2000-01-01')) : null;
+        return !empty($this->getInvoice()['datepaid']) ? new DateTimeImmutable($this->getInvoice()['datepaid']) : null;
     }
 
     public function getCountryCode(): string
@@ -175,7 +176,7 @@ class Source extends BaseSource
      * For WHMCS, only invoices are supported as sources,
      * thus the invoice date is the source date.
      */
-    public function getInvoiceDate(): string
+    public function getInvoiceDate(): DateTimeInterface
     {
         return $this->getDate();
     }

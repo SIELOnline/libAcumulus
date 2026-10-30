@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\TestWebShop\Invoice;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use Exception;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
@@ -28,9 +29,9 @@ class Source extends BaseSource
         $this->id = (int) $this->getShopObject()->id;
     }
 
-    public function getDate(): string
+    public function getDate(): DateTimeImmutable
     {
-        return $this->getShopObject()->date;
+        return new DateTimeImmutable($this->getShopObject()->date);
     }
 
     public function getStatus(): int|string|null
@@ -48,12 +49,11 @@ class Source extends BaseSource
         return $this->getShopObject()->paid ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
-    public function getPaymentDate(): ?string
+    public function getPaymentDate(): ?DateTimeInterface
     {
         try {
             $timestamp = $this->getShopObject()->payment->timestamp;
-            $date = new DateTimeImmutable($timestamp);
-            $result = $date->format('Y-m-d');
+            $result = new DateTimeImmutable($timestamp);
         } catch (Exception) {
             $result = null;
         }

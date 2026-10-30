@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Invoice;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoCollection;
@@ -100,10 +102,10 @@ class Source extends BaseSource
         return 'CM' . $this->getShopObject()->getIncrementId();
     }
 
-    public function getDate(): string
+    public function getDate(): DateTimeInterface
     {
         // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
-        return substr($this->getShopObject()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+        return new DateTimeImmutable($this->getShopObject()->getCreatedAt());
     }
 
     /**
@@ -292,9 +294,9 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
      */
-    protected function getInvoiceDateOrder(): ?string
+    protected function getInvoiceDateOrder(): ?DateTimeInterface
     {
-        return $this->getInvoice() !== null ? substr($this->getInvoice()->getCreatedAt(), 0, strlen('2000-01-01')) : null;
+        return $this->getInvoice() !== null ? new DateTimeImmutable($this->getInvoice()->getCreatedAt()) : null;
     }
 
     protected function getShopOrderOrId(): int

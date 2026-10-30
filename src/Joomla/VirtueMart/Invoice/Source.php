@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Currency;
@@ -87,9 +89,9 @@ class Source extends BaseSource
         return $this->getShopObject()['details']['BT']->order_number;
     }
 
-    public function getDate(): string
+    public function getDate(): DateTimeInterface
     {
-        return date(Api::DateFormat_Iso, strtotime($this->getShopObject()['details']['BT']->created_on));
+        return new DateTimeImmutable($this->getShopObject()['details']['BT']->created_on);
     }
 
     /**
@@ -122,7 +124,7 @@ class Source extends BaseSource
             : Api::PaymentStatus_Due;
     }
 
-    public function getPaymentDate(): ?string
+    public function getPaymentDate(): ?DateTimeInterface
     {
         $date = null;
         $previousStatus = '';
@@ -134,7 +136,7 @@ class Source extends BaseSource
             }
             $previousStatus = $orderHistory->order_status_code;
         }
-        return $date ? date(Api::DateFormat_Iso, strtotime($date)) : $date;
+        return $date ? new DateTimeImmutable($date) : $date;
     }
 
     /**
@@ -222,9 +224,9 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via {@see callTypeSpecificMethod()}.
      */
-    protected function getInvoiceDateOrder(): ?string
+    protected function getInvoiceDateOrder(): ?DateTimeInterface
     {
-        return !empty($this->invoice['created_on']) ? date(Api::DateFormat_Iso, strtotime($this->invoice['created_on'])) : null;
+        return !empty($this->invoice['created_on']) ? new DateTimeImmutable($this->invoice['created_on']) : null;
     }
 
     protected function createItems(): array

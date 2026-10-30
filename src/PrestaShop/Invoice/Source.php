@@ -9,6 +9,8 @@ use Configuration;
 use Context;
 use Country;
 use Currency;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Db;
 use Order;
 use OrderSlip;
@@ -90,9 +92,9 @@ class Source extends BaseSource
     /**
      * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
-    public function getDate(): string
+    public function getDate(): DateTimeInterface
     {
-        return substr($this->getShopObject()->date_add, 0, strlen('2000-01-01'));
+        return new DateTimeImmutable($this->getShopObject()->date_add);
     }
 
     /**
@@ -148,7 +150,7 @@ class Source extends BaseSource
     /**
      * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
-    public function getPaymentDate(): ?string
+    public function getPaymentDate(): ?DateTimeInterface
     {
         if ($this->getType() === Source::Order) {
             $paymentDate = null;
@@ -165,7 +167,7 @@ class Source extends BaseSource
             $paymentDate = $this->getShopObject()->date_upd;
         }
 
-        return $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
+        return $paymentDate ? new DateTimeImmutable($paymentDate) : null;
     }
 
     public function getCountryCode(): string
@@ -289,10 +291,10 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused  Called via getInvoiceDate().
      */
-    protected function getInvoiceDateOrder(): ?string
+    protected function getInvoiceDateOrder(): ?DateTimeInterface
     {
         return !empty($this->getShopObject()->invoice_number)
-            ? substr($this->getShopObject()->invoice_date, 0, strlen('2000-01-01'))
+            ? new DateTimeImmutable($this->getShopObject()->invoice_date)
             : null;
     }
 

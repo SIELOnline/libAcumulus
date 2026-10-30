@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Invoice;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\LineType;
@@ -68,9 +70,9 @@ abstract class Source extends BaseSource
         $this->id = $this->shopObject['order_id'];
     }
 
-    public function getDate(): string
+    public function getDate(): DateTimeInterface
     {
-        return substr($this->shopObject['date_added'], 0, strlen('2000-01-01'));
+        return new DateTimeImmutable($this->shopObject['date_added']);
     }
 
     /**
@@ -134,7 +136,7 @@ abstract class Source extends BaseSource
             : Api::PaymentStatus_Due;
     }
 
-    public function getPaymentDate(): ?string
+    public function getPaymentDate(): ?DateTimeInterface
     {
         // @todo Can we determine this based on history (and optionally payment_code)?
         // Will default to the issue date.

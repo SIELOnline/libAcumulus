@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use DateTimeInterface;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
@@ -15,7 +16,6 @@ use WC_Coupon;
 
 use function count;
 use function sprintf;
-use function strlen;
 
 /**
  * Wraps a WooCommerce order in an invoice source object.
@@ -23,7 +23,10 @@ use function strlen;
  * Since WC 2.2.0 multiple order types can be defined, @see
  * wc_register_order_type() and wc_get_order_types(). WooCommerce itself defines
  * 'shop_order' and 'shop_order_refund'. The base class for all these types of
- * orders is WC_Abstract_Order
+ * orders is WC_Abstract_Order.
+ *
+ * NOTE: Date methods, like get_date_created(), return a WC_DateTime which is a
+ * DateTimeInterface, so these can be returned as is in our date methods.
  *
  * @method WC_Abstract_Order getShopObject()
  */
@@ -83,13 +86,9 @@ class Source extends BaseSource
         return parent::getReference();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getDate(): string
+    public function getDate(): DateTimeInterface
     {
-        // get_date_created() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->getShopObject()->get_date_created(), 0, strlen('2000-01-01'));
+        return $this->getShopObject()->get_date_created();
     }
 
     /**
@@ -154,31 +153,31 @@ class Source extends BaseSource
     /**
      * Returns the payment date of the order.
      *
-     * @return string
-     *   The payment date of the order (yyyy-mm-dd).
+     * @return DateTimeInterface
+     *   The payment date of the order.
      *
      * @noinspection PhpUnused : called via getPaymentDate().
      */
-    protected function getPaymentDateOrder(): string
+    protected function getPaymentDateOrder(): DateTimeInterface
     {
-        // get_date_paid() returns a WC_DateTime which has a _toString() method.
+        // get_date_paid() returns a WC_DateTime which is a DateTimeInterface.
         /** @noinspection PhpUndefinedMethodInspection false positive */
-        return substr((string) $this->getShopObject()->get_date_paid(), 0, strlen('2000-01-01'));
+        return $this->getShopObject()->get_date_paid();
     }
 
     /**
      * Returns the payment date of the order refund.
      * We take the last modified date as pay date.
      *
-     * @return string
-     *   The payment date of the order refund (yyyy-mm-dd).
+     * @return DateTimeInterface
+     *   The payment date of the order refund.
      *
      * @noinspection PhpUnused : called via getPaymentDate().
      */
-    protected function getPaymentDateCreditNote(): string
+    protected function getPaymentDateCreditNote(): DateTimeInterface
     {
-        // get_date_modified() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->getShopObject()->get_date_modified(), 0, strlen('2000-01-01'));
+        // get_date_modified() returns a WC_DateTime which is a DateTimeInterface.
+        return $this->getShopObject()->get_date_modified();
     }
 
     public function getCountryCode(): string

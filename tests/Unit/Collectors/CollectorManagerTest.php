@@ -47,7 +47,7 @@ class CollectorManagerTest extends TestCase
         self::assertNull($invoice->accountNumber);
         self::assertNull($invoice->template);
         self::assertSame(Api::PaymentStatus_Paid, $invoice->paymentStatus);
-        self::assertEquals(new DateTimeImmutable('2022-12-02'), $invoice->paymentDate);
+        self::assertSame((new DateTimeImmutable('2022-12-02'))->format(Api::DateFormat_Iso), $invoice->paymentDate->format(Api::DateFormat_Iso));
         self::assertSame('Bestelling 3', $invoice->description);
         self::assertNull($invoice->descriptionText);
         self::assertNull($invoice->invoiceNotes);
@@ -56,7 +56,7 @@ class CollectorManagerTest extends TestCase
         self::assertSame(Source::Order, $metadataCollection->get(Meta::SourceType));
         self::assertSame(3, $metadataCollection->get(Meta::SourceId));
         self::assertSame(3, $metadataCollection->get(Meta::SourceReference));
-        self::assertEquals('2022-12-01', $metadataCollection->get(Meta::SourceDate));
+        self::assertEquals(new DateTimeImmutable('2022-12-01'), $metadataCollection->get(Meta::SourceDate));
         self::assertSame('pending', $metadataCollection->get(Meta::SourceStatus));
         self::assertSame('paypal', $metadataCollection->get(Meta::PaymentMethod));
         self::assertNull($metadataCollection->get(Meta::ShopInvoiceId));

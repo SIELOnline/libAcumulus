@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Invoice;
 
+use DateTimeInterface;
 use RuntimeException;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Product\Product;
@@ -81,14 +82,12 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * Returns the web shop's order or refund date.
+     * Returns the web shop's object date.
      *
-     * @return string
-     *   The order (or credit memo) date: yyyy-mm-dd.
-     *
-     * @todo: convert to type DateTime
+     * @return \DateTimeInterface
+     *   The order (or credit memo) date
      */
-    public function getDate(): string
+    public function getDate(): DateTimeInterface
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -175,13 +174,10 @@ abstract class Source implements WrapperInterface, Stringable
      * the non-paid status to the paid status. If there are multiple status
      * changes, the last one should be taken.
      *
-     * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the order has not been (fully)
-     *   paid yet.
-     *
-     * @todo: convert to type DateTime
+     * @return \DateTimeInterface|null
+     *   The payment date or null if the order has not been (fully) paid yet.
      */
-    public function getPaymentDate(): ?string
+    public function getPaymentDate(): ?DateTimeInterface
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -322,13 +318,11 @@ abstract class Source implements WrapperInterface, Stringable
     /**
      * Returns the date of the web shop invoice linked to this source.
      *
-     * @return string|null
+     * @return \DateTimeInterface|null
      *   Date of the (web shop) invoice linked to this source: yyyy-mm-dd, or
      *   null if no web shop invoice is linked to this source.
-     *
-     * @todo: convert to type DateTime
      */
-    public function getInvoiceDate(): ?string
+    public function getInvoiceDate(): ?DateTimeInterface
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -337,10 +331,8 @@ abstract class Source implements WrapperInterface, Stringable
      * See {@see getInvoiceDate}
      *
      * @noinspection PhpUnused  Called via callTypeSpecificMethod().
-     *
-     * @todo: convert to type DateTime
      */
-    protected function getInvoiceDateCreditNote(): ?string
+    protected function getInvoiceDateCreditNote(): ?DateTimeInterface
     {
         // A credit note is to be considered an invoice on its own.
         return $this->getDate();
@@ -351,9 +343,10 @@ abstract class Source implements WrapperInterface, Stringable
      *
      * Do not override this method but override getShopOrderOrId() instead.
      *
-     * @return Source
+     * @return ?Source
      *   If the invoice source is a credit note, its original order is returned,
-     *   otherwise, the invoice source is an order itself and $this is returned.
+     *   If the invoice source is an order, $this is returned.
+     *   If the invoice source is an invoice, null is returned.
      */
     public function getOrder(): ?Source
     {

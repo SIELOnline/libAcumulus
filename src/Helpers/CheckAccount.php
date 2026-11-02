@@ -33,7 +33,7 @@ class CheckAccount extends MessageCollection
     }
 
     /**
-     * Checks the account settings for correctness and sufficient authorization.
+     * Checks the account settings for correctness and sufficient authorisation.
      *
      * This is done by calling the 'About' API call and checking the result.
      *

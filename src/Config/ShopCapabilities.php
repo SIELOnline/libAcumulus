@@ -316,4 +316,30 @@ abstract class ShopCapabilities
      *   address is used otherwise.
      */
     abstract public function getFiscalAddressSetting(): string;
+
+    /**
+     * Returns info about a public repository for releases (zip files) of this module.
+     *
+     * Null is returned if there is no repo for this module but updates are published
+     * through the webshops' marketplace.
+     *
+     * Note that this concerns:
+     * - GitHub repos
+     * - That publish releases with the module's zip file as you can upload to your
+     *   webshop to install or update a module, plugin, or whatever it is called in your
+     *   shop,
+     * - And thus not the project code repo nor the libAcumulus repo.
+     *
+     * This default implementation returns null, override if your shop has a repo for new
+     * releases.
+     *
+     * @return string[]|null
+     *   An array with 'owner' and 'repo' keys that identify the GitHub repository that
+     *   contains releases for this module. Null if the shop does not have a releases
+     *   repository.
+     */
+    public function getReleasesRepository(): ?array
+    {
+        return null;
+    }
 }

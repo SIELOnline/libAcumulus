@@ -18,6 +18,8 @@ use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Meta;
 
+use Stringable;
+
 use function array_key_exists;
 use function is_array;
 use function is_bool;
@@ -235,17 +237,17 @@ class Config
      * @return array
      *   Array with cast values.
      */
-    protected function castValues(
-        #[SensitiveParameter]
-        array $values
-    ): array {
+    protected function castValues(#[SensitiveParameter] array $values): array
+    {
         $keyInfos = $this->getKeyInfo();
         foreach ($keyInfos as $key => $keyInfo) {
             if (array_key_exists($key, $values)) {
                 switch ($keyInfo['type']) {
                     case 'string':
                         if (!is_string($values[$key])) {
-                            $values[$key] = (string) $values[$key];
+                            $values[$key] = $values[$key] instanceof Stringable
+                                ? (string) $values[$key]
+                                : json_encode($values[$key], JSON_THROW_ON_ERROR);
                         }
                         break;
                     case 'int':
@@ -318,12 +320,27 @@ class Config
     }
 
     /**
+     * @throws \JsonException
+     */
+    public function getLatestReleaseInfo(): ?string
+    {
+        $result = $this->get('cachedLatestReleaseInfo');
+        // Cannot handle nullable strings in the config, use the string 'null' for that.
+        if ($result === 'null') {
+            $result = null;
+        } else {
+            $result = json_decode($result, false, flags: JSON_THROW_ON_ERROR);
+        }
+        return $result;
+    }
+
+    /**
      * Returns the ShowRatePluginMessage config setting.
      *
-     * @noinspection PhpUnused
-     *    Called from shop-specific code outside this library.
-     *
      * @throws \JsonException
+     *
+     * @noinspection PhpUnused  Called from shop-specific code outside this library.
+     * @deprecated: use get()
      */
     public function getShowRatePluginMessage(): int
     {
@@ -336,8 +353,7 @@ class Config
      * @throws \JsonException
      *
      * @deprecated: use get()
-     * @noinspection PhpUnused
-     *    Called from shop-specific code outside this library.
+     * @noinspection PhpUnused Called from shop-specific code outside this library.
      */
     public function getPluginV8Message(): int
     {
@@ -1006,6 +1022,21 @@ class Config
                     'group' => 'other',
                     'type' => 'string',
                     'default' => 'null',
+                ],
+                'cachedLatestReleaseInfoTimestamp' => [
+                    'group' => 'other',
+                    'type' => 'int',
+                    'default' => 0,
+                ],
+                'cachedLatestReleaseInfo' => [
+                    'group' => 'other',
+                    'type' => 'string',
+                    'default' => 'null',
+                ],
+                'showNewReleaseMessage' => [
+                    'group' => 'other',
+                    'type' => 'int',
+                    'default' => 0,
                 ],
                 Config::Mappings => [
                     'group' => 'other',

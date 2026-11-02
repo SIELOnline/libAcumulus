@@ -19,6 +19,7 @@ use InvalidArgumentException;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\ApiClient\AcumulusResult;
+use Siel\Acumulus\ApiClient\GitHub;
 use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Collectors\CollectorInterface;
@@ -66,7 +67,7 @@ use const Siel\Acumulus\Version;
  * - This library is built with the idea to extract common code into base classes and have
  *   webshop-specific classes extend those base classes with web-shop-specific overrides
  *   and implementations of abstract methods.
- * - Therefore, upon creating an instance, the most specialized class possible  will be
+ * - Therefore, upon creating an instance, the most specialised class possible  will be
  *   instantiated and returned. See below how this is done.
  * - Container::getInstance() is the weakly typed instance getting method, but for almost
  *   all known classes in this library, a strongly typed getter is available as well.
@@ -80,7 +81,7 @@ use const Siel\Acumulus\Version;
  * ----------------------
  * Creating the container is normally done by code in the part adhering to your webshop's
  * architecture, e.g. a controller or model. That code must pass the following arguments:
- * - $shopNamespace: defines the namespace hierarchy where to look for specialized
+ * - $shopNamespace: defines the namespace hierarchy where to look for specialised
  *   classes. This is further explained below.
  * - $language: the language to use with translating. As the container is able to pass
  *   constructor arguments all by itself, it must know the current language, as the
@@ -320,6 +321,16 @@ class Container
         ]);
     }
 
+    public function getCheckNewRelease(): CheckNewRelease
+    {
+        return $this->getInstance('CheckNewRelease', 'Helpers', fn() => [
+            $this->getGitHubApiClient(),
+            $this->getShopCapabilities(),
+            $this->getConfig(),
+            $this->getEnvironment(),
+        ]);
+    }
+
     public function getCountries(): Countries
     {
         return $this->getInstance('Countries', 'Helpers');
@@ -391,6 +402,11 @@ class Container
     public function getAcumulusApiClient(): Acumulus
     {
         return $this->getInstance('Acumulus', 'ApiClient', fn() => [$this, $this->getEnvironment(), $this->getLog()]);
+    }
+
+    public function getGitHubApiClient(): GitHub
+    {
+        return $this->getInstance('GitHub', 'ApiClient', fn() => [$this->getLog()]);
     }
 
     public function createAcumulusRequest(): AcumulusRequest
@@ -855,7 +871,7 @@ class Container
      * and finally the base namespace (\Siel\Acumulus).
      *
      * Normally, only 1 instance is created per class, but the $newInstance argument can
-     * be used to change this behavior.
+     * be used to change this behaviour.
      *
      * @param string $class
      *   The name of the class without namespace. The class is searched for in multiple

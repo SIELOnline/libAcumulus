@@ -135,7 +135,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return Context::getContext()->link->getAdminLink('AdminTaxes') . '#form';
             case 'logo':
                 /** @noinspection PhpUndefinedConstantInspection  Defined in config,inc.php, line 130 or 132. */
-                return  __PS_BASE_URI__ . 'modules/acumulus/views/img/Acumulus-Online-Boekhouden_icon_150.png';
+                return  __PS_BASE_URI__ . 'modules/acumulus/views/img/acumulus-logo.svg';
             case 'pro-support-image':
                 /** @noinspection PhpUndefinedConstantInspection  Defined in config,inc.php, line 130 or 132. */
                 return  __PS_BASE_URI__ . 'modules/acumulus/views/img/pro-support-prestashop.png';
@@ -148,5 +148,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getFiscalAddressSetting(): string
     {
         return 'PS_TAX_ADDRESS_TYPE'; // 'id_address_invoice' or 'id_address_delivery'
+    }
+
+    public function getReleasesRepository(): ?array
+    {
+        return ['owner' => 'SIELOnline', 'repo' => 'Acumulus-for-PrestaShop'];
     }
 }

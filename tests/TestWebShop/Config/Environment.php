@@ -9,13 +9,16 @@ use Siel\Acumulus\Config\Environment as EnvironmentBase;
 use const Siel\Acumulus\Version;
 
 /**
- * Defines the PrestaShop webshop-specific environment.
+ * Defines the TestWebShop webshop-specific environment.
  */
 class Environment extends EnvironmentBase
 {
+    // Allows to get different test cases when testing releases..
+    public string $version = Version;
+
     protected function setShopEnvironment(): void
     {
-        $this->data['moduleVersion'] = Version;
+        $this->data['moduleVersion'] = &$this->version;
         $this->data['shopVersion'] = Version;
     }
 

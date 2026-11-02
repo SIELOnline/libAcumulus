@@ -1,0 +1,37 @@
+{
+    "url": "https://api.github.com/repos/SIELOnline/Acumulus-for-PrestaShop/releases/429442847",
+    "assets_url": "https://api.github.com/repos/SIELOnline/Acumulus-for-PrestaShop/releases/429442847/assets",
+    "upload_url": "https://uploads.github.com/repos/SIELOnline/Acumulus-for-PrestaShop/releases/429442847/assets{?name,label}",
+    "html_url": "https://github.com/SIELOnline/Acumulus-for-PrestaShop/releases/tag/8.7.0",
+    "id": 429442848,
+    "node_id": "RE_kwDOBxdKys4ZmMcg",
+    "tag_name": "8.6.12",
+    "target_commitish": "master",
+    "name": "8.6.12",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "created_at": "2025-11-04T08:22:23Z",
+    "updated_at": "2025-11-30T20:11:19Z",
+    "published_at": "2025-11-05T20:11:19Z",
+    "assets": [
+        {
+            "url": "https://api.github.com/repos/SIELOnline/Acumulus-for-PrestaShop/releases/assets/693275089",
+            "id": 693275090,
+            "node_id": "RA_kwDOBxdKys4pUonS",
+            "name": "PrestaShop-Acumulus-8.7.0.zip",
+            "label": null,
+            "content_type": "application/x-zip-compressed",
+            "state": "uploaded",
+            "size": 799877,
+            "digest": "sha256:7b52c7b82ce19ee7d6491009e2cf18aa04827220bf374a46ae46e75d19f8f912",
+            "download_count": 0,
+            "created_at": "2025-12-30T20:05:46Z",
+            "updated_at": "2025-12-30T20:05:48Z",
+            "browser_download_url": "https://github.com/SIELOnline/Acumulus-for-PrestaShop/releases/download/8.6.12/PrestaShop-Acumulus-8.6.12.zip"
+        }
+    ],
+    "tarball_url": "https://api.github.com/repos/SIELOnline/Acumulus-for-PrestaShop/tarball/8.6.12",
+    "zipball_url": "https://api.github.com/repos/SIELOnline/Acumulus-for-PrestaShop/zipball/8.6.12",
+    "body": "Version 8.6.12 of the Acumulus-for-PrestaShop module.\r\n\r\n- Changelog: [changelog of the libAcumulus project](https://raw.githubusercontent.com/SIELOnline/libAcumulus/refs/heads/master/changelog.txt)\r\n- Compatible with PrestaShop versions: 1.7 to 9.x"
+}

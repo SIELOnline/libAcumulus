@@ -106,6 +106,7 @@ class ContainerTest extends TestCase
         $this->expectNotToPerformAssertions();
         $container = self::$container;
         $container->getAcumulusApiClient();
+        $container->getGitHubApiClient();
         $container->createHttpRequest([]);
         $container->createAcumulusRequest();
     }

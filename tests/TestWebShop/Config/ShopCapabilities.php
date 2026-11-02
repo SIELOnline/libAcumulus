@@ -10,6 +10,7 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Fld;
+use Siel\Acumulus\Helpers\Container;
 
 /**
  * Defines the TestWebShop specific capabilities.
@@ -18,6 +19,8 @@ use Siel\Acumulus\Fld;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
+    public bool $hasReleasesRepository = true;
+
     /**
      * @noinspection PhpMissingParentCallCommonInspection parent method returns empty array.
      */
@@ -111,5 +114,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getFiscalAddressSetting(): string
     {
         return 'testwebshop_tax_based_on';
+    }
+
+    public function getReleasesRepository(): ?array
+    {
+        return $this->hasReleasesRepository ? ['owner' => 'SIELOnline', 'repo' => 'Acumulus-for-PrestaShop'] : null;
     }
 }

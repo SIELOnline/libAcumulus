@@ -289,7 +289,7 @@ class Acumulus
     /**
      * A helper method to retrieve a given picklist.
      *
-     * The Acumulus API for picklists is so well standardized that it is
+     * The Acumulus API for picklists is so well standardised that it is
      * possible to use 1 general picklist retrieval function that can process
      * all picklist types.
      *

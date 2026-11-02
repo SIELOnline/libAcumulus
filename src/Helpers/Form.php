@@ -539,8 +539,8 @@ abstract class Form extends MessageCollection
      * Adds a form message.
      *
      * @param string $field
-     *   The id of the form field. Does not have to be specified if multiple
-     *   fields are involved
+     *   The id of the form field. Does not have to be specified if multiple fields are
+     *   involved.
      *
      * @return $this
      */

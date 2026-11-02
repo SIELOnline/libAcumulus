@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Helpers;
 
-use function in_array;
-
 /**
  * Translator provides a simple way of providing translated texts.
  *
@@ -114,9 +112,10 @@ class Translator
         if (isset($this->translations[$key])) {
             return $this->translations[$key];
         } else {
-            // All keys are supposed to hve translations, they are not human-readable
-            // phrases for some default language. So not finding a translation is handled
-            // as a missing translation (minor) bug to be solved, so we log it.
+            // Generally, keys are identifier-like strings, thus not necessarily
+            // human-understandable. So all keys are supposed to have translations.
+            // Therefore, not finding a translation is handled as a missing translation,
+            // a (minor) bug to be solved, so we log it.
             $this->getLog()->info("Translation key '$key' not found");
             return $key;
         }

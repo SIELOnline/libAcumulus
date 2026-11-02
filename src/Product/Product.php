@@ -135,7 +135,7 @@ abstract class Product implements WrapperInterface
      * misconfiguration, as few are products with variants for which all variants ship the
      * same parent product (electricity cables with some predefined lengths as variants
      * and cut on order, but even there you will typically see prepackaged lengths of 10,
-     * 25, 50 and 100m.)
+     * 25, 50 and 100m.).
      */
     public function getStockManagingProduct(): static
     {

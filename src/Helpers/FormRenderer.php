@@ -113,7 +113,7 @@ class FormRenderer
      *
      * @return $this
      */
-    public function setProperty(string $property, $value): self
+    public function setProperty(string $property, $value): static
     {
         if (property_exists($this, $property) && $property !== 'form') {
             /** @noinspection PhpVariableVariableInspection */

@@ -544,7 +544,7 @@ abstract class Form extends MessageCollection
      *
      * @return $this
      */
-    public function addFormMessage(string $message, int $severity, string $field = ''): MessageCollection
+    public function addFormMessage(string $message, int $severity, string $field = ''): static
     {
         return $this->addMessage(Message::createForFormField($message, $severity, $field));
     }

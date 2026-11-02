@@ -231,8 +231,10 @@ class Container
      * @param string $language
      *   A language or locale code, e.g. nl, nl-NL, or en-UK.
      *   Only the first 2 characters will be used.
+     *
+     * @return $this
      */
-    public function setLanguage(string $language): self
+    public function setLanguage(string $language): static
     {
         $this->language = substr($language, 0, 2);
         return $this;

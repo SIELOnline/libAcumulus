@@ -57,6 +57,11 @@ class Totals
         $this->calculated = $calculated;
     }
 
+    /**
+     * Adds a split amount to the current totals.
+     *
+     * @return $this
+     */
     public function add(?float $amountInc, ?float $amountVat, ?float $amountEx = null, ?float $vatRate = null): static
     {
         $calculated = $this->completeParameters($amountInc, $amountVat, $amountEx, $vatRate);

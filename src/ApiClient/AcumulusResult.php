@@ -546,7 +546,7 @@ class AcumulusResult extends MessageCollection
     /**
      * @return $this
      */
-    public function setMainAcumulusResponseKey(string $mainResponseKey, bool $isList = false): AcumulusResult
+    public function setMainAcumulusResponseKey(string $mainResponseKey, bool $isList = false): static
     {
         $this->mainAcumulusResponseKey = $mainResponseKey;
         $this->isList = $isList;

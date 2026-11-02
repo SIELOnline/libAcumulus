@@ -55,7 +55,7 @@ class MessageCollection
      *
      * @return $this
      */
-    public function addMessage(Message $message): MessageCollection
+    public function addMessage(Message $message): static
     {
         $this->messages[] = $message->setTranslator($this->translator);
         return $this;

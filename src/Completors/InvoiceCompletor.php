@@ -51,7 +51,7 @@ class InvoiceCompletor extends BaseCompletor
      *
      * @legacy: The old Completor parts still need the Source.
      */
-    public function setSource(Source $source): InvoiceCompletor
+    public function setSource(Source $source): static
     {
         $this->source = $source;
         return $this;

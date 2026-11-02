@@ -119,7 +119,7 @@ class Message
      *
      * @return $this
      */
-    public function setTranslator(Translator $translator): Message
+    public function setTranslator(Translator $translator): static
     {
         $this->translator = $translator;
         return $this;

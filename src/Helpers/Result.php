@@ -181,7 +181,7 @@ class Result extends MessageCollection
      *
      * @noinspection PhpUnused
      */
-    public function setTrigger(string $trigger): Result
+    public function setTrigger(string $trigger): static
     {
         $this->trigger = $trigger;
         return $this;

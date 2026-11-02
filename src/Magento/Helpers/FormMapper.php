@@ -32,7 +32,7 @@ class FormMapper extends BaseFormMapper
     /**
      * @return $this
      */
-    public function setMagentoForm(AbstractForm $magentoForm): FormMapper
+    public function setMagentoForm(AbstractForm $magentoForm): static
     {
         $this->magentoForm = $magentoForm;
         return $this;

@@ -17,10 +17,10 @@ use Siel\Acumulus\Helpers\Translator;
 use function sprintf;
 
 /**
- * Shows a plugin version specific message that informs the user about changes in the new
- * Acumulus plugin version.
+ * Shows a message with 2 buttons 'later' and 'hide' (and the Acumulus logo).
  *
- * This form contains only text and 2 buttons.
+ * This form is configurable regarding the message to show, where to store the 'later'
+ * delay and how long that delay should be.
  *
  * SECURITY REMARKS
  * ----------------
@@ -33,6 +33,9 @@ use function sprintf;
 class MessageForm extends Form
 {
     protected string $action = '';
+    protected string $configKey = '';
+    protected string $message = '';
+    protected int $later = 7;
 
     public function __construct(
         FormHelper $formHelper,
@@ -48,6 +51,59 @@ class MessageForm extends Form
         $this->isFullPage = false;
         $this->addSeverityClassToFields = false;
         $this->translator->add(new MessageFormTranslations());
+    }
+
+    public function getConfigKey(): string
+    {
+        return $this->configKey;
+    }
+
+    /**
+     * Defines which config key should be used to store the timestamp that indicates when
+     * the message should be shown again.
+     *
+     * @return $this
+     */
+    public function setConfigKey(string $configKey): static
+    {
+        $this->configKey = $configKey;
+        return $this;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    /**
+     * Sets the message that will be played to the user.
+     *
+     * Should be translated, as passing in a translation key might need a call to
+     * sprintf() with additional arguments, which is difficult to specify in this method.
+     *
+     * @return $this
+     */
+    public function setMessage(string $message): static
+    {
+        $this->message = $message;
+        return $this;
+    }
+
+    public function getLater(): int
+    {
+        return $this->later;
+    }
+
+    /**
+     * Set the number of days to wait before showing the message again after the user
+     * clicked the 'later' button.
+     *
+     * @return $this
+     */
+    public function setLater(int $later): static
+    {
+        $this->later = $later;
+        return $this;
     }
 
     /**
@@ -85,10 +141,10 @@ class MessageForm extends Form
         $this->action = $this->getSubmittedValue('service');
         switch ($this->action) {
             case 'later':
-                $result = $this->acumulusConfig->save(['showPluginV84Message' => time() + 7 * 24 * 60 * 60]);
+                $result = $this->acumulusConfig->save([$this->getConfigKey() => time() + $this->getLater() * 24 * 60 * 60]);
                 break;
             case 'hide':
-                $result = $this->acumulusConfig->save(['showPluginV84Message' => PHP_INT_MAX]);
+                $result = $this->acumulusConfig->save([$this->getConfigKey() => PHP_INT_MAX]);
                 break;
             default:
                 $this->createAndAddMessage(sprintf($this->t('unknown_action'), $this->action), Severity::Error);
@@ -119,7 +175,7 @@ class MessageForm extends Form
     protected function getFieldDefinitionsFull(): array
     {
         return [
-            'acumulus-rate' => [
+            'acumulus-message' => [
                 'type' => 'fieldset',
                 'fields' => [
                     'logo' => [
@@ -128,10 +184,7 @@ class MessageForm extends Form
                     ],
                     'message' => [
                         'type' => 'markup',
-                        'value' => sprintf($this->t('plugin_v84_message'),
-                            $this->shopCapabilities->getLink('settings') . '#stockManagementSettingsHeader',
-                            'https://forum.acumulus.nl/index.php/topic,8731.msg48337.html'
-                        ),
+                        'value' => $this->getMessage(),
                     ],
                     'later' => [
                         'type' => 'button',

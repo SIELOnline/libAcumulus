@@ -52,14 +52,14 @@ class FormTest extends TestCase
     public static function formTypesProvider(): array
     {
         return [
-            ['settings', SettingsForm::class],
-            ['mappings', MappingsForm::class],
-            ['batch', BatchForm::class],
-            ['register', RegisterForm::class],
-            ['activate', ActivateSupportForm::class],
-            ['rate', RatePluginForm::class],
-            ['message', MessageForm::class],
-            ['invoice', InvoiceStatusForm::class],
+            ['settings', SettingsForm::class,],
+            ['mappings', MappingsForm::class,],
+            ['batch', BatchForm::class,],
+            ['register', RegisterForm::class,],
+            ['activate', ActivateSupportForm::class,],
+            ['rate', RatePluginForm::class,],
+            ['message', MessageForm::class, ['configKey' => 'showNewReleaseMessage', 'message' => 'test message']],
+            ['invoice', InvoiceStatusForm::class,],
         ];
     }
 
@@ -68,7 +68,7 @@ class FormTest extends TestCase
      *
      * @dataProvider formTypesProvider
      */
-    public function testCreate(string $type, string $class): void
+    public function testCreate(string $type, string $class, array $properties = []): void
     {
         $form = $this->getForm($type);
         /** @noinspection UnnecessaryAssertionInspection */
@@ -77,6 +77,11 @@ class FormTest extends TestCase
         if ($type === 'invoice') {
             /** @noinspection PhpPossiblePolymorphicInvocationInspection  will be an InvoiceStatusForm */
             $form->setSource($this->getInvoiceSource());
+        } elseif ($type === 'message') {
+            foreach ($properties as $property => $value) {
+                $method = 'set' . ucfirst($property);
+                $form->$method($value);
+            }
         }
         $renderer = $this->getRenderer();
         $output = $renderer->render($form);

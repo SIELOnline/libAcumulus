@@ -675,7 +675,7 @@ abstract class Form extends MessageCollection
     {
         /** @noinspection HtmlUnknownTarget */
         return sprintf(
-            '<img src="%1$s" alt="Logo SIEL Acumulus" title="SIEL Acumulus" width="%2$d" height="%2$d">',
+            '<img src="%1$s" alt="Acumulus Logo" title="Acumulus" width="%2$d" height="%2$d">',
             $this->getLogoUrl(),
             $size
         );

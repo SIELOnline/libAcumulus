@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Helpers;
 
-use Siel\Acumulus\ApiClient\GitHub;
 use Siel\Acumulus\Helpers\CheckNewRelease;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\Container;

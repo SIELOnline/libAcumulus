@@ -19,7 +19,7 @@ class AcumulusResult extends BaseResult
         return 'json';
     }
 
-    public function setMainAcumulusResponseKey(string $mainResponseKey, bool $isList = false): BaseResult
+    public function setMainAcumulusResponseKey(string $mainResponseKey, bool $isList = false): static
     {
         // Add messages for the parameters that were passed in, so they can be checked.
         $this->createAndAddMessage($mainResponseKey, Severity::Log, 'mainResponseKey');

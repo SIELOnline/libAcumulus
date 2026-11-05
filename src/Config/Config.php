@@ -322,7 +322,7 @@ class Config
     /**
      * @throws \JsonException
      */
-    public function getLatestReleaseInfo(): ?string
+    public function getLatestReleaseInfo(): ?object
     {
         $result = $this->get('cachedLatestReleaseInfo');
         // Cannot handle nullable strings in the config, use the string 'null' for that.
@@ -345,19 +345,6 @@ class Config
     public function getShowRatePluginMessage(): int
     {
         return $this->get('showRatePluginMessage');
-    }
-
-    /**
-     * Returns the Plugin V8 Message config setting.
-     *
-     * @throws \JsonException
-     *
-     * @deprecated: use get()
-     * @noinspection PhpUnused Called from shop-specific code outside this library.
-     */
-    public function getPluginV8Message(): int
-    {
-        return $this->get('showPluginV8Message');
     }
 
     /**
@@ -1002,21 +989,6 @@ class Config
                     'group' => 'other',
                     'type' => 'int',
                     'default' => 0,
-                ],
-                'showPluginV84Message' => [
-                    'group' => 'other',
-                    'type' => 'int',
-                    'default' => 0,
-                ],
-                'showPluginV8Message' => [
-                    'group' => 'other',
-                    'type' => 'int',
-                    'default' => 0,
-                ],
-                'showPluginV8MessageOverriddenMappings' => [
-                    'group' => 'other',
-                    'type' => 'array',
-                    'default' => [],
                 ],
                 'cachedAccountMessage' => [
                     'group' => 'other',

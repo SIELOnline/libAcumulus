@@ -127,6 +127,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'mappings':
             case 'batch':
             case 'invoice':
+            case 'message':
                 $action = ucfirst($linkType);
                 return Context::getContext()->link->getAdminLink("AdminAcumulus$action");
             case 'settings':
@@ -150,6 +151,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return 'PS_TAX_ADDRESS_TYPE'; // 'id_address_invoice' or 'id_address_delivery'
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function getReleasesRepository(): ?array
     {
         return ['owner' => 'SIELOnline', 'repo' => 'Acumulus-for-PrestaShop'];

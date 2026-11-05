@@ -196,9 +196,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'emailAsPdf' => false,
 
             'sendEmptyShipping' => false, // hidden
-
-            'showPluginV84Message' => PHP_INT_MAX,
-            'showPluginV8Message' => PHP_INT_MAX,
         ];
     }
 

@@ -290,8 +290,6 @@ class ConfigUpgrade
         }
         if (!empty($mappings)) {
             $values[Config::Mappings] = $mappings;
-            // This is to warn the user.
-            $values['showPluginV8MessageOverriddenMappings'] = $this->getOverriddenMappings($mappings);
             $result = $this->getConfig()->save($values);
         }
         return $result;

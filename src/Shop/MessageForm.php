@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
@@ -38,6 +39,7 @@ class MessageForm extends Form
     protected int $later = 7;
 
     public function __construct(
+        Acumulus $acumulusApiClient,
         FormHelper $formHelper,
         CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
@@ -46,7 +48,7 @@ class MessageForm extends Form
         Translator $translator,
         Log $log
     ) {
-        parent::__construct(null, $formHelper, $checkAccount, $shopCapabilities, $config, $environment, $translator, $log);
+        parent::__construct($acumulusApiClient, $formHelper, $checkAccount, $shopCapabilities, $config, $environment, $translator, $log);
         $this->addMeta = false;
         $this->isFullPage = false;
         $this->addSeverityClassToFields = false;
@@ -129,6 +131,7 @@ class MessageForm extends Form
 
         // Sanitise service: lowercase ASCII.
         $this->submittedValues['service'] = preg_replace('/[^a-z]/', '', $this->submittedValues['clicked']);
+        $this->submittedValues['messageName'] = preg_replace('/[^a-zA-Z0-9]/', '', $this->submittedValues['clicked']);
     }
 
     /**
@@ -139,6 +142,8 @@ class MessageForm extends Form
     protected function execute(): bool
     {
         $this->action = $this->getSubmittedValue('service');
+        $this->setConfigKey($this->getSubmittedValue('messageName'))
+            ->setLater((int) $this->getSubmittedValue('laterDays'));
         switch ($this->action) {
             case 'later':
                 $result = $this->acumulusConfig->save([$this->getConfigKey() => time() + $this->getLater() * 24 * 60 * 60]);
@@ -156,51 +161,76 @@ class MessageForm extends Form
 
     protected function getFieldDefinitions(): array
     {
-        return match ($this->action) {
-            'later', 'hide' => [
-                $this->action => [
-                    'type' => 'markup',
-                    'value' => $this->t('no_problem'),
-                ],
-            ],
-            default => $this->getFieldDefinitionsFull(),
+        $fields = match ($this->action) {
+            'later', 'hide' => $this->getOkFields(),
+            default => $this->getFullFields(),
         };
+        return [
+            'message' => [
+                'type' => 'fieldset',
+                'legend' => $this->getLogo(100),
+                'fields' => $fields,
+            ],
+        ];
     }
 
     /**
      * Returns the field definitions when we are showing the full message.
      *
      * @return array[];
+     *
+     * @todo: placing the logo in the legend worked well for PrestaShop (new release
+     *   message), but might not work for others: to test.
      */
-    protected function getFieldDefinitionsFull(): array
+    protected function getFullFields(): array
     {
         return [
-            'acumulus-message' => [
-                'type' => 'fieldset',
-                'fields' => [
-                    'logo' => [
-                        'type' => 'markup',
-                        'value' => $this->getLogo(100),
-                    ],
-                    'message' => [
-                        'type' => 'markup',
-                        'value' => $this->getMessage(),
-                    ],
-                    'later' => [
-                        'type' => 'button',
-                        'value' => $this->t('later'),
-                        'attributes' => [
-                            'class' => 'acumulus-ajax',
-                        ],
-                    ],
-                    'hide' => [
-                        'type' => 'button',
-                        'value' => $this->t('hide'),
-                        'attributes' => [
-                            'class' => 'acumulus-ajax',
-                        ],
-                    ],
+//            'logo' => [
+//                'type' => 'markup',
+//                'value' => $this->getLogo(100),
+//            ],
+            'message' => [
+                'type' => 'markup',
+                'value' => $this->getMessage(),
+            ],
+            'messageName' => [
+                'type' => 'hidden',
+                'value' => $this->getConfigKey(),
+            ],
+            'laterDays' => [
+                'type' => 'hidden',
+                'value' => $this->getLater(),
+            ],
+            'later' => [
+                'type' => 'button',
+                'value' => $this->t('later'),
+                'attributes' => [
+                    'class' => 'acumulus-ajax',
                 ],
+            ],
+            'hide' => [
+                'type' => 'button',
+                'value' => $this->t('hide'),
+                'attributes' => [
+                    'class' => 'acumulus-ajax',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Description.
+     *
+     *
+     * @return array[]
+     *   Description.
+     */
+    private function getOkFields(): array
+    {
+        return [
+            $this->action => [
+                'type' => 'markup',
+                'value' => $this->t('no_problem'),
             ],
         ];
     }

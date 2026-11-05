@@ -122,6 +122,10 @@ class FormMapper extends BaseFormMapper
             'multiple' => $field['attributes']['multiple'] ?? false,
         ];
 
+        if ($result['type'] === 'html' && !empty($field['value'])) {
+            $result['html_content'] = $field['value'];
+        }
+
         if (!empty($field['attributes'])) {
             $result['attributes'] = $field['attributes'];
         }
@@ -151,8 +155,10 @@ class FormMapper extends BaseFormMapper
         switch ($type) {
             case 'fieldset':
             case 'details':
-            case 'markup':
                 $type = 'free';
+                break;
+            case 'markup':
+                $type = 'html';
                 break;
             case 'email':
                 $type = 'text';

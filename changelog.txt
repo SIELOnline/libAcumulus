@@ -3,6 +3,13 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+8.7.3 (2026-11-??) (PS)
+-----------------------
+Features:
+- PS: New releases of the module zip are now stored in a GitHub repository, and the module
+  checks for new releases and shows a message on its own pages.
+
+
 8.7.2 (2026-10-30) (WC)
 -----------------------
 This is an intermediate release, while we are working towards a full 8.8.0 for all

@@ -15,23 +15,24 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class MessageFormTranslations extends TranslationCollection
 {
     protected array $nl = [
-        // https://forum.acumulus.nl/index.php/topic,8731.msg48337.html
-        'plugin_v84_message' => '<p>Acumulus is bijgewerkt naar versie 8.4. Deze versie bevat nu het doorsturen van voorraadmutaties naar Acumulus. '
-            . 'U kunt dit aanzetten op het <a href="%1$s">Acumulus instellingen formulier</a>. '
-            . 'Op het Acumulus forum vindt u het document <a href="%2$s" target="_blank">Voorraadbeheer in Acumulus en uw webshop</a> dat het proces toelicht.</p>',
+        'message_form_title' => 'Bericht van Acumulus',
+        'message_form_header' => 'Bericht van Acumulus',
+        'message_form_message_success' => '',
+        'message_form_message_error' => '',
         'later' => 'Herinner me later',
         'hide' => 'Niet meer tonen',
         'no_problem' => 'OK, geen probleem.',
         'unknown_action' => "Onbekende actie '%s'",
+        'newReleaseMessage' => '<p>Je gebruikt momenteel versie %3$s van de %1$s %2$s. De nieuwste versie is %4$s. <a href="%5$s" target="_blank">Update de %2$s</a> om de nieuwste functionaliteiten te gebruiken.</p>',
     ];
 
     protected array $en = [
-        'plugin_v84_message' => '<p>Acumulus has been updated to version 8.4. This version now allows sending stock mutations to Acumulus. '
-            . 'You can enable this feature on the <a href="%1$s">Acumulus settings form</a>. '
-            . 'At our Acumulus forum, you can find the document <a href="%2$s" target="_blank">Stock management in Acumulus and your web shop (Dutch)</a> that explains the feature.</p>',
+        'message_form_title' => 'Message from Acumulus',
+        'message_form_header' => 'Message from Acumulus',
         'hide' => "Don't show anymore",
         'later' => 'Remind me later',
         'no_problem' => 'OK, no problem.',
         'unknown_action' => "Unknown action '%s'",
+        'newReleaseMessage' => '<p>You are currently using version %3$s of this %1$s %2$s. The latest version is %4$s. <a href="%5$s" target="_blank">Update the %2$s</a> to enjoy the latest features.</p>',
     ];
 }

@@ -9,6 +9,9 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
 
+use function sprintf;
+use function strlen;
+
 /**
  * CheckNewRelease checks for a new release on a GitHub based repository with releases.
  */
@@ -23,7 +26,24 @@ class CheckNewRelease
         protected readonly ShopCapabilities $shopCapabilities,
         protected readonly Config $config,
         protected readonly Environment $environment,
+        protected readonly Translator $translator,
     ) {
+    }
+
+    /**
+     * Helper method to translate strings.
+     *
+     * @param string $key
+     *  The key to get a translation for.
+     *
+     * @return string
+     *   The translation for the given key or the key itself if no translation
+     *   could be found.
+     *
+     */
+    protected function t(string $key): string
+    {
+        return $this->translator->get($key);
     }
 
     /**
@@ -67,17 +87,41 @@ class CheckNewRelease
         return false;
     }
 
+    public function formatMessage(): string
+    {
+        return sprintf(
+            $this->t('newReleaseMessage'),
+            $this->t('module_name'),  // Acumulus
+            $this->t('module'),  // module, plugin, addon, ...
+            $this->environment->get('moduleVersion'), // Something like 8.7.0
+            $this->latestReleaseInfo->tag_name, // Something like 8.7.2
+            $this->getReleasesUrl(), // https://github.com/SIELOnline/Acumulus-for-PrestaShop/releases
+        );
+    }
     protected function initialiseFromCache(): void
     {
         $this->cachedTime = $this->config->get('cachedLatestReleaseInfoTimestamp');
-        $this->latestReleaseInfo = $this->config->get('cachedLatestReleaseInfo');
+        $this->latestReleaseInfo = $this->config->getLatestReleaseInfo();
     }
 
     protected function refreshCache(): void
     {
         $this->cachedLatestReleaseInfo = $this->latestReleaseInfo;
         $this->latestReleaseInfo = $this->githubApiClient->getLatestRelease(...$this->shopCapabilities->getReleasesRepository());
+        if ($this->cachedLatestReleaseInfo === null) {
+            // First time ever: set cache to what we retrieved.
+            $this->cachedLatestReleaseInfo = $this->latestReleaseInfo;
+        }
         $this->cachedTime = time();
         $this->config->save(['cachedLatestReleaseInfo' => $this->latestReleaseInfo, 'cachedLatestReleaseInfoTimestamp' => $this->cachedTime]);
+    }
+
+    /**
+     * Returns the URL that users can visit to get an overview of available releases.
+     */
+    private function getReleasesUrl(): string
+    {
+        $releasesPart = strpos($this->latestReleaseInfo->assets[0]->browser_download_url, '/releases/') + strlen('/releases');
+        return substr($this->latestReleaseInfo->assets[0]->browser_download_url, 0, $releasesPart);
     }
 }

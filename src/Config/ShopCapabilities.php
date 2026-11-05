@@ -264,14 +264,17 @@ abstract class ShopCapabilities
     }
 
     /**
-     * Returns a link to a form page or an image.
+     * Returns a link to the requested resource.
      *
      * If the web shop adds a session token or something like that to
      * administrative links, the returned link should contain so as well.
      *
      * @param string $linkType
-     *   The form or resource to get the link to: 'settings', 'mappings', 'batch',
-     *   'activate', 'register', 'logo', 'pro-support-link', 'pro-support-img'.
+     *   The form or resource to get the link to:
+     *   - One of our form types, e.g.'settings'.
+     *   - Our own module page: 'modulePage', 'moduleUri'
+     *   - A webshop form, e.g. 'fiscal-address-setting' or 'product'.
+     *   - A resource: 'logo', 'pro-support-link', 'pro-support-img'.
      * @param mixed|null $parameter
      *   Any parameter to add to the link. Used to get a product specific page (thus,
      *   $parameter being a product id).

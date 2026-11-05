@@ -230,7 +230,7 @@ class RegisterForm extends Form
             ];
         } else {
             // Successfully submitted: show details of the created account.
-            $this->isFullPage = false;
+            $this->isFullPage = false; // We do not need the save button of the shop
             $fields += $this->getCongratulationsFields();
             $fields += $this->getCreatedAccountFields();
             $fields += $this->getCreatedApiAccountFields();

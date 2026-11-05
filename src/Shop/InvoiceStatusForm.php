@@ -102,8 +102,8 @@ class InvoiceStatusForm extends Form
     public function __construct(
         InvoiceManager $invoiceManager,
         AcumulusEntryManager $acumulusEntryManager,
-        Acumulus $acumulusApiClient,
         Container $container,
+        Acumulus $acumulusApiClient,
         FormHelper $formHelper,
         CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
@@ -322,6 +322,8 @@ class InvoiceStatusForm extends Form
 
     /**
      * @inheritDoc
+     *
+     * @noinspection PhpMissingParentCallCommonInspection empty parent
      */
     protected function validate(): void
     {
@@ -892,7 +894,7 @@ class InvoiceStatusForm extends Form
                 $dateToUse = $shopSettings['dateToUse'];
                 if ($dateToUse !== Config::IssueDateSource_Transfer) {
                     $defaultPaymentDate = $source->getInvoiceDate();
-                    if ($dateToUse !== Config::IssueDateSource_InvoiceCreate || empty($defaultPaymentDate)) {
+                    if ($dateToUse !== Config::IssueDateSource_InvoiceCreate || $defaultPaymentDate === null) {
                         $defaultPaymentDate = $source->getDate();
                     }
                 }
@@ -1095,7 +1097,7 @@ class InvoiceStatusForm extends Form
         $result = [];
         $actions = [];
         $links = [];
-        $documentsSettings = $this->container->getConfig()->getDocumentsSettings();
+        $documentsSettings = $this->acumulusConfig->getDocumentsSettings();
 
         $document = ucfirst($this->t('document_invoice'));
         if ($documentsSettings['showInvoiceDetail']) {

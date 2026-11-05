@@ -312,6 +312,11 @@ class Container
         return $this->getInstance('Util', 'Helpers');
     }
 
+    public function getMessageCollection(): MessageCollection
+    {
+        return $this->getInstance('MessageCollection', 'Helpers', [$this->getTranslator()]);
+    }
+
     public function getCheckAccount(): CheckAccount
     {
         return $this->getInstance('CheckAccount', 'Helpers', fn() => [
@@ -328,6 +333,7 @@ class Container
             $this->getShopCapabilities(),
             $this->getConfig(),
             $this->getEnvironment(),
+            $this->getTranslator(),
         ]);
     }
 
@@ -825,30 +831,26 @@ class Container
             case 'activate':
             case 'register':
                 $arguments[] = $this->getAboutBlockForm();
-                $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'mappings':
                 $arguments[] = $this->getMappings();
                 $arguments[] = $this->getFieldExpanderHelp();
                 $arguments[] = $this->getAboutBlockForm();
-                $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'batch':
                 $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getInvoiceManager();
-                $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'invoice':
                 $arguments[] = $this->getInvoiceManager();
                 $arguments[] = $this->getAcumulusEntryManager();
-                $arguments[] = $this->getAcumulusApiClient();
                 $arguments[] = $this;
                 break;
             case 'uninstall':
-                $arguments[] = $this->getAcumulusApiClient();
                 break;
         }
         $arguments = array_merge($arguments, [
+            $this->getAcumulusApiClient(),
             $this->getFormHelper(),
             $this->getCheckAccount(),
             $this->getShopCapabilities(),

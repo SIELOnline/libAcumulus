@@ -92,7 +92,7 @@ abstract class Form extends MessageCollection
     protected ShopCapabilities $shopCapabilities;
     protected Config $acumulusConfig;
     protected Environment $environment;
-    protected ?Acumulus $acumulusApiClient;
+    protected Acumulus $acumulusApiClient;
     /** @var array[] The form field definitions */
     protected array $fields;
     protected bool $formValuesSet;
@@ -139,7 +139,7 @@ abstract class Form extends MessageCollection
     protected bool $addSeverityClassToFields = true;
 
     public function __construct(
-        ?Acumulus $acumulusApiClient,
+        Acumulus $acumulusApiClient,
         FormHelper $formHelper,
         CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,

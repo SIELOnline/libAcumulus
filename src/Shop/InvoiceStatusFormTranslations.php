@@ -19,6 +19,8 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'invoice_form_title' => 'Acumulus',
         'invoice_form_header' => 'Status van de factuur in Acumulus voor deze bestelling',
         'invoice_form_header_p' => 'Status van de factuur in Acumulus voor deze %1$s',
+        'message_form_invoice_success' => '',
+        'message_form_invoice_error' => '',
         InvoiceStatusForm::Invoice_NotSent => 'Nog niet verzonden',
         InvoiceStatusForm::Invoice_Sent => 'Factuur %1$s van %2$s',
         InvoiceStatusForm::Invoice_SentConcept => 'Op %1$s als concept verzonden',

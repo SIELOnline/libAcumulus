@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
@@ -35,6 +36,7 @@ class RatePluginForm extends Form
     protected string $action = '';
 
     public function __construct(
+        Acumulus $acumulusApiClient,
         FormHelper $formHelper,
         CheckAccount $checkAccount,
         ShopCapabilities $shopCapabilities,
@@ -43,7 +45,7 @@ class RatePluginForm extends Form
         Translator $translator,
         Log $log
     ) {
-        parent::__construct(null, $formHelper, $checkAccount, $shopCapabilities, $config, $environment, $translator, $log);
+        parent::__construct($acumulusApiClient, $formHelper, $checkAccount, $shopCapabilities, $config, $environment, $translator, $log);
         $this->addMeta = false;
         $this->isFullPage = false;
         $this->addSeverityClassToFields = false;

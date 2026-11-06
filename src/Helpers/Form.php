@@ -690,6 +690,54 @@ abstract class Form extends MessageCollection
     }
 
     /**
+     * Adds (or overwrites) an attribute.
+     * If the attribute already exists and $multiple is false, the existing value will be
+     * overwritten. If it is true, or null when $attribute ='class', it will be added.
+     *
+     * @param array $attributes
+     *   The array of attributes to add the value to.
+     * @param string $attribute
+     *   The name of the attribute to set.
+     * @param bool|string|string[]|int|null $value
+     *   The value(s) of the attribute to add or set. If null, the attribute value will
+     *   be ignored (no-op). Other types must be convertable to a string because that is
+     *   how an attribute value eventually will end. For array and bool we do some
+     *   handling our own, for other types we expect that a cast to string suffices.
+     * @param bool|null $multiple
+     *   Allow multiple values for the given attribute. By default, (null) this
+     *   is only allowed for the class attribute.
+     *
+     * @return array
+     *   The set of attributes with the value added.
+     */
+    public function addAttribute(array $attributes, string $attribute, mixed $value, ?bool $multiple = null): array
+    {
+        // Do add false and 0, but not an empty string, empty array or null.
+        if ($value !== null && $value !== '' && $value !== []) {
+            if ($multiple === null) {
+                $multiple = is_array($value) || $attribute === 'class';
+            }
+
+            if ($multiple) {
+                // Multiple values allowed: set or add, not overwriting.
+                if (isset($attributes[$attribute])) {
+                    // Assure it is an array, not a scalar
+                    $attributes[$attribute] = (array) $attributes[$attribute];
+                } else {
+                    // Set as an empty array
+                    $attributes[$attribute] = [];
+                }
+                // Now we know for sure that it is an array, add it.
+                $attributes[$attribute] = array_merge($attributes[$attribute], (array) $value);
+            } else {
+                // Single value: just set, possibly overwriting.
+                $attributes[$attribute] = $value;
+            }
+        }
+        return $attributes;
+    }
+
+    /**
      * Returns a list of field ids/keys appearing in the form.
      */
     protected function getKeys(): array

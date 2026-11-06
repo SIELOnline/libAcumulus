@@ -3,11 +3,15 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.7.3 (2026-11-??) (PS)
------------------------
+8.7.3 (2026-11-??) (PS|WC)
+--------------------------
 Features:
 - PS: New releases of the module zip are now stored in a GitHub repository, and the module
   checks for new releases and shows a message on its own pages.
+
+Bugs:
+- WC (possibly ALL): Updating an order was prevented by empty paid date in our invoice
+  status overview (on an order's detail page).
 
 
 8.7.2 (2026-10-30) (WC)

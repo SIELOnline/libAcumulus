@@ -471,8 +471,8 @@ class InvoiceStatusForm extends Form
 
         $idPrefix = $this->getIdPrefix($source);
         if (!$this->isSubmitted()) {
-            // We are loading the form for the first time: just add a "show"
-            // button to lazy-load it (so no calls to the Acumulus API).
+            // We are loading the form for the first time: just add a "show" button to
+            // lazy-load it (so no calls to the Acumulus API to render the initial form).
             $fields[$idPrefix . 'invoice_show'] = [
                 'type' => 'button',
                 'value' => $this->t('show'),
@@ -503,6 +503,7 @@ class InvoiceStatusForm extends Form
                 ];
             }
         }
+        $fields = $this->addFormAttribute($fields, 'acumulus-' . $this->getType());
         return $fields;
     }
 
@@ -1208,6 +1209,34 @@ class InvoiceStatusForm extends Form
             'type' => 'hidden',
             'value' => $value,
         ];
+    }
+
+    /**
+     * Recursively adds a form attribute to all fields whose value will be sent on submit.
+     *
+     * This allows to place this form within another form (the shop's "edit order" form)
+     * without interfering with it.
+     *
+     * @todo: It can also make our js that collects values to send easier if this form is
+     *   not placed in a <form> tag.
+     *
+     * @param array[] $fields
+     *   A set of form fields.
+     *
+     * @return array[]
+     *   The form fields with the attribute added.
+     */
+    protected function addFormAttribute(array $fields, string $formId): array
+    {
+        foreach ($fields as &$field) {
+            if (!in_array($field['type'], ['fieldset', 'details', 'collection', 'markup'])) {
+                $field['attributes'] = $this->addAttribute($field['attributes'] ?? [], 'form', $formId);
+            }
+            if (!empty($field['fields'])) {
+                $field['fields'] = $this->addFormAttribute($field['fields'], $formId);
+            }
+        }
+        return $fields;
     }
 
     /**

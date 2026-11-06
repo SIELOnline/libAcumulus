@@ -717,29 +717,7 @@ class FormRenderer
      */
     protected function addAttribute(array $attributes, string $attribute, mixed $value, ?bool $multiple = null): array
     {
-        // Do add false and 0, but not an empty string, empty array or null.
-        if ($value !== null && $value !== '' && $value !== []) {
-            if ($multiple === null) {
-                $multiple = is_array($value) || $attribute === 'class';
-            }
-
-            if ($multiple) {
-                // Multiple values allowed: set or add, not overwriting.
-                if (isset($attributes[$attribute])) {
-                    // Assure it is an array, not a scalar
-                    $attributes[$attribute] = (array) $attributes[$attribute];
-                } else {
-                    // Set as an empty array
-                    $attributes[$attribute] = [];
-                }
-                // Now we know for sure that it is an array, add it.
-                $attributes[$attribute] = array_merge($attributes[$attribute], (array) $value);
-            } else {
-                // Single value: just set, possibly overwriting.
-                $attributes[$attribute] = $value;
-            }
-        }
-        return $attributes;
+        return $this->form->addAttribute($attributes, $attribute, $value, $multiple);
     }
 
     /**

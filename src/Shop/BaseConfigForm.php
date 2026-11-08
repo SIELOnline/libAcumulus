@@ -127,7 +127,7 @@ abstract class BaseConfigForm extends Form
                 'value' => sprintf(
                     $this->t('config_form_register_button'),
                     $this->shopCapabilities->getLink('register'),
-                    $this->t('button_class')
+                    $this->t('button_class_primary')
                 ),
             ],
         ];

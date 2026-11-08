@@ -54,6 +54,7 @@ class ModuleTranslations extends TranslationCollection
         'document_mail' => '%1$s mailen',
         'document_show_title' => 'Acumulus %1$s openen in uw browser',
         'document_mail_title' => 'Acumulus %1$s mailen',
+        'document_mailed' =>  'De PDF met Acumulus %1$s voor %2$s %3$s is gemaild.',
 
         // Objects.
         'Item' => 'bestelregel',
@@ -73,9 +74,9 @@ class ModuleTranslations extends TranslationCollection
 
         'wait' => 'Even wachten',
 
-        // @todo: start using these 3 parameters, for now this text is
-        //   overridden in all shops with only 2 parameters.
-        'button_link' => '<a href="%2$s">%1$s</a>',
+        'button_link' => '<a href="%2$s" class="%3$s">%1$s</a>',
+        'button_class_default' => 'button',
+        'button_class_primary' => 'button',
         'button_class' => 'button',
         'message_config_saved' => 'De instellingen zijn opgeslagen.',
         'message_update_failed' => 'De interne upgrade naar versie %s is mislukt. Als deze melding terug blijft komen, neem dan contact op met support.',
@@ -121,6 +122,7 @@ class ModuleTranslations extends TranslationCollection
         'document_mail' => 'Mail %1$s',
         'document_show_title' => 'Open Acumulus %1$s in your browser',
         'document_mail_title' => 'Mail Acumulus %1$s',
+        'document_mailed' =>  'Acumulus %1$s PDF for %2$s %3$s has been mailed.',
 
         // Objects.
         'Item' => 'item line',

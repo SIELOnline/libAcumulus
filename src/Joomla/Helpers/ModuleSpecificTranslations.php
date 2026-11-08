@@ -18,7 +18,9 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected array $nl = [
         'module' => 'extensie',
-        'button_link' => '<a href="%2$s" class="btn btn-default"><span class="icon-cog"></span> %1$s</a>',
+        'button_link' => '<a href="%2$s" class="%3$s"><span class="icon-cog"></span> %1$s</a>',
+        'button_class_default' => 'btn btn-default',
+        'button_class_primary' => 'btn btn-primary',
         'button_class' => 'btn btn-primary',
     ];
 

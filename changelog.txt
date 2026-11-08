@@ -8,6 +8,8 @@ This file contains a historical overview of changes in our code.
 Features:
 - PS: New releases of the module zip are now stored in a GitHub repository, and the module
   checks for new releases and shows a message on its own pages.
+- WC: Provide visual feedback about the "mail document" action on the order list page.
+
 
 Bugs:
 - WC (possibly ALL): Updating an order was prevented by empty paid date in our invoice

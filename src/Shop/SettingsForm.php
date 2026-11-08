@@ -973,7 +973,8 @@ class SettingsForm extends BaseConfigForm
                 'value' => sprintf(
                     $this->t('button_link'),
                     $this->t('mappings_form_link_text'),
-                    $this->shopCapabilities->getLink('mappings')
+                    $this->shopCapabilities->getLink('mappings'),
+                    $this->t('button_class_primary')
                 ),
             ],
         ];

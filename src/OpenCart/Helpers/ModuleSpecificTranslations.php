@@ -19,7 +19,10 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected array $nl = [
         'module' => 'extensie',
-        'button_link' => '<a href="%2$s" class="button btn btn-primary"><i class="fa fa-cog"></i> %1$s</a>',
+        'button_link' => '<a href="%2$s" class="%3$s"><i class="fa fa-cog"></i> %1$s</a>',
+        'button_class_default' => 'buttonn btn btn-default',
+        'button_class_primary' => 'button btn btn-primary',
+        'button_class' => 'button btn',
 
         'desc_triggerSettings' => 'Met behulp van deze instelling kunt u aangeven op welk(e) moment(en) u de factuur voor een bestelling naar Acumulus wilt versturen. Als u meerdere momenten selecteert, wordt de factuur naar Acumulus verstuurd zodra de bestelling één van de gekozen statussen bereikt. Een factuur zal altijd slechts 1 keer naar Acumulus worden verstuurd. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De factuur van de webwinkel hoeft dus nog niet aangemaakt te zijn, tenzij u voor factuurdatum en nummer de gegevens van die factuur van de webwinkel wilt gebruiken. Als u voor "Niet automatisch versturen" kiest, dient u de facturen zelf over te zetten m.b.v. het <a href="%s">Acumulus batch-formulier</a>.',
 

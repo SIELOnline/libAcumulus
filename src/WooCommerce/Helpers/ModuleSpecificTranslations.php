@@ -18,7 +18,9 @@ use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTransl
 class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected array $nl = [
-        'button_link' => '<a href="%2$s" class="button button-primary button-large">%1$s</a>',
+        'button_class_default' => 'button button-default button-primary button-large',
+        'button_class_primary' => 'button button-primary button-large',
+        'button_class' => 'button button-large',
         'see_post_meta' => 'Zie de tabel "postmeta" voor posts van het type "order" of "refund"',
         'meta_original_order_for_refund' => 'Post meta-waardes van de oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
 

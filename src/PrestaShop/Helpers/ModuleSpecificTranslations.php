@@ -18,8 +18,10 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected array $nl = [
         'module' => 'module',
-        'button_link' => '<a href="%2$s" class="btn btn-default"><i class="process-icon-cogs"></i>%1$s</a>',
-        'button_class' => 'btn btn-primary',
+        'button_link' => '<a href="%2$s" class="%3$s"><i class="process-icon-cogs"></i>%1$s</a>',
+        'button_class_default' => 'btn btn-default',
+        'button_class_primary' => 'btn btn-primary',
+        'button_class' => 'btn',
 
         'see_billing_address' => 'Verzendadres, bevat dezelfde eigenschappen als het "address_invoice" object hierboven',
 

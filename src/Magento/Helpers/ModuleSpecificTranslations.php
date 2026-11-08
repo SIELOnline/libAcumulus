@@ -19,7 +19,8 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected array $nl = [
         'module' => 'extensie',
-        'button_link' => '<a href="%2$s" class="action-secondary">%1$s</a>',
+        'button_class_default' => 'action-default',
+        'button_class_primary' => 'action-primary',
         'button_class' => 'action-secondary',
 
         // Config form.

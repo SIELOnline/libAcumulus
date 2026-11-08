@@ -23,7 +23,8 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'menu_settings' => 'Modules → Acumulus → Settings',
         'menu_mappings' => 'Modules → Acumulus → Mappings',
 
-        'button_link' => '<a href="%2$s" class="btn btn-primary">%1$s</a>',
+        'button_class_default' => 'btn btn-default',
+        'button_class_primary' => 'btn btn-primary',
         'button_class' => 'btn btn-primary',
 
         // Rate our plugin message.

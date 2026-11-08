@@ -624,7 +624,8 @@ class MappingsForm extends Form
                 'value' => sprintf(
                     $this->t('button_link'),
                     $this->t('settings_form_link_text'),
-                    $this->shopCapabilities->getLink('settings', null)
+                    $this->shopCapabilities->getLink('settings', null),
+                    $this->t('button_class_primary')
                 ),
             ],
         ];

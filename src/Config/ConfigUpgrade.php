@@ -17,6 +17,9 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Helpers\Severity;
 
+use Siel\Acumulus\Meta;
+
+use function array_key_exists;
 use function count;
 use function is_string;
 
@@ -164,6 +167,10 @@ class ConfigUpgrade
             $result = $this->upgrade837() && $result;
         }
 
+        if (version_compare($currentVersion, '8.7.3', '<')) {
+            $result = $this->upgrade873() && $result;
+        }
+
         $this->getLog()->notice('Config: finished upgrading to %s (%s)', Version, $result ? 'success' : 'failure');
         return $result;
     }
@@ -291,24 +298,6 @@ class ConfigUpgrade
         if (!empty($mappings)) {
             $values[Config::Mappings] = $mappings;
             $result = $this->getConfig()->save($values);
-        }
-        return $result;
-    }
-
-    /**
-     * Returns a list of mappings that are overridden.
-     *
-     * @param string[][] $mappings
-     *
-     * @return string[]
-     */
-    private function getOverriddenMappings(array $mappings): array
-    {
-        $result = [];
-        foreach ($mappings as $object => $objectMappings) {
-            foreach ($objectMappings as $property => $mapping) {
-                $result[] = "$object::$property (was $mapping)";
-            }
         }
         return $result;
     }
@@ -493,5 +482,22 @@ class ConfigUpgrade
             }
         }
         return $this->getConfig()->save($newValues);
+    }
+
+    /**
+     * 8.7.3 upgrade.
+     *
+     * - Removed old message settings (v8 to v8.4).
+     * - Renamed Meta::PricesIncludeVat to Meta::ProductPricesIncludeVat.
+     */
+    protected function upgrade873(): bool
+    {
+        $values = $this->getConfigStore()->load();
+        unset($values['showPluginV8Message'], $values['showPluginV84Message'], $values['showPluginV8MessageOverriddenMappings']);
+        if (array_key_exists('meta-prices-include-vat', $values['mappings'] ?? [])) {
+            $values['mappings'][Meta::ProductPricesIncludeVat] = $values['mappings']['meta-prices-include-vat'];
+            unset($values['mappings']['meta-prices-include-vat']);
+        }
+        return $this->getConfig()->save($values);
     }
 }

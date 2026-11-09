@@ -478,6 +478,7 @@ class Completor
             foreach ($vatTypeVatRates as &$vatRate) {
                 $vatRate = [Fld::VatRate => $vatRate, Fld::VatType => $vatType];
             }
+            unset($vatRate);
             /** @noinspection SlowArrayOperationsInLoopInspection */
             $possibleVatRates = array_merge($possibleVatRates, $vatTypeVatRates);
         }
@@ -1162,8 +1163,10 @@ class Completor
     {
         if (empty($this->invoice->getCustomer()->vatTypeId)) {
             $vatTypeId = $this->isCompany() ? Api::VatTypeId_Business : Api::VatTypeId_Private;
+            // NOTE: at 2026-10-16 I added a check for isNl() but that resets the vat type
+            // id of dutch companies to private as they won't have a reversed VAT invoice.
             if ($this->isCompany()
-                && ($this->isNl() || $this->isEu())
+                && $this->isEu()
                 && !empty($this->invoice->vatType)
                 && $this->invoice->vatType !== Api::VatType_EuReversed
                 && !$this->isVatFreeInvoice()

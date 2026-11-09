@@ -33,11 +33,11 @@ use function strlen;
  *
  * Additional restrictions may hold, and the basic and most used restrictions
  * are supported by this class:
- * - Required: even required values are initialized as null, only when trying to
+ * - Required: even required values are initialised as null, only when trying to
  *   use it to construct a message will a required but empty value throw an
  *   error.
- * - Positive integer: modeled with a separate type 'id'.
- * - Enumerations: modeled with the allowedValues property of this class. For
+ * - Positive integer: modelled with a separate type 'id'.
+ * - Enumerations: modelled with the allowedValues property of this class. For
  *   properties of type bool the allowedValues property of this class is used to
  *   map the 2 boolean values to their value on the Acumulus API.
  *

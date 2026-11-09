@@ -12,7 +12,6 @@
  *
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode  During the transition to Collectors, duplicate code will exist.
  */
 
@@ -640,13 +639,15 @@ class CompletorInvoiceLines
     /**
      * Returns the set of possible vat rates that fall in the given vat range.
      *
-     * @param array|null $vatRateInfos
+     * @param array[]|float[]|null $vatRateInfos
      *   The set of vat rate infos to filter. If not given, the property
      *   $this->possibleVatRates is used.
      *
      * @return array[]
      *   The, possibly empty, set of vat rate infos that have a vat rate that
      *   falls within the given vat range.
+     *
+     * @noinspection OffsetOperationsInspection  false positives on $vatRateinfo
      */
     protected function filterVatRateInfosByRange(float $min, float $max, ?array $vatRateInfos = null): array
     {

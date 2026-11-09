@@ -84,6 +84,7 @@ abstract class AcumulusObject
         foreach ($this->data as &$acumulusProperty) {
             $acumulusProperty = clone $acumulusProperty;
         }
+        unset($acumulusProperty);
         if (isset($this->metadata)) {
             $this->metadata = clone $this->metadata;
         }

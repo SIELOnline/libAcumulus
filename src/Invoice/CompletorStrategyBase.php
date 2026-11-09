@@ -12,7 +12,6 @@
  *
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
 namespace Siel\Acumulus\Invoice;
@@ -175,7 +174,7 @@ abstract class CompletorStrategyBase
     }
 
     /**
-     * Initializes the amount properties.
+     * Initialises the amount properties.
      *
      * to be able to calculate the amounts, at least 2 of the 3 meta amounts
      * 'meta-invoice-vatamount', 'meta-invoice-amountinc', or
@@ -206,7 +205,7 @@ abstract class CompletorStrategyBase
     }
 
     /**
-     * Initializes $this->lines2Complete with all strategy lines.
+     * Initialises $this->lines2Complete with all strategy lines.
      */
     protected function initLines2Complete(): void
     {
@@ -219,14 +218,14 @@ abstract class CompletorStrategyBase
     }
 
     /**
-     * Initializes $this->vatBreakdown with a breakdown of vat rates and amounts
+     * Initialises $this->vatBreakdown with a breakdown of vat rates and amounts
      * occurring on the invoice (and not being strategy lines).
      */
     protected function initVatBreakdown(): void
     {
         $this->vatBreakdown = [];
 
-        // Initialize by adding all possible vat rates.
+        // Initialise by adding all possible vat rates.
         foreach ($this->possibleVatRates as $possibleVatRate) {
             $vatRate = sprintf('%.3f', $possibleVatRate[Fld::VatRate]);
             if (!isset($this->vatBreakdown[$vatRate])) {

@@ -235,12 +235,12 @@ class Invoice extends AcumulusObject
         $invoice[Fld::Line] = $lines;
 
         if ($this->metadataGet(Meta::AddEmailAsPdfSection)) {
-            /** @noinspection NullPointerExceptionInspection  should throw on null */
+            // Should throw on null
             $invoice[Fld::EmailAsPdf] = $this->getEmailAsPdf()->toArray();
         }
         $invoice += $this->metadataToArray();
 
-        /** @noinspection NullPointerExceptionInspection  should throw on null */
+        // Should throw on null
         $customer = $this->getCustomer()->toArray();
         $customer[Fld::Invoice] = $invoice;
         return [Fld::Customer => $customer];

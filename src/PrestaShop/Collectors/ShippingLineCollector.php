@@ -23,6 +23,8 @@ class ShippingLineCollector extends LineCollector
     /**
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   A shipping line with the mapped fields filled in.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection  Empty parent.
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {
@@ -62,7 +64,6 @@ class ShippingLineCollector extends LineCollector
         $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact);
         $line->metadataAdd(Meta::FieldsCalculated, [Fld::UnitPrice, Meta::VatAmount]);
         // VAT lookup metadata should be based on the address used for VAT calculations.
-        /** @noinspection NullPointerExceptionInspection */
         $vatBasedOn = $invoice->getCustomer()->getMainAddressType();
         /** @noinspection UnnecessaryCastingInspection  those properties might be numeric strings. */
         $addressId = (int) ($vatBasedOn === AddressType::Invoice

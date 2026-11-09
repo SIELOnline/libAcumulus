@@ -49,7 +49,6 @@ class InvoiceManager extends BaseInvoiceManager
      * introduce sequential order numbers in which case this query should be
      * adapted.
      *
-     * @noinspection NullPointerExceptionInspection
      * @noinspection PhpUndefinedMethodInspection {@See \Joomla\Database\DatabaseInterface::escape()}
      */
     public function getInvoiceSourcesByReferenceRange(

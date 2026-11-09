@@ -33,7 +33,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     private function getAcumulusComponent(): AcumulusComponent
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        /** @noinspection NullPointerExceptionInspection */
         return Factory::getApplication()->bootComponent('acumulus');
     }
 
@@ -112,7 +111,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function toSql(DateTimeInterface $date): string
     {
-        /** @noinspection NullPointerExceptionInspection, PhpUnhandledExceptionInspection */
         return (new Date($date->format(Api::Format_TimeStamp), new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 

@@ -62,14 +62,13 @@ class LineCollector extends BaseLineCollector
             if ($taxClassId === 'standard') {
                 $taxClassId = '';
             }
-            // Vat class name is the non-sanitized version of the id
+            // Vat class name is the non-sanitised version of the id
             // and thus does not convey more information: don't add.
             $line->metadataAdd(Meta::VatRateLookup, null, true);
             $line->metadataAdd(Meta::VatRateLookupLabel, null, true);
 
-            // Find applicable vat rates. We use WC_Tax::find_rates() to find
-            // them.
-            /** @noinspection NullPointerExceptionInspection  getCustomer() will NOT return null */
+            // Find applicable vat rates. We use WC_Tax::find_rates() to find them.
+            // getCustomer() will NOT return null here.
             $args = [
                 'tax_class' => $taxClassId,
                 'country' => $invoice->getCustomer()->getFiscalAddress()->countryCode,

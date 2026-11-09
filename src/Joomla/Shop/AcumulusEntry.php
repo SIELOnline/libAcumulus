@@ -19,7 +19,6 @@ class AcumulusEntry extends BaseAcumulusEntry
      */
     protected function getDefaultTimeZone(): DateTimeZone
     {
-        /** @noinspection NullPointerExceptionInspection */
         return new DateTimeZone(Factory::getApplication()->get('offset'));
     }
 }

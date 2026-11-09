@@ -53,7 +53,6 @@ class StockTransactionMail extends Mail
     protected function getIntroSentences(): array
     {
         $sentences = parent::getIntroSentences();
-        /** @noinspection NullPointerExceptionInspection */
         if ($this->getResult()->isMatchError())
         {
             array_pop($sentences);

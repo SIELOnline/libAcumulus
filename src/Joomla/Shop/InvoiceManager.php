@@ -68,7 +68,6 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function toSql(string $dateStr): string
     {
-        /** @noinspection NullPointerExceptionInspection */
         return (new Date($dateStr, new DateTimeZone(Factory::getApplication()->get('offset'))))->toSql(true);
     }
 }

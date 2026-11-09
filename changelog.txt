@@ -12,6 +12,8 @@ Features:
 
 
 Bugs:
+- PS: Error in creating an Acumulus entry: column 'created' not listed as a column whose
+  value will be provided.
 - WC (possibly ALL): Updating an order was prevented by empty paid date in our invoice
   status overview (on an order's detail page).
 

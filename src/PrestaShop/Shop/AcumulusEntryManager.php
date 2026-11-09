@@ -81,7 +81,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         }
         return $this->getDb()->execute(
             sprintf(
-                "INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES (%u, %u, %s, %s, '%s', %u, '%s', '%s')",
+                "INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, source_type, source_id, created, updated) VALUES (%u, %u, %s, %s, '%s', %u, '%s', '%s')",
                 $this->tableName,
                 $shopId,
                 $shopGroupId,

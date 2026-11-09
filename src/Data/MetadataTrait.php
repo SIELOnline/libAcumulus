@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use DateTimeInterface;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Meta;
 
@@ -51,6 +52,7 @@ trait MetadataTrait
      */
     public function metadataSet(string $name, $value): void
     {
+        $value = $this->handleDate($name, $value);
         $this->getMetadataCollection()->set($name, $value);
     }
 
@@ -59,9 +61,17 @@ trait MetadataTrait
      */
     public function metadataAdd(string $name, $value, bool $isList = true): void
     {
+        $value = $this->handleDate($name, $value);
         $this->getMetadataCollection()->add($name, $value, $isList);
     }
 
+    protected function handleDate(string $name, mixed $value): mixed
+    {
+        if (str_contains($name, 'date') && !str_contains($name, 'time') && $value instanceof DateTimeInterface) {
+            $value = $value->setTime(0, 0, 0);
+        }
+        return $value;
+    }
     /**
      * Creates ad deep clone of the metadata value with the given name form the given
      * AcumulusObject and adds it to this metadata collection.

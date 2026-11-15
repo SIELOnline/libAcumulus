@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Tests\Unit\Data;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataCollection;
 use Siel\Acumulus\Data\MetadataValue;
+use Siel\Acumulus\Meta;
 use stdClass;
 
 /**
@@ -90,7 +91,7 @@ class MetadataCollectionTest extends TestCase
 
         // Test add that creates.
         $name2 = 'my_metadata2';
-        $mdc->add($name2, $value1, false);
+        $mdc->add($name2, $value1, MetadataValue::Single);
         self::assertTrue($mdc->exists($name2));
         self::assertInstanceOf(MetadataValue::class, $mdc->getMetadataValue($name2));
         self::assertNull($mdc->get($name2));
@@ -131,15 +132,15 @@ class MetadataCollectionTest extends TestCase
 
         // Test empty set creation by passing null.
         $mdc = new MetadataCollection();
-        $mdc->add($name1, null, true);
+        $mdc->add($name1, null, MetadataValue::List);
         self::assertTrue($mdc->exists($name1));
         self::assertCount(0, $mdc->get($name1));
 
         // Test "not a list" creation with passing null.
         $mdc = new MetadataCollection();
-        $mdc->add($name1, null, false);
+        $mdc->add($name1, null);
         self::assertTrue($mdc->exists($name1));
-        self::assertNull($mdc->get($name1));
+        self::assertSame([], $mdc->get($name1));
     }
 
     public function testMetadataCollectionAddArray(): void
@@ -150,7 +151,7 @@ class MetadataCollectionTest extends TestCase
 
         // Test list creation.
         $mdc = new MetadataCollection();
-        $mdc->add($name1, $data1, true);
+        $mdc->add($name1, $data1, MetadataValue::List);
         self::assertTrue($mdc->exists($name1));
         self::assertCount(3, $mdc->get($name1));
         $mdc->add($name1, $data2);
@@ -158,10 +159,10 @@ class MetadataCollectionTest extends TestCase
 
         // Test list creation with $isList = false.
         $mdc = new MetadataCollection();
-        $mdc->add($name1, $data1, false);
+        $mdc->add($name1, $data1);
         self::assertTrue($mdc->exists($name1));
         self::assertCount(3, $mdc->get($name1));
-        $mdc->add($name1, $data2, false);
+        $mdc->add($name1, $data2);
         self::assertCount(6, $mdc->get($name1));
 
         // Test not a list creation.
@@ -187,17 +188,18 @@ class MetadataCollectionTest extends TestCase
         $mdc->set($name1, $value1);
         $mdc->set($name2, $value2);
 
-        $copy1 = $mdc->copy($name1);
-        $copy2 = $mdc->copy($name2);
+        $copy = new MetadataCollection();
+        $copy->copy($mdc, $name1);
+        $copy->copy($mdc, $name2);
 
-        self::assertSame($mdc->get($name1), $copy1->get());
-        self::assertNotSame($mdc->get($name2), $copy2->get());
-        self::assertEquals($mdc->get($name2), $copy2->get());
+        self::assertSame($mdc->get($name1), $copy->get($name1));
+        self::assertNotSame($mdc->get($name2), $copy->get($name2));
+        self::assertEquals($mdc->get($name2), $copy->get($name2));
 
         $value2->s4 = 'value4';
         $value2->s3 = 'value5';
         self::assertEquals($value2, $mdc->get($name2));
-        self::assertNotEquals($mdc->get($name2), $copy2->get());
+        self::assertNotEquals($mdc->get($name2), $copy->get($name2));
     }
 
     public function testToArray(): void

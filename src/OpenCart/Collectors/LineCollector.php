@@ -102,8 +102,8 @@ class LineCollector extends BaseLineCollector
             if ($taxClass) {
                 $line->metadataSet(Meta::VatClassId, $taxClass['tax_class_id']);
                 $line->metadataSet(Meta::VatClassName, $taxClass['title']);
-                $line->metadataAdd(Meta::VatRateLookup, null, true);
-                $line->metadataAdd(Meta::VatRateLookupLabel, null, true);
+                $line->metadataAdd(Meta::VatRateLookup, null);
+                $line->metadataAdd(Meta::VatRateLookupLabel, null);
 
                 $taxRules = $this->getTaxRules($taxClassId);
                 foreach ($taxRules as $taxRule) {

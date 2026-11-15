@@ -162,8 +162,8 @@ class ShippingLineCollector extends LineCollector
                             if (!$taxRateFound) {
                                 $line->metadataSet(Meta::VatAmount, ((float) $amount) / $line->quantity);
                                 $line->metadataSet(Meta::PrecisionVatAmount, 0.01);
-                                $line->metadataAdd(Meta::VatRateLookup, null, true);
-                                $line->metadataAdd(Meta::VatRateLookupLabel, null, true);
+                                $line->metadataAdd(Meta::VatRateLookup, null);
+                                $line->metadataAdd(Meta::VatRateLookupLabel, null);
                                 $line->metadataSet(
                                     Meta::VatClassId,
                                     $taxRate->tax_rate_class !== '' ? $taxRate->tax_rate_class : 'standard'
@@ -176,7 +176,7 @@ class ShippingLineCollector extends LineCollector
                             // get_rate_percent() contains a % at the end of the string:
                             // remove it.
                             $line->metadataAdd(Meta::VatRateLookup, (float) substr(WC_Tax::get_rate_percent($taxRateId), 0, -1));
-                            $line->metadataAdd(Meta::VatRateLookupLabel, WC_Tax::get_rate_label($taxRate), true);
+                            $line->metadataAdd(Meta::VatRateLookupLabel, WC_Tax::get_rate_label($taxRate));
                         }
                     }
                 }

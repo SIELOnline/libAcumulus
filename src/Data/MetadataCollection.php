@@ -47,9 +47,11 @@ class MetadataCollection
     /**
      * Returns a clone of the {@see MetadataValue} for the given name, or null if not set.
      */
-    public function copy(string $name): ?MetadataValue
+    public function copy(self $source, string $name): void
     {
-        return $this->exists($name) ? clone $this->getMetadataValue($name) : null;
+        if ($source->exists($name)) {
+            $this->metadata[$name] = clone $source->getMetadataValue($name);
+        }
     }
 
     /**
@@ -89,34 +91,35 @@ class MetadataCollection
      *   The name for the metadata field.
      * @param mixed $value
      *   The value for the metadata field.
+     * @param int $behaviour
+     *   One of the {@see MetadataValue} behaviour constants specifying the behaviour of
+     *   this metadata value w.r.t. uniqueness and list handling.
      */
-    public function set(string $name, mixed $value, bool $isList = false): void
+    public function set(string $name, mixed $value, int $behaviour = MetadataValue::Unique): void
     {
-        $this->metadata[$name] = (new MetadataValue($isList))->add($value);
+        $this->metadata[$name] = (new MetadataValue($behaviour))->add($value);
     }
 
     /**
-     * Adds a value to a metadata field, creating it if it not already exists.
+     * Adds a value to a metadata field, creating it, if it not already exists.
      *
-     * - If the metadata name does not already exist, it will be set to this
-     *   value.
-     * - If the metadata name already exists, this value will be added to it
-     *   (without checking for double entries). A metadata field can thus
-     *   contain multiple values.
+     * - If the metadata name does not already exist, it will be set to this value.
+     * - If the metadata name already exists, this value will be added to it (without
+     *   checking for double entries). A metadata field can thus contain multiple values.
      *
      * @param string $name
      *   The name for the metadata field.
      * @param mixed $value
      *   The value to add to (or set for) the metadata field.
-     * @param bool $isList
-     *   If $isList = true and this is a new metadata value and $value = null: an empty
-     *   list is created (not a list with null as its first value).
+     * @param int $behaviour
+     *   One of the {@see MetadataValue} behaviour constants specifying the behaviour of
+     *   this metadata value w.r.t. uniqueness and list handling.
      */
-    public function add(string $name, mixed $value, bool $isList = true): void
+    public function add(string $name, mixed $value, int $behaviour = MetadataValue::UniqueList): void
     {
         if (!$this->exists($name)) {
-            $this->metadata[$name] = new MetadataValue($isList);
-            if ($isList && $value === null) {
+            $this->metadata[$name] = new MetadataValue($behaviour);
+            if ($this->metadata[$name]->isList() && $value === null) {
                 return;
             }
         }
@@ -125,10 +128,8 @@ class MetadataCollection
 
     public function toArray(): array
     {
-        $result = [];
-        foreach ($this->metadata as $key => $value) {
-            $result[$key] = $value->getApiValue();
-        }
-        return $result;
+        return array_map(static function ($value) {
+            return $value->getApiValue();
+        }, $this->metadata);
     }
 }

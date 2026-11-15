@@ -328,7 +328,7 @@ abstract class CompletorStrategyBase
         if ($this->checkPreconditions()) {
             return $this->execute();
         } else {
-            $this->invoice->metadataAdd(Meta::CompletorStrategyPreconditionFailed, $this->getName(), true);
+            $this->invoice->metadataAdd(Meta::CompletorStrategyPreconditionFailed, $this->getName());
             return false;
         }
     }

@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Collectors;
 use ArrayObject;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\MetadataValue;
 use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
@@ -340,6 +341,6 @@ abstract class Collector implements CollectorInterface
      */
     protected function addMessage(AcumulusObject $acumulusObject, string $message, string $severity = Meta::Warning): void
     {
-        $acumulusObject->metadataAdd($severity, $message, false);
+        $acumulusObject->metadataAdd($severity, $message, MetadataValue::Unique);
     }
 }

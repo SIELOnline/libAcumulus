@@ -51,7 +51,7 @@ class CompleteConceptTest extends TestCase
         self::assertTrue($invoice->concept);
 
         $line = $this->getLine(LineType::Item);
-        $line->metadataAdd(Meta::Warning, 'warning');
+        $line->addWarning(Meta::Warning, 'warning');
 
         // Plugin, warning = true
         $config->set('concept', Config::Concept_Plugin);

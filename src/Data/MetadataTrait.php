@@ -9,9 +9,8 @@ use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Meta;
 
 /**
- * Wraps the {@see \Siel\Acumulus\Data\MetadataCollection} methods in methods
- * for an {@see \Siel\Acumulus\Data\AcumulusObject}, or any ther object, that wants to
- * contain a MetadataCollection.
+ * Wraps the {@see MetadataCollection} methods in methods for an {@see AcumulusObject}
+ * (or any ther object, that wants to contain a MetadataCollection).
  */
 trait MetadataTrait
 {
@@ -50,19 +49,19 @@ trait MetadataTrait
     /**
      * See {@see \Siel\Acumulus\Data\MetadataCollection::set()}.
      */
-    public function metadataSet(string $name, $value): void
+    public function metadataSet(string $name, mixed $value, int $behaviour = MetadataValue::Unique): void
     {
         $value = $this->handleDate($name, $value);
-        $this->getMetadataCollection()->set($name, $value);
+        $this->getMetadataCollection()->set($name, $value, $behaviour);
     }
 
     /**
      * See {@see \Siel\Acumulus\Data\MetadataCollection::add()}.
      */
-    public function metadataAdd(string $name, $value, bool $isList = true): void
+    public function metadataAdd(string $name, $value, int $behaviour = MetadataValue::UniqueList): void
     {
         $value = $this->handleDate($name, $value);
-        $this->getMetadataCollection()->add($name, $value, $isList);
+        $this->getMetadataCollection()->add($name, $value, $behaviour);
     }
 
     protected function handleDate(string $name, mixed $value): mixed
@@ -72,18 +71,21 @@ trait MetadataTrait
         }
         return $value;
     }
+
     /**
-     * Creates ad deep clone of the metadata value with the given name form the given
+     * Creates ad deep clone of the metadata value with the given name from the given
      * AcumulusObject and adds it to this metadata collection.
      *
      * If no metadata value exists with the given name in the given AcumulusObject nothing
      * is done.
      */
-    public function metadataCopy(AcumulusObject $source, string $name): void
+    public function metadataCopy(self $source, string $name): void
     {
-        if ($source->metadataExists($name)) {
-            $this->getMetadataCollection()->set($name, $source->getMetadataCollection()->copy($name));
-        }
+        /**
+         * @noinspection PhpParamsInspection  Expected parameter of type 'MetadataCollection', 'MetadataTrait' provided:
+         *   Strange as Traits can never be used as classes/types.
+         */
+        $this->getMetadataCollection()->copy($source, $name);
     }
 
     /**
@@ -102,7 +104,7 @@ trait MetadataTrait
      */
     public function addWarning(string|Message $message): void
     {
-        $this->metadataAdd(Meta::Warning, $message, false);
+        $this->metadataAdd(Meta::Warning, $message, MetadataValue::Unique);
     }
 
     /**

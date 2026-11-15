@@ -90,7 +90,7 @@ class CompletorStrategyLines
                 }
                 if ($strategy->apply()) {
                     $this->replaceLinesCompleted($strategy->getReplacingLines(), $strategy->getName());
-                    $this->invoice->metadataAdd(Meta::CompletorStrategyUsed, $strategy->getDescription(), true);
+                    $this->invoice->metadataAdd(Meta::CompletorStrategyUsed, $strategy->getDescription());
                     // Allow for partial solutions: a strategy may correct only some
                     // strategy lines and leave the rest up to other strategies.
                     if (!$this->invoiceHasStrategyLine()) {
@@ -157,7 +157,7 @@ class CompletorStrategyLines
                 // Replace line with replacing lines.
                 foreach ($replacingLines[$index] as $replacingLine) {
                     if ($replacingLine->metadataGet(Meta::VatRateSource) !== VatRateSource::Strategy) {
-                        $replacingLine->metadataAdd(Meta::Warning, 'Vat rate source was not VatRateSource::Strategy');
+                        $replacingLine->addWarning('Vat rate source was not VatRateSource::Strategy');
                     }
                     $replacingLine->metadataSet(Meta::VatRateSource, VatRateSource::Strategy_Completed);
                     $replacingLine->metadataSet(Meta::CompletorStrategyUsed, $strategyName);

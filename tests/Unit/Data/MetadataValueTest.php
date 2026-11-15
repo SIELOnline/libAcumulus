@@ -21,11 +21,11 @@ class MetadataValueTest extends TestCase
     {
         $mdv = new MetadataValue();
         self::assertSame(0, $mdv->count());
-        self::assertSame('', $mdv->get());
+        self::assertSame(null, $mdv->get());
         self::assertNull($mdv->get(0));
-        self::assertSame('', $mdv->getApiValue());
+        self::assertSame(null, $mdv->getApiValue());
 
-        $mdv = new MetadataValue(true);
+        $mdv = new MetadataValue(MetadataValue::List);
         self::assertSame(0, $mdv->count());
         self::assertEqualsCanonicalizing([], $mdv->get());
         self::assertNull($mdv->get(0));
@@ -43,7 +43,7 @@ class MetadataValueTest extends TestCase
         self::assertNull($mdv->get(1));
         self::assertSame($value1, $mdv->getApiValue());
 
-        $mdv = (new MetadataValue(true))->add($value1);
+        $mdv = (new MetadataValue(MetadataValue::List))->add($value1);
         self::assertSame(1, $mdv->count());
         self::assertSame([$value1], $mdv->get());
         self::assertSame($value1, $mdv->get(0));
@@ -62,7 +62,7 @@ class MetadataValueTest extends TestCase
         self::assertNull($mdv->get(1));
         self::assertNull($mdv->getApiValue());
 
-        $mdv = (new MetadataValue(true))->add($value1);
+        $mdv = (new MetadataValue(MetadataValue::List))->add($value1);
         self::assertSame(1, $mdv->count());
         self::assertSame([null], $mdv->get());
         self::assertNull($mdv->get(0));
@@ -81,7 +81,7 @@ class MetadataValueTest extends TestCase
         self::assertNull($mdv->get(1));
         self::assertSame('[]', $mdv->getApiValue());
 
-        $mdv = (new MetadataValue(true))->add($value);
+        $mdv = (new MetadataValue(MetadataValue::List))->add($value);
         self::assertSame(0, $mdv->count());
         self::assertEqualsCanonicalizing([], $mdv->get());
         self::assertNull($mdv->get(0));
@@ -102,7 +102,15 @@ class MetadataValueTest extends TestCase
         self::assertNull($mdv->get(2));
         self::assertSame("['value1',2]", $mdv->getApiValue());
 
-        $mdv = (new MetadataValue(true))->add($value1)->add($value2);
+        $mdv = (new MetadataValue(MetadataValue::List))->add($value1)->add($value2)->add($value1);
+        self::assertSame(3, $mdv->count());
+        self::assertSame([$value1, $value2, $value1], $mdv->get());
+        // Note that this might fail depending on pretty print settings of json_encode().
+        self::assertSame(2, $mdv->get(1));
+        self::assertNull($mdv->get(3));
+        self::assertSame("['value1',2,'value1']", $mdv->getApiValue());
+
+        $mdv = (new MetadataValue(MetadataValue::Unique))->add($value1)->add($value2)->add($value1)->add($value2);
         self::assertSame(2, $mdv->count());
         self::assertSame([$value1, $value2], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode().
@@ -151,11 +159,17 @@ class MetadataValueTest extends TestCase
         self::assertSame("[{'a':'value1','b':2},{'c':'value3','d':4}]", $mdv->getApiValue());
 
         $value = [[$value1, $value2]];
-        $mdv = (new MetadataValue(false))->add($value);
+        $mdv = (new MetadataValue(MetadataValue::Single))->add($value);
         self::assertSame(1, $mdv->count());
         self::assertSame([$value1, $value2], $mdv->get());
         self::assertNull($mdv->get(1));
         self::assertSame("['value1',2]", $mdv->getApiValue());
+
+        $mdv = (new MetadataValue(MetadataValue::List))->add($value);
+        self::assertSame(1, $mdv->count());
+        self::assertSame([[$value1, $value2]], $mdv->get());
+        self::assertNull($mdv->get(1));
+        self::assertSame("[['value1',2]]", $mdv->getApiValue());
     }
 
     public function testClone(): void

@@ -64,8 +64,8 @@ class LineCollector extends BaseLineCollector
             }
             // Vat class name is the non-sanitised version of the id
             // and thus does not convey more information: don't add.
-            $line->metadataAdd(Meta::VatRateLookup, null, true);
-            $line->metadataAdd(Meta::VatRateLookupLabel, null, true);
+            $line->metadataAdd(Meta::VatRateLookup, null);
+            $line->metadataAdd(Meta::VatRateLookupLabel, null);
 
             // Find applicable vat rates. We use WC_Tax::find_rates() to find them.
             // getCustomer() will NOT return null here.

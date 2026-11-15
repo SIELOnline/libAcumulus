@@ -15,6 +15,7 @@ use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Data\MetadataValue;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
@@ -867,7 +868,7 @@ class Completor
                                         $this->t('field_euVat')
                                     );
                                     $this->result->createAndAddMessage($notice, Severity::Notice, 814);
-                                    $this->addWarning($invoice, $notice, Meta::Notice);
+                                    $this->addMessage($invoice, $notice, Meta::Notice);
                                 }
                             } else {
                                 // Current year: we can assume to be sure when
@@ -894,7 +895,7 @@ class Completor
                                             $this->t('field_euVat')
                                         );
                                         $this->result->createAndAddMessage($notice, Severity::Notice, 813);
-                                        $this->addWarning($invoice, $notice, Meta::Notice);
+                                        $this->addMessage($invoice, $notice, Meta::Notice);
                                         break;
                                 }
                             }
@@ -1164,7 +1165,7 @@ class Completor
         if (empty($this->invoice->getCustomer()->vatTypeId)) {
             $vatTypeId = $this->isCompany() ? Api::VatTypeId_Business : Api::VatTypeId_Private;
             // NOTE: at 2026-10-16 I added a check for isNl() but that resets the vat type
-            // id of dutch companies to private as they won't have a reversed VAT invoice.
+            // id of Dutch companies to private as they won't have a reversed VAT invoice.
             if ($this->isCompany()
                 && $this->isEu()
                 && !empty($this->invoice->vatType)
@@ -1798,20 +1799,20 @@ class Completor
                 $message = sprintf($message, ...$args);
             }
             $this->result->createAndAddMessage($message, Severity::Warning, $code);
-            $this->addWarning($acumulusObject, $this->result->getByCode($code)->format(Message::Format_Plain));
+            $acumulusObject->addWarning($this->result->getByCode($code)->format(Message::Format_Plain));
         }
     }
 
     /**
-     * Helper method to add a warning to an array.
+     * Helper method to add a message to an {@see AcumulusObject}.
      *
-     * Warnings are placed in the $array under the key Meta::Warning. If no
-     * warning is set, $warning is added as a string, otherwise it becomes an
-     * array of warnings to which this $warning is added.
+     * Messages are placed in the $acumulusObject under the key Meta::{$severity}. If no
+     * message is set so far, $message is added as a string, otherwise it becomes an
+     * array of messages to which this $message is added.
      */
-    protected function addWarning(AcumulusObject $acumulusObject, string $warning, string $severity = Meta::Warning): void
+    protected function addMessage(AcumulusObject $acumulusObject, string $message, string $severity = Meta::Warning): void
     {
-        $acumulusObject->metadataAdd($severity, $warning);
+        $acumulusObject->metadataAdd($severity, $message, MetadataValue::Unique);
     }
 
     /**
@@ -1846,5 +1847,18 @@ class Completor
         }
 
         return $reports[$year];
+    }
+
+    /**
+     * Returns whether the shop might sell margin products.
+     *
+     * @return int
+     *   One of the constants {@see Config::MarginProducts_Both},
+     *   {@see Config::MarginProducts_No}, {@see Config::MarginProducts_Only},
+     *   or {@see Config::MarginProducts_Unknown}.
+     */
+    public function getMarginProducts(): int
+    {
+        return $this->config->get('marginProducts');
     }
 }

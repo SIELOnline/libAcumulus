@@ -32,6 +32,13 @@ Refactorings:
   RuntimeException, not LogicException.
 - Number:getDivisionRange: slightly smaller interval "halving".
 - Log: allow to mark logged exceptions as being silenced.
+- Collectors should not have to compute and fill in the missing value of the 3 related
+  unit amounts themselves (price ex, price inc, and vat amount). Completor should do
+  this.
+- Changed metadata handling: replaced the 'isList' by 'behaviour' which covers lists and
+  unique values handling. Also copying/cloning metadata values seemed incorrect. This also
+  led to changes to helper methods to add a message or warning to an AcumulusObject.
+
 
 8.7.2 (2026-10-30) (WC)
 -----------------------

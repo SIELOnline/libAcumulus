@@ -14,6 +14,7 @@ use Stringable;
 
 use function array_key_exists;
 use function count;
+use function in_array;
 use function is_array;
 use function is_object;
 use function is_scalar;
@@ -52,14 +53,12 @@ use function is_string;
  */
 class MetadataValue
 {
+    public const Single = 0;
+    public const Unique = 1;
+    public const List = 2;
+    public const UniqueList = self::Unique | self::List;
     protected const ScalarConstants = ['true' => true, 'false' => false, 'null' => null];
-    /**
-     * @var bool
-     *   Indicates whether the value is to be seen as a list. In fact, each MetaDataValue
-     *   is a list, possibly having only 1 value. This property only influences what is
-     *   returned with {@see get()} when we have only 0 or 1 values.
-     */
-    private bool $isList;
+
     private array $value = [];
 
     /**
@@ -78,18 +77,25 @@ class MetadataValue
         }
     }
 
-    public function __construct(bool $isList = false)
+    /**
+     * @param int $behaviour
+     *   Indicates how the value is to be seen: as a single value, a list or a set (list
+     *   with unique values). In fact, each MetaDataValue is a list, possibly having only
+     *   1 value. This property influences what is returned with {@see get()} when we have
+     *   only 0 or 1 values and what happens if we add a duplicate value.
+     */
+    public function __construct(protected int $behaviour = self::Single)
     {
-        $this->isList = $isList;
     }
 
-    /**
-     * Indicates whether this metadata value is to be seen as a list. This influences what
-     * is returned with {@see get()} when we have 0 or 1 values.
-     */
     public function isList(): bool
     {
-        return $this->isList;
+        return ($this->behaviour & self::List) !== 0;
+    }
+
+    public function allowDuplicates(): bool
+    {
+        return ($this->behaviour & self::Unique) === 0;
     }
 
     public function count(): int
@@ -103,7 +109,7 @@ class MetadataValue
      * @param mixed $value
      *   The value to add to this property. If this is a
      *   {@see array_is_list() consecutively numerically indexed array}:
-     *   - The property $isList is set to true (to correctly handle adding an empty array)
+     *   - The property $behaviour is set to true (to correctly handle adding an empty array)
      *   - And each value is added separately
      *
      * @return $this
@@ -111,14 +117,25 @@ class MetadataValue
     public function add(mixed $value): static
     {
         if (is_array($value) && array_is_list($value)) {
-            $this->isList = $this->isList || count($value) !== 1;
+
+            if (count($value) !== 1) {
+                $this->behaviour |= self::List;
+            }
             foreach ($value as $singleValue) {
-                $this->value[] = $this->simplifyValue($singleValue, 1);
+                $this->add1($singleValue);
             }
         } else {
-            $this->value[] = $this->simplifyValue($value, 1);
+            $this->add1($value);
         }
         return $this;
+    }
+
+    protected function add1(mixed $value): void
+    {
+        $value = $this->simplifyValue($value, 1);
+        if ($this->allowDuplicates() || !in_array($value, $this->value, true)) {
+            $this->value[] = $value;
+        }
     }
 
     /**
@@ -172,10 +189,10 @@ class MetadataValue
     public function get(?int $index = null): mixed
     {
         if ($index === null) {
-            return $this->isList || $this->count() > 1
+            return $this->isList() || $this->count() > 1
                 ? $this->value
                 : match ($this->count()) {
-                    0 => '',
+                    0 => null,
                     1 => $this->value[0],
                 };
         } else {

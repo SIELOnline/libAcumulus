@@ -55,7 +55,7 @@ use function strlen;
  * Field names on the child classes are copied from the API, though capitals are
  * introduced for readability and to prevent PhpStorm typo inspections.
  *
- * Metadata can be added via the {@see MetadataCollection} methods.
+ * Metadata can be added via the {@see MetadataTrait} methods.
  */
 abstract class AcumulusObject
 {

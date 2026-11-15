@@ -41,10 +41,9 @@ use function sprintf;
  * - Only necessary if no vat rate has been collected.
  * - Only possible if at least 2 out of the 3 values "unit price", "unit price inc" and
  *   "vat amount" (and their precision) are known.
- * - If only 1 amount is available a warning will be added to the line.
- *
- * @todo: do strategy lines pass here? then a warning is not needed for those.
  * - If 2 out of 3 are available, the 3rd will be set (as well as Meta::FieldsCalculated).
+ * - If only 1 amount is available a warning will be added to the line.
+ *   @todo: do strategy lines pass here? then a warning is not needed for those.
  */
 class CompleteVatRange extends BaseCompletorTask
 {
@@ -122,7 +121,7 @@ class CompleteVatRange extends BaseCompletorTask
     protected function fillMissingData(Line $line): bool
     {
         $countSet = (int) $this->exSet + (int) $this->incSet + (int) $this->vatSet;
-        if ($countSet < 2) {
+        if ($countSet <= 1) {
             $line->addWarning(
                 Message::create(
                     sprintf($this->t('message_warning_only_1_filled'), $this->t('amount_ex'), $this->t('amount_inc'), $this->t('amount_vat')),
@@ -143,85 +142,6 @@ class CompleteVatRange extends BaseCompletorTask
                 $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
             }
         }
-        return true;
-    }
-
-    /**
-     * Check the conditions and adds a vat range if necessary and possible.
-     *
-     * @deprecated, delete when new method is tested and approved.
-     * @noinspection PhpUnused
-     */
-    protected function completeVatRange(Line $line): void
-    {
-        if (isset($line->vatRate)) {
-            return;
-        }
-
-        if ((!isset($line->unitPrice) || !$line->metadataExists(Meta::PrecisionUnitPrice))
-            && $line->metadataExists(Meta::UnitPriceInc) && $line->metadataExists(Meta::PrecisionUnitPriceInc)
-            && $line->metadataExists(Meta::VatAmount) && $line->metadataExists(Meta::PrecisionVatAmount)
-        ) {
-            $line->unitPrice = $line->metadataGet(Meta::UnitPriceInc) - $line->metadataGet(Meta::VatAmount);
-            $line->metadataSet(
-                Meta::PrecisionUnitPrice,
-                $line->metadataGet(Meta::PrecisionUnitPriceInc) + $line->metadataGet(Meta::PrecisionVatAmount)
-            );
-            $line->metadataAdd(Meta::FieldsCalculated, Fld::UnitPrice);
-        }
-        if (!isset($line->unitPrice) || !$line->metadataExists(Meta::PrecisionUnitPrice)) {
-            return;
-        }
-
-        if ((!$line->metadataExists(Meta::VatAmount) || !$line->metadataExists(Meta::PrecisionVatAmount))
-            && $line->metadataExists(Meta::UnitPriceInc) && $line->metadataExists(Meta::PrecisionUnitPriceInc)
-        ) {
-            $line->metadataSet(Meta::VatAmount, $line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice);
-            $line->metadataSet(
-                Meta::PrecisionVatAmount,
-                $line->metadataGet(Meta::PrecisionUnitPriceInc) + $line->metadataGet(Meta::PrecisionUnitPrice)
-            );
-            $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
-        }
-        if (!$line->metadataExists(Meta::VatAmount) || !$line->metadataExists(Meta::PrecisionVatAmount)) {
-            return;
-        }
-
-        static::oldAddVatRangeTags($line);
-    }
-
-    /**
-     * Adds information about the range in which the vat rate will lie.
-     *
-     *  The following fields/metadata will be set:
-     *  - vatRate
-     *  - Meta::VatRateMin
-     *  - Meta::VatRateMax
-     *  - Meta::VatRateSource
-     */
-    public static function oldAddVatRangeTags(Line $line): void
-    {
-        $numerator = $line->metadataGet(Meta::VatAmount);
-        $numeratorPrecision = $line->metadataGet(Meta::PrecisionVatAmount);
-        $denominator = $line->unitPrice;
-        $denominatorPrecision = $line->metadataGet(Meta::PrecisionUnitPrice);
-
-        /** @noinspection DuplicatedCode */
-        if (Number::isZero($denominator, 0.0001)) {
-            // zero amounts (and I hope zero VAT): we cannot determine the range.
-            $line->vatRate = null;
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
-        } elseif (Number::isZero($numerator, 0.0001)) {
-            // zero VAT with non-zero amount: rate = 0
-            $line->vatRate = 0;
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact0);
-        } else {
-            $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
-            // @todo: Is this needed for some code further on in the process: comment out and see what happens.
-//            $line->vatRate = 100.0 * $range['calculated'];
-            $line->metadataSet(Meta::VatRateMin, 100.0 * $range['min']);
-            $line->metadataSet(Meta::VatRateMax, 100.0 * $range['max']);
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Calculated);
-        }
+        return $countSet >= 2;
     }
 }

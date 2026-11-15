@@ -8,8 +8,8 @@ use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 
 /**
@@ -35,13 +35,13 @@ class ItemLineCollector extends LineCollector
     }
 
     /**
-     * Collects 1 item line, both for an order or credit slip.
+     * Collects the logic fields for 1 item line, for an order or credit slip.
      *
-     * @legacy: This is a copy of old Creator code: to be integrated in this collector in
-     *   a neat/correct way!
+     * An item will contain information as detailed on the
+     * {@see \Siel\Acumulus\PrestaShop\Invoice\Item} class.
      *
      * @param Line $line
-     *   An item line with the mapped fields filled in
+     *   An item line with the mapped fields filled in.
      */
     protected function getItemLine(Line $line, PropertySources $propertySources): void
     {
@@ -49,46 +49,56 @@ class ItemLineCollector extends LineCollector
         $invoice = $propertySources['invoice'];
         /** @var \Siel\Acumulus\Invoice\Source $source */
         $source = $propertySources['source'];
-        $sign = $source->getSign();
         /** @var \Siel\Acumulus\Invoice\Item $item */
         $item = $propertySources['item'];
         /** @var array $shopItem */
         $shopItem = $item->getShopObject();
 
-        // 'unit_amount' (table order_detail_tax) is not always set: assume
-        // no discount if not set, so not necessary to add the value.
-        if (isset($shopItem['unit_amount']) &&
-            !Number::floatsAreEqual($shopItem['unit_amount'], $line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice)
-        ) {
-            $line->metadataSet(
-                Meta::LineDiscountVatAmount,
-                $shopItem['unit_amount'] - ($line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice)
-            );
+        if ($source->getType() === Source::CreditNote) {
+            // The amounts of the order_detail_tax record may be incorrect if not all
+            // articles were returned.
+            $line->metadataRemove(Meta::VatAmount);
+            $line->metadataRemove(Meta::LineVatAmount);
+        } elseif ($this->lineWasDiscounted($line)) {
+            $realLineVatAmount = $line->metadataGet(Meta::LineAmountInc) - $line->metadataGet(Meta::LineAmount);
+            $line->metadataSet(Meta::LineDiscountVatAmount, $line->metadataGet(Meta::LineVatAmount) - $realLineVatAmount);
+            $line->metadataRemove(Meta::VatAmount);
+            $line->metadataRemove(Meta::LineVatAmount);
         }
 
-        // Try to get the vat rate:
-        // The field 'rate' comes from order->getOrderDetailTaxes() and is thus only
-        // available for orders and was not filled before PS1.6.1.1. So, check if the
-        // field is available.
-        // The fields 'unit_amount' and 'total_amount' (also from table order_detail_tax)
-        // are based on the discounted product price and thus cannot be used to get the
-        // vat rate.
-        if (isset($shopItem['rate'])) {
-            $line->vatRate = $shopItem['rate'];
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact);
-        } else {
-            $line->unitPrice = $sign * $shopItem['unit_price_tax_excl'];
-            $line->metadataSet(Meta::VatAmount, $sign * ($shopItem['unit_price_tax_incl'] - $shopItem['unit_price_tax_excl']));
-            $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);
-            $line->metadataSet(Meta::PrecisionVatAmount, $this->precision);
-            $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
-        }
+
         $taxRulesGroupId = isset($shopItem['id_tax_rules_group']) ? (int) $shopItem['id_tax_rules_group'] : 0;
         // VAT lookup metadata should be based on the address used for VAT calculations.
         $vatBasedOn = $invoice->getCustomer()->getMainAddressType();
         $addressId = (int) ($vatBasedOn === AddressType::Invoice
             ? $source->getOrder()->getShopObject()->id_address_invoice
             : $source->getOrder()->getShopObject()->id_address_delivery);
-        $this->addVatRateLookupMetadata($line, $addressId, $taxRulesGroupId);
+        $this->addVatRateLookupMetadata($line, $propertySources['invoice'], $taxRulesGroupId);
+    }
+
+    /**
+     * Returns whether this order line was discounted.
+     *
+     * Discounts based on coupons, cart discounts in PS, do get their own DiscountLine,
+     * or lines when they are split over multiple VAT rates. So an ItemLine should contain
+     * amounts related to the price before a coupon discount (though they may include
+     * catalogue or volume discounts).
+     *
+     * Most amounts are correct, but the amounts that come from the order_detail_tax
+     * table, 'unit_amount' and 'total_amount', are after discount, so ItemLine properties
+     * or metadata based on these, should be corrected or unset. But this information is
+     * necessary to split a coupon over various VAT rates that appear in this invoice.
+     *
+     * NOTE: For a credit note, it is possible that not all items of this line were
+     * returned, making 'total_amount' incorrect, and/or that any voucher discount applied
+     * is now cancelled fully and thus spread over the returned articles only, making a
+     * discounted 'unit_amount' incorrect. So we should not call this for credit notes.
+     */
+    protected function lineWasDiscounted(Line $line): bool
+    {
+        return !Number::floatsAreEqual(
+            $line->metadataGet(Meta::LineVatAmount) ,
+            $line->metadataGet(Meta::LineAmountInc) - $line->metadataGet(Meta::LineAmount)
+        );
     }
 }

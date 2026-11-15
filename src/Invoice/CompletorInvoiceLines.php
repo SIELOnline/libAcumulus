@@ -28,6 +28,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 
 use function count;
+use function is_float;
 use function is_scalar;
 
 /**
@@ -110,6 +111,8 @@ class CompletorInvoiceLines
     protected function completeInvoiceLinesRecursive(Invoice $invoice): void
     {
         $this->convertLinesToEuro($invoice->getLines(), $invoice->metadataGet(Meta::Currency));
+        $this->completeVatRanges($invoice->getLines());
+        $this->completeLineRequiredData($invoice->getLines());
         // @todo: we could combine all completor phase methods of getting the
         //   correct vat rate:
         //     - possible vat rates
@@ -198,6 +201,25 @@ class CompletorInvoiceLines
     }
 
     /**
+     * Completes the vat range in an early phase of the line completion.
+     *
+     * Especially used to fill missing unit amounts.
+     *
+     * @param Line[] $lines
+     */
+    private function completeVatRanges(array $lines): void
+    {
+        foreach ($lines as $line) {
+            $this->completor->getCompletorTask('Line', 'VatRange')->complete($line);
+            // Recursively complete vat ranges.
+            if ($line->hasChildren()) {
+                $this->completeVatRanges($line->getChildren());
+            }
+
+        }
+    }
+
+    /**
      * Corrects 'calculated' vat rates.
      *
      * Tries to correct 'calculated' vat rates for rounding errors by matching
@@ -277,6 +299,7 @@ class CompletorInvoiceLines
             // Single match: fill it in as the vat rate for this line.
             $line->vatRate = $vatRate;
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor_Range);
+            $line->metadataAdd(Meta::FieldsCalculated, Fld::VatRate);
         }
     }
 
@@ -391,12 +414,11 @@ class CompletorInvoiceLines
     protected function completeLineRequiredData(array $lines, ?Line $parent = null): void
     {
         foreach ($lines as $line) {
-            $fieldsCalculated = [];
             // Easy gains first. Known usages: Magento.
             if (!$line->metadataExists(Meta::VatAmount) && $line->metadataExists(Meta::LineVatAmount)) {
                 // Known usages: Magento.
                 $line->metadataSet(Meta::VatAmount, $line->metadataGet(Meta::LineVatAmount) / $line->quantity);
-                $fieldsCalculated[] = Meta::VatAmount . ' (from ' . Meta::LineVatAmount . ')';
+                $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount . ' (from ' . Meta::LineVatAmount . ')');
             }
             if (!$line->metadataExists(Meta::SubType) && $parent !== null) {
                 // Known usages: WooCommerce TM Extra Product Options that adds
@@ -407,7 +429,7 @@ class CompletorInvoiceLines
             if (!isset($line->unitPrice)) {
                 // With margin scheme, the unit price should be known but may
                 // have ended up in the unit price inc.
-                if (isset($line->costPrice)) {
+                if ($this->completor->getMarginProducts() !== Config::MarginProducts_No && isset($line->costPrice) ) {
                     if ($line->metadataExists(Meta::UnitPriceInc)) {
                         $line->unitPrice = $line->metadataGet(Meta::UnitPriceInc);
                     }
@@ -425,7 +447,7 @@ class CompletorInvoiceLines
                     //     We cannot fill in unit price reliably, so better to
                     //     leave it empty and fail clearly.
                     // }
-                    $fieldsCalculated[] = Fld::UnitPrice;
+                    $line->metadataAdd(Meta::FieldsCalculated, Fld::UnitPrice);
                 }
             }
 
@@ -452,7 +474,7 @@ class CompletorInvoiceLines
                     //     We cannot fill in unit price inc reliably, so we
                     //     leave it empty as it is metadata after all.
                     // }
-                    $fieldsCalculated[] = Meta::UnitPriceInc;
+                    $line->metadataAdd(Meta::FieldsCalculated, Meta::UnitPriceInc);
                 }
             }
 
@@ -466,10 +488,9 @@ class CompletorInvoiceLines
                         // Allow strategy phase to also add a vat rate to the child lines.
                         $line->metadataSet(Meta::VatRateSource, VatRateSource::Strategy);
                     }
-                } elseif ($line->metadataExists(Meta::VatAmount) && isset($line->unitPrice)) {
+                } elseif ($line->metadataExists(Meta::VatAmount) && isset($line->unitPrice) && !$line->metadataExists(Meta::VatRateMin)) {
                     // This may use the easy gain. Known usages: Magento.
-                    // Set (overwrite the tag vatrate-source) 'vatrate' and
-                    // accompanying tags.
+                    // Set (overwrite 'vatrate-source'), 'vatrate' and accompanying tags.
                     $precision = 0.01;
                     // If the amounts are the sum of amounts taken from
                     // children products, the precision may be lower.
@@ -479,12 +500,8 @@ class CompletorInvoiceLines
                     $line->metadataSet(Meta::PrecisionUnitPrice, $precision);
                     $line->metadataSet(Meta::PrecisionVatAmount, $precision);
                     $this->completor->getCompletorTask('Line', 'VatRange')->complete($line);
-                    $fieldsCalculated[] = Fld::VatRate;
+                    $line->metadataAdd(Meta::FieldsCalculated, Fld::VatRate);
                 }
-            }
-
-            if (count($fieldsCalculated) > 0) {
-                $line->metadataAdd(Meta::FieldsCalculated, $fieldsCalculated);
             }
 
             // Recursively complete the required data.
@@ -501,24 +518,21 @@ class CompletorInvoiceLines
      *   Array of vat rate infos.
      *
      * @return float|false|null
-     *   If all vat rate in $vatRates are equal,that vat rate, null if
-     *   $matchedVatRates is empty, false otherwise (multiple but different vat
-     *   rates).
+     *   - If all vat rates in $vatRates are equal: that vat rate.
+     *   - null if $matchedVatRates is empty.
+     *   - false otherwise: multiple but different vat rates.
      */
-    protected function getUniqueVatRate(array $vatRateInfos): float|bool|null
+    protected function getUniqueVatRate(array $vatRateInfos): float|false|null
     {
-        return array_reduce($vatRateInfos, static function ($carry, $matchedVatRate) {
+        return array_reduce($vatRateInfos, static function (float|false|null $carry, $matchedVatRate): float|false {
             if ($carry === null) {
                 // 1st item: return its vat rate.
                 return (float) $matchedVatRate[Fld::VatRate];
-            } elseif ($carry !== false && Number::floatsAreEqual($carry, $matchedVatRate[Fld::VatRate])) {
-                // Note that in PHP: '21' == '21.0000' returns true. So using ==
-                // works. Vat rate equals all previous vat rates: return that
-                // vat rate.
+            } elseif (is_float($carry) && Number::floatsAreEqual($carry, $matchedVatRate[Fld::VatRate])) {
+                // Vat rate equals all previous vat rates: return that vat rate.
                 return $carry;
             } else {
-                // Vat rate does not match previous vat rates or carry is
-                // already false: return false.
+                // Vat rate does not match previous vat rates or carry is already false:
                 return false;
             }
         }, null);
@@ -811,16 +825,13 @@ class CompletorInvoiceLines
                 } elseif ($line->metadataExists(Meta::LineDiscountVatAmount) && !$line->metadataExists(Meta::LineDiscountAmountInc)) {
                     $line->metadataSet(
                         Meta::LineDiscountAmountInc,
-                        $line->metadataGet(Meta::LineDiscountVatAmount)
-                        / $line->vatRate * (100 + $line->vatRate)
+                        $line->metadataGet(Meta::LineDiscountVatAmount) / $line->vatRate * (100 + $line->vatRate)
                     );
                     $fieldsCalculated[] = Meta::LineDiscountAmountInc;
                 }
-            } elseif ($line->metadataGet(Meta::VatRateSource) == VatRateSource::Strategy && !empty(
-                $line->metadataGet(
-                    Meta::StrategySplit
-                )
-                )) {
+            } elseif ($line->metadataGet(Meta::VatRateSource) == VatRateSource::Strategy
+                && !empty($line->metadataGet(Meta::StrategySplit))
+            ) {
                 if (isset($line->unitPrice) && $line->metadataExists(Meta::UnitPriceInc)) {
                     if (!$line->metadataExists(Meta::LineAmount)) {
                         $line->metadataSet(Meta::LineAmount, $line->unitPrice * $line->quantity);

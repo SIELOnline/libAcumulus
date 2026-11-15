@@ -30,7 +30,13 @@ class Mappings
         AddressType::Invoice,
         AddressType::Shipping,
         LineType::Item,
-        // @todo: add other line types when defining mappings for them.
+        LineType::Shipping,
+        LineType::GiftWrapping,
+        LineType::PaymentFee,
+        LineType::Other,
+        LineType::Discount,
+        LineType::Manual,
+        LineType::Voucher,
         EmailAsPdfType::Invoice,
         EmailAsPdfType::PackingSlip,
         DataType::Product,
@@ -260,6 +266,8 @@ class Mappings
 //                Meta::VatClassId => '[product::getVatClassId()]',
 //                Meta::VatClassName => '[product::getVatClassName()]',
                 Meta::Id => '[item::getId()]',
+                // The following specification will not be valid for all webshops.
+                // Override in ShopCapabilities::getDefaultShopMappings().
                 Meta::ProductId => '[item::getProduct()::getId()]',
             ],
             DataType::StockTransaction => [

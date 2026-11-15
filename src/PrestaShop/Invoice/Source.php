@@ -30,7 +30,6 @@ use Validate;
 
 use function is_array;
 use function sprintf;
-use function strlen;
 
 /**
  * Wraps a PrestaShop order in an invoice source object.
@@ -70,10 +69,7 @@ class Source extends BaseSource
     {
         return $this->getType() === Source::Order
             ? $this->getShopObject()->reference
-            : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf(
-                '%06d',
-                $this->getShopObject()->id
-            );
+            : sprintf('%s%06d', Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id), $this->getShopObject()->id);
     }
 
     /**
@@ -94,14 +90,17 @@ class Source extends BaseSource
      */
     public function getDate(): DateTimeInterface
     {
+        /**
+         * @noinspection PhpUndefinedFieldInspection Property date_add is defined in both
+         *   Order and OrderSlip, not in their common base class.
+         */
         return new DateTimeImmutable($this->getShopObject()->date_add);
     }
 
     /**
      * Returns the status of this order.
      *
-     * @noinspection PhpUnused
-     *   Called via getStatus().
+     * @noinspection PhpUnused Called via getStatus().
      */
     protected function getStatusOrder(): int|null
     {
@@ -111,14 +110,12 @@ class Source extends BaseSource
     /**
      * Returns the status of this credit note.
      *
-     * @noinspection PhpDocSignatureInspection PHP 8.2: null is a standalone type
      * @return null
      *   A credit note in PrestaShop does not have a state.
      *
-     * @todo: PHP8.2: standalone null is allowed
      * @noinspection PhpUnused Called via getStatus().
      */
-    protected function getStatusCreditNote(): int|null
+    protected function getStatusCreditNote(): null
     {
         return null;
     }
@@ -164,6 +161,10 @@ class Source extends BaseSource
             }
         } else {
             // Assumption: the last modified date is the date of the actual reimbursement.
+            /**
+             * @noinspection PhpUndefinedFieldInspection Property date_add is defined in
+             *   both Order and OrderSlip, not in their common base class.
+             */
             $paymentDate = $this->getShopObject()->date_upd;
         }
 
@@ -187,7 +188,10 @@ class Source extends BaseSource
     public function getCurrency(): AcumulusCurrency
     {
         $currency = Currency::getCurrencyInstance($this->getOrder()->shopObject->id_currency);
-        /** @noinspection PhpCastIsUnnecessaryInspection  conversion_rate contains the string representation of a float */
+        /**
+         * @noinspection PhpUndefinedFieldInspection The property conversion_rate exists
+         *   in both Order and OrderSlip
+         */
         return new AcumulusCurrency($currency->iso_code, 1.0 / $this->getShopObject()->conversion_rate, true);
     }
 
@@ -230,10 +234,8 @@ class Source extends BaseSource
             // Use the cart rules to correct these errors.
             /** @var OrderSlip $creditNote */
             $creditNote = $this->getShopObject();
-            $amountEx = $creditNote->total_products_tax_excl
-                + $creditNote->total_shipping_tax_excl;
-            $amountInc = $creditNote->total_products_tax_incl
-                + $creditNote->total_shipping_tax_incl;
+            $amountEx = $creditNote->total_products_tax_excl + $creditNote->total_shipping_tax_excl;
+            $amountInc = $creditNote->total_products_tax_incl + $creditNote->total_shipping_tax_incl;
             /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
             if ((int) $creditNote->order_slip_type !== VoucherRefundType::PRODUCT_PRICES_REFUND) {
                 /** @var Order $order */
@@ -354,23 +356,37 @@ class Source extends BaseSource
     }
 
     /**
-     * Returns records from:
-     * - Source::Order: order detail table + order_detail_tax.
-     * - Source::CreditNote: order_slip_detail + order_detail.
+     * Returns records from several joined tables containing item line information.
+     *
+     * {@see Order::getOrderDetailTaxes()} returns joined records from the tables:
+     * - order_detail (order lines)
+     * - order_detail_tax (tax details for order lines)
+     * - tax (tax classes)
+     *
+     * {@see OrderSlip::getOrdersSlipDetail()} returns joined records from the tables:
+     * - order_slip_detail (credit note lines, with column 'id_order_detail' referring to
+     *   order lines (not a counter within an order slip).
+     *
+     * - Source::Order: order_detail_tax.
+     * - Source::CreditNote: order_slip_detail + order_detail_tax, the latter only for
+     *   order details that are refunded and thus are referenced in order_slip_detail.
+     *
+     * See {@see \Siel\Acumulus\PrestaShop\Invoice\Item} for more information.
      *
      * @noinspection PhpMissingParentCallCommonInspection Default base method.
      */
     protected function createItems(): array
     {
         if ($this->getType() === Source::Order) {
-            // Note: these methods return "raw" (and merged) database results, not objects
-            //   from the PrestaShop datamodel.
             $orderDetails = $this->mergeProductLines(
                 $this->getShopObject()->getProductsDetail(),
                 $this->getShopObject()->getOrderDetailTaxes()
             );
         } else {
-            $orderDetails = OrderSlip::getOrdersSlipProducts($this->getId(), $this->getOrder()->getShopObject());
+            $orderDetails = $this->mergeProductLines(
+                OrderSlip::getOrdersSlipProducts($this->getId(), $this->getOrder()->getShopObject()),
+                $this->getOrder()->getShopObject()->getOrderDetailTaxes()
+            );
         }
         $items = [];
         foreach ($orderDetails as $orderDetail) {
@@ -380,18 +396,16 @@ class Source extends BaseSource
     }
 
     /**
-     * Merges the product and tax details arrays.
+     * Merges arrays of records on the field 'id_order_detail'.
      *
      * @param array $productLines
-     *   An array of order line information, the fields are about the product of this
-     *   order line.
+     *   An array of order (slip) line records ((order_slip_detail +) order_detail in PS).
      * @param array $taxLines
-     *   An array of line tax information, the fields are about the tax on this
-     *   order line.
+     *   An array of tax information records (order_detail_tax + tax in PS).
      *
      * @return array
-     *   An array with the product and tax lines merged based on the field
-     *   'id_order_detail', the unique identifier for an order line.
+     *   An array with the product and tax records joined on the field 'id_order_detail',
+     *   the unique identifier for an order line.
      */
     protected function mergeProductLines(array $productLines, array $taxLines): array
     {
@@ -407,9 +421,10 @@ class Source extends BaseSource
                     // A 2nd tax line for a product line: not common in the Netherlands
                     Container::getContainer()->getLog()->notice(
                         sprintf(
-                            '%s: Another tax detail found for order item line %d (of order %d)',
+                            '%s: Another tax detail found for order item line %d (of %s %d)',
                             __METHOD__,
                             $taxLine['id_order_detail'],
+                            $this->t($this->getType()),
                             $this->getId()
                         )
                     );
@@ -419,15 +434,19 @@ class Source extends BaseSource
                 }
             } else {
                 // We have a tax line for a non-product item line ([SIEL #200452]).
-                Container::getContainer()->getLog()->notice(
-                    sprintf(
-                        '%s: Tax detail found for order item line %d (of order %d) without product info',
-                        __METHOD__,
-                        $taxLine['id_order_detail'],
-                        $this->getId()
-                    )
-                );
-                $result[$taxLine['id_order_detail']] = $taxLine;
+                // This is to be expected for credit notes where not all products were
+                // returned, but not for orders.
+                if ($this->getType() === Source::Order) {
+                    Container::getContainer()->getLog()->notice(
+                        sprintf(
+                            '%s: Tax detail found for order item line %d (of %s %d) without product info',
+                            __METHOD__,
+                            $taxLine['id_order_detail'],
+                            $this->t($this->getType()),
+                            $this->getId()
+                        )
+                    );
+                }
             }
         }
         return $result;

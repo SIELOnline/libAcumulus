@@ -72,6 +72,7 @@ class Translations extends TranslationCollection
         'message_warning_missing_amount_added' => 'Het factuurbedrag klopt niet met het totaal van de regels. Daarom is er een correctieregel toegevoegd met een bedrag (ex. btw) van €%1$.2f en een btw bedrag van €%2$.2f. ' . self::sharedNl,
         'message_warning_missing_amount_warn' => 'Het factuurbedrag klopt niet met het totaal van de regels. %1$s. ' . self::sharedNl,
         'message_warning_missing_amount_spec' => 'het %1$s wijkt €%2$.2f af',
+        'message_warning_only_1_filled' => 'Slechts 1 v/d 3 bedragen %1$s, %2$s, en %3$s is ingevuld: kan geen btw-%% bereik berekenen.',
         'amount_ex' => 'bedrag (ex. btw)',
         'amount_inc' => 'bedrag (incl. btw)',
         'amount_vat' => 'btw-bedrag',

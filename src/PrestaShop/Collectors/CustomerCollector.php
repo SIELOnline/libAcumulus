@@ -13,6 +13,7 @@ use Siel\Acumulus\Data\AddressType;
  */
 class CustomerCollector extends BaseCustomerCollector
 {
+    /** @noinspection PhpMissingParentCallCommonInspection  default implementation */
     protected function getVatBasedOn(): string
     {
         return Configuration::get($this->getContainer()->getShopCapabilities()->getFiscalAddressSetting());

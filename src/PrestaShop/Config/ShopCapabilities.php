@@ -13,9 +13,12 @@ use Siel\Acumulus\Data\AddressType;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\LineType;
+use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Meta;
 use TaxRulesGroup;
+
+use function sprintf;
 
 /**
  * Defines the PrestaShop web shop specific capabilities.
@@ -53,6 +56,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::PostalCode => '[address_invoice::postcode]',
                 Fld::City => '[address_invoice::city]',
                 Meta::ShopCountryId => '[address_invoice::id_country]',
+                Meta::AddressId => '[address_invoice::id]',
             ],
             AddressType::Shipping => [ // address_shipping instanceof Address
                 Fld::CompanyName1 => '[address_shipping::company]',
@@ -62,6 +66,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::PostalCode => '[address_shipping::postcode]',
                 Fld::City => '[address_shipping::city]',
                 Meta::ShopCountryId => '[address_shipping::id_country]',
+                Meta::AddressId => '[address_shipping::id]',
             ],
             EmailAsPdfType::Invoice => [
                 Fld::EmailTo => '[source::getOrder()::getShopObject()::getCustomer()::email]',
@@ -78,10 +83,61 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::Quantity => '[item::getShopObject()::product_quantity]',
                 Fld::CostPrice => '[sign*item::getShopObject()::purchase_supplier_price]',
                 Fld::UnitPrice => '[sign*item::getShopObject()::unit_price_tax_excl]',
+                Fld::VatRate => '[item::getShopObject()::rate]',
                 Meta::UnitPriceInc => '[sign*item::getShopObject()::unit_price_tax_incl]',
                 Meta::LineAmount => '[sign*item::getShopObject()::total_price_tax_excl]',
                 Meta::LineAmountInc => '[sign*item::getShopObject()::total_price_tax_incl]',
-                Fld::VatRate => '[item::getShopObject()::rate]',  //@todo: not set for orderSlips: add logic, also to set Meta::VatRateSource
+                Meta::VatRateSource => VatRateSource::Exact,
+                // In case of a discount that applies to the collected line, the following
+                // 2 fields will be unset, but will be calculated in the Completor phase.
+                Meta::VatAmount => '[sign*item::getShopObject()::unit_amount]',
+                Meta::LineVatAmount => '[sign*item::getShopObject()::total_amount]',
+            ],
+            LineType::Shipping => [
+                Fld::Product => sprintf('[carrier::name|"%s"]', $this->t('shipping_costs')),
+                Fld::Quantity => 1,
+                Fld::UnitPrice => '[sign*source::getShopObject()::total_shipping_tax_excl]',
+                Fld::VatRate => '[source::getOrder()::getShopObject()::carrier_tax_rate]',
+                Meta::UnitPriceInc => '[sign*source::getShopObject()::total_shipping_tax_incl]',
+                Meta::VatRateSource => VatRateSource::Exact,
+                // The shipping costs excl. VAT is rounded to a cent, so recalculating
+                // this amount might prevent rounding differences for this line.
+                Meta::RecalculatePrice => Fld::UnitPrice,
+            ],
+            LineType::GiftWrapping => [
+                Fld::Product => $this->t('gift_wrapping'),
+                Fld::Quantity => 1,
+                Fld::UnitPrice => '[sign*source::getShopObject()::total_wrapping_tax_excl]',
+                Meta::UnitPriceInc => '[sign*source::getShopObject()::total_wrapping_tax_incl]',
+                // The gift wrapping fee setting is stored excl. VAT and rounded to a
+                // cent, while on the order/invoice it appears as an amount incl. VAT
+                // rounded to a cent. So recalculating the price ex might prevent rounding
+                // differences for this line.
+                Meta::PrecisionUnitPrice => 0.01,
+                Meta::PrecisionUnitPriceInc => 0.01,
+                Meta::RecalculatePrice => Fld::UnitPrice,
+            ],
+            LineType::PaymentFee => [
+                Fld::Product => $this->t('payment_costs'),
+                Fld::Quantity => 1,
+                /**
+                 * Typically, 2 our of 3 of the following fields will be set by our {@see ThirdPartyModuleSupport} class,
+                 * so we cannot add precision metadata.
+                 */
+                Fld::UnitPrice => sprintf('[sign*paymentFeeLineInfo::%s]', Fld::UnitPrice),
+                Fld::VatRate => sprintf('[paymentFeeLineInfo::%s]', Fld::VatRate),
+                Meta::UnitPriceInc => sprintf('[sign*paymentFeeLineInfo::metadataGet("%s")]', Meta::UnitPriceInc),
+            ],
+            LineType::Discount => [
+                Fld::ItemNumber => '[discountLineInfo::id_cart_rule]',
+                Fld::Product => sprintf('["%s"+discountLineInfo::name]', $this->t('discount_code')),
+                Fld::Quantity => 1,
+                Fld::UnitPrice => '[-sign*discountLineInfo::value_tax_excl]',
+                Meta::UnitPriceInc => '[-sign*discountLineInfo::value]',
+                Meta::PrecisionUnitPrice => 0.01,
+                Meta::PrecisionUnitPriceInc => 0.01,
+                // If no match is found, this line may be split.
+                Meta::StrategySplit => true,
             ],
         ];
     }

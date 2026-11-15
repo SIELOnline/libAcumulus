@@ -16,12 +16,11 @@ use Siel\Acumulus\Meta;
  *
  * Currently, we support:
  * - Payment fees from the Mollie module.
- * - Payment fees from the "Paypal with a fee" module.
+ * - Payment fees from the "PayPal with a fee" module.
  */
-class ThirdPartyModuleSupport
+readonly class ThirdPartyModuleSupport
 {
-
-    public function __construct(private readonly Source $source)
+    public function __construct(private Source $source)
     {
     }
 
@@ -43,7 +42,7 @@ class ThirdPartyModuleSupport
     }
 
     /**
-     * If set, adds a line for a Mollie payment fee.
+     * If set, adds a line for a "Mollie" payment fee.
      *
      * @param Line[] $lineInfos
      *
@@ -59,11 +58,10 @@ class ThirdPartyModuleSupport
                 /** @noinspection PhpUndefinedMethodInspection false positive (why?) */
                 $paymentFee = $paymentFeeRepository->findOneBy(['id_order' => $this->source->getId()]);
                 if ($paymentFee instanceof MolOrderPaymentFee) {
-                    $sign = $this->source->getSign();
                     $line = new Line();
                     $line->setType(LineType::PaymentFee);
-                    $line->unitPrice = $sign * $paymentFee->fee_tax_excl;
-                    $line->metadataSet(Meta::UnitPriceInc, $sign * $paymentFee->fee_tax_incl);
+                    $line->unitPrice = $paymentFee->fee_tax_excl;
+                    $line->metadataSet(Meta::UnitPriceInc, $paymentFee->fee_tax_incl);
                     $lineInfos[] = $line;
                 }
             }
@@ -72,11 +70,13 @@ class ThirdPartyModuleSupport
     }
 
     /**
-     * If set, adds a line for a Paypal with a Fee payment fee.
+     * If set, adds a line for a "PayPal with a Fee" payment fee.
      *
      * @param Line[] $lineInfos
      *
      * @return Line[]
+     *
+     * @noinspection PhpSameParameterValueInspection
      */
     private function addPaypalWithAFeeLineInfos(array $lineInfos): array
     {

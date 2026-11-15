@@ -8,6 +8,8 @@ This file contains a historical overview of changes in our code.
 Features:
 - PS: New releases of the module zip are now stored in a GitHub repository, and the module
   checks for new releases and shows a message on its own pages.
+- PS: Thoroughly tested invoice creation, discovering some small possible errors and
+  improving precision to prevent some off by a (few) cent(s) cases.
 - WC: Provide visual feedback about the "mail document" action on the order list page.
 - ALL: FieldExpander now:
   - Also accepts "-sign*" at the beginning of a field specification.
@@ -23,6 +25,11 @@ Bugs:
 - ALL: FieldExpander could fail on a scalar value being passed as property source.
 
 Refactorings:
+- PS: Thoroughly tested invoice creation leading to many changes:
+  - Moved all "simple" assignments from the collectors to a mapping in
+    ShopCapabilities::getDefaultShopMappings().
+  - Added a number of recalculate unit price instructions to improve precision.
+  - ALL: streamlined vat range completion.
 - Mappings: FieldExpander no longer casts numeric values. Distinguishing phone numbers
   from ints/floats proved to be too hard to do without context. So the mapping now returns
   what it found, the AcumulusProperty will cast it, if it is a numeric field. Metadata

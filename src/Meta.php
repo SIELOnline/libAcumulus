@@ -41,6 +41,7 @@ interface Meta
      * - Customer (available via contactYourId)
      */
     public const Id = 'meta-id';
+    public const AddressId = 'meta-address-id'; // to distinguish it from customer id.
     /**
      * Messages can be added at any level and are placed at the level it applies to
      * (order, order line, ...). It tells that the code discovered a problem (warning) or
@@ -225,18 +226,18 @@ interface Meta
     public const LineVatAmount = 'meta-line-vatamount';
     /**
      * Creator->Strategy: the discount amount ex vat that was applied to this
-     * line (used by the SplitKnownDiscountLine strategy, Magento only).
+     * line (used by the SplitKnownDiscountLine strategy, PS+MA).
      */
     public const LineDiscountAmount = 'meta-line-discount-amount';
     /**
      * Creator->Strategy: the discount amount inc vat that was applied to this
-     * line (used by the SplitKnownDiscountLine strategy, Magento only).
+     * line (used by the SplitKnownDiscountLine strategy, PS+MA).
      */
     public const LineDiscountAmountInc = 'meta-line-discount-amountinc';
     public const LineDiscountAmountIncCorrected = 'meta-line-discount-amountinc-corrected';
     /**
      * Creator -> Strategy: the discount vat amount that was applied to this
-     * line (used by the SplitKnownDiscountLine strategy, Magento only).
+     * line (used by the SplitKnownDiscountLine strategy, PS+MA).
      */
     public const LineDiscountVatAmount = 'meta-line-discount-vatamount';
 

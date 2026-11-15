@@ -9,16 +9,17 @@ use Siel\Acumulus\Collectors\CollectorManager as BaseCollectorManager;
 
 /**
  * CollectorManager contains a PrestaShop specific override for
- * {@see \Siel\Acumulus\Collectors\CollectorManager::setPropertySourcesForSource()}.
+ * {@see \Siel\Acumulus\Collectors\CollectorManager::addShopPropertySources()}.
  *
  * @noinspection PhpUnused  Instantiated via the Container
  */
 class CollectorManager extends BaseCollectorManager
 {
+    /** @noinspection PhpMissingParentCallCommonInspection empty parent */
     public function addShopPropertySources(): void
     {
         /** @var \Order $order */
-        $order = $this->getPropertySources()['source']->getOrder()->getShopObject();
+        $order = $this->getPropertySources()->source->getOrder()->getShopObject();
         $this->getPropertySources()->address_invoice = new Address($order->id_address_invoice);
         $this->getPropertySources()->address_shipping = new Address($order->id_address_delivery);
     }

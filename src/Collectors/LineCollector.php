@@ -9,7 +9,6 @@ use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
-use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Item;
 use Siel\Acumulus\Meta;
 
@@ -106,7 +105,7 @@ class LineCollector extends SubTypedCollector
     {
         $acumulusObject->setType($this->subType);
         // ItemLineCollectors only: add the {@see Product} as a property source.
-        $item = $propertySources->item ?? null;
+        $item = $propertySources['item'] ?? null;
         if ($item instanceof Item) {
             /** @deprecated use item::getProduct()::... */
             $propertySources['product'] = $item->getProduct();
@@ -143,71 +142,5 @@ class LineCollector extends SubTypedCollector
     protected function getShippingMethodName(mixed ...$args): string
     {
         return $this->t('shipping_costs');
-    }
-
-    /**
-     * Adds information about the range in which the vat rate will lie.
-     *
-     * If a web shop does not store the vat rates used in the order, we must
-     * calculate them using a (product) price and the vat on it. But as web
-     * shops often store these numbers rounded to cents, the vat rate
-     * calculation becomes imprecise. Therefore, we compute the range in which
-     * it will lie and will let the Completor do a comparison with the actual
-     * vat rates that an order can have.
-     * - If $denominator = 0 (free product), the vat rate will be set to null
-     *   and the Completor will try to get this line listed under the correct
-     *   vat rate.
-     * - If $numerator = 0, the vat rate will be set to 0 and be treated as if it
-     *   is an exact vat rate, not a vat range.
-     *
-     *  The following fields and metadata will be set/added::
-     *  - vatRate
-     *  - 'vatamount'
-     *  - 'meta-vatrate-min'
-     *  - 'meta-vatrate-max'
-     *  - 'meta-vatamount-precision'
-     *  - 'meta-vatrate-source'
-     *
-     * @param float $numerator
-     *   The amount of VAT as received from the web shop.
-     * @param float $denominator
-     *   The price of a product excluding VAT as received from the web shop.
-     * @param float $numeratorPrecision
-     *   The precision used when rounding the number. This means that the
-     *   original numerator will not differ more than half of this.
-     * @param float $denominatorPrecision
-     *   The precision used when rounding the number. This means that the
-     *   original denominator will not differ more than half of this.
-     *
-     * @deprecated : Move this from the collector to the completor phase:
-     *   DONE left for reference.
-     */
-    public static function addVatRangeTags(
-        Line $line,
-        float $numerator,
-        float $denominator,
-        float $numeratorPrecision = 0.01,
-        float $denominatorPrecision = 0.01
-    ): void {
-        if (Number::isZero($denominator, 0.0001)) {
-            // A zero amount (and I hope zero VAT): we cannot determine the range.
-            $line->vatRate = null;
-            $line->metadataSet(Meta::VatAmount, $numerator);
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
-        } elseif (Number::isZero($numerator, 0.0001)) {
-            // zero VAT with non-zero amount: rate = 0
-            $line->vatRate = 0;
-            $line->metadataSet(Meta::VatAmount, $numerator);
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact0);
-        } else {
-            $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
-            $line->vatRate = 100.0 * $range['calculated'];
-            $line->metadataSet(Meta::VatRateMin, 100.0 * $range['min']);
-            $line->metadataSet(Meta::VatRateMax, 100.0 * $range['max']);
-            $line->metadataSet(Meta::VatAmount, $numerator);
-            $line->metadataSet(Meta::PrecisionUnitPrice, $denominatorPrecision);
-            $line->metadataSet(Meta::PrecisionVatAmount, $numeratorPrecision);
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Calculated);
-        }
     }
 }

@@ -71,7 +71,7 @@ abstract class Event
      *
      * This event allows you to:
      * - Add property sources to the $collectorManager.
-     *   <code>$propertySources->add('bookingInfo', Bookings::getByOrderLine($item->getId());</code>
+     *   <code>$propertySources['bookingInfo'] = Bookings::getByOrderLine($item->getId();</code>
      * - Directly set some values or metadata on the line.
      *   <code>$line->itemNumber = $shippingLineInfo->moduleId;</code>
      * - Prevent a line from being collected and added to the invoice by setting the

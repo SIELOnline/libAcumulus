@@ -74,7 +74,7 @@ class Collector3rdPartyPluginSupport
     public function itemLineCollectBeforeBookings(PropertySources $propertySources): void
     {
         /** @var \Siel\Acumulus\WooCommerce\Invoice\Item $item */
-        $item = $propertySources->item;
+        $item = $propertySources['item'];
         if (($item->getProduct() !== null) && function_exists('is_wc_booking_product')) {
             $product = $item->getProduct()->getShopObject();
             if (is_wc_booking_product($product)) {
@@ -84,10 +84,10 @@ class Collector3rdPartyPluginSupport
                     // line, but if that occurs, only the 1st booking will be added as a
                     // property source.
                     $booking = new WC_Booking(reset($booking_ids));
-                    $propertySources->booking = $booking;
+                    $propertySources['booking'] = $booking;
                     $resource = $booking->get_resource();
                     if ($resource) {
-                        $propertySources->resource = $resource;
+                        $propertySources['resource'] = $resource;
                     }
                 }
             }

@@ -37,7 +37,7 @@ class Log extends BaseLog
         $moduleLoggingStatus = Setting::getValue('ModuleDebugMode');
         if ($moduleLoggingStatus === 'on') {
             $module = sprintf('%s %s', Acumulus::Name, Acumulus::Version);
-            $responseData = is_string($response) ? $response : $this->exceptionToMessage($response, true);
+            $responseData = is_string($response) ? $response : $this->exceptionToMessage($response, true, false);
             logModuleCall($module, $service, $request, $responseData, '', []);
             if ($response instanceof Throwable) {
                 return [$this->exception($response)];

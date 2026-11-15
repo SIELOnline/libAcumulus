@@ -99,7 +99,7 @@ class Log
     protected function hasBeenLogged(string $message): bool
     {
         foreach ($this->loggedMessages as $loggedMessage) {
-            if (str_starts_with($loggedMessage['message'], $message) || $loggedMessage['format'] === $message) {
+            if (str_contains($loggedMessage['message'], $message) || $loggedMessage['format'] === $message) {
                 return true;
             }
         }
@@ -236,23 +236,26 @@ class Log
      *
      * @param \Throwable $e
      *   The "exception" to log.
+     * @param bool $isSilenced
+     *   Whether the exception will be silenced, i.e ignore and continue.
      *
      * @return string
      *   The formatted message whether it got logged or not.
      */
-    public function exception(Throwable $e, bool $includeTrace = false): string
+    public function exception(Throwable $e, bool $includeTrace = false, bool $isSilenced = false): string
     {
-        $message = $this->exceptionToMessage($e, false);
+        $message = $this->exceptionToMessage($e, false, $isSilenced);
         if (!$this->hasBeenLogged($message)) {
             if ($includeTrace) {
-                $message = $this->exceptionToMessage($e, $includeTrace);
+                $message = $this->exceptionToMessage($e, $includeTrace, $isSilenced);
             }
+
             $this->log(Severity::Exception, $message);
         }
         return $message;
     }
 
-    protected function exceptionToMessage(Throwable $e, bool $includeTrace): string
+    protected function exceptionToMessage(Throwable $e, bool $includeTrace, bool $isSilenced): string
     {
         $callingFunction = $e->getTrace()[0]['function'];
         $callingLine = $e->getLine();
@@ -266,6 +269,9 @@ class Log
         $fullMessage = "$class: $code$message in $callingFunction:$callingLine";
         if ($includeTrace) {
             $fullMessage .= "\n" . $e->getTraceAsString();
+        }
+        if ($isSilenced) {
+            $fullMessage = "Silent failure: $fullMessage";
         }
         return $fullMessage;
     }

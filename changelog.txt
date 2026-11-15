@@ -30,8 +30,8 @@ Refactorings:
 - As a side effect of the above refactoring: changed the exception type that will be
   thrown when invalid values are given to an AcumulusProperty: they should extend
   RuntimeException, not LogicException.
-- Number:getDivisionRange: slightly smaller interval halfing.
-
+- Number:getDivisionRange: slightly smaller interval "halving".
+- Log: allow to mark logged exceptions as being silenced.
 
 8.7.2 (2026-10-30) (WC)
 -----------------------

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @noinspection PhpIncompatibleReturnTypeInspection
  *   The get/create...() methods are strong-typed while the internal getInstance() isn't,

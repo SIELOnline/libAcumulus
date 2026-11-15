@@ -30,6 +30,8 @@ class ItemLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *
      * @throws \Exception
+     *
+     * @noinspection PhpMissingParentCallCommonInspection empty parent
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {

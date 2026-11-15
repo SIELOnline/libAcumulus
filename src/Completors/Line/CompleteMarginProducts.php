@@ -63,12 +63,14 @@ class CompleteMarginProducts extends BaseCompletorTask
     }
 
     /**
-     * Description.
+     * Returns whether the shop might sell margin products.
      *
-     * @return mixed
-     *   Description.
+     * @return int
+     *   One of the constants {@see Config::MarginProducts_Both},
+     *   {@see Config::MarginProducts_No}, {@see Config::MarginProducts_Only},
+     *   or {@see Config::MarginProducts_Unknown}.
      */
-    private function getMarginProducts(): mixed
+    protected function getMarginProducts(): int
     {
         return $this->getContainer()->getConfig()->get('marginProducts');
     }

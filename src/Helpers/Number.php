@@ -37,25 +37,11 @@ class Number
      */
     public static function castNumericValue(mixed $value): mixed
     {
-        if (is_string($value) && is_numeric($value) && !Number::isPossiblyPhoneNumber($value)) {
+        if (is_string($value) && is_numeric($value)) {
             // Is it a float or an int? Check integers for phone number.
             $value = strpbrk($value, '.eE') !== false ? (float) $value : (int) $value;
         }
         return $value;
-    }
-
-    /**
-     * Returns whether a numeric string might be a phone number.
-     * - integer  string starting with 0: 0123456789.
-     * - numeric string starting with a +: +33123456789 or +31.123456789
-     *   \+[1-9][0-9]{0-2}\.?[0-9]{1-}
-     *
-     * @param string $value
-     *   A {@see is_numeric() numeric} string.
-     */
-    public static function isPossiblyPhoneNumber(string $value): bool
-    {
-        return !strpbrk($value, 'eE') && strlen($value) > 5 && preg_match('/(\+?[1-9]\d{0,2}\.?)?\d+/', $value);
     }
 
     /**
@@ -74,16 +60,12 @@ class Number
      * @return array
      *   Array of floats with keys 'min', 'max' and 'calculated'.
      */
-    public static function getDivisionRange(
-        float $numerator,
-        float $denominator,
-        float $numeratorPrecision,
-        float $denominatorPrecision
-    ): array {
+    public static function getDivisionRange(float $numerator, float $denominator, float $numeratorPrecision, float $denominatorPrecision): array
+    {
         // The actual value can be half the precision lower or higher.
-        // To err on the save side, we take 56% of it (instead of 50%).
-        $numeratorHalfRange = 0.56 * $numeratorPrecision;
-        $denominatorHalfRange = 0.56 * $denominatorPrecision;
+        // To err on the save side, we add 10% to both sides.
+        $numeratorHalfRange = 0.551 * $numeratorPrecision;
+        $denominatorHalfRange = 0.551 * $denominatorPrecision;
 
         // The min values should be closer to 0 than the value.
         // The max values should be further from 0 than the value.
@@ -99,8 +81,8 @@ class Number
         $minDenominator = $denominator - $denominatorHalfRange;
         $maxDenominator = $denominator + $denominatorHalfRange;
 
-        // We get the min value of the division by dividing the minimum
-        // numerator by the maximum denominator and vice versa.
+        // We get the min value of the division by dividing the minimum numerator by the
+        // maximum denominator, and vice versa for the max value.
         $min = $minNumerator / $maxDenominator;
         $max = $maxNumerator / $minDenominator;
         $calculated = $numerator / $denominator;
@@ -160,11 +142,8 @@ class Number
             $f = (string) $f;
         }
         if ($f !== null && $f !== '' && !is_numeric($f)) {
-            /** @noinspection JsonEncodingApiUsageInspection */
-            throw new InvalidArgumentException(sprintf(
-                '%s is not considered a numeric value',
-                json_encode($f)
-            ));
+            /** @noinspection JsonEncodingApiUsageInspection  we want this exception, not a json exception. */
+            throw new InvalidArgumentException(sprintf('%s is not considered a numeric value', json_encode($f)));
         }
         return (float) $f;
     }

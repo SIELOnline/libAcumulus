@@ -6,9 +6,8 @@ namespace Siel\Acumulus\Data;
 
 use BadMethodCallException;
 use ReflectionClass;
-use RuntimeException;
-
 use Siel\Acumulus\Meta;
+use UnexpectedValueException;
 
 use function array_key_exists;
 use function count;
@@ -213,13 +212,13 @@ abstract class AcumulusObject
      *   cased version of $name.
      *
      * @throws \RuntimeException
-     *   $name is not an existing property name.
+     *   $name is not an existing name of an {@see AcumulusProperty}.
      */
     private function checkIsProperty(string $name): string
     {
         $realName = $this->getPropertyName($name);
         if ($realName === null) {
-            throw new RuntimeException("Unknown property: $name");
+            throw new UnexpectedValueException("Unknown property: $name");
         }
         return $realName;
     }
@@ -262,8 +261,9 @@ abstract class AcumulusObject
      * @return bool
      *   True if the value was actually set, false otherwise.
      *
-     * @throws \RuntimeException
-     *   $name is not an existing name of an {@see AcumulusProperty}.
+     * @throws \UnexpectedValueException $name is not an existing property name, or $value
+     *   cannot be converted to the type of the rproperty
+     * @throws \RangeException $value is not an allowed value
      */
     public function set(string $name, mixed $value, int $mode = PropertySet::Always): bool
     {

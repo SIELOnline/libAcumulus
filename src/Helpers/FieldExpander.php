@@ -64,12 +64,13 @@ use function strlen;
  *   a value can be used: properties on real objects, key names on arrays, or (getter)
  *   methods on real objects. Even methods with parameters can be used.
  * - A "field expansion specification" that consists of a single property specification:
- *     - Can be signed by placing sign* directly after the '[' opening bracket.
+ *     - Can be signed by placing (-)sign* directly after the '[' opening bracket.
  *     - Is returned in the type of the property, but as soon as properties get
  *       concatenated they are converted to a string:
  *         - bool: to the string 'true' or 'false'.
  *         - null: empty string.
- *         - number: string representation of the number. (@todo: precision?)
+ *         - number: string representation of the number (without further formatting like,
+ *           e.g., limiting the number of decimals).
  *         - array: imploded with glue = ' ' (a space).
  *         - object: if the __toString() method exists, it will be called, otherwise
  *           {@see json_encode()} will be used.
@@ -80,13 +81,13 @@ use function strlen;
  * - expansion-specification = property-alternative('|'property-alternative)*
  * - property-alternative = space-concatenated-property('+'space-concatenated-property)*
  * - space-concatenated-property = property('&'property)*
- * - property = property-in-named-object|single-property-name|literal-text|constant
+ * - property = property-in-named-object|single-property-name|constant
  * - property-in-named-object = (object-name'::')+property-name
  * - object-name = text
  * - single-property-name = text
+ * - constant = 'true'|'false'|'null'|literal-text|numeric-constant
  * - literal-text = "text"
- * - constant = 'true'|'false'|'null'|numeric-constant
- * - numeric-constant = -?[0-9][0-9]*(.[0-9][0-9]*)? @todo: add tests.
+ * - numeric-constant = -?[0-9][0-9]*(.[0-9][0-9]*)?
  *
  * Notes:
  * - This syntax is quite simple. The following features are not possible:
@@ -303,6 +304,9 @@ class FieldExpander
         if (str_starts_with($expansionSpecification, 'sign*')) {
             $sign = $this->objects['source']?->getSign() ?? 1;
             $expansionSpecification = substr($expansionSpecification, strlen('sign*'));
+        } elseif (str_starts_with($expansionSpecification, '-sign*')) {
+            $sign = -($this->objects['source']?->getSign() ?? 1);
+            $expansionSpecification = substr($expansionSpecification, strlen('-sign*'));
         } else {
             $sign = null;
         }
@@ -381,10 +385,7 @@ class FieldExpander
      */
     protected function expandProperty(string $property): array
     {
-        if ($this->isLiteral($property)) {
-            $type = self::TypeLiteral;
-            $value = $this->getLiteral($property);
-        } elseif ($this->isConstant($property)) {
+        if ($this->isConstant($property)) {
             $type = self::TypeLiteral;
             $value = $this->getConstant($property);
         } elseif (str_contains($property, '::')) {
@@ -417,7 +418,9 @@ class FieldExpander
 
     protected function isConstant(string $singleProperty): bool
     {
-        return array_key_exists($singleProperty, static::Constants) || $this->isLiteral($singleProperty);
+        return array_key_exists($singleProperty, static::Constants)
+            || $this->isNumericConstant($singleProperty)
+            || $this->isLiteral($singleProperty);
     }
 
     protected function isNumericConstant(string $singleProperty): bool
@@ -432,11 +435,13 @@ class FieldExpander
      * - numeric-constant = int|float (not with a + sign nor scientific notation)
      *
      * @return mixed
-     *   The value 'implied' by the constant, a bool, null, or a numeric value.
+     *   The value 'implied' by the constant, a bool, null, numeric value or string
      */
     protected function getConstant(string $singleProperty): mixed
     {
-        if ($this->isNumericConstant($singleProperty)) {
+        if ($this->isLiteral($singleProperty)) {
+            return $this->getLiteral($singleProperty);
+        } elseif ($this->isNumericConstant($singleProperty)) {
             return str_contains($singleProperty, '.') ? (float) $singleProperty : (int) $singleProperty;
         } else {
             return static::Constants[$singleProperty];
@@ -494,9 +499,12 @@ class FieldExpander
         }
         // Search in the objects of the super object, so 1 level deep only.
         foreach ($this->objects as $object) {
-            $property = $this->getValue($propertyName, $object);
-            if ($property !== null && $property !== '') {
-                break;
+            // The super object may contain "non object" (i.e. scalar) values.
+            if (is_array($object) || is_object($object)) {
+                $property = $this->getValue($propertyName, $object);
+                if ($property !== null && $property !== '') {
+                    break;
+                }
             }
         }
         return $property ?? null;
@@ -527,7 +535,7 @@ class FieldExpander
      *   The "object" to extract the property from.
      *
      * @return mixed
-     *   The value for the property of the given name on the given object, or null or the
+     *   The value of the property with the given name on the given object, or null or the
      *   empty string if the property does not exist or is not accessible, not even via
      *   __call() or __get().
      */
@@ -538,7 +546,7 @@ class FieldExpander
         if (preg_match('/^(.+)\((.*)\)$/', $property, $matches)) {
             // Case 1: method
             $property = $matches[1];
-            $args = explode(',', $matches[2]);
+            $args = $matches[2] === '' ? [] : explode(',', $matches[2]);
             $value = $this->getValueFromMethod($object, $property, $args);
         } else {
             //
@@ -552,7 +560,7 @@ class FieldExpander
             }
         }
 
-        return Number::castNumericValue($value);
+        return $value;
     }
 
     /**
@@ -566,6 +574,13 @@ class FieldExpander
     protected function getValueFromMethod(object $object, string $method, array $args): mixed
     {
         try {
+            // Massage arguments.
+            // Constants are converted to their type.
+            foreach ($args as &$arg) {
+                if ($this->isConstant($arg)) {
+                    $arg = $this->getConstant($arg);
+                }
+            }
             return is_callable([$object, $method]) ? $object->$method(...$args) : null;
         } catch (Throwable $e) {
             $this->log->debug($e->getMessage());

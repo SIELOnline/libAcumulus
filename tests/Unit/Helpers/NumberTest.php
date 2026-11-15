@@ -22,11 +22,13 @@ class NumberTest extends TestCase
             ['1.23', 1.23],
             [1.25, 1.25],
             ['test', 'test'],
-            ['+33012345678', '+33012345678'],
-            ['+33.012345678', '+33.012345678'],
-            ['33.012345678', '33.012345678'],
+            ['+33012345678', +33012345678],
+            ['+33.012345678', +33.012345678],
+            ['33.012345678', 33.012345678],
             ['33 12345678', '33 12345678'],
-            ['012345678', '012345678'],
+            ['012345678', 12345678],
+            ['12345678', 12345678],
+            ['1.210000', 1.21],
             ['0.12', 0.12],
             ['0.12e-3', 0.12e-3],
             ['0.12 test', '0.12 test'],
@@ -36,15 +38,13 @@ class NumberTest extends TestCase
 
     /**
      * @dataProvider getCastNumericValueDataProvider
-     *
-     * Note: this method also tests {@see Number::isPossiblyPhoneNumber()}.
      */
     public function testCastNumericValue(mixed $value, mixed $expected): void
     {
         self::assertSame($expected, Number::castNumericValue($value));
     }
 
-    public function testGetVatRangeTags(): void
+    public function testGetDivisionRange(): void
     {
         $test1 = Number::getDivisionRange(7.18378, 34.22, 0.0001, 0.0001);
         self::assertLessThanOrEqual(0.21, $test1['min']);

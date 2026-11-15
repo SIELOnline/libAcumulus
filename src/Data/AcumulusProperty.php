@@ -7,6 +7,7 @@ namespace Siel\Acumulus\Data;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DomainException;
+use RangeException;
 use UnexpectedValueException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
@@ -165,6 +166,8 @@ class AcumulusProperty
      * @return bool
      *   true if the value was actually set, false otherwise.
      *
+     * @throws \UnexpectedValueException
+     * @throws \RangeException
      * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
     public function setValue(mixed $value, int $mode = PropertySet::Always): bool
@@ -180,17 +183,17 @@ class AcumulusProperty
                 case 'int':
                 case 'id':
                     if (!is_numeric($value)) {
-                        throw new DomainException("$this->name: not a valid $this->type: " . var_export($value, true));
+                        throw new UnexpectedValueException("$this->name: not a valid $this->type: " . var_export($value, true));
                     }
                     $iResult = (int) round((float) $value);
                     if (($this->type === 'id' && $iResult <= 0) || !Number::floatsAreEqual($iResult, (float) $value, 0.0001)) {
-                        throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
+                        throw new UnexpectedValueException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
                     $value = $iResult;
                     break;
                 case 'float':
                     if (!is_numeric($value)) {
-                        throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
+                        throw new UnexpectedValueException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
                     $value = (float) $value;
                     break;
@@ -206,23 +209,23 @@ class AcumulusProperty
                         $date = $value;
                     }
                     if ($date === false) {
-                        throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
+                        throw new UnexpectedValueException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
                     $value = $date->setTime(0, 0, 0);
                     break;
                 case 'bool':
                     if (!is_bool($value)) {
                         if (!in_array($value, $this->allowedValues, true)) {
-                            throw new DomainException("$this->name: not a valid allowed bool value: " . var_export($value, true));
+                            throw new RangeException("$this->name: not a valid allowed bool value: " . var_export($value, true));
                         }
                         $value = $value === $this->allowedValues[1];
                     }
                     break;
                 default:
-                    throw new UnexpectedValueException("$this->name: not a valid type: $this->type");
+                    throw new DomainException("$this->name: not a valid type: $this->type");
             }
             if ($this->type !== 'bool' && count($this->allowedValues) > 0 && !in_array($value, $this->allowedValues, true)) {
-                throw new DomainException("$this->name: not an allowed value: " . var_export($value, true));
+                throw new RangeException("$this->name: not an allowed value: " . var_export($value, true));
             }
         }
         if (($mode & PropertySet::NotOverwrite) !== 0 && $this->value !== null) {

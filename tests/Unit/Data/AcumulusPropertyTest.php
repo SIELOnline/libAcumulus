@@ -6,8 +6,10 @@ namespace Siel\Acumulus\Tests\Unit\Data;
 
 use DateTimeImmutable;
 use DomainException;
+use RangeException;
 use Siel\Acumulus\Data\AcumulusProperty;
 use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
 /**
  * Tests for the {@see AcumulusProperty} class.
@@ -152,7 +154,7 @@ class AcumulusPropertyTest extends TestCase
      */
     public function testSetValueWrongValue(string $type, $value): void
     {
-        $this->expectException(DomainException::class);
+        $this->expectException(UnexpectedValueException::class);
         $pd = ['name' => 'property', 'type' => $type];
         $p = new AcumulusProperty($pd);
         $p->setValue($value);
@@ -160,7 +162,7 @@ class AcumulusPropertyTest extends TestCase
 
     public function testSetValueNotAllowedValue(): void
     {
-        $this->expectException(DomainException::class);
+        $this->expectException(RangeException::class);
         $pd = ['name' => 'property', 'type' => 'int', 'allowedValues' => [1,2]];
         $p = new AcumulusProperty($pd);
         $value = 3;

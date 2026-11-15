@@ -125,7 +125,8 @@ class MetadataValue
      * Recursively 'simplifies' values before adding them.
      *
      * Simplifying is mainly converting numeric strings or scalar constants as string to
-     * their scalar value.
+     * their scalar value. Metadata has no type, so all "numeric values" will be cast,
+     * even if it "is a" phone number.
      */
     private function simplifyValue(mixed $value, int $recursionLevel): mixed
     {

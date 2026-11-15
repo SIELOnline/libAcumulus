@@ -65,7 +65,7 @@ class LineCollector extends BaseLineCollector
         if ($totalLine['code'] === 'voucher') {
             // A voucher is to be seen as a partial payment, thus no tax.
             $line->vatRate = -1;
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact0);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::No_Vat_Detected);
         } elseif ($totalLine['code'] === 'coupon') {
             // Coupons may have to be split over various taxes.
             $line->vatRate = null;

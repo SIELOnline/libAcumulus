@@ -52,13 +52,13 @@ class LineCollector extends BaseLineCollector
         $calcRule = $this->getCalcRule($calcRuleType, $orderItemId);
         if ($calcRule !== null && !empty($calcRule->calc_value)) {
             $line->vatRate = (float) $calcRule->calc_value;
-            $line->metadataSet(Meta::VatRateSource, Number::isZero($vatAmount) ? VatRateSource::Exact0 : VatRateSource::Exact);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::Mapped);
             $line->metadataSet(Meta::VatClassId, $calcRule->virtuemart_calc_id);
             $line->metadataSet(Meta::VatClassName, $calcRule->calc_rule_name);
         } elseif (Number::isZero($vatAmount)) {
             // No vat class assigned to payment or shipping fee.
             $line->vatRate = Api::VatFree;
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact0);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::No_Vat_Detected);
             $line->metadataSet(Meta::VatClassId, Config::VatClass_Null);
         } else {
             $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);

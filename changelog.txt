@@ -45,6 +45,7 @@ Refactorings:
 - Changed metadata handling: replaced the 'isList' by 'behaviour' which covers lists and
   unique values handling. Also copying/cloning metadata values seemed incorrect. This also
   led to changes to helper methods to add a message or warning to an AcumulusObject.
+- Renamed 2 vat rate source metadata values.
 
 
 8.7.2 (2026-10-30) (WC)

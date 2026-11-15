@@ -94,7 +94,7 @@ class ItemLineCollector extends LineCollector
         if (isset($vatRate)) {
             $line->vatRate = 100.0 * $vatRate;
             $line->metadataSet(Meta::VatAmount, $productVat);
-            $line->metadataSet(Meta::VatRateSource, Number::isZero($productVat) ? VatRateSource::Exact0 : VatRateSource::Exact);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::Mapped);
         } else {
             $line->metadataSet(Meta::VatAmount, $productVat);
             $line->metadataSet(Meta::PrecisionUnitPrice, $this->precision);

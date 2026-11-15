@@ -87,7 +87,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Meta::UnitPriceInc => '[sign*item::getShopObject()::unit_price_tax_incl]',
                 Meta::LineAmount => '[sign*item::getShopObject()::total_price_tax_excl]',
                 Meta::LineAmountInc => '[sign*item::getShopObject()::total_price_tax_incl]',
-                Meta::VatRateSource => VatRateSource::Exact,
+                Meta::VatRateSource => VatRateSource::Mapped,
                 // In case of a discount that applies to the collected line, the following
                 // 2 fields will be unset, but will be calculated in the Completor phase.
                 Meta::VatAmount => '[sign*item::getShopObject()::unit_amount]',
@@ -99,7 +99,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::UnitPrice => '[sign*source::getShopObject()::total_shipping_tax_excl]',
                 Fld::VatRate => '[source::getOrder()::getShopObject()::carrier_tax_rate]',
                 Meta::UnitPriceInc => '[sign*source::getShopObject()::total_shipping_tax_incl]',
-                Meta::VatRateSource => VatRateSource::Exact,
+                Meta::VatRateSource => VatRateSource::Mapped,
                 // The shipping costs excl. VAT is rounded to a cent, so recalculating
                 // this amount might prevent rounding differences for this line.
                 Meta::RecalculatePrice => Fld::UnitPrice,

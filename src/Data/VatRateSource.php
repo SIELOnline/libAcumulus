@@ -12,8 +12,8 @@ namespace Siel\Acumulus\Data;
  */
 interface VatRateSource
 {
-    public const Exact = 'exact';
-    public const Exact0 = 'exact-0';
+    public const Mapped = 'mapped';
+    public const No_Vat_Detected = 'no-vat-detected';
     public const Calculated = 'calculated';
     public const Completor = 'completor';
     public const Strategy = 'strategy';

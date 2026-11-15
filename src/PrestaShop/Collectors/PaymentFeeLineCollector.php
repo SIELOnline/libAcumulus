@@ -30,7 +30,7 @@ class PaymentFeeLineCollector extends LineCollector
         $line = $acumulusObject;
         if (!empty($line->vatRate)) {
             // PayPal with a fee: inc and vat rate are given, ex to be calculated.
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::Mapped);
         } else {
             // Mollie line: ex and inc are given: vat rate to be calculated.
             $line->metadataSet(Meta::PrecisionUnitPrice, 0.01);

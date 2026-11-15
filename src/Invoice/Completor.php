@@ -65,8 +65,8 @@ class Completor
      *   considered correct.
      */
     protected static array $CorrectVatRateSources = [
-        VatRateSource::Exact,
-        VatRateSource::Exact0,
+        VatRateSource::Mapped,
+        VatRateSource::No_Vat_Detected,
         VatRateSource::Creator_Lookup,
         VatRateSource::Completor_Range,
         VatRateSource::Completor_Lookup,

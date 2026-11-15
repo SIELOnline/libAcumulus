@@ -147,7 +147,7 @@ class ItemLineCollector extends LineCollector
             // No 0 VAT, or 0 VAT and not a parent product and not a zero price:
             // the vat rate is real.
             $line->vatRate = $vatRate;
-            $line->metadataSet(Meta::VatRateSource, Number::isZero($vatRate) ? VatRateSource::Exact0 : VatRateSource::Exact);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::Mapped);
         }
 
         // Add vat metadata.
@@ -264,7 +264,7 @@ class ItemLineCollector extends LineCollector
         // And the VAT related info.
         if (isset($vat_rate)) {
             $line->vatRate = $vat_rate;  // copied to mappings.
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::Mapped);
         } elseif (isset($lineVat)) {
             $line->unitPrice = $productPriceEx;
             $line->metadataSet(Meta::VatAmount, $lineVat / $line->quantity);

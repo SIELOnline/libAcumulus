@@ -90,7 +90,7 @@ class CompleteVatRange extends BaseCompletorTask
         } elseif (Number::isZero($numerator, 0.0001)) {
             // zero VAT with non-zero amount: rate = 0
             $line->vatRate = 0;
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Exact0);
+            $line->metadataSet(Meta::VatRateSource, VatRateSource::No_Vat_Detected);
         } else {
             $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
             $line->metadataSet(Meta::VatRateMin, 100.0 * $range['min']);

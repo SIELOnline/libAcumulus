@@ -67,7 +67,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Fld::UnitPrice => '[item::getShopObject()::amount]',
                 Fld::VatRate => '[source::getShopObject()::taxrate]',
                 Meta::ProductId => '[null]', // Product id is not available on an invoice item
-                Meta::VatRateSource => VatRateSource::Exact,
+                Meta::VatRateSource => VatRateSource::Mapped,
                 Meta::Taxed => '[item::getShopObject()::taxed]',
             ],
         ];

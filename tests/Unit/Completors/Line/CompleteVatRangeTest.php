@@ -78,7 +78,7 @@ class CompleteVatRangeTest extends TestCase
     {
         return [
             [10, 2.1, VatRateSource::Calculated, 20.9334, 21.0668, null],
-            [10, 0, VatRateSource::Exact0, null, null, 0],
+            [10, 0, VatRateSource::No_Vat_Detected, null, null, 0],
             [0, 0, VatRateSource::Completor, null, null, null],
         ];
     }
@@ -124,7 +124,7 @@ class CompleteVatRangeTest extends TestCase
     {
         return [
             [12.1, 2.1, VatRateSource::Calculated, 20.9218, 21.0783, null],
-            [10, 0, VatRateSource::Exact0, null, null, 0],
+            [10, 0, VatRateSource::No_Vat_Detected, null, null, 0],
             [0, 0, VatRateSource::Completor, null, null, null],
         ];
     }

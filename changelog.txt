@@ -3,7 +3,7 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.7.3 (2026-11-??) (PS|WC)
+8.7.3 (2026-11-16) (PS|WC)
 --------------------------
 Features:
 - PS: New releases of the module zip are now stored in a GitHub repository, and the module
@@ -25,6 +25,8 @@ Bugs:
 - ALL: FieldExpander could fail on a scalar value being passed as property source.
 
 Refactorings:
+- WC|ALL: Do not place a form within a form (not allowed in HTML), use the form attribute
+  on form elements that were part of that form in form (includes changing ajax handling).
 - PS: Thoroughly tested invoice creation leading to many changes:
   - Moved all "simple" assignments from the collectors to a mapping in
     ShopCapabilities::getDefaultShopMappings().

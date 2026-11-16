@@ -21,7 +21,6 @@ use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
@@ -868,7 +867,7 @@ class Completor
                                         $this->t('field_euVat')
                                     );
                                     $this->result->createAndAddMessage($notice, Severity::Notice, 814);
-                                    $this->addMessage($invoice, $notice, Meta::Notice);
+                                    $invoice->addMessage($this->result->getByCode(814));
                                 }
                             } else {
                                 // Current year: we can assume to be sure when
@@ -895,7 +894,7 @@ class Completor
                                             $this->t('field_euVat')
                                         );
                                         $this->result->createAndAddMessage($notice, Severity::Notice, 813);
-                                        $this->addMessage($invoice, $notice, Meta::Notice);
+                                        $invoice->addMessage($this->result->getByCode(813));
                                         break;
                                 }
                             }
@@ -1799,20 +1798,8 @@ class Completor
                 $message = sprintf($message, ...$args);
             }
             $this->result->createAndAddMessage($message, Severity::Warning, $code);
-            $acumulusObject->addWarning($this->result->getByCode($code)->format(Message::Format_Plain));
+            $acumulusObject->addMessage($this->result->getByCode($code));
         }
-    }
-
-    /**
-     * Helper method to add a message to an {@see AcumulusObject}.
-     *
-     * Messages are placed in the $acumulusObject under the key Meta::{$severity}. If no
-     * message is set so far, $message is added as a string, otherwise it becomes an
-     * array of messages to which this $message is added.
-     */
-    protected function addMessage(AcumulusObject $acumulusObject, string $message, string $severity = Meta::Warning): void
-    {
-        $acumulusObject->metadataAdd($severity, $message, MetadataValue::Unique);
     }
 
     /**

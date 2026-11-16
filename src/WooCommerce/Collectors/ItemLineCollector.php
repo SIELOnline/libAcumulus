@@ -10,6 +10,7 @@ use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Meta;
 use WC_Order_Item_Product;
 use WC_Product;
@@ -92,7 +93,7 @@ class ItemLineCollector extends LineCollector
             $precisionEx = $this->precision;
             $reason = $this->isPriceIncRealistic($productPriceInc, $taxes, $shopProduct);
             if ($reason !== '') {
-                $this->addMessage($line, "Price inc is realistic: $reason", Meta::Info);
+                $line->addMessage("Price inc is realistic: $reason", Severity::Info);
                 $precisionInc = 0.001;
                 $recalculatePrice = Fld::UnitPrice;
             } else {

@@ -7,7 +7,6 @@ namespace Siel\Acumulus\Collectors;
 use ArrayObject;
 use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\MetadataValue;
 use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\FieldExpander;
@@ -330,17 +329,5 @@ abstract class Collector implements CollectorInterface
     {
         return str_starts_with($field, 'meta')
             || in_array($field, [Meta::UnitPriceInc, Meta::VatAmount], true);
-    }
-
-    /**
-     * Helper method to add a message to an InvoiceSendResult.
-     *
-     * The message is placed under the meta-key passed as severity. If no message is set
-     * yet, the message is added as a string. Otherwise, it becomes an array of messages
-     * to which the message is added.
-     */
-    protected function addMessage(AcumulusObject $acumulusObject, string $message, string $severity = Meta::Warning): void
-    {
-        $acumulusObject->metadataAdd($severity, $message, MetadataValue::Unique);
     }
 }

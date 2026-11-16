@@ -42,8 +42,8 @@ use function sprintf;
  * - Only possible if at least 2 out of the 3 values "unit price", "unit price inc" and
  *   "vat amount" (and their precision) are known.
  * - If 2 out of 3 are available, the 3rd will be set (as well as Meta::FieldsCalculated).
- * - If only 1 amount is available a warning will be added to the line.
- *   @todo: do strategy lines pass here? then a warning is not needed for those.
+ * - If only 1 amount is available a warning will be added to the line, unless it is a
+ *   completor or strategy line.
  */
 class CompleteVatRange extends BaseCompletorTask
 {
@@ -62,6 +62,53 @@ class CompleteVatRange extends BaseCompletorTask
                 $this->addVatRangeTags($acumulusObject);
             }
         }
+    }
+
+    /**
+     * Sets which of the 3 fields amount ex, amount inc, and vat amount are available,
+     * including their precision.
+     */
+    protected function setWhatIsAvailable(Line $line): void
+    {
+        $this->exSet = isset($line->unitPrice) && $line->metadataExists(Meta::PrecisionUnitPrice);
+        $this->incSet = $line->metadataExists(Meta::UnitPriceInc) && $line->metadataExists(Meta::PrecisionUnitPriceInc);
+        $this->vatSet = $line->metadataExists(Meta::VatAmount) && $line->metadataExists(Meta::PrecisionVatAmount);
+    }
+
+    /**
+     * Sets the 3rd amount if exactly 2 are available. Adds a warning when only 1 is
+     * available.
+     *
+     * @return bool
+     *   whether all 3 amounts are now set (at least 2 of the 3 amounts were available to
+     *   start with).
+     */
+    protected function fillMissingData(Line $line): bool
+    {
+        $countSet = (int) $this->exSet + (int) $this->incSet + (int) $this->vatSet;
+        if ($countSet <= 1) {
+            if ($line->metadataGet(Meta::VatRateSource) !== VatRateSource::Completor && !$line->metadataGet(Meta::StrategySplit)) {
+                $line->addMessage(
+                    Message::create(
+                        sprintf($this->t('message_warning_only_1_filled'), $this->t('amount_ex'), $this->t('amount_inc'), $this->t('amount_vat')),
+                        Severity::Warning,
+                        801
+                    )
+                );
+            }
+        } elseif ($countSet === 2) {
+            if ($this->vatSet && $this->exSet) {
+                $line->metadataSet(Meta::UnitPriceInc, $line->unitPrice + $line->metadataGet(Meta::VatAmount));
+                $line->metadataAdd(Meta::FieldsCalculated, Meta::UnitPriceInc);
+            } elseif ($this->vatSet && $this->incSet) {
+                $line->unitPrice = $line->metadataGet(Meta::UnitPriceInc) - $line->metadataGet(Meta::VatAmount);
+                $line->metadataAdd(Meta::FieldsCalculated, Fld::UnitPrice);
+            } elseif ($this->exSet && $this->incSet) {
+                $line->metadataSet(Meta::VatAmount, $line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice);
+                $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
+            }
+        }
+        return $countSet >= 2;
     }
 
     protected function addVatRangeTags(Line $line): void
@@ -97,51 +144,5 @@ class CompleteVatRange extends BaseCompletorTask
             $line->metadataSet(Meta::VatRateMax, 100.0 * $range['max']);
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Calculated);
         }
-    }
-
-    /**
-     * Sets which of the 3 fields amount ex, amount inc, and vat amount are available,
-     * including their precision.
-     */
-    private function setWhatIsAvailable(Line $line): void
-    {
-        $this->exSet = isset($line->unitPrice) && $line->metadataExists(Meta::PrecisionUnitPrice);
-        $this->incSet = $line->metadataExists(Meta::UnitPriceInc) && $line->metadataExists(Meta::PrecisionUnitPriceInc);
-        $this->vatSet = $line->metadataExists(Meta::VatAmount) && $line->metadataExists(Meta::PrecisionVatAmount);
-    }
-
-    /**
-     * Sets the 3rd amount if exactly 2 are available. Adds a warning when only 1 is
-     * available.
-     *
-     * @return bool
-     *   whether all 3 amounts are now set (at least 2 of the 3 amounts were available to
-     *   start with).
-     */
-    protected function fillMissingData(Line $line): bool
-    {
-        $countSet = (int) $this->exSet + (int) $this->incSet + (int) $this->vatSet;
-        if ($countSet <= 1) {
-            $line->addWarning(
-                Message::create(
-                    sprintf($this->t('message_warning_only_1_filled'), $this->t('amount_ex'), $this->t('amount_inc'), $this->t('amount_vat')),
-                    Severity::Warning,
-                    801
-                )
-            );
-            return false;
-        } elseif ($countSet === 2) {
-            if ($this->vatSet && $this->exSet) {
-                $line->metadataSet(Meta::UnitPriceInc, $line->unitPrice + $line->metadataGet(Meta::VatAmount));
-                $line->metadataAdd(Meta::FieldsCalculated, Meta::UnitPriceInc);
-            } elseif ($this->vatSet && $this->incSet) {
-                $line->unitPrice = $line->metadataGet(Meta::UnitPriceInc) - $line->metadataGet(Meta::VatAmount);
-                $line->metadataAdd(Meta::FieldsCalculated, Fld::UnitPrice);
-            } elseif ($this->exSet && $this->incSet) {
-                $line->metadataSet(Meta::VatAmount, $line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice);
-                $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
-            }
-        }
-        return $countSet >= 2;
     }
 }

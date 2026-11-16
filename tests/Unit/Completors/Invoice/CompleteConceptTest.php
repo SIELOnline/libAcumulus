@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Completors\Invoice\CompleteConcept;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Data\DataType;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tests\Utils\AcumulusContainer;
@@ -51,7 +50,7 @@ class CompleteConceptTest extends TestCase
         self::assertTrue($invoice->concept);
 
         $line = $this->getLine(LineType::Item);
-        $line->addWarning(Meta::Warning, 'warning');
+        $line->addMessage('warning');
 
         // Plugin, warning = true
         $config->set('concept', Config::Concept_Plugin);
@@ -60,14 +59,15 @@ class CompleteConceptTest extends TestCase
         $completor->complete($invoice);
         self::assertTrue($invoice->concept);
 
-        // No, warning = false
+        // No, warning = true
         $config->set('concept', Api::Concept_No);
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
         $completor->complete($invoice);
         self::assertFalse($invoice->concept);
 
-        // Yes, warning = true
+        // Yes, warning = no
+        $line->metadataRemove(Meta::Warning);
         $config->set('concept', Api::Concept_Yes);
         $invoice = $this->getInvoice();
         $invoice->addLine($line);

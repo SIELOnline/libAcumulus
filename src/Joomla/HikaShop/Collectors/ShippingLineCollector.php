@@ -229,7 +229,7 @@ class ShippingLineCollector extends LineCollector
                 $shippingLine->metadataSet(Meta::VatAmount, 0.0);
                 $shippingLine->metadataSet(Meta::VatRateSource, VatRateSource::Creator_Missing_Amount);
                 $shippingLine->metadataSet(Meta::VatClassName, Config::VatClass_Null);
-                $shippingLine->addWarning(
+                $shippingLine->addMessage(
                     'Amounts for this shipping method do not add up: '
                     . 'probably vat free product or rates have changed. (order_shipping_params->prices = '
                     . str_replace('"', "'", json_encode($order->order_shipping_params->prices, Meta::JsonFlags))
@@ -252,7 +252,7 @@ class ShippingLineCollector extends LineCollector
             // changed: we will already have discovered that above, so we do
             // not produce this warning here.)
             if (!$warningAdded) {
-                $line->addWarning(
+                $line->addMessage(
                     'Amounts for the shipping method(s) do not add up: lost too much precision?'
                     . ' (order_shipping_params->prices = '
                     . str_replace('"', "'", json_encode($order->order_shipping_params->prices, Meta::JsonFlags))

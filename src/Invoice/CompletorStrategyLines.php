@@ -157,7 +157,7 @@ class CompletorStrategyLines
                 // Replace line with replacing lines.
                 foreach ($replacingLines[$index] as $replacingLine) {
                     if ($replacingLine->metadataGet(Meta::VatRateSource) !== VatRateSource::Strategy) {
-                        $replacingLine->addWarning('Vat rate source was not VatRateSource::Strategy');
+                        $replacingLine->addMessage('Vat rate source was not VatRateSource::Strategy');
                     }
                     $replacingLine->metadataSet(Meta::VatRateSource, VatRateSource::Strategy_Completed);
                     $replacingLine->metadataSet(Meta::CompletorStrategyUsed, $strategyName);

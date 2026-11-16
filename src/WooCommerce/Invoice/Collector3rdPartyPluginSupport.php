@@ -184,7 +184,7 @@ class Collector3rdPartyPluginSupport
                 } else {
                     // Oops: not found. Add a warning in the line metadata and keep it as
                     // a separate line.
-                    $line->addWarning('Bundle parent with id=' . $line->metadataGet(Meta::BundleParentId) . ' not found');
+                    $line->addMessage('Bundle parent with id=' . $line->metadataGet(Meta::BundleParentId) . ' not found');
                     $result[] = $line;
                 }
             } else {

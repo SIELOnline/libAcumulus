@@ -87,7 +87,7 @@ class ItemLineCollector extends LineCollector
             } elseif (count($shopItem->order_product_tax_info) === 0) {
                 $line->metadataSet(Meta::VatClassId, Config::VatClass_Null);
             } else {
-                $line->addWarning('Cumulative vat rates applied: unknown in NL');
+                $line->addMessage('Cumulative vat rates applied: unknown in NL');
             }
         }
 

@@ -30,9 +30,7 @@ class CompleteEmail extends BaseCompletorTask
         // Check email address.
         if (empty($acumulusObject->email)) {
             $acumulusObject->email = $this->configGet('emailIfAbsent');
-            // @todo: add warning to Result?
-            $message = Message::create($this->t('message_warning_no_email'), Severity::Warning, 801);
-            $acumulusObject->addWarning($message);
+            $acumulusObject->addMessage(Message::create($this->t('message_warning_no_email'), Severity::Warning, 801));
         } else {
             $email = $acumulusObject->email;
             // Look for multiple addresses, but do not mistake a comma in a

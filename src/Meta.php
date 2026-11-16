@@ -48,10 +48,12 @@ interface Meta
      * just gives some more info on what it did or how it obtained some value (info or
      * notice). Warnings are often the result of a failing sanity check.
      */
+    public const Exception = 'meta-exception';
     public const Error = 'meta-error';
     public const Warning = 'meta-warning';
     public const Notice = 'meta-notice';
     public const Info = 'meta-info';
+    public const Success = 'meta-success';
     public const Debug = 'meta-debug';
 
     // Customer + addresses:

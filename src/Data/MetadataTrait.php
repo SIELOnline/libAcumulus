@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Data;
 
 use DateTimeInterface;
 use Siel\Acumulus\Helpers\Message;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Meta;
 
 /**
@@ -100,11 +101,26 @@ trait MetadataTrait
     }
 
     /**
-     * Adds a warning to the object (in its metadata).
+     * Adds a message to the object (in its metadata).
+     *
+     * To detect duplicates, we convert a {@see Message} to a string before adding it.
      */
-    public function addWarning(string|Message $message): void
+    public function addMessage(string|Message $message, int $severity = Severity::Warning): void
     {
-        $this->metadataAdd(Meta::Warning, $message, MetadataValue::Unique);
+        $metaNames = [
+            Severity::Exception => Meta::Exception,
+            Severity::Error => Meta::Error,
+            Severity::Warning => Meta::Warning,
+            Severity::Notice => Meta::Notice,
+            Severity::Info => Meta::Info,
+            Severity::Success => Meta::Success,
+            Severity::Log => Meta::Debug,
+        ];
+        if ($message instanceof Message) {
+            $severity = $message->getSeverity();
+        }
+        $severity = $metaNames[$severity] ?? Meta::Warning;
+        $this->metadataAdd($severity, (string) $message, MetadataValue::Unique);
     }
 
     /**

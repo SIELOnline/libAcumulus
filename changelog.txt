@@ -3,8 +3,12 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
-8.7.4 (2026-11-??) (MA)
------------------------
+8.7.4 (2026-11-??) (MA|WC)
+--------------------------
+Features:
+- WC: Use the version of our own plugin to add to JS and CSS file requests, to prevent
+  cache issues.
+
 Refactorings:
 - Allow Currency::convertAmount() to be called with null.
 - Converted some legacy completor code to new collector-Completor architecture.
@@ -2023,7 +2027,7 @@ Bugs:
   shipping method settings of WC3.
 - ALL: Warning: implode(): Invalid arguments passed in Completor.php on line 835.
 - ALL: module specific translations were not loaded on case-sensitive systems
-  (e.g. linux).
+  (e.g. Linux).
 - ALL: Warning 511: Incorrect vattype value used (false) in vattype tag as part
   of invoice section in the XML. Using default value of 1(national, regular
   invoice). (CE005BVTC)
@@ -2314,7 +2318,7 @@ Changes:
 
 5.0.5 (2018-01-25)
 ------------------
-- composer.json: Message from packagist: siel/acumulus failed to update, invalid
+- composer.json: Message from Packagist: siel/acumulus failed to update, invalid
   composer.json data:  License "GPL-3.0" is a deprecated SPDX license
   identifier, use "GPL-3.0-only" or "GPL-3.0-or-later" instead.
 - PSR-1: use true, false, and null instead of TRUE, FALSE, and NULL.
@@ -2334,7 +2338,7 @@ Changes:
 - ALL: originalInvoiceSource als bron van veldverwijzingen werkte niet.
 - OC23/OC3: Ondersteuning voor quick_status_updater module.
 - WC: WooCommerce bug #18357 is nu in onze eigen code opgelost zodat deze versie
-  van onze plugin met zowel oude als toekomstige WC versies goed werkt.
+  van onze plugin met zowel oude als toekomstige WC-versies goed werkt.
 - PS: Fout in ondersteuning voor paypal module (veld payment_fee).
 
 5.0.1 (2018-01-11)

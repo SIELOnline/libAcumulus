@@ -35,6 +35,9 @@ class EmailInvoiceAsPdfCompletor extends BaseCompletor
      *
      * @param EmailInvoiceAsPdf $acumulusObject
      * @param Result $result
+     *   Will be an {@see \Siel\Acumulus\Invoice\InvoiceSendResult} when called as part of
+     *   an invoice complete process.
+     *   When called directly, it will be a {@see \Siel\Acumulus\Helpers\Result}.
      */
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {

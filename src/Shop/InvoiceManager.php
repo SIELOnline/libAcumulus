@@ -334,6 +334,7 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\InvoiceSendResult
      *   The result of updating (or not) the invoice.
      *
+     * @noinspection PhpUnused Called from code outside library.
      * @todo: do we need the $changes list? (e.g. to use it to decide on which API method to call?).
      */
     public function sourceChange(Source $source, array $changes): InvoiceSendResult
@@ -360,6 +361,8 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\InvoiceSendResult
      *   The result of sending (or not sending) the invoice.
+     *
+     * @noinspection PhpUnused Called from code outside library.
      */
     public function invoiceCreate(Source $source): InvoiceSendResult
     {

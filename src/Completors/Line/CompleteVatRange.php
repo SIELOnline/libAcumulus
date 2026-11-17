@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Completors\Line;
 
-use Siel\Acumulus\Completors\BaseCompletorTask;
-use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Fld;
@@ -45,21 +43,26 @@ use function sprintf;
  * - If only 1 amount is available a warning will be added to the line, unless it is a
  *   completor or strategy line.
  */
-class CompleteVatRange extends BaseCompletorTask
+class CompleteVatRange extends RecursiveLineCompletor
 {
     protected bool $exSet;
     protected bool $incSet;
     protected bool $vatSet;
 
-    /**
-     * @param \Siel\Acumulus\Data\Line $acumulusObject
-     */
-    public function complete(AcumulusObject $acumulusObject, ...$args): void
+    protected function complete1(Line $line, ...$args): void
     {
-        if (!isset($acumulusObject->vatRate)) {
-            $this->setWhatIsAvailable($acumulusObject);
-            if ($this->fillMissingData($acumulusObject)) {
-                $this->addVatRangeTags($acumulusObject);
+        $this->completeVatRange($line);
+    }
+
+    /**
+     * @param \Siel\Acumulus\Data\Line $line
+     */
+    public function completeVatRange(Line $line): void
+    {
+        if (!isset($line->vatRate)) {
+            $this->setWhatIsAvailable($line);
+            if ($this->fillMissingData($line)) {
+                $this->addVatRangeTags($line);
             }
         }
     }

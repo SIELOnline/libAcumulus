@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Completors\Line;
 
-use Siel\Acumulus\Completors\BaseCompletorTask;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Data\LineType;
 use Siel\Acumulus\Meta;
 
 /**
- * CompleteMarginScheme changes some values for item lines with margin products.
+ * CompleteMarginProducts changes some values for item lines with margin products.
  *
  * Margin scheme:
  * - Product should have a cost price and that must have been set on this line.
@@ -24,14 +22,11 @@ use Siel\Acumulus\Meta;
  * @todo: should we do this at the end, if the vat rate vs vat amount indicates that this
  *   indeed is a margin line.
  */
-class CompleteMarginProducts extends BaseCompletorTask
+class CompleteMarginProducts extends RecursiveLineCompletor
 {
-    /**
-     * @param \Siel\Acumulus\Data\Line $acumulusObject
-     */
-    public function complete(AcumulusObject $acumulusObject, ...$args): void
+    protected function complete1(Line $line, ...$args): void
     {
-        $this->completeMarginScheme($acumulusObject);
+        $this->completeMarginScheme($line);
     }
 
     /**

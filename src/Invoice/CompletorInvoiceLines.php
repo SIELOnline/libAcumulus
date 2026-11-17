@@ -110,8 +110,6 @@ class CompletorInvoiceLines
      */
     protected function completeInvoiceLinesRecursive(Invoice $invoice): void
     {
-        $this->convertLinesToEuro($invoice->getLines(), $invoice->metadataGet(Meta::Currency));
-        $this->completeVatRanges($invoice->getLines());
         $this->completeLineRequiredData($invoice->getLines());
         // @todo: we could combine all completor phase methods of getting the
         //   correct vat rate:
@@ -148,75 +146,6 @@ class CompletorInvoiceLines
         $this->addVatRateTo0PriceLines($invoice->getLines());
         $this->recalculateLineData($invoice->getLines());
         $this->completeLineMetaData($invoice->getLines());
-    }
-
-    /**
-     * Converts amounts to euro if another currency was used.
-     *
-     * This method only converts amounts at the line level. The invoice level is handled
-     * by the completor and already has been converted.
-     *
-     * @param Line[] $lines
-     *   The invoice lines to (recursively) convert.
-     * @param Currency $currency
-     *   The rate of the Euro expressed in the foreign currency.
-     */
-    protected function convertLinesToEuro(array $lines, Currency $currency): void
-    {
-        if ($currency->shouldConvert()) {
-            foreach ($lines as $line) {
-                $line->unitPrice = $currency->convertAmount($line->unitPrice);
-                // Cost price may well be in purchase currency, let's assume it already is in euros ...
-                //$this->completor->convertAmount($line, Fld::CostPrice, $conversionRate);
-                $this->convertAmount($line, Meta::UnitPriceInc, $currency);
-                $this->convertAmount($line, Meta::VatAmount, $currency);
-                $this->convertAmount($line, Meta::LineAmount, $currency);
-                $this->convertAmount($line, Meta::LineAmountInc, $currency);
-                $this->convertAmount($line, Meta::LineVatAmount, $currency);
-                $this->convertAmount($line, Meta::LineDiscountAmount, $currency);
-                $this->convertAmount($line, Meta::LineDiscountAmountInc, $currency);
-                $this->convertAmount($line, Meta::LineDiscountVatAmount, $currency);
-
-                // Recursively convert any amount.
-                if ($line->hasChildren()) {
-                    $this->convertLinesToEuro($line->getChildren(), $currency);
-                }
-            }
-        }
-    }
-
-    /**
-     * Helper method to convert an amount field to euros.
-     *
-     * @return bool
-     *   Whether the amount was converted.
-     */
-    protected function convertAmount(Line $line, string $key, Currency $currency): bool
-    {
-        if ($line->metadataExists($key)) {
-            $line->metadataSet($key, $currency->convertAmount($line->metadataGet($key)));
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Completes the vat range in an early phase of the line completion.
-     *
-     * Especially used to fill missing unit amounts.
-     *
-     * @param Line[] $lines
-     */
-    private function completeVatRanges(array $lines): void
-    {
-        foreach ($lines as $line) {
-            $this->completor->getCompletorTask('Line', 'VatRange')->complete($line);
-            // Recursively complete vat ranges.
-            if ($line->hasChildren()) {
-                $this->completeVatRanges($line->getChildren());
-            }
-
-        }
     }
 
     /**
@@ -420,6 +349,8 @@ class CompletorInvoiceLines
                 $line->metadataSet(Meta::VatAmount, $line->metadataGet(Meta::LineVatAmount) / $line->quantity);
                 $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount . ' (from ' . Meta::LineVatAmount . ')');
             }
+            // @todo: sub type should always be set right on construction or start of
+            //   collection, also for child lines (because beforeCollect will set it).
             if (!$line->metadataExists(Meta::SubType) && $parent !== null) {
                 // Known usages: WooCommerce TM Extra Product Options that adds
                 // child lines.
@@ -552,6 +483,7 @@ class CompletorInvoiceLines
         $nature = $this->getMaxAppearingNature($lines);
         if (!empty($nature)) {
             foreach ($lines as $line) {
+                // @todo: sub type should be set.
                 if ($line->metadataExists(Meta::SubType) && $line->metadataGet(Meta::SubType) !== LineType::Item && !isset($line->nature)) {
                     $line->nature = $nature;
                 }
@@ -583,6 +515,7 @@ class CompletorInvoiceLines
     {
         $amountPerNature = ['' => 0.0, Api::Nature_Product => 0.0, Api::Nature_Service => 0.0];
         foreach ($lines as $line) {
+            // @todo: sub type should be set.
             if ($line->metadataExists(Meta::SubType) && $line->metadataGet(Meta::SubType) === LineType::Item) {
                 $nature = !empty($line->nature) ? $line->nature : '';
                 $amount = abs($line->quantity * $line->unitPrice);

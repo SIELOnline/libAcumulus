@@ -3,6 +3,14 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our code.
 
+8.7.4 (2026-11-??) (MA)
+-----------------------
+Refactorings:
+- Allow Currency::convertAmount() to be called with null.
+- Converted some legacy completor code to new collector-Completor architecture.
+- Corrected line completors to be recursive if they are run before lines are flattened.
+
+
 8.7.3 (2026-11-16) (PS|WC)
 --------------------------
 Features:

@@ -12,7 +12,6 @@ use UnexpectedValueException;
 use function array_key_exists;
 use function count;
 use function sprintf;
-use function strlen;
 
 /**
  * AcumulusObjects represent Acumulus API message structures.
@@ -166,7 +165,6 @@ abstract class AcumulusObject
                 if ($count !== 1 && $count !== 2) {
                     throw new BadMethodCallException("Expected 1 or 2 arguments for method $name, $count passed'");
                 }
-                $propertyName = lcfirst(substr($name, strlen('get')));
                 return $this->set($propertyName, ...$arguments);
             default:
                 throw new BadMethodCallException("Undefined method '$name'");

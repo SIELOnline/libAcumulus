@@ -158,7 +158,7 @@ class Invoice extends AcumulusObject
     }
 
     /**
-     * Replaces all lines in the invoice with the give set of lines.
+     * Replaces all lines in the invoice with the given set of lines.
      *
      * Typically, this is the original set of lines processed in a way that may have lead
      * to more (or less) lines, e.g. flattening child lines, (actual use case) or

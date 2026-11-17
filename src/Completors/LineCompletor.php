@@ -14,6 +14,8 @@ use Siel\Acumulus\Data\Line;
 use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Invoice\InvoiceSendResult;
 
+use Siel\Acumulus\Meta;
+
 use function assert;
 
 /**
@@ -40,8 +42,12 @@ class LineCompletor extends BaseCompletor
     {
         assert($acumulusObject instanceof Line);
         assert($result instanceof InvoiceSendResult);
+        assert($result->getInvoice() !== null);
 
-        $this->getContainer()->getCompletorTask(DataType::Line, 'ConvertToEuro')->complete($acumulusObject);
+        $this->getContainer()->getCompletorTask(DataType::Line, 'ConvertToEuro')->complete(
+            $acumulusObject,
+            $result->getInvoice()->metadataGet(Meta::Currency)
+        );
         $this->getContainer()->getCompletorTask(DataType::Line, 'ByConfig')->complete($acumulusObject);
         $this->getContainer()->getCompletorTask(DataType::Line, 'MarginProducts')->complete($acumulusObject);
         $this->getContainer()->getCompletorTask(DataType::Line, 'VatRange')->complete($acumulusObject);

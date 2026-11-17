@@ -92,9 +92,13 @@ abstract class BaseCompletor
      *
      * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      *   The object to complete.
-     * @param \Siel\Acumulus\Helpers\MessageCollection $result
-     *   A message collection where any message can be added to.
-     *   @todo: can/should this be a Result?
+     * @param \Siel\Acumulus\Helpers\Result $result
+     *   A message collection where any message can be added to. This typically is a
+     *   {@see \Siel\Acumulus\Invoice\InvoiceSendResult} for all child completors related
+     *   to invoice creation, or a {@see \Siel\Acumulus\Product\StockTransactionResult}
+     *   when completinga stock transaction. For now, only when completing a
+     *   {@see \Siel\Acumulus\Data\BasicSubmit}, a plain MessageCollection is passed.
+     *   Overrides {@see assert()} the type.
      */
     abstract public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void;
 }

@@ -64,10 +64,13 @@ class Line extends AcumulusObject
     /**
      * Returns the type of this line.
      *
-     * @return string
+     * @return string|null
      *   One of the {@see LineType} constants.
+     *
+     * @todo: had to change return type from string to ?string, as child lines may not
+     *   have set it: solve that then switch back to string here.
      */
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->metadataGet(Meta::SubType);
     }

@@ -38,8 +38,8 @@ class CustomerCompletor extends BaseCompletor
      */
     public function complete(AcumulusObject $acumulusObject, MessageCollection $result): void
     {
-        $this->customer = $acumulusObject;
         assert($result instanceof InvoiceSendResult);
+        $this->customer = $acumulusObject;
 
         $this->completeAddresses($result);
         $this->getContainer()->getCompletorTask('Customer', 'Defaults')->complete($this->customer);

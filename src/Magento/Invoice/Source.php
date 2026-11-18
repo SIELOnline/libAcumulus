@@ -21,13 +21,11 @@ use Throwable;
 use function count;
 use function in_array;
 use function sprintf;
-use function strlen;
 
 /**
  * Wraps a Magento order or credit memo in an invoice source object.
  *
  * @method Order|Creditmemo getShopObject()
- * @property Order|Creditmemo $shopObject
  */
 class Source extends BaseSource
 {
@@ -48,7 +46,7 @@ class Source extends BaseSource
     /**
      * Loads an Order source for the set id.
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}.
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}.
      */
     protected function setSourceOrder(): void
     {
@@ -64,7 +62,7 @@ class Source extends BaseSource
     /**
      * Loads a Credit memo source for the set id.
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}.
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}.
      */
     protected function setSourceCreditNote(): void
     {
@@ -85,7 +83,7 @@ class Source extends BaseSource
     /**
      * Returns the order reference (something like 00000123).
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getReferenceOrder(): string
     {
@@ -95,7 +93,7 @@ class Source extends BaseSource
     /**
      * Returns the credit note reference (something like CM00000123).
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getReferenceCreditNote(): string
     {
@@ -104,14 +102,15 @@ class Source extends BaseSource
 
     public function getDate(): DateTimeInterface
     {
-        // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
-        return new DateTimeImmutable($this->getShopObject()->getCreatedAt());
+        // Order::getCreatedAt() returns a full date-time, set time part to 0.
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return (new DateTimeImmutable($this->getShopObject()->getCreatedAt()))->setTime(0, 0, 0);
     }
 
     /**
      * Returns the status of this order.
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getStatusOrder(): string
     {
@@ -127,7 +126,7 @@ class Source extends BaseSource
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_REFUNDED = 2;
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED = 3;
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getStatusCreditNote(): int
     {
@@ -158,7 +157,7 @@ class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getPaymentStatusOrder(): int
     {
@@ -174,7 +173,7 @@ class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getPaymentStatusCreditNote(): int
     {
@@ -186,9 +185,9 @@ class Source extends BaseSource
 
     /**
      * Returns whether the order is in a status that makes it considered paid.
-     * This method is NOT used to determine the paid status, but is used to
-     * determine the paid date by looking for these statuses in the
-     * StatusHistoryCollection.
+     *
+     * This method is NOT used to determine the paid status, but is used to determine the
+     * paid date by looking for these statuses in the StatusHistoryCollection.
      */
     protected function isPaidStatus(string $status): bool
     {
@@ -198,13 +197,14 @@ class Source extends BaseSource
     /**
      * Returns the payment date for the order.
      *
-     * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the order has not been paid
-     *   yet.
+     * @return DateTimeInterface|null
+     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @throws \Exception
+     *
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
-    protected function getPaymentDateOrder(): ?string
+    protected function getPaymentDateOrder(): ?DateTimeInterface
     {
         // Take date of last payment as payment date.
         $paymentDate = null;
@@ -212,8 +212,11 @@ class Source extends BaseSource
         $statusHistoryCollection = $this->getShopObject()->getStatusHistoryCollection();
         foreach ($statusHistoryCollection as $statusChange) {
             /** @var \Magento\Sales\Model\Order\Status\History $statusChange */
+            // @todo: this logic seems incorrect: any first status change, indicating paid
+            //   or not, will be used as possible payment date.
             if (!$paymentDate || $this->isPaidStatus($statusChange->getStatus())) {
-                $createdAt = substr($statusChange->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+                // getCreatedAt() returns a full date-time, set time part to 0.
+                $createdAt = (new DateTimeImmutable($statusChange->getCreatedAt()))->setTime(0, 0, 0);
                 if (!$paymentDate || $createdAt < $paymentDate) {
                     $paymentDate = $createdAt;
                 }
@@ -225,18 +228,20 @@ class Source extends BaseSource
     /**
      * Returns the payment date for the credit memo.
      *
-     * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the credit memo has not been
-     *   paid yet.
+     * @return DateTimeInterface|null
+     *   The payment date (yyyy-mm-dd) or null if the credit memo has not been paid yet.
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @throws \Exception
+     *
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
-    protected function getPaymentDateCreditNote(): ?string
+    protected function getPaymentDateCreditNote(): ?DateTimeInterface
     {
         // @todo: how and when does a credit note get the state refunded? when we know,
         //   createdAt will probably no longer be correct.
+        // Creditmemo::getCreatedAt() returns a full date-time, set time part to 0.
         return (int) $this->getShopObject()->getState() === Creditmemo::STATE_REFUNDED
-            ? substr($this->getShopObject()->getCreatedAt(), 0, strlen('yyyy-mm-dd'))
+            ? (new DateTimeImmutable($this->getShopObject()->getCreatedAt()))->setTime(0, 0, 0)
             : null;
     }
 
@@ -282,7 +287,7 @@ class Source extends BaseSource
      *
      * @return string|null
      *   The increment id (with padding 0's, thus a string) or null if not yet set
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getInvoiceReferenceOrder(): ?string
     {
@@ -292,11 +297,17 @@ class Source extends BaseSource
     /**
      * {@see Source::getInvoiceDate()}
      *
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @throws \Exception
+     *
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function getInvoiceDateOrder(): ?DateTimeInterface
     {
-        return $this->getInvoice() !== null ? new DateTimeImmutable($this->getInvoice()->getCreatedAt()) : null;
+        // Invoice::getCreatedAt() returns a full date-time, set time part to 0.
+
+        /** @var \Magento\Sales\Model\Order\Invoice $invoice */
+        $invoice = $this->getInvoice();
+        return $invoice !== null ? (new DateTimeImmutable($invoice->getCreatedAt()))->setTime(0, 0, 0) : null;
     }
 
     protected function getShopOrderOrId(): int
@@ -323,7 +334,7 @@ class Source extends BaseSource
     }
 
     /**
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function createItemsOrder(): array
     {
@@ -336,7 +347,7 @@ class Source extends BaseSource
     }
 
     /**
-     * @noinspection PhpUnused  Called via {@see Source::callTypeSpecificMethod()}
+     * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function createItemsCreditNote(): array
     {

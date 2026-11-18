@@ -18,8 +18,8 @@ use function get_class;
  * Source is an adapter (and wrapper) class around a web shop order or refund.
  *
  * Source is used to provide unified access to information about an order or refund from
- * the web shop. Furthermore, by wrapping it in a single, library-defined, object type,
- * web shop orders and refunds can be passed around in a strongly typed way.
+ * the webshop. Furthermore, by wrapping it in a single, library-defined, object type,
+ * webshop orders and refunds can be passed around in a strongly typed way.
  *
  * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
@@ -254,7 +254,7 @@ abstract class Source implements WrapperInterface, Stringable
      *   or null if no (separate) invoice is linked to this source.
      *
      * @todo: change this to return a Source object with type is Source::Invoice.
-     *   Then implement it in WHMCS.
+     *   Then implement it in WHMCS (and Magento).
      */
     protected function getInvoice(): object|array|null
     {

@@ -11,5 +11,5 @@ composer.lock
 **/Data/**/*.latest.*
 .phpunit.result.cache
 
-# Local files withut importance
+# Local files without importance
 todo.txt

@@ -158,11 +158,11 @@ trait Mail
         // Give mail serer time to process the mail and save the log file.
         sleep(1);
         $now = new DateTimeImmutable();
-        $papercutLogs = static::getPapercutLogFiles();
-        foreach ($papercutLogs as $papercutLog) {
-            $logLines = array_reverse(explode("\n", str_replace(["\r\n", "\r"], "\n", static::tail($papercutLog, 50))));
+        $logMessage = 'Successfully Saved email message';
+        $papercutLogFiles = static::getPapercutLogFiles();
+        foreach ($papercutLogFiles as $papercutLogfile) {
+            $logLines = array_reverse(explode("\n", str_replace(["\r\n", "\r"], "\n", static::tail($papercutLogfile, 50))));
             foreach ($logLines as $line) {
-                $logMessage = 'Successfully Saved email message';
                 $logMessageStart = strpos($line, $logMessage);
                 if ($logMessageStart !== false && str_contains($line, $subject)) {
                     // Line looks like {timestamp} [{level}] {message}

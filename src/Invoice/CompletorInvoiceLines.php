@@ -228,7 +228,6 @@ class CompletorInvoiceLines
             // Single match: fill it in as the vat rate for this line.
             $line->vatRate = $vatRate;
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor_Range);
-            $line->metadataAdd(Meta::FieldsCalculated, Fld::VatRate);
         }
     }
 
@@ -431,7 +430,6 @@ class CompletorInvoiceLines
                     $line->metadataSet(Meta::PrecisionUnitPrice, $precision);
                     $line->metadataSet(Meta::PrecisionVatAmount, $precision);
                     $this->completor->getCompletorTask('Line', 'VatRange')->complete($line);
-                    $line->metadataAdd(Meta::FieldsCalculated, Fld::VatRate);
                 }
             }
 

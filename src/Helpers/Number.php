@@ -32,14 +32,21 @@ class Number
     /**
      * Tries to cast a numeric string value to an int or float.
      *
-     * Note that we don't want to cast phone numbers, so we check for that if we find a
-     * numeric string value.
+     * Note that we don't want to cast phone numbers, or prefixed sequence numbers
+     * (Magento credit note references are like 000001, 000002, etc.). So, numeric values
+     * are checked for:
+     * - starting with a '+' (phone numbers), or
+     * - starting with leading zeros: '0031...' (phone number), or '0001' or '-0001'
+     *   (formatted sequence number). Note: '0' and '0.1' are considered numeric.
      */
     public static function castNumericValue(mixed $value): mixed
     {
-        if (is_string($value) && is_numeric($value)) {
-            // Is it a float or an int? Check integers for phone number.
-            $value = strpbrk($value, '.eE') !== false ? (float) $value : (int) $value;
+        if (is_string($value) && is_numeric($value) && !str_starts_with($value, '+')) {
+            $regexp = '/^-?0+\d+(\.\d+)?$/';
+            if (preg_match($regexp, $value) !== 1) {
+                // Is it a float or an int?
+                $value = strpbrk($value, '.eE') !== false ? (float) $value : (int) $value;
+            }
         }
         return $value;
     }

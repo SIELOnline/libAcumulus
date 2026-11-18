@@ -13,10 +13,9 @@ use Siel\Acumulus\Invoice\Source;
 /**
  * Manages {@see AcumulusEntry} records/objects.
  *
- * This manager class performs CRU(D) operations on Acumulus entries in the
- * web shop database. The features of this class include:
- * - Retrieval of an Acumulus entry record for an invoice source (orders or
- *   refunds).
+ * This manager class performs CRU(D) operations on Acumulus entries in the web shop
+ * database. The features of this class include:
+ * - Retrieval of an Acumulus entry record for an invoice source (orders or refunds).
  * - Retrieval of an Acumulus entry record for a given entry id.
  * - Save (insert or update) an Acumulus entry.
  * - Install and uninstall the db table at module install respectively uninstall time.
@@ -39,8 +38,7 @@ abstract class AcumulusEntryManager
      *   The entry id to look up.
      *
      * @return AcumulusEntry|null
-     *   Acumulus entry record for the given entry id or null if the entry id is
-     *   unknown.
+     *   Acumulus entry record for the given entry id or null if the entry id is unknown.
      */
     abstract public function getByEntryId(int $entryId): ?AcumulusEntry;
 
@@ -54,8 +52,8 @@ abstract class AcumulusEntryManager
      *   or to ignore it (true, default).
      *
      * @return AcumulusEntry|null
-     *   Acumulus entry record for the given invoice source or null if no
-     *   invoice has yet been created in Acumulus for this invoice source.
+     *   Acumulus entry record for the given invoice source or null if no invoice has yet
+     *   been created in Acumulus for this invoice source.
      */
     abstract public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry;
 
@@ -84,11 +82,10 @@ abstract class AcumulusEntryManager
     /**
      * Locks an invoice source for sending twice.
      *
-     * To prevent two processes or threads to send an invoice twice, the sending
-     * process sets a lock on the invoiceSource by already creating an
-     * AcumulusEntry for it before starting to send. That record will contain
-     * some special values by which it can be recognised as a lock instead of as
-     * a reference to a real entry in Acumulus.
+     * To prevent two processes or threads to send an invoice twice, the sending process
+     * sets a lock on the invoiceSource by already creating an AcumulusEntry for it before
+     * starting to send. That record will contain some special values by which it can be
+     * recognised as a lock instead of as a reference to a real entry in Acumulus.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The invoice source to set and acquire a lock on.
@@ -108,21 +105,20 @@ abstract class AcumulusEntryManager
      *   The invoice-source to delete the lock for.
      *
      * @return int
-     *   One of the AcumulusEntry::Lock_... constants describing the status of
-     *   the lock:
+     *   One of the AcumulusEntry::Lock_... constants describing the status of the lock:
      *   - AcumulusEntry::Lock_Deleted: success
-     *   - AcumulusEntry::Lock_BecameRealEntry: (probably) the process that held
-     *     the lock was successful after all
-     *   - AcumulusEntry::Lock_NoLongerExists: another process deleted it or the
-     *     process that created the lock finished unsuccessfully after all.
+     *   - AcumulusEntry::Lock_BecameRealEntry: (probably) the process that held the lock
+     *     was successful after all
+     *   - AcumulusEntry::Lock_NoLongerExists: another process deleted it or the process
+     *     that created the lock finished unsuccessfully after all.
      */
     public function deleteLock(Source $invoiceSource): int
     {
         $entry = $this->getByInvoiceSource($invoiceSource, false);
         if ($entry === null) {
-            // - The process that had the lock may have failed to send the
-            //   invoice to Acumulus and has removed the lock (e.g. a connection
-            //   timeout, with the timeout being longer than our lock expiry).
+            // - The process that had the lock may have failed to send the invoice to
+            //   Acumulus and has removed the lock (e.g. a connection timeout, with the
+            //   timeout being longer than our lock expiry).
             // - Yet another process already cleared the lock.
             return AcumulusEntry::Lock_NoLongerExists;
         }
@@ -131,26 +127,26 @@ abstract class AcumulusEntryManager
             $this->delete($entry);
             return AcumulusEntry::Lock_Deleted;
         }
-        // The AcumulusEntry became a real entry: apparently the process which
-        // had the lock successfully finished sending the invoice after all.
+        // The AcumulusEntry became a real entry: apparently the process which had the
+        // lock successfully finished sending the invoice after all.
         return AcumulusEntry::Lock_BecameRealEntry;
     }
 
     /**
      * Saves the Acumulus entry for the given order in the web shop's database.
-     * This default implementation calls getByInvoiceSource() to determine
-     * whether to subsequently call insert() or update().
-     * So normally, a child class should implement insert() and update() and not
-     * override this method.
+     *
+     * This default implementation calls getByInvoiceSource() to determine whether to
+     * subsequently call insert() or update(). So normally, a child class should implement
+     * insert() and update() and not override this method.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source object for which the invoice was created.
      * @param int|string|null $entryId
-     *   The Acumulus entry id assigned to the invoice for this order. This is
-     *   an int but is returned as a string by the API.
+     *   The Acumulus entry id assigned to the invoice for this order. This is an int but
+     *   is returned as a string by the API.
      * @param string|null $token
-     *   The Acumulus token to be used to access the invoice for this order via
-     *   the Acumulus API.
+     *   The Acumulus token to be used to access the invoice for this order via the
+     *   Acumulus API.
      *
      * @return bool
      *   Success.
@@ -177,8 +173,8 @@ abstract class AcumulusEntryManager
      * @param int|null $entryId
      *   The Acumulus entry id assigned to the invoice for this order.
      * @param string|null $token
-     *   The Acumulus token to be used to access the invoice for this order via
-     *   the Acumulus API.
+     *   The Acumulus token to be used to access the invoice for this order via the
+     *   Acumulus API.
      * @param DateTimeInterface $created
      *   The creation time (null = current time).
      *
@@ -231,7 +227,6 @@ abstract class AcumulusEntryManager
      *
      * @param \Siel\Acumulus\Shop\AcumulusEntry $entry
      *   The Acumulus entry to delete.
-     *   The source object for which to delete the {@see \Siel\Acumulus\Shop\AcumulusEntry}.
      *
      * @return bool
      *   Success.

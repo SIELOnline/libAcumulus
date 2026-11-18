@@ -21,23 +21,22 @@ use function is_array;
 use function is_object;
 
 /**
- * An AcumulusEntry links a webshop order or credit note to an entry in
- * Acumulus.
+ * An AcumulusEntry links a webshop order or credit note to an entry in Acumulus.
  *
- * Acumulus identifies entries by their entry id (Dutch: boekstuknummer) or,
- * for a number of API calls, a token. Both the entry id and token are stored
- * together with information that identifies the shop invoice source (order or
- * credit note) and created and last updated timestamps.
+ * Acumulus identifies entries by their entry id (Dutch: boekstuknummer) or, for a number
+ * of API calls, a token. Both the entry id and token are stored together with information
+ * that identifies the shop invoice source (order or credit note) and created and last
+ * updated timestamps.
  *
- * Concepts do not have a token, they only have a concept id. As this feature
- * was added after this class and the underlying storage had been created, we
- * store the concept id in the entry id field and use the token field (empty or
- * set) to determine what the entry id field refers to.
+ * Concepts do not have a token, they only have a concept id. however, this feature was
+ * only added after this class and the underlying storage had been created. So, instead of
+ * changing the storage, we store the concept id in the entry id field and use the token
+ * field (empty or set) to determine what the entry id field represents.
  *
- * A 3rd "type" of entry is a "lock" entry that is inserted just before an
- * invoiceAdd request is sent and deleted/replaced with a real record after the
- * result has been received. This is used to prevent sending an invoice twice at
- * more or less the same time.
+ * A 3rd "type" of entry is a "lock" entry that is inserted just before an invoiceAdd
+ * request is sent and deleted/replaced with a real record after the result has been
+ * received. This is used to prevent sending an invoice twice at more or less the same
+ * time.
  *
  * Summarising, each entry characterises one of the following:
  * - Entry: entryId = entry id AND token = token
@@ -45,8 +44,8 @@ use function is_object;
  * - Concept new style: entryId = concept id AND token = null
  * - Lock record: entryId = const lockEntryId AND token = const lockToken
  *
- * Most webshops also require/expect a single primary key (technical key),
- * but that is irrelevant for this class.
+ * Most webshops also require/expect a single primary key (technical key), but that is
+ * irrelevant for this class.
  *
  * Usages of this information (* = not (yet) implemented):
  * - Prevent that an invoice for a given order or credit note is sent twice.
@@ -56,6 +55,7 @@ use function is_object;
  *
  * @todo: should we use unique lock id's where a request adds a unique suffix to the lock
  *   token?
+ * @noinspection PhpLackOfCohesionInspection
  */
 class AcumulusEntry
 {
@@ -199,7 +199,7 @@ class AcumulusEntry
      * @return \DateTimeInterface
      *   The timestamp when this record was created.
      *
-     * @throws \DateException|\RuntimeException (PHP8.3: DateException)
+     * @throws \DateException
      */
     public function getCreated(): DateTimeInterface
     {
@@ -212,7 +212,7 @@ class AcumulusEntry
      * @return \DateTimeInterface
      *   The timestamp when this record was last updated.
      *
-     * @throws \DateException|\RuntimeException (PHP8.3: DateException)
+     * @throws \DateException
      */
     public function getUpdated(): DateTimeInterface
     {
@@ -226,7 +226,7 @@ class AcumulusEntry
     /**
      * Returns a DateTimeInterface object based on the timestamp in database format.
      *
-     * @throws \DateException|\RuntimeException (DateException as of PHP8.3)
+     * @throws \DateException
      */
     protected function toDateTime(float|int|string $timestamp): DateTimeInterface
     {

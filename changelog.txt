@@ -9,8 +9,14 @@ Features:
 - WC: Use the version of our own plugin to add to JS and CSS file requests, to prevent
   cache issues.
 
+Bugs:
+- MA: AcumulusEntryManager failed to recognise empty entries.
+
 Refactorings:
 - Allow Currency::convertAmount() to be called with null.
+- Number::castNumericValue(): changed again: do not cast numeric values with leading zeros
+  (also not when starting with a '-') or starting with a '+'. Also do not cast degenerate
+  numeric values like '3.' or '.3'.
 - Converted some legacy completor code to new collector-Completor architecture.
 - Corrected line completors to be recursive if they are run before lines are flattened.
 

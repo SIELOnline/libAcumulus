@@ -44,28 +44,31 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     public function getByEntryId(int $entryId): ?AcumulusEntry
     {
-        /** @var \Siel\AcumulusMa2\Model\Entry $result */
-        $result = $this->getResourceCollection()
-            ->addFieldToFilter('entry_id', $entryId)
-            ->getFirstItem();
+        // getFirstItem() returns an "empty" Entry object, which is a bit vague to test
+        // for "emptiness", so we check the size of the collection first, before calling
+        // that method.
+        $result = $this->getResourceCollection()->addFieldToFilter('entry_id', $entryId);
+        /** @var \Siel\AcumulusMa2\Model\Entry|null $entry */
+        $entry = $result->getSize() > 0 ? $result->getFirstItem() : null;
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->convertDbResultToAcumulusEntry($result);
+        return $this->convertDbResultToAcumulusEntry($entry);
     }
 
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
-        /** @var \Siel\AcumulusMa2\Model\Entry $result */
+        // getFirstItem() returns an "empty" Entry object, which is a bit vague to test
+        // for "emptiness", so we check the size of the collection first, before calling
+        // that method.
         $result = $this->getResourceCollection()
             ->addFieldToFilter('source_type', $invoiceSource->getType())
-            ->addFieldToFilter('source_id', $invoiceSource->getId())
-            ->getFirstItem();
+            ->addFieldToFilter('source_id', $invoiceSource->getId());
+        /** @var \Siel\AcumulusMa2\Model\Entry|null $entry */
+        $entry = $result->getSize() > 0 ? $result->getFirstItem() : null;
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->convertDbResultToAcumulusEntry($result, $ignoreLock);
+        return $this->convertDbResultToAcumulusEntry($entry, $ignoreLock);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Exception
      */
     protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, DateTimeInterface $created): bool
@@ -81,15 +84,13 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 ->setUpdated($timestamp);
             $this->getResourceModel()->save($record);
         } catch (Exception $e) {
-            $this->log->error(__METHOD__ . ': '. $e->getMessage());
+            $this->log->error(__METHOD__ . ': ' . $e->getMessage());
             throw $e;
         }
         return true;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Exception
      */
     protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, DateTimeInterface $updated): bool
@@ -103,15 +104,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 ->setUpdated($updated->format(Api::Format_TimeStamp));
             $this->getResourceModel()->save($record);
         } catch (Exception $e) {
-            $this->log->error(__METHOD__ . ': '. $e->getMessage());
+            $this->log->error(__METHOD__ . ': ' . $e->getMessage());
             throw $e;
         }
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function delete(BaseAcumulusEntry $entry): bool
     {
         $result = true;
@@ -120,7 +118,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         try {
             $this->getResourceModel()->delete($record);
         } catch (Exception $e) {
-            $this->log->error(__METHOD__ . ': '. $e->getMessage());
+            $this->log->error(__METHOD__ . ': ' . $e->getMessage());
             $result = false;
         }
         return $result;
@@ -129,8 +127,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      *
-     * Magento has separate installation scripts, so nothing has to be done
-     * here.
+     * Magento has separate installation scripts, so nothing has to be done here.
      */
     public function install(): bool
     {
@@ -140,8 +137,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      *
-     * Magento has separate uninstallation scripts, so nothing has to be done
-     * here.
+     * Magento has separate uninstallation scripts, so nothing has to be done here.
      */
     public function uninstall(): bool
     {

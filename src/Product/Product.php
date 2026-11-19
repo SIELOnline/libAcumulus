@@ -95,7 +95,7 @@ abstract class Product implements WrapperInterface
      *   products in Acumulus, which may be an empty value indicating the product cannot
      *   be matched to a product in Acumulus.
      *
-     * @noinspection PhpUnused  Used in the FieldExpander via a mapping in
+     * @noinspection PhpUnused Used in the FieldExpander via a mapping in
      *   {@see \Siel\Acumulus\Config\Mappings::getShopIndependentDefaults()}.
      */
     public function getReferenceForAcumulusLookup(): int|string|null

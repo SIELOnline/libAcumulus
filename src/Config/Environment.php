@@ -55,7 +55,7 @@ abstract class Environment
         $this->data['dbName'] = $variables['version_comment'] ?? static::Unknown;
         $this->data['dbVersion'] = $variables['version'] ?? static::Unknown;
         $this->data['os'] = php_uname();
-        /** @noinspection PhpComposerExtensionStubsInspection  false positive in projects with a higher level composer.json */
+        /** @noinspection PhpComposerExtensionStubsInspection false positive in projects with a higher level composer.json */
         $curlVersion = curl_version();
         /** @noinspection OffsetOperationsInspection */
         $this->data['curlVersion'] = "{$curlVersion['version']} (ssl: {$curlVersion['ssl_version']}; zlib: {$curlVersion['libz_version']})";

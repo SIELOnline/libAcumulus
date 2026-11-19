@@ -11,7 +11,7 @@ use Siel\Acumulus\Data\Line;
 /**
  * OtherLineCollector contains OpenCart specific {@see LineType::Other} collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class OtherLineCollector extends LineCollector
 {

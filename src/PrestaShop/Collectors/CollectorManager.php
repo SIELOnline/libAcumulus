@@ -11,7 +11,7 @@ use Siel\Acumulus\Collectors\CollectorManager as BaseCollectorManager;
  * CollectorManager contains a PrestaShop specific override for
  * {@see \Siel\Acumulus\Collectors\CollectorManager::addShopPropertySources()}.
  *
- * @noinspection PhpUnused  Instantiated via the Container
+ * @noinspection PhpUnused Instantiated via the Container
  */
 class CollectorManager extends BaseCollectorManager
 {

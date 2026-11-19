@@ -1,7 +1,7 @@
 <?php
 /**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter.
- * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4.
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection SensitiveParameter.
+ * @noinspection PhpLanguageLevelInspection An attribute is a comment in 7.4.
  */
 declare(strict_types=1);
 

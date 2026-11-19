@@ -837,7 +837,7 @@ class Completor
                 //   making it a margin scheme invoice and adding cost price = 0
                 //   to all normal lines.
                 $this->guessVatType($vatTypeInfo['intersection']);
-                /** @noinspection PhpConditionAlreadyCheckedInspection  can be set by guessVatType() */
+                /** @noinspection PhpConditionAlreadyCheckedInspection can be set by guessVatType() */
                 if (empty($invoice->vatType)) {
                     if (in_array(Api::VatType_MarginScheme, $vatTypeInfo['union'])) {
                         $invoice->vatType = Api::VatType_MarginScheme;

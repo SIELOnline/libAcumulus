@@ -46,7 +46,7 @@ use function is_string;
  * @method bool setCountryAutoNameLang(?string $value, int $mode = PropertySet::Always)
  * @method bool setCountry(?string $value, int $mode = PropertySet::Always)
  *
- * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
+ * @noinspection PhpLackOfCohesionInspection Data objects have little cohesion.
  */
 class Address extends AcumulusObject
 {

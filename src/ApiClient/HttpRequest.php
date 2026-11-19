@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection SensitiveParameter
  */
 
 declare(strict_types=1);

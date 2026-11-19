@@ -73,7 +73,7 @@ class FormHelper
     protected function getMeta(): array
     {
         if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
-            /** @noinspection JsonEncodingApiUsageInspection  Fail silently: tampering */
+            /** @noinspection JsonEncodingApiUsageInspection Fail silently: tampering */
             $meta = json_decode($_POST[static::Meta], false);
             if (is_object($meta) || is_array($meta)) {
                 $this->setMeta($meta);

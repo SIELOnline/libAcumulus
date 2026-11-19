@@ -15,7 +15,7 @@ use Siel\Acumulus\Meta;
  * PaymentFeeLineCollector contains HikaShop specific {@see LineType::PaymentFee}
  * collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class PaymentFeeLineCollector extends LineCollector
 {

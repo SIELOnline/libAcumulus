@@ -339,7 +339,7 @@ class Config
      *
      * @throws \JsonException
      *
-     * @noinspection PhpUnused  Called from shop-specific code outside this library.
+     * @noinspection PhpUnused Called from shop-specific code outside this library.
      * @deprecated: use get()
      */
     public function getShowRatePluginMessage(): int

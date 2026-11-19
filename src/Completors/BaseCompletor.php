@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpPrivateFieldCanBeLocalVariableInspection  In the future, $invoice may
+ * @noinspection PhpPrivateFieldCanBeLocalVariableInspection In the future, $invoice may
  *   be made a local variable, but probably we will need it as a property.
  */
 

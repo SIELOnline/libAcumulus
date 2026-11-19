@@ -18,7 +18,7 @@ use function assert;
  * After a stock transaction has been collected, the shop-specific part, it may need to be
  * completed shop independently.
  *
- * @noinspection PhpUnused  Instantiated by type name
+ * @noinspection PhpUnused Instantiated by type name
  */
 class StockTransactionCompletor extends BaseCompletor
 {

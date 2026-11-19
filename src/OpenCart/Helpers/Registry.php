@@ -198,9 +198,9 @@ abstract class Registry
      *   proxies a ModelGroup1Group2Model class. This follows the duck typing
      *   principle, thus we cannot define a strong typed return type here
      *
-     * @noinspection ReturnTypeCanBeDeclaredInspection  Actually, this method returns a
+     * @noinspection ReturnTypeCanBeDeclaredInspection Actually, this method returns a
      *   {@see \Opencart\System\Engine\Proxy}, not a model.
-     * @noinspection PhpDocMissingThrowsInspection  Will throw an \Exception
+     * @noinspection PhpDocMissingThrowsInspection Will throw an \Exception
      *   when the model class is not found, but that should be considered a
      *   development error.
      */
@@ -225,7 +225,7 @@ abstract class Registry
      * @return \Opencart\Admin\Model\Sale\Order|\Opencart\Catalog\Model\Checkout\Order
      * @OC3-return \ModelCheckoutOrder|\ModelSaleOrder
      *
-     * @noinspection ReturnTypeCanBeDeclaredInspection  Actually, this method returns a
+     * @noinspection ReturnTypeCanBeDeclaredInspection Actually, this method returns a
      *   {@see \Opencart\System\Engine\Proxy}, not one of the Order models.
      */
     public function getOrderModel()

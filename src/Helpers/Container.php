@@ -363,7 +363,7 @@ class Container
     }
 
     /**
-     * @noinspection PhpUnused  Called from shop-specific code.
+     * @noinspection PhpUnused Called from shop-specific code.
      */
     public function getCrashReporter(): CrashReporter
     {
@@ -397,7 +397,7 @@ class Container
     }
 
     /**
-     * @noinspection PhpUnused  Called from shop-specific code.
+     * @noinspection PhpUnused Called from shop-specific code.
      */
     public function getFormMapper(): FormMapper
     {

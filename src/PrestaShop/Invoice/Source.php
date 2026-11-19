@@ -236,7 +236,7 @@ class Source extends BaseSource
             $creditNote = $this->getShopObject();
             $amountEx = $creditNote->total_products_tax_excl + $creditNote->total_shipping_tax_excl;
             $amountInc = $creditNote->total_products_tax_incl + $creditNote->total_shipping_tax_incl;
-            /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
+            /** @noinspection PhpCastIsUnnecessaryInspection order_slip_type contains the string representation of an integer */
             if ((int) $creditNote->order_slip_type !== VoucherRefundType::PRODUCT_PRICES_REFUND) {
                 /** @var Order $order */
                 $order = $this->getOrder()->getShopObject();
@@ -244,7 +244,7 @@ class Source extends BaseSource
                 $cartRules = $order->getCartRules();
                 /** @var array $cartRule */
                 foreach ($cartRules as $cartRule) {
-                    /** @noinspection PhpCastIsUnnecessaryInspection  order_slip_type contains the string representation of an integer */
+                    /** @noinspection PhpCastIsUnnecessaryInspection order_slip_type contains the string representation of an integer */
                     if ((int) $creditNote->order_slip_type === VoucherRefundType::PRODUCT_PRICES_EXCLUDING_VOUCHER_REFUND) {
                         $amountEx += $cartRule['value'] - $cartRule['value_tax_excl'];
                         $amountInc -= $cartRule['value'];
@@ -269,7 +269,7 @@ class Source extends BaseSource
     /**
      * Returns the invoice reference for an order
      *
-     * @noinspection PhpUnused  Called via {@see Source::getInvoiceReference()}.
+     * @noinspection PhpUnused Called via {@see Source::getInvoiceReference()}.
      */
     protected function getInvoiceReferenceOrder(): ?string
     {
@@ -291,7 +291,7 @@ class Source extends BaseSource
     /**
      * Returns the invoice date for an order
      *
-     * @noinspection PhpUnused  Called via getInvoiceDate().
+     * @noinspection PhpUnused Called via getInvoiceDate().
      */
     protected function getInvoiceDateOrder(): ?DateTimeInterface
     {

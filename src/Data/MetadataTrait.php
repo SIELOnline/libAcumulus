@@ -83,7 +83,7 @@ trait MetadataTrait
     public function metadataCopy(self $source, string $name): void
     {
         /**
-         * @noinspection PhpParamsInspection  Expected parameter of type 'MetadataCollection', 'MetadataTrait' provided:
+         * @noinspection PhpParamsInspection Expected parameter of type 'MetadataCollection', 'MetadataTrait' provided:
          *   Strange as Traits can never be used as classes/types.
          */
         $this->getMetadataCollection()->copy($source, $name);

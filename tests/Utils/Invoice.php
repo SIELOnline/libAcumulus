@@ -49,7 +49,7 @@ trait Invoice
             static::assertArrayHasKey(Fld::Customer, $result);
             $messages = [];
             $this->compareAcumulusObjects($expected[Fld::Customer], $result[Fld::Customer], Fld::Customer, $excludeFields, $messages);
-            /** @noinspection JsonEncodingApiUsageInspection  false positive */
+            /** @noinspection JsonEncodingApiUsageInspection false positive */
             static::assertCount(0, $messages, json_encode($messages, Log::JsonFlags));
         } else {
             // File does not yet exist: first time for a new test order: save order to Order{id}.json.
@@ -146,7 +146,7 @@ trait Invoice
         $path = static::getDataPath() . '/Invoice';
         $append = $isNew ? '' : '.latest';
         $filename = "$path/$type$id$append.json";
-        /** @noinspection JsonEncodingApiUsageInspection  false positive */
+        /** @noinspection JsonEncodingApiUsageInspection false positive */
         file_put_contents($filename, json_encode($data, Log::JsonFlags) . "\n");
     }
 

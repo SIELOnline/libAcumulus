@@ -90,7 +90,7 @@ class MappingsForm extends Form
     }
 
     /**
-     * @noinspection PhpMissingParentCallCommonInspection  Parent is empty.
+     * @noinspection PhpMissingParentCallCommonInspection Parent is empty.
      */
     protected function validate(): void
     {

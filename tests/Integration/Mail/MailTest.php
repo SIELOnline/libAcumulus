@@ -172,7 +172,7 @@ class MailTest extends TestCase
     {
         $count = $this->getMailer()->getMailCount();
         $mail = $this->getMail($type, $namespace);
-        /** @noinspection UnnecessaryAssertionInspection  testing for a subclass of Mail */
+        /** @noinspection UnnecessaryAssertionInspection testing for a subclass of Mail */
         static::assertInstanceOf($class, $mail);
 
         $mail->createAndSend($args);

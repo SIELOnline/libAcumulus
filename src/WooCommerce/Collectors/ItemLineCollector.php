@@ -22,7 +22,7 @@ use function is_array;
 /**
  * ItemLineCollector contains WooCommerce specific {@see LineType::Item} collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class ItemLineCollector extends LineCollector
 {

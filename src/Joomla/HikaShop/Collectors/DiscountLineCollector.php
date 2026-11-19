@@ -32,7 +32,7 @@ use Siel\Acumulus\Meta;
  *   tends to be equal. It is the metadata in the invoice (as sent to Acumulus)
  *   that shows the differences.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class DiscountLineCollector extends LineCollector
 {

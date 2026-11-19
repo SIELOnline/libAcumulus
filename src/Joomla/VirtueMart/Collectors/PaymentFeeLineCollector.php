@@ -14,7 +14,7 @@ use Siel\Acumulus\Meta;
  * PaymentFeeLineCollector contains VirtueMart specific {@see LineType::PaymentFee}
  * collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class PaymentFeeLineCollector extends LineCollector
 {

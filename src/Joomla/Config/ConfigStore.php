@@ -37,7 +37,7 @@ class ConfigStore extends BaSeConfigStore
     {
         $extensionTable = new Extension(Factory::getContainer()->get(DatabaseInterface::class));
         $extensionTable->load(['element' => 'com_acumulus']);
-        /** @noinspection JsonEncodingApiUsageInspection  false positive */
+        /** @noinspection JsonEncodingApiUsageInspection false positive */
         $extensionTable->custom_data = json_encode($values, Meta::JsonFlags | JSON_FORCE_OBJECT);
         return $extensionTable->store();
     }

@@ -14,7 +14,7 @@ use VmModel;
  * ShippingLineCollector contains VirtueMart specific {@see LineType::Shipping} collecting
  * logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class ShippingLineCollector extends LineCollector
 {

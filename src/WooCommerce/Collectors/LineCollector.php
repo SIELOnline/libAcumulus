@@ -18,7 +18,7 @@ use function sprintf;
 /**
  * ItemLineCollector contains WooCommerce specific {@see LineType::Item} collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class LineCollector extends BaseLineCollector
 {

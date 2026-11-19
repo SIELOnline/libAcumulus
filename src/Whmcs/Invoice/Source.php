@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpMissingParentCallCommonInspection  Most parent methods are base/no-op implementations.
+ * @noinspection PhpMissingParentCallCommonInspection Most parent methods are base/no-op implementations.
  * @noinspection SpellCheckingInspection Too many compound words in (all lowercase) array keys.
  */
 

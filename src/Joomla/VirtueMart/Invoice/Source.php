@@ -59,7 +59,7 @@ class Source extends BaseSource
     /**
      * Loads an Order source for the set id.
      *
-     * @noinspection PhpUnused  Called via setSource().
+     * @noinspection PhpUnused Called via setSource().
      */
     protected function setShopObject(): void
     {
@@ -222,7 +222,7 @@ class Source extends BaseSource
     /**
      * See {@see getInvoiceDate}
      *
-     * @noinspection PhpUnused  Called via {@see callTypeSpecificMethod()}.
+     * @noinspection PhpUnused Called via {@see callTypeSpecificMethod()}.
      */
     protected function getInvoiceDateOrder(): ?DateTimeInterface
     {

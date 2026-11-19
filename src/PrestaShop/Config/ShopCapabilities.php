@@ -191,10 +191,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'fiscal-address-setting':
                 return Context::getContext()->link->getAdminLink('AdminTaxes') . '#form';
             case 'logo':
-                /** @noinspection PhpUndefinedConstantInspection  Defined in config,inc.php, line 130 or 132. */
+                /** @noinspection PhpUndefinedConstantInspection Defined in config,inc.php, line 130 or 132. */
                 return  __PS_BASE_URI__ . 'modules/acumulus/views/img/acumulus-logo.svg';
             case 'pro-support-image':
-                /** @noinspection PhpUndefinedConstantInspection  Defined in config,inc.php, line 130 or 132. */
+                /** @noinspection PhpUndefinedConstantInspection Defined in config,inc.php, line 130 or 132. */
                 return  __PS_BASE_URI__ . 'modules/acumulus/views/img/pro-support-prestashop.png';
             case 'pro-support-link':
                 return 'https://pay.siel.nl/?p=KL9pPSIIdMzqIieXB0FA56mTgyOvlEfUEosWM3ODsTZODa0P';

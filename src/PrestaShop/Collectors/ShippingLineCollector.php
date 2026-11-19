@@ -12,7 +12,7 @@ use Siel\Acumulus\Data\AcumulusObject;
 /**
  * ShippingLineCollector contains PrestaShop specific {@see LineType::Shipping} collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class ShippingLineCollector extends LineCollector
 {
@@ -29,7 +29,7 @@ class ShippingLineCollector extends LineCollector
      * @param \Siel\Acumulus\Data\Line $acumulusObject
      *   A shipping line with the mapped fields filled in.
      *
-     * @noinspection PhpMissingParentCallCommonInspection  Empty parent.
+     * @noinspection PhpMissingParentCallCommonInspection Empty parent.
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {

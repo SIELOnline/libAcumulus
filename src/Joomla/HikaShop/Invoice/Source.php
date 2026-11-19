@@ -27,7 +27,7 @@ class Source extends BaseSource
     /**
      * Loads an Order source for the set id.
      *
-     * @noinspection PhpUnused  Called via setSource().
+     * @noinspection PhpUnused Called via setSource().
      */
     protected function setShopObject(): void
     {

@@ -75,7 +75,7 @@ class FormTest extends TestCase
         static::assertInstanceOf($class, $form);
 
         if ($type === 'invoice') {
-            /** @noinspection PhpPossiblePolymorphicInvocationInspection  will be an InvoiceStatusForm */
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection will be an InvoiceStatusForm */
             $form->setSource($this->getInvoiceSource());
         } elseif ($type === 'message') {
             foreach ($properties as $property => $value) {

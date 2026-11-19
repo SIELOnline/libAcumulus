@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection DuplicatedCode  This started as a duplicate of ConfigForm.
+ * @noinspection DuplicatedCode This started as a duplicate of ConfigForm.
  */
 
 declare(strict_types=1);
@@ -46,7 +46,7 @@ class SettingsForm extends BaseConfigForm
     protected array $accountNumberOptions;
 
     /**
-     * @noinspection PhpMissingParentCallCommonInspection  Parent is empty.
+     * @noinspection PhpMissingParentCallCommonInspection Parent is empty.
      */
     protected function validate(): void
     {

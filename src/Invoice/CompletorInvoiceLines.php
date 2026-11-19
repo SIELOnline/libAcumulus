@@ -12,7 +12,7 @@
  *
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
- * @noinspection DuplicatedCode  During the transition to Collectors, duplicate code will exist.
+ * @noinspection DuplicatedCode During the transition to Collectors, duplicate code will exist.
  */
 
 namespace Siel\Acumulus\Invoice;
@@ -592,7 +592,7 @@ class CompletorInvoiceLines
      *   The, possibly empty, set of vat rate infos that have a vat rate that
      *   falls within the given vat range.
      *
-     * @noinspection OffsetOperationsInspection  false positives on $vatRateinfo
+     * @noinspection OffsetOperationsInspection false positives on $vatRateinfo
      */
     protected function filterVatRateInfosByRange(float $min, float $max, ?array $vatRateInfos = null): array
     {

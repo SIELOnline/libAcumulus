@@ -12,7 +12,7 @@ use Siel\Acumulus\Data\Line;
  * ShippingLineCollector contains OpenCart specific {@see LineType::Shipping} collecting
  * logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class ShippingLineCollector extends LineCollector
 {

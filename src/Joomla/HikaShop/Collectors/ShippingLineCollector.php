@@ -57,7 +57,7 @@ use function sprintf;
  *   array contains the proportion of the (total) tax per tax class (but thus no line for
  *   a vat free product without tax class), see last example.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class ShippingLineCollector extends LineCollector
 {

@@ -103,7 +103,7 @@ class AcumulusRequest
         if ($submit !== null) {
             $submit = $this->util->maskArray($this->getSubmit());
         }
-        /** @noinspection JsonEncodingApiUsageInspection  False positive */
+        /** @noinspection JsonEncodingApiUsageInspection False positive */
         return sprintf("Request: uri=%s\nsubmit=%s", $uri ?? 'null', json_encode($submit, Log::JsonFlags));
     }
 

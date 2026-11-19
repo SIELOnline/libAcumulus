@@ -85,7 +85,7 @@ class FieldExpander extends BaseFieldExpander
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
      *
-     * @noinspection PhpUndefinedFieldInspection  Class WC_Meta_Data implements __get().
+     * @noinspection PhpUndefinedFieldInspection Class WC_Meta_Data implements __get().
      */
     protected function getValueFromMetadata(array $metaData, string $key): mixed
     {

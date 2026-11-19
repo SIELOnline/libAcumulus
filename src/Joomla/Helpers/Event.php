@@ -52,7 +52,7 @@ class Event extends BaseEvent
 
     private function getCMSApplication(): CMSApplicationInterface
     {
-        /** @noinspection PhpUnhandledExceptionInspection  won't fail, application has started. */
+        /** @noinspection PhpUnhandledExceptionInspection won't fail, application has started. */
         return Factory::getApplication();
     }
 }

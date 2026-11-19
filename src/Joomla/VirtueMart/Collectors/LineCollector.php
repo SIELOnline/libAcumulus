@@ -18,7 +18,7 @@ use Siel\Acumulus\Meta;
 /**
  * LineCollector contains common VirtueMart specific line collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class LineCollector extends BaseLineCollector
 {

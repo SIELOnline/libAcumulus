@@ -12,7 +12,7 @@ use Siel\Acumulus\Data\AcumulusObject;
  * GiftWrappingFeeLineCollector contains PrestaShop specific {@see LineType::PaymentFee}
  * collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class GiftWrappingFeeLineCollector extends LineCollector
 {
@@ -22,7 +22,7 @@ class GiftWrappingFeeLineCollector extends LineCollector
      *
      * @throws \Exception
      *
-     * @noinspection PhpMissingParentCallCommonInspection  Empty parent
+     * @noinspection PhpMissingParentCallCommonInspection Empty parent
      */
     protected function collectLogicFields(AcumulusObject $acumulusObject, PropertySources $propertySources): void
     {

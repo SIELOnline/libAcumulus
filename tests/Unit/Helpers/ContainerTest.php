@@ -168,7 +168,7 @@ class ContainerTest extends TestCase
             define ('_PS_ROOT_DIR_', dirname(__FILE__, 5));
         }
         $object = $container->getCollector($dataType, $subType);
-        /** @noinspection UnnecessaryAssertionInspection  we check for a subtype of the specified return type */
+        /** @noinspection UnnecessaryAssertionInspection we check for a subtype of the specified return type */
         self::assertInstanceOf($collectorClass, $object);
     }
 

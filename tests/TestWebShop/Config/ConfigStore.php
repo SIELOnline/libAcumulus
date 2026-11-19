@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  PHP8.2 attribute
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection PHP8.2 attribute
  */
 
 declare(strict_types=1);

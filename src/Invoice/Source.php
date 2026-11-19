@@ -133,7 +133,7 @@ abstract class Source implements WrapperInterface, Stringable
      * @return int|string|null
      *   A value identifying the payment method or null if the payment method is unknown.
      *
-     * @noinspection PhpUnused  Called via callTypeSpecificMethod().
+     * @noinspection PhpUnused Called via callTypeSpecificMethod().
      */
     protected function getPaymentMethodCreditNote(): int|string|null
     {
@@ -284,7 +284,7 @@ abstract class Source implements WrapperInterface, Stringable
     /**
      * See {@see getInvoiceId()}
      *
-     * @noinspection PhpUnused  Called via callTypeSpecificMethod().
+     * @noinspection PhpUnused Called via callTypeSpecificMethod().
      */
     protected function getInvoiceIdCreditNote(): ?int
     {
@@ -307,7 +307,7 @@ abstract class Source implements WrapperInterface, Stringable
     /**
      * See {@see getInvoiceReference()}
      *
-     * @noinspection PhpUnused  Called via callTypeSpecificMethod().
+     * @noinspection PhpUnused Called via callTypeSpecificMethod().
      */
     protected function getInvoiceReferenceCreditNote(): int|string
     {
@@ -330,7 +330,7 @@ abstract class Source implements WrapperInterface, Stringable
     /**
      * See {@see getInvoiceDate}
      *
-     * @noinspection PhpUnused  Called via callTypeSpecificMethod().
+     * @noinspection PhpUnused Called via callTypeSpecificMethod().
      */
     protected function getInvoiceDateCreditNote(): ?DateTimeInterface
     {
@@ -391,7 +391,7 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * @noinspection PhpUnused  May be called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     * @noinspection PhpUnused May be called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
      */
     public function isOrder(): ?Source
     {
@@ -399,7 +399,7 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * @noinspection PhpUnused  May be called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     * @noinspection PhpUnused May be called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
      */
     public function isCreditNote(): ?Source
     {
@@ -407,7 +407,7 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * @noinspection PhpUnused  May be called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
+     * @noinspection PhpUnused May be called via the {@see \Siel\Acumulus\Helpers\FieldExpander}.
      */
     public function isInvoice(): ?Source
     {
@@ -488,7 +488,7 @@ abstract class Source implements WrapperInterface, Stringable
      *     for this order.
      *   - Credit note: if $index = 0, the credit note itself, otherwise null.
      *
-     * @noinspection PhpUnused  Can be used in mappings.
+     * @noinspection PhpUnused Can be used in mappings.
      */
     public function getCreditNote(int $index = 0): object|array|null
     {
@@ -580,7 +580,7 @@ abstract class Source implements WrapperInterface, Stringable
      *   The, possibly empty, set of shipping-infos. The type of the array entries
      *   differs per shop and may even differ within the list of 1 shop.
      *
-     * @noinspection PhpUnused  called via
+     * @noinspection PhpUnused called via
      *    {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getShippingLineInfos(): array
@@ -589,7 +589,7 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * @noinspection PhpUnused  called via
+     * @noinspection PhpUnused called via
      *   {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getGiftWrappingFeeLineInfos(): array
@@ -598,7 +598,7 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * @noinspection PhpUnused  called via
+     * @noinspection PhpUnused called via
      *   {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getPaymentFeeLineInfos(): array
@@ -607,7 +607,7 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * @noinspection PhpUnused  called via
+     * @noinspection PhpUnused called via
      *   {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getOtherLineInfos(): array
@@ -622,7 +622,7 @@ abstract class Source implements WrapperInterface, Stringable
      *   The, possibly empty, set of discount infos. The type of the array entries
      *   differs per shop and may even differ within the list of 1 shop.
      *
-     * @noinspection PhpUnused  called via
+     * @noinspection PhpUnused called via
      *    {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getDiscountLineInfos(): array
@@ -650,7 +650,7 @@ abstract class Source implements WrapperInterface, Stringable
      * @return array
      *   Description.
      *
-     * @noinspection PhpUnused  called via
+     * @noinspection PhpUnused called via
      *    {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getManualLineInfos(): array
@@ -659,7 +659,7 @@ abstract class Source implements WrapperInterface, Stringable
     }
 
     /**
-     * @noinspection PhpUnused  called via
+     * @noinspection PhpUnused called via
      *   {@see \Siel\Acumulus\Collectors\InvoiceCollector::collectLinesForType()}
      */
     public function getVoucherLineInfos(): array

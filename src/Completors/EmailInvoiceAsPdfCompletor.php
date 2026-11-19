@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpPrivateFieldCanBeLocalVariableInspection  In the future,
+ * @noinspection PhpPrivateFieldCanBeLocalVariableInspection In the future,
  *   $address may be made a local variable, but probably we will need it as a
  *   property.
  */
@@ -24,7 +24,7 @@ use function assert;
  * completed, also the emailAsPdf part. Think of things like:
  * - Adding config-based properties.
  *
- * @noinspection PhpUnused  Instantiated by type name
+ * @noinspection PhpUnused Instantiated by type name
  */
 class EmailInvoiceAsPdfCompletor extends BaseCompletor
 {

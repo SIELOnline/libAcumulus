@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpMissingStrictTypesDeclarationInspection  We cannot enforce
+ * @noinspection PhpMissingStrictTypesDeclarationInspection We cannot enforce
  *   strict typing as we may have to call functions/methods with literal number
  *   constants extracted from a string and thus passed as a string instead of a
  *   number.

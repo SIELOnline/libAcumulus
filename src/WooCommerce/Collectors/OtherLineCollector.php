@@ -13,7 +13,7 @@ use Siel\Acumulus\Meta;
  * OtherLineCollector contains WooCommerce specific {@see LineType::Other}
  * collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class OtherLineCollector extends LineCollector
 {

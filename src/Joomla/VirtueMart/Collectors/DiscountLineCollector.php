@@ -24,7 +24,7 @@ use Siel\Acumulus\Meta;
  * calculation rules. So it is better to add a line per calc rule with a
  * negative amount: this gives us descriptions of the discounts as well.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class DiscountLineCollector extends LineCollector
 {

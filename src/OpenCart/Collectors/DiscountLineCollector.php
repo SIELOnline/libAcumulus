@@ -11,7 +11,7 @@ use Siel\Acumulus\Data\Line;
 /**
  * DiscountLineCollector contains OpenCart specific {@see LineType::Discount} collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class DiscountLineCollector extends LineCollector
 {

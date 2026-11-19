@@ -54,7 +54,7 @@ use function is_string;
  * @method bool setTemplate(?int $value, int $mode = PropertySet::Always)
  * @method bool setInvoiceNotes(?string $value, int $mode = PropertySet::Always)
  *
- * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
+ * @noinspection PhpLackOfCohesionInspection Data objects have little cohesion.
  */
 class Invoice extends AcumulusObject
 {

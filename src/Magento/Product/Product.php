@@ -22,7 +22,7 @@ class Product extends BaseProduct
 
     protected function setId(): void
     {
-        /** @noinspection PhpCastIsUnnecessaryInspection  actually a numeric string is returned */
+        /** @noinspection PhpCastIsUnnecessaryInspection actually a numeric string is returned */
         $this->id = (int) $this->shopObject->getId();
     }
 }

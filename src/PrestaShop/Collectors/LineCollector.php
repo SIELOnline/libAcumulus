@@ -53,7 +53,7 @@ class LineCollector extends BaseLineCollector
                 $taxRulesGroup = new TaxRulesGroup($taxRulesGroupId);
                 $address = new Address($invoice->getCustomer()->getFiscalAddress()->metadataGet(Meta::AddressId));
                 $taxManager = TaxManagerFactory::getManager($address, $taxRulesGroupId);
-                /** @noinspection PhpUndefinedMethodInspection  false positive */
+                /** @noinspection PhpUndefinedMethodInspection false positive */
                 $taxCalculator = $taxManager->getTaxCalculator();
                 $line->metadataSet(Meta::VatClassId, $taxRulesGroup->id);
                 $line->metadataSet(Meta::VatClassName, $taxRulesGroup->name);

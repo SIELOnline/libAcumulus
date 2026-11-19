@@ -10,7 +10,7 @@ namespace Siel\Acumulus\TestWebShop\Config;
 class Mappings extends \Siel\Acumulus\Config\Mappings
 {
     /**
-     * @noinspection PhpOverridingMethodVisibilityInspection  Just for testing.
+     * @noinspection PhpOverridingMethodVisibilityInspection Just for testing.
      */
     public function getOverriddenValues(array $mappings, array $existingMappings): array
     {

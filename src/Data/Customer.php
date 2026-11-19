@@ -62,7 +62,7 @@ use function in_array;
  * @method bool setMark(?string $value, int $mode = PropertySet::Always)
  * @method bool setDisableDuplicates(bool|int|null $value, int $mode = PropertySet::Always)
  *
- * @noinspection PhpLackOfCohesionInspection  Data objects have little cohesion.
+ * @noinspection PhpLackOfCohesionInspection Data objects have little cohesion.
  */
 class Customer extends AcumulusObject
 {
@@ -220,7 +220,7 @@ class Customer extends AcumulusObject
         });
         $altAddress = array_combine($altAddressKeys, $altAddress);
 
-        /** @noinspection PhpArithmeticTypeCheckInspection  false positive */
+        /** @noinspection PhpArithmeticTypeCheckInspection false positive */
         return $this->propertiesToArray() + $address + $altAddress + $this->metadataToArray();
     }
 

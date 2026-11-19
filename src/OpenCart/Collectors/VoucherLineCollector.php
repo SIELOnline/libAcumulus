@@ -11,7 +11,7 @@ use Siel\Acumulus\Data\Line;
 /**
  * VoucherLineCollector contains OpenCart specific {@see LineType::Voucher} collecting logic.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class VoucherLineCollector extends LineCollector
 {

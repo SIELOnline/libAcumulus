@@ -149,7 +149,7 @@ class Number
             $f = (string) $f;
         }
         if ($f !== null && $f !== '' && !is_numeric($f)) {
-            /** @noinspection JsonEncodingApiUsageInspection  we want this exception, not a json exception. */
+            /** @noinspection JsonEncodingApiUsageInspection we want this exception, not a json exception. */
             throw new InvalidArgumentException(sprintf('%s is not considered a numeric value', json_encode($f)));
         }
         return (float) $f;

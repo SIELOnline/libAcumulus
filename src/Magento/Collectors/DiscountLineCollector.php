@@ -16,7 +16,7 @@ use Siel\Acumulus\Meta;
  * Discounts in Magento are stored at the order/creditmemo level. If product prices are
  * incl. VAT, the discount amount will also be incl. VAT.
  *
- * @noinspection PhpUnused  Instantiated via a factory.
+ * @noinspection PhpUnused Instantiated via a factory.
  */
 class DiscountLineCollector extends LineCollector
 {

@@ -135,7 +135,7 @@ class CompleteVatRange extends RecursiveLineCompletor
 
         if (Number::isZero($denominator, 0.0001)) {
             // zero amounts (and I hope zero VAT): we cannot determine the range.
-            $line->vatRate = null;
+            unset($line->vatRate);
             $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
         } elseif (Number::isZero($numerator, 0.0001)) {
             // zero VAT with non-zero amount: rate = 0

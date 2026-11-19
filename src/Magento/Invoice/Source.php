@@ -374,6 +374,8 @@ class Source extends BaseSource
 
     public function getManualLineInfos(): array
     {
+        // Manual lines in Magento can only appear on refunds and its info is stored at
+        // the credit memo level.
         return $this->getType() === Source::CreditNote && !Number::isZero($this->getShopObject()->getBaseAdjustment()) ? [$this] : [];
     }
 }

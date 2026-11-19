@@ -75,6 +75,7 @@ class ItemLineCollector extends LineCollector
             // @todo: this is a mess:
             //   - we do no collect child lines but have to repeat the mappings here in code
             //   - we pass the shop item and would have to create the Acumulus wrappers for item and product ourselves.
+            //   First createe a way to recursively call the Collector::collect()
             $line->product = $shopItem->getName();
             $line->quantity = $shopItem->getQtyOrdered();
             $line->vatRate = $shopItem->getTaxPercent();
@@ -93,7 +94,7 @@ class ItemLineCollector extends LineCollector
         $line->quantity = $shopItem->getQtyOrdered(); // copied to mappings.
 
         // Get vat and discount information
-        // - Tax percent = VAT % as specified in product settings, for the
+        // - Tax rate = VAT % as specified in product settings, for the
         //   parent of bundled products this may be 0 and incorrect.
         $vatRate = (float) $shopItem->getTaxPercent(); // Copied to mappings.
         // - (Base) tax amount = VAT on discounted item line =
@@ -204,7 +205,7 @@ class ItemLineCollector extends LineCollector
             }
         }
 
-        // Add customizable options.
+        // Add customisable options.
         $customizableOptions = $shopItem->getProductOptionByCode('options');
         if (!empty($customizableOptions)) {
             foreach ($customizableOptions as $customizableOption) {

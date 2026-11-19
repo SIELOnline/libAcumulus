@@ -7,8 +7,6 @@ namespace Siel\Acumulus\Magento\Collectors;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Data\VatRateSource;
-use Siel\Acumulus\Magento\Invoice\Source;
 use Siel\Acumulus\Meta;
 
 /**
@@ -34,44 +32,25 @@ class DiscountLineCollector extends LineCollector
     }
 
     /**
-     * Collects the discount line for the invoice.
+     * Collects the part that needs logic from the discount line for the invoice.
+     *
+     * If product prices are entered incl./ex. VAT, the discount amount is also incl./ex.
+     * VAT.
      *
      * @param \Siel\Acumulus\Data\Line $line
-     *   A discount line with the mapped fields filled in.
+     *   A discount line with the mapped fields already filled in.
      *
      * @throws \Exception
+     * @noinspection PhpUnusedParameterInspection
      */
     protected function collectDiscountLine(Line $line, PropertySources $propertySources): void
     {
-        /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        $source = $propertySources['source'];
-
-        $line->itemNumber = '';
-        $line->product = $this->getDiscountDescription($source);
-        // Product prices incl. VAT => discount amount is also incl. VAT
-        if ($this->productPricesIncludeTax()) {
-            $line->metadataSet(Meta::UnitPriceInc, $source->getSign() * $source->getShopObject()->getBaseDiscountAmount());
-        } else {
-            $line->unitPrice = $source->getSign() * $source->getShopObject()->getBaseDiscountAmount();
+        if (!$this->productPricesIncludeTax()) {
+            // Move amount and precision from unit price inc. to unit price ex.
+            $line->unitPrice = $line->metadataGet(Meta::UnitPriceInc);
+            $line->metadataAdd(Meta::PrecisionUnitPrice, $line->metadataGet(Meta::PrecisionUnitPriceInc));
+            $line->metadataRemove(Meta::UnitPriceInc);
+            $line->metadataRemove(Meta::PrecisionUnitPriceInc);
         }
-        $line->vatRate = null;
-        $line->metadataSet(Meta::VatRateSource, VatRateSource::Strategy);
-        $line->metadataSet(Meta::StrategySplit, true);
-        $line->quantity = 1;
-    }
-
-    protected function getDiscountDescription(Source $source): string
-    {
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $source->getOrder()->getShopObject();
-
-        if ($order->getDiscountDescription()) {
-            $description = $this->t('discount_code') . ' ' . $order->getDiscountDescription();
-        } elseif ($order->getCouponCode()) {
-            $description = $this->t('discount_code') . ' ' . $order->getCouponCode();
-        } else {
-            $description = $this->t('discount');
-        }
-        return $description;
     }
 }

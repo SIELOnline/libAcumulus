@@ -7,7 +7,6 @@ namespace Siel\Acumulus\Magento\Collectors;
 use Siel\Acumulus\Collectors\PropertySources;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Line;
-use Siel\Acumulus\Data\VatRateSource;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
@@ -40,68 +39,55 @@ class ShippingLineCollector extends LineCollector
     {
         /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
         $source = $propertySources['source'];
-        /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $shopSource */
-        $shopSource = $source->getShopObject();
+        /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $shopObject */
+        $sign = $source->getSign();
 
-        $line->product = $this->getShippingMethodName($source);
-        $line->quantity = 1;
+        if ($this->shippingPriceIncludeTax()) {
+            // May prevent rounding differences between the shop and Acumulus.
+            $line->metadataSet(Meta::RecalculatePrice, Fld::UnitPrice);
+        }
+
+        // Add vat class meta data.
+        $this->addVatClassMetaData($line, $this->getShippingTaxClassId());
+
         // What do the following methods return?
         // - getBaseShippingAmount(): shipping costs ex VAT ex any discount.
         // - getBaseShippingInclTax(): shipping costs inc VAT ex any discount.
         // - getBaseShippingTaxAmount(): VAT on shipping costs inc discount.
-        // - getBaseShippingDiscountAmount(): discount on shipping inc VAT.
-        if (!Number::isZero($shopSource->getBaseShippingAmount())) {
-            // We have 2 ways of calculating the vat rate: first one is
-            // based on tax amount and normal shipping costs corrected with
-            // any discount (as the tax amount is including any discount):
-            // $vatRate1 = $magentoSource->getBaseShippingTaxAmount() / ($magentoSource->getBaseShippingInclTax()
-            //   - $magentoSource->getBaseShippingDiscountAmount() - $magentoSource->getBaseShippingTaxAmount());
-            // However, we will use the 2nd way as that seems to be more
-            // precise and thus generally leads to a smaller range:
-            // Get range based on normal shipping costs inc and ex-VAT.
-            $sign = $source->getSign();
-            $shippingInc = $sign * $shopSource->getBaseShippingInclTax();
-            $shippingEx = $sign * $shopSource->getBaseShippingAmount();
-            $shippingVat = $shippingInc - $shippingEx;
-            $line->unitPrice = $shippingEx;
-            $line->metadataSet(Meta::VatAmount, $shippingVat);
-            $line->metadataSet(Meta::PrecisionUnitPrice, $this->shippingPriceIncludeTax() ? 0.02 : 0.01);
-            $line->metadataSet(Meta::PrecisionVatAmount, 0.02);
-            $line->metadataSet(Meta::UnitPriceInc, $shippingInc);
-            $line->metadataSet(Meta::RecalculatePrice, $this->shippingPriceIncludeTax() ? Fld::UnitPrice : Meta::UnitPriceInc);
-            $line->metadataAdd(Meta::FieldsCalculated, Meta::VatAmount);
+        // - getBaseShippingDiscountAmount(): discount on shipping. However: only exists
+        //   on Orders and whether this is inc or ex vat depends on the 'tax =>
+        //   calculation => discount_tax' setting.
+        $shippingDiscountAmount = $sign * $source->getOrder()->getShopObject()->getBaseShippingDiscountAmount();
 
-            // Add vat class meta data.
-            $this->addVatClassMetaData($line, $this->getShippingTaxClassId());
-
-            // getBaseShippingDiscountAmount() only exists on Orders.
-            if ($source->getType() === Source::Order && !Number::isZero($shopSource->getBaseShippingDiscountAmount())) {
-                $tag = $this->discountIncludesTax() ? Meta::LineDiscountAmountInc : Meta::LineDiscountAmount;
-                $line->metadataSet($tag, -$sign * $shopSource->getBaseShippingDiscountAmount());
-            } elseif ($source->getType() === Source::CreditNote
-                && !Number::floatsAreEqual($shippingVat, $shopSource->getBaseShippingTaxAmount(), 0.02)
-            ) {
-                // On credit notes, the shipping discount amount is not
-                // stored but can be deduced via the shipping discount tax
-                // amount and the shipping vat rate. To get a more precise
-                // Meta::LineDiscountAmountInc, we compute that in the
-                // completor when we have corrected the vat rate.
-                $line->metadataSet(Meta::LineDiscountVatAmount, $sign * ($shippingVat - $sign * $shopSource->getBaseShippingTaxAmount()));
+        if (!Number::isZero($shippingDiscountAmount)) {
+            if ($source->getType() === Source::Order) {
+                // Set discount metadata and adjust prices as were set by mapping.
+                if ($this->discountIncludesTax()) {
+                    $line->metadataSet(Meta::LineDiscountAmountInc, $shippingDiscountAmount);
+                    // Adjust unit price inc, remove unit price.
+                    $line->metadataSet(Meta::UnitPriceInc, $line->metadataGet(Meta::UnitPriceInc) + $shippingDiscountAmount);
+                    $line->metadataSet(Meta::PrecisionUnitPriceInc, $line->metadataGet(Meta::PrecisionUnitPriceInc) + 0.01);
+                    unset($line->unitPrice);
+                    $line->metadataRemove(Meta::PrecisionUnitPrice);
+                } else {
+                    $line->metadataSet(Meta::LineDiscountAmount, $shippingDiscountAmount);
+                    // Adjust unit price, remove unit price inc.
+                    $line->unitPrice += $shippingDiscountAmount;
+                    $line->metadataSet(Meta::PrecisionUnitPrice, $line->metadataGet(Meta::PrecisionUnitPrice) + 0.01);
+                    $line->metadataRemove(Meta::UnitPriceInc);
+                    $line->metadataRemove(Meta::PrecisionUnitPriceInc);
+                }
+            } else { // Source::Creditmemo
+                // On credit notes, the shipping discount amount is not stored but can be
+                // deduced via the shipping discount tax amount and the shipping vat rate.
+                // To get a more precise Meta::LineDiscountAmountInc, we compute that in
+                // the completor when we have corrected the vat rate.
+                // These amounts have the expected sign (- on order, + on refund).
+                $nonDiscountedShippingVat = $line->metadataGet(Meta::UnitPriceInc) - $line->unitPrice;
+                $discountedShippingVat = $line->metadataGet(Meta::VatAmount);
+                $shippingVatDiscount = $nonDiscountedShippingVat - $discountedShippingVat;
+                $line->metadataSet(Meta::LineDiscountVatAmount, $shippingVatDiscount);
             }
-        } else {
-            // Free shipping should get a "normal" tax rate. We leave that
-            // to the completor to determine.
-            $line->unitPrice = 0;
-            $line->vatRate = null;
-            $line->metadataSet(Meta::VatRateSource, VatRateSource::Completor);
         }
-    }
-
-    protected function getShippingMethodName(mixed ...$args): string
-    {
-        /** @var \Siel\Acumulus\Magento\Invoice\Source $source */
-        [$source] = $args;
-        $name = $source->getOrder()->getShopObject()->getShippingDescription();
-        return !empty($name) ? $name : parent::getShippingMethodName();
     }
 }

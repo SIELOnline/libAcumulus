@@ -229,17 +229,20 @@ interface Meta
     /**
      * Creator->Strategy: the discount amount ex vat that was applied to this
      * line (used by the SplitKnownDiscountLine strategy, PS+MA).
+     * Is expected to be negative on orders, positive on credit notes.
      */
     public const LineDiscountAmount = 'meta-line-discount-amount';
     /**
      * Creator->Strategy: the discount amount inc vat that was applied to this
      * line (used by the SplitKnownDiscountLine strategy, PS+MA).
+     * Is expected to be negative on orders, positive on credit notes.
      */
     public const LineDiscountAmountInc = 'meta-line-discount-amountinc';
     public const LineDiscountAmountIncCorrected = 'meta-line-discount-amountinc-corrected';
     /**
      * Creator -> Strategy: the discount vat amount that was applied to this
      * line (used by the SplitKnownDiscountLine strategy, PS+MA).
+     * Is expected to be negative on orders, positive on credit notes.
      */
     public const LineDiscountVatAmount = 'meta-line-discount-vatamount';
 

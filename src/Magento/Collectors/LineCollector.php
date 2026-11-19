@@ -14,8 +14,6 @@ use Siel\Acumulus\Meta;
 
 /**
  * LineCollector contains common methods for Magento line collectors.
- *
- * @noinspection PhpUnused  Instantiated via a factory.
  */
 class LineCollector extends BaseLineCollector
 {

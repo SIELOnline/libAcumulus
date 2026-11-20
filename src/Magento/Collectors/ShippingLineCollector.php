@@ -58,7 +58,6 @@ class ShippingLineCollector extends LineCollector
         //   on Orders and whether this is inc or ex vat depends on the 'tax =>
         //   calculation => discount_tax' setting.
         $shippingDiscountAmount = $sign * $source->getOrder()->getShopObject()->getBaseShippingDiscountAmount();
-
         if (!Number::isZero($shippingDiscountAmount)) {
             if ($source->getType() === Source::Order) {
                 // Set discount metadata and adjust prices as were set by mapping.

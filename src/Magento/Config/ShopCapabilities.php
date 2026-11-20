@@ -79,11 +79,23 @@ class ShopCapabilities extends ShopCapabilitiesBase
             LineType::Item => [
                 Meta::Id => '[item::getId()]',
                 Fld::ItemNumber => '[item::getShopObject()::getSku()]',
-                Fld::Product => '[product::getShopObject()::getName()]',
-                Fld::Quantity => '[item::getShopObject()::getQtyOrdered()]',
-                Fld::VatRate => '[item::getShopObject()::getTaxPercent()|item::getShopObject()::getOrderItem():;getTaxPercent()]',
+                Fld::Product => '[item::getProduct()::getShopObject()::getName()]',
+                // getBasePrice() exists on both CreditmemoInterface and OrderItemInterface.
+                Fld::UnitPrice => '[sign*item::getShopObject()::getBasePrice()]',
+                Meta::PrecisionUnitPrice => 0.01,
+                // CreditmemoItemInterface::getQty() or OrderItemInterface::getQtyOrdered().
+                Fld::Quantity => '[item::getShopObject()::getQty()|item::getShopObject()::getQtyOrdered()]',
+                // Creditmemo::getOrderItem() to get the vat rate from the order item.
+                Fld::VatRate => '[item::getShopObject()::getOrderItem()::getTaxPercent()|item::getShopObject()::getTaxPercent()]',
+                // getBasePriceInclTax() exists on both CreditmemoInterface and OrderItemInterface.
+                Meta::UnitPriceInc => '[sign*item::getShopObject()::getBasePriceInclTax()]',
+                Meta::PrecisionUnitPriceInc => 0.01,
+                Meta::VatRateSource => VatRateSource::Mapped,
+                // Tax class id is a custom attribute, so this is handled by __call()
+                Meta::VatClassId => '[item::getProduct()::getShopObject()::getTaxClassId()]',
+
                 Meta::ProductType => '[item::getShopObject()::getProductType()]',
-                Meta::ProductId => '[item::getShopObject()::getProductId()|product::getShopObject()::getId()]',
+                Meta::ProductId => '[item::getShopObject()::getProductId()]',
             ],
             LineType::Shipping => [
                 // Order, not Creditmemo

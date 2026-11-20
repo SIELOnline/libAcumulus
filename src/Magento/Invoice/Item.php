@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Invoice;
 
-use Magento\Catalog\Model\Product as MagentoProduct;
 use RuntimeException;
 use Siel\Acumulus\Invoice\Item as BaseItem;
 use Siel\Acumulus\Product\Product;
@@ -13,7 +12,7 @@ use Siel\Acumulus\Magento\Helpers\Registry;
 /**
  * Item is a wrapper/adapter around Magento specific order/credit memo product lines.
  *
- * @method \Siel\Acumulus\Magento\Product\Product getProduct()
+ * @method \Siel\Acumulus\Magento\Product\Product|null getProduct()
  * @method \Magento\Sales\Model\Order\Item|\Magento\Sales\Model\Order\Creditmemo\Item getShopObject()
  * @property \Magento\Sales\Model\Order\Item|\Magento\Sales\Model\Order\Creditmemo\Item $shopObject
  */
@@ -31,15 +30,10 @@ class Item extends BaseItem
 
     protected function createProduct(): ?Product
     {
-        if ($this->getSource()->getType() === Source::Order) {
-            $product = $this->shopObject->getProduct();
-            return $product !== null ? $this->getContainer()->createProduct($product, $this) : null;
-        } else {
-            /** @var \Magento\Catalog\Model\Product $product */
-            $product = $this->getRegistry()->create(MagentoProduct::class);
-            $this->getRegistry()->get($product->getResourceName())->load($product, $this->shopObject->getProductId());
-            return !empty($product->getId()) ? $this->getContainer()->createProduct($product, $this) : null;
-        }
+        $shopProduct = $this->getSource()->getType() === Source::Order
+            ? $this->shopObject->getProduct()
+            : $this->getShopObject()->getOrderItem()->getProduct();
+        return $shopProduct !== null ? $this->getContainer()->createProduct($shopProduct, $this) : null;
     }
 
     protected function getRegistry(): Registry

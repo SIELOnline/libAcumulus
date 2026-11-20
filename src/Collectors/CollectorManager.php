@@ -150,7 +150,7 @@ class CollectorManager
 
     public function collectBasicSubmit(bool $needContract): BasicSubmit
     {
-        $this->getPropertySources()->add([
+        $oldPropertySources = $this->getPropertySources()->add([
             'needContract' => $needContract,
             'config' => $this->getContainer()->getConfig(),
             'environment' => $this->getContainer()->getEnvironment()->toArray(),
@@ -158,7 +158,7 @@ class CollectorManager
         /** @var \Siel\Acumulus\Collectors\BasicSubmitCollector $basicSubmitCollector */
         $basicSubmitCollector = $this->getContainer()->getCollector(DataType::BasicSubmit);
         $basicSubmit = $basicSubmitCollector->collect($this->getPropertySources());
-        $this->getPropertySources()->remove('environment', 'config', 'needContact');
+        $this->getPropertySources()->exchangeArray($oldPropertySources);
         return $basicSubmit;
     }
 }

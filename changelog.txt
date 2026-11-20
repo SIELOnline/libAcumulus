@@ -13,12 +13,13 @@ Bugs:
 - MA: AcumulusEntryManager failed to recognise empty entries.
 
 Refactorings:
+- Allow child lines to be collected recursively like a main line is Colleted.
 - Allow Currency::convertAmount() to be called with null.
 - Number::castNumericValue(): changed again: do not cast numeric values with leading zeros
   (also not when starting with a '-') or starting with a '+'. Also do not cast degenerate
   numeric values like '3.' or '.3'.
 - Converted some legacy completor code to new collector-Completor architecture.
-- Corrected line completors to be recursive if they are run before lines are flattened.
+- Corrected: line completors should be recursive if they are run before lines are flattened.
 
 
 8.7.3 (2026-11-16) (PS|WC)

@@ -84,6 +84,9 @@ use Siel\Acumulus\Meta;
  */
 class LineCollector extends SubTypedCollector
 {
+    private PropertySources $propertySources;
+    private ?ArrayObject $fieldSpecifications;
+
     /**
      * This override changes the {@see \Siel\Acumulus\Data\AcumulusObject} type as
      * {@see \Siel\Acumulus\Data\Line} has no subclasses (just subtypes) but does have
@@ -103,6 +106,11 @@ class LineCollector extends SubTypedCollector
      */
     protected function collectBefore(AcumulusObject $acumulusObject, PropertySources $propertySources, ArrayObject $fieldSpecifications): void
     {
+        // Create a reference to these 2 values to be able to use them when collecting a
+        // child.
+        $this->propertySources = $propertySources;
+        $this->fieldSpecifications = $fieldSpecifications;
+
         $acumulusObject->setType($this->subType);
         // ItemLineCollectors only: add the {@see Product} as a property source.
         $item = $propertySources['item'] ?? null;
@@ -123,6 +131,34 @@ class LineCollector extends SubTypedCollector
         $this->getContainer()->getEvent()->triggerLineCollectAfter($acumulusObject, $propertySources);
         // Actually for ItemLineCollectors only, but remove won't fail, throw, or alert.
         $propertySources->remove('product');
+    }
+
+    /**
+     * Collects a child Line.
+     *
+     * Collecting a child line differs from collecting a line in that:
+     * - The {@see Collector::collectBefore()} and {@see Collector::collectAfter()} are
+     *   not called.
+     * - The collectLineBefore and collectLineAfter events are not triggered.
+     * - The Line gets a Meta::IsChild = true metadata value.
+     * - PropertySources passed are additional and will temporarily be added during
+     *   collecting this child line.
+     *
+     * @param array $additionalPropertySources
+     *   Additional property sources to be added to the originally set. If a property
+     *   source with the same name already exists, it will (temporartily) be overwritten.
+     *
+     * @return \Siel\Acumulus\Data\AcumulusObject
+     *   The collected child line.
+     */
+    protected function collectChild(array $additionalPropertySources): AcumulusObject
+    {
+        $oldPropertySources = $this->propertySources->add($additionalPropertySources);
+        $acumulusObject = $this->createAcumulusObject();
+        $acumulusObject->metadataSet(Meta::IsChild, true);
+        $this->collectFields($acumulusObject, $this->propertySources, $this->fieldSpecifications);
+        $this->propertySources->exchangeArray($oldPropertySources);
+        return $acumulusObject;
     }
 
     /**

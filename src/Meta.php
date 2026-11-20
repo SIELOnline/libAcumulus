@@ -308,6 +308,10 @@ interface Meta
      */
     public const ParentIndex = 'meta-parent-index';
     /**
+     * Collector: indicating whether we are collecting a child.
+     */
+    public const IsChild = 'meta-is-child';
+    /**
      * Support: the number of child lines this parent line had before
      * flattening.
      */

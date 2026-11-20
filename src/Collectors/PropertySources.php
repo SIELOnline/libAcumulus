@@ -44,10 +44,13 @@ class PropertySources extends ArrayObject
      *   The objects to be added, keyed by a string that can be used to refer to the
      *   object by the field expander mapping specifications or retrieve the object in
      *   code.
+     *
+     * @return array
+     *   The old set of property sources as an array.
      */
-    public function add(array $objects): void
+    public function add(array $objects): array
     {
-        $this->exchangeArray(array_reverse($objects) + $this->getArrayCopy());
+        return $this->exchangeArray(array_reverse($objects) + $this->getArrayCopy());
     }
 
     /**

@@ -11,6 +11,8 @@ Features:
 
 Bugs:
 - MA: AcumulusEntryManager failed to recognise empty entries.
+- PHP85: Exception: Deprecated Functionality: ArrayObject::__construct(): Using an object
+  as a backing array for ArrayObject is deprecated, ...  in .../Collector.php on line 129.
 
 Refactorings:
 - MA: Converted LineCollector code to mappings where possible,

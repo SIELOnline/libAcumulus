@@ -126,7 +126,7 @@ abstract class Collector implements CollectorInterface
      */
     protected function getFieldSpecifications(?ArrayObject $fieldSpecifications): ArrayObject
     {
-        return $fieldSpecifications ?? new ArrayObject($this->getMappings()->getFor($this->getMappingsKey()));
+        return $fieldSpecifications ?? $this->getMappings()->getFor($this->getMappingsKey());
     }
 
     /**

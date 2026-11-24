@@ -307,7 +307,7 @@ De derde optie kunt u gebruiken om dubbelingen (op basis van het e-mailadres van
         'field_mainAddress' => 'Hoofdadres',
         'option_mainAddress_shop' => 'Volg de instelling van uw winkel (aangeraden)',
         'desc_mainAddress' => 'Kies welk adres als hoofdadres gebruikt wordt en welk als alternatief adres. U kunt beide adressen gebruiken in uw templates in Acumulus, '
-            . 'maar Acumulus gebruikt het hoofdadres voor het bepalen van de toe te passen btw-tarieven.',
+            . 'maar Acumulus gebruikt het hoofdadres voor het bepalen van de toe te passen btw-tarieven en dat zou dus hetzelfde adres moeten zijn als dat uw webwinkel daarvoor gebruikt.',
         'desc_mainAddress_shopSetting' => 'U kunt de instelling van uw webwinkel aanpassen onder "<a href="%2$s" target="_blank">%1$s</a>".',
         'desc_mainAddress_shopUses' => 'Uw webwinkel gebruikt altijd het %s voor btw-berekeningen',
         AddressType::Invoice => 'factuuradres',
@@ -836,8 +836,8 @@ Use the third option to deactivate duplicate customer accounts (based on e-mail 
 
         'field_mainAddress' => 'Main address',
         'option_mainAddress_shop' => 'Follow your shop (recommended)',
-        'desc_mainAddress' => 'Choose which address to use as main address and which one as alternative address. You can use both addresses in your Acumulus templates, '
-            . 'however, Acumulus uses the main address to determine applicable vat rates.',
+        'desc_mainAddress' => 'Choose which address to use as main address and which one as alternative address. You can use both addresses in your Acumulus templates. '
+            . 'However, Acumulus uses the main address to determine applicable vat rates, so that should be the address that your shop also used for this.',
         'desc_mainAddress_shopSetting' => 'You can change the webshop setting at "<a href="%2$s" target="_blank">%1$s</a>".',
         'desc_mainAddress_shopUses' => 'Your webshop always uses the %s to determine the applicable vat rates',
         AddressType::Invoice => 'invoice address',

@@ -22,7 +22,8 @@
     "autoload-dev": {
         "psr-4": {
             "Siel\\Acumulus\\Tests\\": "tests/",
-            "Siel\\Acumulus\\TestWebShop\\": "tests/TestWebShop"
+            "Siel\\Acumulus\\TestWebShop\\": "tests/TestWebShop",
+            "Rector\\Rector\\": "vendor/rector/rector"
         }
     },
     "require-dev": {

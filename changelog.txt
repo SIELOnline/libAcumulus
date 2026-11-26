@@ -11,8 +11,10 @@ Features:
 
 Bugs:
 - MA: AcumulusEntryManager failed to recognise empty entries.
-- PHP85: Exception: Deprecated Functionality: ArrayObject::__construct(): Using an object
-  as a backing array for ArrayObject is deprecated, ...  in .../Collector.php on line 129.
+- PHP85: Deprecated Functionality: ArrayObject::__construct(): Using an object as a
+  backing array for ArrayObject is deprecated, ...  in .../Collector.php on line 129.
+- PHP85: Function curl_close() is deprecated since 8.5, as it has no effect since PHP 8.0
+  in .../ApiClient/ConnectionHandler.php on line 59.
 
 Refactorings:
 - MA: Converted LineCollector code to mappings where possible,

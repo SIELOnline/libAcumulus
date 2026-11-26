@@ -12,14 +12,13 @@ use function is_array;
 /**
  * ConnectionHandler handles HTTP connections.
  *
- * This library uses Curl for the actual connections. Connections created by
- * Curl can be reused in subsequent requests (if {@see \curl_close()} was not
- * called). This can improve performance if multiple requests are made to the
- * same server. The performance gain will even be bigger for SSL connections!
- * Therefore, during 1 PHP request, this handler creates and keeps a curl handle
- * per destination server. If a subsequent request to the same server is
- * executed, that handle can be reused, thereby preventing a new connection set
- * up.
+ * This library uses Curl for the actual connections. Connections created by Curl can be
+ * reused in subsequent requests (if {@see \curl_close()} was not called). This can
+ * improve performance if multiple requests are made to the same server. The performance
+ * gain will even be bigger for SSL connections! Therefore, during 1 PHP request, this
+ * handler creates and keeps a curl handle per destination server. If a subsequent request
+ * to the same server is executed, that handle can be reused, thereby preventing a new
+ * connection set up.
  */
 class ConnectionHandler
 {
@@ -48,16 +47,6 @@ class ConnectionHandler
      */
     protected function __construct()
     {
-    }
-
-    /**
-     * Closes all open Curl handles.
-     */
-    public function __destruct()
-    {
-        foreach ($this->curlHandles as $curlHandle) {
-            curl_close($curlHandle);
-        }
     }
 
     /**

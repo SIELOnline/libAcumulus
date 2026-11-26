@@ -28,7 +28,7 @@ class CheckNewReleaseTest extends TestCase
     {
         $this->container->getShopCapabilities()->hasReleasesRepository = false;
         $result = $this->releaseChecker->doCheck();
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 
     /** @noinspection PhpPossiblePolymorphicInvocationInspection */
@@ -39,7 +39,7 @@ class CheckNewReleaseTest extends TestCase
         $this->container->getEnvironment()->version = '8.6.12';
         $this->releaseChecker->cachedTimeDiff = 20;
         $result = $this->releaseChecker->doCheck();
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 
     /** @noinspection PhpPossiblePolymorphicInvocationInspection */
@@ -49,7 +49,7 @@ class CheckNewReleaseTest extends TestCase
         $this->container->getEnvironment()->version = '8.6.12';
         $this->releaseChecker->cachedTimeDiff = 40;
         $result = $this->releaseChecker->doCheck();
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 
     /** @noinspection PhpPossiblePolymorphicInvocationInspection */
@@ -59,6 +59,6 @@ class CheckNewReleaseTest extends TestCase
         $this->container->getShopCapabilities()->hasReleasesRepository = true;
         $this->releaseChecker->cachedTimeDiff = 80;
         $result = $this->releaseChecker->doCheck();
-        $this->assertTrue($result);
+        static::assertTrue($result);
     }
 }

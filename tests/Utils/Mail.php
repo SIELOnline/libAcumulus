@@ -41,7 +41,7 @@ trait Mail
             /** @noinspection UntrustedInclusionInspection The variable contains an absolute path. */
             include $phpFileName;
         } elseif (is_readable($fullFileName)) {
-            self::assertTrue(false, 'Switch to use PHP files for mails instead of text files');
+            static::assertTrue(false, 'Switch to use PHP files for mails instead of text files');
             eval('$mail = ' . file_get_contents($fullFileName) . ';');
         }
         /** @noinspection PhpExpressionAlwaysNullInspection */
@@ -129,7 +129,7 @@ trait Mail
         $bodyText = 'Text test message met {accolades}.';
         $bodyHtml = '<p>HTML Test message met {accolades}.</p>';
         $mailer = static::getContainer()->getMailer();
-        self::assertTrue($mailer->sendAdminMail($subject, $bodyText, $bodyHtml), 'Sending mail failed');
+        static::assertTrue($mailer->sendAdminMail($subject, $bodyText, $bodyHtml), 'Sending mail failed');
         static::assertMailServerReceivedMail($subject, $hasTextPart ? $bodyText : null, $hasHtmlPart ? $bodyHtml : null, $isBase64);
     }
 

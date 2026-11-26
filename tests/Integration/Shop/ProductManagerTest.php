@@ -46,7 +46,7 @@ class ProductManagerTest extends TestCase
     {
         $productManager = $this->getProductManager();
         $products = $productManager->getAcumulusProducts($filter);
-        self::assertEqualsCanonicalizing($productIds, array_column($products, Fld::ProductId));
+        static::assertEqualsCanonicalizing($productIds, array_column($products, Fld::ProductId));
     }
 
     public static function referenceProvider(): array
@@ -67,9 +67,9 @@ class ProductManagerTest extends TestCase
         $productManager = $this->getProductManager();
         $product = $productManager->getAcumulusProductByReference($acumulusField, $reference);
         if ($productId === null) {
-            self::assertNull($product);
+            static::assertNull($product);
         } else {
-            self::assertSame($productId, (int) $product[Fld::ProductId]);
+            static::assertSame($productId, (int) $product[Fld::ProductId]);
         }
     }
 
@@ -164,14 +164,14 @@ class ProductManagerTest extends TestCase
         $result = $productManager->updateStockForItem($item, $change, 'ProductManagerTest::testUpdateStock');
         $this->checkLog();
         if ($result->isSendingPrevented()) {
-            self::assertSame($acumulusProductIdOrError, $result->getSendStatus());
+            static::assertSame($acumulusProductIdOrError, $result->getSendStatus());
             $this->checkMail($mailCount);
         } elseif ($result->hasError()) {
-            self::assertNotNull($result->getByCodeTag($acumulusProductIdOrError));
+            static::assertNotNull($result->getByCodeTag($acumulusProductIdOrError));
             $this->checkMail($mailCount);
         } else {
-            self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
-            self::assertSame(
+            static::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
+            static::assertSame(
                 $acumulusProductIdSource,
                 $result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource]
             );
@@ -179,12 +179,12 @@ class ProductManagerTest extends TestCase
 
             // Correct the stock so that continuous (successful) testing will not change the actual levels at Acumulus.
             $result = $productManager->updateStockForItem($item, -$change, 'ProductManagerTest::returnStock');
-            self::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
-            self::assertSame(
+            static::assertSame($acumulusProductIdOrError, (int) $result->getMainApiResponse()[Fld::ProductId]);
+            static::assertSame(
                 'local',
                 $result->getAcumulusResult()->getAcumulusRequest()->getSubmit()['stock'][Meta::AcumulusProductIdSource]
             );
-            self::assertSame($stockAmount - $change, (float) $result->getMainApiResponse()[Fld::StockAmount]);
+            static::assertSame($stockAmount - $change, (float) $result->getMainApiResponse()[Fld::StockAmount]);
         }
     }
 }

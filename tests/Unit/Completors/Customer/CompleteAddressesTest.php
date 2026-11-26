@@ -100,8 +100,8 @@ class CompleteAddressesTest extends TestCase
         $customer = $this->createCustomer($invoiceAddress, $shippingAddress, AddressType::Invoice);
         $completor->complete($customer);
         $altAddress = $customer->getShippingAddress();
-        self::assertNull($altAddress);
-//        self::assertNotSame($shippingAddress, $altAddress);
-//        self::assertNotSame($shippingAddress->countryAutoName, $altAddress->countryAutoName);
+        static::assertNull($altAddress);
+//        static::assertNotSame($shippingAddress, $altAddress);
+//        static::assertNotSame($shippingAddress->countryAutoName, $altAddress->countryAutoName);
     }
 }

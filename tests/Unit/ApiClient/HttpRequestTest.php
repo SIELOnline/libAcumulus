@@ -17,9 +17,9 @@ class HttpRequestTest extends TestCase
     public function testBefore(): void
     {
         $httpRequest = new HttpRequest();
-        self::assertNull($httpRequest->getMethod());
-        self::assertNull($httpRequest->getUri());
-        self::assertNull($httpRequest->getBody());
+        static::assertNull($httpRequest->getMethod());
+        static::assertNull($httpRequest->getUri());
+        static::assertNull($httpRequest->getBody());
     }
 
     public function testGet(): void
@@ -27,10 +27,10 @@ class HttpRequestTest extends TestCase
         $httpRequest = new HttpRequest();
         $uri = 'accounts';
         $httpResponse = $httpRequest->get($uri);
-        self::assertSame('GET', $httpRequest->getMethod());
-        self::assertSame($uri, $httpRequest->getUri());
-        self::assertNull($httpRequest->getBody());
-        self::assertSame($httpRequest, $httpResponse->getRequest());
+        static::assertSame('GET', $httpRequest->getMethod());
+        static::assertSame($uri, $httpRequest->getUri());
+        static::assertNull($httpRequest->getBody());
+        static::assertSame($httpRequest, $httpResponse->getRequest());
     }
 
     public function testPost(): void
@@ -39,9 +39,9 @@ class HttpRequestTest extends TestCase
         $uri = 'accounts';
         $post = ['my_post' => 'my_value'];
         $httpResponse = $httpRequest->post($uri, $post);
-        self::assertSame('POST', $httpRequest->getMethod());
-        self::assertSame($uri, $httpRequest->getUri());
-        self::assertSame($post, $httpRequest->getBody());
-        self::assertSame($httpRequest, $httpResponse->getRequest());
+        static::assertSame('POST', $httpRequest->getMethod());
+        static::assertSame($uri, $httpRequest->getUri());
+        static::assertSame($post, $httpRequest->getBody());
+        static::assertSame($httpRequest, $httpResponse->getRequest());
     }
 }

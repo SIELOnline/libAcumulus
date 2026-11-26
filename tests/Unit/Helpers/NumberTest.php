@@ -47,25 +47,25 @@ class NumberTest extends TestCase
      */
     public function testCastNumericValue(mixed $value, mixed $expected): void
     {
-        self::assertSame($expected, Number::castNumericValue($value));
+        static::assertSame($expected, Number::castNumericValue($value));
     }
 
     public function testGetDivisionRange(): void
     {
         $test1 = Number::getDivisionRange(7.18378, 34.22, 0.0001, 0.0001);
-        self::assertLessThanOrEqual(0.21, $test1['min']);
-        self::assertGreaterThanOrEqual(0.20, $test1['max']);
+        static::assertLessThanOrEqual(0.21, $test1['min']);
+        static::assertGreaterThanOrEqual(0.20, $test1['max']);
 
         $test2 = Number::getDivisionRange(7.18378, 34.22, 0.001, 0.001);
-        self::assertLessThanOrEqual(0.21, $test2['min']);
-        self::assertGreaterThanOrEqual(0.20, $test2['max']);
+        static::assertLessThanOrEqual(0.21, $test2['min']);
+        static::assertGreaterThanOrEqual(0.20, $test2['max']);
 
         $test3 = Number::getDivisionRange(7.18378, 34.22, 0.005, 0.005);
-        self::assertLessThanOrEqual(0.21, $test3['min']);
-        self::assertGreaterThanOrEqual(0.21, $test3['max']);
+        static::assertLessThanOrEqual(0.21, $test3['min']);
+        static::assertGreaterThanOrEqual(0.21, $test3['max']);
 
         $test4 = Number::getDivisionRange(7.18378, 34.22, 0.01, 0.01);
-        self::assertLessThanOrEqual(0.21, $test4['min']);
-        self::assertGreaterThanOrEqual(0.21, $test4['max']);
+        static::assertLessThanOrEqual(0.21, $test4['min']);
+        static::assertGreaterThanOrEqual(0.21, $test4['max']);
     }
 }

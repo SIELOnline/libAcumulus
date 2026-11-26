@@ -24,15 +24,15 @@ class InvoiceTest extends TestCase
     public function testIsZeroAmount(): void
     {
         $invoice = new Invoice();
-        self::assertFalse($invoice->isZeroAmount());
+        static::assertFalse($invoice->isZeroAmount());
 
         $totals = new Totals(null, 2.1, 10.0);
         $invoice->metadataSet(Meta::Totals, $totals);
-        self::assertFalse($invoice->isZeroAmount());
+        static::assertFalse($invoice->isZeroAmount());
 
         $totals = new Totals(0, 0);
         $invoice->metadataSet(Meta::Totals, $totals);
-        self::assertTrue($invoice->isZeroAmount());
+        static::assertTrue($invoice->isZeroAmount());
     }
 
     public function testToArrayNoCustomer(): void
@@ -100,6 +100,6 @@ class InvoiceTest extends TestCase
                 ]
             ],
         ];
-        self::assertSame($expected, $a);
+        static::assertSame($expected, $a);
     }
 }

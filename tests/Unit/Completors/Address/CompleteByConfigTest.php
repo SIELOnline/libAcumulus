@@ -61,11 +61,11 @@ class CompleteByConfigTest extends TestCase
         $completor->complete($address);
 
         if (empty($countryCode)) {
-            self::assertNull($address->countryCode);
+            static::assertNull($address->countryCode);
         } else {
-            self::assertSame(strtoupper($countryCode), $address->countryCode);
+            static::assertSame(strtoupper($countryCode), $address->countryCode);
         }
-        self::assertSame($expectedCountryAutoName, $address->countryAutoName);
-        self::assertSame($expectedCountry, $address->country);
+        static::assertSame($expectedCountryAutoName, $address->countryAutoName);
+        static::assertSame($expectedCountry, $address->country);
     }
 }

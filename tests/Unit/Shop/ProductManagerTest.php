@@ -46,8 +46,8 @@ class ProductManagerTest extends TestCase
         $productManager = $this->getProductManager();
         $acumulusField = self::getContainer()->getConfig()->set('productMatchAcumulusField', 'productsku');
         $product = $productManager->getAcumulusProductByMatchField('TESTSKU');
-        self::assertSame('TESTSKU', $product[Fld::ProductSku]);
-        self::assertSame('t-shirt rood', $product[Fld::ProductDescription]);
+        static::assertSame('TESTSKU', $product[Fld::ProductSku]);
+        static::assertSame('t-shirt rood', $product[Fld::ProductDescription]);
         self::getContainer()->getConfig()->set('productMatchAcumulusField', $acumulusField);
     }
 }

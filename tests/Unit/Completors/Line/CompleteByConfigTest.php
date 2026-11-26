@@ -45,6 +45,6 @@ class CompleteByConfigTest extends TestCase
         $line = $this->getLine($lineType);
         $line->nature = $natureBefore;
         $completor->complete($line);
-        self::assertSame($natureExpected, $line->nature);
+        static::assertSame($natureExpected, $line->nature);
     }
 }

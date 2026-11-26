@@ -20,16 +20,16 @@ class MetadataValueTest extends TestCase
     public function testEmpty(): void
     {
         $mdv = new MetadataValue();
-        self::assertSame(0, $mdv->count());
-        self::assertSame(null, $mdv->get());
-        self::assertNull($mdv->get(0));
-        self::assertSame(null, $mdv->getApiValue());
+        static::assertSame(0, $mdv->count());
+        static::assertSame(null, $mdv->get());
+        static::assertNull($mdv->get(0));
+        static::assertSame(null, $mdv->getApiValue());
 
         $mdv = new MetadataValue(MetadataValue::List);
-        self::assertSame(0, $mdv->count());
-        self::assertEqualsCanonicalizing([], $mdv->get());
-        self::assertNull($mdv->get(0));
-        self::assertSame('[]', $mdv->getApiValue());
+        static::assertSame(0, $mdv->count());
+        static::assertEqualsCanonicalizing([], $mdv->get());
+        static::assertNull($mdv->get(0));
+        static::assertSame('[]', $mdv->getApiValue());
     }
 
     public function testSingleValue(): void
@@ -37,18 +37,18 @@ class MetadataValueTest extends TestCase
         $value1 = 2;
 
         $mdv = (new MetadataValue())->add($value1);
-        self::assertSame(1, $mdv->count());
-        self::assertSame($value1, $mdv->get());
-        self::assertSame($value1, $mdv->get(0));
-        self::assertNull($mdv->get(1));
-        self::assertSame($value1, $mdv->getApiValue());
+        static::assertSame(1, $mdv->count());
+        static::assertSame($value1, $mdv->get());
+        static::assertSame($value1, $mdv->get(0));
+        static::assertNull($mdv->get(1));
+        static::assertSame($value1, $mdv->getApiValue());
 
         $mdv = (new MetadataValue(MetadataValue::List))->add($value1);
-        self::assertSame(1, $mdv->count());
-        self::assertSame([$value1], $mdv->get());
-        self::assertSame($value1, $mdv->get(0));
-        self::assertNull($mdv->get(1));
-        self::assertSame("[$value1]", $mdv->getApiValue());
+        static::assertSame(1, $mdv->count());
+        static::assertSame([$value1], $mdv->get());
+        static::assertSame($value1, $mdv->get(0));
+        static::assertNull($mdv->get(1));
+        static::assertSame("[$value1]", $mdv->getApiValue());
     }
 
     public function testNullValue(): void
@@ -56,18 +56,18 @@ class MetadataValueTest extends TestCase
         $value1 = null;
 
         $mdv = (new MetadataValue())->add($value1);
-        self::assertSame(1, $mdv->count());
-        self::assertNull($mdv->get());
-        self::assertNull($mdv->get(0));
-        self::assertNull($mdv->get(1));
-        self::assertNull($mdv->getApiValue());
+        static::assertSame(1, $mdv->count());
+        static::assertNull($mdv->get());
+        static::assertNull($mdv->get(0));
+        static::assertNull($mdv->get(1));
+        static::assertNull($mdv->getApiValue());
 
         $mdv = (new MetadataValue(MetadataValue::List))->add($value1);
-        self::assertSame(1, $mdv->count());
-        self::assertSame([null], $mdv->get());
-        self::assertNull($mdv->get(0));
-        self::assertNull($mdv->get(1));
-        self::assertSame('[null]', $mdv->getApiValue());
+        static::assertSame(1, $mdv->count());
+        static::assertSame([null], $mdv->get());
+        static::assertNull($mdv->get(0));
+        static::assertNull($mdv->get(1));
+        static::assertSame('[null]', $mdv->getApiValue());
     }
 
     public function testEmptyArray(): void
@@ -75,18 +75,18 @@ class MetadataValueTest extends TestCase
         $value = [];
 
         $mdv = (new MetadataValue())->add($value);
-        self::assertSame(0, $mdv->count());
-        self::assertEqualsCanonicalizing([], $mdv->get());
-        self::assertNull($mdv->get(0));
-        self::assertNull($mdv->get(1));
-        self::assertSame('[]', $mdv->getApiValue());
+        static::assertSame(0, $mdv->count());
+        static::assertEqualsCanonicalizing([], $mdv->get());
+        static::assertNull($mdv->get(0));
+        static::assertNull($mdv->get(1));
+        static::assertSame('[]', $mdv->getApiValue());
 
         $mdv = (new MetadataValue(MetadataValue::List))->add($value);
-        self::assertSame(0, $mdv->count());
-        self::assertEqualsCanonicalizing([], $mdv->get());
-        self::assertNull($mdv->get(0));
-        self::assertNull($mdv->get(1));
-        self::assertSame('[]', $mdv->getApiValue());
+        static::assertSame(0, $mdv->count());
+        static::assertEqualsCanonicalizing([], $mdv->get());
+        static::assertNull($mdv->get(0));
+        static::assertNull($mdv->get(1));
+        static::assertSame('[]', $mdv->getApiValue());
     }
 
     public function testMultipleValues(): void
@@ -95,28 +95,28 @@ class MetadataValueTest extends TestCase
         $value2 = 2;
 
         $mdv = (new MetadataValue())->add($value1)->add($value2);
-        self::assertSame(2, $mdv->count());
-        self::assertSame([$value1, $value2], $mdv->get());
+        static::assertSame(2, $mdv->count());
+        static::assertSame([$value1, $value2], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode().
-        self::assertSame(2, $mdv->get(1));
-        self::assertNull($mdv->get(2));
-        self::assertSame("['value1',2]", $mdv->getApiValue());
+        static::assertSame(2, $mdv->get(1));
+        static::assertNull($mdv->get(2));
+        static::assertSame("['value1',2]", $mdv->getApiValue());
 
         $mdv = (new MetadataValue(MetadataValue::List))->add($value1)->add($value2)->add($value1);
-        self::assertSame(3, $mdv->count());
-        self::assertSame([$value1, $value2, $value1], $mdv->get());
+        static::assertSame(3, $mdv->count());
+        static::assertSame([$value1, $value2, $value1], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode().
-        self::assertSame(2, $mdv->get(1));
-        self::assertNull($mdv->get(3));
-        self::assertSame("['value1',2,'value1']", $mdv->getApiValue());
+        static::assertSame(2, $mdv->get(1));
+        static::assertNull($mdv->get(3));
+        static::assertSame("['value1',2,'value1']", $mdv->getApiValue());
 
         $mdv = (new MetadataValue(MetadataValue::Unique))->add($value1)->add($value2)->add($value1)->add($value2);
-        self::assertSame(2, $mdv->count());
-        self::assertSame([$value1, $value2], $mdv->get());
+        static::assertSame(2, $mdv->count());
+        static::assertSame([$value1, $value2], $mdv->get());
         // Note that this might fail depending on pretty print settings of json_encode().
-        self::assertSame(2, $mdv->get(1));
-        self::assertNull($mdv->get(2));
-        self::assertSame("['value1',2]", $mdv->getApiValue());
+        static::assertSame(2, $mdv->get(1));
+        static::assertNull($mdv->get(2));
+        static::assertSame("['value1',2]", $mdv->getApiValue());
     }
 
     public function testAddArray(): void
@@ -128,48 +128,48 @@ class MetadataValueTest extends TestCase
         $valueN1 = [$value1, $value2];
         $valueN2 = [$value3, $value4];
         $mdv = (new MetadataValue())->add($valueN1);
-        self::assertSame(2, $mdv->count());
-        self::assertSame([$value1, $value2], $mdv->get());
-        self::assertSame(2, $mdv->get(1));
-        self::assertNull($mdv->get(2));
-        self::assertSame("['value1',2]", $mdv->getApiValue());
+        static::assertSame(2, $mdv->count());
+        static::assertSame([$value1, $value2], $mdv->get());
+        static::assertSame(2, $mdv->get(1));
+        static::assertNull($mdv->get(2));
+        static::assertSame("['value1',2]", $mdv->getApiValue());
         // Add 2nd array.
         $mdv->add($valueN2);
-        self::assertSame(4, $mdv->count());
-        self::assertSame([$value1, $value2, $value3, 4], $mdv->get());
-        self::assertSame(2, $mdv->get(1));
-        self::assertSame(4, $mdv->get(3));
-        self::assertNull($mdv->get(4));
-        self::assertSame("['value1',2,'value3',4]", $mdv->getApiValue());
+        static::assertSame(4, $mdv->count());
+        static::assertSame([$value1, $value2, $value3, 4], $mdv->get());
+        static::assertSame(2, $mdv->get(1));
+        static::assertSame(4, $mdv->get(3));
+        static::assertNull($mdv->get(4));
+        static::assertSame("['value1',2,'value3',4]", $mdv->getApiValue());
 
 
         $valueK1 = ['a' => $value1, 'b' => $value2];
         $valueK2 = ['c' => $value3, 'd' => $value4];
         $mdv = (new MetadataValue())->add($valueK1);
-        self::assertSame(1, $mdv->count());
-        self::assertSame($valueK1, $mdv->get());
-        self::assertNull($mdv->get(1));
-        self::assertSame("{'a':'value1','b':2}", $mdv->getApiValue());
+        static::assertSame(1, $mdv->count());
+        static::assertSame($valueK1, $mdv->get());
+        static::assertNull($mdv->get(1));
+        static::assertSame("{'a':'value1','b':2}", $mdv->getApiValue());
         // Add 2nd array.
         $mdv->add($valueK2);
-        self::assertSame(2, $mdv->count());
-        self::assertSame([$valueK1, ['c' => $value3, 'd' => 4]], $mdv->get());
-        self::assertSame(['c' => $value3, 'd' => 4], $mdv->get(1));
-        self::assertNull($mdv->get(2));
-        self::assertSame("[{'a':'value1','b':2},{'c':'value3','d':4}]", $mdv->getApiValue());
+        static::assertSame(2, $mdv->count());
+        static::assertSame([$valueK1, ['c' => $value3, 'd' => 4]], $mdv->get());
+        static::assertSame(['c' => $value3, 'd' => 4], $mdv->get(1));
+        static::assertNull($mdv->get(2));
+        static::assertSame("[{'a':'value1','b':2},{'c':'value3','d':4}]", $mdv->getApiValue());
 
         $value = [[$value1, $value2]];
         $mdv = (new MetadataValue(MetadataValue::Single))->add($value);
-        self::assertSame(1, $mdv->count());
-        self::assertSame([$value1, $value2], $mdv->get());
-        self::assertNull($mdv->get(1));
-        self::assertSame("['value1',2]", $mdv->getApiValue());
+        static::assertSame(1, $mdv->count());
+        static::assertSame([$value1, $value2], $mdv->get());
+        static::assertNull($mdv->get(1));
+        static::assertSame("['value1',2]", $mdv->getApiValue());
 
         $mdv = (new MetadataValue(MetadataValue::List))->add($value);
-        self::assertSame(1, $mdv->count());
-        self::assertSame([[$value1, $value2]], $mdv->get());
-        self::assertNull($mdv->get(1));
-        self::assertSame("[['value1',2]]", $mdv->getApiValue());
+        static::assertSame(1, $mdv->count());
+        static::assertSame([[$value1, $value2]], $mdv->get());
+        static::assertNull($mdv->get(1));
+        static::assertSame("[['value1',2]]", $mdv->getApiValue());
     }
 
     public function testClone(): void
@@ -180,14 +180,14 @@ class MetadataValueTest extends TestCase
         $value2->s3 = 'value3';
         $mdv = (new MetadataValue())->add($value1)->add($value2);
         $clone = clone $mdv;
-        self::assertSame($mdv->get(0), $clone->get(0));
-        self::assertNotSame($mdv->get(1), $clone->get(1));
-        self::assertEquals($mdv->get(1), $clone->get(1));
+        static::assertSame($mdv->get(0), $clone->get(0));
+        static::assertNotSame($mdv->get(1), $clone->get(1));
+        static::assertEquals($mdv->get(1), $clone->get(1));
         $value2->s4 = 'value4';
         $value2->s3 = 'value5';
-        self::assertSame($value2, $mdv->get(1));
-        self::assertNotSame($mdv->get(1), $clone->get(1));
-        self::assertNotEquals($mdv->get(1), $clone->get(1));
+        static::assertSame($value2, $mdv->get(1));
+        static::assertNotSame($mdv->get(1), $clone->get(1));
+        static::assertNotEquals($mdv->get(1), $clone->get(1));
     }
 
     /**
@@ -205,7 +205,7 @@ class MetadataValueTest extends TestCase
             ['false', false],
             [1.23, 1.23],
             ['2', 2],
-            ['+33612345678', 33612345678],
+            ['+33612345678', '+33612345678'],
             ['00 33 6 12 34 56 78', '00 33 6 12 34 56 78'],
             ['test', 'test'],
             [['test1', 'test2'], "['test1','test2']"],
@@ -222,7 +222,7 @@ class MetadataValueTest extends TestCase
     {
         $mdv = new MetadataValue();
         $mdv->add($value);
-        self::assertSame($expected, $mdv->getApiValue());
+        static::assertSame($expected, $mdv->getApiValue());
     }
 
     /**
@@ -263,7 +263,7 @@ class MetadataValueTest extends TestCase
     {
         $mdv = new MetadataValue();
         $mdv->add($value);
-        self::assertSame($expected, $mdv->getApiValue());
+        static::assertSame($expected, $mdv->getApiValue());
     }
 
     public function testGetApiValueStringable(): void
@@ -273,11 +273,11 @@ class MetadataValueTest extends TestCase
 
         $mdv = new MetadataValue();
         $mdv->add($stringableClass);
-        self::assertSame('1.2.3.4', $mdv->getApiValue());
+        static::assertSame('1.2.3.4', $mdv->getApiValue());
 
         $mdv = new MetadataValue();
         $mdv->add($notStringableClass);
-        self::assertSame("{'oct1':1,'oct2':2}", $mdv->getApiValue());
+        static::assertSame("{'oct1':1,'oct2':2}", $mdv->getApiValue());
     }
 
     private static function getStringableObject(): Stringable

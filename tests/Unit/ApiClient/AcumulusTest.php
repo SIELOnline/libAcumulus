@@ -183,12 +183,12 @@ class AcumulusTest extends TestCase
         $environment = self::getContainer()->getEnvironment()->toArray();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
         $acumulus = self::getContainer()->getAcumulusApiClient();
-        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN", $acumulus->getInvoicePdfUri('TOKEN'));
-        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1", $acumulus->getInvoicePdfUri('TOKEN', true));
-        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=0", $acumulus->getInvoicePdfUri('TOKEN', false));
-        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=1", $acumulus->getInvoicePdfUri('TOKEN', null, true));
-        self::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=0", $acumulus->getInvoicePdfUri('TOKEN', null, false));
-        self::assertSame(
+        static::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN", $acumulus->getInvoicePdfUri('TOKEN'));
+        static::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1", $acumulus->getInvoicePdfUri('TOKEN', true));
+        static::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=0", $acumulus->getInvoicePdfUri('TOKEN', false));
+        static::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=1", $acumulus->getInvoicePdfUri('TOKEN', null, true));
+        static::assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=0", $acumulus->getInvoicePdfUri('TOKEN', null, false));
+        static::assertSame(
             "$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1&gfx=0",
             $acumulus->getInvoicePdfUri('TOKEN', true, false)
         );
@@ -202,19 +202,19 @@ class AcumulusTest extends TestCase
     {
         $environment = self::getContainer()->getEnvironment()->toArray();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
-        self::assertSame(
+        static::assertSame(
             "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN",
             self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN')
         );
-        self::assertSame(
+        static::assertSame(
             "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN",
             self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN', null)
         );
-        self::assertSame(
+        static::assertSame(
             "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN&gfx=1",
             self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN', true)
         );
-        self::assertSame(
+        static::assertSame(
             "$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN&gfx=0",
             self::getContainer()->getAcumulusApiClient()->getPackingSlipPdfUri('TOKEN', false)
         );

@@ -59,6 +59,6 @@ class CompleteTemplateTest extends TestCase
             $invoice->template = $filledIn;
         }
         $completor->complete($invoice);
-        self::assertEquals($expected, $invoice->template);
+        static::assertEquals($expected, $invoice->template);
     }
 }

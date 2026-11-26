@@ -30,9 +30,9 @@ class CompleteVatRangeTest extends TestCase
 
         $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
-        self::assertFalse($line->metadataExists(Meta::VatRateSource));
-        self::assertFalse($line->metadataExists(Meta::VatRateMin));
-        self::assertFalse($line->metadataExists(Meta::VatRateMax));
+        static::assertFalse($line->metadataExists(Meta::VatRateSource));
+        static::assertFalse($line->metadataExists(Meta::VatRateMin));
+        static::assertFalse($line->metadataExists(Meta::VatRateMax));
     }
 
     public function testNoCompletionHasNoVatAmount(): void
@@ -44,9 +44,9 @@ class CompleteVatRangeTest extends TestCase
 
         $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
-        self::assertFalse($line->metadataExists(Meta::VatRateSource));
-        self::assertFalse($line->metadataExists(Meta::VatRateMin));
-        self::assertFalse($line->metadataExists(Meta::VatRateMax));
+        static::assertFalse($line->metadataExists(Meta::VatRateSource));
+        static::assertFalse($line->metadataExists(Meta::VatRateMin));
+        static::assertFalse($line->metadataExists(Meta::VatRateMax));
     }
 
     public function testNoCompletionHasNoPrecision(): void
@@ -58,9 +58,9 @@ class CompleteVatRangeTest extends TestCase
 
         $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
-        self::assertFalse($line->metadataExists(Meta::VatRateSource));
-        self::assertFalse($line->metadataExists(Meta::VatRateMin));
-        self::assertFalse($line->metadataExists(Meta::VatRateMax));
+        static::assertFalse($line->metadataExists(Meta::VatRateSource));
+        static::assertFalse($line->metadataExists(Meta::VatRateMin));
+        static::assertFalse($line->metadataExists(Meta::VatRateMax));
 
         $line = $this->getLine(LineType::Item);
         $line->unitPrice = 10;
@@ -69,9 +69,9 @@ class CompleteVatRangeTest extends TestCase
 
         $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
-        self::assertFalse($line->metadataExists(Meta::VatRateSource));
-        self::assertFalse($line->metadataExists(Meta::VatRateMin));
-        self::assertFalse($line->metadataExists(Meta::VatRateMax));
+        static::assertFalse($line->metadataExists(Meta::VatRateSource));
+        static::assertFalse($line->metadataExists(Meta::VatRateMin));
+        static::assertFalse($line->metadataExists(Meta::VatRateMax));
     }
 
     public static function vatRangeWithUnitPriceDataProvider(): array
@@ -102,21 +102,21 @@ class CompleteVatRangeTest extends TestCase
 
         $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
-        self::assertSame($vatRateSource, $line->metadataGet(Meta::VatRateSource));
+        static::assertSame($vatRateSource, $line->metadataGet(Meta::VatRateSource));
         if ($min !== null) {
-            self::assertEqualsWithDelta($min, $line->metadataGet(Meta::VatRateMin), 0.0001);
+            static::assertEqualsWithDelta($min, $line->metadataGet(Meta::VatRateMin), 0.0001);
         } else {
-            self::assertFalse($line->metadataExists(Meta::VatRateMin));
+            static::assertFalse($line->metadataExists(Meta::VatRateMin));
         }
         if ($max !== null) {
-            self::assertEqualsWithDelta($max, $line->metadataGet(Meta::VatRateMax), 0.0001);
+            static::assertEqualsWithDelta($max, $line->metadataGet(Meta::VatRateMax), 0.0001);
         } else {
-            self::assertFalse($line->metadataExists(Meta::VatRateMax));
+            static::assertFalse($line->metadataExists(Meta::VatRateMax));
         }
         if ($rate !== null) {
-            self::assertEqualsWithDelta($rate, $line->vatRate, 0.0001);
+            static::assertEqualsWithDelta($rate, $line->vatRate, 0.0001);
         } else {
-            self::assertNull($line->vatRate);
+            static::assertNull($line->vatRate);
         }
     }
 
@@ -148,21 +148,21 @@ class CompleteVatRangeTest extends TestCase
 
         $completor = self::getContainer()->getCompletorTask('Line', 'VatRange');
         $completor->complete($line);
-        self::assertSame($vatRateSource, $line->metadataGet(Meta::VatRateSource));
+        static::assertSame($vatRateSource, $line->metadataGet(Meta::VatRateSource));
         if ($min !== null) {
-            self::assertEqualsWithDelta($min, $line->metadataGet(Meta::VatRateMin), 0.0001);
+            static::assertEqualsWithDelta($min, $line->metadataGet(Meta::VatRateMin), 0.0001);
         } else {
-            self::assertFalse($line->metadataExists(Meta::VatRateMin));
+            static::assertFalse($line->metadataExists(Meta::VatRateMin));
         }
         if ($max !== null) {
-            self::assertEqualsWithDelta($max, $line->metadataGet(Meta::VatRateMax), 0.0001);
+            static::assertEqualsWithDelta($max, $line->metadataGet(Meta::VatRateMax), 0.0001);
         } else {
-            self::assertFalse($line->metadataExists(Meta::VatRateMax));
+            static::assertFalse($line->metadataExists(Meta::VatRateMax));
         }
         if ($rate !== null) {
-            self::assertEqualsWithDelta($rate, $line->vatRate, 0.0001);
+            static::assertEqualsWithDelta($rate, $line->vatRate, 0.0001);
         } else {
-            self::assertNull($line->vatRate);
+            static::assertNull($line->vatRate);
         }
     }
 }

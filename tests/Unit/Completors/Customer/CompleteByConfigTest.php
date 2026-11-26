@@ -43,6 +43,6 @@ class CompleteByConfigTest extends TestCase
         $customer = $this->getCustomer();
         $completor->complete($customer);
         /** @noinspection PhpVariableVariableInspection */
-        self::assertSame($expected, $customer->$property);
+        static::assertSame($expected, $customer->$property);
     }
 }

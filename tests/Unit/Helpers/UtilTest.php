@@ -27,10 +27,10 @@ class UtilTest extends TestCase
     {
         $json = (new GetTestData())->getJson(false);
         $array = $this->getUtil()->convertJsonToArray($json);
-        self::assertIsArray($array['order']);
-        self::assertIsArray($array['customer']);
-        self::assertIsArray($array['customer']['invoice_address']);
-        self::assertArrayNotHasKey('shipping_address', $array);
+        static::assertIsArray($array['order']);
+        static::assertIsArray($array['customer']);
+        static::assertIsArray($array['customer']['invoice_address']);
+        static::assertArrayNotHasKey('shipping_address', $array);
     }
 
 //    public function testArrayToList(): void
@@ -42,17 +42,17 @@ class UtilTest extends TestCase
         $object = (new GetTestData())->getJson();
         $json = $this->getUtil()->convertToJson($object);
         $maskedJson = $this->getUtil()->maskJson($json);
-        self::assertSame($json, $maskedJson);
+        static::assertSame($json, $maskedJson);
 
         $array = $this->getUtil()->convertJsonToArray($json);
         $array['customer']['my_password'] = 'secret';
         $array['address']['my_password'] = 'secret';
         $json = $this->getUtil()->convertToJson($array);
         $maskedJson = $this->getUtil()->maskJson($json);
-        self::assertStringContainsString('"my_password":"REMOVED FOR SECURITY"', $maskedJson);
+        static::assertStringContainsString('"my_password":"REMOVED FOR SECURITY"', $maskedJson);
         $maskedArray = $this->getUtil()->convertJsonToArray($maskedJson);
-        self::assertSame('REMOVED FOR SECURITY', $maskedArray['customer']['my_password']);
-        self::assertSame('REMOVED FOR SECURITY', $maskedArray['address']['my_password']);
+        static::assertSame('REMOVED FOR SECURITY', $maskedArray['customer']['my_password']);
+        static::assertSame('REMOVED FOR SECURITY', $maskedArray['address']['my_password']);
     }
 
 //    public function testConvertArrayToXml(): void
@@ -75,15 +75,15 @@ class UtilTest extends TestCase
         $array['customer']['my_password'] = 'secret';
         $array['address']['my_password'] = 'secret';
         $maskedArray = $this->getUtil()->maskArray($array);
-        self::assertSame('REMOVED FOR SECURITY', $maskedArray['customer']['my_password']);
-        self::assertSame('REMOVED FOR SECURITY', $maskedArray['address']['my_password']);
+        static::assertSame('REMOVED FOR SECURITY', $maskedArray['customer']['my_password']);
+        static::assertSame('REMOVED FOR SECURITY', $maskedArray['address']['my_password']);
     }
 
     public function testMaskHtml(): void
     {
         $html = (new GetTestData())->getHtml();
         $maskedHtml = $this->getUtil()->maskHtml($html);
-        self::assertStringContainsString('value="REMOVED FOR SECURITY"', $maskedHtml);
+        static::assertStringContainsString('value="REMOVED FOR SECURITY"', $maskedHtml);
     }
 
 //    public function testConvertXmlToArray(): void

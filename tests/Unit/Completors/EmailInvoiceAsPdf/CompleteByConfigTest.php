@@ -43,6 +43,6 @@ class CompleteByConfigTest extends TestCase
         $emailAsPdf = $this->getEmailInvoiceAsPdf();
         $completor->complete($emailAsPdf);
 
-        self::assertSame($expectedValue, $emailAsPdf->ubl);
+        static::assertSame($expectedValue, $emailAsPdf->ubl);
     }
 }

@@ -63,6 +63,6 @@ class CompleteIssueDateTest extends TestCase
         $invoice->metadataSet(Meta::SourceDate, $orderDate);
         $invoice->metadataSet(Meta::ShopInvoiceDate, $invoiceDate);
         $completor->complete($invoice, $issueDateSource);
-        self::assertEquals($expected, $invoice->issueDate);
+        static::assertEquals($expected, $invoice->issueDate);
     }
 }

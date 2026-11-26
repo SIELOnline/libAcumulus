@@ -69,15 +69,15 @@ class AcumulusErrorHandlingTest extends TestCase
             $this->acumulusClient->timeout(static::ValidEntryId);
             $this->fail('Should not arrive here');
         } catch (AcumulusException) {
-            self::assertCount(2 + $offset, self::getLog()->getLoggedMessages());
-            self::assertSubmittedRequestHasBeenLogged(0, Severity::Exception);
+            static::assertCount(2 + $offset, self::getLog()->getLoggedMessages());
+            static::assertSubmittedRequestHasBeenLogged(0, Severity::Exception);
             $loggedMessages = self::getLog()->getLoggedMessages();
             $loggedMessage2 = end($loggedMessages);
             $lastMessage = $loggedMessage2['message'];
             $lastSeverity = $loggedMessage2['severity'];
-            self::assertStringStartsWith('AcumulusException: curl_exec()', $lastMessage);
-            self::assertStringContainsString((string) CURLE_OPERATION_TIMEDOUT, $lastMessage);
-            self::assertEquals(Severity::Exception, $lastSeverity);
+            static::assertStringStartsWith('AcumulusException: curl_exec()', $lastMessage);
+            static::assertStringContainsString((string) CURLE_OPERATION_TIMEDOUT, $lastMessage);
+            static::assertEquals(Severity::Exception, $lastSeverity);
         }
     }
 
@@ -90,9 +90,9 @@ class AcumulusErrorHandlingTest extends TestCase
             $this->acumulusClient->notExisting();
             $this->fail('Should not arrive here');
         } catch (AcumulusResponseException) {
-            self::assertCount(2, self::getLog()->getLoggedMessages());
-            self::assertSubmittedRequestHasBeenLogged(0, Severity::Exception);
-            self::assertHttpLevelErrorHasBeenLogged(-1, 404, 'Not Found', Severity::Exception);
+            static::assertCount(2, self::getLog()->getLoggedMessages());
+            static::assertSubmittedRequestHasBeenLogged(0, Severity::Exception);
+            static::assertHttpLevelErrorHasBeenLogged(-1, 404, 'Not Found', Severity::Exception);
         }
     }
 
@@ -102,12 +102,12 @@ class AcumulusErrorHandlingTest extends TestCase
     public function test403(): void
     {
         $result = $this->acumulusClient->noContract();
-        self::assertTrue($result->hasError());
-        self::assertNotNull($result->getByCode(403));
-        self::assertSame(403, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
-        self::assertApplicationLevelErrorHasBeenLogged(-1, 403,  Severity::Error);
+        static::assertTrue($result->hasError());
+        static::assertNotNull($result->getByCode(403));
+        static::assertSame(403, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
+        static::assertApplicationLevelErrorHasBeenLogged(-1, 403,  Severity::Error);
     }
 
     /**
@@ -116,12 +116,12 @@ class AcumulusErrorHandlingTest extends TestCase
     public function testNoEmailOnError(): void
     {
         $result = $this->acumulusClient->noEmailOnError(static::ValidEntryId);
-        self::assertFalse($result->hasError());
-        self::assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertArrayHasKey('entryid', $result->getMainAcumulusResponse());
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Success);
-        self::assertApplicationLevelSuccessHasBeenLogged(-1);
+        static::assertFalse($result->hasError());
+        static::assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertArrayHasKey('entryid', $result->getMainAcumulusResponse());
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Success);
+        static::assertApplicationLevelSuccessHasBeenLogged(-1);
     }
 
     /**
@@ -130,57 +130,57 @@ class AcumulusErrorHandlingTest extends TestCase
     public function testNoEmailOnWarning(): void
     {
         $result = $this->acumulusClient->noEmailOnWarning(static::ValidEntryId);
-        self::assertFalse($result->hasError());
-        self::assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertArrayHasKey('entryid', $result->getMainAcumulusResponse());
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Success);
-        self::assertApplicationLevelSuccessHasBeenLogged(-1);
+        static::assertFalse($result->hasError());
+        static::assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertArrayHasKey('entryid', $result->getMainAcumulusResponse());
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Success);
+        static::assertApplicationLevelSuccessHasBeenLogged(-1);
     }
 
     public function testEntryNotfound(): void
     {
         $result = $this->acumulusClient->getEntry(1);
-        self::assertTrue($result->hasError());
-        self::assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertNotNull($result->getByCode(404));
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
-        self::assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
+        static::assertTrue($result->hasError());
+        static::assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertNotNull($result->getByCode(404));
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
+        static::assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
     }
 
     public function testSetDeleteStatusEntryNotfound(): void
     {
         $result = $this->acumulusClient->setDeleteStatus(1, Api::Entry_Delete);
-        self::assertTrue($result->hasError());
-        self::assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertNotNull($result->getByCode(404));
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
-        self::assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
+        static::assertTrue($result->hasError());
+        static::assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertNotNull($result->getByCode(404));
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
+        static::assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
     }
 
     public function testConceptNotFound(): void
     {
         //  valid ConceptId: 171866
         $result = $this->acumulusClient->getConceptInfo(123);
-        self::assertTrue($result->hasError());
-        self::assertSame(400, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertNotNull($result->getByCode(400));
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
-        self::assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
+        static::assertTrue($result->hasError());
+        static::assertSame(400, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertNotNull($result->getByCode(400));
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
+        static::assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
     }
 
     public function testSetPaymentStatusInvalidToken(): void
     {
         $result = $this->acumulusClient->setPaymentStatus(static::InvalidToken, Api::PaymentStatus_Paid);
-        self::assertTrue($result->hasError());
-        self::assertSame(400, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertNotNull($result->getByCode(400));
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
-        self::assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
+        static::assertTrue($result->hasError());
+        static::assertSame(400, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertNotNull($result->getByCode(400));
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
+        static::assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
     }
 
     public function testGetInvoicePdfInvalidToken(): void
@@ -189,8 +189,8 @@ class AcumulusErrorHandlingTest extends TestCase
         $httpRequest = new HttpRequest([CURLOPT_HTTPHEADER => ['Cache-Control: no-cache']]);
         $response = $httpRequest->get($uri);
 
-        self::assertSame(400, $response->getHttpStatusCode());
-        self::assertStringContainsString('AA69CBAA', $response->getBody());
+        static::assertSame(400, $response->getHttpStatusCode());
+        static::assertStringContainsString('AA69CBAA', $response->getBody());
     }
 
     public function testEmailAsPdfInvalidToken(): void
@@ -199,11 +199,11 @@ class AcumulusErrorHandlingTest extends TestCase
         $emailInvoiceAsPdf->setEmailTo('test@example.com');
 
         $result = $this->acumulusClient->emailInvoiceAsPdf(static::InvalidToken, $emailInvoiceAsPdf);
-        self::assertTrue($result->hasError());
-        self::assertNotNull($result->getByCode(400));
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
-        self::assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
+        static::assertTrue($result->hasError());
+        static::assertNotNull($result->getByCode(400));
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
+        static::assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
     }
 
     public function testProductNotfound(): void
@@ -213,34 +213,34 @@ class AcumulusErrorHandlingTest extends TestCase
         $stockTransaction->stockAmount = 1;
 
         $result = $this->acumulusClient->stockTransaction($stockTransaction);
-        self::assertTrue($result->hasError());
-        self::assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertNotNull($result->getByCode(404));
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
-        self::assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
+        static::assertTrue($result->hasError());
+        static::assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertNotNull($result->getByCode(404));
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Error);
+        static::assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
     }
 
     public function testEmptyPicklistProducts(): void
     {
         $result = $this->acumulusClient->getPicklistProducts('This will not match any product');
-        self::assertFalse($result->hasError());
-        self::assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertCount(0, $result->getMainAcumulusResponse());
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Success);
-        self::assertApplicationLevelSuccessHasBeenLogged(-1);
+        static::assertFalse($result->hasError());
+        static::assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertCount(0, $result->getMainAcumulusResponse());
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Success);
+        static::assertApplicationLevelSuccessHasBeenLogged(-1);
     }
 
     public function testEmptyPicklistDiscountProfiles(): void
     {
         $result = $this->acumulusClient->getPicklistDiscountProfiles();
-        self::assertFalse($result->hasError());
-        self::assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
-        self::assertCount(0, $result->getMainAcumulusResponse());
-        self::assertCount(2, self::getLog()->getLoggedMessages());
-        self::assertSubmittedRequestHasBeenLogged(0, Severity::Success);
-        self::assertApplicationLevelSuccessHasBeenLogged(-1);
+        static::assertFalse($result->hasError());
+        static::assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
+        static::assertCount(0, $result->getMainAcumulusResponse());
+        static::assertCount(2, self::getLog()->getLoggedMessages());
+        static::assertSubmittedRequestHasBeenLogged(0, Severity::Success);
+        static::assertApplicationLevelSuccessHasBeenLogged(-1);
     }
 
     public static function assertSubmittedRequestHasBeenLogged(int $index, int $expectedSeverity): void
@@ -250,9 +250,9 @@ class AcumulusErrorHandlingTest extends TestCase
         $loggedMessage = $loggedMessages[$index];
         $message = $loggedMessage['message'];
         $severity = $loggedMessage['severity'];
-        self::assertStringStartsWith('Request: uri=', $message);
-        self::assertStringContainsString('submit={', $message);
-        self::assertEquals($expectedSeverity, $severity);
+        static::assertStringStartsWith('Request: uri=', $message);
+        static::assertStringContainsString('submit={', $message);
+        static::assertEquals($expectedSeverity, $severity);
     }
 
     public static function assertHttpLevelErrorHasBeenLogged(
@@ -266,9 +266,9 @@ class AcumulusErrorHandlingTest extends TestCase
         $loggedMessage = $loggedMessages[$index];
         $message = $loggedMessage['message'];
         $severity = $loggedMessage['severity'];
-        self::assertStringContainsString("HTTP status code=$expectedCode", $message);
-        self::assertStringContainsString($expectedPhrase, $message);
-        self::assertEquals($expectedSeverity, $severity);
+        static::assertStringContainsString("HTTP status code=$expectedCode", $message);
+        static::assertStringContainsString($expectedPhrase, $message);
+        static::assertEquals($expectedSeverity, $severity);
     }
 
     public static function assertApplicationLevelErrorHasBeenLogged(int $index, int $expectedCode, int $expectedSeverity):void
@@ -278,9 +278,9 @@ class AcumulusErrorHandlingTest extends TestCase
         $loggedMessage = $loggedMessages[$index];
         $message = str_replace(["\r", "\n", "\t", ' '], '', $loggedMessage['message']);
         $severity = $loggedMessage['severity'];
-        self::assertStringStartsWith("Response:status=$expectedCode", $message);
-        self::assertStringContainsString("\"error\":{\"code\":\"$expectedCode", $message);
-        self::assertEquals($expectedSeverity, $severity);
+        static::assertStringStartsWith("Response:status=$expectedCode", $message);
+        static::assertStringContainsString("\"error\":{\"code\":\"$expectedCode", $message);
+        static::assertEquals($expectedSeverity, $severity);
     }
 
     public static function assertApplicationLevelSuccessHasBeenLogged(int $index):void
@@ -290,8 +290,8 @@ class AcumulusErrorHandlingTest extends TestCase
         $loggedMessage = $loggedMessages[$index];
         $message = str_replace(["\r", "\n", "\t", ' '], '', $loggedMessage['message']);
         $severity = $loggedMessage['severity'];
-        self::assertStringContainsString('Response:status=200', $message);
-        self::assertStringContainsString('"status":"0"', $message);
-        self::assertEquals(Severity::Success, $severity);
+        static::assertStringContainsString('Response:status=200', $message);
+        static::assertStringContainsString('"status":"0"', $message);
+        static::assertEquals(Severity::Success, $severity);
     }
 }

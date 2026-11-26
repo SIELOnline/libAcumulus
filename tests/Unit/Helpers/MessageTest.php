@@ -31,36 +31,36 @@ class MessageTest extends TestCase
     public function testCreateWithAllParams1(): Message
     {
         $message = Message::create('Message 701', Severity::Error, 'S1')->setTranslator(self::$translator);
-        self::assertSame('Message 701', $message->getText());
-        self::assertSame(Severity::Error, $message->getSeverity());
-        self::assertSame('S1', $message->getCode());
-        self::assertSame('', $message->getCodeTag());
-        self::assertSame('', $message->getField());
-        self::assertNull($message->getException());
+        static::assertSame('Message 701', $message->getText());
+        static::assertSame(Severity::Error, $message->getSeverity());
+        static::assertSame('S1', $message->getCode());
+        static::assertSame('', $message->getCodeTag());
+        static::assertSame('', $message->getField());
+        static::assertNull($message->getException());
         return $message;
     }
 
     public function testCreateWithAllParams2(): Message
     {
         $message = Message::create('Message 701 empty codes', Severity::Success)->setTranslator(self::$translator);
-        self::assertSame('Message 701 empty codes', $message->getText());
-        self::assertSame(Severity::Success, $message->getSeverity());
-        self::assertSame(0, $message->getCode());
-        self::assertSame('', $message->getCodeTag());
-        self::assertSame('', $message->getField());
-        self::assertNull($message->getException());
+        static::assertSame('Message 701 empty codes', $message->getText());
+        static::assertSame(Severity::Success, $message->getSeverity());
+        static::assertSame(0, $message->getCode());
+        static::assertSame('', $message->getCodeTag());
+        static::assertSame('', $message->getField());
+        static::assertNull($message->getException());
         return $message;
     }
 
     public function testCreateWithArray(): Message
     {
         $message = Message::createFromApiMessage(['code' => 702, 'codetag' => 'W2', 'message' => 'Message 702'], Severity::Warning)->setTranslator(self::$translator);
-        self::assertSame('Message 702', $message->getText());
-        self::assertSame(Severity::Warning, $message->getSeverity());
-        self::assertSame(702, $message->getCode());
-        self::assertSame('W2', $message->getCodeTag());
-        self::assertSame('', $message->getField());
-        self::assertNull($message->getException());
+        static::assertSame('Message 702', $message->getText());
+        static::assertSame(Severity::Warning, $message->getSeverity());
+        static::assertSame(702, $message->getCode());
+        static::assertSame('W2', $message->getCodeTag());
+        static::assertSame('', $message->getField());
+        static::assertNull($message->getException());
         return $message;
     }
 
@@ -68,24 +68,24 @@ class MessageTest extends TestCase
     {
         $e = new RuntimeException('Message 703', 703);
         $message = Message::createFromException($e)->setTranslator(self::$translator);
-        self::assertSame('Message 703', $message->getText());
-        self::assertSame(Severity::Exception, $message->getSeverity());
-        self::assertSame(703, $message->getCode());
-        self::assertSame('', $message->getCodeTag());
-        self::assertSame('', $message->getField());
-        self::assertSame($e, $message->getException());
+        static::assertSame('Message 703', $message->getText());
+        static::assertSame(Severity::Exception, $message->getSeverity());
+        static::assertSame(703, $message->getCode());
+        static::assertSame('', $message->getCodeTag());
+        static::assertSame('', $message->getField());
+        static::assertSame($e, $message->getException());
         return $message;
     }
 
     public function testCreateFormFieldError(): Message
     {
         $message = Message::createForFormField('Not a valid e-mail address', Severity::Error, 'email')->setTranslator(self::$translator);
-        self::assertSame('Not a valid e-mail address', $message->getText());
-        self::assertSame(Severity::Error, $message->getSeverity());
-        self::assertSame(0, $message->getCode());
-        self::assertSame('', $message->getCodeTag());
-        self::assertSame('email', $message->getField());
-        self::assertNull($message->getException());
+        static::assertSame('Not a valid e-mail address', $message->getText());
+        static::assertSame(Severity::Error, $message->getSeverity());
+        static::assertSame(0, $message->getCode());
+        static::assertSame('', $message->getCodeTag());
+        static::assertSame('email', $message->getField());
+        static::assertNull($message->getException());
         return $message;
     }
 
@@ -98,8 +98,8 @@ class MessageTest extends TestCase
      */
     public function testToString(Message $message1, Message $message2): void
     {
-        self::assertSame('S1: Message 701', (string) $message1);
-        self::assertSame('Message 701 empty codes', (string) $message2);
+        static::assertSame('S1: Message 701', (string) $message1);
+        static::assertSame('Message 701 empty codes', (string) $message2);
     }
 
     /**
@@ -117,17 +117,17 @@ class MessageTest extends TestCase
      */
     public function testFormat(Message $message1, Message $message2, Message $message3, Message $message4, Message $message5): void
     {
-        self::assertSame('S1: Message 701', $message1->format(Message::Format_Plain));
-        self::assertSame('Message 701 empty codes', $message2->format(Message::Format_Plain));
-        self::assertSame('<span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_Html));
+        static::assertSame('S1: Message 701', $message1->format(Message::Format_Plain));
+        static::assertSame('Message 701 empty codes', $message2->format(Message::Format_Plain));
+        static::assertSame('<span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_Html));
 
-        self::assertSame('Ernstige fout: 703: Message 703', $message4->format(Message::Format_PlainWithSeverity));
-        self::assertSame('<span>Waarschuwing:</span> <span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_HtmlWithSeverity));
+        static::assertSame('Ernstige fout: 703: Message 703', $message4->format(Message::Format_PlainWithSeverity));
+        static::assertSame('<span>Waarschuwing:</span> <span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_HtmlWithSeverity));
 
-        self::assertSame('• S1: Message 701', $message1->format(Message::Format_PlainList));
-        self::assertSame('<li><span>702, W2:</span> <span>Message 702</span></li>', $message3->format(Message::Format_HtmlList));
+        static::assertSame('• S1: Message 701', $message1->format(Message::Format_PlainList));
+        static::assertSame('<li><span>702, W2:</span> <span>Message 702</span></li>', $message3->format(Message::Format_HtmlList));
 
-        self::assertSame('Not a valid e-mail address', $message5->format(Message::Format_Plain));
-        self::assertSame('Fout: Not a valid e-mail address', $message5->format(Message::Format_PlainWithSeverity));
+        static::assertSame('Not a valid e-mail address', $message5->format(Message::Format_Plain));
+        static::assertSame('Fout: Not a valid e-mail address', $message5->format(Message::Format_PlainWithSeverity));
     }
 }

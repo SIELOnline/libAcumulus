@@ -30,24 +30,24 @@ class CompleteConceptTest extends TestCase
         $config->set('concept', Config::Concept_Plugin);
         $invoice = $this->getInvoice();
         $completor->complete($invoice);
-        self::assertFalse($invoice->concept);
+        static::assertFalse($invoice->concept);
 
         // No, no warning = false
         $config->set('concept', Api::Concept_No);
         $invoice = $this->getInvoice();
         $completor->complete($invoice);
-        self::assertFalse($invoice->concept);
+        static::assertFalse($invoice->concept);
 
         // Yes, no warning = true
         $config->set('concept', Api::Concept_Yes);
         $invoice = $this->getInvoice();
         $completor->complete($invoice);
-        self::assertTrue($invoice->concept);
+        static::assertTrue($invoice->concept);
 
         // Test not overwrite.
         $config->set('concept', Api::Concept_No);
         $completor->complete($invoice);
-        self::assertTrue($invoice->concept);
+        static::assertTrue($invoice->concept);
 
         $line = $this->getLine(LineType::Item);
         $line->addMessage('warning');
@@ -57,14 +57,14 @@ class CompleteConceptTest extends TestCase
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
         $completor->complete($invoice);
-        self::assertTrue($invoice->concept);
+        static::assertTrue($invoice->concept);
 
         // No, warning = true
         $config->set('concept', Api::Concept_No);
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
         $completor->complete($invoice);
-        self::assertFalse($invoice->concept);
+        static::assertFalse($invoice->concept);
 
         // Yes, warning = no
         $line->metadataRemove(Meta::Warning);
@@ -72,6 +72,6 @@ class CompleteConceptTest extends TestCase
         $invoice = $this->getInvoice();
         $invoice->addLine($line);
         $completor->complete($invoice);
-        self::assertTrue($invoice->concept);
+        static::assertTrue($invoice->concept);
     }
 }

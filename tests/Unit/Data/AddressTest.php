@@ -64,31 +64,31 @@ class AddressTest extends TestCase
     public function testEquals(): void
     {
         $address1 = $this->createAddress1();
-        self::assertFalse($address1->equals(null));
-        self::assertTrue($address1->equals($address1));
-        self::assertTrue($address1->equals($this->createAddress2()));
-        self::assertFalse($address1->equals($this->createAddress3()));
+        static::assertFalse($address1->equals(null));
+        static::assertTrue($address1->equals($address1));
+        static::assertTrue($address1->equals($this->createAddress2()));
+        static::assertFalse($address1->equals($this->createAddress3()));
     }
 
     public function testEmpty(): void
     {
-        self::assertFalse($this->createAddress1()->isEmpty());
+        static::assertFalse($this->createAddress1()->isEmpty());
         $address3 = $this->createAddress3();
-        self::assertTrue($address3->isEmpty());
+        static::assertTrue($address3->isEmpty());
         $address3->setType(AddressType::Invoice);
-        self::assertTrue($address3->isEmpty());
+        static::assertTrue($address3->isEmpty());
         $address3->setType(AddressType::Shipping);
-        self::assertFalse($address3->isEmpty());
+        static::assertFalse($address3->isEmpty());
         $address3->setType(AddressType::Store);
-        self::assertTrue($address3->isEmpty());
+        static::assertTrue($address3->isEmpty());
 
         $address4 = $this->createAddress4();
-        self::assertTrue($address4->isEmpty());
+        static::assertTrue($address4->isEmpty());
         $address4->setType(AddressType::Invoice);
-        self::assertFalse($address4->isEmpty());
+        static::assertFalse($address4->isEmpty());
         $address4->setType(AddressType::Shipping);
-        self::assertTrue($address4->isEmpty());
+        static::assertTrue($address4->isEmpty());
         $address4->setType(AddressType::Store);
-        self::assertTrue($address4->isEmpty());
+        static::assertTrue($address4->isEmpty());
     }
 }

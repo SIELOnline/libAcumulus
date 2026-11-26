@@ -58,7 +58,7 @@ class FieldExpanderTest extends TestCase
     {
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function fieldsNoObjectsProvider(): array
@@ -75,7 +75,7 @@ class FieldExpanderTest extends TestCase
     {
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $this->createPropertySources());
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function fields1PropertyProvider(): array
@@ -101,7 +101,7 @@ class FieldExpanderTest extends TestCase
     {
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function fieldsWithAlternativesProvider(): array
@@ -124,7 +124,7 @@ class FieldExpanderTest extends TestCase
     {
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function fieldsWithSpaceConcatenatedPropertiesProvider(): array
@@ -144,7 +144,7 @@ class FieldExpanderTest extends TestCase
     {
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public function fieldsWithConcatenatedPropertiesProvider(): array
@@ -164,7 +164,7 @@ class FieldExpanderTest extends TestCase
     {
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function fieldsWithNumericalConstantsProvider(): array
@@ -190,7 +190,7 @@ class FieldExpanderTest extends TestCase
     {
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function fieldsWithLiteralsProvider(): array
@@ -215,7 +215,7 @@ class FieldExpanderTest extends TestCase
     {
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function complexFieldsProvider(): array
@@ -234,7 +234,7 @@ class FieldExpanderTest extends TestCase
     {
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $this->getTestDataPropertySources());
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function objectsProvider(): array
@@ -257,7 +257,7 @@ class FieldExpanderTest extends TestCase
         $objects = $this->createPropertySources(['container' => self::getContainer()]);
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $objects);
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     /**
@@ -272,10 +272,10 @@ class FieldExpanderTest extends TestCase
         $object->language = self::Language;
         $objects = $this->createPropertySources(['object' => $object, 'language' => 'other language']);
         $field = $this->getFieldExpander();
-        self::assertSame('other language', $field->expand('[language]', $objects));
-        self::assertSame(self::Language, $field->expand('[object::language]', $objects));
+        static::assertSame('other language', $field->expand('[language]', $objects));
+        static::assertSame(self::Language, $field->expand('[object::language]', $objects));
         // Do not descend into scalars.
-        self::assertNull($field->expand('[lang]', $objects));
+        static::assertNull($field->expand('[lang]', $objects));
     }
 
     public static function objectWithNumericArrayAnd0ValuesProvider(): array
@@ -306,7 +306,7 @@ class FieldExpanderTest extends TestCase
         };
         $field = $this->getFieldExpander();
         $result = $field->expand($fieldDefinition, $objects);
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function methodCallArgumentsProvider(): array
@@ -328,7 +328,7 @@ class FieldExpanderTest extends TestCase
         $objects = $this->createPropertySources(['this' => $this]);
         $expander = $this->getFieldExpander();
         $result = $expander->expand($fieldSpecification, $objects);
-        self::assertSame($expectedArgs, $result);
+        static::assertSame($expectedArgs, $result);
     }
 
     /**
@@ -360,13 +360,13 @@ class FieldExpanderTest extends TestCase
         $result1 = $field->expand('[order::amount]', $objects);
         $result2 = $field->expand('[sign*order::amount]', $objects);
         $result3 = $field->expand('[-sign*order::amount]', $objects);
-        self::assertSame($result1, $result2);
-        self::assertSame(-$result1, $result3);
+        static::assertSame($result1, $result2);
+        static::assertSame(-$result1, $result3);
         $result4 = $field->expand('[order::amount1|order::amount]', $objects);
         $result5 = $field->expand('[sign*order::amount1|order::amount]', $objects);
         $result6 = $field->expand('[-sign*order::amount1|order::amount]', $objects);
-        self::assertSame($result4, $result5);
-        self::assertSame(-$result4, $result6);
+        static::assertSame($result4, $result5);
+        static::assertSame(-$result4, $result6);
 
         $objects = $this->getTestDataPropertySources();
         $objects['source'] = new class {
@@ -379,12 +379,12 @@ class FieldExpanderTest extends TestCase
         $result1 = $field->expand('[order::amount]', $objects);
         $result2 = $field->expand('[sign*order::amount]', $objects);
         $result3 = $field->expand('[-sign*order::amount]', $objects);
-        self::assertSame(-$result1, $result2);
-        self::assertSame($result1, $result3);
+        static::assertSame(-$result1, $result2);
+        static::assertSame($result1, $result3);
         $result4 = $field->expand('[order::amount1|order::amount]', $objects);
         $result5 = $field->expand('[sign*order::amount1|order::amount]', $objects);
         $result6 = $field->expand('[-sign*order::amount1|order::amount]', $objects);
-        self::assertSame(-$result4, $result5);
-        self::assertSame($result4, $result6);
+        static::assertSame(-$result4, $result5);
+        static::assertSame($result4, $result6);
     }
 }

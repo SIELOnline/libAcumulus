@@ -31,19 +31,19 @@ class MessageCollectionTest extends TestCase
     public function testCreateMessageCollection(): MessageCollection
     {
         $collection = new MessageCollection($this->translator);
-        self::assertSame(Severity::Unknown, $collection->getSeverity());
-        self::assertFalse($collection->hasRealMessages());
-        self::assertFalse($collection->hasError());
-        self::assertNull($collection->getByCode(403));
-        self::assertNull($collection->getByCode('403'));
-        self::assertNull($collection->getByCodeTag('E2'));
-        self::assertEmpty($collection->getByField('email'));
-        self::assertCount(0, $collection->getMessages());
-        self::assertCount(0, $collection->getMessages(Severity::Log));
-        self::assertCount(0, $collection->getMessages(Severity::Success));
-        self::assertCount(0, $collection->getMessages(Severity::Log | Severity::Success));
-        self::assertCount(0, $collection->getMessages(Severity::Info));
-        self::assertCount(0, $collection->getMessages(Severity::Error));
+        static::assertSame(Severity::Unknown, $collection->getSeverity());
+        static::assertFalse($collection->hasRealMessages());
+        static::assertFalse($collection->hasError());
+        static::assertNull($collection->getByCode(403));
+        static::assertNull($collection->getByCode('403'));
+        static::assertNull($collection->getByCodeTag('E2'));
+        static::assertEmpty($collection->getByField('email'));
+        static::assertCount(0, $collection->getMessages());
+        static::assertCount(0, $collection->getMessages(Severity::Log));
+        static::assertCount(0, $collection->getMessages(Severity::Success));
+        static::assertCount(0, $collection->getMessages(Severity::Log | Severity::Success));
+        static::assertCount(0, $collection->getMessages(Severity::Info));
+        static::assertCount(0, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -59,19 +59,19 @@ class MessageCollectionTest extends TestCase
     {
         $collection->createAndAddMessage('log', Severity::Log);
 
-        self::assertSame(Severity::Log, $collection->getSeverity());
-        self::assertFalse($collection->hasRealMessages());
-        self::assertFalse($collection->hasError());
-        self::assertNull($collection->getByCode(403));
-        self::assertNull($collection->getByCode('403'));
-        self::assertNull($collection->getByCodeTag('E2'));
-        self::assertEmpty($collection->getByField('email'));
-        self::assertCount(1, $collection->getMessages());
-        self::assertCount(1, $collection->getMessages(Severity::Log));
-        self::assertCount(0, $collection->getMessages(Severity::Success));
-        self::assertCount(1, $collection->getMessages(Severity::Log | Severity::Success));
-        self::assertCount(0, $collection->getMessages(Severity::Info));
-        self::assertCount(0, $collection->getMessages(Severity::Error));
+        static::assertSame(Severity::Log, $collection->getSeverity());
+        static::assertFalse($collection->hasRealMessages());
+        static::assertFalse($collection->hasError());
+        static::assertNull($collection->getByCode(403));
+        static::assertNull($collection->getByCode('403'));
+        static::assertNull($collection->getByCodeTag('E2'));
+        static::assertEmpty($collection->getByField('email'));
+        static::assertCount(1, $collection->getMessages());
+        static::assertCount(1, $collection->getMessages(Severity::Log));
+        static::assertCount(0, $collection->getMessages(Severity::Success));
+        static::assertCount(1, $collection->getMessages(Severity::Log | Severity::Success));
+        static::assertCount(0, $collection->getMessages(Severity::Info));
+        static::assertCount(0, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -87,19 +87,19 @@ class MessageCollectionTest extends TestCase
     {
         $collection->createAndAddMessage('suc6', Severity::Success);
 
-        self::assertSame(Severity::Success, $collection->getSeverity());
-        self::assertFalse($collection->hasRealMessages());
-        self::assertFalse($collection->hasError());
-        self::assertNull($collection->getByCode(403));
-        self::assertNull($collection->getByCode('403'));
-        self::assertNull($collection->getByCodeTag('E2'));
-        self::assertEmpty($collection->getByField('email'));
-        self::assertCount(2, $collection->getMessages());
-        self::assertCount(1, $collection->getMessages(Severity::Log));
-        self::assertCount(1, $collection->getMessages(Severity::Success));
-        self::assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
-        self::assertCount(0, $collection->getMessages(Severity::Info));
-        self::assertCount(0, $collection->getMessages(Severity::Error));
+        static::assertSame(Severity::Success, $collection->getSeverity());
+        static::assertFalse($collection->hasRealMessages());
+        static::assertFalse($collection->hasError());
+        static::assertNull($collection->getByCode(403));
+        static::assertNull($collection->getByCode('403'));
+        static::assertNull($collection->getByCodeTag('E2'));
+        static::assertEmpty($collection->getByField('email'));
+        static::assertCount(2, $collection->getMessages());
+        static::assertCount(1, $collection->getMessages(Severity::Log));
+        static::assertCount(1, $collection->getMessages(Severity::Success));
+        static::assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
+        static::assertCount(0, $collection->getMessages(Severity::Info));
+        static::assertCount(0, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -115,22 +115,22 @@ class MessageCollectionTest extends TestCase
     {
         $collection->addMessages([Message::create('Message 702', Severity::Error, '403 Forbidden')]);
 
-        self::assertSame(Severity::Error, $collection->getSeverity());
-        self::assertTrue($collection->hasError());
-        self::assertNull($collection->getByCode(701));
-        self::assertInstanceOf(Message::class, $collection->getByCode('403 Forbidden'));
-        self::assertInstanceOf(Message::class, $collection->getByCode('403 forbidden'));
-        self::assertInstanceOf(Message::class, $collection->getByCode(403));
-        self::assertInstanceOf(Message::class, $collection->getByCode('403'));
-        self::assertInstanceOf(Message::class, $collection->getByCode('forbidden'));
-        self::assertNull($collection->getByCodeTag('E1'));
-        self::assertEmpty($collection->getByField('email'));
-        self::assertCount(3, $collection->getMessages());
-        self::assertCount(1, $collection->getMessages(Severity::Log));
-        self::assertCount(1, $collection->getMessages(Severity::Success));
-        self::assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
-        self::assertCount(0, $collection->getMessages(Severity::Info));
-        self::assertCount(1, $collection->getMessages(Severity::Error));
+        static::assertSame(Severity::Error, $collection->getSeverity());
+        static::assertTrue($collection->hasError());
+        static::assertNull($collection->getByCode(701));
+        static::assertInstanceOf(Message::class, $collection->getByCode('403 Forbidden'));
+        static::assertInstanceOf(Message::class, $collection->getByCode('403 forbidden'));
+        static::assertInstanceOf(Message::class, $collection->getByCode(403));
+        static::assertInstanceOf(Message::class, $collection->getByCode('403'));
+        static::assertInstanceOf(Message::class, $collection->getByCode('forbidden'));
+        static::assertNull($collection->getByCodeTag('E1'));
+        static::assertEmpty($collection->getByField('email'));
+        static::assertCount(3, $collection->getMessages());
+        static::assertCount(1, $collection->getMessages(Severity::Log));
+        static::assertCount(1, $collection->getMessages(Severity::Success));
+        static::assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
+        static::assertCount(0, $collection->getMessages(Severity::Info));
+        static::assertCount(1, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -152,24 +152,24 @@ class MessageCollectionTest extends TestCase
         ];
         $collection->addMessages($messages, Severity::Warning);
 
-        self::assertSame(Severity::Error, $collection->getSeverity());
-        self::assertTrue($collection->hasError());
-        self::assertInstanceOf(Message::class, $collection->getByCode(700));
-        self::assertNull($collection->getByCode(701));
-        self::assertInstanceOf(Message::class, $collection->getByCode(403));
-        self::assertNull($collection->getByCodeTag('E1'));
-        self::assertCount(1, $collection->getByField('email'));
-        self::assertContainsOnlyInstancesOf(Message::class, $collection->getByField('email'));
-        self::assertCount(7, $collection->getMessages());
-        self::assertContainsOnlyInstancesOf(Message::class, $collection->getMessages());
-        self::assertCount(1, $collection->getMessages(Severity::Log));
-        self::assertCount(1, $collection->getMessages(Severity::Success));
-        self::assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
-        self::assertCount(2, $collection->getMessages(Severity::Info));
-        self::assertCount(1, $collection->getMessages(Severity::Notice));
-        self::assertCount(1, $collection->getMessages(Severity::Warning));
-        self::assertCount(2, $collection->getMessages(Severity::WarningOrWorse));
-        self::assertCount(1, $collection->getMessages(Severity::Error));
+        static::assertSame(Severity::Error, $collection->getSeverity());
+        static::assertTrue($collection->hasError());
+        static::assertInstanceOf(Message::class, $collection->getByCode(700));
+        static::assertNull($collection->getByCode(701));
+        static::assertInstanceOf(Message::class, $collection->getByCode(403));
+        static::assertNull($collection->getByCodeTag('E1'));
+        static::assertCount(1, $collection->getByField('email'));
+        static::assertContainsOnlyInstancesOf(Message::class, $collection->getByField('email'));
+        static::assertCount(7, $collection->getMessages());
+        static::assertContainsOnlyInstancesOf(Message::class, $collection->getMessages());
+        static::assertCount(1, $collection->getMessages(Severity::Log));
+        static::assertCount(1, $collection->getMessages(Severity::Success));
+        static::assertCount(2, $collection->getMessages(Severity::Log | Severity::Success));
+        static::assertCount(2, $collection->getMessages(Severity::Info));
+        static::assertCount(1, $collection->getMessages(Severity::Notice));
+        static::assertCount(1, $collection->getMessages(Severity::Warning));
+        static::assertCount(2, $collection->getMessages(Severity::WarningOrWorse));
+        static::assertCount(1, $collection->getMessages(Severity::Error));
 
         return $collection;
     }
@@ -183,15 +183,15 @@ class MessageCollectionTest extends TestCase
     {
         $format = $collection->formatMessages(Message::Format_Plain);
 
-        self::assertCount(7, $format);
-        self::assertSame('log', $format[0]);
-        self::assertSame('suc6', $format[1]);
+        static::assertCount(7, $format);
+        static::assertSame('log', $format[0]);
+        static::assertSame('suc6', $format[1]);
 
         $format = $collection->formatMessages(Message::Format_HtmlList);
 
-        self::assertIsString($format);
-        self::assertStringStartsWith('<ul>', $format);
-        self::assertStringEndsWith("</ul>\n", $format);
-        self::assertCount(8, explode('<li>', $format));
+        static::assertIsString($format);
+        static::assertStringStartsWith('<ul>', $format);
+        static::assertStringEndsWith("</ul>\n", $format);
+        static::assertCount(8, explode('<li>', $format));
     }
 }

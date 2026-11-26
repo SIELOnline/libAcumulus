@@ -59,6 +59,6 @@ class CompleteInvoiceNumberTest extends TestCase
         $invoice->metadataSet(Meta::SourceReference, $orderReference);
         $invoice->metadataSet(Meta::ShopInvoiceReference, $invoiceReference);
         $completor->complete($invoice, $sourceToUse);
-        self::assertSame($expected, $invoice->number);
+        static::assertSame($expected, $invoice->number);
     }
 }

@@ -26,9 +26,9 @@ class AcumulusObjectCloningTest extends TestCase
         $ao2->nature = Api::Nature_Service;
         $ao2->unitPrice = 50.55;
 
-        self::assertSame('I1', $ao1->itemNumber);
-        self::assertSame(Api::Nature_Product, $ao1->nature);
-        self::assertSame(19.99, $ao1->unitPrice);
+        static::assertSame('I1', $ao1->itemNumber);
+        static::assertSame(Api::Nature_Product, $ao1->nature);
+        static::assertSame(19.99, $ao1->unitPrice);
     }
 
     public function testCloneComplex(): void
@@ -55,19 +55,19 @@ class AcumulusObjectCloningTest extends TestCase
         $cao1->list = [$ao2, $ao3];
 
         $cao2 = clone $cao1;
-        self::assertNotSame($cao1->date, $cao2->date);
-        self::assertNotSame($cao1->simple, $cao2->simple);
-        self::assertNotSame($cao1->list, $cao2->list);
+        static::assertNotSame($cao1->date, $cao2->date);
+        static::assertNotSame($cao1->simple, $cao2->simple);
+        static::assertNotSame($cao1->list, $cao2->list);
 
         $cao2->itemNumber = 'I2';
         $cao2->date = '2024-12-05';
         $cao2->simple->itemNumber = 'I4';
         $cao2->list[0]->itemNumber = 'I6';
         $cao2->list[1]->itemNumber = 'I8';
-        self::assertSame('I1', $ao1->itemNumber);
-        self::assertSame('I3', $ao2->itemNumber);
-        self::assertSame('I5', $ao3->itemNumber);
-        self::assertSame('I7', $cao1->itemNumber);
-        self::assertSame('2024-12-01', $cao1->date->format('Y-m-d'));
+        static::assertSame('I1', $ao1->itemNumber);
+        static::assertSame('I3', $ao2->itemNumber);
+        static::assertSame('I5', $ao3->itemNumber);
+        static::assertSame('I7', $cao1->itemNumber);
+        static::assertSame('2024-12-01', $cao1->date->format('Y-m-d'));
     }
 }

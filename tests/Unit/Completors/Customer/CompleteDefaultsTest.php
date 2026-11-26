@@ -36,10 +36,10 @@ class CompleteDefaultsTest extends TestCase
         $customer->setShippingAddress($this->getAddress());
         $customer->getInvoiceAddress()->countryCode = $country;
         $customer->getShippingAddress()->countryCode = $country;
-        self::assertSame($expectedBefore, $customer->getInvoiceAddress()->countryCode);
-        self::assertSame($expectedBefore, $customer->getShippingAddress()->countryCode);
+        static::assertSame($expectedBefore, $customer->getInvoiceAddress()->countryCode);
+        static::assertSame($expectedBefore, $customer->getShippingAddress()->countryCode);
         $completor->complete($customer);
-        self::assertSame($expectedAfter, $customer->getInvoiceAddress()->countryCode);
-        self::assertSame($expectedAfter, $customer->getShippingAddress()->countryCode);
+        static::assertSame($expectedAfter, $customer->getInvoiceAddress()->countryCode);
+        static::assertSame($expectedAfter, $customer->getShippingAddress()->countryCode);
     }
 }

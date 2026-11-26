@@ -78,10 +78,10 @@ class CompleteMarginProductsTest extends TestCase
      */
     private function marginProducts0(Line $line, array $lineValues): void
     {
-        self::assertFalse($line->metadataGet(Meta::MarginLine));
-        self::assertFalse($line->metadataExists(Meta::MarginLineOldUnitPrice));
-        self::assertSame($lineValues[Fld::UnitPrice], $line->unitPrice);
-        self::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
+        static::assertFalse($line->metadataGet(Meta::MarginLine));
+        static::assertFalse($line->metadataExists(Meta::MarginLineOldUnitPrice));
+        static::assertSame($lineValues[Fld::UnitPrice], $line->unitPrice);
+        static::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
     }
 
     /**
@@ -91,10 +91,10 @@ class CompleteMarginProductsTest extends TestCase
      */
     private function marginProducts1(Line $line, array $lineValues): void
     {
-        self::assertNull($line->metadataGet(Meta::MarginLine));
-        self::assertSame($lineValues[Fld::UnitPrice], $line->metadataGet(Meta::MarginLineOldUnitPrice));
-        self::assertSame($lineValues[Meta::UnitPriceInc], $line->unitPrice);
-        self::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
+        static::assertNull($line->metadataGet(Meta::MarginLine));
+        static::assertSame($lineValues[Fld::UnitPrice], $line->metadataGet(Meta::MarginLineOldUnitPrice));
+        static::assertSame($lineValues[Meta::UnitPriceInc], $line->unitPrice);
+        static::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
     }
 
     /**
@@ -104,10 +104,10 @@ class CompleteMarginProductsTest extends TestCase
      */
     private function marginProducts2(Line $line, array $lineValues): void
     {
-        self::assertFalse($line->metadataGet(Meta::MarginLine));
-        self::assertFalse($line->metadataExists(Meta::MarginLineOldUnitPrice));
-        self::assertSame($lineValues[Fld::UnitPrice], $line->unitPrice);
-        self::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
+        static::assertFalse($line->metadataGet(Meta::MarginLine));
+        static::assertFalse($line->metadataExists(Meta::MarginLineOldUnitPrice));
+        static::assertSame($lineValues[Fld::UnitPrice], $line->unitPrice);
+        static::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
     }
 
     /**
@@ -117,10 +117,10 @@ class CompleteMarginProductsTest extends TestCase
      */
     private function marginProducts3(Line $line, array $lineValues): void
     {
-        self::assertTrue($line->metadataGet(Meta::MarginLine));
-        self::assertSame($lineValues[Fld::UnitPrice], $line->metadataGet(Meta::MarginLineOldUnitPrice));
-        self::assertSame($lineValues[Meta::UnitPriceInc], $line->unitPrice);
-        self::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
+        static::assertTrue($line->metadataGet(Meta::MarginLine));
+        static::assertSame($lineValues[Fld::UnitPrice], $line->metadataGet(Meta::MarginLineOldUnitPrice));
+        static::assertSame($lineValues[Meta::UnitPriceInc], $line->unitPrice);
+        static::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
     }
 
     /**
@@ -130,9 +130,9 @@ class CompleteMarginProductsTest extends TestCase
      */
     private function marginProductsOtherLine(Line $line, array $lineValues): void
     {
-        self::assertFalse($line->metadataExists(Meta::MarginLine));
-        self::assertFalse($line->metadataExists(Meta::MarginLineOldUnitPrice));
-        self::assertSame($lineValues[Fld::UnitPrice], $line->unitPrice);
-        self::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
+        static::assertFalse($line->metadataExists(Meta::MarginLine));
+        static::assertFalse($line->metadataExists(Meta::MarginLineOldUnitPrice));
+        static::assertSame($lineValues[Fld::UnitPrice], $line->unitPrice);
+        static::assertSame($lineValues[Meta::UnitPriceInc], $line->metadataGet(Meta::UnitPriceInc));
     }
 }

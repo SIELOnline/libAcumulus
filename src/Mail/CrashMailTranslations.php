@@ -17,7 +17,7 @@ class CrashMailTranslations extends TranslationCollection
 
         // Body main.
         'mail_body_intro_crash' => 'De {module_name} {module} in jouw webshop is tegen een technisch probleem aangelopen.',
-        'mail_body_intro_temporary' => 'Dit kan een tijdelijk probleem zijn omdat b.v. de Acumulus server even niet bereikbaar is.',
+        'mail_body_intro_temporary' => 'Dit kan een tijdelijk probleem zijn omdat bijvoorbeeld de Acumulus server even niet bereikbaar is.',
         'mail_body_intro_contact_support' => 'Als het probleem blijft aanhouden, stuur deze mail dan door naar Acumulus support.',
         'mail_body_intro_forward_all' => 'Stuur in dat geval de hele tekst mee, want deze is nodig om het probleem goed te kunnen onderzoeken.',
 

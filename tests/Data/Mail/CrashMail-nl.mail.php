@@ -11,14 +11,14 @@ $mail =
         'from' => 'unit.test@example.com',
         'fromName' => 'Unit Test | Example',
         'to' => 'admin@example.com',
-        'subject' => 'Je Acumulus module heeft een technisch probleem',
+        'subject' => 'Je Acumulus module ervaart een technisch probleem',
         'bodyText' => [
             'De Acumulus module in jouw webshop is tegen een technisch probleem
-aangelopen. Dit kan een tijdelijk probleem zijn omdat b.v. de Acumulus
-server even niet bereikbaar is. Als het probleem blijft aanhouden,
-stuur deze mail dan door naar Acumulus support. Stuur in dat geval de
-hele tekst mee, want deze is nodig om het probleem goed te kunnen
-onderzoeken.
+aangelopen. Dit kan een tijdelijk probleem zijn omdat bijvoorbeeld de
+Acumulus server even niet bereikbaar is. Als het probleem blijft
+aanhouden, stuur deze mail dan door naar Acumulus support. Stuur in
+dat geval de hele tekst mee, want deze is nodig om het probleem goed
+te kunnen onderzoeken.
 
 Over uw webwinkel:
 
@@ -35,7 +35,7 @@ Test Exception
         ],
         'bodyHtml' => [
             '<p>De Acumulus module in jouw webshop is tegen een technisch probleem aangelopen.
-Dit kan een tijdelijk probleem zijn omdat b.v. de Acumulus server even niet bereikbaar is.
+Dit kan een tijdelijk probleem zijn omdat bijvoorbeeld de Acumulus server even niet bereikbaar is.
 Als het probleem blijft aanhouden, stuur deze mail dan door naar Acumulus support.
 Stuur in dat geval de hele tekst mee, want deze is nodig om het probleem goed te kunnen onderzoeken.</p>
 <h3>Over uw webwinkel</h3>

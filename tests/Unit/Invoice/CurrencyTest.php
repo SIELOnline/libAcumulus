@@ -26,9 +26,8 @@ class CurrencyTest extends TestCase
 
     /**
      * Tests converting amounts.
-     *
-     * @dataProvider currencyProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('currencyProvider')]
     public function testConvertAmount(
         bool $shouldConvert,
         ?float $amount,

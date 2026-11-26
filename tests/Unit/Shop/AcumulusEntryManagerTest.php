@@ -69,9 +69,7 @@ class AcumulusEntryManagerTest extends TestCase
         static::assertGreaterThanOrEqual($now, $acumulusEntry1->getUpdated());
     }
 
-    /**
-     * @depends testLockForSending
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testLockForSending')]
     public function testDeleteLock(): void
     {
         $manager = $this->getAcumulusEntryManager();
@@ -141,9 +139,7 @@ class AcumulusEntryManagerTest extends TestCase
         static::assertGreaterThanOrEqual($now, $acumulusEntry2->getUpdated());
     }
 
-    /**
-     * @depends testSaveInsertGet
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testSaveInsertGet')]
     public function testUpdate(): void
     {
         sleep(1);
@@ -183,9 +179,7 @@ class AcumulusEntryManagerTest extends TestCase
         static::assertLessThan($now, $acumulusEntry2->getUpdated());
     }
 
-    /**
-     * @depends testUpdate
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testUpdate')]
     public function testDelete(): void
     {
         $manager = $this->getAcumulusEntryManager();
@@ -215,9 +209,7 @@ class AcumulusEntryManagerTest extends TestCase
         static::assertLessThanOrEqual($now, $acumulusEntry1->getUpdated());
     }
 
-    /**
-     * @depends testDelete
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testDelete')]
     public function testDeleteByEntryId(): void
     {
         $manager = $this->getAcumulusEntryManager();

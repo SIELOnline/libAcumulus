@@ -25,9 +25,7 @@ class CompleteDefaultsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider customerConfigDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('customerConfigDataProvider')]
     public function testComplete(?string $country, ?string $expectedBefore, string $expectedAfter): void
     {
         $completor = self::getContainer()->getCompletorTask('Customer','Defaults');

@@ -80,9 +80,8 @@ class ConvertToEuroTest extends TestCase
 
     /**
      * Tests converting amounts.
-     *
-     * @dataProvider combinedDataProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('combinedDataProvider')]
     public function testConvertAmount(Currency $currency, Line $line, array $expected): void
     {
         $completor = self::getContainer()->getCompletorTask('Line', 'ConvertToEuro');

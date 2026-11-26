@@ -39,9 +39,7 @@ class FieldParsingTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsProvider1
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsProvider1')]
     public function testExpandNoExpansionSpecifications(string $field): void
     {
         $log = self::getContainer()->getLog();
@@ -62,9 +60,7 @@ class FieldParsingTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsProvider2
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsProvider2')]
     public function testExpand1ExpansionSpecification(string $field, string $match): void
     {
         $log = self::getContainer()->getLog();
@@ -86,9 +82,7 @@ class FieldParsingTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsProvider3
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsProvider3')]
     public function testExpandMultipleExpansionSpecifications(string $field, array $parts): void
     {
         $log = self::getContainer()->getLog();
@@ -107,9 +101,7 @@ class FieldParsingTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsProvider4
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsProvider4')]
     public function testExpandPropertyAlternatives(string $field, array $parts): void
     {
         $log = self::getContainer()->getLog();
@@ -129,9 +121,7 @@ class FieldParsingTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsProvider5
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsProvider5')]
     public function testExpandSpaceConcatenatedProperties(string $field, array $parts): void
     {
         $log = self::getContainer()->getLog();
@@ -151,9 +141,7 @@ class FieldParsingTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsProvider6
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsProvider6')]
     public function testExpandSingleProperties(string $field, array $parts, array $spaceConcatenatedProperties): void
     {
         $log = self::getContainer()->getLog();
@@ -175,9 +163,7 @@ class FieldParsingTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsProvider7
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsProvider7')]
     public function testExpandPropertiesAndLiterals(string $field, array $propertiesInObject, array $properties, array $literals): void
     {
         $log = self::getContainer()->getLog();

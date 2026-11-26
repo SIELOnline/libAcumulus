@@ -43,9 +43,7 @@ class CompleteIssueDateTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider issueDateDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('issueDateDataProvider')]
     public function testComplete(
         int $issueDateSource,
         ?string $orderDate,

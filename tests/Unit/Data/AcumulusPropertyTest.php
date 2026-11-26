@@ -75,9 +75,7 @@ class AcumulusPropertyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider setValueDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setValueDataProvider')]
     public function testSetValue(string $type, $value, $propertyValue): void
     {
         $pd = ['name' => 'property', 'type' => $type];
@@ -100,9 +98,7 @@ class AcumulusPropertyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider setBoolValueDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setBoolValueDataProvider')]
     public function testSetBoolValue(array $allowedValues, $value, $propertyValue): void
     {
         $pd = ['name' => 'property', 'type' => 'bool', 'allowedValues' => $allowedValues];
@@ -122,9 +118,7 @@ class AcumulusPropertyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider setDateValueDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setDateValueDataProvider')]
     public function testDateSetValue(string $type, $value, $castValue): void
     {
         $pd = ['name' => 'property', 'type' => $type];
@@ -149,9 +143,7 @@ class AcumulusPropertyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider setValueWrongTypeDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setValueWrongTypeDataProvider')]
     public function testSetValueWrongValue(string $type, $value): void
     {
         $this->expectException(UnexpectedValueException::class);
@@ -184,9 +176,7 @@ class AcumulusPropertyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider apiValueDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('apiValueDataProvider')]
     public function testApiValue(array $propertyDefinition, $value, $expected): void
     {
         $pd = ['name' => 'property'] + $propertyDefinition;

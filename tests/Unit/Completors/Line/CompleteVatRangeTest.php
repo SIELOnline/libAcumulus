@@ -83,9 +83,7 @@ class CompleteVatRangeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider vatRangeWithUnitPriceDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('vatRangeWithUnitPriceDataProvider')]
     public function testCompletionWithUnitPrice(
         float $unitPrice,
         float $vatAmount,
@@ -129,9 +127,7 @@ class CompleteVatRangeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider vatRangeWithUnitPriceIncDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('vatRangeWithUnitPriceIncDataProvider')]
     public function testCompletionWithUnitPriceInc(
         float $unitPriceInc,
         float $vatAmount,

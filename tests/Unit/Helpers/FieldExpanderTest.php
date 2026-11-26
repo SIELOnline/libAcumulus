@@ -51,9 +51,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsNoFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsNoFieldsProvider')]
     public function testExpandNoVariableFields(string $fieldDefinition, string $expected): void
     {
         $field = $this->getFieldExpander();
@@ -68,9 +66,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsNoObjectsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsNoObjectsProvider')]
     public function testExpandNoObjects(string $fieldDefinition, string $expected): void
     {
         $field = $this->getFieldExpander();
@@ -94,9 +90,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fields1PropertyProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fields1PropertyProvider')]
     public function testExpand1Property(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
@@ -117,9 +111,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsWithAlternativesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsWithAlternativesProvider')]
     public function testExpandAlternatives(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
@@ -137,9 +129,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsWithSpaceConcatenatedPropertiesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsWithSpaceConcatenatedPropertiesProvider')]
     public function testExpandSpaceConcatenatedProperties(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
@@ -157,9 +147,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsWithSpaceConcatenatedPropertiesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsWithSpaceConcatenatedPropertiesProvider')]
     public function testExpandConcatenatedProperties(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
@@ -183,9 +171,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsWithNumericalConstantsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsWithNumericalConstantsProvider')]
     public function testExpandWithNumericalConstants(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
@@ -208,9 +194,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fieldsWithLiteralsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldsWithLiteralsProvider')]
     public function testExpandWithLiterals(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
@@ -227,9 +211,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider complexFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('complexFieldsProvider')]
     public function testExpandComplexFields(string $fieldDefinition, $expected): void
     {
         $field = $this->getFieldExpander();
@@ -249,9 +231,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider objectsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('objectsProvider')]
     public function testObjects(string $fieldDefinition, $expected): void
     {
         $objects = $this->createPropertySources(['container' => self::getContainer()]);
@@ -292,9 +272,7 @@ class FieldExpanderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider objectWithNumericArrayAnd0ValuesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('objectWithNumericArrayAnd0ValuesProvider')]
     public function testObjectWithNumericArray(string $fieldDefinition, $expected): void
     {
         $objects = $this->getTestDataPropertySources();
@@ -320,9 +298,8 @@ class FieldExpanderTest extends TestCase
 
     /**
      * Tests parameter passing.
-     *
-     * @dataProvider methodCallArgumentsProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('methodCallArgumentsProvider')]
     public function testParameterPassing(string $fieldSpecification, array $expectedArgs): void
     {
         $objects = $this->createPropertySources(['this' => $this]);

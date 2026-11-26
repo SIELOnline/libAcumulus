@@ -178,9 +178,7 @@ class AcumulusTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider responseKeysProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('responseKeysProvider')]
     public function testServicesKeysInResponse(string $method, array $args, bool $isList, array $expectedKeys): void
     {
         /** @var \Siel\Acumulus\ApiClient\AcumulusResult $result */
@@ -266,9 +264,7 @@ class AcumulusTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider vatInfoProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('vatInfoProvider')]
     public function testGetVatInfo(array $args, array $expected): void
     {
         $result = $this->acumulusClient->getVatInfo(... $args);
@@ -350,9 +346,7 @@ class AcumulusTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider stockTransactionProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stockTransactionProvider')]
     public function testStockTransaction(StockTransaction $stockTransaction, array $expected): void
     {
         $result = $this->acumulusClient->stockTransaction($stockTransaction);

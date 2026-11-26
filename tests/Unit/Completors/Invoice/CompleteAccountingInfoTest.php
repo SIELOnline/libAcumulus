@@ -35,13 +35,13 @@ class CompleteAccountingInfoTest extends TestCase
     }
 
     /**
-     * @dataProvider invoiceNumberDataProvider
      *
      * @param int[] $costCenterPerPaymentMethod
      * @param int[] $accountNumberPerPaymentMethod
      *
      * @noinspection PhpTooManyParametersInspection
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invoiceNumberDataProvider')]
     public function testComplete(
         int|string $paymentMethod,
         ?int $defaultCostCenter,

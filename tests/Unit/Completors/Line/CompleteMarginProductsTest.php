@@ -45,9 +45,9 @@ class CompleteMarginProductsTest extends TestCase
     }
 
     /**
-     * @dataProvider marginProductsConfigDataProvider
      * @noinspection PhpUnusedParameterInspection
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('marginProductsConfigDataProvider')]
     public function testComplete(string $lineType, array $lineValues, $lineValuesExpected): void
     {
         $config = self::getContainer()->getConfig();

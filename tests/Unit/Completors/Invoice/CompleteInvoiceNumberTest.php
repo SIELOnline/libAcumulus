@@ -39,9 +39,7 @@ class CompleteInvoiceNumberTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invoiceNumberDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invoiceNumberDataProvider')]
     public function testComplete(
         int $sourceToUse,
         int|string|null $orderReference,

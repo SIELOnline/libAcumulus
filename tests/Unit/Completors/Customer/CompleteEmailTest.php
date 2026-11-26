@@ -30,9 +30,7 @@ class CompleteEmailTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider customerEmailDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('customerEmailDataProvider')]
     public function testComplete(string $email, string $expected, bool $expectWarning): void
     {
         if ($expected === '') {

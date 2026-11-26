@@ -90,12 +90,12 @@ class MessageTest extends TestCase
     }
 
     /**
-     * @depends testCreateWithAllParams1
-     * @depends testCreateWithAllParams2
      *
      * @param \Siel\Acumulus\Helpers\Message $message1
      * @param \Siel\Acumulus\Helpers\Message $message2
      */
+    #[\PHPUnit\Framework\Attributes\Depends('testCreateWithAllParams1')]
+    #[\PHPUnit\Framework\Attributes\Depends('testCreateWithAllParams2')]
     public function testToString(Message $message1, Message $message2): void
     {
         static::assertSame('S1: Message 701', (string) $message1);
@@ -103,11 +103,6 @@ class MessageTest extends TestCase
     }
 
     /**
-     * @depends testCreateWithAllParams1
-     * @depends testCreateWithAllParams2
-     * @depends testCreateWithArray
-     * @depends testCreateWithException
-     * @depends testCreateFormFieldError
      *
      * @param \Siel\Acumulus\Helpers\Message $message1
      * @param \Siel\Acumulus\Helpers\Message $message2
@@ -115,6 +110,11 @@ class MessageTest extends TestCase
      * @param \Siel\Acumulus\Helpers\Message $message4
      * @param \Siel\Acumulus\Helpers\Message $message5
      */
+    #[\PHPUnit\Framework\Attributes\Depends('testCreateWithAllParams1')]
+    #[\PHPUnit\Framework\Attributes\Depends('testCreateWithAllParams2')]
+    #[\PHPUnit\Framework\Attributes\Depends('testCreateWithArray')]
+    #[\PHPUnit\Framework\Attributes\Depends('testCreateWithException')]
+    #[\PHPUnit\Framework\Attributes\Depends('testCreateFormFieldError')]
     public function testFormat(Message $message1, Message $message2, Message $message3, Message $message4, Message $message5): void
     {
         static::assertSame('S1: Message 701', $message1->format(Message::Format_Plain));

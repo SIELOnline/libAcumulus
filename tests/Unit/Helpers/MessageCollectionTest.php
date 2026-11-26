@@ -49,12 +49,12 @@ class MessageCollectionTest extends TestCase
     }
 
     /**
-     * @depends testCreateMessageCollection
      *
      * @param \Siel\Acumulus\Helpers\MessageCollection $collection
      *
      * @return \Siel\Acumulus\Helpers\MessageCollection
      */
+    #[\PHPUnit\Framework\Attributes\Depends('testCreateMessageCollection')]
     public function testAddLogMessage(MessageCollection $collection): MessageCollection
     {
         $collection->createAndAddMessage('log', Severity::Log);
@@ -77,12 +77,12 @@ class MessageCollectionTest extends TestCase
     }
 
     /**
-     * @depends testAddLogMessage
      *
      * @param \Siel\Acumulus\Helpers\MessageCollection $collection
      *
      * @return \Siel\Acumulus\Helpers\MessageCollection
      */
+    #[\PHPUnit\Framework\Attributes\Depends('testAddLogMessage')]
     public function testAddMessage(MessageCollection $collection): MessageCollection
     {
         $collection->createAndAddMessage('suc6', Severity::Success);
@@ -105,12 +105,12 @@ class MessageCollectionTest extends TestCase
     }
 
     /**
-     * @depends testAddMessage
      *
      * @param \Siel\Acumulus\Helpers\MessageCollection $collection
      *
      * @return \Siel\Acumulus\Helpers\MessageCollection
      */
+    #[\PHPUnit\Framework\Attributes\Depends('testAddMessage')]
     public function testAddMessage2(MessageCollection $collection): MessageCollection
     {
         $collection->addMessages([Message::create('Message 702', Severity::Error, '403 Forbidden')]);
@@ -136,12 +136,12 @@ class MessageCollectionTest extends TestCase
     }
 
     /**
-     * @depends testAddMessage2
      *
      * @param \Siel\Acumulus\Helpers\MessageCollection $collection
      *
      * @return \Siel\Acumulus\Helpers\MessageCollection
      */
+    #[\PHPUnit\Framework\Attributes\Depends('testAddMessage2')]
     public function testAddMessages(MessageCollection $collection): MessageCollection
     {
         $messages = [
@@ -175,10 +175,10 @@ class MessageCollectionTest extends TestCase
     }
 
     /**
-     * @depends testAddMessages
      *
      * @param \Siel\Acumulus\Helpers\MessageCollection $collection
      */
+    #[\PHPUnit\Framework\Attributes\Depends('testAddMessages')]
     public function testFormatMessages(MessageCollection $collection): void
     {
         $format = $collection->formatMessages(Message::Format_Plain);

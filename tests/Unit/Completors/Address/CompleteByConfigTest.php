@@ -40,9 +40,7 @@ class CompleteByConfigTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider addressConfigDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('addressConfigDataProvider')]
     public function testComplete(
         string $key,
         ?int $value,

@@ -214,9 +214,6 @@ class MetadataValueTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getSingleValueDataProvider
-     */
     #[DataProvider('getSingleValueDataProvider')]
     public function testGetSingleApiValue($value, $expected): void
     {
@@ -255,9 +252,6 @@ class MetadataValueTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getMultiValueDataProvider
-     */
     #[DataProvider('getMultiValueDataProvider')]
     public function testGetMultiApiValue($value, $expected): void
     {

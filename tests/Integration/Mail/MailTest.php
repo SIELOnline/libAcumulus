@@ -90,9 +90,7 @@ class MailTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invoiceAddMailProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invoiceAddMailProvider')]
     public function testInvoiceAddMail(string $name, string $uri, int $debug, bool $emailAsPdf): void
     {
         $type = 'InvoiceAddMail';
@@ -131,10 +129,10 @@ class MailTest extends TestCase
     }
 
     /**
-     * @dataProvider stockTransactionMailProvider
      *
      * @todo: mail contents is now covered by the broader {@see ProductmanagerTest::testUpdateStock()}
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stockTransactionMailProvider')]
     public function testStockTransactionMail(string $name, string $uri, int $debug, int|float $change): void
     {
         $type = 'StockTransactionMail';

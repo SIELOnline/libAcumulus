@@ -148,9 +148,8 @@ class AcumulusTest extends TestCase
 
     /**
      * Tests that the correct arguments are passed to Acumulus::callApiFunction().
-     *
-     * @dataProvider argumentsPassed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('argumentsPassed')]
     public function testArgumentPassingToCallApiFunction(
         string $method,
         array $args,

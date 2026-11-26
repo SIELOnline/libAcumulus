@@ -127,9 +127,7 @@ class ContainerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataNameSpaceDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataNameSpaceDataProvider')]
     public function testDataNameSpace(string $dataType, string $dataClass): void
     {
         $container = self::$container;
@@ -157,9 +155,7 @@ class ContainerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider collectorNameSpaceDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('collectorNameSpaceDataProvider')]
     public function testCollectorsNameSpace(string $dataType, ?string $subType, string $collectorClass): void
     {
 //        $container = self::$container;
@@ -253,9 +249,7 @@ class ContainerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider completorsNameSpaceDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('completorsNameSpaceDataProvider')]
     public function testCompletorsNameSpace(string $dataType, string $subType, string $completorClass): void
     {
         $container = self::$container;

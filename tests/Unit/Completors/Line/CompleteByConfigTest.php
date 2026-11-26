@@ -34,9 +34,7 @@ class CompleteByConfigTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider natureConfigDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('natureConfigDataProvider')]
     public function testComplete(int $natureShop, string $lineType, ?string $natureBefore, $natureExpected): void
     {
         $config = self::getContainer()->getConfig();

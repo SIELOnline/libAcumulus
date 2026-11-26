@@ -28,9 +28,7 @@ class CompleteByConfigTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider emailInvoiceAsPdfConfigDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emailInvoiceAsPdfConfigDataProvider')]
     public function testComplete(
         string $key,
         $value,

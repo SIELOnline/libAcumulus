@@ -65,9 +65,8 @@ class FormTest extends TestCase
 
     /**
      * Tests the form-creation and rendering process.
-     *
-     * @dataProvider formTypesProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('formTypesProvider')]
     public function testCreate(string $type, string $class, array $properties = []): void
     {
         $form = $this->getForm($type);

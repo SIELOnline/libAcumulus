@@ -32,9 +32,7 @@ class CompleteByConfigTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider customerConfigDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('customerConfigDataProvider')]
     public function testComplete(string $key, int $value, string $property, bool|int $expected): void
     {
         $config = self::getContainer()->getConfig();

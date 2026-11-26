@@ -31,7 +31,6 @@ class CompleteConvertTotalsToEuroTest extends TestCase
     }
 
     /**
-     * @dataProvider convertToEuroDataProvider
      *
      * @param array $currencyArgs
      * @param array $totalsArgs

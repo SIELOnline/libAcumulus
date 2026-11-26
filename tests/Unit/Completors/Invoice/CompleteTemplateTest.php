@@ -31,7 +31,6 @@ class CompleteTemplateTest extends TestCase
     }
 
     /**
-     * @dataProvider templateDataProvider
      *
      * @param int $paymentStatus
      * @param int $defaultInvoiceTemplate
@@ -42,6 +41,7 @@ class CompleteTemplateTest extends TestCase
      * @todo: add cases where template has already been filled in.
      *    And do the same for all other completors...
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('templateDataProvider')]
     public function testComplete(
         int $paymentStatus,
         int $defaultInvoiceTemplate,

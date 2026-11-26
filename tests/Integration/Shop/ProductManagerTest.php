@@ -39,9 +39,8 @@ class ProductManagerTest extends TestCase
 
     /**
      * Tests that the Acumulus product picklist filter is not case-sensitive.
-     *
-     * @dataProvider searchProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('searchProvider')]
     public function testGetAcumulusProducts(string $filter, array $productIds): void
     {
         $productManager = $this->getProductManager();
@@ -59,9 +58,8 @@ class ProductManagerTest extends TestCase
 
     /**
      * Tests that the {@see ProductManager::getAcumulusProductByReference()) method is case-sensitive.
-     *
-     * @dataProvider referenceProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('referenceProvider')]
     public function testGetAcumulusProductByReference(string $reference, string $acumulusField, ?int $productId): void
     {
         $productManager = $this->getProductManager();
@@ -91,9 +89,7 @@ class ProductManagerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider itemProvider1
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('itemProvider1')]
     public function testUpdateStockWithConfig(
         int $itemId,
         int|float $change,
@@ -123,9 +119,7 @@ class ProductManagerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider itemProvider2
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('itemProvider2')]
     public function testUpdateStockWithMapping(
         int $itemId,
         int|float $change,

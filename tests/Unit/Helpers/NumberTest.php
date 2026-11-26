@@ -42,9 +42,7 @@ class NumberTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getCastNumericValueDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCastNumericValueDataProvider')]
     public function testCastNumericValue(mixed $value, mixed $expected): void
     {
         static::assertSame($expected, Number::castNumericValue($value));

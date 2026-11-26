@@ -8,6 +8,7 @@
         "php": "^8.1",
         "ext-ctype": "*",
         "ext-curl": "*",
+        "ext-mbstring": "*",
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
@@ -26,6 +27,6 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^10",
-        "ext-mbstring": "*"
+        "rector/rector": "^2.9"
     }
 }

@@ -139,10 +139,11 @@ class LineCollector extends SubTypedCollector
      * Collecting a child line differs from collecting a line in that:
      * - The {@see Collector::collectBefore()} and {@see Collector::collectAfter()} are
      *   not called.
-     * - The collectLineBefore and collectLineAfter events are not triggered.
+     * - The collectLineBefore and collectLineAfter events are not triggered (as a
+     *   consequence of the above difference).
      * - The Line gets a Meta::IsChild = true metadata value.
-     * - PropertySources passed are additional and will temporarily be added during
-     *   collecting this child line.
+     * - PropertySources passed to this method are additional, not the complete set, and
+     *   will temporarily be added during collecting this child line.
      *
      * @param array $additionalPropertySources
      *   Additional property sources to be added to the originally set. If a property

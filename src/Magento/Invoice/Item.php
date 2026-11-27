@@ -18,6 +18,14 @@ use Siel\Acumulus\Magento\Helpers\Registry;
  */
 class Item extends BaseItem
 {
+    // @todo: Are child items considered to be Magento specific or is this to be
+    //   generalised for all shops (even those that do not know that concept).
+    //   If so, should we extract this into a trait to be used by Line and Item?
+    /** @var ?Item */
+    protected self|null $parent = null;
+    /** @var Item[] */
+    protected array $children = [];
+
     protected function setShopObject(): void
     {
         throw new RuntimeException('This method is not expected to be called in Magento');
@@ -30,14 +38,41 @@ class Item extends BaseItem
 
     protected function createProduct(): ?Product
     {
+        // The reference to an order item in a Credit memo item should refer to an
+        // existing order item, but if not, considered database corruption, we continue
+        // and the library will try to complete the line.
         $shopProduct = $this->getSource()->getType() === Source::Order
-            ? $this->shopObject->getProduct()
-            : $this->getShopObject()->getOrderItem()->getProduct();
+            ? $this->getShopObject()->getProduct()
+            : $this->getShopObject()->getOrderItem()?->getProduct();
         return $shopProduct !== null ? $this->getContainer()->createProduct($shopProduct, $this) : null;
     }
 
     protected function getRegistry(): Registry
     {
         return Registry::getInstance();
+    }
+
+    public function getParent(): ?Item
+    {
+        return $this->parent;
+    }
+
+    public function hasChildren(): bool
+    {
+        return count($this->getChildren()) > 0;
+    }
+
+    /**
+     * @return static[]
+     */
+    public function getChildren(): array
+    {
+        return $this->children;
+    }
+
+    public function addChild(Item $child): void
+    {
+        $this->children[] = $child;
+        $child->parent = $this;
     }
 }

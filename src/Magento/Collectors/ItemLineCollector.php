@@ -124,50 +124,14 @@ class ItemLineCollector extends LineCollector
         }
 
         // Add composed products or product variant.
-        if (!empty($childItems)) {
-            foreach ($childItems as $shopChildItem) {
-                /** @var Line $childLine */
-                $childLine = $this->collectChild(['item' => $this->getContainer()->createItem($shopChildItem, $source)]);
-                if (!$childLine->metadataGet(Meta::DoNotAdd)) {
-                    $line->addChild($childLine);
-                }
-            }
-            if ($this->isChildSameAsParent($line, $line->getChildren())) {
-                $line->metadataSet(Meta::ChildSameAsParent, true);
-                // A configurable product having 1 child means the child is the
-                // chosen variant: copy the product id and name, and vat info from the
-                // child to the parent and remove the child.
-                $childLine = $line->getChildren()[0];
-                $line->product = $childLine->product;
-                $line->metadataSet(Meta::ProductId, $childLine->metadataGet(Meta::ProductId));
-                // We may have to copy vat data.
-                if (empty($line->vatRate) && !empty($childLine->vatRate)) {
-                    $line->vatRate = $childLine->vatRate;
-                    $line->metadataSet(Meta::VatRateSource, VatRateSource::Child);
-                    if (!empty($childLine->metadataGet(Meta::VatRateLookup))) {
-                        $line->metadataSet(Meta::VatRateLookup, $childLine->metadataGet(Meta::VatRateLookup));
-                    } else {
-                        $line->metadataRemove(Meta::VatRateLookup);
-                    }
-                    if (!empty($childLine->metadataGet(Meta::VatRateLookupSource))) {
-                        $line->metadataSet(Meta::VatRateLookupSource, $childLine->metadataGet(Meta::VatRateLookupSource));
-                    } else {
-                        $line->metadataRemove(Meta::VatRateLookupSource);
-                    }
-                    if (!empty($childLine->metadataGet(Meta::VatClassId))) {
-                        $line->metadataSet(Meta::VatClassId, $childLine->metadataGet(Meta::VatClassId));
-                    } else {
-                        $line->metadataRemove(Meta::VatClassId);
-                    }
-                    if (!empty($childLine->metadataGet(Meta::VatClassName))) {
-                        $line->metadataSet(Meta::VatClassName, $childLine->metadataGet(Meta::VatClassName));
-                    } else {
-                        $line->metadataRemove(Meta::VatClassName);
-                    }
-                }
-                $line->removeChildren();
+        foreach ($childItems as $shopChildItem) {
+            /** @var Line $childLine */
+            $childLine = $this->collectChild(['item' => $this->getContainer()->createItem($shopChildItem, $source)]);
+            if (!$childLine->metadataGet(Meta::DoNotAdd)) {
+                $line->addChild($childLine);
             }
         }
+        $this->mergeSingleVariantChild($line);
 
         // Add customisable options.
         $customizableOptions = $shopItem->getProductOptionByCode('options');
@@ -218,9 +182,20 @@ class ItemLineCollector extends LineCollector
             $this->addVatClassMetaData($line, $line->metadataGet(Meta::VatClassId));
         }
 
-        // On a credit note we only have single lines, no compound lines, thus
-        // no children that might have to be added.
-        // @todo: but do we have options and variants?
+        // On a credit note we only have single lines, but via their referenced order
+        // items, we can and have established a parent-child tree of Items.
+        // Possible situations:
+        // - variant: product id (and, as a consequence) product name are different, sku
+        //   is the same. Most other child fields are null (or sometimes equal to the
+        //   parent field).
+        foreach ($item->getChildren() as $childItem) {
+            /** @var Line $childLine */
+            $childLine = $this->collectChild(['item' => $childItem]);
+            if (!$childLine->metadataGet(Meta::DoNotAdd)) {
+                $line->addChild($childLine);
+            }
+        }
+        $this->mergeSingleVariantChild($line);
     }
 
     /**
@@ -239,19 +214,62 @@ class ItemLineCollector extends LineCollector
      * @param Line[] $children
      *
      * @return bool
-     *   True if the single child line is actually the "same" as its parent.
+     *   True if the single child line is a single (simple) variant of its parent.
      */
-    protected
-    function isChildSameAsParent(
-        Line $line,
-        array $children
-    ): bool {
+    protected function isChildSameAsParent(Line $line, array $children): bool
+    {
         if ($line->metadataGet(Meta::ProductType) === 'configurable' && count($children) === 1) {
             $child = reset($children);
             if ($line->itemNumber === $child->itemNumber && $line->quantity === $child->quantity && Number::isZero($child->unitPrice)) {
+                // && child->meta-product-type === 'simple' && !child->hasChildren(): @todo: should we check on this or are there other cases?
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Merges a single child line if it is a variant line and thus rather identical to its
+     * parent.
+     *
+     * @param \Siel\Acumulus\Data\Line $line
+     */
+    private function mergeSingleVariantChild(Line $line): void
+    {
+        if ($this->isChildSameAsParent($line, $line->getChildren())) {
+            $line->metadataSet(Meta::ChildSameAsParent, true);
+            // A configurable product having 1 child means the child is the
+            // chosen variant: copy the product id and name, and vat info from the
+            // child to the parent and remove the child.
+            $childLine = $line->getChildren()[0];
+            $line->product = $childLine->product;
+            $line->metadataSet(Meta::ProductId, $childLine->metadataGet(Meta::ProductId));
+            // We may have to copy vat data (Order item lines, not credit memo lines). @todo: check this
+            if (empty($line->vatRate) && !empty($childLine->vatRate)) {
+                $line->vatRate = $childLine->vatRate;
+                $line->metadataSet(Meta::VatRateSource, VatRateSource::Child);
+                if (!empty($childLine->metadataGet(Meta::VatRateLookup))) {
+                    $line->metadataSet(Meta::VatRateLookup, $childLine->metadataGet(Meta::VatRateLookup));
+                } else {
+                    $line->metadataRemove(Meta::VatRateLookup);
+                }
+                if (!empty($childLine->metadataGet(Meta::VatRateLookupSource))) {
+                    $line->metadataSet(Meta::VatRateLookupSource, $childLine->metadataGet(Meta::VatRateLookupSource));
+                } else {
+                    $line->metadataRemove(Meta::VatRateLookupSource);
+                }
+                if (!empty($childLine->metadataGet(Meta::VatClassId))) {
+                    $line->metadataSet(Meta::VatClassId, $childLine->metadataGet(Meta::VatClassId));
+                } else {
+                    $line->metadataRemove(Meta::VatClassId);
+                }
+                if (!empty($childLine->metadataGet(Meta::VatClassName))) {
+                    $line->metadataSet(Meta::VatClassName, $childLine->metadataGet(Meta::VatClassName));
+                } else {
+                    $line->metadataRemove(Meta::VatClassName);
+                }
+            }
+            $line->removeChildren();
+        }
     }
 }

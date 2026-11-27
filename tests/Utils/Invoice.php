@@ -103,7 +103,7 @@ trait Invoice
                             break;
                         default:
                             if (is_float($value)) {
-                                static::assertEqualsWithDelta($value, $object[$field], 0.005, "$objectName::$field");
+                                static::assertEqualsWithDelta($value, $object[$field], 0.001, "$objectName::$field");
                             } else {
                                 static::assertSame($value, $object[$field], "$objectName::$field");
                             }

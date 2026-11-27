@@ -347,24 +347,55 @@ class Source extends BaseSource
     }
 
     /**
+     * Returns the items of a credit note
+     *
+     * A {@see CreditMemo} does not have a method {@see Creditmemo::getAllVisibleItems()},
+     * so we use {@see Creditmemo::getAllItems()}. However, like orrder items, creditmemo
+     * items can also have a child-parent relationship even though there is no field
+     * 'parent_item_id'. Therefore, we look at the parent_item_id of their referenced
+     * order items to build the children tree.
+     *
+     * @return Item[]
+     *
      * @noinspection PhpUnused Called via {@see Source::callTypeSpecificMethod()}
      */
     protected function createItemsCreditNote(): array
     {
-        $result = [];
-        // A CreditMemo does not have the method getAllVisibleItems().
-        foreach ($this->getShopObject()->getAllItems() as $item) {
-            // Only items for which row total is set are refunded.
-            if (!Number::isZero($item->getRowTotal())) {
-                $result[] = $this->getContainer()->createItem($item, $this);
+        // Create all items.
+        /** @var Item[] $allItems */
+        $allItems = [];
+        foreach ($this->getShopObject()->getAllItems() as $shopItem) {
+            /** @var Item $item */
+            $item = $this->getContainer()->createItem($shopItem, $this);
+            $allItems[] = $item;
+        }
+
+        // Create parent-child relationships.
+        foreach ($allItems as $item) {
+            // Is this a child item (non-null order_item=>parent_item_id)?
+            $orderItemParentItemId = $item->getShopObject()->getOrderItem()->getParentItemId();
+            if ($orderItemParentItemId !== null) {
+                // Search parent based on creditmemo_item => order_item => parent_item_id
+                foreach ($allItems as $possibleParentItem) {
+                    /** @noinspection PhpCastIsUnnecessaryInspection values are returned as numeric strings */
+                    if ($possibleParentItem !== $item
+                        && (int) $possibleParentItem->getShopObject()->getOrderItemId() === (int) $orderItemParentItemId
+                    ) {
+                        $possibleParentItem->addChild($item);
+                    }
+                }
             }
         }
-        return $result;
+
+        // Return parents only (and orphaned children).
+        return array_filter($allItems, static function (Item $item): bool {
+            return $item->getParent() === null;
+        });
     }
 
     public function getShippingLineInfos(): array
     {
-        return  $this->getType() === Source::Order || !Number::isZero($this->getShopObject()->getBaseShippingAmount()) ? [$this] : [];
+        return $this->getType() === Source::Order || !Number::isZero($this->getShopObject()->getBaseShippingAmount()) ? [$this] : [];
     }
 
     public function getDiscountLineInfos(): array

@@ -93,8 +93,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 Meta::VatRateSource => VatRateSource::Mapped,
                 // Tax class id is a custom attribute, so this is handled by __call()
                 Meta::VatClassId => '[item::getProduct()::getShopObject()::getTaxClassId()]',
-
-                Meta::ProductType => '[item::getShopObject()::getProductType()]',
+                // Creditmemo::getOrderItem() to get the product type from the order item.
+                Meta::ProductType => '[item::getShopObject()::getOrderItem()::getProductType()|item::getShopObject()::getProductType()]',
                 Meta::ProductId => '[item::getShopObject()::getProductId()]',
             ],
             LineType::Shipping => [

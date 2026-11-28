@@ -13,7 +13,7 @@ use Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples;
  */
 class HttpRequest extends BaseHttpRequest
 {
-    private ApiRequestResponseExamples $examples;
+    private readonly ApiRequestResponseExamples $examples;
 
     public function __construct()
     {

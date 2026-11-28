@@ -17,7 +17,7 @@ use Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples;
  */
 class AcumulusRequest extends BaseAcumulusRequest
 {
-    private ApiRequestResponseExamples $examples;
+    private readonly ApiRequestResponseExamples $examples;
 
     public function __construct(
         Container $container,

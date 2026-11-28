@@ -21,7 +21,7 @@ use Siel\Acumulus\Helpers\Log;
 class ConfigStore extends BaseConfigStore
 {
     private string $configDir = __DIR__ . '/../../../../config';
-    private string $configFile;
+    private readonly string $configFile;
 
     public function __construct()
     {

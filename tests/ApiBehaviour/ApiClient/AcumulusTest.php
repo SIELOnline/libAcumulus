@@ -40,21 +40,15 @@ class AcumulusTest extends TestCase
         $baseUri = "{$environment['baseUri']}/{$environment['apiVersion']}";
         static::assertSame(
             "$baseUri/$apiFunction.php",
-            (function (string $apiFunction, array $parameters = []) {
-                return $this->constructUri($apiFunction, $parameters);
-            })->call($this->acumulusClient, $apiFunction)
+            (fn(string $apiFunction, array $parameters = []) => $this->constructUri($apiFunction, $parameters))->call($this->acumulusClient, $apiFunction)
         );
         static::assertSame(
             "$baseUri/$apiFunction.php",
-            (function (string $apiFunction, array $parameters = []) {
-                return $this->constructUri($apiFunction, $parameters);
-            })->call($this->acumulusClient, $apiFunction, [])
+            (fn(string $apiFunction, array $parameters = []) => $this->constructUri($apiFunction, $parameters))->call($this->acumulusClient, $apiFunction, [])
         );
         static::assertSame(
             "$baseUri/$apiFunction.php?var1=value1&var2=2&var3=&var4=1",
-            (function (string $apiFunction, array $parameters = []) {
-                return $this->constructUri($apiFunction, $parameters);
-            })->call($this->acumulusClient, $apiFunction, $parameters)
+            (fn(string $apiFunction, array $parameters = []) => $this->constructUri($apiFunction, $parameters))->call($this->acumulusClient, $apiFunction, $parameters)
         );
     }
 

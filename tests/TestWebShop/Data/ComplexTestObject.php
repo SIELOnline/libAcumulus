@@ -23,7 +23,7 @@ use Siel\Acumulus\Data\PropertySet;
  */
 class ComplexTestObject extends AcumulusObject
 {
-    public ?SimpleTestObject $simple;
+    public ?SimpleTestObject $simple = null;
     /** @var SimpleTestObject[] */
     public array $list = [];
 

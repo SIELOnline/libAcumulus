@@ -15,13 +15,11 @@ use Siel\Acumulus\Helpers\Log;
  */
 class FieldExpander extends BaseFieldExpander
 {
-    public string $stopAt;
     public array $trace;
 
-    public function __construct(Log $log, string $stopAt = '')
+    public function __construct(Log $log, public string $stopAt = '')
     {
         parent::__construct($log);
-        $this->stopAt = $stopAt;
         $this->trace = [];
     }
 

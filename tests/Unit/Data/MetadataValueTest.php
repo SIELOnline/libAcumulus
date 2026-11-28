@@ -21,9 +21,9 @@ class MetadataValueTest extends TestCase
     {
         $mdv = new MetadataValue();
         static::assertSame(0, $mdv->count());
-        static::assertSame(null, $mdv->get());
+        static::assertNull($mdv->get());
         static::assertNull($mdv->get(0));
-        static::assertSame(null, $mdv->getApiValue());
+        static::assertNull($mdv->getApiValue());
 
         $mdv = new MetadataValue(MetadataValue::List);
         static::assertSame(0, $mdv->count());
@@ -214,8 +214,17 @@ class MetadataValueTest extends TestCase
         ];
     }
 
+    /**
+     * Description.
+     *
+     * @param mixed $value
+     *   The value that will be added to a metadata value, may be any type
+     * @param string|int|float|bool|null $expected
+     *   The value converted to a formatted ACUMULUS XML based API value, typically a
+     *   scalar
+     */
     #[DataProvider('getSingleValueDataProvider')]
-    public function testGetSingleApiValue($value, $expected): void
+    public function testGetSingleApiValue(mixed $value, mixed $expected): void
     {
         $mdv = new MetadataValue();
         $mdv->add($value);
@@ -253,7 +262,7 @@ class MetadataValueTest extends TestCase
     }
 
     #[DataProvider('getMultiValueDataProvider')]
-    public function testGetMultiApiValue($value, $expected): void
+    public function testGetMultiApiValue(array $value, string $expected): void
     {
         $mdv = new MetadataValue();
         $mdv->add($value);

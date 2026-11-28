@@ -195,13 +195,9 @@ trait Invoice
     {
         $replacements = [
             // PHP doesn't know '$1"\L$2": '
-            '/( +)"([a-zA-Z0-9]+)": /' => function (array $matches) {
-                return strtolower($matches[0]);
-            },
+            '/( +)"([a-zA-Z0-9]+)": /' => fn(array $matches) => strtolower($matches[0]),
             // PHP doesn't know '$1\L$2$4'
-            '/(\'|")(unitPrice(Inc)?)(\'|")/' => function (array $matches) {
-                return strtolower($matches[0]);
-            },
+            '/(\'|")(unitPrice(Inc)?)(\'|")/' => fn(array $matches) => strtolower($matches[0]),
             '/"altMeta/' => '"altmeta',
             '/vat(-t|T)ype/' => 'vattype',
             '/vat(-r|R)ate/' => 'vatrate',

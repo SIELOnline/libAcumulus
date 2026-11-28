@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Completors\Line;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Data\Line;
@@ -47,7 +48,7 @@ class CompleteMarginProductsTest extends TestCase
     /**
      * @noinspection PhpUnusedParameterInspection
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('marginProductsConfigDataProvider')]
+    #[DataProvider('marginProductsConfigDataProvider')]
     public function testComplete(string $lineType, array $lineValues, $lineValuesExpected): void
     {
         $config = self::getContainer()->getConfig();

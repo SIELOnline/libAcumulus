@@ -7,7 +7,7 @@
 declare(strict_types=1);
 
 $mail =
-array (
+ [
   'from' => 'unit.test@example.com',
   'fromName' => 'Unit Test | Example',
   'to' => 'admin@example.com',
@@ -50,5 +50,5 @@ De voorraadmutatie is niet verwerkt in Acumulus. Pas de zoekdata in uw webshop (
 </details>
 <p><p>Meer informatie over de terugkoppeling van vermeldde foutcodes kunt u vinden op <a href="https://www.siel.nl/acumulus/API/Basic_Response/">Acumulus - Basic response</a>.</p></p>
 ',
-)
+]
 ;

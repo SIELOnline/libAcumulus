@@ -10,7 +10,7 @@ use Siel\Acumulus\Product\Product;
 use Siel\Acumulus\Magento\Helpers\Registry;
 
 /**
- * Item is a wrapper/adapter around Magento specific order/credit memo product lines.
+ * Item is a wrapper/adapter around Magento specific order/credit memo items.
  *
  * @method \Siel\Acumulus\Magento\Product\Product|null getProduct()
  * @method \Magento\Sales\Model\Order\Item|\Magento\Sales\Model\Order\Creditmemo\Item getShopObject()
@@ -21,7 +21,7 @@ class Item extends BaseItem
     // @todo: Are child items considered to be Magento specific or is this to be
     //   generalised for all shops (even those that do not know that concept).
     //   If so, should we extract this into a trait to be used by Line and Item?
-    /** @var ?Item */
+    /** @var Item|null */
     protected self|null $parent = null;
     /** @var Item[] */
     protected array $children = [];
